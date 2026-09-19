@@ -26,7 +26,7 @@ claude-context/
 |---|---|
 | **Source directory** | `/home/harish/.claude/projects/-mnt-data2-git-repos-misc-saju/` |
 | **Engine working tree** | `/mnt/data2/git_repos/misc/saju/` (not itself a git repository) |
-| **Copied** | 2026-09-15 |
+| **Copied** | 2026-09-19 (plan documented 2026-09-15, actual `rsync` deferred to this date) |
 | **Method** | `rsync -a` (archival, no `--delete`) |
 
 `memory/` is the authoritative copy that Claude Code reads. `sessions/` contains the
