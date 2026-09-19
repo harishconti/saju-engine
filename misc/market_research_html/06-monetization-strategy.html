@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Monetization Strategy</title>
+  <style>
+:root {
+  --brand: #2b3a55;
+  --brand-soft: #4a5d7e;
+  --accent: #b48a3a;
+  --bg: #fbfaf6;
+  --bg-soft: #f3efe6;
+  --ink: #1d2330;
+  --ink-soft: #4a5060;
+  --rule: #d9d3c4;
+  --code-bg: #efe9da;
+  --table-stripe: #f6f1e3;
+  --max-w: 880px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.55;
+  font-size: 17px;
+}
+.wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 56px 32px 96px;
+}
+header.cover {
+  border-bottom: 2px solid var(--brand);
+  padding-bottom: 28px;
+  margin-bottom: 40px;
+}
+header.cover .eyebrow {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+}
+header.cover h1 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  font-size: 38px;
+  line-height: 1.15;
+  margin: 8px 0 12px;
+  color: var(--brand);
+}
+header.cover .sub {
+  color: var(--ink-soft);
+  font-size: 16px;
+  font-style: italic;
+}
+header.cover .meta {
+  margin-top: 18px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+}
+nav.toc {
+  background: var(--bg-soft);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brand);
+  padding: 22px 28px 24px;
+  margin: 0 0 48px;
+  border-radius: 2px;
+}
+nav.toc h2 {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand-soft);
+  margin: 0 0 14px;
+  font-weight: 600;
+}
+nav.toc ol {
+  margin: 0;
+  padding-left: 22px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 14.5px;
+}
+nav.toc li { margin: 5px 0; }
+nav.toc a { color: var(--brand); text-decoration: none; }
+nav.toc a:hover { text-decoration: underline; }
+nav.toc .doc-num {
+  display: inline-block;
+  width: 28px;
+  color: var(--accent);
+  font-weight: 600;
+}
+h1, h2, h3, h4 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--brand);
+  line-height: 1.25;
+  margin: 1.6em 0 0.6em;
+}
+h1 { font-size: 30px; border-bottom: 1px solid var(--rule); padding-bottom: 0.25em; }
+h2 { font-size: 24px; }
+h3 { font-size: 19px; color: var(--brand-soft); }
+h4 { font-size: 16px; color: var(--brand-soft); text-transform: uppercase; letter-spacing: 0.05em; }
+p { margin: 0.6em 0 1em; }
+a { color: var(--brand); }
+ul, ol { padding-left: 24px; }
+li { margin: 4px 0; }
+strong { color: var(--ink); }
+em { color: var(--ink-soft); }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.5em 0; }
+code {
+  background: var(--code-bg);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: "SF Mono", "Consolas", "Menlo", monospace;
+  font-size: 0.92em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 14px 16px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 14px;
+  border-left: 3px solid var(--accent);
+}
+pre code { background: none; padding: 0; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1.2em 0;
+  padding: 4px 16px;
+  color: var(--ink-soft);
+  background: var(--bg-soft);
+  font-style: italic;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.2em 0;
+  font-size: 14.5px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+}
+th, td {
+  border: 1px solid var(--rule);
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--brand);
+  color: #fbfaf6;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+tbody tr:nth-child(even) { background: var(--table-stripe); }
+.footnote-ref { font-size: 0.8em; vertical-align: super; }
+.footnotes { margin-top: 3em; border-top: 1px solid var(--rule); padding-top: 1em; font-size: 14px; }
+footer.foot {
+  margin-top: 64px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+@media print {
+  body { background: white; font-size: 11pt; }
+  .wrap { padding: 24px; max-width: none; }
+  nav.toc { page-break-after: always; }
+  h1, h2 { page-break-after: avoid; }
+  table { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    
+<header class="cover">
+  <div class="eyebrow">Market Research · Document 06 of 11</div>
+  <h1>Monetization Strategy</h1>
+</header>
+
+    
+    <main>
+<p><strong>Date:</strong> 2026-06-26
+<strong>Scope:</strong> How the Saju project makes money. Existing tiered pricing is ₹499 / ₹1,499 / ₹3,499; this doc analyzes whether to keep that pricing, what adjacent revenue lines to add, and the revenue scenarios that result.</p>
+<hr />
+<h2>1. Existing monetization (built)</h2>
+<p>The project already ships three one-time report tiers via the premium report generator and self-service calculator:</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Name</th>
+<th>Price (INR)</th>
+<th>Price (USD approx)</th>
+<th>Length</th>
+<th>Delivery</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>The Spark ✦</td>
+<td>₹499</td>
+<td>~$6</td>
+<td>4–5 pages</td>
+<td>Instant PDF</td>
+<td>✅ Built + self-service automated</td>
+</tr>
+<tr>
+<td>2</td>
+<td>The Reading ✦✦</td>
+<td>₹1,499</td>
+<td>~$18</td>
+<td>10–12 pages</td>
+<td>48-hour SLA with human review</td>
+<td>✅ Built; review step is manual</td>
+</tr>
+<tr>
+<td>3</td>
+<td>The Full Map ✦✦✦</td>
+<td>₹3,499</td>
+<td>~$42</td>
+<td>18–22 pages</td>
+<td>72-hour SLA with human review</td>
+<td>✅ Built; review step is manual</td>
+</tr>
+<tr>
+<td>4 (future)</td>
+<td>The Companion ✦✦✦✦</td>
+<td>₹799/month</td>
+<td>~$9.50/month</td>
+<td>Quarterly check-in + monthly energetic guidance</td>
+<td>Email + dashboard</td>
+<td>❌ Not built</td>
+</tr>
+</tbody>
+</table>
+<h2>2. Is the existing pricing right?</h2>
+<p><strong>Yes — and here's why:</strong></p>
+<ol>
+<li><strong>₹499 / $6 is the proven impulse-buy threshold</strong> for spiritual content in India. AstroTalk's free chat + first-paid-question model operates in this band. A Spark-tier entry is exactly the right &quot;yes, I'll try it&quot; price.</li>
+<li><strong>₹1,499 / $18 is the sweet spot for &quot;considered purchase with strong value perception.&quot;</strong> Comparable to Western astrology apps' &quot;Your Year Ahead&quot; at $11.99/year, and below the Korean Saju app segment's per-consultation range (₹300–1,500 / $3.50–$18 for human reader time).</li>
+<li><strong>₹3,499 / $42 is high enough to feel premium but below the wedding-astrology tier.</strong> Wedding astrology in India commands ₹10,000–50,000 per consultation; we're below that. We're also below the Korean long-form human reader rate of ~30,000원/~$22 per 5–10 minutes, which is session-based.</li>
+<li><strong>The 7× ratio between tiers is correct.</strong> It gives clear upsell logic without making Spark feel like a tease.</li>
+<li><strong>The 6 paid pilots all bought Full Map at ₹3,499.</strong> This is the highest-converting tier in our direct-fulfilment pipeline because the price-to-depth ratio is best.</li>
+</ol>
+<p><strong>Recommendation:</strong> keep the three tiers at the existing prices for India. Add a <strong>USD-priced mirror</strong> for Korean diaspora: $9.99 / $29.99 / $69.99 (the 7× ratio preserved, currency rounding).</p>
+<h2>3. Pricing for the Korean diaspora market (new tier structure)</h2>
+<p>For Korean-American / Korean-Canadian / Korean-Australian / Korean-British buyers, the price points need to be 1.5–2× higher than India to signal quality and to match US app pricing norms.</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>India price</th>
+<th>International price (USD)</th>
+<th>Korean diaspora price (USD)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Spark</td>
+<td>₹499</td>
+<td>$9.99</td>
+<td>$14.99</td>
+</tr>
+<tr>
+<td>Reading</td>
+<td>₹1,499</td>
+<td>$29.99</td>
+<td>$49.99</td>
+</tr>
+<tr>
+<td>Full Map</td>
+<td>₹3,499</td>
+<td>$69.99</td>
+<td>$99.99</td>
+</tr>
+<tr>
+<td>Companion (future)</td>
+<td>₹799/mo</td>
+<td>$14.99/mo</td>
+<td>$19.99/mo</td>
+</tr>
+</tbody>
+</table>
+<p>For tier-3 global Hallyu-curious audience, the international USD pricing is correct.</p>
+<h2>4. Adjacent revenue lines to add (in priority order)</h2>
+<h3>Revenue Line 1: Compatibility add-on (₹999 standalone, or ₹499 bundled)</h3>
+<ul>
+<li><strong>Demand:</strong> Very high. Korean Saju 궁합 is a top-3 requested feature.</li>
+<li><strong>Build cost:</strong> Medium — needs a new module in the engine.</li>
+<li><strong>Operational cost:</strong> Low if template-based, medium if human-reviewed.</li>
+<li><strong>Pricing rationale:</strong> Half the price of a Reading, because the input is two charts not one.</li>
+<li><strong>Time to launch:</strong> ~6–8 weeks (build + test + payment integration).</li>
+</ul>
+<h3>Revenue Line 2: Companion subscription (₹799/month)</h3>
+<ul>
+<li><strong>Demand:</strong> Unproven in our codebase. Western astrology apps (Co-Star, The Pattern) sustain large subscription bases.</li>
+<li><strong>Build cost:</strong> High — needs user accounts, daily content engine, push notifications, quarterly review infrastructure.</li>
+<li><strong>Operational cost:</strong> Medium — quarterly check-ins + monthly content.</li>
+<li><strong>Pricing rationale:</strong> Below Co-Star's $8.99/month. Targeted at Full Map buyers as the natural upsell.</li>
+<li><strong>Time to launch:</strong> ~16–20 weeks (full build).</li>
+<li><strong>Projected impact:</strong> At 10% conversion of Full Map buyers = ~₹80k–3.5 lakh MRR in Year 1 depending on Full Map volume. This is the largest single revenue-line opportunity.</li>
+</ul>
+<h3>Revenue Line 3: Auspicious-date picking (₹499 standalone or bundled into Full Map)</h3>
+<ul>
+<li><strong>Demand:</strong> Medium — useful for weddings, business launches, relocations.</li>
+<li><strong>Build cost:</strong> Low — already supported by the engine's <code>sewoon.py</code> daily-luck overlay.</li>
+<li><strong>Pricing rationale:</strong> Low ticket, fun add-on.</li>
+<li><strong>Time to launch:</strong> ~2–3 weeks once the engine output is exposed via web UI.</li>
+</ul>
+<h3>Revenue Line 4: Yearly &quot;Year Ahead&quot; subscription (₹999/year, or ₹499/year bundled)</h3>
+<ul>
+<li><strong>Demand:</strong> High (Western apps: &quot;Your Year Ahead&quot; at $11.99/year is the most-cloned feature).</li>
+<li><strong>Build cost:</strong> Low — re-uses the Full Map annual section with personalization.</li>
+<li><strong>Pricing rationale:</strong> Subscription lite, low commitment.</li>
+<li><strong>Time to launch:</strong> ~6–8 weeks once the annual forecast engine is web-exposed.</li>
+</ul>
+<h3>Revenue Line 5: Course / cohort (₹4,999–9,999 per person, 6-week cohort)</h3>
+<ul>
+<li><strong>Demand:</strong> Low initial, builds over 12–24 months.</li>
+<li><strong>Build cost:</strong> Medium — needs curriculum, video, cohort management.</li>
+<li><strong>Pricing rationale:</strong> Premium education tier.</li>
+<li><strong>Time to launch:</strong> ~12+ months (post-Companion).</li>
+<li><strong>Projected impact:</strong> 30–100 students per cohort × 2 cohorts/year × ₹7,000 avg = ₹4–14 lakh/year.</li>
+</ul>
+<h3>Revenue Line 6: API / B2B white-label (revenue share + per-call fee)</h3>
+<ul>
+<li><strong>Demand:</strong> Low initial, builds over 24–36 months.</li>
+<li><strong>Build cost:</strong> High — needs API, auth, rate limiting, partner onboarding.</li>
+<li><strong>Pricing rationale:</strong> Per-call or per-month + rev-share.</li>
+<li><strong>Time to launch:</strong> ~24+ months.</li>
+<li><strong>Projected impact:</strong> 5–20 B2B partners × ₹2–10 lakh/year each = ₹10–200 lakh/year. Wide range.</li>
+</ul>
+<h2>5. Revenue model scenarios</h2>
+<p>Three scenarios with realistic numbers. All assume a solo founder for Year 1; a 2–4 person team by Year 2.</p>
+<h3>Scenario A: Solo, slow growth (conservative)</h3>
+<table>
+<thead>
+<tr>
+<th>Quarter</th>
+<th>What happens</th>
+<th>Spark</th>
+<th>Reading</th>
+<th>Full Map</th>
+<th>Companion</th>
+<th>Monthly revenue</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q3 2026</td>
+<td>Self-service Spark launches; founder hand-delivers Reading + Full Map</td>
+<td>30</td>
+<td>12</td>
+<td>6</td>
+<td>0</td>
+<td>~₹65k/mo</td>
+</tr>
+<tr>
+<td>Q4 2026</td>
+<td>Year-ahead push; first content marketing investments</td>
+<td>60</td>
+<td>25</td>
+<td>12</td>
+<td>0</td>
+<td>~₹1.25L/mo</td>
+</tr>
+<tr>
+<td>Q1 2027</td>
+<td>Compatibility launches; PWA launches</td>
+<td>120</td>
+<td>50</td>
+<td>25</td>
+<td>5</td>
+<td>~₹2.7L/mo</td>
+</tr>
+<tr>
+<td>Q2 2027</td>
+<td>Android app; first paid ads</td>
+<td>200</td>
+<td>90</td>
+<td>40</td>
+<td>15</td>
+<td>~₹4.9L/mo</td>
+</tr>
+<tr>
+<td><strong>Q2 2027 ARR run-rate</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>~₹59 Lakh/year</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>Scenario B: Solo, fast growth (realistic base case)</h3>
+<table>
+<thead>
+<tr>
+<th>Quarter</th>
+<th>What happens</th>
+<th>Spark</th>
+<th>Reading</th>
+<th>Full Map</th>
+<th>Companion</th>
+<th>Monthly revenue</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q3 2026</td>
+<td>Self-service Spark launches; Reading/Full Map via personal referral</td>
+<td>80</td>
+<td>35</td>
+<td>15</td>
+<td>0</td>
+<td>~₹1.7L/mo</td>
+</tr>
+<tr>
+<td>Q4 2026</td>
+<td>Year-ahead push; content engine active; first ₹20k ad spend</td>
+<td>200</td>
+<td>80</td>
+<td>40</td>
+<td>5</td>
+<td>~₹4.2L/mo</td>
+</tr>
+<tr>
+<td>Q1 2027</td>
+<td>Compatibility launches; first Instagram Reels go viral</td>
+<td>500</td>
+<td>180</td>
+<td>80</td>
+<td>30</td>
+<td>~₹10.4L/mo</td>
+</tr>
+<tr>
+<td>Q2 2027</td>
+<td>PWA + Android; 1 part-time reader hired; first B2B conversation</td>
+<td>800</td>
+<td>300</td>
+<td>140</td>
+<td>80</td>
+<td>~₹19.3L/mo</td>
+</tr>
+<tr>
+<td><strong>Q2 2027 ARR run-rate</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>~₹2.3 Crore/year</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>Scenario C: With team + B2B (Year 2-3 upside)</h3>
+<p>Year 2–3 with 2 part-time readers, B2B API in beta, and content engine producing 20 articles/month + 30 reels/month:</p>
+<table>
+<thead>
+<tr>
+<th>Quarter</th>
+<th>Spark</th>
+<th>Reading</th>
+<th>Full Map</th>
+<th>Companion</th>
+<th>B2B</th>
+<th>Course</th>
+<th>Monthly revenue</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q3 2027</td>
+<td>1500</td>
+<td>500</td>
+<td>250</td>
+<td>200</td>
+<td>2</td>
+<td>0</td>
+<td>~₹40L/mo</td>
+</tr>
+<tr>
+<td>Q1 2028</td>
+<td>3000</td>
+<td>1000</td>
+<td>500</td>
+<td>500</td>
+<td>8</td>
+<td>30</td>
+<td>~₹85L/mo</td>
+</tr>
+<tr>
+<td>Q3 2028</td>
+<td>5000</td>
+<td>1800</td>
+<td>900</td>
+<td>1000</td>
+<td>15</td>
+<td>50</td>
+<td>~₹1.5Cr/mo</td>
+</tr>
+<tr>
+<td><strong>Year 3 ARR run-rate</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>~₹18 Crore/year</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reality check:</strong> Scenario C is optimistic but plausible if Year 1 hits Scenario B. The bottleneck is interpretation throughput — that's why hiring part-time readers is the critical Year 2 move.</p>
+<h2>6. Revenue mix target (Year 2)</h2>
+<pre><code>One-time reports (Spark + Reading + Full Map): 60%
+Companion subscription:                       25%
+Compatibility / add-on:                        8%
+Course / cohort:                               4%
+B2B / API:                                     3%
+</code></pre>
+<p>This mirrors the mature Western astrology app revenue mix (Co-Star: ~72% subscription), but with a heavier one-time-report component because the Full Map at ₹3,499 is a high-margin, high-value product that the solo founder can hand-deliver.</p>
+<h2>7. Pricing experiments to run</h2>
+<ol>
+<li><strong>A/B test Spark at ₹399 vs ₹499.</strong> ₹399 is the impulse-buy ceiling; ₹499 is the standard. If conversion drops less than 30% at ₹399, switch to ₹399.</li>
+<li><strong>A/B test Reading at ₹999 vs ₹1,499.</strong> ₹999 is the &quot;considered purchase&quot; sweet spot; ₹1,499 is premium. The Full Map buyers all went to ₹3,499 — they were not price-sensitive. The Reading tier is where price sensitivity is highest.</li>
+<li><strong>Test a ₹7,999 &quot;Full Map + 60-min personal consultation&quot; tier.</strong> Combines the PDF + a 60-minute call with the founder. Pricing test, not permanent.</li>
+<li><strong>Test annual discount on Companion.</strong> ₹799/month = ₹9,588/year. ₹6,999/year is a 27% discount; ₹4,999/year is 48% off. The 27% discount is the proven SaaS sweet spot.</li>
+<li><strong>Test dynamic pricing for tier-2 (Korean diaspora).</strong> The proposed $14.99/$49.99/$99.99 is the entry tier; raise to $19.99/$69.99/$149.99 if conversion holds.</li>
+</ol>
+<h2>8. What NOT to monetize</h2>
+<ol>
+<li><strong>Don't add per-minute chat.</strong> Requires a reader network. Out of scope.</li>
+<li><strong>Don't add a free + ads tier.</strong> The brand position is premium; ads cheapen it.</li>
+<li><strong>Don't add a &quot;gemstones&quot; or &quot;yantras&quot; shop.</strong> Out of scope, separate business.</li>
+<li><strong>Don't add a &quot;buy a question&quot; micro-payment.</strong> Confuses the value ladder.</li>
+<li><strong>Don't add tipping / donations.</strong> Astrology + donation is a bad combination.</li>
+<li><strong>Don't discount aggressively.</strong> Discounts signal &quot;the product isn't worth the price.&quot; Use trial tiers instead.</li>
+<li><strong>Don't bundle Reading + Full Map.</strong> Forces the customer to choose. Let them self-select.</li>
+<li><strong>Don't add &quot;premium add-ons&quot; to Spark.</strong> Spark is the funnel; up-sell to Reading, not within Spark.</li>
+</ol>
+<h2>9. Refund policy (must have from Day 1)</h2>
+<p>The single biggest business-killing risk is the refund dispute on a ₹3,499 Full Map that didn't resonate. A defensible refund policy is essential:</p>
+<p><strong>Recommended policy:</strong></p>
+<ul>
+<li><strong>Spark (₹499):</strong> No refunds. This is a digital product delivered instantly; the impulse-buy threshold is low.</li>
+<li><strong>Reading (₹1,499):</strong> Refund within 7 days if the report is not delivered within the promised 48-hour SLA, OR if the report contains verifiable factual errors in the chart calculation (pillar wrong, hidden-stems wrong).</li>
+<li><strong>Full Map (₹3,499):</strong> Refund within 14 days if the report is not delivered within 72 hours, OR contains chart errors, OR if the client attended the (optional) 30-minute clarification call and is still dissatisfied.</li>
+</ul>
+<p><strong>Why this works:</strong></p>
+<ul>
+<li>Refunds-on-delivery-failure are standard and acceptable.</li>
+<li>Refunds-on-calculation-error are defensible because the calculation is verifiable.</li>
+<li>Refunds-on-subjective-dissatisfaction are the dangerous category — but the optional clarification call converts most &quot;I'm not satisfied&quot; into &quot;actually I see it now.&quot;</li>
+</ul>
+<p><strong>Communicate this clearly</strong> on the intake form, on the receipt, and in the report itself.</p>
+<h2>10. Net revenue per order (after Razorpay / Stripe fees)</h2>
+<p>Assume Razorpay 2% + GST for India, Stripe 2.9% + $0.30 per transaction for international.</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Price (INR)</th>
+<th>Gateway fee</th>
+<th>Net revenue (INR)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Spark</td>
+<td>₹499</td>
+<td>~₹14</td>
+<td><strong>₹485</strong></td>
+</tr>
+<tr>
+<td>Reading</td>
+<td>₹1,499</td>
+<td>~₹35</td>
+<td><strong>₹1,464</strong></td>
+</tr>
+<tr>
+<td>Full Map</td>
+<td>₹3,499</td>
+<td>~₹80</td>
+<td><strong>₹3,419</strong></td>
+</tr>
+<tr>
+<td>Companion (monthly)</td>
+<td>₹799</td>
+<td>~₹20</td>
+<td><strong>₹779</strong></td>
+</tr>
+</tbody>
+</table>
+<p>For USD-priced tiers, Stripe fees are ~3% of revenue. Margin is preserved.</p>
+<h2>11. Cost of revenue (the human-review bottleneck)</h2>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Human review time</th>
+<th>Cost per order at ₹500/hour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Spark</td>
+<td>0 min (automated)</td>
+<td>₹0</td>
+</tr>
+<tr>
+<td>Reading</td>
+<td>45 min</td>
+<td>₹375</td>
+</tr>
+<tr>
+<td>Full Map</td>
+<td>90–120 min</td>
+<td>₹750–1,000</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The Reading and Full Map margins are razor-thin</strong> if the founder does the review at &quot;founder opportunity cost&quot; of ₹500/hour.</p>
+<p><strong>Two ways to restore margin:</strong></p>
+<ol>
+<li><strong>Hire part-time readers</strong> at ₹200–300/hour in India. Reading margin improves to ~₹1,090. Full Map margin to ~₹2,440.</li>
+<li><strong>AI-assisted review</strong> where the engine does 70% of the draft, the human reviews in 15–20 minutes. Reading cost drops to ~₹125. Full Map cost to ~₹250. <strong>This is the path to scale.</strong></li>
+</ol>
+<h2>12. Source-of-truth references</h2>
+<ul>
+<li>Tiered pricing structure: <a href="../../CLAUDE.md">CLAUDE.md — Tiered Client Products</a></li>
+<li>Self-service calculator: <a href="../../tools/client_intake_app.py">tools/client_intake_app.py</a></li>
+<li>Intake form: <a href="../../tools/client_intake_app.html">tools/client_intake_app.html</a></li>
+<li>Premium report generator: <a href="../../tools/saju_engine/premium_report.py">tools/saju_engine/premium_report.py</a></li>
+<li>6 paid pilots: <a href="../../candidates_horoscope/reports/">candidates_horoscope/reports/</a></li>
+</ul>
+
+    
+<nav class="toc" style="margin-top:48px;font-size:14px;">
+  <div style="display:flex;justify-content:space-between;gap:12px;">
+    <div><a href="05-audience-demographics.html">← Doc 05: Audience Demographics</a></div>
+    <div><a href="combined.html">↑ Combined report</a></div>
+    <div><a href="07-app-platform-decision.html">Doc 07: App Platform Decision →</a></div>
+  </div>
+</nav>
+</main>
+    <footer class="foot">
+      Saju market research · generated 2026-06-28 · /
+      <a href="https://github.com/anthropics/skills">no external dependencies beyond markdown-it-py</a>
+    </footer>
+  </div>
+</body>
+</html>

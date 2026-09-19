@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saju AI Platform — Complete Marketing Strategy Report</title>
+<style>
+  :root {
+    --gold: #C9A84C;
+    --dark: #0D0D1A;
+    --card: #13131F;
+    --border: #2A2A40;
+    --text: #E2E2F0;
+    --muted: #8888AA;
+    --accent: #7B5EA7;
+    --green: #3EC98B;
+    --red: #E05C5C;
+    --blue: #5B9CF6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--dark); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; line-height: 1.65; padding: 20px; }
+  .page { max-width: 1100px; margin: 0 auto; }
+
+  /* Header */
+  .hero { background: linear-gradient(135deg, #1A0A2E 0%, #0D1A2E 60%, #1A1A0D 100%);
+    border: 1px solid var(--gold); border-radius: 16px; padding: 50px 40px; margin-bottom: 36px; text-align: center; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 50%, rgba(201,168,76,0.08), transparent 60%); }
+  .hero h1 { font-size: 2.4rem; color: var(--gold); letter-spacing: 1px; margin-bottom: 10px; position: relative; }
+  .hero .sub { color: var(--muted); font-size: 1rem; position: relative; }
+  .hero .badges { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; position: relative; }
+  .badge { background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.35); border-radius: 20px; padding: 5px 16px; font-size: 0.8rem; color: var(--gold); }
+
+  /* Section */
+  .section { margin-bottom: 36px; }
+  .section-title { font-size: 1.3rem; color: var(--gold); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+  .section-title span { font-size: 1.5rem; }
+
+  /* Cards grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 22px; }
+  .card.gold-border { border-color: rgba(201,168,76,0.5); }
+  .card h3 { font-size: 1rem; color: var(--gold); margin-bottom: 10px; }
+  .card h4 { font-size: 0.9rem; color: var(--blue); margin-bottom: 8px; }
+  .card p, .card li { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+  .card ul { padding-left: 16px; }
+  .card ul li { margin-bottom: 5px; }
+
+  /* Tier cards */
+  .tier { border-radius: 14px; padding: 28px; border: 1px solid var(--border); }
+  .tier.basic { background: linear-gradient(160deg, #13131F, #1A1A2A); }
+  .tier.premium { background: linear-gradient(160deg, #1A1208, #2A1E08); border-color: rgba(201,168,76,0.5); }
+  .tier .price { font-size: 2.2rem; font-weight: 700; margin: 10px 0; }
+  .tier.basic .price { color: var(--blue); }
+  .tier.premium .price { color: var(--gold); }
+  .tier .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .tier ul { margin-top: 14px; padding-left: 16px; }
+  .tier ul li { font-size: 0.87rem; color: var(--text); margin-bottom: 7px; }
+  .tier .tag { display: inline-block; background: rgba(201,168,76,0.15); color: var(--gold); border-radius: 5px; padding: 3px 10px; font-size: 0.75rem; margin-top: 10px; }
+
+  /* Audience table */
+  table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+  th { background: rgba(201,168,76,0.12); color: var(--gold); padding: 12px 14px; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border); }
+  td { padding: 11px 14px; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text); vertical-align: top; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .pill { display: inline-block; border-radius: 10px; padding: 2px 10px; font-size: 0.75rem; font-weight: 600; }
+  .pill.in { background: rgba(94,166,255,0.15); color: var(--blue); }
+  .pill.global { background: rgba(62,201,139,0.15); color: var(--green); }
+  .pill.nri { background: rgba(201,168,76,0.15); color: var(--gold); }
+
+  /* Channel cards */
+  .channel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+  .channel .ch-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .channel .icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+  .channel h3 { font-size: 0.95rem; color: var(--text); }
+  .channel .priority { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  .priority.high { color: var(--green); }
+  .priority.medium { color: var(--gold); }
+  .priority.low { color: var(--muted); }
+  .channel p { font-size: 0.84rem; color: var(--muted); }
+
+  /* Funnel */
+  .funnel-step { background: var(--card); border-left: 4px solid var(--gold); border-radius: 0 10px 10px 0; padding: 16px 20px; margin-bottom: 12px; display: flex; gap: 14px; align-items: flex-start; }
+  .funnel-step .num { background: var(--gold); color: var(--dark); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+  .funnel-step h4 { color: var(--text); font-size: 0.95rem; margin-bottom: 4px; }
+  .funnel-step p { color: var(--muted); font-size: 0.84rem; }
+
+  /* Retention table */
+  .retain-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .retain-card h3 { color: var(--accent); font-size: 0.95rem; margin-bottom: 12px; }
+  .retain-card ul { padding-left: 16px; }
+  .retain-card ul li { font-size: 0.86rem; color: var(--muted); margin-bottom: 7px; }
+
+  /* Timeline */
+  .timeline { position: relative; }
+  .tl-item { display: flex; gap: 16px; margin-bottom: 20px; }
+  .tl-line { display: flex; flex-direction: column; align-items: center; }
+  .tl-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--gold); flex-shrink: 0; margin-top: 4px; }
+  .tl-conn { width: 2px; background: var(--border); flex: 1; margin: 4px 0; }
+  .tl-content { flex: 1; padding-bottom: 10px; }
+  .tl-content h4 { color: var(--gold); font-size: 0.9rem; margin-bottom: 6px; }
+  .tl-content p { color: var(--muted); font-size: 0.84rem; }
+
+  /* Metrics */
+  .metric { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; }
+  .metric .val { font-size: 2rem; font-weight: 700; color: var(--green); }
+  .metric .lbl { font-size: 0.78rem; color: var(--muted); margin-top: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .metric .note { font-size: 0.8rem; color: var(--text); margin-top: 8px; }
+
+  /* Competition moat */
+  .moat { background: linear-gradient(135deg, #0D1A2E, #1A0A2E); border: 1px solid rgba(123,94,167,0.4); border-radius: 12px; padding: 22px; }
+  .moat h3 { color: #A78BCA; margin-bottom: 12px; font-size: 0.95rem; }
+  .moat ul { padding-left: 16px; }
+  .moat ul li { font-size: 0.86rem; color: var(--muted); margin-bottom: 8px; }
+  .moat ul li strong { color: var(--text); }
+
+  /* Upsell ladder */
+  .ladder { display: flex; flex-direction: column; gap: 0; }
+  .rung { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .rung .rung-name { font-size: 0.9rem; color: var(--text); }
+  .rung .rung-price { font-size: 1rem; font-weight: 700; color: var(--gold); }
+  .rung .rung-tag { font-size: 0.75rem; color: var(--muted); margin-top: 3px; }
+  .arrow-down { text-align: center; color: var(--gold); font-size: 1.3rem; line-height: 1; }
+
+  /* Content calendar */
+  .cal-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
+  .cal-day { background: rgba(201,168,76,0.1); color: var(--gold); border-radius: 6px; padding: 6px 12px; font-size: 0.8rem; font-weight: 600; min-width: 80px; text-align: center; }
+  .cal-content { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; flex: 1; font-size: 0.84rem; color: var(--muted); }
+  .cal-content strong { color: var(--text); }
+
+  /* Footer */
+  .footer { text-align: center; padding: 30px; color: var(--muted); font-size: 0.82rem; border-top: 1px solid var(--border); margin-top: 40px; }
+
+  @media (max-width: 700px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 1.6rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HERO -->
+<div class="hero">
+  <h1>⭐ Saju AI Platform — Marketing Strategy Report</h1>
+  <p class="sub">Complete Go-to-Market Plan | Leads, Audience, Retention & Expansion</p>
+  <div class="badges">
+    <span class="badge">2 Tiers: ₹799 &amp; ₹1499</span>
+    <span class="badge">Indian + Global Audience</span>
+    <span class="badge">Semi-Manual Delivery</span>
+    <span class="badge">24h Turnaround</span>
+    <span class="badge">June 2026</span>
+  </div>
+</div>
+
+<!-- TIER BREAKDOWN -->
+<div class="section">
+  <div class="section-title"><span>📦</span> Product Tiers</div>
+  <div class="grid-2">
+    <div class="tier basic">
+      <div class="label">Tier 1 — Essential Report</div>
+      <div class="price">₹799</div>
+      <div style="color:#8888AA;font-size:0.82rem;">≈ $9.50 USD · Best for first-time buyers</div>
+      <ul>
+        <li>Full Saju birth chart calculation</li>
+        <li>10-year decade (Daewoon) analysis</li>
+        <li>Career &amp; finance overview (2–3 pages)</li>
+        <li>Key lucky elements &amp; colors</li>
+        <li>PDF report — delivered in 24h</li>
+        <li>English + Tamil option</li>
+      </ul>
+      <span class="tag">Low-friction entry · High volume</span>
+    </div>
+    <div class="tier premium">
+      <div class="label">Tier 2 — Deep Destiny Report</div>
+      <div class="price">₹1499</div>
+      <div style="color:#8888AA;font-size:0.82rem;">≈ $18 USD · Best for serious seekers</div>
+      <ul>
+        <li>Everything in Tier 1</li>
+        <li>Year-by-year predictions (2025–2030)</li>
+        <li>Relationship &amp; marriage compatibility</li>
+        <li>Business launch timing analysis</li>
+        <li>ElevenLabs AI voice audio summary (5–8 min)</li>
+        <li>One follow-up question via email</li>
+        <li>PDF + MP3 — delivered in 24h</li>
+      </ul>
+      <span class="tag">⭐ Best Seller Target · 2× revenue</span>
+    </div>
+  </div>
+</div>
+
+<!-- AUDIENCE SEGMENTS -->
+<div class="section">
+  <div class="section-title"><span>🎯</span> Target Audience Segments</div>
+  <div class="card" style="padding: 0; overflow: hidden;">
+    <table>
+      <thead>
+        <tr>
+          <th>Segment</th>
+          <th>Type</th>
+          <th>Size</th>
+          <th>Buying Trigger</th>
+          <th>Best Channel</th>
+          <th>Tier Preference</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Tamil astrology believers</strong><br>25–45, urban, middle-class India</td>
+          <td><span class="pill in">India</span></td>
+          <td>~15M online</td>
+          <td>Marriage, job change, career confusion</td>
+          <td>Facebook, YouTube, WhatsApp</td>
+          <td>₹799 first</td>
+        </tr>
+        <tr>
+          <td><strong>Korean/East Asian diaspora</strong><br>Saju is Korean — huge global niche</td>
+          <td><span class="pill global">Global</span></td>
+          <td>~5M diaspora interested</td>
+          <td>Career decisions, relationship compatibility</td>
+          <td>Instagram, Reddit (r/saju), TikTok</td>
+          <td>₹1499 ($18)</td>
+        </tr>
+        <tr>
+          <td><strong>NRI Indians</strong><br>UAE, USA, UK, Singapore, Australia</td>
+          <td><span class="pill nri">NRI</span></td>
+          <td>~32M NRI population</td>
+          <td>Major life decisions, cultural connection</td>
+          <td>Instagram, LinkedIn, YouTube</td>
+          <td>₹1499 (high income)</td>
+        </tr>
+        <tr>
+          <td><strong>Spiritual seekers globally</strong><br>Astrology fans, horoscope followers</td>
+          <td><span class="pill global">Global</span></td>
+          <td>Astrology app users: 150M+</td>
+          <td>Bored with Western astrology, want depth</td>
+          <td>TikTok, YouTube Shorts, Reddit</td>
+          <td>₹799 (entry)</td>
+        </tr>
+        <tr>
+          <td><strong>Indian startup founders / professionals</strong><br>Entrepreneurs in 25–40 age bracket</td>
+          <td><span class="pill in">India</span></td>
+          <td>~8M professionals</td>
+          <td>Business timing, wealth potential reading</td>
+          <td>LinkedIn, Twitter/X, Telegram</td>
+          <td>₹1499</td>
+        </tr>
+        <tr>
+          <td><strong>Korean-American / Korean-European youth</strong><br>K-culture fans, 18–35</td>
+          <td><span class="pill global">Global</span></td>
+          <td>K-pop fandom: 100M+ global</td>
+          <td>Curiosity from K-drama / K-pop interest</td>
+          <td>TikTok, Instagram Reels, Reddit</td>
+          <td>₹799 ($10 impulse)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- LEAD GENERATION -->
+<div class="section">
+  <div class="section-title"><span>🔥</span> Lead Generation Channels</div>
+  <div class="grid-3">
+
+    <div class="channel">
+      <div class="ch-header">
+        <div class="icon" style="background:rgba(255,80,80,0.15);">▶️</div>
+        <div>
+          <h3>YouTube Shorts</h3>
+          <div class="priority high">Priority: Highest</div>
+        </div>
+      </div>
+      <p>Post 30–60 sec Saju fact videos: "What your birth hour says about wealth", "Why Saju says you struggle in your 30s". Add link to landing page in bio + pinned comment. 3 Shorts/week. Korean diaspora + Indian spiritual audience both exist on YouTube.</p>
+    </div>
+
+    <div class="channel">
+      <div class="ch-header">
+        <div class="icon" style="background:rgba(255,105,180,0.15);">📸</div>
+        <div>
+          <h3>Instagram Reels</h3>
+          <div class="priority high">Priority: Highest</div>
+        </div>
+      </div>
+      <p>Visual carousels on "Saju vs Western astrology", "Top 3 signs your Saju is Fire-dominant", "NRI edition: what your chart says about settling abroad". Use ElevenLabs for voiceover Reels. Bio link to landing page. 4–5 posts/week.</p>
+    </div>
+
+    <div class="channel">
+      <div class="ch-header">
+        <div class="icon" style="background:rgba(100,180,255,0.15);">💬</div>
+        <div>
+          <h3>Reddit &amp; Quora</h3>
+          <div class="priority high">Priority: High</div>
+        </div>
+      </div>
+      <p>Post free sample readings on r/astrology, r/saju, r/VedicAstrology. Answer questions genuinely. Drop soft CTA after 10–20 helpful replies. Quora: answer "What is Saju astrology" and rank organically. This is your best global lead source.</p>
+    </div>
+
+    <div class="channel">
+      <div class="ch-header">
+        <div class="icon" style="background:rgba(0,120,255,0.15);">👥</div>
+        <div>
+          <h3>Facebook Groups</h3>
+          <div class="priority high">Priority: High (India)</div>
+        </div>
+      </div>
+      <p>Tamil astrology and Jyotish groups have 100K–500K members each. Post chart snippets, offer free mini-readings to comment leads. Collect WhatsApp numbers. Convert via DM. Best for ₹799 Indian tier buyers.</p>
+    </div>
+
+    <div class="channel">
+      <div class="ch-header">
+        <div class="icon" style="background:rgba(201,168,76,0.15);">📢</div>
+        <div>
+          <h3>Telegram Channels</h3>
+          <div class="priority medium">Priority: Medium</div>
+        </div>
+      </div>
+      <p>Build a "Saju Daily Insights" Telegram channel. Post 1 daily tip. Run monthly free reading contest. Sell reports to channel members. Telegram works well for Indian professional audience and is low-cost to maintain.</p>
+    </div>
+
+    <div class="channel">
+      <div class="ch-header">
+        <div class="icon" style="background:rgba(0,185,100,0.15);">🎵</div>
+        <div>
+          <h3>TikTok (Global)</h3>
+          <div class="priority medium">Priority: Medium (Global)</div>
+        </div>
+      </div>
+      <p>Saju + K-pop connection videos go viral with Korean diaspora audiences. "Saju reading for your BTS bias" or "What does your Saju say about love". Use faceless format with ElevenLabs voice. Link to landing page. Huge organic potential for $USD pricing.</p>
+    </div>
+
+    <div class="channel">
+      <div class="ch-header">
+        <div class="icon" style="background:rgba(0,119,181,0.15);">💼</div>
+        <div>
+          <h3>LinkedIn</h3>
+          <div class="priority medium">Priority: Medium (Professionals)</div>
+        </div>
+      </div>
+      <p>Target Indian professionals, startup founders, and NRIs. Posts like "I analyzed my Saju birth chart before launching my startup — here's what it said." Converts well to ₹1499 tier. Harish's personal brand as data engineer who built an AI destiny engine is a unique hook.</p>
+    </div>
+
+    <div class="channel">
+      <div class="ch-header">
+        <div class="icon" style="background:rgba(255,180,0,0.15);">🔍</div>
+        <div>
+          <h3>SEO / Blog</h3>
+          <div class="priority medium">Priority: Medium (Long-term)</div>
+        </div>
+      </div>
+      <p>Write 2 blog posts/month: "Saju astrology explained for Indians", "Free Saju chart reading 2026", "Saju vs Vedic astrology". Target low-competition keywords. Google ranks these and drives passive organic leads. Compound asset over 6–12 months.</p>
+    </div>
+
+    <div class="channel">
+      <div class="ch-header">
+        <div class="icon" style="background:rgba(255,100,100,0.15);">🤝</div>
+        <div>
+          <h3>Micro-Influencer Collabs</h3>
+          <div class="priority medium">Priority: Medium</div>
+        </div>
+      </div>
+      <p>Partner with 5–10 astrology Instagram accounts (5K–50K followers). Offer free reading in exchange for a post. These are low or zero-cost. Indian astrology, Korean culture, or spiritual niches all work. One viral collab can spike 200–500 orders.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- FREE LEAD MAGNET -->
+<div class="section">
+  <div class="section-title"><span>🎁</span> Lead Magnet Strategy</div>
+  <div class="grid-2">
+    <div class="card gold-border">
+      <h3>Free Mini Chart Summary</h3>
+      <p>Offer a free 1-page Saju chart snapshot (just elements, lucky colors, dominant energy) in exchange for name + email. No birth time needed — just date and birth year. This removes all friction and builds your email list fast. Convert via email sequence to ₹799 report within 3–5 days.</p>
+    </div>
+    <div class="card gold-border">
+      <h3>"Is 2026 your year?" Campaign</h3>
+      <p>Run a landing page with: "Enter your birth date — we'll tell you if 2026 is your power year, neutral year, or caution year." Free result + upsell to full ₹799 report. This is hyper-shareable. Works especially well for Indian New Year season (Puthandu), Diwali, and Jan 1.</p>
+    </div>
+  </div>
+</div>
+
+<!-- CONVERSION FUNNEL -->
+<div class="section">
+  <div class="section-title"><span>🔄</span> Conversion Funnel</div>
+  <div class="funnel-step">
+    <div class="num">1</div>
+    <div>
+      <h4>Awareness — Social Content + SEO</h4>
+      <p>Shorts, Reels, Reddit posts, blog articles. Goal: drive 500–2000 landing page visits/month within 90 days.</p>
+    </div>
+  </div>
+  <div class="funnel-step">
+    <div class="num">2</div>
+    <div>
+      <h4>Interest — Free Mini Reading or Lead Magnet</h4>
+      <p>Landing page collects birth date + email. Delivers instant free chart element summary. Expected opt-in rate: 25–40% from warm traffic.</p>
+    </div>
+  </div>
+  <div class="funnel-step">
+    <div class="num">3</div>
+    <div>
+      <h4>Consideration — Email Nurture (3-email sequence)</h4>
+      <p>Email 1: "Your free Saju element is [X] — here's what it means." Email 2: Sample of full report with a redacted page. Email 3: Time-limited offer — ₹799 for 48 hours. Expected conversion: 5–12% of email list to paid.</p>
+    </div>
+  </div>
+  <div class="funnel-step">
+    <div class="num">4</div>
+    <div>
+      <h4>Purchase — Form + Manual Payment</h4>
+      <p>Landing page form collects: name, DOB, birth time, birth city, report type. Razorpay (India) or Stripe (global) payment. WhatsApp confirmation sent within 1 hour. Report delivered within 24h.</p>
+    </div>
+  </div>
+  <div class="funnel-step">
+    <div class="num">5</div>
+    <div>
+      <h4>Delight — Over-Deliver on First Order</h4>
+      <p>Send the report + a bonus "lucky dates for next 3 months" page free with every first order. Attach a handwritten-style note (AI-generated in your voice). This triggers word-of-mouth and reviews.</p>
+    </div>
+  </div>
+  <div class="funnel-step">
+    <div class="num">6</div>
+    <div>
+      <h4>Retention + Upsell — Follow-up within 7 days</h4>
+      <p>"Did the report resonate? Many readers upgrade to a live consultation or yearly update package." Push to ₹1499 if they bought ₹799. Push consultation upsell if they bought ₹1499.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING PSYCHOLOGY -->
+<div class="section">
+  <div class="section-title"><span>💡</span> Pricing Psychology Tips</div>
+  <div class="grid-3">
+    <div class="card">
+      <h3>Anchor with ₹1499 first</h3>
+      <p>On landing page, show ₹1499 (Deep Report) first, then ₹799 below. Anchoring makes ₹799 feel like a deal even though it's your main volume driver. Expected split: 60% buy ₹799, 30% buy ₹1499, 10% upgrade later.</p>
+    </div>
+    <div class="card">
+      <h3>Bundle for higher AOV</h3>
+      <p>Offer a couple's compatibility bundle: 2 reports + relationship section for ₹2499 (instead of ₹2998 separate). This increases order value without needing more customers. Run during Valentine's Day, marriage season (April–June, Nov–Dec).</p>
+    </div>
+    <div class="card">
+      <h3>Urgency + scarcity</h3>
+      <p>Show "Accepting only 15 reports this week due to manual processing." This is genuine because you are semi-manual. Creates real urgency. Rotate with "Slots open again — order now." This is an honest constraint, not fake scarcity.</p>
+    </div>
+  </div>
+</div>
+
+<!-- COMPETITION MOAT -->
+<div class="section">
+  <div class="section-title"><span>🛡️</span> Sustaining Competition — Your Moats</div>
+  <div class="grid-2">
+    <div class="moat">
+      <h3>🔐 Technical Moat (Your Edge)</h3>
+      <ul>
+        <li><strong>AI-powered engine built by you</strong> — not a generic app. Your Saju engine has your own interpretation logic and prompt system baked in.</li>
+        <li><strong>ElevenLabs voice reports</strong> — almost no other Saju service offers AI audio narration. This is a differentiator that costs you almost nothing per report.</li>
+        <li><strong>Speed (24h) + precision</strong> — most traditional readers take 3–7 days or charge ₹3000–₹10000 for lesser depth.</li>
+        <li><strong>Structured PDF format</strong> — data-engineer-level organization. Competitors give unformatted text blobs. Your report looks like a premium product.</li>
+      </ul>
+    </div>
+    <div class="moat">
+      <h3>🌐 Brand Moat (Build Over 6 Months)</h3>
+      <ul>
+        <li><strong>Personal brand as a "data engineer who reads destiny"</strong> — uniquely cross-disciplinary. No competitor has this angle.</li>
+        <li><strong>Testimonials + case studies</strong> — collect 20–50 specific testimonials ("the career prediction for 2024 was exactly right"). Screenshots drive 10x more sales than copy.</li>
+        <li><strong>Content library</strong> — each blog post, Reel, and Reddit answer creates a permanent discovery asset. After 6 months, your moat becomes organic traffic.</li>
+        <li><strong>Accuracy reputation</strong> — frame it as "AI-assisted analysis, human-verified" and track which predictions come true. Use verified testimonials as your best marketing.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- RETENTION + EXPANSION LADDER -->
+<div class="section">
+  <div class="section-title"><span>📈</span> Retention + Service Ladder (Make Them Come Back)</div>
+  <div class="grid-2">
+    <div>
+      <h3 style="color:var(--gold);margin-bottom:16px;font-size:1rem;">💰 Upsell / Service Ladder</h3>
+      <div class="ladder">
+        <div class="rung">
+          <div><div class="rung-name">Free Mini Chart</div><div class="rung-tag">Lead magnet → email capture</div></div>
+          <div class="rung-price">₹0</div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="rung">
+          <div><div class="rung-name">Essential Report</div><div class="rung-tag">Career + decade overview</div></div>
+          <div class="rung-price">₹799</div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="rung">
+          <div><div class="rung-name">Deep Destiny Report + Audio</div><div class="rung-tag">Year predictions + voice MP3</div></div>
+          <div class="rung-price">₹1499</div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="rung">
+          <div><div class="rung-name">Yearly Update Report</div><div class="rung-tag">Jan/New Year refresh — same buyer returns</div></div>
+          <div class="rung-price">₹999/yr</div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="rung">
+          <div><div class="rung-name">Live 30-min Consultation (Video/Call)</div><div class="rung-tag">You + AI report on screen, discuss live</div></div>
+          <div class="rung-price">₹2999</div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="rung">
+          <div><div class="rung-name">Couple Compatibility Report</div><div class="rung-tag">Bundle upsell — both charts analyzed</div></div>
+          <div class="rung-price">₹2499</div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="rung" style="border-color:rgba(201,168,76,0.4);">
+          <div><div class="rung-name" style="color:var(--gold);">Monthly Destiny Subscription</div><div class="rung-tag">Monthly energy forecast + lucky timing</div></div>
+          <div class="rung-price" style="color:var(--green);">₹299/mo</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3 style="color:var(--gold);margin-bottom:16px;font-size:1rem;">🔁 Retention Tactics</h3>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="retain-card">
+          <h3>📅 New Year / Birthday Triggers</h3>
+          <ul>
+            <li>Email all past buyers in December: "Your 2027 Saju forecast is ready — 10% off until Jan 15."</li>
+            <li>Birthday email: "Your new solar year begins [date] — time for a yearly update reading."</li>
+            <li>Automated triggers = near-zero effort, high repeat purchase rate.</li>
+          </ul>
+        </div>
+        <div class="retain-card">
+          <h3>💬 WhatsApp Community</h3>
+          <ul>
+            <li>After purchase, invite buyers into a "Saju Insights" WhatsApp group.</li>
+            <li>Post 1 weekly tip: lucky day of the week, element compatibility tip, monthly energy.</li>
+            <li>This keeps them warm without any paid ads. Reactivate with offers.</li>
+          </ul>
+        </div>
+        <div class="retain-card">
+          <h3>⭐ Review Loop</h3>
+          <ul>
+            <li>After 7 days, send: "Did the report resonate? Leave a comment and get ₹100 off your next reading."</li>
+            <li>Collect testimonials actively. Screenshot them. Use them as social proof ads.</li>
+            <li>One authentic "the business prediction was true 6 months later" testimonial is worth ₹10K in ads.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT CALENDAR -->
+<div class="section">
+  <div class="section-title"><span>📅</span> Weekly Content Calendar (Steady State)</div>
+  <div class="grid-2">
+    <div>
+      <div class="cal-row"><div class="cal-day">Mon</div><div class="cal-content"><strong>Instagram Reel</strong> — "What your birth month says about your wealth element" (ElevenLabs voiceover)</div></div>
+      <div class="cal-row"><div class="cal-day">Tue</div><div class="cal-content"><strong>Reddit/Quora</strong> — Answer 2 astrology questions, add soft CTA to free reading</div></div>
+      <div class="cal-row"><div class="cal-day">Wed</div><div class="cal-content"><strong>YouTube Short</strong> — "3 signs your Saju has strong Metal energy" — link to landing page in description</div></div>
+      <div class="cal-row"><div class="cal-day">Thu</div><div class="cal-content"><strong>LinkedIn Post</strong> — Professional angle: "I built an AI engine to decode Saju — here's what I found about career cycles"</div></div>
+      <div class="cal-row"><div class="cal-day">Fri</div><div class="cal-content"><strong>Telegram Channel</strong> — Weekend lucky element forecast (2 minutes effort)</div></div>
+      <div class="cal-row"><div class="cal-day">Sat</div><div class="cal-content"><strong>Instagram Carousel</strong> — "Saju vs Vedic astrology: 5 key differences" — educational, shareable, evergreen</div></div>
+      <div class="cal-row"><div class="cal-day">Sun</div><div class="cal-content"><strong>Free report draw</strong> — "Comment your birth year for a free element reading" — engagement post, collect leads</div></div>
+    </div>
+    <div>
+      <div class="card">
+        <h3>Content Pillars</h3>
+        <ul style="margin-top:10px;">
+          <li><strong style="color:var(--gold);">Education (40%)</strong> — Explain Saju concepts, elements, decade cycles. Builds authority and SEO.</li>
+          <li style="margin-top:8px;"><strong style="color:var(--blue);">Social proof (25%)</strong> — Testimonials, "reader said this happened" posts, before/after readings. Drives conversions.</li>
+          <li style="margin-top:8px;"><strong style="color:var(--green);">Entertainment (20%)</strong> — Viral formats: "Saju reading for your zodiac", "Famous people's Saju charts". Drives reach.</li>
+          <li style="margin-top:8px;"><strong style="color:var(--accent);">Promotional (15%)</strong> — Direct CTAs, limited slots, discount campaigns. Drives revenue.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 90-DAY TIMELINE -->
+<div class="section">
+  <div class="section-title"><span>🗓️</span> 90-Day Launch Timeline</div>
+  <div class="grid-2">
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-line"><div class="tl-dot"></div><div class="tl-conn"></div></div>
+        <div class="tl-content">
+          <h4>Week 1–2: Launch Foundation</h4>
+          <p>Landing page live. Razorpay + Stripe set up. 3 sample reports created for social proof. Free mini-reading lead magnet ready. First 10 Reddit posts in r/astrology and r/saju.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-line"><div class="tl-dot"></div><div class="tl-conn"></div></div>
+        <div class="tl-content">
+          <h4>Week 3–4: Content Seeding</h4>
+          <p>5 YouTube Shorts published. Instagram account posts 10 Reels. First Facebook group posts. Email nurture sequence live. Target: 100 email signups, 10–15 paid reports.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-line"><div class="tl-dot"></div><div class="tl-conn"></div></div>
+        <div class="tl-content">
+          <h4>Month 2: Amplification</h4>
+          <p>First micro-influencer collaboration. TikTok account launch (global audience). WhatsApp community started with first 30 buyers. First couple compatibility bundle promoted. Target: 50–100 reports, ₹50K–₹1L revenue.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-line"><div class="tl-dot"></div></div>
+        <div class="tl-content">
+          <h4>Month 3: Systems + Scale</h4>
+          <p>First paid Instagram/Facebook ad (₹3K–₹5K test). SEO blog posts indexed. Yearly subscription product launched. First live consultation upsell tested. Target: 150+ reports/month, ₹1.5L–₹2L MRR.</p>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="metric">
+        <div class="val">₹50K</div>
+        <div class="lbl">Month 1 Target Revenue</div>
+        <div class="note">~45–60 reports at blended ₹950 ASP</div>
+      </div>
+      <div class="metric">
+        <div class="val">₹1.2L</div>
+        <div class="lbl">Month 3 Target Revenue</div>
+        <div class="note">~120 reports + upsells + consultations</div>
+      </div>
+      <div class="metric">
+        <div class="val">₹3L+</div>
+        <div class="lbl">Month 6 Target Revenue</div>
+        <div class="note">Subscriptions + reports + live sessions</div>
+      </div>
+      <div class="metric">
+        <div class="val">~₹120</div>
+        <div class="lbl">CAC (Customer Acquisition Cost)</div>
+        <div class="note">Organic-first strategy keeps this ultra-low</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GLOBAL vs INDIA PRICING -->
+<div class="section">
+  <div class="section-title"><span>🌍</span> India vs Global Pricing Strategy</div>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table>
+      <thead>
+        <tr>
+          <th>Tier</th>
+          <th>India Price</th>
+          <th>Global (USD)</th>
+          <th>Why It Works</th>
+          <th>Payment Method</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Essential Report</td>
+          <td>₹799</td>
+          <td>$12</td>
+          <td>Impulse-friendly in India; coffee-money for global buyers</td>
+          <td>Razorpay (IN) / Stripe (Global)</td>
+        </tr>
+        <tr>
+          <td>Deep Destiny + Audio</td>
+          <td>₹1499</td>
+          <td>$22</td>
+          <td>Still cheap for NRI/global; premium perception vs competitors</td>
+          <td>Razorpay / Stripe / PayPal</td>
+        </tr>
+        <tr>
+          <td>Couple Compatibility</td>
+          <td>₹2499</td>
+          <td>$35</td>
+          <td>Wedding/relationship season upsell — high willingness to pay</td>
+          <td>Razorpay / Stripe</td>
+        </tr>
+        <tr>
+          <td>Live Consultation (30 min)</td>
+          <td>₹2999</td>
+          <td>$45</td>
+          <td>Global buyers expect to pay $40–100 for this; you're underpriced globally</td>
+          <td>Calendly + Stripe / Razorpay</td>
+        </tr>
+        <tr>
+          <td>Monthly Subscription</td>
+          <td>₹299/mo</td>
+          <td>$5/mo</td>
+          <td>Recurring revenue; low churn due to ongoing value</td>
+          <td>Razorpay Subscriptions / Stripe</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- COMPETITION DIFFERENTIATION -->
+<div class="section">
+  <div class="section-title"><span>⚔️</span> Competitive Differentiation</div>
+  <div class="grid-3">
+    <div class="card">
+      <h3>vs Traditional Astrologers</h3>
+      <ul>
+        <li>You: 24h delivery. They: 3–7 days</li>
+        <li>You: ₹799–₹1499. They: ₹2000–₹10000</li>
+        <li>You: structured PDF + audio. They: unformatted WhatsApp text</li>
+        <li>You: data-driven format. They: subjective reading</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>vs Astrology Apps (AstroSage etc.)</h3>
+      <ul>
+        <li>You: human-depth AI report. They: generic template output</li>
+        <li>You: voice audio narrative. They: text-only</li>
+        <li>You: personalized predictions. They: mass-generated charts</li>
+        <li>You: boutique quality. They: scale but no depth</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>vs Western Astrology Platforms</h3>
+      <ul>
+        <li>Saju is underexplored in English internet — SEO is wide open</li>
+        <li>Korean diaspora actively searches for Saju in English — no Indian brand serves them</li>
+        <li>Your cross-cultural positioning (Indian + Korean system) is unique globally</li>
+        <li>No major English-language Saju + AI brand exists yet</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p>Strategy Report for Harish NG · Saju AI Platform · Built June 2026</p>
+  <p style="margin-top:6px;">Semi-manual → full automation path: 3 months organic → 6 months SaaS → 12 months subscription platform</p>
+</div>
+
+</div>
+</body>
+</html>

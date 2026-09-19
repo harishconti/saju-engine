@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Market Size &amp; Demand</title>
+  <style>
+:root {
+  --brand: #2b3a55;
+  --brand-soft: #4a5d7e;
+  --accent: #b48a3a;
+  --bg: #fbfaf6;
+  --bg-soft: #f3efe6;
+  --ink: #1d2330;
+  --ink-soft: #4a5060;
+  --rule: #d9d3c4;
+  --code-bg: #efe9da;
+  --table-stripe: #f6f1e3;
+  --max-w: 880px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.55;
+  font-size: 17px;
+}
+.wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 56px 32px 96px;
+}
+header.cover {
+  border-bottom: 2px solid var(--brand);
+  padding-bottom: 28px;
+  margin-bottom: 40px;
+}
+header.cover .eyebrow {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+}
+header.cover h1 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  font-size: 38px;
+  line-height: 1.15;
+  margin: 8px 0 12px;
+  color: var(--brand);
+}
+header.cover .sub {
+  color: var(--ink-soft);
+  font-size: 16px;
+  font-style: italic;
+}
+header.cover .meta {
+  margin-top: 18px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+}
+nav.toc {
+  background: var(--bg-soft);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brand);
+  padding: 22px 28px 24px;
+  margin: 0 0 48px;
+  border-radius: 2px;
+}
+nav.toc h2 {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand-soft);
+  margin: 0 0 14px;
+  font-weight: 600;
+}
+nav.toc ol {
+  margin: 0;
+  padding-left: 22px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 14.5px;
+}
+nav.toc li { margin: 5px 0; }
+nav.toc a { color: var(--brand); text-decoration: none; }
+nav.toc a:hover { text-decoration: underline; }
+nav.toc .doc-num {
+  display: inline-block;
+  width: 28px;
+  color: var(--accent);
+  font-weight: 600;
+}
+h1, h2, h3, h4 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--brand);
+  line-height: 1.25;
+  margin: 1.6em 0 0.6em;
+}
+h1 { font-size: 30px; border-bottom: 1px solid var(--rule); padding-bottom: 0.25em; }
+h2 { font-size: 24px; }
+h3 { font-size: 19px; color: var(--brand-soft); }
+h4 { font-size: 16px; color: var(--brand-soft); text-transform: uppercase; letter-spacing: 0.05em; }
+p { margin: 0.6em 0 1em; }
+a { color: var(--brand); }
+ul, ol { padding-left: 24px; }
+li { margin: 4px 0; }
+strong { color: var(--ink); }
+em { color: var(--ink-soft); }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.5em 0; }
+code {
+  background: var(--code-bg);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: "SF Mono", "Consolas", "Menlo", monospace;
+  font-size: 0.92em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 14px 16px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 14px;
+  border-left: 3px solid var(--accent);
+}
+pre code { background: none; padding: 0; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1.2em 0;
+  padding: 4px 16px;
+  color: var(--ink-soft);
+  background: var(--bg-soft);
+  font-style: italic;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.2em 0;
+  font-size: 14.5px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+}
+th, td {
+  border: 1px solid var(--rule);
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--brand);
+  color: #fbfaf6;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+tbody tr:nth-child(even) { background: var(--table-stripe); }
+.footnote-ref { font-size: 0.8em; vertical-align: super; }
+.footnotes { margin-top: 3em; border-top: 1px solid var(--rule); padding-top: 1em; font-size: 14px; }
+footer.foot {
+  margin-top: 64px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+@media print {
+  body { background: white; font-size: 11pt; }
+  .wrap { padding: 24px; max-width: none; }
+  nav.toc { page-break-after: always; }
+  h1, h2 { page-break-after: avoid; }
+  table { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    
+<header class="cover">
+  <div class="eyebrow">Market Research · Document 02 of 11</div>
+  <h1>Market Size &amp; Demand</h1>
+</header>
+
+    
+    <main>
+<p><strong>Date:</strong> 2026-06-26
+<strong>Scope:</strong> Global astrology/spiritual wellness market, Indian astrology segment, Korean Saju niche, English-language gap, demand signals relevant to the Saju project.</p>
+<hr />
+<h2>1. Headline numbers</h2>
+<table>
+<thead>
+<tr>
+<th>Market</th>
+<th>Size (2025)</th>
+<th>Growth</th>
+<th>Source / Confidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Global spiritual wellness + astrology</strong></td>
+<td>~USD 4.2B (astrology apps alone, per Raft Labs industry analysis)</td>
+<td>~9.1% CAGR</td>
+<td><a href="https://www.raftlabs.com/blog/how-to-build-astrology-app">Raft Labs</a> — single-source estimate, treat as [estimate].</td>
+</tr>
+<tr>
+<td><strong>Global spiritual wellness market (broader)</strong></td>
+<td>Multi-billion, growing at ~16.1% CAGR (per Market.us)</td>
+<td>16.1% CAGR</td>
+<td><a href="https://market.us/report/spiritual-wellness-astrology-market/">Market.us</a> — single-source, [estimate].</td>
+</tr>
+<tr>
+<td><strong>India astrology services market (broader, includes offline)</strong></td>
+<td><strong>USD 10–12B annually</strong></td>
+<td>~12% CAGR</td>
+<td><a href="https://www.tribuneindia.com/news/impact-feature/instaastro-gains-popularity-among-gen-z-for-astrological-guidance/">The Tribune / InstaAstro reporting</a> and FICCI/KPMG 2022 figures cited at $10B.</td>
+</tr>
+<tr>
+<td><strong>India online astrology market</strong></td>
+<td><strong>USD 102–106M (FY24)</strong></td>
+<td>Projected to decuple by FY30 (~10x by 2030)</td>
+<td><a href="https://redseer.com/articles/astro-tech-cosmic-trends-digital-era/">Redseer Astro-Tech 2024</a> — credible venture-research source.</td>
+</tr>
+<tr>
+<td><strong>India astrology app market</strong></td>
+<td><strong>USD 1.0B in 2025</strong>, projected <strong>USD 3.5B by 2032</strong> (~14.4% CAGR)</td>
+<td>14.4% CAGR</td>
+<td>Industry estimate, consistent across multiple secondary sources.</td>
+</tr>
+<tr>
+<td><strong>Korean Saju apps (domestic, paid + ad-supported)</strong></td>
+<td><strong>Not publicly broken out</strong> — apps classified under Lifestyle/Entertainment</td>
+<td>Limited public data</td>
+<td>Sensor Tower / data.ai behind paywall; most market data in Korean only. [estimate].</td>
+</tr>
+<tr>
+<td><strong>English-language Saju app niche</strong></td>
+<td><strong>Very small</strong>, virtually unmonetized at scale</td>
+<td>Underserved</td>
+<td>Confirmed by multiple Reddit threads on r/Korean, r/ChineseAstrology asking where to find English saju apps; &quot;The Saju Booth&quot; and &quot;Lucky Saju&quot; (iOS, $3.99) are among the only credible English products.</td>
+</tr>
+<tr>
+<td><strong>Global Four Pillars / BaZi app market (Chinese-language)</strong></td>
+<td>Estimated low-hundreds of millions USD annually across major apps</td>
+<td>Subscription-shift underway</td>
+<td><a href="https://astrologytechinsights.com/bazi-monetization-2025">astrologytechinsights.com</a> — single-source [estimate].</td>
+</tr>
+</tbody>
+</table>
+<h2>2. India: the headline opportunity</h2>
+<p>India is by far the largest single-country opportunity because:</p>
+<ol>
+<li><strong>Population + cultural penetration.</strong> ~1.4 billion population, ~70% of urban Indians consult astrologers for major life decisions (2019 YouGov, cited via Redseer).</li>
+<li><strong>AstroTalk is a proven unicorn-scale business.</strong> ₹651 crore FY24 revenue (~USD 78M at 2024 rates), ₹94 crore net profit (10x YoY growth), 30M+ users, 4.5M paid sessions/month, IPO planned for 2026 (targeting ₹2,000 crore). (<a href="https://economictimes.indiatimes.com/tech/startups/astrotalk-rides-online-astrology-boom-to-double-fy24-revenue-to-rs-651-crore/articleshow/113500403.cms">The Economic Times</a>)</li>
+<li><strong>Gen Z is the dominant growth segment.</strong> 60–61% of users on AstroTalk, InstaAstro, Astroyogi are Gen Z (born 1997–2012). Gen Z uses astrology 11% month-on-month at AstroSage. (<a href="https://www.republicworld.com/tech/apps/genz-accounts-for-60-user-base-on-astrology-apps-report">Republic World</a>)</li>
+<li><strong>Subscription and paid chat is the proven model.</strong> Per-minute chat is the dominant monetization (₹10–200/min). Subscription tiers are emerging but less proven than per-minute chat.</li>
+</ol>
+<p><strong>But</strong> the Indian market is dominated by Vedic astrology (Jyotish), not Korean Saju. Korean Saju is a <strong>prestige niche</strong> that has to position as &quot;premium / classical / different&quot; to avoid direct head-to-head with AstroTalk.</p>
+<h2>3. Korean Saju: the heritage market</h2>
+<p>In Korea, Saju is mainstream cultural literacy, not niche:</p>
+<ul>
+<li><strong>~30% of 20-somethings</strong> in Korea use astrology apps vs. ~10% over 60 (Nielsen 2021, cited via Gitnux).</li>
+<li><strong>25% pandemic-era increase</strong> in astrology consultations.</li>
+<li>The dominant app is <strong>&quot;신점 당신의사주&quot;</strong> by 사주닷컴 (founded 2001): 1M+ Google Play downloads, ~4.4★ rating, ~4.5★ iOS, #67 Lifestyle on iOS. Features include Saju calendar, Tojeong bigyeol, Tarot, dream interpretation, 궁합 (compatibility), New Year fortunes, monthly/daily fortunes. ([App Store / Play Store listings, via WebSearch])</li>
+<li>Other notable Korean apps: <strong>사주닷컴 (stjpbl.com)</strong>, <strong>당신의 사주</strong>, <strong>만세력</strong>, <strong>별다줄</strong>, <strong>운세다</strong>. Most monetize via ads + premium subscription + paid one-off consultations.</li>
+</ul>
+<p><strong>Reality check:</strong> the Korean Saju app market is <strong>saturated, mature, and dominated by well-funded incumbents</strong>. New entrants compete on UX and content, not on the calculation itself — the calculation tables are public domain.</p>
+<h2>4. The English-language gap: our real wedge</h2>
+<p>Multiple signals confirm that <strong>English-language, internationally-available Korean Saju is an underserved niche</strong>:</p>
+<ul>
+<li>Reddit threads on r/Korean and r/ChineseAstrology regularly ask &quot;is there a saju app in English?&quot; with the answer usually being &quot;the most popular Korean apps don't work outside Korea.&quot;</li>
+<li>&quot;The Saju Booth&quot; exists but has no public revenue / user metrics — implying small.</li>
+<li>&quot;Lucky Saju&quot; is a $3.99 one-off iOS app — too cheap to be a sustainable business, suggesting limited commercial validation.</li>
+<li>&quot;Aha Chat&quot; and &quot;Korean Saju Palja Chat&quot; are AI chatbot apps; they exist but are not premium products.</li>
+</ul>
+<p><strong>Demand estimate for English-language Korean Saju [estimate, low confidence]:</strong></p>
+<ul>
+<li><strong>Addressable global audience:</strong> 5–15M English-speaking adults interested in Korean astrology (rough estimate based on Hallyu Wave reach: K-pop, K-drama audiences are 50–100M+, of whom an astrology-curious minority is 5–15%). Cross-reference: Korean Wave content reaches ~200M+ globally per Korean Foundation surveys.</li>
+<li><strong>Realistic paying segment (Year 1):</strong> 0.5–2% conversion = 25k–300k potential paying users globally over 5 years.</li>
+<li><strong>India-specific Korean-Saju-curious segment:</strong> smaller, ~50–200k paying users over 5 years (Korean Wave interest is real but smaller than Korean diaspora; India doesn't have a Korean diaspora anywhere near US/Canada/Australia scale).</li>
+</ul>
+<h2>5. Demand signals we already have (from this codebase)</h2>
+<p>The project itself is evidence of demand:</p>
+<ol>
+<li><strong>6 paid pilots already executed</strong> at the Full Map tier (₹3,499), each with a bespoke Markdown + PDF deliverable: Sruthi, Pawan, Harish, Gurumoorthy, Mahesh, Vishnu Priya. All on the same South-Indian client network, mostly via referral.</li>
+<li><strong>Existing intake submissions</strong> in <code>candidates_horoscope/intake/</code> from the self-service calculator (4 test files as of 2026-06-22).</li>
+<li><strong>Cross-candidate joint analysis</strong> (<code>reports/cross-candidate-business-analysis.md</code>) was the highest-value deliverable to the trio — a clear signal that <strong>business / venture analysis is the most demanded use case</strong>, not generic &quot;what does my chart say.&quot;</li>
+</ol>
+<h2>6. Demand by use case</h2>
+<table>
+<thead>
+<tr>
+<th>Use case</th>
+<th>Demand intensity</th>
+<th>Willingness to pay</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Business / venture timing</strong></td>
+<td><strong>Very high</strong> (proven by cross-candidate analysis)</td>
+<td>High (₹3,499 Full Map)</td>
+<td>The 5-business analysis was the single most-praised deliverable in this project.</td>
+</tr>
+<tr>
+<td><strong>Year-ahead outlook</strong> (2027 outlook, etc.)</td>
+<td>High</td>
+<td>High</td>
+<td>The annual forecast in Full Map aligns well.</td>
+</tr>
+<tr>
+<td><strong>Career / domain fit</strong></td>
+<td>High</td>
+<td>High</td>
+<td>The <code>career.md</code> follow-up files exist for 5 of 6 candidates — universally demanded.</td>
+</tr>
+<tr>
+<td><strong>Compatibility / matchmaking</strong></td>
+<td>High in India specifically</td>
+<td>Medium</td>
+<td>Vedic Kundli Milan is dominant in India; Korean 궁합 has to differentiate.</td>
+</tr>
+<tr>
+<td><strong>Daily / monthly horoscope</strong></td>
+<td>Medium-high</td>
+<td>Low (free tier expectation)</td>
+<td>Highest volume but lowest ARPU. Should be a free funnel, not a paid product.</td>
+</tr>
+<tr>
+<td><strong>Marriage timing</strong></td>
+<td>High</td>
+<td>Medium</td>
+<td>Year-specific deliverable.</td>
+</tr>
+<tr>
+<td><strong>Children / parenting analysis</strong></td>
+<td>Low-Medium</td>
+<td>Low</td>
+<td>Niche.</td>
+</tr>
+<tr>
+<td><strong>Health tendencies</strong></td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Important to position as &quot;tendencies, not diagnosis&quot; — see CLAUDE.md ground rules.</td>
+</tr>
+<tr>
+<td><strong>Relocation / feng shui</strong></td>
+<td>Low-Medium</td>
+<td>Low</td>
+<td>Niche in English market.</td>
+</tr>
+</tbody>
+</table>
+<h2>7. Demand seasonality</h2>
+<ul>
+<li><strong>New Year (Jan 1–15):</strong> massive spike in &quot;year ahead&quot; queries. Indian + Korean + Chinese New Year periods all concentrate demand.</li>
+<li><strong>Wedding season (Oct–Feb in India):</strong> matchmaking / compatibility demand spikes.</li>
+<li><strong>April–June (exam season in India):</strong> parent-driven academic timing queries.</li>
+<li><strong>Career season (March–June):</strong> job-switch / business-launch queries spike.</li>
+</ul>
+<p><strong>Implication:</strong> the annual forecast window in Full Map should be <strong>heavy on Jan, light on Jul</strong>. The Companion subscription model has natural retention logic around new year / new quarter.</p>
+<h2>8. What this means for the project</h2>
+<table>
+<thead>
+<tr>
+<th>Insight</th>
+<th>Implication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>India is the biggest single market by value but most contested.</td>
+<td>Enter India via Tier 1 only (Spark ₹499) initially; avoid head-to-head with AstroTalk on Vedic.</td>
+</tr>
+<tr>
+<td>English-language Korean Saju is underserved globally.</td>
+<td>This is the durable wedge — Indian diaspora + Korean diaspora + Hallyu-curious global audience.</td>
+</tr>
+<tr>
+<td>The 6 paid pilots prove the Full Map price point works in person.</td>
+<td>The bottleneck is interpretation throughput, not pricing.</td>
+</tr>
+<tr>
+<td>Business / venture / career use cases are most in demand.</td>
+<td>Lean the marketing and product copy toward career + business, not &quot;destiny.&quot;</td>
+</tr>
+<tr>
+<td>Daily horoscope is a funnel, not a product.</td>
+<td>Free tier = daily / monthly fortune; paid tier = deep natal + timing.</td>
+</tr>
+</tbody>
+</table>
+<h2>9. Sources</h2>
+<ul>
+<li><a href="https://market.us/report/spiritual-wellness-astrology-market/">Market.us: Spiritual Wellness Astrology Market</a></li>
+<li><a href="https://www.grandviewresearch.com/industry-analysis/spiritual-wellness-astrology-market-report">Grand View Research: Spiritual Wellness Astrology</a></li>
+<li><a href="https://redseer.com/articles/astro-tech-cosmic-trends-digital-era/">Redseer: Astro-Tech Cosmic Trends in the Digital Era</a></li>
+<li><a href="https://economictimes.indiatimes.com/tech/startups/astrotalk-rides-online-astrology-boom-to-double-fy24-revenue-to-rs-651-crore/articleshow/113500403.cms">The Economic Times: AstroTalk FY24 revenue</a></li>
+<li><a href="https://www.tribuneindia.com/news/impact-feature/instaastro-gains-popularity-among-gen-z-for-astrological-guidance/">The Tribune: InstaAstro Gen Z trends</a></li>
+<li><a href="https://entrackr.com/2024/05/instaastro-raises-2-3-mn-led-by-artha-venture-fund/">Entrackr: InstaAstro funding</a></li>
+<li><a href="https://www.republicworld.com/tech/apps/genz-accounts-for-60-user-base-on-astrology-apps-report">Republic World: Gen Z on astrology apps</a></li>
+<li><a href="https://numrovani.com/ai-astrology-2025-mid-year-study/">NumroVani: AI Astrology 2025 Consumer Trends</a></li>
+<li><a href="https://www.raftlabs.com/blog/how-to-build-astrology-app">Raft Labs: How to Build an Astrology App</a></li>
+<li><a href="https://www.axios.com/2021/04/14/astrology-app-co-star-raises-15-million-funding">Axios: Co-Star $15M Series A</a></li>
+<li><a href="https://www.cbinsights.com/company/co-star-astrology-society/financials">CB Insights: Co-Star financials</a></li>
+<li><a href="https://gitnux.org/astrology-statistics/">Gitnux: Astrology Statistics 2026</a></li>
+<li><a href="https://astrologytechinsights.com/bazi-monetization-2025">Astrology Tech Insights: BaZi monetization 2025</a></li>
+</ul>
+
+    
+<nav class="toc" style="margin-top:48px;font-size:14px;">
+  <div style="display:flex;justify-content:space-between;gap:12px;">
+    <div></div>
+    <div><a href="combined.html">↑ Combined report</a></div>
+    <div><a href="03-competitor-landscape.html">Doc 03: Competitor Landscape →</a></div>
+  </div>
+</nav>
+</main>
+    <footer class="foot">
+      Saju market research · generated 2026-06-28 · /
+      <a href="https://github.com/anthropics/skills">no external dependencies beyond markdown-it-py</a>
+    </footer>
+  </div>
+</body>
+</html>

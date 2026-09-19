@@ -1,0 +1,999 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Architecture — Backend × Vercel × Cosmic ID</title>
+  <style>
+:root {
+  --brand: #2b3a55;
+  --brand-soft: #4a5d7e;
+  --accent: #b48a3a;
+  --bg: #fbfaf6;
+  --bg-soft: #f3efe6;
+  --ink: #1d2330;
+  --ink-soft: #4a5060;
+  --rule: #d9d3c4;
+  --code-bg: #efe9da;
+  --table-stripe: #f6f1e3;
+  --max-w: 880px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.55;
+  font-size: 17px;
+}
+.wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 56px 32px 96px;
+}
+header.cover {
+  border-bottom: 2px solid var(--brand);
+  padding-bottom: 28px;
+  margin-bottom: 40px;
+}
+header.cover .eyebrow {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+}
+header.cover h1 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  font-size: 38px;
+  line-height: 1.15;
+  margin: 8px 0 12px;
+  color: var(--brand);
+}
+header.cover .sub {
+  color: var(--ink-soft);
+  font-size: 16px;
+  font-style: italic;
+}
+header.cover .meta {
+  margin-top: 18px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+}
+nav.toc {
+  background: var(--bg-soft);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brand);
+  padding: 22px 28px 24px;
+  margin: 0 0 48px;
+  border-radius: 2px;
+}
+nav.toc h2 {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand-soft);
+  margin: 0 0 14px;
+  font-weight: 600;
+}
+nav.toc ol {
+  margin: 0;
+  padding-left: 22px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 14.5px;
+}
+nav.toc li { margin: 5px 0; }
+nav.toc a { color: var(--brand); text-decoration: none; }
+nav.toc a:hover { text-decoration: underline; }
+nav.toc .doc-num {
+  display: inline-block;
+  width: 28px;
+  color: var(--accent);
+  font-weight: 600;
+}
+h1, h2, h3, h4 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--brand);
+  line-height: 1.25;
+  margin: 1.6em 0 0.6em;
+}
+h1 { font-size: 30px; border-bottom: 1px solid var(--rule); padding-bottom: 0.25em; }
+h2 { font-size: 24px; }
+h3 { font-size: 19px; color: var(--brand-soft); }
+h4 { font-size: 16px; color: var(--brand-soft); text-transform: uppercase; letter-spacing: 0.05em; }
+p { margin: 0.6em 0 1em; }
+a { color: var(--brand); }
+ul, ol { padding-left: 24px; }
+li { margin: 4px 0; }
+strong { color: var(--ink); }
+em { color: var(--ink-soft); }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.5em 0; }
+code {
+  background: var(--code-bg);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: "SF Mono", "Consolas", "Menlo", monospace;
+  font-size: 0.92em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 14px 16px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 14px;
+  border-left: 3px solid var(--accent);
+}
+pre code { background: none; padding: 0; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1.2em 0;
+  padding: 4px 16px;
+  color: var(--ink-soft);
+  background: var(--bg-soft);
+  font-style: italic;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.2em 0;
+  font-size: 14.5px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+}
+th, td {
+  border: 1px solid var(--rule);
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--brand);
+  color: #fbfaf6;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+tbody tr:nth-child(even) { background: var(--table-stripe); }
+.footnote-ref { font-size: 0.8em; vertical-align: super; }
+.footnotes { margin-top: 3em; border-top: 1px solid var(--rule); padding-top: 1em; font-size: 14px; }
+footer.foot {
+  margin-top: 64px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+@media print {
+  body { background: white; font-size: 11pt; }
+  .wrap { padding: 24px; max-width: none; }
+  nav.toc { page-break-after: always; }
+  h1, h2 { page-break-after: avoid; }
+  table { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    
+<header class="cover">
+  <div class="eyebrow">Market Research · Document 13 of 11</div>
+  <h1>Architecture — Backend × Vercel × Cosmic ID</h1>
+</header>
+
+    
+    <main>
+<p><strong>Date:</strong> 2026-06-26
+<strong>Scope:</strong> How to split the Korean-Saju product across <strong>Saju repo (backend)</strong>, <strong>a new Vercel web app (frontend for paid PDFs)</strong>, and <strong>Cosmic ID / AgeReveal (Android client for free + upsell)</strong>. Includes what to change in the Cosmic ID codebase and the canonical feature split.</p>
+<hr />
+<h2>1. The verdict in one paragraph</h2>
+<p><strong>Make the Saju repo the backend.</strong> It already contains the canonical engine (<code>tools/saju_engine/</code>), the citation-grounded knowledge base (<code>knowledge/</code>), the premium tiered report generator (<code>tools/saju_engine/premium_report.py</code>), and the PDF toolchain (<code>tools/md_to_saju_pdf.py</code>, <code>tools/md_to_saju_html_pdf.py</code>). All it needs is a thin HTTP layer wrapping the existing <code>compute_chart()</code> + <code>build_pdf_from_chart()</code> flow and a Postgres/Redis layer for user accounts, orders, and subscription state. <strong>Add a new Next.js + Vercel web app</strong> that talks to that backend via JSON — this is where paying customers buy Spark/Reading/Full Map and get tiered PDFs. <strong>Keep Cosmic ID (AgeReveal) on-device for free features</strong> (Korean Saju preview, 오행 balance, current 대운, daily fortune) and <strong>deep-link to the web app for paid tiers</strong> (Full Map PDF, Companion subscription, year-ahead). The Android app becomes a discovery + retention surface; the web app becomes the monetization surface.</p>
+<hr />
+<h2>2. The three layers</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────────┐
+│  ANDROID CLIENT — Cosmic ID / AgeReveal                             │
+│  ─ on-device Korean Saju preview (free)                             │
+│  ─ 오행 balance, 천간·지지 in Hangul, current 대운                   │
+│  ─ Compatibility (single-screen, free)                              │
+│  ─ Daily fortune / birthday reminders (existing v2.0 features)      │
+│  ─ &quot;Get Full Map →&quot; deep-link to web app for paid tier               │
+│  ─ In-app subscription (Google Play Billing) routes to Companion     │
+│    via backend subscription state                                   │
+│                                                                     │
+│  Location: /mnt/data2/git_repos/AgeReveal/  (existing, KEEP)        │
+│  Deploy:    Play Store                                              │
+└──────────────────────────────┬──────────────────────────────────────┘
+                               │  HTTPS / JSON
+                               │  (capabilities: chart-preview,
+                               │   save-profile, link-account)
+┌──────────────────────────────▼──────────────────────────────────────┐
+│  WEB APP — Next.js 14 + Vercel                                     │
+│  ─ Pricing page, FAQ, pillar SEO posts                              │
+│  ─ Intake form (DOB + time + location + tier select)                │
+│  ─ Razorpay (IN) + Stripe (Intl) checkout                           │
+│  ─ User accounts (Clerk or Supabase)                                │
+│  ─ Tiered PDF viewer + email delivery                               │
+│  ─ Companion dashboard (subscription mgmt)                          │
+│  ─ Admin queue: founder review of Reading/Full Map drafts           │
+│                                                                     │
+│  Location: NEW repo  saju-web/  at /mnt/data2/git_repos/            │
+│  Deploy:    Vercel (existing Railway subscription retired)          │
+└──────────────────────────────┬──────────────────────────────────────┘
+                               │  HTTPS / JSON
+                               │  (POST /v1/chart,
+                               │   POST /v1/report/preview,
+                               │   POST /v1/orders,
+                               │   GET  /v1/orders/{id}/pdf)
+┌──────────────────────────────▼──────────────────────────────────────┐
+│  BACKEND — Saju Engine Service                                     │
+│  ─ saju_engine.compute_chart()   (60-cycle, 십신, 12운성, 대운)     │
+│  ─ saju_engine.premium_report    (tiered Spark/Reading/Full Map)    │
+│  ─ md_to_saju_pdf / html_pdf     (PDF rendering, two backends)     │
+│  ─ knowledge/  (11-file citation-grounded corpus)                   │
+│  ─ POST /v1/chart             → Chart JSON                         │
+│  ─ POST /v1/report/preview    → premium markdown (engine draft)     │
+│  ─ POST /v1/report/finalize   → apply human-review deltas → PDF     │
+│  ─ GET  /v1/orders/{id}/pdf   → signed URL or stream               │
+│  ─ POST /v1/subscriptions     → webhook receiver (Razorpay+Stripe) │
+│                                                                     │
+│  Location: /mnt/data2/git_repos/saju/tools/  (existing)             │
+│  Deploy:    Railway (existing subscription KEEP) or Fly.io           │
+└─────────────────────────────────────────────────────────────────────┘
+                               │
+┌──────────────────────────────▼──────────────────────────────────────┐
+│  DATA LAYER                                                         │
+│  ─ Postgres (Neon / Supabase): users, orders, subscriptions         │
+│  ─ S3 / R2 / Vercel Blob: generated PDFs                            │
+│  ─ Resend: transactional email                                      │
+│  ─ Razorpay / Stripe: payments                                      │
+│  ─ Plausible / PostHog: analytics                                   │
+└─────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<hr />
+<h2>3. Why this split</h2>
+<h3>3.1 The engine belongs on a server, not in an APK</h3>
+<p><code>saju_engine/</code> is a Python module wrapping <code>sajupy</code> + 11 knowledge files + premium-report scaffold. Three reasons it must stay server-side:</p>
+<ol>
+<li><strong>Updates ship instantly.</strong> Pricing change, citation correction, new 섹션 in Reading tier — push to Railway, all clients see it next request. With on-device you'd ship a Play Store update.</li>
+<li><strong>Premium tier is a heavy compute.</strong> <code>premium_report.py</code> is multi-section markdown with overlay compositing — 5–15s on cold cache. Fine on a server, jank on a phone.</li>
+<li><strong>The <code>knowledge/</code> corpus is the moat.</strong> Keeping it on-device (in the APK) exposes the citation-grounded rules to anyone who unzips the APK. Server-side it stays private.</li>
+</ol>
+<h3>3.2 The web app is where money changes hands</h3>
+<p>Web app gets:</p>
+<ul>
+<li><strong>SEO surface</strong> for &quot;Korean Saju reading English&quot; + 80–100 pillar posts (Google's 2026 YMYL rules disfavor apps for astrology content; web ranks).</li>
+<li><strong>Full Razorpay + Stripe flow</strong> with checkout, webhook receipt, refund, tax handling.</li>
+<li><strong>Email + welcome sequence + PDF download</strong> in one place.</li>
+<li><strong>Subscription dashboard</strong> for Companion.</li>
+</ul>
+<p>Android is great for <strong>discovery + retention</strong> but <strong>terrible for SEO</strong> and <strong>fine for IAP</strong> but worse than web for <strong>Razorpay/Stripe</strong> in India where UPI/cards/autopay dominate.</p>
+<h3>3.3 Cosmic ID stays free + on-device</h3>
+<p>The Android app already has 50k+ installs implied by the v2.0 production rollout, a working SajuKoreanCalculator.kt (673 LOC, lunar-java based, Hangul-first), and a Google Play Billing subscription (<code>premium_monthly</code> ₹49, <code>premium_yearly</code> ₹299). Throwing all that away to rebuild on Vercel+Capacitor would burn the existing acquisition funnel.</p>
+<p><strong>Keep Cosmic ID as the free + IAP funnel. Push paid tiers to the web app.</strong></p>
+<hr />
+<h2>4. Backend changes in the Saju repo</h2>
+<h3>4.1 Add: thin FastAPI wrapper around existing engine</h3>
+<p>Today: <code>tools/client_intake_app.py</code> is a working FastAPI app that:</p>
+<ul>
+<li>serves <code>client_intake_app.html</code> at <code>/</code></li>
+<li>accepts form POST → calls <code>compute_chart()</code> → calls <code>build_pdf_from_chart()</code> → returns PDF</li>
+</ul>
+<p>It works for solo-founder local use. Promote it to a production service by:</p>
+<ol>
+<li><strong>Wrap with a versioned API</strong> at <code>/v1/...</code> (additive, doesn't break the existing <code>/generate</code> for legacy clients).</li>
+<li><strong>Pull user/orders state out of JSON files in <code>candidates_horoscope/intake/</code></strong> into Postgres.</li>
+<li><strong>Add idempotency keys</strong> on order creation (avoid double-charge on retry).</li>
+<li><strong>Add webhook receivers</strong> for Razorpay + Stripe.</li>
+<li><strong>Add signed PDF URLs</strong> (or stream through backend) — never expose PDFs at predictable paths.</li>
+</ol>
+<p>Suggested new file: <code>tools/api_server.py</code>. Coexists with <code>client_intake_app.py</code>; the latter stays for local solo-founder use.</p>
+<h3>4.2 Add: Postgres schema (minimal)</h3>
+<pre><code class="language-sql">-- users
+id uuid pk, email text unique, name text, created_at timestamptz
+
+-- profiles (one user → many birth profiles)
+id uuid pk, user_id fk, name, gender, dob date, birth_time time,
+birth_location text, lat real, lon real, utc_offset_min int
+
+-- orders
+id uuid pk, user_id fk, profile_id fk, tier text, price_inr int,
+status text, gateway text, gateway_ref text, created_at timestamptz
+
+-- subscriptions
+id uuid pk, user_id fk, tier text, gateway text, gateway_ref text,
+status text, current_period_end timestamptz
+
+-- review_queue
+id uuid pk, order_id fk, engine_draft_md text,
+human_review_md text, reviewer text, status text, updated_at timestamptz
+</code></pre>
+<p>Neon (free tier) or Supabase Postgres are the obvious picks. Use SQLAlchemy 2.x async + Alembic migrations.</p>
+<h3>4.3 Add: minimal auth (Clerk or Supabase)</h3>
+<p>You don't want to write auth. <strong>Use Clerk</strong> for the web app (free tier covers hobby scale, magic-link auth out of the box). The Android app uses Google sign-in (already implied by Firebase Analytics) → exchange ID token at <code>/v1/auth/exchange</code> for a backend JWT.</p>
+<h3>4.4 Add: payment webhooks</h3>
+<ul>
+<li>Razorpay webhook: <code>payment.captured</code>, <code>subscription.activated</code>, <code>subscription.cancelled</code>. Verify HMAC-SHA256 with secret.</li>
+<li>Stripe webhook: <code>checkout.session.completed</code>, <code>invoice.paid</code>, <code>customer.subscription.deleted</code>. Verify with <code>STRIPE_WEBHOOK_SECRET</code>.</li>
+</ul>
+<p>Both flows should write to <code>orders</code> / <code>subscriptions</code> tables and trigger <code>tools/build-pdf.sh --from-chart ...</code> for the order, then email the customer.</p>
+<h3>4.5 Keep: existing engine + knowledge + PDF toolchain untouched</h3>
+<p><code>tools/saju_engine/</code>, <code>tools/md_to_saju_pdf.py</code>, <code>tools/md_to_saju_html_pdf.py</code>, <code>tools/build-pdf.sh</code>, and <code>knowledge/</code> should <strong>not</strong> be modified for the API split — they're the canonical assets. Only the API layer and storage layer are new.</p>
+<h3>4.6 Keep: Railway subscription</h3>
+<p>The user already has Railway. <strong>Keep it for the backend.</strong> It's well-suited for FastAPI long-running services with Postgres add-on. Estimated cost at base case (Scenario B from <code>11-financial-model.md</code>):</p>
+<ul>
+<li>Railway Hobby plan: $5/mo + usage (~$5–20/mo at low traffic)</li>
+<li>Postgres add-on: $5/mo (free tier exists; paid when DB &gt; 1GB)</li>
+<li>Total backend: <strong>$10–25/mo</strong> until you cross ~10k orders/mo</li>
+</ul>
+<p>Vercel is for the <strong>web app only</strong> (Next.js frontend). Railway runs the Python.</p>
+<h3>4.7 What does NOT change</h3>
+<ul>
+<li><code>tools/saju_engine/</code> (calculation logic)</li>
+<li><code>knowledge/</code> (citation corpus)</li>
+<li><code>tools/build-pdf.sh</code> (PDF toolchain wrapper)</li>
+<li><code>tools/client_intake_app.py</code> (legacy solo-founder local use)</li>
+<li><code>candidates_horoscope/</code> (hand-written reports + pilot data)</li>
+<li><code>tests/</code> (129 pytest cases — keep green)</li>
+</ul>
+<hr />
+<h2>5. New: Web app on Vercel</h2>
+<h3>5.1 Stack</h3>
+<ul>
+<li><strong>Framework:</strong> Next.js 14+ App Router (server-rendered for SEO)</li>
+<li><strong>Styling:</strong> Tailwind + the same brand CSS variables from <code>market_research_html/combined.html</code> (warm cream, dark navy headings, brass accent)</li>
+<li><strong>Auth:</strong> Clerk</li>
+<li><strong>DB:</strong> Neon Postgres (or Supabase) — same schema as backend</li>
+<li><strong>Payments:</strong> Razorpay + Stripe Checkout</li>
+<li><strong>Email:</strong> Resend</li>
+<li><strong>Analytics:</strong> Plausible (self-hosted or .io)</li>
+<li><strong>Forms:</strong> React Hook Form + Zod</li>
+</ul>
+<h3>5.2 Pages (URLs)</h3>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/</code></td>
+<td>Landing page (pricing, FAQ, pillar posts index)</td>
+</tr>
+<tr>
+<td><code>/saju-reading</code></td>
+<td>Spark/Reading/Full Map product page</td>
+</tr>
+<tr>
+<td><code>/compatibility</code></td>
+<td>궁합 product page</td>
+</tr>
+<tr>
+<td><code>/pricing</code></td>
+<td>Tiered pricing table</td>
+</tr>
+<tr>
+<td><code>/blog/[slug]</code></td>
+<td>SEO pillar posts (4–8/month for Year 1)</td>
+</tr>
+<tr>
+<td><code>/blog</code></td>
+<td>Index</td>
+</tr>
+<tr>
+<td><code>/faq</code></td>
+<td>FAQ</td>
+</tr>
+<tr>
+<td><code>/about</code></td>
+<td>Founder bio + classical-tradition positioning</td>
+</tr>
+<tr>
+<td><code>/contact</code></td>
+<td>Form</td>
+</tr>
+<tr>
+<td><code>/legal/privacy</code></td>
+<td>GDPR + DPDP compliant privacy policy</td>
+</tr>
+<tr>
+<td><code>/legal/refunds</code></td>
+<td>Refund policy</td>
+</tr>
+<tr>
+<td><code>/onboarding</code></td>
+<td>2-step intake (name+contact → DOB+time+location+tier)</td>
+</tr>
+<tr>
+<td><code>/checkout/[orderId]</code></td>
+<td>Razorpay/Stripe redirect</td>
+</tr>
+<tr>
+<td><code>/checkout/success</code></td>
+<td>Post-payment landing</td>
+</tr>
+<tr>
+<td><code>/dashboard</code></td>
+<td>User home (orders, subscription, profile)</td>
+</tr>
+<tr>
+<td><code>/dashboard/orders</code></td>
+<td>Order history + PDF downloads</td>
+</tr>
+<tr>
+<td><code>/dashboard/companion</code></td>
+<td>Subscription mgmt (cancel, update card)</td>
+</tr>
+<tr>
+<td><code>/dashboard/profile</code></td>
+<td>Birth profiles CRUD</td>
+</tr>
+<tr>
+<td><code>/admin/queue</code></td>
+<td>Founder review queue (Reading/Full Map drafts)</td>
+</tr>
+<tr>
+<td><code>/api/auth/[...clerk]</code></td>
+<td>Clerk webhooks</td>
+</tr>
+<tr>
+<td><code>/api/webhooks/razorpay</code></td>
+<td>Payment webhook</td>
+</tr>
+<tr>
+<td><code>/api/webhooks/stripe</code></td>
+<td>Payment webhook</td>
+</tr>
+<tr>
+<td><code>/api/chart/preview</code></td>
+<td>→ proxies backend <code>/v1/chart</code></td>
+</tr>
+</tbody>
+</table>
+<h3>5.3 What it does NOT do</h3>
+<ul>
+<li><strong>No chart calculation in the browser.</strong> Always proxy to backend.</li>
+<li><strong>No PDF rendering in the browser.</strong> Always fetch from backend <code>/v1/orders/{id}/pdf</code>.</li>
+<li><strong>No AI prompts on the frontend.</strong> LLM-based review is backend-internal.</li>
+</ul>
+<h3>5.4 SEO</h3>
+<ul>
+<li>Server-rendered (App Router default).</li>
+<li>Schema markup: <code>Article</code>, <code>FAQPage</code>, <code>Product</code>, <code>Organization</code>, <code>Person</code> (founder E-E-A-T).</li>
+<li>Sitemap auto-generated.</li>
+<li><code>hreflang</code> for en/hi/ko future.</li>
+<li>Page speed budget: &lt;2s LCP on Indian 4G.</li>
+</ul>
+<h3>5.5 Vercel cost</h3>
+<ul>
+<li>Free tier covers hobby.</li>
+<li>Pro plan ($20/mo per seat) only when you need team features or &gt;100GB bandwidth.</li>
+<li><strong>At base case Scenario B</strong>, expect <strong>$0–25/mo Vercel</strong>.</li>
+</ul>
+<hr />
+<h2>6. Cosmic ID (AgeReveal) — what changes</h2>
+<p>The Android app has a real, working Saju layer already (<code>SajuKoreanCalculator.kt</code>, 673 LOC, lunar-java based, Hangul-first). It's <em>different</em> from the Saju repo's <code>sajupy</code>-based engine — simpler, less citation-grounded, no <code>knowledge/</code> corpus, no premium tiered reports.</p>
+<h3>6.1 The strategic question</h3>
+<p><strong>Two options for Korean Saju on Android:</strong></p>
+<p><strong>Option A — Keep on-device SajuKoreanCalculator.kt, add deep-links to web app.</strong></p>
+<ul>
+<li>Pros: no APK size increase, no engine sync, on-device works offline (good for Indian rural 4G).</li>
+<li>Cons: two engines means two possible interpretations for the same chart (user complains &quot;my phone says X, my web app says Y&quot;).</li>
+</ul>
+<p><strong>Option B — Replace on-device Saju with backend calls.</strong></p>
+<ul>
+<li>Pros: single source of truth, server citations, no APK size hit from <code>knowledge/</code>.</li>
+<li>Cons: requires network for every Saju feature; degrades badly on poor connectivity; APK can't preview offline.</li>
+</ul>
+<p><strong>Recommendation: Option A (keep on-device) for <em>free preview</em> features, add backend calls for <em>paid</em> features.</strong></p>
+<p>Concretely:</p>
+<ul>
+<li>Day Master, 오행 balance, current 대운, daily fortune → <strong>on-device</strong> (free, offline-friendly)</li>
+<li>Full Map tier PDF, year-ahead, Companion check-ins → <strong>deep-link to web app</strong></li>
+</ul>
+<h3>6.2 Specific code changes (minimal)</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Change</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SajuKoreanCalculator.kt</code></td>
+<td><strong>Keep as-is.</strong> Optionally surface a <code>[FREE PREVIEW — for Full Map detail, see cosmicsaju.com/saju]</code> watermark.</td>
+<td>On-device stays the discovery surface.</td>
+</tr>
+<tr>
+<td><code>DetailsUnlockScreen.kt</code></td>
+<td><strong>Keep Overview/Western/Vedic tabs free.</strong> Add a &quot;Get Full Map →&quot; button on the Korean Saju tab that opens a deep-link to <code>https://cosmicsaju.com/saju-full-map?profileId={id}</code> (profile data encoded in URL).</td>
+<td>Drives paid conversion to web app without losing the free preview.</td>
+</tr>
+<tr>
+<td><code>CompatibilityScreen.kt</code></td>
+<td><strong>Keep the Western + Korean compatibility score</strong> (50/50 blend). Optionally add a &quot;Get 궁합 Full Report →&quot; deep-link.</td>
+<td>Compatibility is the #1 requested feature per <code>04-feature-demand.md</code>.</td>
+</tr>
+<tr>
+<td><code>PaywallScreen.kt</code></td>
+<td><strong>Add a third tier</strong> for &quot;Korean Saju Full Map&quot; pointing to web app. The existing <code>premium_monthly</code> (₹49) and <code>premium_yearly</code> (₹299) <strong>stay as Companion-style subscriptions</strong> but route through backend for subscription state sync.</td>
+<td>Don't break existing billing.</td>
+</tr>
+<tr>
+<td><code>BillingManager.kt</code></td>
+<td><strong>Add a webhook listener</strong> to POST purchase events to backend <code>/v1/subscriptions</code>. Backend is the source of truth; the Android app reads cached state for UI.</td>
+<td>Single subscription state across web + Android.</td>
+</tr>
+<tr>
+<td><code>UserPreferencesRepository</code></td>
+<td><strong>Add <code>webAppLinkToken</code></strong> — magic-link token generated by backend for one-tap web login from Android.</td>
+<td>No password friction.</td>
+</tr>
+<tr>
+<td><code>MainActivity.kt</code></td>
+<td><strong>Handle new deep-links:</strong> <code>cosmicid://saju-full-map</code>, <code>https://cosmicsaju.com/saju-full-map</code>.</td>
+<td>App Links for Android 12+.</td>
+</tr>
+<tr>
+<td><code>OnboardingScreen.kt</code></td>
+<td><strong>Step 3 (after birth details): add &quot;Sign in to sync with cosmicsaju.com&quot; as an optional step.</strong></td>
+<td>Bridge to web app account.</td>
+</tr>
+<tr>
+<td><code>CalculatorScreen.kt</code></td>
+<td><strong>Add a &quot;Korean Saju&quot; card</strong> (currently lives in DetailsUnlockScreen). Make it more discoverable.</td>
+<td>Korean Saju is the East-Asian pillar per CLAUDE.md.</td>
+</tr>
+<tr>
+<td><code>ShareCardGenerator.kt</code></td>
+<td><strong>Add <code>drawSajuKoreanBalanceCard()</code></strong> (already in roadmap) — 오행 radar card, free, shareable.</td>
+<td>Drives organic discovery.</td>
+</tr>
+<tr>
+<td><code>BuildConfig.kt</code></td>
+<td><strong>Add <code>BACKEND_URL</code></strong> build config field (different per build type — debug = staging, release = prod).</td>
+<td>Clean config.</td>
+</tr>
+</tbody>
+</table>
+<h3>6.3 New feature additions (and whether to add them)</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Add to Cosmic ID?</th>
+<th>Add to Web app?</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Day Master preview</td>
+<td>✅ Yes (on-device)</td>
+<td>—</td>
+<td>Already in <code>SajuKoreanCalculator.kt</code></td>
+</tr>
+<tr>
+<td>오행 balance</td>
+<td>✅ Yes (on-device)</td>
+<td>—</td>
+<td>Already in <code>SajuKoreanCalculator.kt</code></td>
+</tr>
+<tr>
+<td>Current 대운</td>
+<td>✅ Yes (on-device)</td>
+<td>—</td>
+<td>Already in <code>SajuKoreanCalculator.kt</code></td>
+</tr>
+<tr>
+<td>Daily fortune</td>
+<td>✅ Yes (on-device)</td>
+<td>—</td>
+<td>Already shipped in v2.0</td>
+</tr>
+<tr>
+<td>Compatibility (Western+Korean blend)</td>
+<td>✅ Yes (on-device)</td>
+<td>—</td>
+<td>Already shipped</td>
+</tr>
+<tr>
+<td>궁합 full report PDF</td>
+<td>❌ No — deep-link</td>
+<td>✅ Yes</td>
+<td>Avoids two-engine interpretation drift</td>
+</tr>
+<tr>
+<td>Full Map tier PDF</td>
+<td>❌ No — deep-link</td>
+<td>✅ Yes</td>
+<td>Citation-grounded, server-side</td>
+</tr>
+<tr>
+<td>Year-ahead forecast</td>
+<td>❌ No — deep-link</td>
+<td>✅ Yes</td>
+<td>Server-side</td>
+</tr>
+<tr>
+<td>Companion subscription</td>
+<td>✅ Yes (existing Play Billing)</td>
+<td>✅ Yes (Razorpay/Stripe)</td>
+<td><strong>Both</strong> — sync via backend</td>
+</tr>
+<tr>
+<td>Companion dashboard</td>
+<td>❌ No — deep-link</td>
+<td>✅ Yes</td>
+<td>Web UX is richer</td>
+</tr>
+<tr>
+<td>Compatibility product (₹999 standalone)</td>
+<td>❌ No — deep-link</td>
+<td>✅ Yes</td>
+<td>The #1 market gap</td>
+</tr>
+<tr>
+<td>Annual report (December reminder)</td>
+<td>✅ Push notif</td>
+<td>✅ Email + landing</td>
+<td>Push + email both</td>
+</tr>
+<tr>
+<td>Spark (₹499 PDF)</td>
+<td>❌ No — deep-link</td>
+<td>✅ Yes</td>
+<td>Free preview already covers most of this</td>
+</tr>
+<tr>
+<td>Reading (₹1,499 PDF)</td>
+<td>❌ No — deep-link</td>
+<td>✅ Yes</td>
+<td>Founder-reviewed, server-side</td>
+</tr>
+<tr>
+<td>Sipsin 십신 table</td>
+<td>✅ Yes (on-device, free preview)</td>
+<td>✅ Yes (full Reading+)</td>
+<td>Free preview shows top-3 only</td>
+</tr>
+<tr>
+<td>12운성 chart</td>
+<td>✅ Yes (on-device)</td>
+<td>✅ Yes</td>
+<td>Same data both sides</td>
+</tr>
+<tr>
+<td>신살 (special stars)</td>
+<td>❌ No — server-only</td>
+<td>✅ Yes</td>
+<td>Requires <code>knowledge/stars.md</code> corpus</td>
+</tr>
+<tr>
+<td>궁합 (sipsin cross-matrix)</td>
+<td>⚠️ Free preview only</td>
+<td>✅ Yes (full report)</td>
+<td>Free shows score; paid shows full matrix</td>
+</tr>
+<tr>
+<td>In-app Korean Saju IAP (₹149 one-time)</td>
+<td>⚠️ Deprecate</td>
+<td>—</td>
+<td>Roadmap Mission 7 lists this, but it conflicts with web-app monetization. <strong>Recommendation: skip in favor of web deep-link.</strong> See §6.4.</td>
+</tr>
+<tr>
+<td>Lunar phase widget</td>
+<td>✅ Yes (existing)</td>
+<td>—</td>
+<td>Glance widget already shipped</td>
+</tr>
+<tr>
+<td>Birthday widget</td>
+<td>✅ Yes (existing)</td>
+<td>—</td>
+<td>Glance widget already shipped</td>
+</tr>
+<tr>
+<td>Friend / family profile sharing</td>
+<td>⚠️ Defer</td>
+<td>✅ Yes (later)</td>
+<td>Needs user accounts first</td>
+</tr>
+</tbody>
+</table>
+<h3>6.4 Whether to build the Korean Saju IAP in Cosmic ID</h3>
+<p>The Cosmic ID roadmap (Mission 7) lists a one-time ₹149 Korean Saju Premium Unlock IAP as a v2.1 item. <strong>Recommendation: do not ship this.</strong> Reasons:</p>
+<ol>
+<li><strong>Two-engine interpretation drift</strong> is the single biggest product risk. A user who runs Saju on Android (gets version A) and on web (gets version B) will spot differences and trust collapses.</li>
+<li><strong>The web app is the better monetization surface</strong> — SEO drives free → paid; Android drives free → web → paid. Killing the web funnel with an in-app IAP removes the SEO moat.</li>
+<li><strong>Play Billing fees (15–30%)</strong> are higher than Razorpay (2%) + Stripe (3%). Keeping IAP on the cheap-tier subscription and pushing paid tiers to the web preserves margin.</li>
+<li><strong>The free preview on Android is itself a major moat</strong> — 50k+ installs already, vs. the web app starting from zero. Don't give users a reason to not come back to the app.</li>
+</ol>
+<p>Instead, replace this roadmap item with: <strong>&quot;Korean Saju Full Map deep-link to web app + free 오행 radar card&quot;</strong>.</p>
+<h3>6.5 Whether to add full Premium IAP</h3>
+<p>The existing <code>premium_monthly</code> (₹49) and <code>premium_yearly</code> (₹299) subscriptions already exist on Cosmic ID. <strong>Keep these</strong> as the <strong>free-tier → IAP</strong> upgrade path inside the app, but reframe them:</p>
+<ul>
+<li><strong>Today:</strong> premium unlocks all tabs in DetailsUnlockScreen.</li>
+<li><strong>After this split:</strong> premium stays as <strong>&quot;premium themes + remove banner ads + unlimited saved profiles&quot;</strong> (existing behavior). The deep astrological content (Full Map / Reading / 궁합 full report) lives on the web app.</li>
+</ul>
+<p>This protects existing IAP revenue while letting the web app own the high-LTV tiers.</p>
+<h3>6.6 APK size impact</h3>
+<p>SajuKoreanCalculator.kt + SajuKoreanCompatibilityCalculator.kt already ship in the APK. <strong>No new dependencies.</strong> Adding web deep-link handling + a magic-link token field is &lt;1KB. Estimated APK size delta: <strong>&lt;10KB</strong>.</p>
+<p>If you later go Option B (replace on-device Saju with backend calls), APK size <strong>drops</strong> by ~150KB (the lunar-java library + 673 LOC Kotlin), but you lose offline preview. Trade-off.</p>
+<hr />
+<h2>7. Cross-cutting concerns</h2>
+<h3>7.1 Single source of truth for chart data</h3>
+<p>The backend's <code>compute_chart()</code> is the canonical engine. Cosmic ID's <code>SajuKoreanCalculator.kt</code> is an approximation. To prevent drift:</p>
+<ol>
+<li>Add a &quot;What is Korean Saju&quot; educational screen in the Android app that <strong>explicitly notes</strong> the on-device preview uses a simplified algorithm, and the web app uses the classical-tradition engine.</li>
+<li>Don't promise identical readings across surfaces.</li>
+<li>For any user who logs in (via magic link from Android to web app), the web app <strong>recomputes</strong> the chart from raw birth data — never trusts the on-device chart output.</li>
+</ol>
+<h3>7.2 Auth bridge</h3>
+<p>When a Cosmic ID user wants to upgrade to a paid tier:</p>
+<ol>
+<li>User taps &quot;Get Full Map →&quot; in Android.</li>
+<li>Deep-link opens <code>https://cosmicsaju.com/saju-full-map?profileId={encoded-birth-data}</code>.</li>
+<li>Web app shows pricing. If user clicks &quot;Buy,&quot; web app asks for sign-in.</li>
+<li>If user is signed in to Cosmic ID via Google, backend exchanges ID token at <code>/v1/auth/exchange</code> for a JWT.</li>
+<li>Web app uses JWT to create an order tied to the user's <code>profileId</code>.</li>
+</ol>
+<p>If the user isn't signed in to Cosmic ID on Android, the web app falls back to email + magic-link auth (Clerk).</p>
+<h3>7.3 Payment routing</h3>
+<ul>
+<li><strong>Inside Cosmic ID (existing IAP):</strong> Google Play Billing → Play Console. Backend listens to Real-Time Developer Notifications (RTDN) via Google Pub/Sub → backend <code>/v1/webhooks/google-play</code> → updates <code>subscriptions</code> table.</li>
+<li><strong>Web app (new):</strong> Razorpay for India (UPI + cards + netbanking), Stripe for international. Backend listens to webhooks → updates <code>orders</code> / <code>subscriptions</code>.</li>
+</ul>
+<p>A user can have <strong>both</strong> a Play subscription (premium-monthly) and a web subscription (Companion). These are tracked separately. The web subscription is the high-LTV one.</p>
+<h3>7.4 Data flow</h3>
+<pre><code>Android intake (birth data)
+    │
+    ▼  (deep-link)
+Web app intake form
+    │
+    ▼  POST /v1/chart
+Backend computes chart (sajupy + lookup + patterns)
+    │
+    ▼  POST /v1/report/preview  (tier=reading|fullmap)
+Backend generates engine-draft markdown
+    │
+    ▼  row inserted into review_queue
+Founder / part-time reader reviews in /admin/queue
+    │
+    ▼  POST /v1/report/finalize  (with human_review_md)
+Backend applies deltas, renders PDF, stores in S3/R2
+    │
+    ▼  email customer (Resend)
+PDF download link in /dashboard/orders
+</code></pre>
+<h3>7.5 Failure modes</h3>
+<ul>
+<li><strong>Backend down</strong> → web app shows &quot;Temporarily unavailable, retry shortly.&quot; Android on-device features still work.</li>
+<li><strong>Razorpay webhook missed</strong> → backend has a 5-minute poll task that calls Razorpay's <code>/orders/{id}/payments</code> to reconcile.</li>
+<li><strong>Stripe webhook missed</strong> → backend has a 1-hour poll task that calls Stripe's <code>/events</code> for reconciliation.</li>
+<li><strong>PDF generation fails</strong> → user gets a refund voucher + email; order marked <code>needs_retry</code>.</li>
+<li><strong>Founder unavailable</strong> → review queue shows SLA breaches (&gt;72h); auto-pause self-service acquisition.</li>
+</ul>
+<hr />
+<h2>8. Migration / rollout sequence</h2>
+<h3>8.1 Week 1–2 (no code change yet)</h3>
+<ul>
+<li>Stand up the backend skeleton on Railway: FastAPI app, Neon Postgres, S3 (or Vercel Blob), Clerk, Resend.</li>
+<li>Stand up the Vercel web app skeleton: Next.js, Clerk, Razorpay test mode, Stripe test mode.</li>
+<li>Confirm <code>tools/client_intake_app.py</code> runs on Railway as-is.</li>
+<li><strong>Keep Cosmic ID untouched.</strong></li>
+</ul>
+<h3>8.2 Week 3–4</h3>
+<ul>
+<li>Add <code>/v1/chart</code>, <code>/v1/report/preview</code>, <code>/v1/report/finalize</code> to backend.</li>
+<li>Wire up Razorpay + Stripe on web app with test mode.</li>
+<li>Add <code>/admin/queue</code> for founder review.</li>
+<li>First end-to-end test: web app → backend → PDF → email.</li>
+</ul>
+<h3>8.3 Week 5–6 (soft launch)</h3>
+<ul>
+<li>Switch Razorpay + Stripe to live mode (small initial volume).</li>
+<li>Switch web app to a real domain (e.g. <code>cosmicsaju.com</code> or <code>saju.com</code> — pick based on brand priority; the user owns <code>cosmic-id</code> already).</li>
+<li>Update Cosmic ID's <code>DetailsUnlockScreen.kt</code> &quot;Korean Saju&quot; tab to add the &quot;Get Full Map →&quot; deep-link.</li>
+<li>Update <code>MainActivity.kt</code> to handle the deep-link.</li>
+<li>Update <code>BuildConfig.kt</code> with <code>BACKEND_URL</code>.</li>
+<li>Ship Cosmic ID v2.1.0 to Play Store (small change, low risk).</li>
+</ul>
+<h3>8.4 Week 7–8</h3>
+<ul>
+<li>Add SEO pillar posts (4 long-form posts).</li>
+<li>Start Instagram Reels kickoff.</li>
+<li>First paid orders via web app.</li>
+<li>Founder review queue active.</li>
+</ul>
+<h3>8.5 Week 9–12</h3>
+<ul>
+<li>Add Companion subscription to web app.</li>
+<li>Add Companion tier sync from Cosmic ID via backend RTDN.</li>
+<li>First part-time reader hire.</li>
+<li>Re-evaluate against milestone gate G1 (Month 1 of commercial launch).</li>
+</ul>
+<hr />
+<h2>9. Cost summary (Year 1, Scenario B from <code>11-financial-model.md</code>)</h2>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Monthly cost</th>
+<th>Annual cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Railway Hobby + Postgres add-on</td>
+<td>$15</td>
+<td>$180</td>
+</tr>
+<tr>
+<td>Vercel Pro (only if needed)</td>
+<td>$20</td>
+<td>$240</td>
+</tr>
+<tr>
+<td>Neon Postgres (free tier covers Year 1)</td>
+<td>$0</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>S3 / Vercel Blob (free tier covers Year 1)</td>
+<td>$0</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>Resend (free tier covers Year 1)</td>
+<td>$0</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>Plausible (free self-host or $9/mo .io)</td>
+<td>$9</td>
+<td>$108</td>
+</tr>
+<tr>
+<td>Clerk (free tier covers Year 1)</td>
+<td>$0</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>Razorpay fees (2% of revenue)</td>
+<td>variable</td>
+<td>~₹90,000 on ₹45L</td>
+</tr>
+<tr>
+<td>Stripe fees (3% of international, ~10% of total)</td>
+<td>variable</td>
+<td>~₹40,000 on ₹15L international</td>
+</tr>
+<tr>
+<td>Domain</td>
+<td>$1/mo</td>
+<td>$12</td>
+</tr>
+<tr>
+<td><strong>Total backend + web infra (fixed)</strong></td>
+<td><strong>$45/mo</strong></td>
+<td><strong>~$540/yr</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Add ~₹1.3 lakh gateway fees per year. These scale linearly with revenue.</p>
+<p>Compare to the existing state: ~$0/mo (local FastAPI, no cloud). The new cost is ~$540/yr + ~₹1.3 lakh gateway — a fraction of the ₹14 lakh annual cost in Scenario B.</p>
+<hr />
+<h2>10. What to drop from this plan if runway is tight</h2>
+<p>If personal runway is &lt;₹8 lakh and you want to minimize infra spend, <strong>drop these in order</strong>:</p>
+<ol>
+<li><strong>Vercel Pro</strong> — use free tier; revisit at 10k+ visitors/mo.</li>
+<li><strong>Clerk</strong> — replace with self-hosted Supabase Auth (free, more setup).</li>
+<li><strong>S3 / Vercel Blob</strong> — store PDFs on Railway local disk initially (loses redundancy).</li>
+<li><strong>Plausible .io</strong> — use free Umami self-hosted.</li>
+<li><strong>Resend paid tier</strong> — use Gmail SMTP via Nodemailer for the first 100 orders.</li>
+</ol>
+<p>Realistic minimum backend cost: <strong>$5/mo Railway + domain</strong>. You can ship Scenario A on this.</p>
+<hr />
+<h2>11. Summary checklist</h2>
+<h3>Saju repo (backend) — keep</h3>
+<ul>
+<li>[x] <code>tools/saju_engine/</code> (engine, 17 modules, 129 tests)</li>
+<li>[x] <code>knowledge/</code> (11-file citation corpus)</li>
+<li>[x] <code>tools/md_to_saju_pdf.py</code> + <code>tools/md_to_saju_html_pdf.py</code></li>
+<li>[x] <code>tools/build-pdf.sh</code></li>
+<li>[x] <code>tools/client_intake_app.py</code> (legacy solo-founder use)</li>
+<li>[x] <code>tests/</code> (129 pytest cases — keep green)</li>
+</ul>
+<h3>Saju repo (backend) — add</h3>
+<ul>
+<li>[ ] <code>tools/api_server.py</code> (FastAPI wrapper, <code>/v1/*</code> routes)</li>
+<li>[ ] <code>tools/auth.py</code> (Clerk JWT verification + Google ID token exchange)</li>
+<li>[ ] <code>tools/webhooks_razorpay.py</code> + <code>tools/webhooks_stripe.py</code></li>
+<li>[ ] <code>tools/webhooks_google_play.py</code> (RTDN receiver)</li>
+<li>[ ] Postgres schema migrations (Alembic)</li>
+<li>[ ] Deployment config (Railway Procfile or <code>railway.toml</code>)</li>
+<li>[ ] <code>.env.example</code> with all required env vars</li>
+</ul>
+<h3>New: Vercel web app — full build</h3>
+<ul>
+<li>[ ] <code>saju-web/</code> repo at <code>/mnt/data2/git_repos/</code></li>
+<li>[ ] Next.js 14 + App Router</li>
+<li>[ ] Pricing, FAQ, About, Blog, Onboarding pages</li>
+<li>[ ] Razorpay + Stripe checkout</li>
+<li>[ ] Clerk auth</li>
+<li>[ ] /admin/queue founder review UI</li>
+<li>[ ] /dashboard user + Companion mgmt</li>
+<li>[ ] Resend email templates</li>
+<li>[ ] SEO: schema markup, sitemap, hreflang stubs</li>
+<li>[ ] Analytics: Plausible</li>
+</ul>
+<h3>Cosmic ID (AgeReveal) — keep</h3>
+<ul>
+<li>[x] <code>SajuKoreanCalculator.kt</code> (on-device preview, 673 LOC)</li>
+<li>[x] <code>SajuKoreanCompatibilityCalculator.kt</code></li>
+<li>[x] <code>BaZiCalculator.kt</code></li>
+<li>[x] All v2.0 features (Calculator, Compatibility, Reminders, Timeline, Paywall, Settings, etc.)</li>
+<li>[x] <code>BillingManager.kt</code> + Play Billing subscriptions</li>
+</ul>
+<h3>Cosmic ID (AgeReveal) — modify</h3>
+<ul>
+<li>[ ] <code>DetailsUnlockScreen.kt</code> — add &quot;Get Full Map →&quot; deep-link button on Korean Saju tab</li>
+<li>[ ] <code>CompatibilityScreen.kt</code> — add &quot;Get 궁합 Full Report →&quot; deep-link button</li>
+<li>[ ] <code>MainActivity.kt</code> — handle new deep-links</li>
+<li>[ ] <code>BuildConfig.kt</code> — add <code>BACKEND_URL</code> per build type</li>
+<li>[ ] <code>UserPreferencesRepository.kt</code> — add <code>webAppLinkToken</code> field</li>
+<li>[ ] <code>BillingManager.kt</code> — POST purchase events to backend <code>/v1/subscriptions</code></li>
+</ul>
+<h3>Cosmic ID (AgeReveal) — explicitly do NOT add</h3>
+<ul>
+<li>[ ] ❌ Korean Saju Premium IAP (₹149 one-time) — replace with deep-link to web app</li>
+<li>[ ] ❌ Server-side Saju engine calls for free features — keep on-device</li>
+<li>[ ] ❌ PDF rendering in-app — push to web app</li>
+</ul>
+<h3>Cosmic ID (AgeReveal) — optionally add later</h3>
+<ul>
+<li>[ ] <code>ShareCardGenerator.drawSajuKoreanBalanceCard()</code> (오행 radar) — already in roadmap</li>
+<li>[ ] Push notification on year-ahead availability (December campaign)</li>
+<li>[ ] App Actions / App Links for &quot;Korean Saju&quot; intent (deep SEO on Android)</li>
+</ul>
+<hr />
+<h2>12. Sources</h2>
+<ul>
+<li>Saju repo: <a href="../../CLAUDE.md"><code>CLAUDE.md</code></a>, <a href="../../tools/saju_engine/"><code>tools/saju_engine/</code></a>, <a href="../../tools/client_intake_app.py"><code>tools/client_intake_app.py</code></a>, <a href="../../pyproject.toml"><code>pyproject.toml</code></a></li>
+<li>Cosmic ID repo: <a href="/mnt/data2/git_repos/AgeReveal/CLAUDE.md"><code>/mnt/data2/git_repos/AgeReveal/CLAUDE.md</code></a>, <code>SajuKoreanCalculator.kt</code>, <code>SajuKoreanCompatibilityCalculator.kt</code>, <code>BaZiCalculator.kt</code></li>
+<li>Market context: <a href="02-market-size-and-demand.md"><code>02-market-size-and-demand.md</code></a>, <a href="07-app-platform-decision.md"><code>07-app-platform-decision.md</code></a>, <a href="11-financial-model.md"><code>11-financial-model.md</code></a></li>
+<li>Vercel pricing: <a href="https://vercel.com/pricing">https://vercel.com/pricing</a></li>
+<li>Railway pricing: <a href="https://railway.app/pricing">https://railway.app/pricing</a></li>
+<li>Neon Postgres pricing: <a href="https://neon.tech/pricing">https://neon.tech/pricing</a></li>
+<li>Razorpay fees: <a href="https://razorpay.com/pricing/">https://razorpay.com/pricing/</a></li>
+<li>Stripe fees: <a href="https://stripe.com/pricing">https://stripe.com/pricing</a></li>
+<li>Clerk pricing: <a href="https://clerk.com/pricing">https://clerk.com/pricing</a></li>
+<li>Resend pricing: <a href="https://resend.com/pricing">https://resend.com/pricing</a></li>
+<li>Google Play Billing fees: <a href="https://support.google.com/googleplay/android-developer/answer/112662">https://support.google.com/googleplay/android-developer/answer/112662</a></li>
+</ul>
+
+    
+<nav class="toc" style="margin-top:48px;font-size:14px;">
+  <div style="display:flex;justify-content:space-between;gap:12px;">
+    <div><a href="12-feasibility-verdict.html">← Doc 12: Feasibility Verdict — Final Go / No-Go</a></div>
+    <div><a href="combined.html">↑ Combined report</a></div>
+    <div></div>
+  </div>
+</nav>
+</main>
+    <footer class="foot">
+      Saju market research · generated 2026-06-28 · /
+      <a href="https://github.com/anthropics/skills">no external dependencies beyond markdown-it-py</a>
+    </footer>
+  </div>
+</body>
+</html>

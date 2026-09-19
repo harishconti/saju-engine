@@ -1,0 +1,1305 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Financial Model</title>
+  <style>
+:root {
+  --brand: #2b3a55;
+  --brand-soft: #4a5d7e;
+  --accent: #b48a3a;
+  --bg: #fbfaf6;
+  --bg-soft: #f3efe6;
+  --ink: #1d2330;
+  --ink-soft: #4a5060;
+  --rule: #d9d3c4;
+  --code-bg: #efe9da;
+  --table-stripe: #f6f1e3;
+  --max-w: 880px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.55;
+  font-size: 17px;
+}
+.wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 56px 32px 96px;
+}
+header.cover {
+  border-bottom: 2px solid var(--brand);
+  padding-bottom: 28px;
+  margin-bottom: 40px;
+}
+header.cover .eyebrow {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+}
+header.cover h1 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  font-size: 38px;
+  line-height: 1.15;
+  margin: 8px 0 12px;
+  color: var(--brand);
+}
+header.cover .sub {
+  color: var(--ink-soft);
+  font-size: 16px;
+  font-style: italic;
+}
+header.cover .meta {
+  margin-top: 18px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+}
+nav.toc {
+  background: var(--bg-soft);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brand);
+  padding: 22px 28px 24px;
+  margin: 0 0 48px;
+  border-radius: 2px;
+}
+nav.toc h2 {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand-soft);
+  margin: 0 0 14px;
+  font-weight: 600;
+}
+nav.toc ol {
+  margin: 0;
+  padding-left: 22px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 14.5px;
+}
+nav.toc li { margin: 5px 0; }
+nav.toc a { color: var(--brand); text-decoration: none; }
+nav.toc a:hover { text-decoration: underline; }
+nav.toc .doc-num {
+  display: inline-block;
+  width: 28px;
+  color: var(--accent);
+  font-weight: 600;
+}
+h1, h2, h3, h4 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--brand);
+  line-height: 1.25;
+  margin: 1.6em 0 0.6em;
+}
+h1 { font-size: 30px; border-bottom: 1px solid var(--rule); padding-bottom: 0.25em; }
+h2 { font-size: 24px; }
+h3 { font-size: 19px; color: var(--brand-soft); }
+h4 { font-size: 16px; color: var(--brand-soft); text-transform: uppercase; letter-spacing: 0.05em; }
+p { margin: 0.6em 0 1em; }
+a { color: var(--brand); }
+ul, ol { padding-left: 24px; }
+li { margin: 4px 0; }
+strong { color: var(--ink); }
+em { color: var(--ink-soft); }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.5em 0; }
+code {
+  background: var(--code-bg);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: "SF Mono", "Consolas", "Menlo", monospace;
+  font-size: 0.92em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 14px 16px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 14px;
+  border-left: 3px solid var(--accent);
+}
+pre code { background: none; padding: 0; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1.2em 0;
+  padding: 4px 16px;
+  color: var(--ink-soft);
+  background: var(--bg-soft);
+  font-style: italic;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.2em 0;
+  font-size: 14.5px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+}
+th, td {
+  border: 1px solid var(--rule);
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--brand);
+  color: #fbfaf6;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+tbody tr:nth-child(even) { background: var(--table-stripe); }
+.footnote-ref { font-size: 0.8em; vertical-align: super; }
+.footnotes { margin-top: 3em; border-top: 1px solid var(--rule); padding-top: 1em; font-size: 14px; }
+footer.foot {
+  margin-top: 64px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+@media print {
+  body { background: white; font-size: 11pt; }
+  .wrap { padding: 24px; max-width: none; }
+  nav.toc { page-break-after: always; }
+  h1, h2 { page-break-after: avoid; }
+  table { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    
+<header class="cover">
+  <div class="eyebrow">Market Research · Document 11 of 11</div>
+  <h1>Financial Model</h1>
+</header>
+
+    
+    <main>
+<p><strong>Date:</strong> 2026-06-26
+<strong>Scope:</strong> Realistic unit economics, three revenue scenarios (conservative / base / optimistic), 12-month and 36-month P&amp;L, break-even analysis, and the funding question.</p>
+<hr />
+<h2>1. Unit economics</h2>
+<h3>Revenue per order (after gateway fees)</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Price (INR)</th>
+<th>Razorpay fee (~2% + GST)</th>
+<th>Net revenue</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Spark</td>
+<td>₹499</td>
+<td>~₹14</td>
+<td><strong>₹485</strong></td>
+</tr>
+<tr>
+<td>Reading</td>
+<td>₹1,499</td>
+<td>~₹35</td>
+<td><strong>₹1,464</strong></td>
+</tr>
+<tr>
+<td>Full Map</td>
+<td>₹3,499</td>
+<td>~₹80</td>
+<td><strong>₹3,419</strong></td>
+</tr>
+<tr>
+<td>Companion (monthly)</td>
+<td>₹799</td>
+<td>~₹20</td>
+<td><strong>₹779</strong></td>
+</tr>
+<tr>
+<td>Compatibility (standalone)</td>
+<td>₹999</td>
+<td>~₹24</td>
+<td><strong>₹975</strong></td>
+</tr>
+</tbody>
+</table>
+<p>For international orders (Stripe ~3% fee):</p>
+<ul>
+<li>Spark $9.99 → $9.69 net</li>
+<li>Reading $29.99 → $29.09 net</li>
+<li>Full Map $69.99 → $67.89 net</li>
+<li>Companion $14.99/mo → $14.54 net</li>
+</ul>
+<h3>Cost of revenue (CoR) per order</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Human review time</th>
+<th>Review cost (₹500/hr founder / ₹250/hr part-time reader)</th>
+<th>Other CoR (PDF gen, email)</th>
+<th>Total CoR</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Spark</td>
+<td>0 min (automated)</td>
+<td>₹0</td>
+<td>₹5</td>
+<td><strong>₹5</strong></td>
+</tr>
+<tr>
+<td>Reading</td>
+<td>45 min founder / 25 min part-time</td>
+<td>₹375 / ₹104</td>
+<td>₹10</td>
+<td><strong>₹385 / ₹114</strong></td>
+</tr>
+<tr>
+<td>Full Map</td>
+<td>90 min founder / 50 min part-time</td>
+<td>₹750 / ₹208</td>
+<td>₹15</td>
+<td><strong>₹765 / ₹223</strong></td>
+</tr>
+<tr>
+<td>Companion (per month served)</td>
+<td>15 min (email/quarterly)</td>
+<td>₹62</td>
+<td>₹5</td>
+<td><strong>₹67</strong></td>
+</tr>
+<tr>
+<td>Compatibility</td>
+<td>30 min founder / 15 min part-time</td>
+<td>₹250 / ₹62</td>
+<td>₹10</td>
+<td><strong>₹260 / ₹72</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Gross margin per order (founder reviewing):</strong></p>
+<ul>
+<li>Spark: ₹480 (96%)</li>
+<li>Reading: ₹1,079 (74%)</li>
+<li>Full Map: ₹2,654 (78%)</li>
+<li>Companion: ₹712 (91% per month)</li>
+<li>Compatibility: ₹715 (73%)</li>
+</ul>
+<p><strong>Gross margin per order (part-time reader reviewing, Phase 3+):</strong></p>
+<ul>
+<li>Reading: ₹1,350 (92%)</li>
+<li>Full Map: ₹3,196 (93%)</li>
+<li>Compatibility: ₹903 (93%)</li>
+</ul>
+<h3>Customer acquisition cost (CAC)</h3>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Est. CAC (India, blended)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Organic SEO</td>
+<td>₹50–200</td>
+</tr>
+<tr>
+<td>Instagram organic</td>
+<td>₹30–150</td>
+</tr>
+<tr>
+<td>Personal referral</td>
+<td>₹0–100</td>
+</tr>
+<tr>
+<td>Paid Instagram ads</td>
+<td>₹200–800</td>
+</tr>
+<tr>
+<td>Paid Google ads (high-intent only)</td>
+<td>₹300–1,000</td>
+</tr>
+<tr>
+<td>Influencer collaboration (micro)</td>
+<td>₹500–2,000 per attributed customer</td>
+</tr>
+<tr>
+<td>Blended target (Phase 3+)</td>
+<td><strong>₹400–800 per paying customer</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>LTV (lifetime value per paying customer)</h3>
+<p>Conservative estimate based on Western astrology app churn benchmarks (22% annual churn for subscription, ~50% repeat purchase for one-time reports):</p>
+<ul>
+<li><strong>Spark buyer LTV:</strong> ₹499 (one-time, low repeat). 30% buy Reading within 12 months = +₹450 LTV. <strong>Total LTV: ~₹950.</strong></li>
+<li><strong>Reading buyer LTV:</strong> ₹1,499 (one-time). 25% buy Full Map within 12 months = +₹875 LTV. 10% buy Companion (₹799 × 12 = ₹9,588 if annual) = +₹960 blended = +₹96 (since 10% buy monthly and average 4 months). <strong>Total LTV: ~₹2,470.</strong></li>
+<li><strong>Full Map buyer LTV:</strong> ₹3,499 (one-time). 30% buy Companion (avg 6 months) = +₹1,438. 40% buy year-ahead renewal next year = +₹1,400. <strong>Total LTV: ~₹6,337.</strong></li>
+<li><strong>Compatibility buyer LTV:</strong> ₹999. 20% buy Reading within 6 months = +₹300. <strong>Total LTV: ~₹1,299.</strong></li>
+</ul>
+<h3>LTV : CAC ratio</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>LTV</th>
+<th>Blended CAC</th>
+<th>LTV : CAC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Spark</td>
+<td>₹950</td>
+<td>₹400</td>
+<td>2.4 : 1</td>
+</tr>
+<tr>
+<td>Reading</td>
+<td>₹2,470</td>
+<td>₹600</td>
+<td>4.1 : 1</td>
+</tr>
+<tr>
+<td>Full Map</td>
+<td>₹6,337</td>
+<td>₹800</td>
+<td>7.9 : 1</td>
+</tr>
+<tr>
+<td>Compatibility</td>
+<td>₹1,299</td>
+<td>₹500</td>
+<td>2.6 : 1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Target LTV : CAC ratio:</strong> ≥ 3 : 1 for sustainable paid acquisition. We're at or above this for all tiers except Spark (which is fine — Spark is the funnel, not the profit center).</p>
+<h3>Payback period</h3>
+<ul>
+<li>Spark: 1 order pays back acquisition cost in &lt;1 month.</li>
+<li>Reading: 1.5 months to pay back.</li>
+<li>Full Map: 1.5 months to pay back (lowest payback because LTV is highest).</li>
+</ul>
+<h2>2. Cost structure (monthly, solo founder)</h2>
+<h3>Fixed costs (Phase 1, solo founder)</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Monthly cost (INR)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Founder &quot;salary&quot; (living expenses, not profit)</td>
+<td>₹1,00,000</td>
+</tr>
+<tr>
+<td>Hosting (Railway / Fly.io)</td>
+<td>₹2,000</td>
+</tr>
+<tr>
+<td>Domain + email (Resend)</td>
+<td>₹1,500</td>
+</tr>
+<tr>
+<td>Razorpay + Stripe fees (variable, ~2% of revenue)</td>
+<td>variable</td>
+</tr>
+<tr>
+<td>S3 / R2 storage (PDFs)</td>
+<td>₹500</td>
+</tr>
+<tr>
+<td>Plausible / PostHog analytics</td>
+<td>₹0 (free tier)</td>
+</tr>
+<tr>
+<td>Misc (Zoom, Notion, software)</td>
+<td>₹3,000</td>
+</tr>
+<tr>
+<td><strong>Total fixed costs</strong></td>
+<td><strong>₹1,07,000</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>Variable costs (Phase 1)</h3>
+<ul>
+<li>Gateway fees: 2% of revenue.</li>
+<li>PDF generation: ~₹5–15 per order (negligible).</li>
+<li>Email delivery: ~₹0.10 per email (negligible).</li>
+<li>Founder review time: 45–90 min per Reading/Full Map.</li>
+</ul>
+<h3>One-time costs (Phase 1)</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Cost (INR)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Domain</td>
+<td>₹800/year</td>
+</tr>
+<tr>
+<td>Play Console account</td>
+<td>₹2,000 (one-time)</td>
+</tr>
+<tr>
+<td>Apple Developer account</td>
+<td>₹8,800/year (only when needed)</td>
+</tr>
+<tr>
+<td>Razorpay setup</td>
+<td>₹0</td>
+</tr>
+<tr>
+<td>Stripe setup</td>
+<td>₹0</td>
+</tr>
+<tr>
+<td>Initial Next.js web app build (founder dev time)</td>
+<td>founder's hours</td>
+</tr>
+<tr>
+<td>Initial SEO content (4 posts)</td>
+<td>founder's hours</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Phase 1 total one-time cost: ~₹10,000</strong> (excluding founder time).</p>
+<h3>Scaling costs (Phase 3+)</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Monthly cost (INR)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Part-time reader (₹250/hr × 80 hrs)</td>
+<td>₹20,000</td>
+</tr>
+<tr>
+<td>Part-time ops/support (₹250/hr × 40 hrs)</td>
+<td>₹10,000</td>
+</tr>
+<tr>
+<td>Paid Instagram ads</td>
+<td>₹20,000</td>
+</tr>
+<tr>
+<td>Influencer collaborations (1/month)</td>
+<td>₹15,000</td>
+</tr>
+<tr>
+<td>Translation services (Hindi)</td>
+<td>₹5,000</td>
+</tr>
+<tr>
+<td>Email list growth tools (ConvertKit)</td>
+<td>₹5,000</td>
+</tr>
+<tr>
+<td><strong>Total Phase 3 scaling cost</strong></td>
+<td><strong>₹75,000</strong> + variable</td>
+</tr>
+</tbody>
+</table>
+<h2>3. Three revenue scenarios</h2>
+<h3>Scenario A — Conservative (slow growth, no viral moment)</h3>
+<p><strong>Assumptions:</strong></p>
+<ul>
+<li>Self-service Spark launches month 1.</li>
+<li>Reading/Full Map hand-delivered via founder + personal network.</li>
+<li>SEO content engine produces 8 articles/month.</li>
+<li>Instagram Reels produce modest growth (no viral moment).</li>
+<li>No paid ads in Year 1.</li>
+<li>Companion subscription doesn't launch.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Month</th>
+<th>Spark</th>
+<th>Reading</th>
+<th>Full Map</th>
+<th>Compatibility</th>
+<th>Companion</th>
+<th>Monthly revenue</th>
+<th>Monthly costs</th>
+<th>Net</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M1</td>
+<td>5</td>
+<td>2</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>₹8,265</td>
+<td>₹1,07,000</td>
+<td>-₹98,735</td>
+</tr>
+<tr>
+<td>M2</td>
+<td>8</td>
+<td>3</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>₹14,374</td>
+<td>₹1,07,000</td>
+<td>-₹92,626</td>
+</tr>
+<tr>
+<td>M3</td>
+<td>12</td>
+<td>5</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>₹22,063</td>
+<td>₹1,07,500</td>
+<td>-₹85,437</td>
+</tr>
+<tr>
+<td>M4</td>
+<td>18</td>
+<td>7</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>₹31,900</td>
+<td>₹1,08,000</td>
+<td>-₹76,100</td>
+</tr>
+<tr>
+<td>M5</td>
+<td>25</td>
+<td>10</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>₹42,750</td>
+<td>₹1,08,500</td>
+<td>-₹65,750</td>
+</tr>
+<tr>
+<td>M6</td>
+<td>30</td>
+<td>12</td>
+<td>6</td>
+<td>0</td>
+<td>0</td>
+<td>₹50,964</td>
+<td>₹1,09,000</td>
+<td>-₹58,036</td>
+</tr>
+<tr>
+<td>M7</td>
+<td>35</td>
+<td>14</td>
+<td>7</td>
+<td>0</td>
+<td>0</td>
+<td>₹59,153</td>
+<td>₹1,09,500</td>
+<td>-₹50,347</td>
+</tr>
+<tr>
+<td>M8</td>
+<td>40</td>
+<td>16</td>
+<td>8</td>
+<td>0</td>
+<td>0</td>
+<td>₹67,432</td>
+<td>₹1,10,000</td>
+<td>-₹42,568</td>
+</tr>
+<tr>
+<td>M9</td>
+<td>45</td>
+<td>18</td>
+<td>9</td>
+<td>5</td>
+<td>0</td>
+<td>₹85,500</td>
+<td>₹1,11,000</td>
+<td>-₹25,500</td>
+</tr>
+<tr>
+<td>M10</td>
+<td>50</td>
+<td>20</td>
+<td>10</td>
+<td>8</td>
+<td>0</td>
+<td>₹99,712</td>
+<td>₹1,12,000</td>
+<td>-₹12,288</td>
+</tr>
+<tr>
+<td>M11</td>
+<td>55</td>
+<td>22</td>
+<td>12</td>
+<td>12</td>
+<td>0</td>
+<td>₹120,375</td>
+<td>₹1,13,000</td>
+<td>+₹7,375</td>
+</tr>
+<tr>
+<td>M12</td>
+<td>60</td>
+<td>25</td>
+<td>15</td>
+<td>15</td>
+<td>0</td>
+<td>₹141,825</td>
+<td>₹1,14,000</td>
+<td>+₹27,825</td>
+</tr>
+<tr>
+<td><strong>Year 1 total</strong></td>
+<td><strong>383</strong></td>
+<td><strong>154</strong></td>
+<td><strong>82</strong></td>
+<td><strong>40</strong></td>
+<td><strong>0</strong></td>
+<td><strong>~₹7,44,313</strong></td>
+<td><strong>~₹13,16,000</strong></td>
+<td><strong>~₹-5,71,687</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Scenario A interpretation:</strong> Solo founder loses ~₹5.7 lakh in Year 1 (mostly opportunity cost of founder time). Break-even at month 11. Annual revenue ~₹7.4 lakh. <strong>Realistic only if founder has personal runway and treats Year 1 as a learning investment.</strong></p>
+<h3>Scenario B — Base case (realistic growth)</h3>
+<p><strong>Assumptions:</strong></p>
+<ul>
+<li>SEO content engine produces 10 articles/month from M3.</li>
+<li>Instagram Reels produce 2–3k new followers/month.</li>
+<li>One viral Reel around month 6.</li>
+<li>Paid Instagram ads start month 9 at ₹20k/month.</li>
+<li>Companion launches month 10.</li>
+<li>One part-time reader hired month 9.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Month</th>
+<th>Spark</th>
+<th>Reading</th>
+<th>Full Map</th>
+<th>Compat.</th>
+<th>Companion</th>
+<th>Monthly revenue</th>
+<th>Monthly costs</th>
+<th>Net</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M1</td>
+<td>15</td>
+<td>6</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>₹23,212</td>
+<td>₹1,07,000</td>
+<td>-₹83,788</td>
+</tr>
+<tr>
+<td>M2</td>
+<td>25</td>
+<td>10</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>₹39,225</td>
+<td>₹1,07,500</td>
+<td>-₹68,275</td>
+</tr>
+<tr>
+<td>M3</td>
+<td>50</td>
+<td>18</td>
+<td>8</td>
+<td>0</td>
+<td>0</td>
+<td>₹70,152</td>
+<td>₹1,08,000</td>
+<td>-₹37,848</td>
+</tr>
+<tr>
+<td>M4</td>
+<td>80</td>
+<td>28</td>
+<td>14</td>
+<td>0</td>
+<td>0</td>
+<td>₹1,12,546</td>
+<td>₹1,09,000</td>
+<td>+₹3,546</td>
+</tr>
+<tr>
+<td>M5</td>
+<td>110</td>
+<td>38</td>
+<td>18</td>
+<td>0</td>
+<td>0</td>
+<td>₹1,49,962</td>
+<td>₹1,10,000</td>
+<td>+₹39,962</td>
+</tr>
+<tr>
+<td>M6</td>
+<td>200</td>
+<td>60</td>
+<td>25</td>
+<td>0</td>
+<td>0</td>
+<td>₹2,28,750</td>
+<td>₹1,11,000</td>
+<td>+₹1,17,750</td>
+</tr>
+<tr>
+<td>M7</td>
+<td>300</td>
+<td>80</td>
+<td>35</td>
+<td>15</td>
+<td>0</td>
+<td>₹3,35,775</td>
+<td>₹1,12,000</td>
+<td>+₹2,23,775</td>
+</tr>
+<tr>
+<td>M8</td>
+<td>400</td>
+<td>110</td>
+<td>50</td>
+<td>25</td>
+<td>0</td>
+<td>₹4,57,125</td>
+<td>₹1,13,000</td>
+<td>+₹3,44,125</td>
+</tr>
+<tr>
+<td>M9</td>
+<td>500</td>
+<td>140</td>
+<td>65</td>
+<td>40</td>
+<td>5</td>
+<td>₹5,77,575</td>
+<td>₹1,42,000</td>
+<td>+₹4,35,575</td>
+</tr>
+<tr>
+<td>M10</td>
+<td>600</td>
+<td>170</td>
+<td>80</td>
+<td>55</td>
+<td>15</td>
+<td>₹7,07,775</td>
+<td>₹1,52,000</td>
+<td>+₹5,55,775</td>
+</tr>
+<tr>
+<td>M11</td>
+<td>700</td>
+<td>200</td>
+<td>95</td>
+<td>70</td>
+<td>30</td>
+<td>₹8,41,950</td>
+<td>₹1,62,000</td>
+<td>+₹6,79,950</td>
+</tr>
+<tr>
+<td>M12</td>
+<td>800</td>
+<td>230</td>
+<td>110</td>
+<td>85</td>
+<td>50</td>
+<td>₹9,84,950</td>
+<td>₹1,72,000</td>
+<td>+₹8,12,950</td>
+</tr>
+<tr>
+<td><strong>Year 1 total</strong></td>
+<td><strong>3,780</strong></td>
+<td><strong>1,090</strong></td>
+<td><strong>508</strong></td>
+<td><strong>290</strong></td>
+<td><strong>100</strong></td>
+<td><strong>~₹45,27,997</strong></td>
+<td><strong>~₹14,12,500</strong></td>
+<td><strong>~₹31,15,497</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Scenario B interpretation:</strong> Solo founder profitable from month 4. Annual revenue ~₹45 lakh. Net ~₹31 lakh. <strong>This is the realistic base case assuming the SEO + Reels flywheel works as expected.</strong></p>
+<h3>Scenario C — Optimistic (viral moment + influencer)</h3>
+<p><strong>Assumptions:</strong></p>
+<ul>
+<li>One major viral moment (Reel or YouTube video) in months 3–6.</li>
+<li>Major influencer collaboration in month 6 (₹1 lakh spend).</li>
+<li>SEO content engine + daily-content engine drives 50k monthly visitors by month 9.</li>
+<li>Companion launches month 8 with strong conversion.</li>
+<li>Two part-time readers + ops person by month 9.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Month</th>
+<th>Spark</th>
+<th>Reading</th>
+<th>Full Map</th>
+<th>Compat.</th>
+<th>Companion</th>
+<th>Monthly revenue</th>
+<th>Monthly costs</th>
+<th>Net</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M1</td>
+<td>30</td>
+<td>12</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>₹42,475</td>
+<td>₹1,07,000</td>
+<td>-₹64,525</td>
+</tr>
+<tr>
+<td>M2</td>
+<td>80</td>
+<td>25</td>
+<td>10</td>
+<td>0</td>
+<td>0</td>
+<td>₹96,725</td>
+<td>₹1,08,000</td>
+<td>-₹11,275</td>
+</tr>
+<tr>
+<td>M3</td>
+<td>200</td>
+<td>60</td>
+<td>25</td>
+<td>0</td>
+<td>0</td>
+<td>₹2,33,725</td>
+<td>₹1,09,000</td>
+<td>+₹1,24,725</td>
+</tr>
+<tr>
+<td>M4</td>
+<td>500</td>
+<td>150</td>
+<td>60</td>
+<td>0</td>
+<td>0</td>
+<td>₹5,90,900</td>
+<td>₹1,12,000</td>
+<td>+₹4,78,900</td>
+</tr>
+<tr>
+<td>M5</td>
+<td>800</td>
+<td>220</td>
+<td>90</td>
+<td>0</td>
+<td>0</td>
+<td>₹9,21,950</td>
+<td>₹1,15,000</td>
+<td>+₹8,06,950</td>
+</tr>
+<tr>
+<td>M6</td>
+<td>1200</td>
+<td>350</td>
+<td>140</td>
+<td>30</td>
+<td>0</td>
+<td>₹13,49,250</td>
+<td>₹2,15,000</td>
+<td>+₹11,34,250</td>
+</tr>
+<tr>
+<td>M7</td>
+<td>1500</td>
+<td>450</td>
+<td>180</td>
+<td>60</td>
+<td>0</td>
+<td>₹17,17,800</td>
+<td>₹1,80,000</td>
+<td>+₹15,37,800</td>
+</tr>
+<tr>
+<td>M8</td>
+<td>1800</td>
+<td>550</td>
+<td>220</td>
+<td>90</td>
+<td>30</td>
+<td>₹21,16,300</td>
+<td>₹1,90,000</td>
+<td>+₹19,26,300</td>
+</tr>
+<tr>
+<td>M9</td>
+<td>2000</td>
+<td>650</td>
+<td>260</td>
+<td>120</td>
+<td>80</td>
+<td>₹24,70,650</td>
+<td>₹2,30,000</td>
+<td>+₹22,40,650</td>
+</tr>
+<tr>
+<td>M10</td>
+<td>2200</td>
+<td>750</td>
+<td>300</td>
+<td>150</td>
+<td>150</td>
+<td>₹28,79,750</td>
+<td>₹2,50,000</td>
+<td>+₹26,29,750</td>
+</tr>
+<tr>
+<td>M11</td>
+<td>2400</td>
+<td>850</td>
+<td>340</td>
+<td>180</td>
+<td>250</td>
+<td>₹33,40,750</td>
+<td>₹2,70,000</td>
+<td>+₹30,70,750</td>
+</tr>
+<tr>
+<td>M12</td>
+<td>2500</td>
+<td>950</td>
+<td>380</td>
+<td>210</td>
+<td>400</td>
+<td>₹38,71,150</td>
+<td>₹2,90,000</td>
+<td>+₹35,81,150</td>
+</tr>
+<tr>
+<td><strong>Year 1 total</strong></td>
+<td><strong>15,010</strong></td>
+<td><strong>5,067</strong></td>
+<td><strong>2,010</strong></td>
+<td><strong>840</strong></td>
+<td><strong>910</strong></td>
+<td><strong>~₹1,96,31,425</strong></td>
+<td><strong>~₹22,26,000</strong></td>
+<td><strong>~₹1,74,05,425</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Scenario C interpretation:</strong> ~₹2 crore annual revenue, ~₹1.74 crore net. <strong>This is the upside scenario if a viral moment lands.</strong></p>
+<h3>Year 1 — Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Annual revenue</th>
+<th>Annual costs</th>
+<th>Net</th>
+<th>Break-even month</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A — Conservative</td>
+<td>₹7.4 lakh</td>
+<td>₹13.2 lakh</td>
+<td>-₹5.7 lakh</td>
+<td>Month 11</td>
+</tr>
+<tr>
+<td>B — Base</td>
+<td>₹45 lakh</td>
+<td>₹14 lakh</td>
+<td>+₹31 lakh</td>
+<td>Month 4</td>
+</tr>
+<tr>
+<td>C — Optimistic</td>
+<td>₹1.96 crore</td>
+<td>₹22 lakh</td>
+<td>+₹1.74 crore</td>
+<td>Month 2</td>
+</tr>
+</tbody>
+</table>
+<h2>4. 36-month P&amp;L (Scenario B — base case)</h2>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Annual revenue</th>
+<th>Annual costs</th>
+<th>Net</th>
+<th>Cumulative net</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Year 1</td>
+<td>₹45 lakh</td>
+<td>₹14 lakh</td>
+<td>+₹31 lakh</td>
+<td>+₹31 lakh</td>
+</tr>
+<tr>
+<td>Year 2</td>
+<td>₹1.2 crore</td>
+<td>₹35 lakh</td>
+<td>+₹85 lakh</td>
+<td>+₹1.16 crore</td>
+</tr>
+<tr>
+<td>Year 3</td>
+<td>₹2.5 crore</td>
+<td>₹70 lakh</td>
+<td>+₹1.8 crore</td>
+<td>+₹2.96 crore</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Year 2 assumptions:</strong></p>
+<ul>
+<li>Self-service Spark + Reading + Full Map at scale.</li>
+<li>Companion subscription at 500+ subscribers.</li>
+<li>Compatibility as upsell to all tiers.</li>
+<li>1 part-time reader + 1 part-time ops person.</li>
+<li>Paid ads scaling to ₹1–2 lakh/month.</li>
+<li>Hindi launch.</li>
+<li>Android app on Play Store.</li>
+</ul>
+<p><strong>Year 3 assumptions:</strong></p>
+<ul>
+<li>iOS app on App Store (if Android supports).</li>
+<li>Course / cohort launches.</li>
+<li>B2B API beta with 5–10 partners.</li>
+<li>2 part-time readers + 1 full-time ops person.</li>
+<li>Possibly Korean-language product.</li>
+<li>Content engine producing 20 articles + 30 reels/month.</li>
+</ul>
+<h2>5. Break-even analysis (Year 1)</h2>
+<p><strong>Solo founder break-even (Scenario B):</strong></p>
+<ul>
+<li>Monthly revenue to cover ₹1.1 lakh/month costs = <strong>~30 Spark + 12 Reading + 6 Full Map = ~₹70k.</strong></li>
+<li>This is the M3-M4 inflection point. Until then, founder relies on personal runway.</li>
+</ul>
+<p><strong>Team break-even (Year 2):</strong></p>
+<ul>
+<li>Monthly costs ₹3 lakh → need <strong>₹3 lakh/month revenue</strong> = <strong>100 Spark + 30 Reading + 20 Full Map + 50 Companion</strong> = <strong>₹3.1 lakh.</strong></li>
+</ul>
+<p><strong>Scale break-even (Year 3):</strong></p>
+<ul>
+<li>Monthly costs ₹6 lakh → need <strong>₹6 lakh/month revenue</strong> = <strong>400 Spark + 100 Reading + 50 Full Map + 80 Companion + 50 Compatibility + 2 B2B partners</strong> = <strong>₹6.1 lakh.</strong></li>
+</ul>
+<h2>6. Funding the launch</h2>
+<h3>Required personal runway</h3>
+<ul>
+<li><strong>Scenario A (conservative):</strong> founder needs ₹15–20 lakh personal runway (6 months living expenses + initial costs).</li>
+<li><strong>Scenario B (base):</strong> founder needs ₹8–10 lakh personal runway (3 months living expenses + initial costs; profitable from M4).</li>
+<li><strong>Scenario C (optimistic):</strong> founder needs ₹5–8 lakh personal runway (profitable from M2).</li>
+</ul>
+<h3>Should we raise outside capital?</h3>
+<p><strong>Strong NO for Year 1.</strong> Reasoning:</p>
+<ol>
+<li><strong>Bootstrapping preserves founder control</strong> of the classical-tradition positioning. VC-funded astrology startups often drift toward mass-market entertainment, which is the opposite of what we're building.</li>
+<li><strong>Outside capital expects 10× returns.</strong> AstroTalk raised $20M+ and is targeting ₹2,000 crore revenue + IPO. We don't need to play that game.</li>
+<li><strong>The product is profitable at small scale.</strong> Scenario B reaches ₹31 lakh net in Year 1 on a solo founder. That's a ₹25 lakh/year lifestyle business before considering scale.</li>
+<li><strong>The market is too early for venture-scale.</strong> The English-language Korean Saju niche is not yet large enough to support a Series A. Wait for traction before approaching investors.</li>
+<li><strong>The classical-tradition positioning is a feature, not a limitation.</strong> A VC-backed company would be pushed to &quot;maximize TAM&quot; by adding Vedic Jyotish, Western astrology, tarot, dream interpretation — all the things CLAUDE.md says we shouldn't do.</li>
+</ol>
+<p><strong>When would we consider raising capital?</strong></p>
+<ul>
+<li><strong>Year 3+</strong> if revenue run rate is ₹5+ crore and we want to expand to a multi-language product (Korean, Hindi, Mandarin).</li>
+<li><strong>Strategic acquirer interest:</strong> a Korean entertainment conglomerate (Kakao, Naver, CJ) might want to acquire a Korean Saju product for cultural-relevance reasons. If approached, evaluate carefully.</li>
+<li><strong>Never for product expansion</strong> (don't dilute the brand).</li>
+</ul>
+<h2>7. Pricing assumptions and sensitivities</h2>
+<p>The base case assumes:</p>
+<ul>
+<li>Spark ₹499: 70% of orders by volume, 25% of revenue.</li>
+<li>Reading ₹1,499: 20% of orders by volume, 30% of revenue.</li>
+<li>Full Map ₹3,499: 10% of orders by volume, 35% of revenue.</li>
+<li>Compatibility ₹999: 5% of orders by volume, 5% of revenue.</li>
+<li>Companion ₹799/mo: by month 12, ~50 active subscribers.</li>
+</ul>
+<p><strong>Sensitivity analysis:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>-20%</th>
+<th>Base</th>
+<th>+20%</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Spark conversion rate</td>
+<td>₹36 lakh</td>
+<td><strong>₹45 lakh</strong></td>
+<td>₹54 lakh</td>
+</tr>
+<tr>
+<td>Reading conversion rate</td>
+<td>₹38 lakh</td>
+<td><strong>₹45 lakh</strong></td>
+<td>₹52 lakh</td>
+</tr>
+<tr>
+<td>Full Map conversion rate</td>
+<td>₹38 lakh</td>
+<td><strong>₹45 lakh</strong></td>
+<td>₹52 lakh</td>
+</tr>
+<tr>
+<td>Companion subscriber count</td>
+<td>₹42 lakh</td>
+<td><strong>₹45 lakh</strong></td>
+<td>₹48 lakh</td>
+</tr>
+<tr>
+<td>Founder review hours (Reading/Full Map)</td>
+<td>₹49 lakh</td>
+<td><strong>₹45 lakh</strong></td>
+<td>₹41 lakh</td>
+</tr>
+<tr>
+<td>CAC blended</td>
+<td>₹51 lakh</td>
+<td><strong>₹45 lakh</strong></td>
+<td>₹39 lakh</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key sensitivities:</strong></p>
+<ol>
+<li><strong>Spark volume</strong> is the largest single revenue driver. -20% Spark = -20% total revenue.</li>
+<li><strong>Full Map conversion</strong> is the highest-margin lever. +20% Full Map conversion = +15% total revenue.</li>
+<li><strong>Founder review time</strong> is the biggest cost lever. AI-assisted review (Phase 2) saves ~₹4 lakh/year in founder opportunity cost.</li>
+</ol>
+<h2>8. Sensitivity to &quot;what if&quot; scenarios</h2>
+<p><strong>What if SEO content engine doesn't drive traffic?</strong></p>
+<ul>
+<li>Drop Spark volume by 50%. Year 1 revenue drops to ~₹25 lakh.</li>
+<li>Mitigation: double down on Instagram + influencer marketing. Higher CAC, but still profitable.</li>
+</ul>
+<p><strong>What if Instagram Reels don't go viral?</strong></p>
+<ul>
+<li>Slower follower growth. Year 1 revenue: ~₹30 lakh instead of ₹45 lakh.</li>
+<li>Mitigation: paid Instagram ads starting month 6 instead of month 9.</li>
+</ul>
+<p><strong>What if a competitor launches first in English Korean Saju?</strong></p>
+<ul>
+<li>Slower organic growth. Year 1 revenue: ~₹35 lakh instead of ₹45 lakh.</li>
+<li>Mitigation: lean into founder voice + citations as differentiator. Companion subscription as moat.</li>
+</ul>
+<p><strong>What if Google penalizes the site for YMYL astrology content?</strong></p>
+<ul>
+<li>Organic traffic drops 50–80%. Year 1 revenue: ~₹15–25 lakh.</li>
+<li>Mitigation: emphasize E-E-A-T (founder bio, classical-tradition references, disclaimers); diversify traffic to Instagram + Reddit.</li>
+</ul>
+<p><strong>What if the founder has health issues / burnout?</strong></p>
+<ul>
+<li>Review bandwidth halves. Year 1 revenue drops to ~₹20 lakh.</li>
+<li>Mitigation: Phase 1 should already have a part-time reader identified (even if not hired).</li>
+</ul>
+<p><strong>What if a major refund / review crisis hits?</strong></p>
+<ul>
+<li>Revenue drops 20% for 2–3 months. Year 1 revenue: ~₹35 lakh.</li>
+<li>Mitigation: documented refund policy + clarification calls + active review management.</li>
+</ul>
+<h2>9. The &quot;minimum viable commercialization&quot; path</h2>
+<p>If the founder has very limited time / runway, the <strong>minimum viable commercialization</strong> is:</p>
+<ol>
+<li>Self-service Spark on existing FastAPI app + Razorpay. <strong>Cost: ₹0</strong> (already built). <strong>Time: 2 weeks.</strong></li>
+<li>Reading + Full Map via personal referral. <strong>Cost: ₹0.</strong> <strong>Time: ongoing.</strong></li>
+<li>Single Instagram account with daily Reels. <strong>Cost: ₹0.</strong> <strong>Time: 1 hour/day.</strong></li>
+<li>Single SEO pillar post. <strong>Cost: ₹0.</strong> <strong>Time: 4 hours one-time.</strong></li>
+</ol>
+<p><strong>Minimum viable Year 1 outcome:</strong> ~₹3–5 lakh revenue, no hires, founder breaks even on opportunity cost. Validates the market without committing to scaling.</p>
+<p>This is the right starting point for a founder who is testing the waters.</p>
+<h2>10. Sources</h2>
+<ul>
+<li>See <code>02-market-size-and-demand.md</code> for market sizing that informs the funnel assumptions.</li>
+<li>See <code>03-competitor-landscape.md</code> for competitor pricing benchmarks.</li>
+<li>See <code>04-feature-demand.md</code> for feature prioritization.</li>
+<li>See <code>05-audience-demographics.md</code> for audience volume assumptions.</li>
+<li>See <code>06-monetization-strategy.md</code> for the pricing model.</li>
+<li>See <code>08-marketing-strategy.md</code> for CAC assumptions.</li>
+<li>See <code>09-product-roadmap.md</code> for sequencing.</li>
+<li>See <code>10-risks-and-do-not-do.md</code> for risk-adjusted scenarios.</li>
+</ul>
+<p>Internal references:</p>
+<ul>
+<li><a href="../../CLAUDE.md">CLAUDE.md — Tiered Client Products</a></li>
+<li><a href="../../tasks.md">tasks.md — project status</a></li>
+<li><a href="../../candidates_horoscope/reports/">candidates_horoscope/reports/</a></li>
+</ul>
+
+    
+<nav class="toc" style="margin-top:48px;font-size:14px;">
+  <div style="display:flex;justify-content:space-between;gap:12px;">
+    <div><a href="10-risks-and-do-not-do.html">← Doc 10: Risks &amp; Do-Not-Do</a></div>
+    <div><a href="combined.html">↑ Combined report</a></div>
+    <div><a href="12-feasibility-verdict.html">Doc 12: Feasibility Verdict — Final Go / No-Go →</a></div>
+  </div>
+</nav>
+</main>
+    <footer class="foot">
+      Saju market research · generated 2026-06-28 · /
+      <a href="https://github.com/anthropics/skills">no external dependencies beyond markdown-it-py</a>
+    </footer>
+  </div>
+</body>
+</html>

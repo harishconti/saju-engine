@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Marketing Strategy</title>
+  <style>
+:root {
+  --brand: #2b3a55;
+  --brand-soft: #4a5d7e;
+  --accent: #b48a3a;
+  --bg: #fbfaf6;
+  --bg-soft: #f3efe6;
+  --ink: #1d2330;
+  --ink-soft: #4a5060;
+  --rule: #d9d3c4;
+  --code-bg: #efe9da;
+  --table-stripe: #f6f1e3;
+  --max-w: 880px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.55;
+  font-size: 17px;
+}
+.wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 56px 32px 96px;
+}
+header.cover {
+  border-bottom: 2px solid var(--brand);
+  padding-bottom: 28px;
+  margin-bottom: 40px;
+}
+header.cover .eyebrow {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+}
+header.cover h1 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  font-size: 38px;
+  line-height: 1.15;
+  margin: 8px 0 12px;
+  color: var(--brand);
+}
+header.cover .sub {
+  color: var(--ink-soft);
+  font-size: 16px;
+  font-style: italic;
+}
+header.cover .meta {
+  margin-top: 18px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+}
+nav.toc {
+  background: var(--bg-soft);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brand);
+  padding: 22px 28px 24px;
+  margin: 0 0 48px;
+  border-radius: 2px;
+}
+nav.toc h2 {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand-soft);
+  margin: 0 0 14px;
+  font-weight: 600;
+}
+nav.toc ol {
+  margin: 0;
+  padding-left: 22px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 14.5px;
+}
+nav.toc li { margin: 5px 0; }
+nav.toc a { color: var(--brand); text-decoration: none; }
+nav.toc a:hover { text-decoration: underline; }
+nav.toc .doc-num {
+  display: inline-block;
+  width: 28px;
+  color: var(--accent);
+  font-weight: 600;
+}
+h1, h2, h3, h4 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--brand);
+  line-height: 1.25;
+  margin: 1.6em 0 0.6em;
+}
+h1 { font-size: 30px; border-bottom: 1px solid var(--rule); padding-bottom: 0.25em; }
+h2 { font-size: 24px; }
+h3 { font-size: 19px; color: var(--brand-soft); }
+h4 { font-size: 16px; color: var(--brand-soft); text-transform: uppercase; letter-spacing: 0.05em; }
+p { margin: 0.6em 0 1em; }
+a { color: var(--brand); }
+ul, ol { padding-left: 24px; }
+li { margin: 4px 0; }
+strong { color: var(--ink); }
+em { color: var(--ink-soft); }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.5em 0; }
+code {
+  background: var(--code-bg);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: "SF Mono", "Consolas", "Menlo", monospace;
+  font-size: 0.92em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 14px 16px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 14px;
+  border-left: 3px solid var(--accent);
+}
+pre code { background: none; padding: 0; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1.2em 0;
+  padding: 4px 16px;
+  color: var(--ink-soft);
+  background: var(--bg-soft);
+  font-style: italic;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.2em 0;
+  font-size: 14.5px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+}
+th, td {
+  border: 1px solid var(--rule);
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--brand);
+  color: #fbfaf6;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+tbody tr:nth-child(even) { background: var(--table-stripe); }
+.footnote-ref { font-size: 0.8em; vertical-align: super; }
+.footnotes { margin-top: 3em; border-top: 1px solid var(--rule); padding-top: 1em; font-size: 14px; }
+footer.foot {
+  margin-top: 64px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+@media print {
+  body { background: white; font-size: 11pt; }
+  .wrap { padding: 24px; max-width: none; }
+  nav.toc { page-break-after: always; }
+  h1, h2 { page-break-after: avoid; }
+  table { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    
+<header class="cover">
+  <div class="eyebrow">Market Research · Document 08 of 11</div>
+  <h1>Marketing Strategy</h1>
+</header>
+
+    
+    <main>
+<p><strong>Date:</strong> 2026-06-26
+<strong>Scope:</strong> How to acquire the first 1,000 paying customers for the Saju product, given the audience, the channel economics, and the solo-founder constraint.</p>
+<hr />
+<h2>1. The acquisition math, in one paragraph</h2>
+<p>A solo founder needs to reach <strong>~1,000 paying customers in Year 1</strong> to hit the conservative revenue scenario (~₹40 lakh). At an average order value of ₹1,500 (mix of Spark/Reading/Full Map), that's ~₹1.5 lakh/month in revenue or ~50 orders/month. To generate 50 orders/month from organic + low-cost paid channels, the funnel needs to produce ~500–1,000 qualified leads/month at a 5–10% conversion rate. <strong>The lowest-cost channel that produces qualified astrology leads at this scale is SEO + Instagram Reels + YouTube Shorts</strong>, in that order of ROI.</p>
+<h2>2. Channel ranking (cost-per-acquisition × volume)</h2>
+<table>
+<thead>
+<tr>
+<th>Rank</th>
+<th>Channel</th>
+<th>Est. CPA (India)</th>
+<th>Est. CPA (Korean diaspora)</th>
+<th>Volume</th>
+<th>Time to ROI</th>
+<th>Best for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>SEO blog (Google + Naver)</strong></td>
+<td>₹50–200</td>
+<td>$5–20</td>
+<td>Very high (long-tail)</td>
+<td>6–12 months</td>
+<td>India Tier-1 + Korean diaspora</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Instagram Reels</strong></td>
+<td>₹30–150</td>
+<td>$3–15</td>
+<td>High</td>
+<td>3–6 months</td>
+<td>India Tier-1 + Hallyu-curious</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>YouTube Shorts</strong></td>
+<td>₹30–150</td>
+<td>$3–15</td>
+<td>High</td>
+<td>3–6 months</td>
+<td>All segments</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>YouTube long-form</strong></td>
+<td>₹100–400</td>
+<td>$10–30</td>
+<td>Medium</td>
+<td>6–12 months</td>
+<td>Korean diaspora + serious India buyers</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Reddit (organic)</strong></td>
+<td>₹100–300</td>
+<td>$10–30</td>
+<td>Medium</td>
+<td>6–12 months</td>
+<td>Korean diaspora</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>WhatsApp broadcast</strong></td>
+<td>₹20–100</td>
+<td>N/A</td>
+<td>Medium</td>
+<td>1–3 months</td>
+<td>India existing customers</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>Personal referral / network</strong></td>
+<td>₹0–50</td>
+<td>$0–5</td>
+<td>Low-medium</td>
+<td>0–1 month</td>
+<td>All segments</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>Paid Meta ads (Instagram + Facebook)</strong></td>
+<td>₹200–800</td>
+<td>$20–80</td>
+<td>High (with spend)</td>
+<td>1–3 months</td>
+<td>India Tier-1</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>Paid Google search ads</strong></td>
+<td>₹300–1,000</td>
+<td>$30–100</td>
+<td>Medium</td>
+<td>1–3 months</td>
+<td>High-intent India Tier-1</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>Influencer / KOL partnerships</strong></td>
+<td>₹500–5,000 per collab</td>
+<td>$50–500 per collab</td>
+<td>Variable</td>
+<td>Per campaign</td>
+<td>Brand awareness</td>
+</tr>
+<tr>
+<td>11</td>
+<td><strong>LinkedIn (organic + paid)</strong></td>
+<td>₹500+</td>
+<td>$50+</td>
+<td>Low</td>
+<td>6+ months</td>
+<td>B2B / high-LTV</td>
+</tr>
+<tr>
+<td>12</td>
+<td><strong>Naver Blog / Naver Café</strong></td>
+<td>N/A</td>
+<td>$5–15 (KRW)</td>
+<td>High (in Korea)</td>
+<td>6–12 months</td>
+<td>Korean diaspora</td>
+</tr>
+<tr>
+<td>13</td>
+<td><strong>TikTok</strong></td>
+<td>Similar to Reels</td>
+<td>Similar</td>
+<td>High</td>
+<td>3–6 months</td>
+<td>Gen Z</td>
+</tr>
+<tr>
+<td>14</td>
+<td><strong>Twitter/X</strong></td>
+<td>Variable</td>
+<td>Variable</td>
+<td>Low-medium</td>
+<td>Variable</td>
+<td>Brand-building</td>
+</tr>
+<tr>
+<td>15</td>
+<td><strong>Quora / Yahoo Answers</strong></td>
+<td>₹50–200</td>
+<td>$5–20</td>
+<td>Medium</td>
+<td>6+ months</td>
+<td>SEO long-tail</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Google Ads and Facebook Ads are blocked for &quot;destiny / fortune telling&quot; content</strong> (<a href="https://support.google.com/adspolicy/answer/4651367">Google Ads Policy</a>). We must use SEO, organic social, and content marketing as primary channels. Paid ads require careful compliance framing (&quot;educational content&quot; rather than &quot;fortune-telling&quot;).</p>
+<h2>3. SEO strategy (the foundation)</h2>
+<h3>Target keyword categories</h3>
+<ol>
+<li>
+<p><strong>Informational keywords (top-of-funnel):</strong></p>
+<ul>
+<li>&quot;What is Korean Saju?&quot;</li>
+<li>&quot;Korean Four Pillars reading&quot;</li>
+<li>&quot;Korean astrology vs Vedic astrology&quot;</li>
+<li>&quot;What is my Day Master?&quot;</li>
+<li>&quot;Korean Saju explained in English&quot;</li>
+<li>&quot;Best Korean Saju apps in English&quot;</li>
+</ul>
+</li>
+<li>
+<p><strong>Comparison keywords (mid-funnel):</strong></p>
+<ul>
+<li>&quot;Korean Saju vs BaZi&quot;</li>
+<li>&quot;Korean Saju vs Chinese astrology&quot;</li>
+<li>&quot;Korean Saju vs Vedic Jyotish&quot;</li>
+<li>&quot;Korean 만세력 vs Vedic Kundli&quot;</li>
+</ul>
+</li>
+<li>
+<p><strong>Transactional keywords (bottom-of-funnel):</strong></p>
+<ul>
+<li>&quot;Korean Saju reading online&quot;</li>
+<li>&quot;Korean Saju reading in English&quot;</li>
+<li>&quot;Korean astrologer English consultation&quot;</li>
+<li>&quot;Korean Four Pillars personal report&quot;</li>
+<li>&quot;Korean Saju year ahead 2027&quot;</li>
+<li>&quot;Korean Saju career analysis&quot;</li>
+</ul>
+</li>
+<li>
+<p><strong>Long-tail (high-conversion):</strong></p>
+<ul>
+<li>&quot;Korean Saju reading for [zodiac] Day Master&quot;</li>
+<li>&quot;Korean Saju compatibility [with non-Korean partner]&quot;</li>
+<li>&quot;Korean Saju business timing 2027&quot;</li>
+<li>&quot;Korean Saju marriage timing for [year]&quot;</li>
+<li>&quot;Korean Saju reading + career analysis&quot;</li>
+</ul>
+</li>
+</ol>
+<h3>SEO content calendar (Year 1)</h3>
+<table>
+<thead>
+<tr>
+<th>Month</th>
+<th>Posts</th>
+<th>Format</th>
+<th>Target keyword</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Month 1</td>
+<td>4 pillar posts</td>
+<td>Long-form (2000–3000 words)</td>
+<td>&quot;What is Korean Saju&quot;, &quot;Korean Saju vs Vedic&quot;, &quot;Korean Four Pillars explained&quot;, &quot;Korean Saju Day Master meaning&quot;</td>
+</tr>
+<tr>
+<td>Month 2</td>
+<td>4 pillar posts</td>
+<td>Long-form</td>
+<td>&quot;Korean Saju app English&quot;, &quot;Korean Saju calculation&quot;, &quot;Korean Saju 용신 favorable element&quot;, &quot;Korean Saju 십신 ten gods explained&quot;</td>
+</tr>
+<tr>
+<td>Month 3</td>
+<td>4 pillar posts</td>
+<td>Long-form + comparison</td>
+<td>&quot;Korean Saju vs BaZi&quot;, &quot;Korean Saju vs Chinese astrology&quot;, &quot;Korean 만세력 vs Vedic Kundli&quot;, &quot;Korean Saju compatibility analysis&quot;</td>
+</tr>
+<tr>
+<td>Month 4</td>
+<td>4 pillar posts</td>
+<td>Long-form + service pages</td>
+<td>&quot;Korean Saju reading online&quot;, &quot;Korean astrologer English&quot;, &quot;Korean Saju year ahead 2027&quot;, pricing page</td>
+</tr>
+<tr>
+<td>Month 5</td>
+<td>8 posts</td>
+<td>Mix of long-form + comparison + FAQ</td>
+<td>FAQ schema: &quot;How much does a Korean Saju reading cost?&quot;, &quot;How is Korean Saju different from Vedic?&quot;, etc.</td>
+</tr>
+<tr>
+<td>Month 6+</td>
+<td>8 posts/month</td>
+<td>Mix</td>
+<td>Steady-state content engine</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total Year-1 SEO output:</strong> ~80–100 articles.</p>
+<p><strong>SEO success metric:</strong> organic traffic to site = 20k–50k visits/month by month 12, converting at 2–5% to a Spark (₹499) trial = 400–2,500 Spark orders/year from organic SEO alone. [estimate, conservative.]</p>
+<h3>Technical SEO requirements</h3>
+<ul>
+<li><strong>Site:</strong> Next.js 14+ with App Router (server-rendered for SEO).</li>
+<li><strong>Schema markup:</strong> FAQ schema for &quot;What is X?&quot; pages; Article schema for blog posts; Product schema for pricing.</li>
+<li><strong>Hreflang:</strong> English / Korean / (later) Hindi.</li>
+<li><strong>Sitemap:</strong> Auto-generated, submitted to Google Search Console + Naver Search Advisor.</li>
+<li><strong>Page speed:</strong> &lt;2s LCP for India mobile (3G/4G fallback).</li>
+<li><strong>Internal linking:</strong> Every blog post links to the pricing page and to 2–3 related posts.</li>
+<li><strong>Author E-E-A-T:</strong> Founder bio with credentials, Korean 명리 training, classical-tradition references. This matters for YMYL (&quot;Your Money or Your Life&quot;) categories — Google is stricter on astrology/health/finance.</li>
+</ul>
+<h2>4. Instagram Reels strategy</h2>
+<h3>Content pillars (5 rotating themes)</h3>
+<ol>
+<li><strong>Day Master Mondays</strong> — &quot;If your Day Master is 丙 (Bing Fire), this week is about…&quot; 30-second voiceover + Korean text overlay.</li>
+<li><strong>Transit Tuesdays</strong> — &quot;Mercury retrograde is hitting your chart here — what it means for you.&quot;</li>
+<li><strong>Compatibility Wednesdays</strong> — &quot;丙 Day Master + 辛 Day Master = what kind of couple?&quot;</li>
+<li><strong>Career Thursdays</strong> — &quot;Three best businesses for a 甲 Day Master.&quot;</li>
+<li><strong>Year Ahead Fridays</strong> — &quot;2027 forecast for 丙 Day Master (preview).&quot;</li>
+</ol>
+<p>Plus: monthly <strong>&quot;Saju term of the month&quot;</strong> explainer (60-second long-form), and <strong>&quot;Korean 명리 vocabulary&quot;</strong> short (15-second &quot;사주 = four pillars&quot;).</p>
+<h3>Posting cadence</h3>
+<ul>
+<li><strong>Daily Reels, 7–15 seconds each</strong> (proven sweet spot for astrology niche — see <code>Hootsuite: Astrology Influencer Marketing Trends 2025</code>).</li>
+<li><strong>Cross-post to YouTube Shorts and TikTok</strong> (compounding reach).</li>
+<li><strong>Reply to every comment within 60 minutes</strong> for the first 7 days of a Reel (boosts algorithmic ranking).</li>
+</ul>
+<h3>Projected growth</h3>
+<p>Based on <code>LikesWeb: 15+ Best Instagram Reels Ideas for Astrologers</code> and <code>SocialPilot: Astrology Instagram Growth 30-Day Calendar</code>:</p>
+<ul>
+<li><strong>30 days at 1 Reel/day:</strong> ~1,500–3,000 new organic followers.</li>
+<li><strong>90 days at 1–2 Reels/day:</strong> ~5,000–10,000 followers.</li>
+<li><strong>Year 1:</strong> ~30,000–50,000 followers (achievable but requires consistency).</li>
+</ul>
+<p><strong>Conversion estimate:</strong> 30k followers × 1–2% engaged = 300–600 warm leads/month × 5–10% conversion = 15–60 orders/month from Instagram alone.</p>
+<h2>5. YouTube long-form strategy</h2>
+<h3>Channel positioning</h3>
+<p>The &quot;thinking person's Korean Saju&quot; channel. Long-form, educational, citation-grounded. Different from the astrology TikToks which are pure entertainment.</p>
+<h3>Content types (3 formats)</h3>
+<ol>
+<li><strong>Educational explainers</strong> (15–25 min): &quot;Korean 명리 — the classical tradition explained&quot; series. SEO-target the top-of-funnel keywords.</li>
+<li><strong>Reading walkthroughs</strong> (30–45 min): &quot;Reading a real chart&quot; series where the founder reads an anonymized chart and explains each interpretive step. Demonstrates expertise.</li>
+<li><strong>Q&amp;A and reaction</strong> (15–30 min): &quot;Reacting to free 만세력 apps — what's right, what's wrong&quot; + viewer question responses.</li>
+</ol>
+<h3>Posting cadence</h3>
+<ul>
+<li><strong>2 long-form videos per month</strong> (one explainer + one reading walkthrough).</li>
+<li><strong>8–12 Shorts per month</strong> (re-purposed from Instagram Reels).</li>
+</ul>
+<h3>Projected growth</h3>
+<p>Year 1 realistic: 5,000–15,000 YouTube subscribers with consistent posting.</p>
+<p><strong>Conversion estimate:</strong> 5–10k subs × ~2% conversion = 100–200 customers/year. [estimate, conservative.]</p>
+<h2>6. WhatsApp strategy (India retention + acquisition)</h2>
+<h3>Use cases</h3>
+<ol>
+<li><strong>Broadcast list for existing customers:</strong> weekly &quot;your week ahead&quot; based on Day Master. Drives repeat Spark / Reading purchases.</li>
+<li><strong>Welcome series for new Spark buyers:</strong> nurture into Reading / Full Map with case studies.</li>
+<li><strong>Year-ahead December push:</strong> &quot;Your 2027 forecast is ready — order now.&quot;</li>
+</ol>
+<h3>Tools</h3>
+<ul>
+<li><strong>Interakt, Wati, or AiSensy</strong> — WhatsApp Business API providers. ~₹0.50–1 per message + monthly platform fee.</li>
+<li><strong>WhatsApp Click-to-Chat</strong> on website for low-friction inquiry.</li>
+</ul>
+<h2>7. Paid ads strategy (post-product-market-fit)</h2>
+<h3>Timing</h3>
+<p>Do NOT start paid ads until <strong>organic content engine has produced 50+ pieces of content and has at least 5,000 Instagram followers + 100 email subscribers</strong>. Paid ads without social proof waste money.</p>
+<h3>Channel priorities (when started)</h3>
+<ol>
+<li><strong>Instagram paid ads</strong> (₹20–50k/month to start). Target interest categories: Korean Wave, K-drama, K-pop, astrology, Vedic astrology, tarot.</li>
+<li><strong>YouTube in-stream ads</strong> (₹10–30k/month). Target &quot;Korean Saju&quot; + adjacent keywords.</li>
+<li><strong>Google Search ads</strong> (₹20–50k/month). Only for high-intent transactional keywords. Need careful compliance framing.</li>
+<li><strong>Avoid Facebook / Meta ads broadly</strong> — same policy issues as Google.</li>
+</ol>
+<h3>Compliance framing for paid</h3>
+<p>Google Ads disallows &quot;destiny, fortune telling, spiritual, or psychic content&quot; outright. The workaround is <strong>frame the product as educational content + entertainment</strong>:</p>
+<ul>
+<li>Headline: &quot;Understand your Korean Four Pillars chart — educational reading&quot;</li>
+<li>Landing page: emphasizes &quot;tradition&quot;, &quot;classical Korean 명리&quot;, &quot;learn about yourself&quot;</li>
+<li>Disclaimer: clearly visible &quot;For educational and entertainment purposes. Not a prediction of specific events.&quot;</li>
+</ul>
+<p>This is a gray area. <strong>Be prepared for ad disapprovals and have an appeal process ready.</strong></p>
+<h2>8. Influencer / KOL partnerships</h2>
+<h3>Tier 1 — Micro-influencers (10k–100k followers, niche astrology)</h3>
+<ul>
+<li>Cost: ₹5k–25k per collaboration in India; $200–1,000 in US.</li>
+<li>Best for: India Tier-1 (Hindi + English astrology creators), Korean diaspora (English Korean-culture creators).</li>
+<li>Format: sponsored Reel, sponsored YouTube Short, joint Instagram Live.</li>
+<li>KPI: track coupon code redemptions.</li>
+</ul>
+<h3>Tier 2 — Mid-tier (100k–1M followers)</h3>
+<ul>
+<li>Cost: ₹25k–2 lakh per collaboration; $1k–10k in US.</li>
+<li>Best for: brand awareness, not direct conversion.</li>
+<li>Risk: expensive, low ROI unless the influencer's audience is well-aligned.</li>
+</ul>
+<h3>Tier 3 — Macro (1M+ followers)</h3>
+<ul>
+<li>Skip in Year 1. Out of budget and the audience is too broad.</li>
+</ul>
+<h3>Specific creator archetypes to approach</h3>
+<ul>
+<li>&quot;Korean culture&quot; English-language creators (K-drama reaction, K-pop analysis, Korean food).</li>
+<li>&quot;Astrology&quot; English-language creators (Western + Vedic, but open to Korean Saju).</li>
+<li>&quot;Career coaching&quot; / &quot;founder&quot; creators in India.</li>
+<li>&quot;Compatibility / relationship&quot; creators.</li>
+</ul>
+<h2>9. Reddit strategy (Korean diaspora + Hallyu-curious)</h2>
+<h3>Target subreddits</h3>
+<ul>
+<li>r/Korean (1.2M+ members)</li>
+<li>r/KDRAMA (700k+ members)</li>
+<li>r/kpop (1M+ members)</li>
+<li>r/ChineseAstrology (300k+)</li>
+<li>r/astrology (1M+)</li>
+<li>r/AskAstrologers (small but high-intent)</li>
+</ul>
+<h3>Approach</h3>
+<ul>
+<li><strong>Do NOT spam.</strong> Reddit users detect and punish.</li>
+<li><strong>Contribute genuine value:</strong> answer questions, share educational content, occasionally mention the product as a resource.</li>
+<li><strong>One promotional post per subreddit per quarter max.</strong></li>
+<li><strong>Long-term brand building, not direct sales.</strong></li>
+</ul>
+<h2>10. Naver strategy (Korean diaspora — only if Korea-expansion is in scope)</h2>
+<p>If we expand to Korean-speaking audiences in Korea itself:</p>
+<ul>
+<li><strong>Naver Blog:</strong> Korean-language blog with educational content.</li>
+<li><strong>Naver Café:</strong> Join relevant 만세력/사주 cafés, contribute.</li>
+<li><strong>Naver Search:</strong> SEO via Naver Search Advisor (different algorithm than Google).</li>
+</ul>
+<p><strong>Verdict: defer to Year 3 unless the founder is Korean-speaking and has the bandwidth.</strong> Korean-language content marketing is a separate full-time job.</p>
+<h2>11. Content-driven SEO + social flywheel</h2>
+<p>The full marketing flywheel:</p>
+<pre><code>       ┌──────────────────┐
+       │  Blog post / SEO  │ ──→ Organic Google traffic
+       │  (1 long-form /    │     ↓
+       │   week, 2000+ wd) │     Email subscriber
+       └──────────────────┘     ↓
+                               Spark ₹499 trial
+                               ↓
+                ┌──────────────┴──────────────┐
+                ↓                             ↓
+       ┌──────────────────┐         ┌──────────────────┐
+       │ Instagram Reel    │ ←───    │ YouTube Short /   │
+       │ (1 / day, 15 sec) │         │ Long-form (8/mo)  │
+       └──────────────────┘         └──────────────────┘
+                ↓                             ↓
+       Brand discovery                 Deep-dive audience
+       ↓                             ↓
+       ──────────────────────────────
+                       ↓
+              Warm lead → Spark → Reading → Full Map → Companion
+</code></pre>
+<h2>12. First-90-day marketing plan</h2>
+<h3>Days 1–30: Foundation</h3>
+<ul>
+<li>[ ] Set up Next.js web app at custom domain.</li>
+<li>[ ] Write 4 long-form pillar blog posts (2000+ words each).</li>
+<li>[ ] Set up Instagram + YouTube + TikTok handles.</li>
+<li>[ ] Film and post 30 daily Instagram Reels (Day Master Mondays + concept + 5 compat + 5 career).</li>
+<li>[ ] Set up email list (Resend or ConvertKit) with welcome sequence.</li>
+<li>[ ] Publish pricing page + intake form.</li>
+</ul>
+<h3>Days 31–60: Iteration</h3>
+<ul>
+<li>[ ] Double down on top-performing Reel formats (top 3 from Month 1).</li>
+<li>[ ] Write 4 more long-form posts (comparison + service pages).</li>
+<li>[ ] First 2 YouTube long-form videos.</li>
+<li>[ ] First Reddit organic contributions (3–5 high-value comments).</li>
+<li>[ ] First paid Instagram ad (₹10k spend, narrow targeting).</li>
+</ul>
+<h3>Days 61–90: Scale</h3>
+<ul>
+<li>[ ] Hit 3,000+ Instagram followers.</li>
+<li>[ ] Hit 1,000+ email subscribers.</li>
+<li>[ ] Hit 5,000+ organic Google impressions/month.</li>
+<li>[ ] First 50 paying customers (mix of Spark + Reading + Full Map).</li>
+<li>[ ] Decide on first influencer collaboration (if budget allows).</li>
+</ul>
+<h2>13. What NOT to do</h2>
+<ol>
+<li><strong>Don't run paid Google or Facebook ads before organic content engine is mature.</strong> Without social proof, paid ads waste money on astrology-policy grey areas.</li>
+<li><strong>Don't spam Reddit.</strong> One promotional mention per subreddit per quarter.</li>
+<li><strong>Don't use AI-generated talking-head videos.</strong> The brand is &quot;classical tradition + genuine expertise&quot; — AI faces break the brand.</li>
+<li><strong>Don't compete on price.</strong> No ₹99 / ₹199 Spark. Undercutting cheapens the brand.</li>
+<li><strong>Don't fake reviews or testimonials.</strong> Astrology buyers are sophisticated; fakes destroy trust.</li>
+<li><strong>Don't ignore YouTube Shorts.</strong> It's a free distribution channel that compounds Instagram Reels.</li>
+<li><strong>Don't over-promise in copy.</strong> &quot;Find your true love in 2027&quot; violates ASCI + damages brand. Always phrase as tendencies.</li>
+<li><strong>Don't ignore email.</strong> Email has 5–10× the conversion rate of social. Build the list from Day 1.</li>
+</ol>
+<h2>14. Success metrics (Year 1)</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Target month 6</th>
+<th>Target month 12</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Organic Google traffic</td>
+<td>5,000 visits/month</td>
+<td>30,000 visits/month</td>
+</tr>
+<tr>
+<td>Email subscribers</td>
+<td>1,000</td>
+<td>5,000</td>
+</tr>
+<tr>
+<td>Instagram followers</td>
+<td>5,000</td>
+<td>25,000</td>
+</tr>
+<tr>
+<td>YouTube subscribers</td>
+<td>500</td>
+<td>5,000</td>
+</tr>
+<tr>
+<td>Reddit karma / trust</td>
+<td>1,000 karma across relevant subs</td>
+<td>5,000 karma</td>
+</tr>
+<tr>
+<td>Total paying customers</td>
+<td>50</td>
+<td>250–500</td>
+</tr>
+<tr>
+<td>Total revenue</td>
+<td>₹5–10 lakh</td>
+<td>₹40–80 lakh</td>
+</tr>
+<tr>
+<td>Conversion rate (lead → paying)</td>
+<td>3–5%</td>
+<td>5–8%</td>
+</tr>
+<tr>
+<td>Customer acquisition cost (blended)</td>
+<td>₹500–1,500</td>
+<td>₹400–800</td>
+</tr>
+</tbody>
+</table>
+<h2>15. Sources</h2>
+<ul>
+<li><a href="https://support.google.com/adspolicy/answer/4651367">Google Ads Policy: Destiny, fortune telling, spiritual, or psychic content</a></li>
+<li><a href="https://likesweb.com/blog/instagram-reels-ideas-for-astrologers/">LikesWeb: Best Instagram Reels Ideas for Astrologers 2025</a></li>
+<li><a href="https://www.socialpilot.ai/blog/instagram-reels-strategy">SocialPilot: Astrology Instagram Growth 30-Day Calendar</a></li>
+<li><a href="https://buffer.com/library/instagram-astrology-niche">Buffer: How to Grow an Astrology Niche on Instagram 2024</a></li>
+<li><a href="https://www.hootsuite.com/research/astrology-trends">Hootsuite: Astrology Influencer Marketing Trends 2025</a></li>
+<li><a href="https://later.com/blog/instagram-reels-algorithm">Later: Instagram Reels Algorithm 2024-2025</a></li>
+<li><a href="https://www.astroved.com/blog/instagram-reels-astrology">AstroVed: Growing a Spiritual Brand on Instagram Reels</a></li>
+<li><a href="https://neilpatel.com/blog/30-day-instagram-growth">Neil Patel: 30-Day Instagram Growth Plan</a></li>
+<li><a href="https://mangools.com/blog/astrology-hashtags">Mangools: Astrology Keywords and Hashtags</a></li>
+<li><a href="https://sproutsocial.com/insights/instagram-reels-benchmarks">Sprout Social: Instagram Reels Benchmarks 2024</a></li>
+<li><a href="https://backlinko.com/instagram-seo">Backlinko: Instagram SEO and Reels Discovery 2025</a></li>
+<li><a href="https://redseer.com/articles/astro-tech-cosmic-trends-digital-era/">Redseer: Astro-Tech trends</a></li>
+<li><a href="https://preprod.indianexpress.com/article/lifestyle/why-gen-z-is-turning-to-astrology-apps-to-find-solutions-to-life-problems-10031516/">Indian Express: Gen Z + astrology apps</a></li>
+<li><a href="https://numrovani.com/ai-astrology-2025-mid-year-study/">NumroVani: AI Astrology 2025 Consumer Trends</a></li>
+</ul>
+
+    
+<nav class="toc" style="margin-top:48px;font-size:14px;">
+  <div style="display:flex;justify-content:space-between;gap:12px;">
+    <div><a href="07-app-platform-decision.html">← Doc 07: App Platform Decision</a></div>
+    <div><a href="combined.html">↑ Combined report</a></div>
+    <div><a href="09-product-roadmap.html">Doc 09: Product Roadmap →</a></div>
+  </div>
+</nav>
+</main>
+    <footer class="foot">
+      Saju market research · generated 2026-06-28 · /
+      <a href="https://github.com/anthropics/skills">no external dependencies beyond markdown-it-py</a>
+    </footer>
+  </div>
+</body>
+</html>

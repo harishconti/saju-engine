@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Feasibility Verdict — Final Go / No-Go</title>
+  <style>
+:root {
+  --brand: #2b3a55;
+  --brand-soft: #4a5d7e;
+  --accent: #b48a3a;
+  --bg: #fbfaf6;
+  --bg-soft: #f3efe6;
+  --ink: #1d2330;
+  --ink-soft: #4a5060;
+  --rule: #d9d3c4;
+  --code-bg: #efe9da;
+  --table-stripe: #f6f1e3;
+  --max-w: 880px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.55;
+  font-size: 17px;
+}
+.wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 56px 32px 96px;
+}
+header.cover {
+  border-bottom: 2px solid var(--brand);
+  padding-bottom: 28px;
+  margin-bottom: 40px;
+}
+header.cover .eyebrow {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+}
+header.cover h1 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  font-size: 38px;
+  line-height: 1.15;
+  margin: 8px 0 12px;
+  color: var(--brand);
+}
+header.cover .sub {
+  color: var(--ink-soft);
+  font-size: 16px;
+  font-style: italic;
+}
+header.cover .meta {
+  margin-top: 18px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+}
+nav.toc {
+  background: var(--bg-soft);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brand);
+  padding: 22px 28px 24px;
+  margin: 0 0 48px;
+  border-radius: 2px;
+}
+nav.toc h2 {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand-soft);
+  margin: 0 0 14px;
+  font-weight: 600;
+}
+nav.toc ol {
+  margin: 0;
+  padding-left: 22px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 14.5px;
+}
+nav.toc li { margin: 5px 0; }
+nav.toc a { color: var(--brand); text-decoration: none; }
+nav.toc a:hover { text-decoration: underline; }
+nav.toc .doc-num {
+  display: inline-block;
+  width: 28px;
+  color: var(--accent);
+  font-weight: 600;
+}
+h1, h2, h3, h4 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--brand);
+  line-height: 1.25;
+  margin: 1.6em 0 0.6em;
+}
+h1 { font-size: 30px; border-bottom: 1px solid var(--rule); padding-bottom: 0.25em; }
+h2 { font-size: 24px; }
+h3 { font-size: 19px; color: var(--brand-soft); }
+h4 { font-size: 16px; color: var(--brand-soft); text-transform: uppercase; letter-spacing: 0.05em; }
+p { margin: 0.6em 0 1em; }
+a { color: var(--brand); }
+ul, ol { padding-left: 24px; }
+li { margin: 4px 0; }
+strong { color: var(--ink); }
+em { color: var(--ink-soft); }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.5em 0; }
+code {
+  background: var(--code-bg);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: "SF Mono", "Consolas", "Menlo", monospace;
+  font-size: 0.92em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 14px 16px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 14px;
+  border-left: 3px solid var(--accent);
+}
+pre code { background: none; padding: 0; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1.2em 0;
+  padding: 4px 16px;
+  color: var(--ink-soft);
+  background: var(--bg-soft);
+  font-style: italic;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.2em 0;
+  font-size: 14.5px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+}
+th, td {
+  border: 1px solid var(--rule);
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--brand);
+  color: #fbfaf6;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+tbody tr:nth-child(even) { background: var(--table-stripe); }
+.footnote-ref { font-size: 0.8em; vertical-align: super; }
+.footnotes { margin-top: 3em; border-top: 1px solid var(--rule); padding-top: 1em; font-size: 14px; }
+footer.foot {
+  margin-top: 64px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+@media print {
+  body { background: white; font-size: 11pt; }
+  .wrap { padding: 24px; max-width: none; }
+  nav.toc { page-break-after: always; }
+  h1, h2 { page-break-after: avoid; }
+  table { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    
+<header class="cover">
+  <div class="eyebrow">Market Research · Document 12 of 11</div>
+  <h1>Feasibility Verdict — Final Go / No-Go</h1>
+</header>
+
+    
+    <main>
+<p><strong>Date:</strong> 2026-06-26
+<strong>Decision-maker:</strong> Solo founder (Harish)
+<strong>Decision:</strong> <strong>CONDITIONAL GO</strong> — proceed with commercialization under specific conditions, with milestone gates that allow graceful exit if early signals fail.</p>
+<hr />
+<h2>1. The verdict, in one paragraph</h2>
+<p><strong>The Korean Saju project has unusually strong fundamentals for a niche consumer product — a working calculation engine with 129 passing tests, a citation-grounded classical-tradition knowledge base, a self-service PDF generation pipeline that already produces tiered client reports, and 6 paid pilots validating the Full Map price point. The realistic 12-month opportunity for a solo operator is ₹40–80 lakh in revenue (Scenario B = ₹45 lakh base case), scaling to ₹2–4 crore annual run rate in 24–36 months with a small team and content engine. The two dominant risks are interpretive quality on the higher tiers (mitigated by mandatory human review) and regulatory/compliance exposure around predictive astrology claims (mitigated by careful compliance framing). The recommended path is a phased 4-quarter launch — web app + self-service Spark → Compatibility add-on + Companion scaffolding → Android app + Companion launch → iOS via Capacitor + first hires.</strong></p>
+<h2>2. Why this is a GO (the strengths)</h2>
+<h3>2.1 The hard part is built</h3>
+<p>The calculation engine at <code>tools/saju_engine/</code> is non-trivial to build from scratch:</p>
+<ul>
+<li>11 knowledge files totaling ~95KB of classical-tradition interpretation rules.</li>
+<li>A 60-cycle day-pillar engine with Korean 야자시 convention (vs. mainland Chinese 조자시).</li>
+<li>십신, 12운성, 대운 direction + starting age, 신살 overlays, strength heuristic, grid/pattern detection, annual/monthly/daily luck windows, prose scaffold, premium tiered report generator.</li>
+<li>129 pytest cases passing.</li>
+</ul>
+<p><strong>This took 18 months of focused work</strong> and would take a competent new entrant 6–12 months to replicate. The moat is real.</p>
+<h3>2.2 The classical-tradition positioning is defensible</h3>
+<p>Most Saju / BaZi / astrology apps produce generic LLM-prompted interpretations that any serious practitioner spots immediately. The <code>knowledge/</code> corpus in this project is <strong>citation-grounded from primary Korean 명리 texts</strong> (Gyeonglakgoyo, Jeokcheon-su, Yeonhae-japyeong, Gungtong-bogam, Myeongrijeongjong). This is the credibility moat for the Full Map tier (₹3,499) where the client expects depth.</p>
+<h3>2.3 The tiered pricing is validated</h3>
+<p>6 paid pilot candidates have already purchased Full Map-tier reports at ₹3,499. Each pilot took 90–120 minutes of founder time. The willingness to pay is real and the price-to-depth ratio is right.</p>
+<h3>2.4 The market has a real, underserved niche</h3>
+<p><strong>English-language Korean Saju is genuinely underserved.</strong> The dominant Korean Saju apps are Korean-only and Korean-App-Store-only. Western astrology apps (Co-Star, The Pattern, Sanctuary) don't cover Korean 명리. Indian astrology apps (AstroTalk, InstaAstro, GaneshaSpeaks) are Vedic Jyotish, not Korean Saju. &quot;The Saju Booth&quot; and &quot;Lucky Saju&quot; exist in English but are small and underfunded.</p>
+<h3>2.5 The audience is reachable</h3>
+<p>The intersection of Hallyu Wave audience (50–100M+ globally per Korean Foundation surveys) × English-strong × Indian urban Tier-1 + Korean diaspora = a defensible ~5–15M addressable audience globally, with realistic ~25k–300k paying users over 5 years. India alone has 1.4B population with ~70% astrology engagement and growing K-content consumption.</p>
+<h3>2.6 The intake → PDF → delivery pipeline already works</h3>
+<p><code>tools/client_intake_app.py</code> accepts an intake form submission, computes the chart from birth data, runs the premium report generator for the chosen tier, and returns a PDF. This is the entire functional path from signup to delivery, working today.</p>
+<h2>3. Why this could be a NO-GO (the risks)</h2>
+<h3>3.1 The interpretive quality bottleneck</h3>
+<p>Every Reading or Full Map order requires 45–120 minutes of human review by the founder. At 50 orders/month, that's 40–100 hours/month — half the founder's available time. Without AI-assisted review or hired readers, the business caps at ~150 Reading/Full Map orders/month. This caps Year 1 revenue at ~₹30–50 lakh regardless of demand.</p>
+<h3>3.2 The marketing compliance wall</h3>
+<p>Google Search ads and Facebook/Meta ads disallow &quot;fortune telling, spiritual, or psychic content&quot; outright. This forces reliance on SEO + organic social + influencer marketing, which is slower and more founder-labor-intensive than paid acquisition. Mitigations exist (organic SEO, Instagram Reels, micro-influencers) but the absolute ceiling on growth velocity is lower than a paid-ads-friendly product would have.</p>
+<h3>3.3 The cultural / tradition backlash risk</h3>
+<p>A credible Korean 명리 practitioner who reads our report and spots a &quot;wrong&quot; interpretation per their school can publicly damage the brand. The mitigation is the citation-grounded knowledge base + <code>[UNCERTAIN]</code> flags + <code>[ENGINE DRAFT — REVIEW REQUIRED]</code> markers, but the risk is real.</p>
+<h3>3.4 The refund risk on the high tier</h3>
+<p>Full Map at ₹3,499 is a 3-figure USD-equivalent purchase. If the client reads it and feels &quot;this doesn't apply to me,&quot; they'll demand a refund. The mitigation is a documented refund policy + optional 30-minute clarification call, but chargeback rates must be monitored carefully.</p>
+<h3>3.5 The founder burnout risk</h3>
+<p>Solo founder. 60–80 hour weeks are common. Burnout is the most common failure mode. The mitigation is strict 50-hour-week cap + part-time reader by month 9 + quarterly breaks.</p>
+<h2>4. The conditions for GO</h2>
+<p>The conditional GO requires these specific preconditions:</p>
+<ol>
+<li><strong>Founder has ₹8–15 lakh personal runway</strong> (3–6 months of living expenses + initial costs).</li>
+<li><strong>Founder commits 30–40 hours/week for 12 months</strong> (not &quot;evenings and weekends&quot; — that's insufficient).</li>
+<li><strong>Founder is willing to hand-deliver Reading/Full Map in Year 1</strong> with 48–72 hour SLA. No fully-automated delivery until AI-assisted review is built in Phase 2.</li>
+<li><strong>Founder has access to a part-time Saju reader</strong> (for Phase 3 hire) — at least identified, even if not hired yet.</li>
+<li><strong>Founder is willing to invest in SEO + content engine</strong> as the primary acquisition channel (not relying on paid ads alone).</li>
+<li><strong>Founder accepts the classical-tradition positioning</strong> as the durable brand — not as a limitation.</li>
+</ol>
+<h2>5. The milestone gates (decision points)</h2>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>When</th>
+<th>Pass criteria</th>
+<th>If fails</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>G0: Pre-launch</strong></td>
+<td>Month 0</td>
+<td>Web app + Razorpay + self-service Spark live. 4 SEO posts published. 30 Instagram Reels filmed. Personal runway ≥ ₹8 lakh.</td>
+<td>Stop. Do not launch.</td>
+</tr>
+<tr>
+<td><strong>G1: First paying customer</strong></td>
+<td>Month 1</td>
+<td>1+ Spark self-service purchase OR 5+ Reading/Full Map requests via referral.</td>
+<td>Pause marketing spend. Re-evaluate positioning.</td>
+</tr>
+<tr>
+<td><strong>G2: Traction</strong></td>
+<td>Month 4</td>
+<td>50+ paying customers cumulatively. ₹4 lakh revenue. SEO traffic &gt;1,000 visits/month. Instagram followers &gt;2,000.</td>
+<td>Pivot to higher-touch (less self-service, more founder-led).</td>
+</tr>
+<tr>
+<td><strong>G3: Profitability</strong></td>
+<td>Month 6</td>
+<td>Monthly revenue &gt;₹1.5 lakh. Monthly costs &lt;₹1.5 lakh. Founder 50-hour-week cap is sustainable.</td>
+<td>Stay solo; defer hiring.</td>
+</tr>
+<tr>
+<td><strong>G4: Hire decision</strong></td>
+<td>Month 9</td>
+<td>₹5 lakh/month revenue run rate. Founder review bandwidth saturated.</td>
+<td>Hire 1 part-time reader.</td>
+</tr>
+<tr>
+<td><strong>G5: Companion launch</strong></td>
+<td>Month 10</td>
+<td>Companion subscription infrastructure ready. 50+ Full Map buyers in customer base.</td>
+<td>Launch Companion. If &lt;30 Full Map buyers, defer to month 18.</td>
+</tr>
+<tr>
+<td><strong>G6: Year-1 review</strong></td>
+<td>Month 12</td>
+<td>₹40+ lakh annual revenue (Scenario B or better). Founder not burned out. Customer NPS &gt;30.</td>
+<td>Continue if NPS OK; pivot if not.</td>
+</tr>
+</tbody>
+</table>
+<h2>6. What the GO looks like, week-by-week</h2>
+<h3>Weeks 1–4: Foundation (G0)</h3>
+<ul>
+<li>Deploy Next.js web app at custom domain.</li>
+<li>Integrate Razorpay (India) + Stripe (international).</li>
+<li>Self-service Spark live and selling.</li>
+<li>4 long-form SEO pillar posts published.</li>
+<li>30 Instagram Reels filmed + posted.</li>
+<li>Email list + welcome sequence live.</li>
+</ul>
+<h3>Weeks 5–8: Compatibility + Iteration (G1)</h3>
+<ul>
+<li>Compatibility (궁합) module built + product page + ₹999 standalone.</li>
+<li>Convert Reading/Full Map to formal paid product with intake + payment + 48–72 hour SLA.</li>
+<li>Documented refund policy in CLAUDE.md.</li>
+<li>4 more SEO posts (comparison + service pages).</li>
+</ul>
+<h3>Weeks 9–16: Funnel + retention (G2)</h3>
+<ul>
+<li>Daily content engine (email + web push).</li>
+<li>First 2 YouTube long-form videos.</li>
+<li>First Reddit organic contributions.</li>
+<li>₹10k first paid Instagram ad test.</li>
+<li>Founder review queue (admin UI).</li>
+</ul>
+<h3>Weeks 17–24: PWA + Android (G3)</h3>
+<ul>
+<li>PWA conversion (manifest + service worker).</li>
+<li>Capacitor wrap for Android + Play Store submission.</li>
+<li>Companion subscription infrastructure ready.</li>
+<li>Year-ahead reminder campaign for December buyers.</li>
+</ul>
+<h3>Weeks 25–36: Scale + Companion (G4, G5)</h3>
+<ul>
+<li>Companion launch + push to existing Full Map buyers.</li>
+<li>Hindi localization (landing page + intake + Spark).</li>
+<li>First paid Instagram ads at scale (₹30k/month).</li>
+<li>First influencer collaboration (₹15k spend).</li>
+<li>First part-time reader hire (₹20k/month).</li>
+</ul>
+<h3>Weeks 37–48: Optimize + Year-2 planning (G6)</h3>
+<ul>
+<li>AI-assisted review to cut human time 50%.</li>
+<li>Conversion rate optimization (A/B tests).</li>
+<li>Year-1 review + Year-2 planning.</li>
+<li>Decision on iOS Capacitor wrap (depends on Android metrics).</li>
+</ul>
+<h2>7. What the NO-GO looks like (graceful exit)</h2>
+<p>If at any milestone gate the criteria are not met, the founder should:</p>
+<ol>
+<li><strong>Stop new marketing spend.</strong> Stop paying for content production, paid ads, influencer collaborations.</li>
+<li><strong>Stop self-service acquisition.</strong> Switch to &quot;request-only&quot; intake.</li>
+<li><strong>Continue fulfilling existing orders</strong> to maintain brand reputation.</li>
+<li><strong>Maintain the project as a paid-pilot hobby.</strong> Accept 1–3 orders/month via personal referral at Full Map tier.</li>
+<li><strong>Document lessons learned.</strong> Add a post-mortem to <code>market_research/</code>.</li>
+<li><strong>Re-evaluate in 6 months.</strong> The market may have shifted; the founder's situation may have shifted.</li>
+</ol>
+<p>The exit is <strong>not a failure</strong>. A niche lifestyle business generating ₹3–5 lakh/year from 12–20 Full Map orders is a valid outcome. The Year-1 GO is to attempt scale; the NO-GO is to recognize when scale isn't working and settle into a sustainable niche business.</p>
+<h2>8. The decision matrix (when to GO vs NO-GO)</h2>
+<table>
+<thead>
+<tr>
+<th>Founder situation</th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>₹20+ lakh runway, 40 hrs/week, part-time reader identified, willingness to do SEO</td>
+<td><strong>Strong GO.</strong> Pursue aggressively. Target Scenario C upside.</td>
+</tr>
+<tr>
+<td>₹8–15 lakh runway, 30 hrs/week, willing to do SEO + Reels, no part-time reader yet</td>
+<td><strong>Conditional GO.</strong> Pursue Scenario B. Plan for milestone gates.</td>
+</tr>
+<tr>
+<td>₹5–8 lakh runway, 20 hrs/week, mostly evenings</td>
+<td><strong>Minimum viable commercialization.</strong> Self-service Spark + Reels + 1 SEO post. Target ₹3–5 lakh Year-1.</td>
+</tr>
+<tr>
+<td>&lt;₹5 lakh runway, &lt;20 hrs/week</td>
+<td><strong>NO-GO.</strong> Maintain as paid-pilot hobby.</td>
+</tr>
+<tr>
+<td>No runway, no time, no interest in marketing</td>
+<td><strong>NO-GO.</strong> Maintain codebase; do not commercialize.</td>
+</tr>
+</tbody>
+</table>
+<h2>9. The verdict, restated</h2>
+<p><strong>GO if and only if:</strong></p>
+<ul>
+<li>You have ₹8+ lakh personal runway.</li>
+<li>You can commit 30+ hours/week for 12 months.</li>
+<li>You're willing to be the face of the brand (Reels, YouTube, possibly in-person readings).</li>
+<li>You accept the citation-grounded classical-tradition positioning as a feature.</li>
+<li>You're willing to hand-deliver Reading/Full Map in Year 1 (no shortcuts on quality).</li>
+</ul>
+<p><strong>If you GO, the realistic outcomes are:</strong></p>
+<ul>
+<li><strong>Scenario B (base):</strong> ₹45 lakh Year-1 revenue, ₹31 lakh net, ₹25+ lakh/year lifestyle business.</li>
+<li><strong>Scenario A (conservative):</strong> ₹7 lakh Year-1 revenue, ₹-6 lakh Year-1 (treated as learning investment).</li>
+<li><strong>Scenario C (optimistic):</strong> ₹2 crore Year-1 revenue, ₹1.7 crore net, validation for ₹5+ crore Year-3 ARR.</li>
+</ul>
+<p><strong>The single most important factor is whether the SEO + Instagram Reels flywheel works.</strong> If it does, the rest follows. If it doesn't, fall back to personal referral niche.</p>
+<h2>10. The one-sentence verdict</h2>
+<p><strong>The project should be commercialized. The engine, knowledge base, and PDF pipeline are already built. The market has an underserved niche. The pricing is validated. The risks are manageable. The conditions are clear. The founder must commit.</strong></p>
+<hr />
+<h2>11. Final notes</h2>
+<p>This research is <strong>decision-support, not investment-grade due diligence</strong>. The numbers are realistic and conservative — many are flagged as <code>[estimate]</code> to indicate uncertainty. Real outcomes will vary.</p>
+<p>The strongest signal that this is the right project at the right time is that <strong>6 paid pilots have already happened organically, without any marketing spend, via personal referral.</strong> The product-market fit signal is already there; the question is whether it can scale.</p>
+<p>If the founder chooses to GO, the most important next step is <strong>to start writing the SEO pillar posts and filming the first 30 Reels today.</strong> The product is built. The market is waiting. The only missing piece is distribution.</p>
+<hr />
+<h2>12. Sources</h2>
+<ul>
+<li>All 11 prior docs in this folder.</li>
+<li>Project state: <a href="../../CLAUDE.md">CLAUDE.md</a>, <a href="../../README.md">README.md</a>, <a href="../../tasks.md">tasks.md</a>.</li>
+<li>Engine + tests: <a href="../../tools/saju_engine/">tools/saju_engine/</a>, <a href="../../tests/">tests/</a>.</li>
+<li>6 paid pilots: <a href="../../candidates_horoscope/reports/">candidates_horoscope/reports/</a>.</li>
+<li>Self-service calculator: <a href="../../tools/client_intake_app.py">tools/client_intake_app.py</a>.</li>
+<li>Premium report generator: <a href="../../tools/saju_engine/premium_report.py">tools/saju_engine/premium_report.py</a>.</li>
+<li>Knowledge base: <a href="../../knowledge/">knowledge/</a>.</li>
+</ul>
+<p>External market research (cited throughout this folder):</p>
+<ul>
+<li><a href="https://market.us/report/spiritual-wellness-astrology-market/">Market.us: Spiritual Wellness Astrology Market</a></li>
+<li><a href="https://www.grandviewresearch.com/industry-analysis/spiritual-wellness-astrology-market-report">Grand View Research: Spiritual Wellness Astrology</a></li>
+<li><a href="https://redseer.com/articles/astro-tech-cosmic-trends-digital-era/">Redseer: Astro-Tech Cosmic Trends</a></li>
+<li><a href="https://economictimes.indiatimes.com/tech/startups/astrotalk-rides-online-astrology-boom-to-double-fy24-revenue-to-rs-651-crore/articleshow/113500403.cms">The Economic Times: AstroTalk FY24</a></li>
+<li><a href="https://www.tribuneindia.com/news/impact-feature/instaastro-gains-popularity-among-gen-z-for-astrological-guidance/">The Tribune: InstaAstro Gen Z</a></li>
+<li><a href="https://www.republicworld.com/tech/apps/genz-accounts-for-60-user-base-on-astrology-apps-report">Republic World: Gen Z on astrology apps</a></li>
+<li><a href="https://numrovani.com/ai-astrology-2025-mid-year-study/">NumroVani: AI Astrology 2025 Consumer Trends</a></li>
+<li><a href="https://www.cbinsights.com/company/co-star-astrology-society/financials">CB Insights: Co-Star financials</a></li>
+<li><a href="https://rev.now/app/ios/co-star-personalized-astrology-82561/">Rev.now: Co-Star revenue</a></li>
+<li><a href="https://www.axios.com/2021/04/14/astrology-app-co-star-raises-15-million-funding">Axios: Co-Star Series A</a></li>
+<li><a href="http://www.kdsnews.co.kr/news/466875">한국데이터신문 사주GPT</a></li>
+<li><a href="https://saju.s-mon.net/plans?tab=subscription">운빨 사주 요금제</a></li>
+<li><a href="https://support.google.com/adspolicy/answer/4651367">Google Ads Policy: fortune telling</a></li>
+<li><a href="https://www.raftlabs.com/blog/how-to-build-astrology-app">Raft Labs: How to Build an Astrology App</a></li>
+<li><a href="https://thedebuggersitsolutions.com/blog/cross-platform-app-2026-flutter-react-native-capacitor">The Debuggers: Flutter vs React Native vs Capacitor 2026</a></li>
+<li><a href="https://likesweb.com/blog/instagram-reels-ideas-for-astrologers/">LikesWeb: Instagram Reels for Astrologers</a></li>
+<li><a href="https://www.socialpilot.ai/blog/instagram-reels-strategy">SocialPilot: Astrology Instagram Growth 30-Day</a></li>
+<li><a href="https://gitnux.org/astrology-statistics/">Gitnux: Astrology Statistics 2026</a></li>
+<li><a href="https://astrologytechinsights.com/bazi-monetization-2025">Astrology Tech Insights: BaZi monetization 2025</a></li>
+</ul>
+
+    
+<nav class="toc" style="margin-top:48px;font-size:14px;">
+  <div style="display:flex;justify-content:space-between;gap:12px;">
+    <div><a href="11-financial-model.html">← Doc 11: Financial Model</a></div>
+    <div><a href="combined.html">↑ Combined report</a></div>
+    <div><a href="13-architecture-saju-web-cosmicid.html">Doc 13: Architecture — Backend × Vercel × Cosmic ID →</a></div>
+  </div>
+</nav>
+</main>
+    <footer class="foot">
+      Saju market research · generated 2026-06-28 · /
+      <a href="https://github.com/anthropics/skills">no external dependencies beyond markdown-it-py</a>
+    </footer>
+  </div>
+</body>
+</html>

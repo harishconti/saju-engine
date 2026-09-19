@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Audience Demographics</title>
+  <style>
+:root {
+  --brand: #2b3a55;
+  --brand-soft: #4a5d7e;
+  --accent: #b48a3a;
+  --bg: #fbfaf6;
+  --bg-soft: #f3efe6;
+  --ink: #1d2330;
+  --ink-soft: #4a5060;
+  --rule: #d9d3c4;
+  --code-bg: #efe9da;
+  --table-stripe: #f6f1e3;
+  --max-w: 880px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.55;
+  font-size: 17px;
+}
+.wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 56px 32px 96px;
+}
+header.cover {
+  border-bottom: 2px solid var(--brand);
+  padding-bottom: 28px;
+  margin-bottom: 40px;
+}
+header.cover .eyebrow {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+}
+header.cover h1 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  font-size: 38px;
+  line-height: 1.15;
+  margin: 8px 0 12px;
+  color: var(--brand);
+}
+header.cover .sub {
+  color: var(--ink-soft);
+  font-size: 16px;
+  font-style: italic;
+}
+header.cover .meta {
+  margin-top: 18px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+}
+nav.toc {
+  background: var(--bg-soft);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brand);
+  padding: 22px 28px 24px;
+  margin: 0 0 48px;
+  border-radius: 2px;
+}
+nav.toc h2 {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand-soft);
+  margin: 0 0 14px;
+  font-weight: 600;
+}
+nav.toc ol {
+  margin: 0;
+  padding-left: 22px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 14.5px;
+}
+nav.toc li { margin: 5px 0; }
+nav.toc a { color: var(--brand); text-decoration: none; }
+nav.toc a:hover { text-decoration: underline; }
+nav.toc .doc-num {
+  display: inline-block;
+  width: 28px;
+  color: var(--accent);
+  font-weight: 600;
+}
+h1, h2, h3, h4 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--brand);
+  line-height: 1.25;
+  margin: 1.6em 0 0.6em;
+}
+h1 { font-size: 30px; border-bottom: 1px solid var(--rule); padding-bottom: 0.25em; }
+h2 { font-size: 24px; }
+h3 { font-size: 19px; color: var(--brand-soft); }
+h4 { font-size: 16px; color: var(--brand-soft); text-transform: uppercase; letter-spacing: 0.05em; }
+p { margin: 0.6em 0 1em; }
+a { color: var(--brand); }
+ul, ol { padding-left: 24px; }
+li { margin: 4px 0; }
+strong { color: var(--ink); }
+em { color: var(--ink-soft); }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.5em 0; }
+code {
+  background: var(--code-bg);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: "SF Mono", "Consolas", "Menlo", monospace;
+  font-size: 0.92em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 14px 16px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 14px;
+  border-left: 3px solid var(--accent);
+}
+pre code { background: none; padding: 0; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1.2em 0;
+  padding: 4px 16px;
+  color: var(--ink-soft);
+  background: var(--bg-soft);
+  font-style: italic;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.2em 0;
+  font-size: 14.5px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+}
+th, td {
+  border: 1px solid var(--rule);
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--brand);
+  color: #fbfaf6;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+tbody tr:nth-child(even) { background: var(--table-stripe); }
+.footnote-ref { font-size: 0.8em; vertical-align: super; }
+.footnotes { margin-top: 3em; border-top: 1px solid var(--rule); padding-top: 1em; font-size: 14px; }
+footer.foot {
+  margin-top: 64px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+@media print {
+  body { background: white; font-size: 11pt; }
+  .wrap { padding: 24px; max-width: none; }
+  nav.toc { page-break-after: always; }
+  h1, h2 { page-break-after: avoid; }
+  table { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    
+<header class="cover">
+  <div class="eyebrow">Market Research · Document 05 of 11</div>
+  <h1>Audience Demographics</h1>
+</header>
+
+    
+    <main>
+<p><strong>Date:</strong> 2026-06-26
+<strong>Scope:</strong> Age, gender, geography, income, psychographics for the paying user of a Korean Saju product. Sourced from market data + the 6 paid pilots in this codebase.</p>
+<hr />
+<h2>1. The paying user, in one paragraph</h2>
+<p>A 28–45-year-old, college-educated, urban or Tier-1-city Indian professional — or a 25–50-year-old Korean-diaspora adult in the US/Canada/Australia/UK. They have heard of &quot;Saju&quot; through K-content or through Korean friends, are curious about whether &quot;Four Pillars&quot; reading says something true about them, and they have already tried at least one free online 만세력 calculator and found it shallow. They are willing to pay ₹499–3,499 (or $15–$100) for a thoughtful, citation-grounded personal reading, but they will not pay for generic AI chatbot content. They read long-form. They share PDFs with their partner or close friends. They come back once a year for the year-ahead reading.</p>
+<h2>2. Geographic distribution (priority ranked)</h2>
+<h3>Tier 1 — India (primary market)</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+<th>Source / Confidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Population</strong></td>
+<td>1.4B+</td>
+<td>Census, [high confidence]</td>
+</tr>
+<tr>
+<td><strong>Internet users</strong></td>
+<td>900M+</td>
+<td>TRAI, [high confidence]</td>
+</tr>
+<tr>
+<td><strong>Astrology-engaged adults</strong></td>
+<td>~70% of urban Indians consult astrologers (YouGov 2019)</td>
+<td>[medium confidence]</td>
+</tr>
+<tr>
+<td><strong>Hallyu Wave audience</strong></td>
+<td>Growing rapidly — K-pop groups, K-dramas widely consumed (BTS, BLACKPINK, Stray Kids top India YouTube 2024)</td>
+<td>[medium confidence]</td>
+</tr>
+<tr>
+<td><strong>Korean Saju awareness</strong></td>
+<td>Very low — Korean Saju is not mainstream in India (Vedic Jyotish dominates)</td>
+<td>[high confidence — observed]</td>
+</tr>
+<tr>
+<td><strong>Korean diaspora size in India</strong></td>
+<td>Small (&lt;50k)</td>
+<td>[low confidence — not well-tracked]</td>
+</tr>
+<tr>
+<td><strong>Spending power for ₹500–3,500 purchases</strong></td>
+<td>Tier-1 city professionals + Tier-2 affluent</td>
+<td>[medium confidence]</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Implication:</strong> India is large in absolute terms but small in Saju-specific awareness. The Indian Saju-curious audience is <strong>upper-middle-class, English-medium-educated, urban</strong>, and likely already exposed to K-content. They have to be educated that &quot;Korean Saju is different from Vedic Jyotish.&quot; This is a marketing job, not a demand-creation job.</p>
+<h3>Tier 2 — Korean diaspora (high-LTV market)</h3>
+<table>
+<thead>
+<tr>
+<th>Country</th>
+<th>Korean diaspora population</th>
+<th>Astrology-curious subset [estimate]</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>United States</td>
+<td>~1.1–1.2M Korean Americans</td>
+<td>~30% × ~50% astrology-curious = ~180–360k</td>
+</tr>
+<tr>
+<td>Canada</td>
+<td>~200k Korean Canadians</td>
+<td>~25–50k</td>
+</tr>
+<tr>
+<td>Australia</td>
+<td>~150k Korean Australians</td>
+<td>~20–40k</td>
+</tr>
+<tr>
+<td>United Kingdom</td>
+<td>~50k Korean British</td>
+<td>~5–15k</td>
+</tr>
+<tr>
+<td><strong>Total Tier-2</strong></td>
+<td><strong>~1.5M worldwide</strong></td>
+<td><strong>~250–500k addressable</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Korean diaspora has higher-than-average household income (US Korean Americans median household income ~$72k vs. national median ~$75k, but with high concentration in professional/technical occupations), high digital adoption, and high cultural retention. <strong>This is the highest-LTV segment</strong> — they will pay $50–$200 for a deep personal reading in English with proper Korean/Hanja inline translation.</p>
+<h3>Tier 3 — Global Hallyu-curious (secondary market)</h3>
+<table>
+<thead>
+<tr>
+<th>Region</th>
+<th>Korean Wave reach</th>
+<th>Realistic Saju-curious segment [estimate]</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Southeast Asia (Indonesia, Vietnam, Philippines, Thailand)</td>
+<td>50–100M+ Hallyu fans per Korean Foundation surveys</td>
+<td>~2–5M astrology-curious</td>
+</tr>
+<tr>
+<td>Japan</td>
+<td>~10M+ Hallyu fans</td>
+<td>~1–2M</td>
+</tr>
+<tr>
+<td>China</td>
+<td>Limited Korean content access; uses Chinese BaZi</td>
+<td>~500k–1M</td>
+</tr>
+<tr>
+<td>Europe + Latin America + MENA</td>
+<td>~30–50M Hallyu fans</td>
+<td>~500k–1.5M</td>
+</tr>
+<tr>
+<td><strong>Total Tier-3</strong></td>
+<td>~100–200M Hallyu fans globally</td>
+<td><strong>~5–10M astrology-curious</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Conversion to paid Korean Saju product from this Tier-3 base is <strong>very low (~0.1–0.5%)</strong> because the language and cultural barrier is significant. This is a long-term brand-building market, not a Year-1 revenue source.</p>
+<h2>3. Age distribution</h2>
+<table>
+<thead>
+<tr>
+<th>Age band</th>
+<th>Share of paying users [estimate]</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>18–24 (Gen Z)</td>
+<td>~10–15%</td>
+<td>Lower willingness to pay for premium reports; higher engagement with free daily content. AstroTalk InstaAstro shows 60%+ Gen Z but they consume free content and chat minutes, not premium PDFs.</td>
+</tr>
+<tr>
+<td>25–34 (younger Millennial)</td>
+<td><strong>~30–35%</strong></td>
+<td><strong>Core paying segment.</strong> Career-building, marriage-curious, business-launching. Most likely to buy Full Map.</td>
+</tr>
+<tr>
+<td>35–44 (older Millennial)</td>
+<td><strong>~30–35%</strong></td>
+<td><strong>Core paying segment.</strong> Peak career years, marriage/children decisions, mid-career transitions. Highest LTV per customer.</td>
+</tr>
+<tr>
+<td>45–54 (Gen X)</td>
+<td>~15%</td>
+<td>Higher disposable income, more skeptical of AI, more receptive to human-reviewer positioning.</td>
+</tr>
+<tr>
+<td>55+</td>
+<td>~5–10%</td>
+<td>Smaller but high-LTV segment in Korean diaspora; less relevant in India.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reality check from the 6 paid pilots in this codebase:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Candidate</th>
+<th>Birth year</th>
+<th>Age band at purchase</th>
+<th>Tier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gurumoorthy</td>
+<td>1964</td>
+<td>55–64</td>
+<td>Full Map</td>
+</tr>
+<tr>
+<td>Pawan</td>
+<td>1991</td>
+<td>30s</td>
+<td>Full Map</td>
+</tr>
+<tr>
+<td>Harish</td>
+<td>1992</td>
+<td>30s</td>
+<td>Full Map</td>
+</tr>
+<tr>
+<td>Sruthi</td>
+<td>1993</td>
+<td>30s</td>
+<td>Full Map</td>
+</tr>
+<tr>
+<td>Mahesh</td>
+<td>1995</td>
+<td>30s</td>
+<td>Full Map</td>
+</tr>
+<tr>
+<td>Vishnu Priya</td>
+<td>2001</td>
+<td>20s</td>
+<td>Full Map</td>
+</tr>
+</tbody>
+</table>
+<p>5 of 6 are aged 25–34; 1 is 55–64. This matches the market estimate above: <strong>25–34 is the core paying segment, with a small but loyal 55+ segment.</strong></p>
+<h2>4. Gender distribution</h2>
+<p>From market data:</p>
+<ul>
+<li><strong>India (Vedic):</strong> 80% of women vs. 60% of men consult astrologers (2019 YouGov). Female-skewed.</li>
+<li><strong>India (Astrology apps):</strong> Female-to-male ratio 60:40 (Astroyogi 2024 report).</li>
+<li><strong>Western astrology apps:</strong> Skews female, especially Gen Z. Co-Star reported 25% of US women 18–25 had downloaded (2021).</li>
+</ul>
+<p><strong>The 6 paid pilots are 4 male + 2 female</strong> (Sruthi, Vishnu Priya are female; Pawan, Harish, Gurumoorthy, Mahesh are male). This is <strong>the opposite skew</strong> — but it's a sample of 6 people via personal referral, not a market-wide signal.</p>
+<p><strong>Realistic expectation for Korean Saju product:</strong></p>
+<ul>
+<li>India: 55–65% female / 35–45% male (similar to AstroTalk family).</li>
+<li>Korean diaspora: 60–70% female (Korean Saju has a strong female-following tradition; mothers consult for children, wives consult for marriage timing).</li>
+<li>Global Hallyu-curious: 70%+ female.</li>
+</ul>
+<h2>5. Income &amp; willingness to pay</h2>
+<h3>India</h3>
+<ul>
+<li>₹499 Spark = ~$6 = impulse buy for upper-middle-class.</li>
+<li>₹1,499 Reading = ~$18 = considered purchase, requires value justification.</li>
+<li>₹3,499 Full Map = ~$42 = serious purchase, requires trust + referrals.</li>
+<li>Companion ₹799/month = ~$9.50/month = subscription territory; requires ongoing perceived value.</li>
+</ul>
+<p><strong>Indian buyer profile:</strong> Urban professional, ₹6–25 LPA household income, English-medium educated, likely Tier-1 city (Bengaluru, Mumbai, Delhi, Chennai, Hyderabad, Pune, Kolkata).</p>
+<h3>Korean diaspora (US/CA/AU/UK)</h3>
+<ul>
+<li>$15–$50 Spark-equivalent tier = impulse buy.</li>
+<li>$50–$100 Reading-equivalent = standard premium tier.</li>
+<li>$150–$300 Full Map-equivalent = top tier for special occasions (wedding, baby, career pivot).</li>
+<li>$10–$30/month Companion = standard subscription territory.</li>
+</ul>
+<p><strong>Korean diaspora buyer profile:</strong> Bilingual or English-strong, college-educated, $50k+ household income, NYC/LA/Seattle/Toronto/Sydney/London metro.</p>
+<h3>Global Hallyu-curious</h3>
+<ul>
+<li>Free → $5 → $20 max tier. Anything above requires personal value justification. Long tail.</li>
+</ul>
+<h2>6. Psychographics</h2>
+<h3>India paying user — what they care about</h3>
+<ol>
+<li><strong>Career and business timing.</strong> &quot;Should I switch jobs in 2026?&quot; &quot;Is now a good time to start a company?&quot; &quot;Which business partner should I choose?&quot; The cross-candidate business analysis from this project is the canonical reference.</li>
+<li><strong>Marriage timing and partner fit.</strong> &quot;When will I marry?&quot; &quot;Is he/she right for me?&quot; &quot;Should my parents arrange a marriage in 2027?&quot;</li>
+<li><strong>Year-ahead outlook.</strong> &quot;How is 2027 going to be for me?&quot; Highest volume in December–January.</li>
+<li><strong>Children / parenting timing.</strong> Lower priority but persistent.</li>
+<li><strong>Health tendencies.</strong> Hesitant to ask directly; framed as &quot;wellness&quot; rather than &quot;diagnosis.&quot;</li>
+</ol>
+<h3>Korean diaspora paying user — what they care about</h3>
+<ol>
+<li><strong>Compatibility with a non-Korean partner.</strong> &quot;I'm marrying a non-Korean — what does my chart say about cross-cultural marriage?&quot;</li>
+<li><strong>Family harmony / intergenerational conflict.</strong> &quot;My mother-in-law is difficult — what does her chart say?&quot;</li>
+<li><strong>Career validation.</strong> &quot;I'm thinking of leaving engineering to do X — does my chart support it?&quot;</li>
+<li><strong>Children's future.</strong> &quot;I want my child to have a chart reading before their exam year.&quot;</li>
+<li><strong>Identity / heritage reconnecting.</strong> &quot;I lost my Korean; help me understand my Saju.&quot;</li>
+</ol>
+<h3>Global Hallyu-curious paying user — what they care about</h3>
+<ol>
+<li><strong>Self-discovery / personality.</strong> &quot;What does my chart say about who I am?&quot;</li>
+<li><strong>Year-ahead entertainment.</strong> &quot;What's 2027 going to be like?&quot;</li>
+<li><strong>Compatibility (curiosity, not commitment).</strong> &quot;Is my K-pop bias compatible with me?&quot;</li>
+<li><strong>Korean culture learning.</strong> &quot;I'm learning Korean; this is the deepest dive I can take.&quot;</li>
+</ol>
+<h2>7. The 6 paid pilots in this codebase — observed psychographics</h2>
+<table>
+<thead>
+<tr>
+<th>Candidate</th>
+<th>Gender</th>
+<th>Age</th>
+<th>Occupation context</th>
+<th>Asked for</th>
+<th>Bought</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sruthi</td>
+<td>F</td>
+<td>30s</td>
+<td>Tech professional</td>
+<td>Base + career</td>
+<td>Full Map</td>
+</tr>
+<tr>
+<td>Pawan</td>
+<td>M</td>
+<td>30s</td>
+<td>Tech / business</td>
+<td>Base + career</td>
+<td>Full Map</td>
+</tr>
+<tr>
+<td>Harish</td>
+<td>M</td>
+<td>30s</td>
+<td>Tech professional</td>
+<td>Base + career</td>
+<td>Full Map</td>
+</tr>
+<tr>
+<td>Gurumoorthy</td>
+<td>M</td>
+<td>55–64</td>
+<td>Senior professional</td>
+<td>Base + career</td>
+<td>Full Map</td>
+</tr>
+<tr>
+<td>Mahesh</td>
+<td>M</td>
+<td>30s</td>
+<td>Tech / business</td>
+<td>Base + career + relationships</td>
+<td>Full Map + add-on</td>
+</tr>
+<tr>
+<td>Vishnu Priya</td>
+<td>F</td>
+<td>20s</td>
+<td>Student / early-career</td>
+<td>Base + career + relationships</td>
+<td>Full Map + add-on</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Observed psychographic pattern:</strong></p>
+<ul>
+<li>100% of pilots are tech-educated / tech-employed (the founder's network bias).</li>
+<li>100% asked for <strong>career</strong> in addition to base reading.</li>
+<li>33% asked for <strong>relationships</strong>.</li>
+<li>0% asked for health, parenting, relocation (yet).</li>
+<li>All bought Full Map tier; no one bought only Spark or only Reading.</li>
+</ul>
+<h2>8. Reachability (where to find them)</h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>India</th>
+<th>Korean diaspora</th>
+<th>Hallyu-curious global</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Instagram</td>
+<td>Very high</td>
+<td>Medium-high</td>
+<td>High</td>
+</tr>
+<tr>
+<td>YouTube</td>
+<td>Very high (long-form + Shorts)</td>
+<td>Medium</td>
+<td>Very high</td>
+</tr>
+<tr>
+<td>WhatsApp</td>
+<td>Very high</td>
+<td>Medium (KakaoTalk preferred in Korea)</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>LinkedIn</td>
+<td>High</td>
+<td>High</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>Reddit</td>
+<td>Medium</td>
+<td>High (r/Korean, r/KDRAMA, r/Kpop)</td>
+<td>High</td>
+</tr>
+<tr>
+<td>TikTok</td>
+<td>High</td>
+<td>Low</td>
+<td>Very high</td>
+</tr>
+<tr>
+<td>KakaoTalk</td>
+<td>N/A</td>
+<td>Very high</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>Naver Blog</td>
+<td>N/A</td>
+<td>High</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>SEO (Google + Naver)</td>
+<td>High</td>
+<td>High (Naver for Korean)</td>
+<td>High</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Highest-ROI channels for the Saju project (Year 1):</strong></p>
+<ol>
+<li><strong>Instagram Reels</strong> — 30-second daily horoscope for the Day Master. Free funnel.</li>
+<li><strong>YouTube Shorts</strong> — &quot;Day Master of the day&quot; series, &quot;Saju term of the week.&quot;</li>
+<li><strong>Long-form YouTube</strong> — &quot;What does a 丙 Day Master mean?&quot; search-intent content.</li>
+<li><strong>SEO blog</strong> — &quot;Korean Saju vs Vedic Jyotish,&quot; &quot;Best Korean Saju apps in English,&quot; &quot;Year ahead 2027 Saju forecast.&quot;</li>
+<li><strong>Reddit</strong> — r/Korean, r/KDRAMA, r/ChineseAstrology. High-trust, slow-burn.</li>
+<li><strong>WhatsApp broadcast</strong> — for India; weekly &quot;your week ahead&quot; based on day master.</li>
+</ol>
+<h2>9. Audience persona summary</h2>
+<h3>Persona 1: Priya — India Tier-1 career builder</h3>
+<ul>
+<li>28–34, female, Bengaluru, ₹14 LPA, software engineer.</li>
+<li>Saw K-drama → curious about Korean culture → heard about Saju from a colleague.</li>
+<li>Wants: career timing, marriage timing, year-ahead forecast.</li>
+<li>Reads long-form, prefers PDFs, shares with partner.</li>
+<li>Will pay ₹1,499–3,499 once a year.</li>
+<li>Discovers via Instagram Reels, YouTube Shorts, SEO blog.</li>
+</ul>
+<h3>Persona 2: Daniel — Korean-American 30-something</h3>
+<ul>
+<li>30–40, male, Los Angeles, $120k household income, marketing manager.</li>
+<li>Lost Korean language; reconnecting through culture.</li>
+<li>Wants: identity affirmation, partner compatibility (non-Korean wife), career validation.</li>
+<li>Will pay $50–$150 once a year.</li>
+<li>Discovers via Reddit, YouTube long-form, Naver/Google SEO.</li>
+</ul>
+<h3>Persona 3: Maya — Global Hallyu-curious Gen Z</h3>
+<ul>
+<li>20–26, female, NYC/London/Sydney, $40k income, junior creative.</li>
+<li>K-pop / K-drama superfan, has tried free 만세력 sites, wants a &quot;real&quot; reading.</li>
+<li>Wants: self-discovery, year-ahead entertainment, partner curiosity.</li>
+<li>Will pay $10–$30 for first reading.</li>
+<li>Discovers via TikTok, Instagram Reels, Reddit, K-content creator partnerships.</li>
+</ul>
+<h3>Persona 4: Mr. Kim — Korean-American 60+</h3>
+<ul>
+<li>55–70, male, Koreatown LA, retired professional.</li>
+<li>Native Korean speaker, low English engagement with apps.</li>
+<li>Wants: Saju in Korean, family consultation, children's chart.</li>
+<li>Will pay $100–$300 for premium consultation.</li>
+<li>Out of immediate scope (Korean-language product not built). Future opportunity.</li>
+</ul>
+<h2>10. Implications for the product</h2>
+<ol>
+<li><strong>English-first is correct.</strong> 80%+ of the addressable paying market is English-strong.</li>
+<li><strong>Long-form PDF is the right format.</strong> This audience reads; they don't swipe.</li>
+<li><strong>Career / business angle is the dominant message.</strong> Lead with it; it converts.</li>
+<li><strong>Compatibility is the upsell.</strong> After the first purchase, &quot;your next read is partner compatibility.&quot;</li>
+<li><strong>Korean diaspora is the highest-LTV segment and the easiest to retain.</strong> Send them a &quot;year ahead&quot; reminder each December.</li>
+<li><strong>India Tier-1 is the highest-volume segment but needs brand-building.</strong> The Hallyu Wave has done the awareness work; we need to position Saju as &quot;the Korean cousin of Vedic astrology, more rigorous and more international.&quot;</li>
+</ol>
+<h2>11. Sources</h2>
+<ul>
+<li>[Korean Foundation overseas Korean survey data, cited via diaspora population estimates]</li>
+<li>[Census Bureau / Statistics Canada / Australian Bureau of Statistics diaspora estimates]</li>
+<li>[TRAI (Telecom Regulatory Authority of India) internet user estimates]</li>
+<li><a href="https://www.tribuneindia.com/news/impact-feature/instaastro-gains-popularity-among-gen-z-for-astrological-guidance/">The Tribune: InstaAstro Gen Z</a></li>
+<li><a href="https://economictimes.indiatimes.com/tech/startups/astrotalk-rides-online-astrology-boom-to-double-fy24-revenue-to-rs-651-crore/articleshow/113500403.cms">The Economic Times: AstroTalk FY24</a></li>
+<li><a href="https://www.republicworld.com/tech/apps/genz-accounts-for-60-user-base-on-astrology-apps-report">Republic World: Gen Z on astrology apps</a></li>
+<li><a href="https://preprod.indianexpress.com/article/lifestyle/why-gen-z-is-turning-to-astrology-apps-to-find-solutions-to-life-problems-10031516/">Indian Express: Gen Z astrology apps</a></li>
+<li><a href="https://numrovani.com/ai-astrology-2025-mid-year-study/">NumroVani: AI Astrology 2025 Consumer Trends</a></li>
+<li><a href="https://redseer.com/articles/astro-tech-cosmic-trends-digital-era/">Redseer: Astro-Tech trends</a></li>
+<li>[YouGov 2019 astrology survey, cited via secondary sources]</li>
+<li>[Nielsen Korea 2021 astrology survey, cited via Gitnux]</li>
+</ul>
+
+    
+<nav class="toc" style="margin-top:48px;font-size:14px;">
+  <div style="display:flex;justify-content:space-between;gap:12px;">
+    <div><a href="04-feature-demand.html">← Doc 04: Feature Demand &amp; Codebase Gaps</a></div>
+    <div><a href="combined.html">↑ Combined report</a></div>
+    <div><a href="06-monetization-strategy.html">Doc 06: Monetization Strategy →</a></div>
+  </div>
+</nav>
+</main>
+    <footer class="foot">
+      Saju market research · generated 2026-06-28 · /
+      <a href="https://github.com/anthropics/skills">no external dependencies beyond markdown-it-py</a>
+    </footer>
+  </div>
+</body>
+</html>

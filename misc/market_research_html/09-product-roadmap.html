@@ -1,0 +1,826 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Product Roadmap</title>
+  <style>
+:root {
+  --brand: #2b3a55;
+  --brand-soft: #4a5d7e;
+  --accent: #b48a3a;
+  --bg: #fbfaf6;
+  --bg-soft: #f3efe6;
+  --ink: #1d2330;
+  --ink-soft: #4a5060;
+  --rule: #d9d3c4;
+  --code-bg: #efe9da;
+  --table-stripe: #f6f1e3;
+  --max-w: 880px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.55;
+  font-size: 17px;
+}
+.wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 56px 32px 96px;
+}
+header.cover {
+  border-bottom: 2px solid var(--brand);
+  padding-bottom: 28px;
+  margin-bottom: 40px;
+}
+header.cover .eyebrow {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+}
+header.cover h1 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  font-size: 38px;
+  line-height: 1.15;
+  margin: 8px 0 12px;
+  color: var(--brand);
+}
+header.cover .sub {
+  color: var(--ink-soft);
+  font-size: 16px;
+  font-style: italic;
+}
+header.cover .meta {
+  margin-top: 18px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+}
+nav.toc {
+  background: var(--bg-soft);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brand);
+  padding: 22px 28px 24px;
+  margin: 0 0 48px;
+  border-radius: 2px;
+}
+nav.toc h2 {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand-soft);
+  margin: 0 0 14px;
+  font-weight: 600;
+}
+nav.toc ol {
+  margin: 0;
+  padding-left: 22px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 14.5px;
+}
+nav.toc li { margin: 5px 0; }
+nav.toc a { color: var(--brand); text-decoration: none; }
+nav.toc a:hover { text-decoration: underline; }
+nav.toc .doc-num {
+  display: inline-block;
+  width: 28px;
+  color: var(--accent);
+  font-weight: 600;
+}
+h1, h2, h3, h4 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--brand);
+  line-height: 1.25;
+  margin: 1.6em 0 0.6em;
+}
+h1 { font-size: 30px; border-bottom: 1px solid var(--rule); padding-bottom: 0.25em; }
+h2 { font-size: 24px; }
+h3 { font-size: 19px; color: var(--brand-soft); }
+h4 { font-size: 16px; color: var(--brand-soft); text-transform: uppercase; letter-spacing: 0.05em; }
+p { margin: 0.6em 0 1em; }
+a { color: var(--brand); }
+ul, ol { padding-left: 24px; }
+li { margin: 4px 0; }
+strong { color: var(--ink); }
+em { color: var(--ink-soft); }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.5em 0; }
+code {
+  background: var(--code-bg);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: "SF Mono", "Consolas", "Menlo", monospace;
+  font-size: 0.92em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 14px 16px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 14px;
+  border-left: 3px solid var(--accent);
+}
+pre code { background: none; padding: 0; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1.2em 0;
+  padding: 4px 16px;
+  color: var(--ink-soft);
+  background: var(--bg-soft);
+  font-style: italic;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.2em 0;
+  font-size: 14.5px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+}
+th, td {
+  border: 1px solid var(--rule);
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--brand);
+  color: #fbfaf6;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+tbody tr:nth-child(even) { background: var(--table-stripe); }
+.footnote-ref { font-size: 0.8em; vertical-align: super; }
+.footnotes { margin-top: 3em; border-top: 1px solid var(--rule); padding-top: 1em; font-size: 14px; }
+footer.foot {
+  margin-top: 64px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+@media print {
+  body { background: white; font-size: 11pt; }
+  .wrap { padding: 24px; max-width: none; }
+  nav.toc { page-break-after: always; }
+  h1, h2 { page-break-after: avoid; }
+  table { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    
+<header class="cover">
+  <div class="eyebrow">Market Research · Document 09 of 11</div>
+  <h1>Product Roadmap</h1>
+</header>
+
+    
+    <main>
+<p><strong>Date:</strong> 2026-06-26
+<strong>Scope:</strong> What to build, what to optimize, what to enhance, what to skip, organized by 12-month phases. Built on the feature-demand analysis from <code>04-feature-demand.md</code>, the platform decision from <code>07-app-platform-decision.md</code>, and the existing codebase inventory.</p>
+<hr />
+<h2>1. The product backlog, organized by 4-quadrant prioritization</h2>
+<p>Each item is scored against:</p>
+<ul>
+<li><strong>Demand intensity</strong> (from <code>04-feature-demand.md</code>): H / M / L</li>
+<li><strong>Build effort</strong> (solo founder, India-based): XS / S / M / L / XL</li>
+<li><strong>Revenue impact</strong> (Year 1): ₹ / ₹₹ / ₹₹₹ / ₹₹₹₹</li>
+</ul>
+<p>The roadmap combines these into a clear build sequence.</p>
+<h2>2. The four quadrants</h2>
+<pre><code>                HIGH DEMAND
+                    │
+                    │   QUICK WINS            BIG BETS
+                    │   (build first)         (build second)
+                    │
+                    │   Compatibility         Companion
+                    │   Daily content         subscription
+                    │   engine                User accounts
+                    │   Web app + Razorpay    B2B API
+                    │   SEO foundation        Course / cohort
+                    │
+LOW EFFORT ────────┼─────────────────────── HIGH EFFORT
+                    │
+                    │   FILL-INS             MONEY PITS (skip)
+                    │   (build if time)      (don't build)
+                    │
+                    │   Lucky attributes      Native iOS app
+                    │   PDF reference card    Live chat marketplace
+                    │   Year-ahead email      Numerology / tarot
+                    │   WhatsApp broadcast   Vedic Jyotish
+                    │
+                LOW DEMAND
+</code></pre>
+<h2>3. Phase-by-phase roadmap</h2>
+<h3>Phase 0 — Now (pre-launch, weeks 0–4)</h3>
+<p><strong>Status:</strong> Most of this is built. Verify, polish, and deploy.</p>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Effort</th>
+<th>Status</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Web app shell (Next.js 14)</td>
+<td>S</td>
+<td>❌ Missing</td>
+<td>Need to deploy FastAPI behind a Next.js frontend</td>
+</tr>
+<tr>
+<td>Domain + hosting (Railway / Fly.io)</td>
+<td>XS</td>
+<td>❌ Missing</td>
+<td>₹500–2,000/month</td>
+</tr>
+<tr>
+<td>Razorpay integration</td>
+<td>S</td>
+<td>❌ Missing</td>
+<td>1 week of dev + Razorpay account setup</td>
+</tr>
+<tr>
+<td>Stripe integration (international)</td>
+<td>S</td>
+<td>❌ Missing</td>
+<td>1 week of dev + Stripe account</td>
+</tr>
+<tr>
+<td>Intake form polish (existing at <code>tools/client_intake_app.html</code>)</td>
+<td>XS</td>
+<td>✅ Built</td>
+<td>Convert to React component</td>
+</tr>
+<tr>
+<td>Self-service Spark flow end-to-end</td>
+<td>S</td>
+<td>🟡 Partial</td>
+<td>Engine + PDF works; needs payment + email + download</td>
+</tr>
+<tr>
+<td>Spark <code>[ENGINE DRAFT — REVIEW REQUIRED]</code> removed (it's automated)</td>
+<td>XS</td>
+<td>✅ Built</td>
+<td>Already marked appropriately</td>
+</tr>
+<tr>
+<td>Reading / Full Map human-review queue</td>
+<td>S</td>
+<td>❌ Missing</td>
+<td>Simple admin UI or Notion-based queue</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Phase 0 deliverables:</strong> Self-service Spark live and selling. Reading/Full Map available on request with 48–72 hour SLA.</p>
+<h3>Phase 1 — Months 1–4 (build the foundation)</h3>
+<h4>Quick wins (build first)</h4>
+<ol>
+<li>
+<p><strong>Web app + Razorpay + Stripe + user accounts.</strong> (S, ₹₹₹)</p>
+<ul>
+<li>Next.js 14 SaaS frontend over existing FastAPI backend.</li>
+<li>Email + magic-link auth via Clerk or Supabase.</li>
+<li>Razorpay for India, Stripe for international.</li>
+<li><strong>Demand: H. Effort: S. Revenue: ₹₹₹.</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>Compatibility (궁합) product.</strong> (M, ₹₹₹)</p>
+<ul>
+<li>New engine module: <code>tools/saju_engine/compatibility.py</code>.</li>
+<li>Inputs: two charts (or two DOB+time+location).</li>
+<li>Outputs: 합/충/형/파/해 mapping + element balance + day master relationship + ten-god cross-matrix + PDF deliverable.</li>
+<li>Pricing: ₹999 standalone; ₹499 bundled into Reading+ upsell.</li>
+<li><strong>Demand: H (Korean Saju's #1 requested feature). Effort: M. Revenue: ₹₹₹.</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>SEO content engine foundation.</strong> (S, ₹₹₹₹)</p>
+<ul>
+<li>4 long-form pillar blog posts published.</li>
+<li>Pricing page, FAQ page, about page, contact page.</li>
+<li>Schema markup for Article + FAQ + Product.</li>
+<li>Google Search Console + Naver Search Advisor setup.</li>
+<li><strong>Demand: H (top-of-funnel). Effort: S. Revenue: ₹₹₹₹ (compounding over 6–12 months).</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>Instagram Reels kickoff.</strong> (S, ₹₹₹₹)</p>
+<ul>
+<li>30 Reels filmed + posted in 30 days (Day Master Mondays etc.).</li>
+<li>Cross-post to YouTube Shorts + TikTok.</li>
+<li><strong>Demand: H. Effort: S. Revenue: ₹₹₹₣ (indirect).</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>Email list + welcome sequence.</strong> (XS, ₹₹₣₹₣)</p>
+<ul>
+<li>Resend (or ConvertKit) for email.</li>
+<li>Welcome series: 5 emails over 14 days, education + soft sell to Spark.</li>
+<li><strong>Demand: H. Effort: XS. Revenue: ₹₹₹₣ (compounding).</strong></li>
+</ul>
+</li>
+</ol>
+<h4>Operational improvements</h4>
+<ol start="6">
+<li>
+<p><strong>Engine-draft → human-review workflow.</strong> (S, ₹₹)</p>
+<ul>
+<li>Simple admin UI showing incoming Reading/Full Map orders + the engine's premium markdown.</li>
+<li>Founder reviews in 45–90 min, applies edits, generates final PDF, sends to client.</li>
+<li><strong>Effort: S. Revenue: enables Phase-1 Reading/Full Map scaling.</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>Refund policy + admin tooling.</strong> (XS, ₹)</p>
+<ul>
+<li>Documented refund policy in CLAUDE.md.</li>
+<li>Simple refund-via-Razorpay flow in admin UI.</li>
+<li><strong>Effort: XS. Revenue: enables risk-managed scaling.</strong></li>
+</ul>
+</li>
+</ol>
+<h4>Skip in Phase 1</h4>
+<ul>
+<li>Native iOS / Android apps.</li>
+<li>Companion subscription infrastructure.</li>
+<li>Hindi / Korean localization.</li>
+<li>Course content.</li>
+<li>B2B API.</li>
+</ul>
+<h3>Phase 2 — Months 5–8 (build the retention loop)</h3>
+<h4>Big bets</h4>
+<ol>
+<li>
+<p><strong>Daily content engine.</strong> (M, ₹₹₣)</p>
+<ul>
+<li>For each free email subscriber, generate a daily &quot;your Day Master today&quot; 1-paragraph reading.</li>
+<li>Push via email (Resend) + web push (Firebase Cloud Messaging).</li>
+<li>Drives free → Spark conversion via repeated exposure.</li>
+<li><strong>Demand: H. Effort: M. Revenue: ₹₹₣₣₣ (compounding).</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>Companion subscription scaffolding.</strong> (M, ₹₹₣₣₣)</p>
+<ul>
+<li>User accounts already in place from Phase 1.</li>
+<li>Add subscription billing (Razorpay Subscriptions + Stripe Subscriptions).</li>
+<li>Build &quot;Companion dashboard&quot; showing quarterly check-in dates + monthly energetic guidance.</li>
+<li><strong>Demand: M (unproven in our product). Effort: M. Revenue: ₹₹₣₣₣ (highest single MRR line).</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>PWA + Capacitor wrap → Android.</strong> (M, ₹₹₣)</p>
+<ul>
+<li>Convert web app to PWA (manifest + service worker).</li>
+<li>Wrap with Capacitor for Play Store submission.</li>
+<li>Play Store listing + ASO (Korean + English description, screenshots).</li>
+<li><strong>Demand: H. Effort: M. Revenue: ₹₣ (indirect + app store discovery).</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>Year-ahead reminder campaign.</strong> (S, ₹₹₣)</p>
+<ul>
+<li>Each December: email all past customers &quot;Your 2027 forecast is ready — order now.&quot;</li>
+<li>Auto-generated from Full Map-tier structure; one-time per year.</li>
+<li><strong>Demand: H. Effort: S. Revenue: ₹₹₣₣₣ (high-LTV repeat purchases).</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>Compatibility as upsell to Reading/Full Map.</strong> (XS, ₹₹)</p>
+<ul>
+<li>After Reading purchase, automated email: &quot;Add partner compatibility for ₹499 — 50% off.&quot;</li>
+<li><strong>Effort: XS. Revenue: ₹₹ (incremental).</strong></li>
+</ul>
+</li>
+</ol>
+<h4>Optimization</h4>
+<ol start="6">
+<li>
+<p><strong>Engine-draft quality improvements.</strong> (S, ₹₣)</p>
+<ul>
+<li>Reduce human-review time from 45–90 min → 20–30 min by improving the prose scaffold.</li>
+<li>Add named-entity recognition for client name + partner name (if compatibility).</li>
+<li>Better default 용신 reasoning.</li>
+<li><strong>Effort: S. Revenue: ₹₣ (margin improvement, not direct).</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>Conversion rate optimization on web app.</strong> (S, ₹₣)</p>
+<ul>
+<li>A/B test Spark at ₹399 vs ₹499.</li>
+<li>A/B test Reading page layout.</li>
+<li>Add exit-intent popup with &quot;Free 2027 forecast preview.&quot;</li>
+<li><strong>Effort: S. Revenue: ₹₣.</strong></li>
+</ul>
+</li>
+</ol>
+<h4>Skip in Phase 2</h4>
+<ul>
+<li>Native iOS app (Phase 4).</li>
+<li>Hindi localization (Phase 3).</li>
+<li>Course / cohort.</li>
+<li>B2B API.</li>
+</ul>
+<h3>Phase 3 — Months 9–12 (scale + diversity)</h3>
+<h4>Big bets</h4>
+<ol>
+<li>
+<p><strong>Companion subscription launch.</strong> (S, ₹₣₣₣₣₣)</p>
+<ul>
+<li>Marketing push to existing Full Map buyers.</li>
+<li>Quarterly check-in content cadence.</li>
+<li><strong>Demand: M (unproven). Effort: S (already built in Phase 2). Revenue: ₹₣₣₣₣₣ (target: 50–200 subscribers by month 12).</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>Hindi localization.</strong> (M, ₹₣)</p>
+<ul>
+<li>Translate landing page + intake form + Spark into Hindi.</li>
+<li>Hire Hindi-speaking astrologer consultant for translation review.</li>
+<li><strong>Demand: M. Effort: M. Revenue: ₹₣ (India Tier-2 unlock).</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>Year-ahead free report as lead magnet.</strong> (S, ₹₣₣₣₣₣)</p>
+<ul>
+<li>&quot;Free 2027 year-ahead Saju preview&quot; — give the first 1,000 words for free, gate the rest.</li>
+<li>Email capture → nurture → Spark / Reading conversion.</li>
+<li><strong>Demand: H. Effort: S. Revenue: ₹₣₣₣₣₣₣ (top-of-funnel volume).</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>Paid Instagram ads.</strong> (S, ₹₣)</p>
+<ul>
+<li>After Phase 1 organic has reached 5,000 followers + 1,000 email subs.</li>
+<li>Start with ₹20k/month budget.</li>
+<li><strong>Demand: H. Effort: S. Revenue: ₹₣ (paid acquisition).</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>First influencer collaboration.</strong> (S, ₹₣)</p>
+<ul>
+<li>One Tier-1 micro-influencer in astrology / Korean culture.</li>
+<li>Sponsored Reel + coupon code.</li>
+<li><strong>Demand: M. Effort: S. Revenue: ₹₣ (brand awareness + direct).</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>Hire first part-time reader.</strong> (S, ₹₣₣₣)</p>
+<ul>
+<li>1 part-time Saju reader at ₹200–300/hour in India.</li>
+<li>Takes over Phase 2 review workload.</li>
+<li><strong>Effort: S. Revenue: ₹₣₣₣ (margin improvement + throughput).</strong></li>
+</ul>
+</li>
+</ol>
+<h4>Optimization</h4>
+<ol start="7">
+<li>
+<p><strong>Engine-draft → AI-assisted human review.</strong> (M, ₹₣₣)</p>
+<ul>
+<li>Use Claude (or similar LLM) to pre-edit the engine draft.</li>
+<li>Human reviewer only checks + adds nuance.</li>
+<li><strong>Effort: M. Revenue: ₹₣₣ (margin + scale).</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>Conversion to Companion from Full Map.</strong> (S, ₹₣₣₣₣)</p>
+<ul>
+<li>Automated email after Full Map delivery: &quot;Stay on track with quarterly check-ins — ₹799/month.&quot;</li>
+<li><strong>Effort: S. Revenue: ₹₣₣₣₣ (highest-LTV line).</strong></li>
+</ul>
+</li>
+</ol>
+<h3>Phase 4 — Year 2 (B2B + iOS + courses)</h3>
+<h4>Big bets</h4>
+<ol>
+<li>
+<p><strong>Native iOS app via Capacitor.</strong> (M, ₹₣)</p>
+<ul>
+<li>Wrap PWA for App Store.</li>
+<li>Justified only if Android shows 10k+ installs and 4★+.</li>
+<li><strong>Demand: H (Korean diaspora). Effort: M. Revenue: ₹₣ (Korean diaspora).</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>API / B2B white-label.</strong> (L, ₹₣₣₣₣₣₣)</p>
+<ul>
+<li>Package engine + premium report as API.</li>
+<li>Onboard 3–5 B2B partners in Year 2.</li>
+<li><strong>Demand: M (B2B). Effort: L. Revenue: ₹₣₣₣₣₣₣ (wide range).</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>Course / cohort.</strong> (M, ₹₣₣₣₣₣)</p>
+<ul>
+<li>&quot;Introduction to Korean 명리&quot; — 6-week paid cohort.</li>
+<li>30–100 students per cohort × 2 cohorts/year.</li>
+<li><strong>Demand: L (long-tail). Effort: M. Revenue: ₹₣₣₣₣₣₣ (low volume, high margin).</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>Hire second part-time reader + operations person.</strong> (S, ₹₣₣)</p>
+<ul>
+<li>1 part-time reader for Reading/Full Map.</li>
+<li>1 part-time ops person for admin + customer support.</li>
+<li><strong>Effort: S. Revenue: ₹₣₣ (throughput).</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>YouTube long-form cadence.</strong> (S, ₹₣₣₣)</p>
+<ul>
+<li>4 long-form videos per month.</li>
+<li><strong>Effort: S. Revenue: ₹₣₣₣ (long-tail organic).</strong></li>
+</ul>
+</li>
+</ol>
+<h3>Phase 5 — Year 3 (international expansion + course ecosystem)</h3>
+<ol>
+<li>
+<p><strong>Korean-language product.</strong> (L, ₹₣₣₣₣₣)</p>
+<ul>
+<li>Korean-language web app + Korean-reading team.</li>
+<li>Targeting Korea domestic market via Naver + Korean-language content.</li>
+<li><strong>Effort: L. Revenue: significant if executed.</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>&quot;Master of Korean 명리&quot; certification.</strong> (L, ₹₣₣₣₣₣)</p>
+<ul>
+<li>Long-form paid certification for serious students.</li>
+<li>6-month program at ₹50,000+ per student.</li>
+<li><strong>Effort: L. Revenue: ₹₣₣₣₣₣ (small but high-margin).</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>Strategic exit options.</strong> (XL, varies)</p>
+<ul>
+<li>Acqui-hire by larger astrology platform.</li>
+<li>Acquired by Hallyu Wave consumer product company.</li>
+<li>Continue as lifestyle business at ₹2–4 crore ARR.</li>
+</ul>
+</li>
+</ol>
+<h2>4. What to optimize (don't rebuild, refine)</h2>
+<h3>Engine (Python)</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>What to optimize</th>
+<th>Effort</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lookup.py</code> Korean 명리 tables</td>
+<td>Cross-check against 2–3 additional Korean classical texts</td>
+<td>S</td>
+</tr>
+<tr>
+<td><code>pillars.py</code> solar-term boundary handling</td>
+<td>Add the Korean textbook 만세력 case from validation wishlist</td>
+<td>S</td>
+</tr>
+<tr>
+<td><code>premium_report.py</code> engine-draft quality</td>
+<td>Improve prose scaffold so human-review time drops from 45–90 min → 20–30 min</td>
+<td>M</td>
+</tr>
+<tr>
+<td><code>sewoon.py</code> daily-luck overlay</td>
+<td>Make daily output JSON-serializable for web app consumption</td>
+<td>S</td>
+</tr>
+<tr>
+<td><code>patterns.py</code> 천간합/화격/종격</td>
+<td>Lower false-positive rate; reduce [UNCERTAIN] noise</td>
+<td>S</td>
+</tr>
+<tr>
+<td>PDF rendering</td>
+<td>Add Korean font fallback for international users; fix the day-master tofu bug (already fixed)</td>
+<td>S</td>
+</tr>
+<tr>
+<td>Test coverage</td>
+<td>Add Korean textbook chart; add 1 Vedic edge case (irrelevant to us but useful for cross-Tradition compatibility)</td>
+<td>S</td>
+</tr>
+</tbody>
+</table>
+<h3>PDF toolchain</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>What to optimize</th>
+<th>Effort</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Color palette</td>
+<td>Strengthen brand identity; make sure Element Balance color coding is consistent</td>
+<td>XS</td>
+</tr>
+<tr>
+<td>Cover page</td>
+<td>Improve typography; add Day Master emoji or symbol</td>
+<td>XS</td>
+</tr>
+<tr>
+<td>Page layout</td>
+<td>Better table spacing; section dividers</td>
+<td>XS</td>
+</tr>
+<tr>
+<td>Citation handling</td>
+<td>Verify citations stay in <code>.md</code> but never reach PDF</td>
+<td>XS</td>
+</tr>
+</tbody>
+</table>
+<h3>Marketing site (Phase 1 build)</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>What to optimize</th>
+<th>Effort</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Page speed</td>
+<td>&lt;2s LCP on Indian 4G</td>
+<td>M</td>
+</tr>
+<tr>
+<td>Schema markup</td>
+<td>Article + FAQ + Product + LocalBusiness</td>
+<td>S</td>
+</tr>
+<tr>
+<td>Content</td>
+<td>4 pillar posts + 4 service pages + 4 FAQ pages</td>
+<td>M</td>
+</tr>
+</tbody>
+</table>
+<h2>5. What to enhance (extend, not rebuild)</h2>
+<ol>
+<li><strong>Add Korean 명리 vocabulary inline.</strong> Enhance the existing glossary + use it in report PDFs to teach the user the Korean term alongside the English. (CLAUDE.md ground rule #6.)</li>
+<li><strong>Strengthen citation ground rules in every report.</strong> Enhance the audit trail — every interpretive claim should be traceable to a <code>knowledge/*.md</code> file.</li>
+<li><strong>Add classic-text references</strong> (Gyeonglakgoyo, Jeokcheon-su, Yeonhae-japyeong, Gungtong-bogam) for serious buyers who want the citations.</li>
+<li><strong>Enhance Element Balance visualization</strong> with a circular chart (already color-coded table; add SVG radar chart).</li>
+<li><strong>Enhance compatibility module</strong> with 십신 cross-mapping and partner elemental analysis.</li>
+<li><strong>Enhance daily-content engine</strong> with lunar-phase + transit-overlay notes.</li>
+</ol>
+<h2>6. What to skip entirely</h2>
+<h3>Anti-feature list (do NOT build)</h3>
+<ol>
+<li><strong>Tarot readings.</strong> Out of scope per CLAUDE.md.</li>
+<li><strong>Dream interpretation (꿈해몽).</strong> Out of scope.</li>
+<li><strong>Face reading (관상).</strong> Out of scope + privacy concerns.</li>
+<li><strong>Numerology / life-path numbers.</strong> Different tradition; dilutes positioning.</li>
+<li><strong>AI chatbot UX.</strong> 사주GPT already does this; the chatbot UX produces lowest-quality interpretations.</li>
+<li><strong>Per-minute chat marketplace.</strong> Requires reader network; not feasible for solo founder.</li>
+<li><strong>Gemstone / yantra shop.</strong> Separate business (inventory + fulfillment).</li>
+<li><strong>Live streaming / video consultations.</strong> Same constraint as per-minute chat.</li>
+<li><strong>Generic &quot;Will I be rich?&quot; fortune-telling.</strong> Brand-killer + ASCI violation.</li>
+<li><strong>Vedic Jyotish features.</strong> Out of scope + risks credibility with both traditions.</li>
+<li><strong>Western astrology features.</strong> Out of scope per CLAUDE.md.</li>
+<li><strong>Custom ephemeris.</strong> sajupy is sufficient.</li>
+<li><strong>Building a native ephemeris from scratch.</strong> Categorically no.</li>
+</ol>
+<h3>Things to skip for now (defer but don't delete)</h3>
+<ul>
+<li>iOS native app.</li>
+<li>Korean-language product.</li>
+<li>Companion subscription before Month 9.</li>
+<li>B2B API before Year 2.</li>
+<li>Course / cohort before Year 2.</li>
+<li>Hindi localization before Month 9.</li>
+</ul>
+<h2>7. The single most important product decision</h2>
+<p><strong>The single highest-impact product decision for Year 1 is: ship a self-service Spark that works end-to-end, and use that as the wedge to validate the funnel.</strong></p>
+<p>Every other feature (Compatibility, Companion, PWA, etc.) is dependent on:</p>
+<ol>
+<li>The Spark funnel working.</li>
+<li>The Reading/Full Map conversion working.</li>
+<li>The marketing engine producing qualified leads.</li>
+</ol>
+<p>If the funnel doesn't convert at 2–5%, the rest of the product is irrelevant.</p>
+<h2>8. Sequenced delivery plan (Year 1)</h2>
+<table>
+<thead>
+<tr>
+<th>Week</th>
+<th>Milestone</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0–4</td>
+<td>Web app shell + Razorpay + Stripe + user accounts + self-service Spark live</td>
+</tr>
+<tr>
+<td>4–8</td>
+<td>Compatibility (궁합) module + product page + ₹999 standalone</td>
+</tr>
+<tr>
+<td>8–12</td>
+<td>SEO content engine (4 pillar posts + 4 service pages) + Instagram Reels kickoff</td>
+</tr>
+<tr>
+<td>12–16</td>
+<td>Daily content engine (email + web push) + email welcome sequence</td>
+</tr>
+<tr>
+<td>16–20</td>
+<td>PWA conversion + Capacitor wrap for Android + Play Store submission</td>
+</tr>
+<tr>
+<td>20–24</td>
+<td>Year-ahead reminder campaign + Companion subscription scaffolding</td>
+</tr>
+<tr>
+<td>24–28</td>
+<td>Hindi localization + paid Instagram ads (after organic engine mature)</td>
+</tr>
+<tr>
+<td>28–32</td>
+<td>Companion launch + first part-time reader hire</td>
+</tr>
+<tr>
+<td>32–36</td>
+<td>First influencer collaboration + conversion rate optimization</td>
+</tr>
+<tr>
+<td>36–40</td>
+<td>Hindi marketing push + first paid Google Search ads test</td>
+</tr>
+<tr>
+<td>40–44</td>
+<td>iOS Capacitor wrap (if Android metrics support)</td>
+</tr>
+<tr>
+<td>44–48</td>
+<td>Year-1 review + Year-2 planning</td>
+</tr>
+</tbody>
+</table>
+<h2>9. Risk-adjusted roadmap</h2>
+<p>If the founder has less time or runway than expected, <strong>drop in this order</strong> (least painful first):</p>
+<ol>
+<li><strong>Drop:</strong> iOS Capacitor wrap (Phase 4).</li>
+<li><strong>Drop:</strong> B2B API (Phase 4).</li>
+<li><strong>Drop:</strong> Course / cohort (Phase 4).</li>
+<li><strong>Drop:</strong> Hindi localization (Phase 3).</li>
+<li><strong>Drop:</strong> Influencer collaborations (Phase 3).</li>
+<li><strong>Drop:</strong> Companion subscription (Phase 3 — but this is the biggest revenue line; cut last).</li>
+<li><strong>Drop:</strong> Daily content engine (Phase 2 — but this is the retention loop; cut last).</li>
+<li><strong>NEVER drop:</strong> Web app + Razorpay + SEO + Instagram Reels. This is the foundation.</li>
+</ol>
+<h2>10. Sources</h2>
+<ul>
+<li>See <code>04-feature-demand.md</code> for the demand ranking.</li>
+<li>See <code>06-monetization-strategy.md</code> for revenue projections.</li>
+<li>See <code>07-app-platform-decision.md</code> for platform picks.</li>
+<li>See <code>08-marketing-strategy.md</code> for marketing channels.</li>
+<li>See <code>11-financial-model.md</code> for detailed P&amp;L.</li>
+</ul>
+
+    
+<nav class="toc" style="margin-top:48px;font-size:14px;">
+  <div style="display:flex;justify-content:space-between;gap:12px;">
+    <div><a href="08-marketing-strategy.html">← Doc 08: Marketing Strategy</a></div>
+    <div><a href="combined.html">↑ Combined report</a></div>
+    <div><a href="10-risks-and-do-not-do.html">Doc 10: Risks &amp; Do-Not-Do →</a></div>
+  </div>
+</nav>
+</main>
+    <footer class="foot">
+      Saju market research · generated 2026-06-28 · /
+      <a href="https://github.com/anthropics/skills">no external dependencies beyond markdown-it-py</a>
+    </footer>
+  </div>
+</body>
+</html>

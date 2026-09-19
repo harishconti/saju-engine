@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CosmicSaju — AI-Powered Saju Destiny Reports | ₹799</title>
+<meta name="description" content="Get your personalized Saju Four Pillars destiny report in 24 hours. Career, wealth, relationships and life cycles decoded by AI. From ₹799.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── DESIGN TOKENS ─────────────────────────────────────── */
+:root {
+  --text-xs:   clamp(0.75rem,  0.7rem  + 0.25vw, 0.875rem);
+  --text-sm:   clamp(0.875rem, 0.8rem  + 0.35vw, 1rem);
+  --text-base: clamp(1rem,     0.95rem + 0.25vw, 1.125rem);
+  --text-lg:   clamp(1.125rem, 1rem    + 0.75vw, 1.5rem);
+  --text-xl:   clamp(1.5rem,   1.2rem  + 1.25vw, 2.25rem);
+  --text-2xl:  clamp(2rem,     1.2rem  + 2.5vw,  3.5rem);
+  --text-3xl:  clamp(2.5rem,   1rem    + 4vw,    5rem);
+  --space-1:.25rem; --space-2:.5rem; --space-3:.75rem; --space-4:1rem;
+  --space-5:1.25rem; --space-6:1.5rem; --space-8:2rem; --space-10:2.5rem;
+  --space-12:3rem; --space-16:4rem; --space-20:5rem; --space-24:6rem;
+  --radius-sm:.375rem; --radius-md:.5rem; --radius-lg:.75rem;
+  --radius-xl:1rem; --radius-2xl:1.5rem; --radius-full:9999px;
+  --font-display:'Cormorant Garamond','Georgia',serif;
+  --font-body:'Inter','system-ui',sans-serif;
+  --transition:180ms cubic-bezier(0.16,1,0.3,1);
+
+  /* CosmicSaju palette */
+  --bg:#08080f; --surface:#0f0f1c; --surface-2:#141428;
+  --border:rgba(201,168,76,0.12); --border-dim:rgba(255,255,255,0.06);
+  --text-c:#e8e8f0; --text-muted:#8888aa; --text-faint:#3a3a55;
+  --gold:#C9A84C; --gold-dim:rgba(201,168,76,0.12);
+  --gold-glow:rgba(201,168,76,0.06); --gold-bright:#E2C06A;
+  --purple:#7B5EA7; --blue:#5B9CF6; --green:#3EC98B;
+  --shadow:0 8px 32px rgba(0,0,0,0.5); --shadow-lg:0 20px 60px rgba(0,0,0,0.6);
+}
+
+/* ── BASE ─────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;scroll-padding-top:80px}
+body{background:var(--bg);color:var(--text-c);font-family:var(--font-body);font-size:var(--text-base);line-height:1.65;min-height:100dvh;overflow-x:hidden}
+img,picture{display:block;max-width:100%;height:auto}
+button{cursor:pointer;border:none;background:none;font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+p{text-wrap:pretty;max-width:68ch}
+h1,h2,h3{text-wrap:balance;line-height:1.1}
+::selection{background:rgba(201,168,76,0.25);color:var(--text-c)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:var(--radius-sm)}
+
+/* ── BACKGROUND ATMOSPHERE ───────────────────────────── */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 15% 5%, rgba(123,94,167,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 85% 95%, rgba(91,156,246,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 50% 50%, rgba(201,168,76,0.03) 0%, transparent 70%);
+}
+
+/* ── LAYOUT ───────────────────────────────────────────── */
+.container{max-width:960px;margin:0 auto;padding:0 var(--space-5);position:relative;z-index:1}
+.container--narrow{max-width:680px;margin:0 auto;padding:0 var(--space-5);position:relative;z-index:1}
+
+/* ── NAV ──────────────────────────────────────────────── */
+nav{position:sticky;top:0;z-index:100;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  background:rgba(8,8,15,0.85);border-bottom:1px solid var(--border-dim)}
+.nav-inner{max-width:960px;margin:0 auto;padding:0 var(--space-5);
+  display:flex;align-items:center;justify-content:space-between;height:64px}
+.nav-logo{display:flex;align-items:center;gap:var(--space-3)}
+.nav-logo svg{width:32px;height:32px}
+.nav-logo-text{font-family:var(--font-display);font-size:1.35rem;font-weight:700;color:var(--gold);letter-spacing:0.5px}
+.nav-cta{background:var(--gold);color:#08080f;border-radius:var(--radius-full);
+  padding:var(--space-2) var(--space-5);font-size:var(--text-sm);font-weight:600;
+  transition:background var(--transition),transform var(--transition)}
+.nav-cta:hover{background:var(--gold-bright);transform:translateY(-1px)}
+.nav-cta:active{transform:translateY(0)}
+
+/* ── HERO ─────────────────────────────────────────────── */
+.hero{padding:var(--space-20) 0 var(--space-16);text-align:center;position:relative}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:var(--space-2);
+  background:var(--gold-dim);border:1px solid rgba(201,168,76,0.25);border-radius:var(--radius-full);
+  padding:var(--space-1) var(--space-4);font-size:var(--text-xs);color:var(--gold);
+  font-weight:500;letter-spacing:0.5px;margin-bottom:var(--space-6)}
+.hero h1{font-family:var(--font-display);font-size:var(--text-3xl);font-weight:700;
+  color:var(--text-c);margin-bottom:var(--space-5);max-width:14ch;margin-left:auto;margin-right:auto}
+.hero h1 em{color:var(--gold);font-style:italic}
+.hero-sub{font-size:var(--text-lg);color:var(--text-muted);max-width:52ch;margin:0 auto var(--space-8)}
+.hero-btns{display:flex;gap:var(--space-3);justify-content:center;flex-wrap:wrap;margin-bottom:var(--space-8)}
+.btn-primary{background:var(--gold);color:#08080f;border-radius:var(--radius-full);
+  padding:var(--space-4) var(--space-8);font-size:var(--text-base);font-weight:600;
+  transition:background var(--transition),transform var(--transition),box-shadow var(--transition);
+  box-shadow:0 0 24px rgba(201,168,76,0.3)}
+.btn-primary:hover{background:var(--gold-bright);transform:translateY(-2px);box-shadow:0 0 36px rgba(201,168,76,0.45)}
+.btn-secondary{background:transparent;color:var(--text-c);border:1px solid rgba(255,255,255,0.2);
+  border-radius:var(--radius-full);padding:var(--space-4) var(--space-8);font-size:var(--text-base);font-weight:500;
+  transition:border-color var(--transition),color var(--transition),transform var(--transition)}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
+.trust-pills{display:flex;gap:var(--space-3);justify-content:center;flex-wrap:wrap}
+.trust-pill{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);color:var(--text-muted)}
+.trust-pill::before{content:'✦';color:var(--gold);font-size:0.6rem}
+.hero-divider{width:1px;height:14px;background:var(--border-dim)}
+
+/* ── WHAT IS SAJU ─────────────────────────────────────── */
+.section{padding:clamp(var(--space-12),6vw,var(--space-20)) 0}
+.section-label{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:2px;color:var(--gold);font-weight:600;margin-bottom:var(--space-4)}
+.section-title{font-family:var(--font-display);font-size:var(--text-2xl);font-weight:700;color:var(--text-c);margin-bottom:var(--space-5)}
+.section-body{font-size:var(--text-base);color:var(--text-muted);margin-bottom:var(--space-6)}
+.pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-3);margin-top:var(--space-8)}
+.pillar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);
+  padding:var(--space-5);text-align:center;transition:border-color var(--transition),transform var(--transition)}
+.pillar:hover{border-color:rgba(201,168,76,0.35);transform:translateY(-3px)}
+.pillar-symbol{font-size:2rem;margin-bottom:var(--space-2)}
+.pillar-name{font-family:var(--font-display);font-size:var(--text-lg);color:var(--gold);font-weight:600;margin-bottom:var(--space-1)}
+.pillar-sub{font-size:var(--text-xs);color:var(--text-muted)}
+
+/* ── TIERS ────────────────────────────────────────────── */
+.tiers-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5)}
+.tier-card{border-radius:var(--radius-2xl);padding:var(--space-8);border:1px solid var(--border-dim);
+  background:var(--surface);position:relative;overflow:hidden;
+  transition:transform var(--transition),border-color var(--transition)}
+.tier-card:hover{transform:translateY(-4px)}
+.tier-card.featured{background:linear-gradient(160deg,#1a1208 0%,#0f0f1c 100%);border-color:rgba(201,168,76,0.4)}
+.tier-card.featured::before{content:'⭐ Best Value';position:absolute;top:var(--space-4);right:var(--space-4);
+  background:var(--gold-dim);border:1px solid rgba(201,168,76,0.3);border-radius:var(--radius-full);
+  padding:var(--space-1) var(--space-3);font-size:0.7rem;color:var(--gold);font-weight:700}
+.tier-label{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);font-weight:600;margin-bottom:var(--space-3)}
+.tier-price{font-family:var(--font-display);font-size:var(--text-2xl);font-weight:700;margin-bottom:var(--space-1)}
+.tier-card .tier-price{color:var(--text-c)}
+.tier-card.featured .tier-price{color:var(--gold)}
+.tier-usd{font-size:var(--text-xs);color:var(--text-muted);margin-bottom:var(--space-6)}
+.tier-features{list-style:none;display:flex;flex-direction:column;gap:var(--space-3);margin-bottom:var(--space-8)}
+.tier-features li{display:flex;align-items:flex-start;gap:var(--space-3);font-size:var(--text-sm);color:var(--text-muted)}
+.tier-features li .check{color:var(--green);flex-shrink:0;margin-top:2px}
+.tier-features li .cross{color:var(--text-faint);flex-shrink:0;margin-top:2px}
+.tier-features li.active{color:var(--text-c)}
+.tier-btn{width:100%;padding:var(--space-4);border-radius:var(--radius-full);font-size:var(--text-sm);font-weight:600;text-align:center;
+  transition:all var(--transition);display:block}
+.tier-btn.ghost{border:1px solid rgba(255,255,255,0.2);color:var(--text-c)}
+.tier-btn.ghost:hover{border-color:var(--gold);color:var(--gold)}
+.tier-btn.solid{background:var(--gold);color:#08080f;box-shadow:0 0 20px rgba(201,168,76,0.3)}
+.tier-btn.solid:hover{background:var(--gold-bright);box-shadow:0 0 32px rgba(201,168,76,0.45);transform:translateY(-1px)}
+
+/* ── HOW IT WORKS ─────────────────────────────────────── */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-6);margin-top:var(--space-8)}
+.step{text-align:center;padding:var(--space-6);background:var(--surface);border:1px solid var(--border-dim);border-radius:var(--radius-xl)}
+.step-num{width:48px;height:48px;border-radius:var(--radius-full);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;margin:0 auto var(--space-4);
+  font-family:var(--font-display);font-size:var(--text-lg);color:var(--gold);font-weight:700}
+.step h3{font-size:var(--text-base);font-weight:600;color:var(--text-c);margin-bottom:var(--space-2)}
+.step p{font-size:var(--text-sm);color:var(--text-muted);max-width:none}
+
+/* ── TESTIMONIALS ─────────────────────────────────────── */
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);margin-top:var(--space-8)}
+.tcard{background:var(--surface);border:1px solid var(--border-dim);border-radius:var(--radius-xl);padding:var(--space-5)}
+.tcard .stars{color:var(--gold);font-size:var(--text-sm);margin-bottom:var(--space-3)}
+.tcard p{font-size:var(--text-sm);color:var(--text-muted);font-style:italic;margin-bottom:var(--space-4)}
+.tcard .author{display:flex;align-items:center;gap:var(--space-2)}
+.author-avatar{width:32px;height:32px;border-radius:var(--radius-full);background:linear-gradient(135deg,var(--purple),var(--gold));display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:#fff;flex-shrink:0}
+.author-name{font-size:var(--text-xs);font-weight:600;color:var(--text-c)}
+.author-loc{font-size:var(--text-xs);color:var(--text-muted)}
+
+/* ── ORDER FORM SECTION ───────────────────────────────── */
+.form-section{padding:clamp(var(--space-12),6vw,var(--space-20)) 0;
+  background:linear-gradient(180deg,transparent,rgba(201,168,76,0.03),transparent)}
+.form-wrapper{background:var(--surface);border:1px solid rgba(201,168,76,0.2);border-radius:var(--radius-2xl);
+  overflow:hidden;box-shadow:var(--shadow-lg)}
+.form-header{padding:var(--space-8);border-bottom:1px solid var(--border-dim);text-align:center}
+.form-header h2{font-family:var(--font-display);font-size:var(--text-2xl);color:var(--gold);margin-bottom:var(--space-2)}
+.form-header p{font-size:var(--text-sm);color:var(--text-muted);max-width:none}
+.form-iframe-wrap{padding:0}
+.form-iframe-wrap iframe{display:block;border:none;background:transparent}
+.form-note{padding:var(--space-5);border-top:1px solid var(--border-dim);display:flex;align-items:center;gap:var(--space-3);font-size:var(--text-xs);color:var(--text-muted)}
+.form-note .lock{color:var(--green)}
+
+/* ── PAYMENT SECTION ──────────────────────────────────── */
+.payment-section{padding:clamp(var(--space-10),5vw,var(--space-16)) 0}
+.payment-cards{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);margin-top:var(--space-8)}
+.pcard{background:var(--surface);border:1px solid var(--border-dim);border-radius:var(--radius-xl);padding:var(--space-6)}
+.pcard-icon{font-size:1.8rem;margin-bottom:var(--space-4)}
+.pcard h3{font-size:var(--text-base);font-weight:600;color:var(--text-c);margin-bottom:var(--space-2)}
+.pcard p{font-size:var(--text-sm);color:var(--text-muted);margin-bottom:var(--space-4)}
+.pcard-methods{display:flex;flex-wrap:wrap;gap:var(--space-2)}
+.method-tag{background:rgba(255,255,255,0.06);border:1px solid var(--border-dim);border-radius:var(--radius-sm);padding:2px 10px;font-size:0.7rem;color:var(--text-muted)}
+.pay-note{margin-top:var(--space-4);font-size:var(--text-xs);color:var(--text-muted);text-align:center}
+.pay-note a{color:var(--gold)}
+
+/* ── FAQ ──────────────────────────────────────────────── */
+.faq{max-width:680px;margin:var(--space-8) auto 0}
+.faq-item{border-bottom:1px solid var(--border-dim);padding:var(--space-5) 0}
+.faq-q{font-size:var(--text-base);font-weight:600;color:var(--text-c);cursor:pointer;
+  display:flex;justify-content:space-between;align-items:center;user-select:none}
+.faq-q .icon{color:var(--gold);font-size:1.2rem;transition:transform var(--transition);flex-shrink:0}
+.faq-a{font-size:var(--text-sm);color:var(--text-muted);max-width:none;padding-top:var(--space-3);
+  display:none;line-height:1.7}
+.faq-item.open .faq-a{display:block}
+.faq-item.open .faq-q .icon{transform:rotate(45deg)}
+
+/* ── FINAL CTA ────────────────────────────────────────── */
+.final-cta{padding:clamp(var(--space-12),6vw,var(--space-20)) 0;text-align:center}
+.final-cta-box{background:linear-gradient(135deg,#1a1508,#0f0f1c);border:1px solid rgba(201,168,76,0.35);
+  border-radius:var(--radius-2xl);padding:clamp(var(--space-10),5vw,var(--space-16));
+  position:relative;overflow:hidden}
+.final-cta-box::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;
+  background:radial-gradient(circle,rgba(201,168,76,0.08),transparent 70%);pointer-events:none}
+.final-cta-box h2{font-family:var(--font-display);font-size:var(--text-2xl);color:var(--gold);margin-bottom:var(--space-4)}
+.final-cta-box p{font-size:var(--text-base);color:var(--text-muted);margin:0 auto var(--space-8)}
+.urgency{display:inline-block;background:rgba(255,100,100,0.08);border:1px solid rgba(255,100,100,0.2);
+  border-radius:var(--radius-full);padding:var(--space-2) var(--space-5);font-size:var(--text-xs);color:#FF9A9A;margin-bottom:var(--space-6)}
+
+/* ── FOOTER ───────────────────────────────────────────── */
+footer{border-top:1px solid var(--border-dim);padding:var(--space-10) 0;text-align:center;position:relative;z-index:1}
+.footer-logo{font-family:var(--font-display);font-size:var(--text-lg);color:var(--gold);margin-bottom:var(--space-4)}
+.footer-links{display:flex;gap:var(--space-6);justify-content:center;flex-wrap:wrap;margin-bottom:var(--space-4)}
+.footer-links a{font-size:var(--text-xs);color:var(--text-muted);transition:color var(--transition)}
+.footer-links a:hover{color:var(--gold)}
+.footer-copy{font-size:var(--text-xs);color:var(--text-faint)}
+
+/* ── RESPONSIVE ───────────────────────────────────────── */
+@media(max-width:768px){
+  .tiers-grid,.payment-cards{grid-template-columns:1fr}
+  .pillars{grid-template-columns:repeat(2,1fr)}
+  .steps{grid-template-columns:1fr}
+  .testimonials-grid{grid-template-columns:1fr}
+  .hero-btns{flex-direction:column;align-items:center}
+  .hero-divider{display:none}
+}
+@media(max-width:480px){.pillars{grid-template-columns:1fr 1fr}}
+
+/* ── SCROLL REVEAL ────────────────────────────────────── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity 0.6s ease,transform 0.6s ease}
+.reveal.visible{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="CosmicSaju logo">
+        <circle cx="16" cy="16" r="15" stroke="#C9A84C" stroke-width="1.2" opacity="0.4"/>
+        <circle cx="16" cy="16" r="10" stroke="#C9A84C" stroke-width="1" opacity="0.6"/>
+        <circle cx="16" cy="16" r="3.5" fill="#C9A84C"/>
+        <circle cx="16" cy="2.5" r="1.8" fill="#C9A84C" opacity="0.6"/>
+        <circle cx="16" cy="29.5" r="1.8" fill="#C9A84C" opacity="0.6"/>
+        <circle cx="2.5" cy="16" r="1.8" fill="#C9A84C" opacity="0.6"/>
+        <circle cx="29.5" cy="16" r="1.8" fill="#C9A84C" opacity="0.6"/>
+      </svg>
+      <span class="nav-logo-text">CosmicSaju</span>
+    </div>
+    <a href="#order" class="nav-cta">Get Your Report →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container" style="display:flex;flex-direction:column;align-items:center">
+    <div class="hero-eyebrow">✦ AI-Powered Saju Destiny Reports</div>
+    <h1>Your Destiny,<br><em>Decoded by the Stars</em></h1>
+    <p class="hero-sub">Personalized Saju Four Pillars analysis — career, wealth, relationships & life cycles — delivered to your inbox within 24 hours.</p>
+    <div class="hero-btns">
+      <a href="#order" class="btn-primary">Get Essential Report — ₹799</a>
+      <div class="hero-divider"></div>
+      <a href="#order" class="btn-secondary">Deep Destiny + Audio — ₹1499</a>
+    </div>
+    <div class="trust-pills">
+      <span class="trust-pill">AI + Human Verified</span>
+      <span class="trust-pill">Delivered in 24 Hours</span>
+      <span class="trust-pill">English &amp; Tamil</span>
+      <span class="trust-pill">Secure Payment</span>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT IS SAJU -->
+<section class="section" style="border-top:1px solid var(--border-dim)">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-12);align-items:center" class="reveal">
+      <div>
+        <div class="section-label">What is Saju?</div>
+        <h2 class="section-title">Ancient Wisdom.<br>AI Precision.</h2>
+        <p class="section-body">Saju (四柱, Four Pillars of Destiny) is an East Asian birth chart system that maps your destiny using the exact year, month, day and hour of your birth. Unlike Western horoscopes, Saju is highly specific — no two people share the same chart.</p>
+        <p class="section-body" style="margin-top:var(--space-3)">CosmicSaju combines traditional Saju interpretation with AI analysis to deliver structured, actionable reports — not vague predictions.</p>
+      </div>
+      <div class="pillars">
+        <div class="pillar"><div class="pillar-symbol">🌿</div><div class="pillar-name">Year</div><div class="pillar-sub">Ancestral energy & early life</div></div>
+        <div class="pillar"><div class="pillar-symbol">🌙</div><div class="pillar-name">Month</div><div class="pillar-sub">Parents, career & wealth</div></div>
+        <div class="pillar"><div class="pillar-symbol">☀️</div><div class="pillar-name">Day</div><div class="pillar-sub">Your core self & relationships</div></div>
+        <div class="pillar"><div class="pillar-symbol">⭐</div><div class="pillar-name">Hour</div><div class="pillar-sub">Children, legacy & old age</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TIERS -->
+<section class="section" id="tiers" style="border-top:1px solid var(--border-dim)">
+  <div class="container">
+    <div class="reveal" style="text-align:center;margin-bottom:var(--space-10)">
+      <div class="section-label">Choose Your Report</div>
+      <h2 class="section-title" style="margin-bottom:0">What You Get</h2>
+    </div>
+    <div class="tiers-grid reveal">
+      <div class="tier-card">
+        <div class="tier-label">Essential Report</div>
+        <div class="tier-price">₹799</div>
+        <div class="tier-usd">≈ $12 USD · PDF · Delivered in 24 hours</div>
+        <ul class="tier-features">
+          <li class="active"><span class="check">✓</span> Full Saju birth chart calculation</li>
+          <li class="active"><span class="check">✓</span> 10-year decade (Daewoon) analysis</li>
+          <li class="active"><span class="check">✓</span> Career &amp; finance overview</li>
+          <li class="active"><span class="check">✓</span> Lucky elements, colors &amp; directions</li>
+          <li class="active"><span class="check">✓</span> English or Tamil report</li>
+          <li><span class="cross">✗</span> Year-by-year predictions (2025–2030)</li>
+          <li><span class="cross">✗</span> Relationship &amp; marriage analysis</li>
+          <li><span class="cross">✗</span> AI voice audio summary</li>
+        </ul>
+        <a href="#order" class="tier-btn ghost">Order Essential →</a>
+      </div>
+      <div class="tier-card featured">
+        <div class="tier-label">Deep Destiny Report</div>
+        <div class="tier-price">₹1499</div>
+        <div class="tier-usd">≈ $22 USD · PDF + MP3 Audio · Delivered in 24 hours</div>
+        <ul class="tier-features">
+          <li class="active"><span class="check">✓</span> Everything in Essential</li>
+          <li class="active"><span class="check">✓</span> Year-by-year predictions 2025–2030</li>
+          <li class="active"><span class="check">✓</span> Relationship &amp; marriage analysis</li>
+          <li class="active"><span class="check">✓</span> Business launch timing analysis</li>
+          <li class="active"><span class="check" style="color:var(--gold)">✓</span> <strong style="color:var(--gold)">AI voice audio summary (5–8 min MP3)</strong></li>
+          <li class="active"><span class="check">✓</span> One follow-up question by email</li>
+          <li class="active"><span class="check">✓</span> English or Tamil report</li>
+        </ul>
+        <a href="#order" class="tier-btn solid">Order Deep Report →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" style="border-top:1px solid var(--border-dim)">
+  <div class="container" style="text-align:center">
+    <div class="reveal">
+      <div class="section-label">Process</div>
+      <h2 class="section-title">How It Works</h2>
+    </div>
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Fill Your Birth Details</h3>
+        <p>Takes 2 minutes. Date, time, city of birth. Your details are encrypted and never shared.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Complete Payment</h3>
+        <p>Pay securely via UPI, card, or net banking. You receive a payment link immediately after the form.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Receive Your Report</h3>
+        <p>Your AI-generated Saju report is emailed within 24 hours. Deep tier includes an MP3 audio summary.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section" style="border-top:1px solid var(--border-dim)">
+  <div class="container" style="text-align:center">
+    <div class="reveal">
+      <div class="section-label">Testimonials</div>
+      <h2 class="section-title">What Customers Say</h2>
+    </div>
+    <div class="testimonials-grid reveal">
+      <div class="tcard">
+        <div class="stars">★★★★★</div>
+        <p>"The career prediction was incredibly accurate — it matched exactly what I was experiencing in my job. The 10-year decade breakdown gave me clarity I haven't had in years."</p>
+        <div class="author">
+          <div class="author-avatar">P</div>
+          <div><div class="author-name">Priya M.</div><div class="author-loc">Bangalore, India</div></div>
+        </div>
+      </div>
+      <div class="tcard">
+        <div class="stars">★★★★★</div>
+        <p>"As an NRI, I expected generic astrology content. Instead I got a detailed, structured report that felt tailor-made. The audio summary on the deep report is a brilliant touch."</p>
+        <div class="author">
+          <div class="author-avatar">R</div>
+          <div><div class="author-name">Rahul S.</div><div class="author-loc">Dubai, UAE</div></div>
+        </div>
+      </div>
+      <div class="tcard">
+        <div class="stars">★★★★★</div>
+        <p>"I've tried many astrology apps — none come close to this. The Saju Four Pillars approach is far more specific. Got my report in under 18 hours. Will definitely order again."</p>
+        <div class="author">
+          <div class="author-avatar">A</div>
+          <div><div class="author-name">Anitha K.</div><div class="author-loc">Chennai, India</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ORDER FORM -->
+<section class="form-section" id="order">
+  <div class="container--narrow">
+    <div class="reveal" style="text-align:center;margin-bottom:var(--space-8)">
+      <div class="section-label">Order Your Report</div>
+      <h2 class="section-title">Fill Your Birth Details</h2>
+      <p style="color:var(--text-muted);font-size:var(--text-sm);margin:0 auto">After submitting, you will receive a payment link by email within a few minutes. Your report arrives within 24 hours of payment confirmation.</p>
+    </div>
+    <div class="form-wrapper reveal">
+      <div class="form-header">
+        <h2>CosmicSaju Order Form</h2>
+        <p>Takes 2 minutes · Your data is private &amp; never shared</p>
+      </div>
+      <!-- REPLACE the src below with your actual Google Form embed URL -->
+      <div class="form-iframe-wrap" style="background:var(--surface-2);padding:var(--space-6);text-align:center;color:var(--text-muted);font-size:var(--text-sm)">
+        <p style="max-width:none;margin-bottom:var(--space-4)">📋 <strong style="color:var(--text-c)">Embed your Google Form here</strong></p>
+        <p style="max-width:none">Replace this block with your Google Form &lt;iframe&gt; embed code.<br>Go to Google Forms → Send → Embed → Copy iframe → paste here.</p>
+        <div style="margin-top:var(--space-6);padding:var(--space-4);background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:var(--radius-lg);font-family:monospace;font-size:0.78rem;color:var(--gold);text-align:left">
+          &lt;iframe<br>
+          &nbsp;&nbsp;src="https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform?embedded=true"<br>
+          &nbsp;&nbsp;width="100%" height="900" frameborder="0"&gt;<br>
+          &lt;/iframe&gt;
+        </div>
+      </div>
+      <div class="form-note">
+        <span class="lock">🔒</span>
+        <span>Secure form · Birth data used only for your report · Never sold or shared · Payments processed by Razorpay (India) / Stripe (Global)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PAYMENT INFO -->
+<section class="payment-section" style="border-top:1px solid var(--border-dim)">
+  <div class="container">
+    <div class="reveal" style="text-align:center;margin-bottom:var(--space-4)">
+      <div class="section-label">Payments</div>
+      <h2 class="section-title">Safe &amp; Secure Checkout</h2>
+      <p style="color:var(--text-muted);font-size:var(--text-sm);margin:0 auto var(--space-6)">You'll receive a payment link by email after submitting the form. Choose your preferred method below.</p>
+    </div>
+    <div class="payment-cards reveal">
+      <div class="pcard">
+        <div class="pcard-icon">🇮🇳</div>
+        <h3>India — Pay in ₹ (Razorpay)</h3>
+        <p>For Indian buyers. Pay via UPI, card, or net banking. Payment confirmed instantly.</p>
+        <div class="pcard-methods">
+          <span class="method-tag">UPI / GPay</span>
+          <span class="method-tag">PhonePe</span>
+          <span class="method-tag">Credit Card</span>
+          <span class="method-tag">Debit Card</span>
+          <span class="method-tag">Net Banking</span>
+          <span class="method-tag">Paytm</span>
+        </div>
+      </div>
+      <div class="pcard">
+        <div class="pcard-icon">🌍</div>
+        <h3>Global — Pay in $ / £ / € (Stripe)</h3>
+        <p>For NRI and international buyers. Secure payment via Stripe. Essential: $12 · Deep: $22.</p>
+        <div class="pcard-methods">
+          <span class="method-tag">Visa / Mastercard</span>
+          <span class="method-tag">Amex</span>
+          <span class="method-tag">Apple Pay</span>
+          <span class="method-tag">Google Pay</span>
+          <span class="method-tag">PayPal</span>
+        </div>
+      </div>
+    </div>
+    <p class="pay-note">Questions about payment? Email <a href="mailto:hello@cosmicsaju.com">hello@cosmicsaju.com</a> or WhatsApp us.</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" style="border-top:1px solid var(--border-dim)">
+  <div class="container--narrow">
+    <div class="reveal" style="text-align:center;margin-bottom:var(--space-8)">
+      <div class="section-label">FAQ</div>
+      <h2 class="section-title">Common Questions</h2>
+    </div>
+    <div class="faq reveal">
+      <div class="faq-item open">
+        <div class="faq-q">What birth details do I need? <span class="icon">+</span></div>
+        <p class="faq-a">Date of birth (day/month/year), exact birth time (hour and minute if possible), and city/country of birth. Birth time is important for Saju accuracy — check your birth certificate if available. An approximate time still gives a strong reading.</p>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What if I don't know my exact birth time? <span class="icon">+</span></div>
+        <p class="faq-a">Enter your best estimate and mention this in the "special focus" field. A 2–3 hour window usually still gives accurate career, wealth, and personality readings. The hour pillar affects the final section of life most directly.</p>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Which report should I choose? <span class="icon">+</span></div>
+        <p class="faq-a">If you want an overview of your elemental strengths, career arc, and decade cycles — choose Essential (₹799). If you want year-by-year timing, relationship analysis, business launch windows, and an audio walkthrough — choose Deep Destiny (₹1499).</p>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What languages are available? <span class="icon">+</span></div>
+        <p class="faq-a">Reports are available in English and Tamil. Mention your preference in the form. The Deep Destiny audio summary is currently in English only — Tamil audio coming soon.</p>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How is this different from free astrology apps? <span class="icon">+</span></div>
+        <p class="faq-a">Free apps give you a generic chart dump with no interpretation. CosmicSaju provides a structured, AI-analyzed report written specifically for your chart — with plain-language explanations of what each element means for your actual life, career, and relationships.</p>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What is your refund policy? <span class="icon">+</span></div>
+        <p class="faq-a">Full refund available within 2 hours of payment if report generation has not yet begun. Once the report is delivered, refunds are not issued — but we will redo any section if there is a factual data error. Our goal is your complete satisfaction.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="container">
+    <div class="final-cta-box reveal">
+      <div class="urgency">⏳ Only 15 reports processed per week — slots available now</div>
+      <h2>Ready to Read Your Destiny?</h2>
+      <p>Join hundreds of people who have used their Saju chart to make better decisions about career, relationships, and timing.</p>
+      <div style="display:flex;gap:var(--space-3);justify-content:center;flex-wrap:wrap">
+        <a href="#order" class="btn-primary">Get Essential — ₹799</a>
+        <a href="#order" class="btn-secondary">Get Deep Report — ₹1499</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-logo">CosmicSaju</div>
+    <div class="footer-links">
+      <a href="#tiers">Reports</a>
+      <a href="#order">Order</a>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms of Service</a>
+      <a href="mailto:hello@cosmicsaju.com">Contact</a>
+    </div>
+    <p class="footer-copy">© 2026 CosmicSaju · cosmicsaju.com · All rights reserved · Report delivery within 24 hours of payment</p>
+  </div>
+</footer>
+
+<script>
+// FAQ accordion
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => {
+    const item = q.parentElement;
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  });
+});
+
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+</script>
+</body>
+</html>

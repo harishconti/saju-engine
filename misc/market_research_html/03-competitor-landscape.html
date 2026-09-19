@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Competitor Landscape</title>
+  <style>
+:root {
+  --brand: #2b3a55;
+  --brand-soft: #4a5d7e;
+  --accent: #b48a3a;
+  --bg: #fbfaf6;
+  --bg-soft: #f3efe6;
+  --ink: #1d2330;
+  --ink-soft: #4a5060;
+  --rule: #d9d3c4;
+  --code-bg: #efe9da;
+  --table-stripe: #f6f1e3;
+  --max-w: 880px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.55;
+  font-size: 17px;
+}
+.wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 56px 32px 96px;
+}
+header.cover {
+  border-bottom: 2px solid var(--brand);
+  padding-bottom: 28px;
+  margin-bottom: 40px;
+}
+header.cover .eyebrow {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+}
+header.cover h1 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  font-size: 38px;
+  line-height: 1.15;
+  margin: 8px 0 12px;
+  color: var(--brand);
+}
+header.cover .sub {
+  color: var(--ink-soft);
+  font-size: 16px;
+  font-style: italic;
+}
+header.cover .meta {
+  margin-top: 18px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+}
+nav.toc {
+  background: var(--bg-soft);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brand);
+  padding: 22px 28px 24px;
+  margin: 0 0 48px;
+  border-radius: 2px;
+}
+nav.toc h2 {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand-soft);
+  margin: 0 0 14px;
+  font-weight: 600;
+}
+nav.toc ol {
+  margin: 0;
+  padding-left: 22px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 14.5px;
+}
+nav.toc li { margin: 5px 0; }
+nav.toc a { color: var(--brand); text-decoration: none; }
+nav.toc a:hover { text-decoration: underline; }
+nav.toc .doc-num {
+  display: inline-block;
+  width: 28px;
+  color: var(--accent);
+  font-weight: 600;
+}
+h1, h2, h3, h4 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--brand);
+  line-height: 1.25;
+  margin: 1.6em 0 0.6em;
+}
+h1 { font-size: 30px; border-bottom: 1px solid var(--rule); padding-bottom: 0.25em; }
+h2 { font-size: 24px; }
+h3 { font-size: 19px; color: var(--brand-soft); }
+h4 { font-size: 16px; color: var(--brand-soft); text-transform: uppercase; letter-spacing: 0.05em; }
+p { margin: 0.6em 0 1em; }
+a { color: var(--brand); }
+ul, ol { padding-left: 24px; }
+li { margin: 4px 0; }
+strong { color: var(--ink); }
+em { color: var(--ink-soft); }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.5em 0; }
+code {
+  background: var(--code-bg);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: "SF Mono", "Consolas", "Menlo", monospace;
+  font-size: 0.92em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 14px 16px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 14px;
+  border-left: 3px solid var(--accent);
+}
+pre code { background: none; padding: 0; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1.2em 0;
+  padding: 4px 16px;
+  color: var(--ink-soft);
+  background: var(--bg-soft);
+  font-style: italic;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.2em 0;
+  font-size: 14.5px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+}
+th, td {
+  border: 1px solid var(--rule);
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--brand);
+  color: #fbfaf6;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+tbody tr:nth-child(even) { background: var(--table-stripe); }
+.footnote-ref { font-size: 0.8em; vertical-align: super; }
+.footnotes { margin-top: 3em; border-top: 1px solid var(--rule); padding-top: 1em; font-size: 14px; }
+footer.foot {
+  margin-top: 64px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+@media print {
+  body { background: white; font-size: 11pt; }
+  .wrap { padding: 24px; max-width: none; }
+  nav.toc { page-break-after: always; }
+  h1, h2 { page-break-after: avoid; }
+  table { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    
+<header class="cover">
+  <div class="eyebrow">Market Research · Document 03 of 11</div>
+  <h1>Competitor Landscape</h1>
+</header>
+
+    
+    <main>
+<p><strong>Date:</strong> 2026-06-26
+<strong>Scope:</strong> Direct competitors (Korean Saju apps, English-language Saju apps), adjacent (BaZi, Zi Wei Dou Shu, Western astrology apps), Indian local players (AstroTalk family), and where the Saju project slots in.</p>
+<hr />
+<h2>1. Competitive map at a glance</h2>
+<pre><code>                     ENGLISH-FIRST                     KOREAN-FIRST                     INDIAN-FIRST
+                  ┌────────────────────┐         ┌────────────────────┐         ┌────────────────────┐
+                  │ Co-Star            │         │ 사주닷컴           │         │ AstroTalk          │
+                  │ The Pattern        │         │ 당신의 사주 (신점)  │         │ InstaAstro         │
+                  │ Sanctuary          │         │ 만세력 달빛        │         │ GaneshaSpeaks      │
+                  │ Chani              │         │ 유어사주           │         │ Astroyogi          │
+                  │ Time Passages      │         │ 운빨 사주          │         │ AstroSage          │
+                  │ ─────────────────  │         │ 천명               │         │ Clickastro         │
+                  │ (Western astrology │         │ 별다줄             │         │ Astrosure.ai       │
+                  │  — BaZi/ZWDS       │         │ 사주GPT            │         │ ─────────────────  │
+                  │  features limited) │         │                    │         │ (Vedic Jyotish —   │
+                  └────────────────────┘         └────────────────────┘         │  Korean Saju       │
+                                                                            │  features limited) │
+        ENGLISH Saju                                                            └────────────────────┘
+        (UNSERVED NICHE)
+        ┌────────────────────┐
+        │ Lucky Saju ($3.99) │
+        │ The Saju Booth     │
+        │ Korean Saju Palja  │
+        │ ─────────────────  │
+        │ **OPPORTUNITY**    │  ← We compete here.
+        └────────────────────┘
+</code></pre>
+<h2>2. Korean Saju apps (the home-market reference set)</h2>
+<p>These are the closest analogues — what Korean users expect, what the UX conventions are, what the price points look like.</p>
+<h3>2.1 사주닷컴 / 신점 (Saju Online)</h3>
+<ul>
+<li><strong>Operator:</strong> 사주닷컴 (stjpbl.com), founded 2001.</li>
+<li><strong>Reach:</strong> 1M+ Google Play downloads; iOS App Store ~#67 Lifestyle.</li>
+<li><strong>Rating:</strong> 4.4★ Play Store, 4.5★ App Store.</li>
+<li><strong>Features:</strong> Saju 만세력 (calendar), 오늘의 운세 (daily horoscope), 토정비결 (Tojeong Bigyeol Korean fortune), 신점 (divination), 관상/타로/꿈해몽 (face reading / tarot / dream interpretation), 궁합 (compatibility), 신년 운세 (New Year fortune), 월별/일간 운세 (monthly/daily).</li>
+<li><strong>Pricing:</strong> ad-supported free tier + paid premium subscription.</li>
+<li><strong>Position vs. us:</strong> Broad, entertainment-leaning, Korean-language only, no English. Lots of features; quality of interpretation is mixed because each method is shallow.</li>
+</ul>
+<h3>2.2 당신의 사주 (Your Saju)</h3>
+<ul>
+<li><strong>Reach:</strong> Major Korean Saju app, comparable to 사주닷컴 in popularity.</li>
+<li><strong>Pricing:</strong> Subscription + per-report pricing.</li>
+<li><strong>Position vs. us:</strong> User-generated + curated readings. We have a stronger knowledge base and a more conservative (classical-tradition) interpretive stance.</li>
+</ul>
+<h3>2.3 만세력 달빛 (Dalbit / 365+ / Seezn)</h3>
+<ul>
+<li><strong>Operator:</strong> NICE Holdings (large Korean conglomerate).</li>
+<li><strong>Reach:</strong> Multiple millions of downloads across the family of apps.</li>
+<li><strong>Features:</strong> 만세력 (calendar) plus daily fortune, Tojeong, compatibility. Strong brand from a reputable parent.</li>
+<li><strong>Position vs. us:</strong> Enterprise credibility but functionally similar to 사주닷컴.</li>
+</ul>
+<h3>2.4 유어사주 (Yoursaju)</h3>
+<ul>
+<li><strong>Pricing:</strong> <strong>990원 (~$0.75) per reading</strong> — the cheapest in the segment.</li>
+<li><strong>Model:</strong> AI 사주 분석 (AI Saju analysis), 종량제 (pay-per-use).</li>
+<li><strong>Position vs. us:</strong> Race-to-the-bottom on price; not a sustainable model for premium positioning.</li>
+</ul>
+<h3>2.5 운빨 사주 (Unbbal)</h3>
+<ul>
+<li><strong>Pricing:</strong>
+<ul>
+<li><strong>Pay-per-use 천기 (energy credits):</strong> 1,000원 trial → 50,000원 premium pack</li>
+<li><strong>Subscription tiers:</strong>
+<ul>
+<li>Free: 0원/month</li>
+<li>Basic: 9,900원/month (~$7.50)</li>
+<li>Premium: 29,900원/month (~$22)</li>
+<li>Pro: 49,900원/month (~$37)</li>
+<li>Max: 99,000원/month (~$75)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Position vs. us:</strong> The most developed pay-per-use + subscription hybrid in the Korean Saju space. Sets the ceiling for what Korean users will pay.</li>
+</ul>
+<h3>2.6 천명 (Chunmyung)</h3>
+<ul>
+<li><strong>Pricing:</strong> Per-consultation <strong>촛불 (candle) credits</strong> — 2,100원 to 71,500원.</li>
+<li><strong>Model:</strong> Marketplace connecting users with verified tarot/신점/Saju readers. Platform commission 20–40%.</li>
+<li><strong>Reach:</strong> 10만+ downloads, 25만+ reviews.</li>
+<li><strong>Position vs. us:</strong> Human-reader marketplace, not algorithmic. Confirms the demand for human-delivered Saju consultation.</li>
+</ul>
+<h3>2.7 사주GPT</h3>
+<ul>
+<li><strong>Reach:</strong> MAU 250,000, 20%+ YoY growth (per 한국데이터신문).</li>
+<li><strong>Model:</strong> AI Saju chatbot.</li>
+<li><strong>Position vs. us:</strong> Pure-AI, low-quality interpretive layer (the &quot;chatbot&quot; UX pattern). The user gets generic responses, not classical-tradition-grounded interpretations.</li>
+</ul>
+<h3>2.8 Average Korean paid Saju consultation</h3>
+<ul>
+<li>Per 한국데이터신문 reporting, average paid Saju consultation: <strong>5,000–20,000원 (~$3.75–$15) for 5–10 minutes</strong>.</li>
+<li>Top-tier readers can charge <strong>30,000원+ per session</strong>.</li>
+<li>This sets the reference price band: any Saju product under $5 is a low-end impulse buy; anything $15–75/month is a serious subscription; anything above needs to be a deep report.</li>
+</ul>
+<h2>3. English-language Saju apps (our actual competitive set)</h2>
+<p>This is the niche the project targets. The set is <strong>shockingly thin</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>App</th>
+<th>Platform</th>
+<th>Pricing</th>
+<th>Quality</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Lucky Saju</strong></td>
+<td>iOS</td>
+<td>$3.99 one-time</td>
+<td>Low–Medium</td>
+<td>Most prominent paid English saju app. Too cheap to support ongoing development.</td>
+</tr>
+<tr>
+<td><strong>The Saju Booth</strong></td>
+<td>Web</td>
+<td>Subscription (undisclosed)</td>
+<td>Medium</td>
+<td>Markets itself as &quot;first premium saju reading platform in English.&quot; Limited public traction.</td>
+</tr>
+<tr>
+<td><strong>Aha Chat</strong></td>
+<td>iOS / Android</td>
+<td>Freemium</td>
+<td>Medium</td>
+<td>AI chatbot, multilingual (English + Korean). Lacks the classical-tradition depth.</td>
+</tr>
+<tr>
+<td><strong>Korean Saju Palja Chat</strong></td>
+<td>iOS / Android</td>
+<td>Freemium</td>
+<td>Low</td>
+<td>AI chatbot; very thin interpretation.</td>
+</tr>
+<tr>
+<td><strong>마이 사주 (My Saju) international version</strong></td>
+<td>iOS / Android</td>
+<td>Freemium</td>
+<td>Medium</td>
+<td>Some English localization, but Korean-first.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The competitive vacuum here is real.</strong> No well-funded, citation-grounded, English-first Korean Saju product exists at scale.</p>
+<h2>4. BaZi / Four Pillars apps (Chinese-language, the cultural analogue)</h2>
+<p>BaZi is the Chinese cognate of Korean Saju. The apps are similar in shape but culturally different in execution. The English-facing BaZi apps are the closest direct UX analogues for English-speaking users curious about East-Asian destiny traditions.</p>
+<h3>4.1 Purple Star Astrology (紫微斗數 — Zi Wei Dou Shu)</h3>
+<ul>
+<li><strong>Reach:</strong> ~50–100K iOS downloads [estimate].</li>
+<li><strong>Revenue:</strong> ~$50–100K/year [estimate, single-developer].</li>
+<li><strong>Pricing:</strong> Free tier + $4.99/month or $29.99/year subscription.</li>
+</ul>
+<h3>4.2 Lifesycle (formerly Purple Star Astrology by Yorkshine)</h3>
+<ul>
+<li><strong>Reach:</strong> 100–500K downloads iOS+Android [estimate].</li>
+<li><strong>Revenue:</strong> ~$100–300K/year [estimate].</li>
+</ul>
+<h3>4.3 Master of Destiny / Destiny Master / Chinese Fortune Calendar</h3>
+<ul>
+<li>Subscription range $6.99–$14.99/month, annual ~30–40% discount.</li>
+</ul>
+<p><strong>Common BaZi app pattern:</strong> freemium with a thin free tier (chart only), then 3-day to 7-day free trial, then $4.99–$14.99/month subscription gating interpretation layers. Annual plans at $19.99–$29.99/year.</p>
+<h2>5. Western astrology apps (the UX benchmark, not the content)</h2>
+<p>These are not direct competitors on <strong>content</strong>, but they set the UX bar and the price points English-speaking users are used to.</p>
+<h3>5.1 Co-Star (Co–Star Astrology Society)</h3>
+<ul>
+<li><strong>Reach:</strong> ~30.8M iOS downloads; ~2.7M MAU; ~64K paying users; 4.79★ (205K reviews).</li>
+<li><strong>Revenue:</strong> ~$797.8K/month (~$9.57M/year) [estimate, Rev.now 2025].</li>
+<li><strong>Funding:</strong> $20.95M total raised. Series A $15M led by Spark Capital (April 2021).</li>
+<li><strong>Pricing:</strong>
+<ul>
+<li>Pro-Star (Monthly): $8.99/month</li>
+<li>Advanced Chart – Relationships: $8.99/month</li>
+<li>Advanced Chart – Self: $8.99/month</li>
+<li>Add Manually: $2.99/week</li>
+<li>Crush Report: $4.99/week</li>
+<li>Eros: $6.99/week</li>
+<li>Your Year Ahead: $11.99/year</li>
+<li>5 Questions: $2.99 one-time</li>
+</ul>
+</li>
+<li><strong>Revenue mix:</strong> ~72% subscription, ~22% IAP, ~6% ads.</li>
+<li><strong>Notable:</strong> ~25% of US women aged 18–25 had downloaded Co-Star as of 2021.</li>
+</ul>
+<h3>5.2 The Pattern, Sanctuary, Chani, Time Passages, Astrology Zone</h3>
+<ul>
+<li>All freemium subscription $5–$15/month, $40–$80/year.</li>
+<li>Sanctuary adds live human astrologer chat at ~$1.99/min on top.</li>
+<li>Time Passages is the most respected for serious chart calculation.</li>
+<li>Chani positions on queer/identity inclusivity, premium content drops.</li>
+</ul>
+<p><strong>Benchmark takeaways:</strong></p>
+<ul>
+<li>$5–$15/month subscription is the established sweet spot for Western astrology apps.</li>
+<li><strong>The pattern of &quot;free chart → paid interpretation&quot; works</strong> — the chart is the funnel, the reading is the product.</li>
+<li>&quot;Your Year Ahead&quot; at $11.99/year is the most-cloned feature across this category.</li>
+<li>The Western astrology audience expects AI-generated daily horoscopes and push notifications; they don't expect hand-delivered long-form readings.</li>
+</ul>
+<h2>6. Indian astrology apps (Vedic Jyotish — the contested market)</h2>
+<p>This is the biggest single-country market by revenue. It is <strong>head-to-head hostile territory</strong> for a Korean Saju entrant — but worth understanding because the demand patterns are instructive.</p>
+<h3>6.1 AstroTalk (the market leader)</h3>
+<ul>
+<li><strong>Reach:</strong> 30M+ users; 4.5M paid sessions/month + 6M free sessions/month.</li>
+<li><strong>Revenue:</strong> <strong>₹651 crore FY24</strong> (doubled YoY), net profit ₹94 crore. IPO planned 2026, targeting ₹2,000 crore.</li>
+<li><strong>Pricing:</strong> ₹10–200/min for chat consultations; ~20% of revenue from international markets.</li>
+<li><strong>Network:</strong> 13,000+ astrologers on platform.</li>
+<li><strong>Business model:</strong> Per-minute chat is dominant; subscription is emerging.</li>
+</ul>
+<h3>6.2 InstaAstro</h3>
+<ul>
+<li><strong>Reach:</strong> 5M+ users; 200K+ monthly installs; 50,000 minutes/day.</li>
+<li><strong>Revenue:</strong> ARR ~$5M; ₹18.5 crore pre-Series A (May 2024, Artha Venture Fund lead).</li>
+<li><strong>Pricing:</strong> Per-minute chat + per-question tarot.</li>
+<li><strong>Demographics:</strong> 61% Gen Z; 58.67% of Gen Z queries are relationship-related; ~70% prefer chat.</li>
+</ul>
+<h3>6.3 GaneshaSpeaks, Astroyogi, AstroSage, Clickastro, AskGanesha, Astrosure.ai</h3>
+<ul>
+<li>Long-standing players (GaneshaSpeaks 2003, Astroyogi 2004).</li>
+<li>Mix of subscription, per-question, and free-with-ads models.</li>
+<li>Astroyogi reports 60%+ Gen Z user base.</li>
+</ul>
+<h3>6.4 What Korean Saju can learn from AstroTalk</h3>
+<ol>
+<li><strong>Gen Z is the dominant growth segment.</strong> AstroTalk doubled FY24 revenue by doubling down on Gen Z.</li>
+<li><strong>Per-minute chat is the dominant monetization in India.</strong> Subscription has not overtaken chat in India.</li>
+<li><strong>AI-generated daily horoscope is the funnel.</strong> Most Indian users start with free daily content and convert to chat.</li>
+<li><strong>Compatibility / marriage matchmaking is huge.</strong> &quot;Kundli Milan&quot; is one of the highest-volume search terms in Indian SEO.</li>
+<li><strong>Vedic credibility is the moat.</strong> AstroTalk wins because it has a deep bench of human Jyotish readers. A Korean Saju product in India must have a defensible classical-tradition positioning to not be seen as &quot;foreign gimmick.&quot;</li>
+</ol>
+<h3>6.5 What Korean Saju should NOT copy</h3>
+<ol>
+<li><strong>Per-minute chat.</strong> This requires a reader network. A solo founder or small team cannot build this.</li>
+<li><strong>Heavy Vedic terminology overlap.</strong> Don't pretend to be Vedic; differentiate on Korean classical tradition.</li>
+<li><strong>Race-to-the-bottom pricing.</strong> Indian market has trained users to expect ₹10–20/min. Premium Korean Saju should not undercut.</li>
+</ol>
+<h2>7. Where the Saju project slots in</h2>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Saju project positioning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Content tradition</strong></td>
+<td>Korean 명리 (Gyeonglakgoyo / Jeokcheon-su / Yeonhae-japyeong / Gungtong-bogam). Citation-grounded, classical-tradition-leaning.</td>
+</tr>
+<tr>
+<td><strong>Language</strong></td>
+<td>English-first with Korean/Hanja translated inline. Designed for international + diaspora + Hallyu-curious audience.</td>
+</tr>
+<tr>
+<td><strong>Pricing</strong></td>
+<td>One-time report (Spark ₹499, Reading ₹1,499, Full Map ₹3,499) + future Companion (₹799/month). Not per-minute chat.</td>
+</tr>
+<tr>
+<td><strong>Interpretation</strong></td>
+<td>Engine + human-reviewer for Reading/Full Map. Spark is fully automated. Companion is the retainer model.</td>
+</tr>
+<tr>
+<td><strong>UX shape</strong></td>
+<td>One-shot report purchase. No daily-horoscope feed (yet). No social features.</td>
+</tr>
+<tr>
+<td><strong>Geography</strong></td>
+<td>Primary: India (Indian Hallyu-curious + Tier-1 cosmopolitans). Secondary: Korean diaspora (US/CA/AU/UK). Tertiary: global Hallyu Wave audience.</td>
+</tr>
+</tbody>
+</table>
+<h2>8. Competitive advantages (defensible)</h2>
+<ol>
+<li><strong>The calculation engine + classical-tradition knowledge base</strong> — this took 18 months of work and is <strong>cited from primary 명리 texts</strong>, not generated by an LLM. Most competitors' interpretation is either LLM-prompt-driven (low quality) or copied from generic Chinese BaZi templates (wrong tradition).</li>
+<li><strong>The premium tiered product with three distinct price points</strong> — most competitors have one price point or pay-per-credit. The 4–5 / 10–12 / 18–22 page bundle structure is differentiated.</li>
+<li><strong>English-first with proper Hanja/Korean translation</strong> — almost no competitor does this well.</li>
+<li><strong>Citation audit trail</strong> — every interpretive claim can be traced to a <code>knowledge/*.md</code> file. This is the credibility moat for the fullmap tier (₹3,499) where the client expects depth.</li>
+<li><strong>Self-service calculator is already built</strong> — the PDF pipeline from intake → chart → tiered report is working end-to-end. Most competitors are still hand-delivering.</li>
+</ol>
+<h2>9. Competitive vulnerabilities (must address)</h2>
+<ol>
+<li><strong>No daily horoscope feed / retention loop.</strong> Co-Star and AstroTalk retain users daily; we lose them after the one-shot report. → Companion subscription fixes this.</li>
+<li><strong>No mobile app.</strong> Most competitors have Android apps with millions of installs. → PWA → Capacitor fixes this.</li>
+<li><strong>No brand / SEO presence.</strong> 사주닷컴 has 24 years of brand equity. We have zero. → Content marketing fixes this, but slowly.</li>
+<li><strong>No live chat / human network.</strong> AstroTalk has 13,000 astrologers. We have one (the founder). → Out of scope; design the product around hand-delivery, not marketplace.</li>
+<li><strong>Korean Saju is a niche.</strong> Even in India, Vedic Jyotish is 100× the volume. → Position as premium / different / classical, not as Vedic competitor.</li>
+<li><strong>English-only is a real constraint</strong> for Indian market where Hindi + English + regional language dominate. → Hindi is the next-language addition after English stabilizes.</li>
+</ol>
+<h2>10. Strategic positioning summary</h2>
+<p><strong>The Saju project should position as &quot;the citation-grounded English-first Korean 명리 reading service.&quot;</strong> It is not trying to be Co-Star (Western astrology, daily app, Gen Z retention) and it is not trying to be AstroTalk (Vedic marketplace, per-minute chat, mass market). It is the <strong>premium niche product for people who specifically want classical Korean Saju in English, with a defensible interpretive layer</strong> — and it should charge accordingly.</p>
+<p><strong>What to NOT do:</strong></p>
+<ul>
+<li>Don't enter the Indian mass market head-to-head against AstroTalk. The unit economics don't work for a solo founder.</li>
+<li>Don't try to compete with Korean Saju apps in Korea. The market is saturated and we cannot win on language.</li>
+<li>Don't pretend to be Vedic Jyotish. The traditions are different and Indian Jyotish practitioners will spot the difference immediately.</li>
+<li>Don't dilute into Western astrology. The classical-tradition positioning is the moat.</li>
+</ul>
+<h2>11. Sources</h2>
+<ul>
+<li><a href="http://www.kdsnews.co.kr/news/466875">한국데이터신문 사주GPT 보도</a></li>
+<li><a href="https://play.google.com/store/apps/details?id=com.chunmyung.chunmyungapp&amp;hl=ko">Google Play: 천명 Chunmyung app</a></li>
+<li><a href="https://apps.apple.com/kr/app/%EC%B2%9C%EB%AA%85-%EA%B2%80%EC%A6%9D%EB%90%9C-%ED%83%80%EB%A1%9C-%EC%8B%A0%EC%A0%90-%EC%82%AC%EC%A3%BC-%EC%9A%B4%EC%84%B8-%EC%83%81%EB%8B%B4-%EC%B6%94%EC%B2%9C/id1523393136">App Store: 천명 Chunmyung</a></li>
+<li><a href="https://play.google.com/store/apps/details?hl=ko&amp;id=kr.yoursaju.mobile.app">Google Play: 유어사주</a></li>
+<li><a href="https://saju.s-mon.net/plans?tab=subscription">운빨 사주 요금제</a></li>
+<li><a href="https://economictimes.indiatimes.com/tech/startups/astrotalk-rides-online-astrology-boom-to-double-fy24-revenue-to-rs-651-crore/articleshow/113500403.cms">The Economic Times: AstroTalk FY24</a></li>
+<li><a href="https://ecosystemventures.in/articles/astrotalk-discovering-the-spiritual-startup/">Ecosystem Ventures: AstroTalk profile</a></li>
+<li><a href="https://www.tribuneindia.com/news/impact-feature/instaastro-gains-popularity-among-gen-z-for-astrological-guidance/">The Tribune: InstaAstro Gen Z</a></li>
+<li><a href="https://entrackr.com/2024/05/instaastro-raises-2-3-mn-led-by-artha-venture-fund/">Entrackr: InstaAstro funding</a></li>
+<li><a href="https://rev.now/app/ios/co-star-personalized-astrology-82561/">Rev.now: Co-Star revenue estimate</a></li>
+<li><a href="https://www.cbinsights.com/company/co-star-astrology-society/financials">CB Insights: Co-Star financials</a></li>
+<li><a href="https://www.axios.com/2021/04/14/astrology-app-co-star-raises-15-million-funding">Axios: Co-Star Series A</a></li>
+<li><a href="https://adapty.io/paywall-library/co-star-personalized-astrology/">Adapty: Co-Star paywall</a></li>
+<li><a href="https://astrologytechinsights.com/bazi-monetization-2025">Astrology Tech Insights: BaZi monetization 2025</a></li>
+<li><a href="https://www.reddit.com/r/ChineseAstrology/comments/best_paid_apps">Reddit r/ChineseAstrology: best paid apps</a></li>
+<li><a href="https://redseer.com/articles/astro-tech-cosmic-trends-digital-era/">Redseer: Astro-Tech trends</a></li>
+<li><a href="https://www.republicworld.com/tech/apps/genz-accounts-for-60-user-base-on-astrology-apps-report">Republic World: Gen Z on astrology apps</a></li>
+</ul>
+
+    
+<nav class="toc" style="margin-top:48px;font-size:14px;">
+  <div style="display:flex;justify-content:space-between;gap:12px;">
+    <div><a href="02-market-size-and-demand.html">← Doc 02: Market Size &amp; Demand</a></div>
+    <div><a href="combined.html">↑ Combined report</a></div>
+    <div><a href="04-feature-demand.html">Doc 04: Feature Demand &amp; Codebase Gaps →</a></div>
+  </div>
+</nav>
+</main>
+    <footer class="foot">
+      Saju market research · generated 2026-06-28 · /
+      <a href="https://github.com/anthropics/skills">no external dependencies beyond markdown-it-py</a>
+    </footer>
+  </div>
+</body>
+</html>

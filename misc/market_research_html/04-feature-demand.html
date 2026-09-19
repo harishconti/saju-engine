@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Feature Demand &amp; Codebase Gaps</title>
+  <style>
+:root {
+  --brand: #2b3a55;
+  --brand-soft: #4a5d7e;
+  --accent: #b48a3a;
+  --bg: #fbfaf6;
+  --bg-soft: #f3efe6;
+  --ink: #1d2330;
+  --ink-soft: #4a5060;
+  --rule: #d9d3c4;
+  --code-bg: #efe9da;
+  --table-stripe: #f6f1e3;
+  --max-w: 880px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.55;
+  font-size: 17px;
+}
+.wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 56px 32px 96px;
+}
+header.cover {
+  border-bottom: 2px solid var(--brand);
+  padding-bottom: 28px;
+  margin-bottom: 40px;
+}
+header.cover .eyebrow {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+}
+header.cover h1 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  font-size: 38px;
+  line-height: 1.15;
+  margin: 8px 0 12px;
+  color: var(--brand);
+}
+header.cover .sub {
+  color: var(--ink-soft);
+  font-size: 16px;
+  font-style: italic;
+}
+header.cover .meta {
+  margin-top: 18px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+}
+nav.toc {
+  background: var(--bg-soft);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brand);
+  padding: 22px 28px 24px;
+  margin: 0 0 48px;
+  border-radius: 2px;
+}
+nav.toc h2 {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand-soft);
+  margin: 0 0 14px;
+  font-weight: 600;
+}
+nav.toc ol {
+  margin: 0;
+  padding-left: 22px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 14.5px;
+}
+nav.toc li { margin: 5px 0; }
+nav.toc a { color: var(--brand); text-decoration: none; }
+nav.toc a:hover { text-decoration: underline; }
+nav.toc .doc-num {
+  display: inline-block;
+  width: 28px;
+  color: var(--accent);
+  font-weight: 600;
+}
+h1, h2, h3, h4 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--brand);
+  line-height: 1.25;
+  margin: 1.6em 0 0.6em;
+}
+h1 { font-size: 30px; border-bottom: 1px solid var(--rule); padding-bottom: 0.25em; }
+h2 { font-size: 24px; }
+h3 { font-size: 19px; color: var(--brand-soft); }
+h4 { font-size: 16px; color: var(--brand-soft); text-transform: uppercase; letter-spacing: 0.05em; }
+p { margin: 0.6em 0 1em; }
+a { color: var(--brand); }
+ul, ol { padding-left: 24px; }
+li { margin: 4px 0; }
+strong { color: var(--ink); }
+em { color: var(--ink-soft); }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.5em 0; }
+code {
+  background: var(--code-bg);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: "SF Mono", "Consolas", "Menlo", monospace;
+  font-size: 0.92em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 14px 16px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 14px;
+  border-left: 3px solid var(--accent);
+}
+pre code { background: none; padding: 0; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1.2em 0;
+  padding: 4px 16px;
+  color: var(--ink-soft);
+  background: var(--bg-soft);
+  font-style: italic;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.2em 0;
+  font-size: 14.5px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+}
+th, td {
+  border: 1px solid var(--rule);
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--brand);
+  color: #fbfaf6;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+tbody tr:nth-child(even) { background: var(--table-stripe); }
+.footnote-ref { font-size: 0.8em; vertical-align: super; }
+.footnotes { margin-top: 3em; border-top: 1px solid var(--rule); padding-top: 1em; font-size: 14px; }
+footer.foot {
+  margin-top: 64px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+@media print {
+  body { background: white; font-size: 11pt; }
+  .wrap { padding: 24px; max-width: none; }
+  nav.toc { page-break-after: always; }
+  h1, h2 { page-break-after: avoid; }
+  table { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    
+<header class="cover">
+  <div class="eyebrow">Market Research · Document 04 of 11</div>
+  <h1>Feature Demand &amp; Codebase Gaps</h1>
+</header>
+
+    
+    <main>
+<p><strong>Date:</strong> 2026-06-26
+<strong>Scope:</strong> Most in-demand features for Saju / astrology apps, what users actually pay for vs. expect free, what they complain about, and how the existing Saju codebase maps to demand.</p>
+<hr />
+<h2>1. Feature demand ranking (consolidated from market signals)</h2>
+<p>The market signal across Western astrology apps, Korean Saju apps, Indian astrology apps, and the BaZi/ZWDS segment converges on a clear hierarchy of feature value.</p>
+<table>
+<thead>
+<tr>
+<th>Rank</th>
+<th>Feature</th>
+<th>Demand intensity</th>
+<th>What users expect</th>
+<th>What users will pay for</th>
+<th>Free or paid</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Daily horoscope / today's fortune</strong></td>
+<td>Very high</td>
+<td>Personalized daily text in the app</td>
+<td>Email / push delivery</td>
+<td><strong>Free</strong> (funnel)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Natal chart / four pillars calculation</strong></td>
+<td>Very high</td>
+<td>Always free</td>
+<td>—</td>
+<td><strong>Free</strong> (top of funnel)</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Compatibility / synastry / 궁합</strong></td>
+<td>Very high</td>
+<td>Basic free comparison</td>
+<td>Detailed partner analysis</td>
+<td><strong>Freemium</strong> (basic free, deep paid)</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Year-ahead / annual forecast</strong></td>
+<td>High</td>
+<td>Year-themed marketing</td>
+<td>Per-year personal PDF</td>
+<td><strong>Paid</strong> ($10–$50)</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Career / money / business timing</strong></td>
+<td>High</td>
+<td>Vague free guidance</td>
+<td>Detailed deep-dive</td>
+<td><strong>Paid</strong> ($30–$200)</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Compatibility deep-dive (relationship analysis)</strong></td>
+<td>High</td>
+<td>Basic numeric score</td>
+<td>Long-form compatibility analysis</td>
+<td><strong>Paid</strong> ($30–$150)</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>Lucky attributes (colors, numbers, directions, foods)</strong></td>
+<td>Medium-high</td>
+<td>Always free</td>
+<td>Personal reference card</td>
+<td><strong>Free</strong> (PDF supplement)</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>Push notifications for transits / luck windows</strong></td>
+<td>Medium-high</td>
+<td>Expected free</td>
+<td>—</td>
+<td><strong>Free</strong> (retention lever)</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>Monthly / weekly outlook</strong></td>
+<td>Medium</td>
+<td>Free preview</td>
+<td>Personal PDF</td>
+<td><strong>Freemium</strong></td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>Daily-luck (일운) and auspicious date picking</strong></td>
+<td>Medium</td>
+<td>Free preview</td>
+<td>Date-picking tool</td>
+<td><strong>Freemium</strong></td>
+</tr>
+<tr>
+<td>11</td>
+<td><strong>Compatibility with multiple partners (saved list)</strong></td>
+<td>Medium</td>
+<td>—</td>
+<td>Persistent feature</td>
+<td><strong>Paid</strong> (subscription)</td>
+</tr>
+<tr>
+<td>12</td>
+<td><strong>Marriage timing / wedding-date picking</strong></td>
+<td>Medium</td>
+<td>Vague free</td>
+<td>Specific year/month</td>
+<td><strong>Paid</strong></td>
+</tr>
+<tr>
+<td>13</td>
+<td><strong>Children / parenting analysis</strong></td>
+<td>Low-medium</td>
+<td>Free preview</td>
+<td>Personal reading</td>
+<td><strong>Paid</strong> (niche)</td>
+</tr>
+<tr>
+<td>14</td>
+<td><strong>Health tendencies</strong></td>
+<td>Medium</td>
+<td>Free preview</td>
+<td>Detailed analysis</td>
+<td><strong>Paid</strong> (regulatory-sensitive)</td>
+</tr>
+<tr>
+<td>15</td>
+<td><strong>Relocation / geography</strong></td>
+<td>Low-medium</td>
+<td>Free preview</td>
+<td>City comparison</td>
+<td><strong>Paid</strong> (niche)</td>
+</tr>
+<tr>
+<td>16</td>
+<td><strong>Relocation / feng shui / directions</strong></td>
+<td>Low</td>
+<td>Free preview</td>
+<td>Detailed home/office analysis</td>
+<td><strong>Paid</strong> (niche)</td>
+</tr>
+<tr>
+<td>17</td>
+<td><strong>Live chat with human reader</strong></td>
+<td>High (in India)</td>
+<td>Per-minute</td>
+<td>—</td>
+<td><strong>Paid per minute</strong></td>
+</tr>
+<tr>
+<td>18</td>
+<td><strong>Course / certification content</strong></td>
+<td>Low</td>
+<td>—</td>
+<td>Cohort-based</td>
+<td><strong>Paid</strong> (niche)</td>
+</tr>
+<tr>
+<td>19</td>
+<td><strong>Community / social feed</strong></td>
+<td>Medium (Western apps)</td>
+<td>Free</td>
+<td>—</td>
+<td><strong>Free</strong> (engagement lever)</td>
+</tr>
+<tr>
+<td>20</td>
+<td><strong>API / white-label B2B</strong></td>
+<td>Low (B2B only)</td>
+<td>—</td>
+<td>Per-call pricing</td>
+<td><strong>B2B</strong></td>
+</tr>
+</tbody>
+</table>
+<h2>2. What users actually pay for (the monetization pyramid)</h2>
+<pre><code>        ┌─────────────────────────┐
+        │  Live chat with human    │  AstroTalk-style, India only
+        │  reader (per-minute)     │  Not in scope for our solo founder
+        └─────────────────────────┘
+            ▲
+        ┌─────────────────────────┐
+        │  Full Map ₹3,499         │  ← Our top tier
+        │  (18-22 pages, deep-dive │     Demand validated by 6 paid pilots
+        │   career, relationships, │
+        │   10-year forecast,       │
+        │   auspicious dates)      │
+        └─────────────────────────┘
+            ▲
+        ┌─────────────────────────┐
+        │  Reading ₹1,499          │  ← Our anchor tier (default)
+        │  (10-12 pages, full      │     Most popular — 10–12 pages
+        │   natal reading)        │     maps to Western apps'
+        └─────────────────────────┘     $11.99 &quot;Your Year Ahead&quot;
+            ▲
+        ┌─────────────────────────┐
+        │  Spark ₹499              │  ← Our entry tier
+        │  (4-5 pages, snapshot +  │     Self-service, automated
+        │   year-ahead paragraph)  │     Top of funnel
+        └─────────────────────────┘
+            ▲
+        ┌─────────────────────────┐
+        │  Companion ₹799/month    │  ← Future (not yet built)
+        │  Quarterly check-in +    │     Recurring revenue, retention
+        │   monthly energetic      │
+        │   guidance               │
+        └─────────────────────────┘
+            ▲
+        ┌─────────────────────────┐
+        │  FREE: chart snapshot +  │  Top of funnel — drives
+        │  daily/weekly fortune +  │  awareness and Spark conversion
+        │  monthly outlook         │
+        └─────────────────────────┘
+</code></pre>
+<h2>3. User complaints (the things to actively avoid)</h2>
+<p>From UK/US astrology app data, these are the most common 1-star review triggers. We should design the product to avoid each one.</p>
+<ol>
+<li><strong>Recycled content becoming obvious.</strong> Long-term users notice when &quot;daily horoscopes&quot; repeat. → Personalize by day master, not by zodiac; surface genuinely different content each day.</li>
+<li><strong>Aggressive upsells disguised as horoscope previews.</strong> &quot;Your week is intense — unlock the full report to find out why!&quot; → Don't gate basic natal interpretation; gate only deep analysis.</li>
+<li><strong>Notification fatigue.</strong> Apps sending 2–3 push notifications per day get punished with 1-star reviews. → 1 high-quality notification per day, max.</li>
+<li><strong>Hidden auto-renewal.</strong> Subscription trials that auto-renew without warning. → No trial-to-paid traps; clear pricing, clear cancellation.</li>
+<li><strong>Manipulative notification copy.</strong> &quot;Big energy shift today, open to see!&quot; → Plain, classical-tradition language, not wellness-influencer copy.</li>
+<li><strong>Server outages on significant days.</strong> Retrogrades, eclipses, New Year — the day your app crashes is the day you lose paying users. → Architecture matters.</li>
+<li><strong>Refund denied on legitimately bad reports.</strong> Reading tier at ₹1,499 with content that doesn't resonate is a refund dispute waiting to happen. → Have a clear refund policy and honor it.</li>
+<li><strong>&quot;AI said my boyfriend is wrong for me.&quot;</strong> Generic interpretations that produce confidently-wrong claims damage trust. → The engine already marks [UNCERTAIN] and [ENGINE DRAFT — REVIEW REQUIRED] for exactly this reason. Keep the review step.</li>
+<li><strong>Predictions that don't come true.</strong> &quot;You will get married in 2026.&quot; → ASCI violation + trust damage. Always frame as tendencies.</li>
+<li><strong>Health / financial claims with no disclaimer.</strong> &quot;Your chart says you'll have a liver issue in 2027.&quot; → The CLAUDE.md ground rules forbid this regardless of platform.</li>
+</ol>
+<h2>4. Feature gaps in the current Saju codebase</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Status in codebase</th>
+<th>What to do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Four pillars calculation</strong></td>
+<td>✅ Built — 129 pytest cases pass</td>
+<td>Done.</td>
+</tr>
+<tr>
+<td><strong>십신 / 12운성 / 대운 / 신살 / strength heuristic</strong></td>
+<td>✅ Built</td>
+<td>Done.</td>
+</tr>
+<tr>
+<td><strong>Solar-term + solar-time + Korean 야자시 handling</strong></td>
+<td>✅ Built</td>
+<td>Done.</td>
+</tr>
+<tr>
+<td><strong>Natal chart snapshot (the &quot;free tier chart&quot;)</strong></td>
+<td>✅ Built (<code>generate_premium_report</code> chart-at-a-glance)</td>
+<td>Free with email gate.</td>
+</tr>
+<tr>
+<td><strong>Tiered reports Spark / Reading / Full Map</strong></td>
+<td>✅ Built</td>
+<td>Done.</td>
+</tr>
+<tr>
+<td><strong>Self-service PDF generation</strong></td>
+<td>✅ Built (<code>tools/client_intake_app.py</code>)</td>
+<td>Deploy.</td>
+</tr>
+<tr>
+<td><strong>PDF toolchain (reportlab + HTML/Playwright)</strong></td>
+<td>✅ Built</td>
+<td>Done.</td>
+</tr>
+<tr>
+<td><strong>Citation-grounded knowledge base</strong></td>
+<td>✅ Built (11 files)</td>
+<td>Done — the moat.</td>
+</tr>
+<tr>
+<td><strong>Intake form</strong></td>
+<td>✅ Built</td>
+<td>Deploy.</td>
+</tr>
+<tr>
+<td><strong>Daily / weekly / monthly fortune engine output</strong></td>
+<td>🟡 Partial — <code>sewoon.py</code> has daily/monthly overlay; not packaged for push delivery</td>
+<td><strong>Build</strong>: package as a daily-content engine.</td>
+</tr>
+<tr>
+<td><strong>Compatibility (궁합) analysis</strong></td>
+<td>❌ Missing</td>
+<td><strong>Build</strong> — single most-demanded feature in Korean Saju market.</td>
+</tr>
+<tr>
+<td><strong>Compatibility with multiple saved partners</strong></td>
+<td>❌ Missing</td>
+<td><strong>Defer</strong> to Companion subscription.</td>
+</tr>
+<tr>
+<td><strong>Push notifications / email delivery</strong></td>
+<td>❌ Missing</td>
+<td><strong>Build</strong> (Firebase Cloud Messaging + SendGrid/Resend).</td>
+</tr>
+<tr>
+<td><strong>User accounts / login / history</strong></td>
+<td>❌ Missing</td>
+<td><strong>Build</strong> — required for Companion and any retention loop.</td>
+</tr>
+<tr>
+<td><strong>Mobile app (Android)</strong></td>
+<td>❌ Missing</td>
+<td><strong>Build</strong> — see <code>07-app-platform-decision.md</code>.</td>
+</tr>
+<tr>
+<td><strong>Payment gateway (Razorpay / Stripe)</strong></td>
+<td>❌ Missing</td>
+<td><strong>Build</strong> — required for self-service.</td>
+</tr>
+<tr>
+<td><strong>Live human chat / marketplace</strong></td>
+<td>❌ Missing</td>
+<td><strong>Skip</strong> — wrong shape for solo founder.</td>
+</tr>
+<tr>
+<td><strong>Course / certification content</strong></td>
+<td>❌ Missing</td>
+<td><strong>Defer</strong> to month 18+.</td>
+</tr>
+<tr>
+<td><strong>API / B2B white-label</strong></td>
+<td>❌ Missing</td>
+<td><strong>Defer</strong> to month 24+.</td>
+</tr>
+<tr>
+<td><strong>Hindi language localization</strong></td>
+<td>❌ Missing</td>
+<td><strong>Defer</strong> to month 12+.</td>
+</tr>
+<tr>
+<td><strong>Korean language localization</strong></td>
+<td>❌ Missing</td>
+<td><strong>Defer</strong> — minor opportunity.</td>
+</tr>
+</tbody>
+</table>
+<h2>5. Where the existing codebase over-invests vs. under-invests</h2>
+<h3>Over-invests (gilding the lily for current scale)</h3>
+<ul>
+<li><strong>HTML/Playwright PDF backend</strong> — premium typography is nice but reportlab covers 95% of client perception. Keep both backends, but don't spend more engineering time on typography polish.</li>
+<li><strong>Grid / pattern detection (천간합 / 화격 / 종격)</strong> — useful for the [ENGINE DRAFT — REVIEW REQUIRED] notes, but few clients actually want to discuss 종격 candidates in their reading. The interpretive value is small.</li>
+<li><strong>Daily-luck (일운) overlay</strong> — academically interesting, but only ~1% of paying clients will ask for 일운 by name. Keep in skeleton; don't feature in marketing.</li>
+</ul>
+<h3>Under-invests (the actual product gaps)</h3>
+<ul>
+<li><strong>Compatibility analysis (궁합)</strong> — this is the <strong>single most-demanded feature in the Korean Saju market</strong>, and we have no implementation. The market signal is unambiguous. Build it next.</li>
+<li><strong>Daily-content packaging</strong> — the engine has all the data (daily pillar, monthly pillar, 세운, 월운, 일운), but no packaging for daily push / daily email. This is the <strong>retention gap</strong> — without daily content, there's no reason for a free user to convert to paid Companion.</li>
+<li><strong>User accounts + payment</strong> — without login, you can't build a subscription, can't store multiple partner comparisons, can't show a purchase history. This is the <strong>infrastructure gap</strong>.</li>
+<li><strong>Mobile app</strong> — without Android, the Indian + Korean diaspora audience can't discover and share the product organically.</li>
+</ul>
+<h2>6. Most-wanted features NOT to build (anti-feature list)</h2>
+<ol>
+<li><strong>Daily generic horoscope feed.</strong> &quot;Aries today: be careful with money.&quot; These are noise; they cheapen the brand.</li>
+<li><strong>Tarot readings.</strong> Out of scope per CLAUDE.md. Also cheapens the brand.</li>
+<li><strong>Dream interpretation (꿈해몽).</strong> Out of scope. Adds clutter.</li>
+<li><strong>Face reading (관상).</strong> Out of scope. Cannot be done without a photo, which raises privacy concerns.</li>
+<li><strong>Numerology / life-path numbers.</strong> Western numerology is a separate tradition; mixing dilutes the Korean 명리 positioning.</li>
+<li><strong>AI chatbot UX.</strong> 사주GPT, Aha Chat, and Palja Chat all do this. The chatbot UX is the lowest-quality interpretation possible. We should not compete here.</li>
+<li><strong>Per-minute chat marketplace.</strong> Requires a reader network. Cannot be built by solo founder.</li>
+<li><strong>Astro-shop (gemstones, yantras, rudraksha).</strong> Indian players monetize this well, but it's a separate business (inventory, fulfillment). Out of scope.</li>
+<li><strong>Live streaming / video consultations.</strong> Same reason as per-minute chat. Out of scope.</li>
+<li><strong>Generic &quot;Will I be rich?&quot; fortune-telling.</strong> Brand-killer. ASCI violation risk. Avoid.</li>
+</ol>
+<h2>7. Demand signal: what the 6 paid pilots actually bought</h2>
+<p>Looking at <code>candidates_horoscope/reports/</code> — what did the 6 paid pilot candidates actually ask for, beyond the base reading?</p>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>How many candidates asked</th>
+<th>Existing file</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Career / business / venture timing</td>
+<td><strong>6 of 6</strong></td>
+<td>career.md (5 candidates), cross-candidate-business-analysis.md</td>
+</tr>
+<tr>
+<td>Relationships / marriage / compatibility</td>
+<td>2 of 6 (Mahesh, Vishnu Priya)</td>
+<td>relationships.md</td>
+</tr>
+<tr>
+<td>Year-specific outlook</td>
+<td>0 explicit files (covered in base Full Map)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Current major luck (대운)</td>
+<td>0 explicit files (covered in base Full Map)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Health</td>
+<td>0</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Parenting / children</td>
+<td>0</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Relocation / geography</td>
+<td>0</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Compatibility with a specific named person</td>
+<td>0 explicit, but asked verbally in 2 cases</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Insight:</strong> Career / business / venture timing is <strong>the dominant paid use case</strong> for this audience. Compatibility with named partners is the second-most demanded, and it's currently delivered verbally without a dedicated file. The base reading already covers year-outlook and current-대운 in the Full Map tier — the additional-file upsell isn't needed there.</p>
+<h2>8. Recommendations</h2>
+<h3>Build now (months 1–6)</h3>
+<ol>
+<li><strong>Web app intake → payment → PDF download pipeline.</strong> Spark (₹499) self-service. Razorpay integration.</li>
+<li><strong>Compatibility (궁합) deep-dive</strong> as a paid add-on (₹999 standalone or ₹499 bundled into Reading+).</li>
+<li><strong>Daily-content engine</strong> — emails &quot;today's pillar&quot; with a personalized one-paragraph reading for free users.</li>
+<li><strong>Push notifications</strong> for free users: &quot;today is a 丙 day, your Day Master — favorable for launching.&quot;</li>
+<li><strong>Android PWA</strong> (see <code>07-app-platform-decision.md</code>).</li>
+</ol>
+<h3>Build later (months 7–18)</h3>
+<ol start="6">
+<li><strong>Companion subscription (₹799/month)</strong> — quarterly check-in + monthly energetic guidance.</li>
+<li><strong>User accounts + purchase history + saved partners.</strong></li>
+<li><strong>Hindi language localization.</strong></li>
+<li><strong>Compatibility deep-dive with multiple saved partners.</strong></li>
+</ol>
+<h3>Build much later (months 19–36)</h3>
+<ol start="10">
+<li><strong>Course / certification</strong> — &quot;Introduction to Korean 명리&quot; paid cohort course for serious enthusiasts.</li>
+<li><strong>API / B2B white-label</strong> — license the engine + report generator to other astrology platforms.</li>
+<li><strong>iOS native app</strong> — only after Android demand is validated.</li>
+</ol>
+<h3>Skip entirely</h3>
+<ul>
+<li>Tarot, dream interpretation, face reading, numerology, AI chatbot UX, per-minute chat marketplace, gemstone shop, live video consultations, generic fortune-telling features.</li>
+</ul>
+<h2>9. Sources</h2>
+<ul>
+<li><a href="https://electroiq.com/stats/astrology-app-statistics/">ElectroIQ: Astrology App Statistics 2026</a></li>
+<li><a href="https://vedika.io/blog/astrology-saas-business-guide">Vedika: Profitable Astrology SaaS Guide</a></li>
+<li><a href="https://unstar.app/blog/co-star-sanctuary-pattern-nebula-stellium-astrology-apps-ranked-2026">Unstar: 5 Astrology Apps Ranked 2026</a></li>
+<li><a href="https://appark.ai/en/blog/market-insights-best-astrology-app-2026-growth-analysis">ApPark: Best Astrology App 2026 Data Analysis</a></li>
+<li><a href="https://bestechsols.co.uk/astrology-app-statistics-uk/">BestTechSols: UK Astrology App Stats 2026</a></li>
+<li><a href="https://astrologytechinsights.com/bazi-monetization-2025">Astrology Tech Insights: BaZi monetization 2025</a></li>
+<li><a href="https://redseer.com/articles/astro-tech-cosmic-trends-digital-era/">Redseer: Astro-Tech trends</a></li>
+<li><a href="https://preprod.indianexpress.com/article/lifestyle/why-gen-z-is-turning-to-astrology-apps-to-find-solutions-to-life-problems-10031516/">Indian Express: Gen Z + astrology apps</a></li>
+<li><a href="https://numrovani.com/ai-astrology-2025-mid-year-study/">NumroVani: AI Astrology 2025 Consumer Trends</a></li>
+<li><a href="https://economictimes.indiatimes.com/tech/startups/astrotalk-rides-online-astrology-boom-to-double-fy24-revenue-to-rs-651-crore/articleshow/113500403.cms">The Economic Times: AstroTalk FY24</a></li>
+</ul>
+
+    
+<nav class="toc" style="margin-top:48px;font-size:14px;">
+  <div style="display:flex;justify-content:space-between;gap:12px;">
+    <div><a href="03-competitor-landscape.html">← Doc 03: Competitor Landscape</a></div>
+    <div><a href="combined.html">↑ Combined report</a></div>
+    <div><a href="05-audience-demographics.html">Doc 05: Audience Demographics →</a></div>
+  </div>
+</nav>
+</main>
+    <footer class="foot">
+      Saju market research · generated 2026-06-28 · /
+      <a href="https://github.com/anthropics/skills">no external dependencies beyond markdown-it-py</a>
+    </footer>
+  </div>
+</body>
+</html>

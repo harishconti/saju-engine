@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>App Platform Decision</title>
+  <style>
+:root {
+  --brand: #2b3a55;
+  --brand-soft: #4a5d7e;
+  --accent: #b48a3a;
+  --bg: #fbfaf6;
+  --bg-soft: #f3efe6;
+  --ink: #1d2330;
+  --ink-soft: #4a5060;
+  --rule: #d9d3c4;
+  --code-bg: #efe9da;
+  --table-stripe: #f6f1e3;
+  --max-w: 880px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.55;
+  font-size: 17px;
+}
+.wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 56px 32px 96px;
+}
+header.cover {
+  border-bottom: 2px solid var(--brand);
+  padding-bottom: 28px;
+  margin-bottom: 40px;
+}
+header.cover .eyebrow {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+}
+header.cover h1 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  font-size: 38px;
+  line-height: 1.15;
+  margin: 8px 0 12px;
+  color: var(--brand);
+}
+header.cover .sub {
+  color: var(--ink-soft);
+  font-size: 16px;
+  font-style: italic;
+}
+header.cover .meta {
+  margin-top: 18px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+}
+nav.toc {
+  background: var(--bg-soft);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brand);
+  padding: 22px 28px 24px;
+  margin: 0 0 48px;
+  border-radius: 2px;
+}
+nav.toc h2 {
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand-soft);
+  margin: 0 0 14px;
+  font-weight: 600;
+}
+nav.toc ol {
+  margin: 0;
+  padding-left: 22px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 14.5px;
+}
+nav.toc li { margin: 5px 0; }
+nav.toc a { color: var(--brand); text-decoration: none; }
+nav.toc a:hover { text-decoration: underline; }
+nav.toc .doc-num {
+  display: inline-block;
+  width: 28px;
+  color: var(--accent);
+  font-weight: 600;
+}
+h1, h2, h3, h4 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Cambria", "Georgia", serif;
+  color: var(--brand);
+  line-height: 1.25;
+  margin: 1.6em 0 0.6em;
+}
+h1 { font-size: 30px; border-bottom: 1px solid var(--rule); padding-bottom: 0.25em; }
+h2 { font-size: 24px; }
+h3 { font-size: 19px; color: var(--brand-soft); }
+h4 { font-size: 16px; color: var(--brand-soft); text-transform: uppercase; letter-spacing: 0.05em; }
+p { margin: 0.6em 0 1em; }
+a { color: var(--brand); }
+ul, ol { padding-left: 24px; }
+li { margin: 4px 0; }
+strong { color: var(--ink); }
+em { color: var(--ink-soft); }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.5em 0; }
+code {
+  background: var(--code-bg);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: "SF Mono", "Consolas", "Menlo", monospace;
+  font-size: 0.92em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 14px 16px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 14px;
+  border-left: 3px solid var(--accent);
+}
+pre code { background: none; padding: 0; }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1.2em 0;
+  padding: 4px 16px;
+  color: var(--ink-soft);
+  background: var(--bg-soft);
+  font-style: italic;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.2em 0;
+  font-size: 14.5px;
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+}
+th, td {
+  border: 1px solid var(--rule);
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--brand);
+  color: #fbfaf6;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+tbody tr:nth-child(even) { background: var(--table-stripe); }
+.footnote-ref { font-size: 0.8em; vertical-align: super; }
+.footnotes { margin-top: 3em; border-top: 1px solid var(--rule); padding-top: 1em; font-size: 14px; }
+footer.foot {
+  margin-top: 64px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  font-family: "Helvetica Neue", "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+@media print {
+  body { background: white; font-size: 11pt; }
+  .wrap { padding: 24px; max-width: none; }
+  nav.toc { page-break-after: always; }
+  h1, h2 { page-break-after: avoid; }
+  table { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    
+<header class="cover">
+  <div class="eyebrow">Market Research · Document 07 of 11</div>
+  <h1>App Platform Decision</h1>
+</header>
+
+    
+    <main>
+<p><strong>Date:</strong> 2026-06-26
+<strong>Scope:</strong> Which app surface (web app, Android, iOS, PWA, hybrid) is the right primary delivery vehicle for the Saju product, given the audience, the existing codebase, the cost of building, and the platform economics.</p>
+<hr />
+<h2>1. The question, sharply</h2>
+<p>Given the existing toolchain (Python engine + FastAPI self-service app + reportlab/Playwright PDF backends + intake form) and the target audience (India + Korean diaspora + global Hallyu-curious), <strong>what is the right primary product surface for the next 12 months</strong>?</p>
+<p>The options on the table:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Initial cost</th>
+<th>Time to launch</th>
+<th>Maintenance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Web app only (responsive)</strong></td>
+<td>Improve the existing FastAPI app into a full SaaS web app</td>
+<td>₹50k–1.5L</td>
+<td>4–8 weeks</td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>B. PWA (Progressive Web App)</strong></td>
+<td>Responsive web app + manifest + offline + push</td>
+<td>₹1–3L</td>
+<td>6–10 weeks</td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>C. PWA + Capacitor wrap → Android Play Store</strong></td>
+<td>Web app wrapped as Android app</td>
+<td>₹2–4L</td>
+<td>8–12 weeks</td>
+<td>Low-medium</td>
+</tr>
+<tr>
+<td><strong>D. Native Android (Kotlin/Java)</strong></td>
+<td>Custom Android app</td>
+<td>₹5–15L</td>
+<td>12–20 weeks</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>E. Native iOS (Swift)</strong></td>
+<td>Custom iOS app</td>
+<td>₹8–20L</td>
+<td>12–20 weeks</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>F. React Native + Expo (single codebase, both platforms)</strong></td>
+<td>JS/TS cross-platform</td>
+<td>₹3–8L</td>
+<td>10–16 weeks</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>G. Flutter</strong></td>
+<td>Dart cross-platform</td>
+<td>₹3–8L</td>
+<td>12–18 weeks</td>
+<td>Medium</td>
+</tr>
+</tbody>
+</table>
+<h2>2. The audience signals</h2>
+<p>The audience (from <code>05-audience-demographics.md</code>) gives a clear answer about device preference:</p>
+<table>
+<thead>
+<tr>
+<th>Market</th>
+<th>Primary device</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>India Tier-1</td>
+<td><strong>Android (80%+)</strong></td>
+<td>Android phone first, laptop second. iPhone is premium-segment. ~70–75% of Indian smartphone shipments are Android.</td>
+</tr>
+<tr>
+<td>India Tier-2/3</td>
+<td><strong>Android (90%+)</strong></td>
+<td>Budget Android dominates.</td>
+</tr>
+<tr>
+<td>Korean diaspora US</td>
+<td>iPhone (~60–65%)</td>
+<td>Higher iPhone penetration than India. Korean-American income skews high.</td>
+</tr>
+<tr>
+<td>Korean diaspora CA/AU/UK</td>
+<td>iPhone (~55–65%)</td>
+<td>Similar to US.</td>
+</tr>
+<tr>
+<td>Global Hallyu-curious Gen Z</td>
+<td>Mixed (Android 50/50)</td>
+<td>Roughly even split; Android stronger in SEA, iPhone stronger in West.</td>
+</tr>
+<tr>
+<td>Older Korean diaspora (50+)</td>
+<td>iPhone + desktop</td>
+<td>Less mobile-app engagement; email + desktop preferred.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Implication:</strong> if we ship Android first, we capture India (the largest market by volume) and ~50% of Hallyu-curious Gen Z. If we ship iOS first, we capture Korean diaspora (the highest-LTV market). <strong>The right answer is &quot;both eventually, but Android first&quot; — because India is the volume play and Korean diaspora is reachable on web + email even without an iOS app.</strong></p>
+<h2>3. Cost &amp; ROI analysis (realistic, India-based)</h2>
+<h3>Option A: Web app only (responsive)</h3>
+<p><strong>Initial cost:</strong> ₹50k–1.5L (existing FastAPI app + responsive CSS + payment integration + user accounts)</p>
+<p><strong>Time to launch:</strong> 4–8 weeks</p>
+<p><strong>Strengths:</strong></p>
+<ul>
+<li>Reuses existing Python codebase (engine, PDF generation, intake).</li>
+<li>One codebase, accessible everywhere.</li>
+<li>SEO-friendly (organic Google traffic is huge for astrology content).</li>
+<li>No app store friction (no review, no 30% cut).</li>
+<li>Razorpay / Stripe work directly without IAP fees.</li>
+</ul>
+<p><strong>Weaknesses:</strong></p>
+<ul>
+<li>No app store presence (no discovery via Play Store search).</li>
+<li>No push notifications (web push is limited, requires permission).</li>
+<li>Lower perceived &quot;app-ness&quot; — Indian users associate paid astrology with apps.</li>
+</ul>
+<p><strong>Verdict:</strong> The right <strong>starting point</strong>. Ship a polished web app first; the app store can come later.</p>
+<h3>Option B: PWA</h3>
+<p><strong>Additional cost over web app:</strong> ₹50k–2L (manifest, service worker, offline cache, install banner, push setup).</p>
+<p><strong>Strengths:</strong></p>
+<ul>
+<li>Same as web app, but installable (adds to home screen).</li>
+<li>Push notifications work in modern browsers.</li>
+<li>Slightly better retention than pure web.</li>
+</ul>
+<p><strong>Weaknesses:</strong></p>
+<ul>
+<li>Push notifications are limited vs. native (Safari support is patchy).</li>
+<li>App store discovery still absent.</li>
+<li>Play Store now accepts PWAs but with caveats.</li>
+</ul>
+<p><strong>Verdict:</strong> A small upgrade to Option A. Worth doing.</p>
+<h3>Option C: PWA + Capacitor wrap → Android Play Store</h3>
+<p><strong>Additional cost over Option B:</strong> ₹1–2L (Capacitor setup, signing key, store listing, Play Console account).</p>
+<p><strong>Time to launch:</strong> 8–12 weeks (after web app is solid).</p>
+<p><strong>Strengths:</strong></p>
+<ul>
+<li>Real Android app in Play Store.</li>
+<li>Same codebase as web app — single engineering effort.</li>
+<li>Lower cost than native (60–80% cheaper per multiple sources).</li>
+<li>Play Store discoverability for India + global.</li>
+</ul>
+<p><strong>Weaknesses:</strong></p>
+<ul>
+<li>Apple sometimes flags WebView apps as &quot;just a wrapped website&quot; and rejects from App Store.</li>
+<li>Performance is slightly worse than native.</li>
+<li>Plugin ecosystem covers ~80% of native APIs.</li>
+</ul>
+<p><strong>Verdict:</strong> <strong>The recommended Year-1 Android strategy.</strong> Cheap, fast, real Play Store presence.</p>
+<h3>Option D: Native Android (Kotlin)</h3>
+<p><strong>Initial cost:</strong> ₹5–15L (full native build).</p>
+<p><strong>Time to launch:</strong> 12–20 weeks.</p>
+<p><strong>Strengths:</strong></p>
+<ul>
+<li>Best Android performance and UX.</li>
+<li>Best integration with Android-specific features.</li>
+<li>Most flexible for future native features.</li>
+</ul>
+<p><strong>Weaknesses:</strong></p>
+<ul>
+<li>Expensive for solo founder.</li>
+<li>Long time to launch.</li>
+<li>India-specific Android dev talent is available but expensive for senior level.</li>
+<li>Most features in the Saju product don't need native performance.</li>
+</ul>
+<p><strong>Verdict:</strong> <strong>Skip for Year 1.</strong> Reconsider in Year 2 if PWA-Capacitor shows performance issues.</p>
+<h3>Option E: Native iOS (Swift)</h3>
+<p><strong>Initial cost:</strong> ₹8–20L.</p>
+<p><strong>Time to launch:</strong> 12–20 weeks.</p>
+<p><strong>Strengths:</strong></p>
+<ul>
+<li>iPhone-only audience (Korean diaspora) feels premium.</li>
+<li>Apple ecosystem is friendlier to subscription apps.</li>
+</ul>
+<p><strong>Weaknesses:</strong></p>
+<ul>
+<li>Most expensive platform.</li>
+<li>Smallest addressable audience (iPhone-skewing).</li>
+<li>Cannot reuse Python codebase.</li>
+</ul>
+<p><strong>Verdict:</strong> <strong>Defer until Year 2 minimum.</strong> The addressable Korean-diaspora iOS audience (~250k addressable) does not justify ₹8–20L Year 1 spend.</p>
+<h3>Option F: React Native + Expo</h3>
+<p><strong>Initial cost:</strong> ₹3–8L.</p>
+<p><strong>Time to launch:</strong> 10–16 weeks.</p>
+<p><strong>Strengths:</strong></p>
+<ul>
+<li>Single codebase for iOS + Android.</li>
+<li>Expo managed workflow gets to TestFlight in 48 hours.</li>
+<li>Free OTA updates via Expo Updates.</li>
+<li>Largest India dev talent pool (~50k+) for hiring.</li>
+<li>RevenueCat integration is straightforward.</li>
+<li>Razorpay SDK has React Native wrappers.</li>
+</ul>
+<p><strong>Weaknesses:</strong></p>
+<ul>
+<li>Native feel slightly lower than Swift/Kotlin.</li>
+<li>Performance ceiling below native.</li>
+<li>Slight learning curve for someone coming from web.</li>
+<li>App Store commission on subscriptions (15–30%) is unavoidable.</li>
+</ul>
+<p><strong>Verdict:</strong> <strong>Best Year-2+ option if iOS becomes necessary.</strong> For Year 1, Capacitor is cheaper.</p>
+<h3>Option G: Flutter</h3>
+<p><strong>Initial cost:</strong> ₹3–8L.</p>
+<p><strong>Time to launch:</strong> 12–18 weeks.</p>
+<p><strong>Strengths:</strong></p>
+<ul>
+<li>Highest cross-platform consistency (pixel-perfect).</li>
+<li>Best animation performance.</li>
+<li>Strong typing via Dart.</li>
+</ul>
+<p><strong>Weaknesses:</strong></p>
+<ul>
+<li>Smallest India dev pool (~15–20k).</li>
+<li>Higher dev replacement risk if founder hires and they leave.</li>
+<li>No OTA updates.</li>
+<li>Dart learning curve.</li>
+</ul>
+<p><strong>Verdict:</strong> <strong>Skip.</strong> The Saju product is content-heavy, not animation-heavy. Flutter's strengths don't apply here.</p>
+<h2>4. Recommended phased rollout</h2>
+<h3>Phase 1 — Months 1–4: Web app + PWA</h3>
+<p><strong>Ship:</strong> A polished responsive web app at a custom domain. Convert the existing FastAPI self-service calculator (<code>tools/client_intake_app.py</code>) into a full SaaS product with:</p>
+<ul>
+<li>Landing page (SEO-optimized for &quot;Korean Saju reading&quot; keywords).</li>
+<li>Pricing page (three tiers + future Companion).</li>
+<li>Intake form (already exists at <code>tools/client_intake_app.html</code>).</li>
+<li>Payment via Razorpay (India) + Stripe (international).</li>
+<li>User accounts (email + passwordless magic link).</li>
+<li>Spark self-service automated end-to-end.</li>
+<li>Reading and Full Map: hand-delivered by the founder with 48–72 hour SLA.</li>
+</ul>
+<p><strong>Cost:</strong> ₹50k–1.5L. <strong>Time:</strong> 4–8 weeks.</p>
+<h3>Phase 2 — Months 5–8: Compatibility + Companion scaffolding</h3>
+<p><strong>Ship:</strong></p>
+<ul>
+<li>Compatibility (궁합) product — paid add-on.</li>
+<li>Daily-content engine (free daily horoscope email + push via web push).</li>
+<li>&quot;Year ahead&quot; reminder email each December.</li>
+<li>Companion subscription infrastructure (accounts + billing).</li>
+</ul>
+<p><strong>Cost:</strong> ₹1.5–3L (mostly engineering time).</p>
+<h3>Phase 3 — Months 9–12: Capacitor wrap → Android Play Store</h3>
+<p><strong>Ship:</strong></p>
+<ul>
+<li>Android app on Play Store, built by wrapping the PWA via Capacitor.</li>
+<li>Play Store listing optimized with screenshots, Korean + English description, ASO.</li>
+<li>App rating / review system.</li>
+</ul>
+<p><strong>Cost:</strong> ₹1–2L. <strong>Time:</strong> 4–6 weeks.</p>
+<h3>Phase 4 — Year 2: iOS via Capacitor (or React Native)</h3>
+<p><strong>Decision point:</strong> evaluate Android metrics. If Android has 10k+ installs and 4★+ rating, wrap for iOS via Capacitor. If Android is below threshold, defer iOS to Year 3.</p>
+<p><strong>Cost:</strong> ₹2–4L (additional). <strong>Time:</strong> 8–12 weeks.</p>
+<h2>5. Why NOT React Native or Flutter for Year 1</h2>
+<ol>
+<li><strong>Existing Python codebase.</strong> The Saju engine is Python. Wrapping a web app via Capacitor reuses the Python backend as-is. Switching to React Native or Flutter means rewriting the entire frontend in a new stack.</li>
+<li><strong>Solo founder economics.</strong> A solo founder needs to ship in weeks, not months. Capacitor + web app is the fastest path to a real app store presence.</li>
+<li><strong>The product is content-heavy, not animation-heavy.</strong> Flutter's main advantage (animation, pixel-perfect consistency) doesn't apply. React Native's main advantage (native UI components) doesn't apply either — the Saju product is mostly text + chart + table.</li>
+<li><strong>India dev pool is largest for React Native</strong> (50k+) but the founder is solo — they aren't hiring Year 1.</li>
+</ol>
+<h2>6. The app store commission question</h2>
+<p>Google Play and Apple App Store take <strong>15–30%</strong> of digital subscription revenue. This is the single biggest reason to launch as a web app first.</p>
+<table>
+<thead>
+<tr>
+<th>Monetization</th>
+<th>Web (Razorpay/Stripe)</th>
+<th>Play Store</th>
+<th>App Store</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>One-time report (Spark ₹499)</td>
+<td><strong>2% fee</strong></td>
+<td>15% fee on IAP, 0% on web-purchased subscription</td>
+<td>15% fee on IAP, 0% on web-purchased subscription</td>
+</tr>
+<tr>
+<td>Reading / Full Map one-time</td>
+<td><strong>2% fee</strong></td>
+<td>15% fee on IAP</td>
+<td>15% fee on IAP</td>
+</tr>
+<tr>
+<td>Subscription (Companion ₹799/mo)</td>
+<td><strong>2% fee</strong></td>
+<td>15% (year 1) → 30% (renewal, after first year)</td>
+<td>15% (year 1) → 30% (renewal)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Apple's &quot;reader app&quot; carve-out</strong> allows web-purchased subscriptions to bypass IAP — but Apple has been tightening this and is hostile to &quot;app that exists only to push users to web.&quot;</p>
+<p><strong>Recommended approach:</strong> sell on the web app for the first 12 months. The Android app on Play Store should sell the same products, with the 15% fee absorbed as cost-of-acquisition. Don't sell on iOS until the audience justifies the 30% commission.</p>
+<h2>7. Specific technology picks</h2>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Pick</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Frontend framework</strong></td>
+<td><strong>Next.js 14+ (React, App Router)</strong></td>
+<td>Already JS-friendly, SEO-friendly, PWA support built-in, Capacitor-wrap-ready.</td>
+</tr>
+<tr>
+<td><strong>Styling</strong></td>
+<td><strong>Tailwind CSS + shadcn/ui</strong></td>
+<td>Modern, accessible, fast to iterate.</td>
+</tr>
+<tr>
+<td><strong>Backend</strong></td>
+<td><strong>FastAPI (existing Python)</strong></td>
+<td>Already running.</td>
+</tr>
+<tr>
+<td><strong>Auth</strong></td>
+<td><strong>Clerk or Supabase Auth</strong></td>
+<td>Magic-link + social login out of the box; minimal code.</td>
+</tr>
+<tr>
+<td><strong>Payment (India)</strong></td>
+<td><strong>Razorpay</strong></td>
+<td>Indian market standard. UPI + cards + netbanking + wallets.</td>
+</tr>
+<tr>
+<td><strong>Payment (international)</strong></td>
+<td><strong>Stripe</strong></td>
+<td>Standard global.</td>
+</tr>
+<tr>
+<td><strong>Email</strong></td>
+<td><strong>Resend or Postmark</strong></td>
+<td>Transactional + marketing.</td>
+</tr>
+<tr>
+<td><strong>Push notifications</strong></td>
+<td><strong>Firebase Cloud Messaging (FCM)</strong></td>
+<td>Free, works on web + Android.</td>
+</tr>
+<tr>
+<td><strong>File storage</strong></td>
+<td><strong>AWS S3 or Cloudflare R2</strong></td>
+<td>For PDF storage.</td>
+</tr>
+<tr>
+<td><strong>Hosting</strong></td>
+<td><strong>Railway / Render / Fly.io</strong></td>
+<td>Cheap, FastAPI-friendly.</td>
+</tr>
+<tr>
+<td><strong>DB</strong></td>
+<td><strong>PostgreSQL</strong></td>
+<td>Standard.</td>
+</tr>
+<tr>
+<td><strong>Capacitor plugins</strong></td>
+<td><strong>@capacitor/push-notifications, @capacitor/in-app-browser, @capacitor/preferences</strong></td>
+<td>For Android wrap.</td>
+</tr>
+<tr>
+<td><strong>Analytics</strong></td>
+<td><strong>Plausible or PostHog</strong></td>
+<td>Privacy-friendly.</td>
+</tr>
+</tbody>
+</table>
+<h2>8. The &quot;should we build a native app from Day 1&quot; trap</h2>
+<p>Many first-time founders believe they need a native app. The data says otherwise for content-heavy spiritual products:</p>
+<ul>
+<li><strong>Co-Star launched in 2017 as iOS only.</strong> They didn't launch Android until 2020.</li>
+<li><strong>AstroTalk launched as Android-first in 2017.</strong> They have an iOS app too, but Android is the dominant platform.</li>
+<li><strong>The Pattern, Sanctuary, Chani</strong> all launched iOS-first; Android was added later.</li>
+<li><strong>AstroSage</strong> is Android-first with a relatively weak iOS app.</li>
+</ul>
+<p><strong>The pattern is clear:</strong> no competitor launched both platforms on Day 1. All started with one platform, validated, then expanded.</p>
+<h2>9. The decision</h2>
+<p><strong>Recommendation: Web app + PWA first (Phase 1 + 2), then Capacitor-wrap for Android (Phase 3).</strong></p>
+<ul>
+<li>This minimizes Year 1 spend (₹50k–1.5L for web + ₹1–2L for Android wrap = ₹1.5–3.5L total).</li>
+<li>Reuses the existing Python engine and FastAPI self-service calculator.</li>
+<li>Captures the Indian Tier-1 audience (the largest market) on the web, and the rest of the audience via web + email.</li>
+<li>Delays iOS until Year 2+ when the audience justifies the spend.</li>
+</ul>
+<p><strong>Do NOT:</strong></p>
+<ul>
+<li>Build a native iOS or Android app in Year 1.</li>
+<li>Use Flutter or React Native for Year 1.</li>
+<li>Use Capacitor without first having a solid PWA underneath.</li>
+</ul>
+<h2>10. Sources</h2>
+<ul>
+<li><a href="https://www.raftlabs.com/blog/how-to-build-astrology-app">Raft Labs: How to Build an Astrology App</a></li>
+<li><a href="https://thedebuggersitsolutions.com/blog/cross-platform-app-2026-flutter-react-native-capacitor">The Debuggers: Flutter vs React Native vs Capacitor 2026</a></li>
+<li><a href="https://levelup.gitconnected.com/react-native-vs-capacitor-a52aa9778e3b">Bret Cameron: React Native vs Capacitor</a></li>
+<li><a href="https://www.vibereference.com/frontend/mobile-app-frameworks">VibeReference: Mobile App Frameworks</a></li>
+<li><a href="https://www.buildbyravirai.com/blog/flutter-vs-react-native-indian-startups-2026/">Ravi Rai: Flutter vs React Native India 2026</a></li>
+<li><a href="https://nextnative.dev/blog/capacitor-vs-react-native">NextNative: Capacitor vs React Native 2025</a></li>
+<li><a href="https://www.cbinsights.com/company/co-star-astrology-society/financials">CB Insights: Co-Star financials</a></li>
+<li><a href="https://rev.now/app/ios/co-star-personalized-astrology-82561/">Rev.now: Co-Star revenue</a></li>
+<li><a href="https://preprod.indianexpress.com/article/lifestyle/why-gen-z-is-turning-to-astrology-apps-to-find-solutions-to-life-problems-10031516/">Indian Express: Gen Z + astrology apps</a></li>
+<li>Existing project: <a href="../../tools/client_intake_app.py">tools/client_intake_app.py</a></li>
+<li>Existing project: <a href="../../pyproject.toml">pyproject.toml</a></li>
+</ul>
+
+    
+<nav class="toc" style="margin-top:48px;font-size:14px;">
+  <div style="display:flex;justify-content:space-between;gap:12px;">
+    <div><a href="06-monetization-strategy.html">← Doc 06: Monetization Strategy</a></div>
+    <div><a href="combined.html">↑ Combined report</a></div>
+    <div><a href="08-marketing-strategy.html">Doc 08: Marketing Strategy →</a></div>
+  </div>
+</nav>
+</main>
+    <footer class="foot">
+      Saju market research · generated 2026-06-28 · /
+      <a href="https://github.com/anthropics/skills">no external dependencies beyond markdown-it-py</a>
+    </footer>
+  </div>
+</body>
+</html>

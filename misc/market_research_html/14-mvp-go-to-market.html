@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MVP Go-to-Market Strategy — Saju Manual Delivery</title>
+<style>
+:root {
+  --cream: #faf6ed;
+  --paper: #fffdf6;
+  --ink: #1a2238;
+  --ink-soft: #3a4258;
+  --brass: #b08c4a;
+  --brass-deep: #8a6a30;
+  --line: #e5dcc4;
+  --line-soft: #efe8d5;
+  --accent: #6a4a2a;
+  --fire: #c84a3a;
+  --earth: #b08c4a;
+  --metal: #c8c2b0;
+  --water: #3a5a8a;
+  --wood: #5a8a4a;
+  --shadow: 0 1px 3px rgba(26,34,56,0.08), 0 6px 16px rgba(26,34,56,0.05);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Georgia', 'Cambria', serif;
+  background: var(--cream);
+  color: var(--ink);
+  line-height: 1.65;
+  font-size: 17px;
+}
+.container { max-width: 920px; margin: 0 auto; padding: 56px 32px 96px; }
+@media (max-width: 720px) { .container { padding: 32px 18px 64px; font-size: 16px; } }
+
+/* Cover */
+.cover {
+  border-bottom: 2px solid var(--brass);
+  padding-bottom: 40px;
+  margin-bottom: 48px;
+}
+.eyebrow {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--brass-deep);
+  margin-bottom: 16px;
+}
+h1 {
+  font-size: 44px;
+  line-height: 1.15;
+  margin-bottom: 20px;
+  letter-spacing: -0.01em;
+}
+@media (max-width: 720px) { h1 { font-size: 32px; } }
+.subtitle {
+  font-size: 20px;
+  color: var(--ink-soft);
+  font-style: italic;
+  margin-bottom: 24px;
+}
+.meta {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 13px;
+  color: var(--ink-soft);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.meta span strong { color: var(--ink); font-weight: 600; }
+
+/* Typography */
+h2 {
+  font-size: 28px;
+  margin-top: 56px;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+  letter-spacing: -0.005em;
+}
+@media (max-width: 720px) { h2 { font-size: 23px; } }
+h3 {
+  font-size: 21px;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--ink);
+}
+h4 {
+  font-size: 16px;
+  margin-top: 22px;
+  margin-bottom: 8px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+p { margin-bottom: 14px; }
+strong { color: var(--ink); font-weight: 700; }
+em { color: var(--ink-soft); }
+a { color: var(--brass-deep); text-decoration: none; border-bottom: 1px dotted var(--brass); }
+a:hover { border-bottom-style: solid; }
+
+/* Thesis callout */
+.thesis {
+  background: var(--paper);
+  border-left: 4px solid var(--brass);
+  padding: 24px 28px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+  border-radius: 0 8px 8px 0;
+}
+.thesis-label {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--brass-deep);
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+/* Flow diagrams */
+.flow {
+  background: var(--paper);
+  padding: 24px;
+  border-radius: 8px;
+  margin: 24px 0;
+  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  border: 1px solid var(--line);
+  overflow-x: auto;
+  white-space: pre;
+  color: var(--ink-soft);
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0 28px;
+  background: var(--paper);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  font-size: 15px;
+}
+th {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 12px 14px;
+  text-align: left;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--line-soft);
+  vertical-align: top;
+}
+tbody tr:nth-child(even) { background: rgba(176,140,74,0.04); }
+tbody tr:last-child td { border-bottom: none; }
+td code {
+  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  background: var(--cream);
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+/* Code blocks */
+pre {
+  background: var(--ink);
+  color: #e8e2d0;
+  padding: 20px 22px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 18px 0;
+  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  box-shadow: var(--shadow);
+}
+pre .comment { color: #8a8470; font-style: italic; }
+pre .flag { color: #c8a868; }
+pre .str { color: #a8c890; }
+
+/* Inline code */
+code {
+  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+  font-size: 0.92em;
+  background: var(--cream);
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: var(--accent);
+  border: 1px solid var(--line-soft);
+}
+
+/* Lists */
+ul, ol { margin: 12px 0 18px 24px; }
+li { margin-bottom: 6px; }
+li strong { color: var(--ink); }
+
+/* Checklists */
+.checklist { list-style: none; margin-left: 0; padding-left: 0; }
+.checklist li {
+  position: relative;
+  padding-left: 32px;
+  margin-bottom: 10px;
+}
+.checklist li::before {
+  content: "☐";
+  position: absolute;
+  left: 0;
+  color: var(--brass);
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+/* Channel cards */
+.channel {
+  background: var(--paper);
+  padding: 24px 28px;
+  border-radius: 8px;
+  margin: 20px 0;
+  box-shadow: var(--shadow);
+  border-left: 4px solid var(--brass);
+}
+.channel.tier1 { border-left-color: var(--fire); }
+.channel.tier2 { border-left-color: var(--earth); }
+.channel.tier3 { border-left-color: var(--water); }
+.channel-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.channel-tier {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: var(--brass);
+  color: var(--cream);
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-weight: 700;
+}
+.channel.tier1 .channel-tier { background: var(--fire); }
+.channel.tier2 .channel-tier { background: var(--earth); }
+.channel.tier3 .channel-tier { background: var(--water); }
+
+/* Pricing card */
+.pricing-card {
+  background: linear-gradient(135deg, var(--paper) 0%, var(--cream) 100%);
+  border: 2px solid var(--brass);
+  border-radius: 12px;
+  padding: 32px;
+  margin: 32px 0;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.pricing-amount {
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--brass-deep);
+  margin: 12px 0;
+  font-family: 'Georgia', serif;
+}
+.pricing-amount-sub { font-size: 24px; color: var(--ink-soft); }
+
+/* Decision matrix */
+.decision-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+.decision-cell {
+  background: var(--paper);
+  padding: 20px;
+  border-radius: 8px;
+  border-top: 3px solid var(--brass);
+  box-shadow: var(--shadow);
+}
+.decision-cell.warn { border-top-color: var(--fire); }
+.decision-cell.go { border-top-color: var(--wood); }
+.decision-cell h4 {
+  margin-top: 0;
+  color: var(--accent);
+  font-size: 13px;
+}
+
+/* Sources footer */
+.sources {
+  margin-top: 64px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.sources h3 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+}
+.sources ul { list-style: none; padding-left: 0; }
+.sources li { margin-bottom: 6px; }
+.sources code { font-size: 12px; }
+
+/* Print */
+@media print {
+  body { background: white; font-size: 11pt; }
+  .container { padding: 24px; max-width: 100%; }
+  h1 { font-size: 24pt; }
+  h2 { font-size: 16pt; page-break-after: avoid; }
+  h3 { font-size: 13pt; page-break-after: avoid; }
+  pre, table { page-break-inside: avoid; }
+  .thesis, .channel, .pricing-card { box-shadow: none; border: 1px solid var(--line); }
+}
+
+/* Math callouts */
+.math {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin: 20px 0;
+}
+.math-cell {
+  background: var(--paper);
+  padding: 18px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  text-align: center;
+}
+.math-amount {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--brass-deep);
+  margin-bottom: 4px;
+}
+.math-label {
+  font-size: 12px;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+}
+
+/* Don't-list */
+.dont { color: var(--fire); font-weight: 600; }
+.do { color: var(--wood); font-weight: 600; }
+
+blockquote {
+  background: var(--paper);
+  border-left: 3px solid var(--line);
+  padding: 12px 20px;
+  margin: 16px 0;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+/* TOC */
+.toc {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 24px 28px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.toc h4 {
+  margin-top: 0;
+  margin-bottom: 14px;
+  color: var(--ink);
+  font-size: 13px;
+}
+.toc ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  columns: 2;
+  column-gap: 32px;
+}
+@media (max-width: 720px) { .toc ol { columns: 1; } }
+.toc li { margin-bottom: 6px; break-inside: avoid; }
+.toc a { color: var(--ink-soft); border-bottom: none; }
+.toc a:hover { color: var(--brass-deep); }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ============== COVER ============== -->
+<header class="cover">
+  <div class="eyebrow">Market Research · Strategy 14</div>
+  <h1>MVP Go-to-Market Strategy</h1>
+  <p class="subtitle">Korean Saju Manual Delivery — First 200 Customers Without a Web App</p>
+  <div class="meta">
+    <span><strong>Date:</strong> 2026-06-26</span>
+    <span><strong>Scope:</strong> Instagram + Landing page + Razorpay + This Engine</span>
+    <span><strong>Time to first sale:</strong> 8–14 days</span>
+    <span><strong>Tooling cost:</strong> ~₹1,500 one-time + 2% per sale</span>
+  </div>
+</header>
+
+<!-- ============== TOC ============== -->
+<nav class="toc">
+  <h4>Table of Contents</h4>
+  <ol>
+    <li><a href="#thesis">0. The thesis</a></li>
+    <li><a href="#workflow">1. MVP workflow</a></li>
+    <li><a href="#pricing">2. Pricing — one product</a></li>
+    <li><a href="#commands">3. The exact manual workflow</a></li>
+    <li><a href="#channels">4. How to get clients</a></li>
+    <li><a href="#funnel">5. The 1-page funnel</a></li>
+    <li><a href="#leadmagnet">6. Free lead magnet</a></li>
+    <li><a href="#checklist">7. Day 1–14 checklist</a></li>
+    <li><a href="#graduate">8. When to graduate</a></li>
+    <li><a href="#content">9. 30 Reels in 30 days</a></li>
+    <li><a href="#experiments">10. Pricing experiments</a></li>
+    <li><a href="#assets">11. Existing assets to use</a></li>
+    <li><a href="#risks">12. Risks and mitigations</a></li>
+    <li><a href="#metrics">13. Success metrics</a></li>
+    <li><a href="#action">14. What to do this week</a></li>
+    <li><a href="#privacy">15. Privacy &amp; separation</a></li>
+    <li><a href="#landingpage">16. Landing page path (recommended)</a></li>
+  </ol>
+</nav>
+
+<!-- ============== 0. THESIS ============== -->
+<section id="thesis">
+<div class="thesis">
+  <div class="thesis-label">The thesis in one paragraph</div>
+  <p><strong>Don't build the web app until customers are paying you.</strong> The architecture research describes a 12-week build of FastAPI + Postgres + Razorpay + Vercel + Next.js + Clerk + Google Play RTDN. That's the right <em>eventual</em> shape. But none of it is needed for the first 200 customers — those can be served with Instagram Reels + a simple landing page + Razorpay Payment Links + this repo's existing engine + Gmail. Total tooling cost: <strong>~₹1,500 one-time + 2% per sale</strong>. <strong>Recommended path:</strong> the landing page (see §16). Validate demand first, automate second.</p>
+</div>
+</section>
+
+<!-- ============== 1. WORKFLOW ============== -->
+<section id="workflow">
+<h2>1. MVP Workflow (no code, no app)</h2>
+
+<div class="flow">Customer sees Instagram Reel
+        │
+        ▼
+Clicks bio link (WhatsApp or Google Form)
+        │
+        ▼
+Fills intake (name, DOB, time, location)
+        │
+        ▼
+You send Razorpay Payment Link via WhatsApp
+        │
+        ▼
+Customer pays ₹1,499
+        │
+        ▼
+You run 2 commands (chart + PDF) — 5 min
+        │
+        ▼
+You personalize the engine draft — 15-20 min
+        │
+        ▼
+You email + WhatsApp the PDF
+        │
+        ▼
+You ask for testimonial (offer ₹200 off next reading)</div>
+
+<p><strong>Time per customer:</strong> 25–35 minutes. <strong>Tooling cost:</strong> ₹0/mo + Razorpay 2% per transaction.</p>
+
+<table>
+  <thead>
+    <tr><th>Tool</th><th>Use</th><th>Cost</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Instagram business account</td><td>Discovery + funnel</td><td>Free</td></tr>
+    <tr><td>WhatsApp Business</td><td>Intake + delivery</td><td>Free</td></tr>
+    <tr><td>Google Form (optional)</td><td>Structured intake</td><td>Free</td></tr>
+    <tr><td>Razorpay Payment Links</td><td>No-code checkout</td><td>Free + 2% per txn</td></tr>
+    <tr><td>Gmail</td><td>PDF delivery</td><td>Free</td></tr>
+    <tr><td><code>tools/saju_engine/</code></td><td>Chart calculation</td><td>Already built</td></tr>
+    <tr><td><code>tools/build-pdf.sh</code></td><td>PDF rendering</td><td>Already built</td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ============== 2. PRICING ============== -->
+<section id="pricing">
+<h2>2. Pricing — Simplify to ONE Product</h2>
+
+<p>The 3-tier structure (<em>Spark / Reading / Full Map</em>) was designed for an automated web app where customers self-serve. For manual delivery, <strong>one product is enough</strong> until you have evidence of demand breadth.</p>
+
+<div class="pricing-card">
+  <h3 style="margin-top:0">The Reading</h3>
+  <div class="pricing-amount">₹1,499</div>
+  <p style="margin-bottom:0"><strong>10–12 page premium PDF</strong> — Day Master, Career & Wealth, Relationships, Health, 대운 timing, Practical Guidance</p>
+  <p style="margin-top:16px;font-size:14px;color:var(--ink-soft)">Delivery via WhatsApp + email within 24–48h · 1 free follow-up question within 30 days</p>
+</div>
+
+<h3>What this price point means</h3>
+<ul>
+  <li><strong>₹1,499</strong> is high enough for <em>serious margin</em> even at 25 min/customer (effective rate ≈ ₹3,600/hr)</li>
+  <li>Low enough for <em>impulse conversion</em> on Instagram after a strong Reel</li>
+  <li>Comparable to mid-tier Indian astrology products (Anytime Astro, Astroyogi consultations run ₹500–2,000)</li>
+  <li>Anchors future pricing (when you add <em>Full Map</em> at ₹3,499, customers see it as premium)</li>
+</ul>
+
+<h3>What to NOT sell yet</h3>
+<ul>
+  <li><span class="dont">❌ Spark (₹499)</span> — eats your time at this delivery rate, customers who want cheap aren't your tribe</li>
+  <li><span class="dont">❌ Full Map (₹3,499)</span> — needs founder review depth you can't sustain at &lt;50 customers</li>
+  <li><span class="dont">❌ Companion subscription (₹799/mo)</span> — needs web dashboard, save for Phase 5</li>
+  <li><span class="dont">❌ 궁합 compatibility (₹999 standalone)</span> — add as add-on after 50 customers</li>
+</ul>
+
+<h3>Volume math</h3>
+<div class="math">
+  <div class="math-cell">
+    <div class="math-amount">2/wk</div>
+    <div class="math-label">Slow start · ₹12K/mo</div>
+  </div>
+  <div class="math-cell">
+    <div class="math-amount">5/wk</div>
+    <div class="math-label">Healthy · ₹29K/mo</div>
+  </div>
+  <div class="math-cell">
+    <div class="math-amount">10/wk</div>
+    <div class="math-label">Scaling · ₹59K/mo</div>
+  </div>
+</div>
+
+<p><strong>5 customers/week × ₹1,499 = ₹30k/week ≈ ₹15L/year.</strong> That's serious side income.</p>
+</section>
+
+<!-- ============== 3. COMMANDS ============== -->
+<section id="commands">
+<h2>3. The Exact Manual Workflow (Copy-Paste Ready)</h2>
+
+<p>Once a customer pays, here's the literal command sequence for a placeholder name "Priya Sharma":</p>
+
+<h3>Step 1: Build the chart + premium markdown (1 min)</h3>
+<pre>$ cd /mnt/data2/git_repos/saju
+
+$ python -m saju_engine \
+    --name "Priya Sharma" \
+    --dob 1992-08-15 \
+    --time 14:30 \
+    --location "Mumbai, IN" \
+    --utc-offset-min 330 \
+    --gender female \
+    --format premium \
+    --tier reading \
+    --output-file candidates_horoscope/reports/priya-sharma/priya-sharma-report.md</pre>
+
+<p>This generates the 10–12 page markdown draft marked <code>[ENGINE DRAFT — REVIEW REQUIRED]</code>.</p>
+
+<h3>Step 2: Review + personalize (15–20 min)</h3>
+<ol>
+  <li>Open <code>candidates_horoscope/reports/priya-sharma/priya-sharma-report.md</code></li>
+  <li>Read through the engine-drafted prose</li>
+  <li>Refine each section using your <code>CLAUDE.md</code> rules + <code>knowledge/</code> citations</li>
+  <li>Replace any placeholders with concrete personalization</li>
+  <li>Remove <code>[ENGINE DRAFT — REVIEW REQUIRED]</code> markers</li>
+  <li>Add a personal note at the top (1–2 lines about why their chart stood out to you)</li>
+</ol>
+
+<h3>Step 3: Render PDF (30 sec)</h3>
+<pre>$ ./tools/build-pdf.sh priya-sharma</pre>
+<p>Outputs <code>priya-sharma-report.pdf</code> next to the <code>.md</code>.</p>
+
+<h3>Step 4: Deliver (5 min)</h3>
+
+<h4>Email template</h4>
+<pre>Subject: Your Korean Saju Reading — Priya ✨
+
+Hi Priya,
+
+Your Reading is attached. The PDF covers your Day Master,
+your major luck periods running out to age 60, and the
+elements that support you.
+
+Quick highlights:
+- Your Day Master is [丙] (the Sun) — [one-line insight]
+- Your favorable element is [Earth] — [one practical recommendation]
+- Your next major luck shift is in [year] — [one-line preview]
+
+If anything resonates (or doesn't), reply to this email or
+WhatsApp me within 30 days — one follow-up question is included.
+
+Wishing you clarity,
+[Your name]</pre>
+
+<h4>WhatsApp message</h4>
+<pre>🌙 Priya, your Reading is ready.
+
+📧 Sent to your email just now.
+📎 Also attached here for easy reading on phone.
+
+A few highlights you'll find inside:
+• Day Master [丙] — what that means for how you lead
+• Your favorable element + how to use it
+• Your next 10 years of major luck shifts
+
+One free follow-up question within 30 days — just message here.
+
+Thanks for trusting me with your chart 🙏</pre>
+
+<h3>Step 5: Ask for testimonial (2 min)</h3>
+<p>After 24h, send:</p>
+<pre>🙏 One small ask, Priya:
+
+If anything in the Reading resonated, I'd love a 2-line
+testimonial (just your first name + city is fine). It helps
+others decide.
+
+In return, ₹200 off your next reading or follow-up question.
+
+No pressure either way!</pre>
+
+<h3>Total time per customer</h3>
+<table>
+  <thead>
+    <tr><th>Step</th><th>Time</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Step 1: Generate</td><td>1 min</td></tr>
+    <tr><td>Step 2: Personalize</td><td>15–20 min</td></tr>
+    <tr><td>Step 3: Render PDF</td><td>30 sec</td></tr>
+    <tr><td>Step 4: Deliver</td><td>5 min</td></tr>
+    <tr><td>Step 5: Testimonial ask</td><td>2 min</td></tr>
+    <tr><td><strong>Total</strong></td><td><strong>25–30 min</strong></td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ============== 4. CHANNELS ============== -->
+<section id="channels">
+<h2>4. How to Get Clients — Channels Ranked by ROI</h2>
+
+<h3>Tier 1: Free + Fast Feedback (Week 1–4)</h3>
+
+<div class="channel tier1">
+  <div class="channel-header">
+    <span class="channel-tier">Tier 1A · Primary</span>
+    <h3 style="margin:0">Instagram Reels</h3>
+  </div>
+  <p><strong>Why Instagram:</strong> Highest concentration of astrology-interested women 22–45 in urban India. Reels reach non-followers via Explore. WhatsApp click-to-chat in bio is frictionless.</p>
+
+  <h4>Hook formulas (proven for astrology niche)</h4>
+  <ul>
+    <li>"Your Day Master reveals how you handle stress" — universal appeal</li>
+    <li>"What's your 천간 (Heavenly Stem)? Comment your birth year" — engagement bait</li>
+    <li>"Day Master 丙 = The Sun. Here's what that means" — educational</li>
+    <li>"Your birth month reveals your zodiac animal — but Day Master is more accurate"</li>
+    <li>"5 things a Korean Saju reader knows that you don't" — listicle</li>
+  </ul>
+
+  <h4>Production recipe (30–60 sec)</h4>
+  <ol>
+    <li><strong>Hook</strong> (0–3 sec): bold claim or question on screen</li>
+    <li><strong>Voiceover/text</strong> (3–25 sec): the insight</li>
+    <li><strong>Visual</strong>: chart screenshot from your engine output, or simple animated text</li>
+    <li><strong>CTA</strong> (last 5 sec): "Get your Reading — link in bio"</li>
+  </ol>
+
+  <h4>Posting frequency</h4>
+  <p>3–4 Reels/week. Daily is better but burns you out. Consistency beats volume.</p>
+
+  <h4>Hashtags (mix of broad + niche)</h4>
+  <pre>#koreansaju #bazi #fourpillars #fourpillarsofdestiny
+#사주 #koreanastrology #indianastrology #zodiac
+#astrology #daymaster #odiac #odiac
+#spirituality #mindfulness #selfdiscovery</pre>
+</div>
+
+<div class="channel tier1">
+  <div class="channel-header">
+    <span class="channel-tier">Tier 1B</span>
+    <h3 style="margin:0">WhatsApp Status (daily, free)</h3>
+  </div>
+  <p>Your existing contacts are your first 100 potential customers. They already trust you.</p>
+  <h4>Daily status ideas</h4>
+  <ul>
+    <li>Quote-of-the-day from <code>knowledge/</code> (e.g., "甲木 people grow best when rooted — that's why your environment matters more than your effort")</li>
+    <li>Behind-the-scenes: "Just finished a Reading for a 丙 day master — her career chapter for the next decade is going to surprise her"</li>
+    <li>Testimonial (with permission, screenshot from chat)</li>
+    <li>Countdown: "5 Reading slots open this week"</li>
+    <li>Day Master spotlight series: post about one Day Master per week, all 10 over 10 weeks</li>
+  </ul>
+</div>
+
+<div class="channel tier1">
+  <div class="channel-header">
+    <span class="channel-tier">Tier 1C</span>
+    <h3 style="margin:0">YouTube Shorts (repurpose Reels)</h3>
+  </div>
+  <p>Same video, uploaded to YouTube Shorts. Doubles your surface area with zero extra work. YouTube search drives long-tail traffic for years.</p>
+</div>
+
+<h3>Tier 2: Build Your Portfolio (Week 1–2, before charging)</h3>
+
+<div class="channel tier2">
+  <div class="channel-header">
+    <span class="channel-tier">Tier 2A · Critical</span>
+    <h3 style="margin:0">5 Free Pilot Readings</h3>
+  </div>
+  <p><strong>This is the single most important step.</strong> Before you charge anyone, deliver 5 free readings to friends/family and collect 5 testimonials.</p>
+  <p><strong>Why 5:</strong> One testimonial is an anecdote. Five is a pattern. Five diverse charts let you claim "I've read charts for software engineers, teachers, mothers, students, and business owners."</p>
+
+  <h4>Pilot selection criteria</h4>
+  <ul>
+    <li>Mix of ages (different 대운 stages)</li>
+    <li>Mix of genders</li>
+    <li>Mix of professions</li>
+    <li>Different Day Masters (so you can showcase variety)</li>
+    <li>People who will give honest feedback, not just "wow amazing"</li>
+  </ul>
+
+  <h4>What to ask in exchange</h4>
+  <ul>
+    <li>Written testimonial (3 lines minimum): their name, city, biggest insight from the reading</li>
+    <li>Permission to share anonymized chart snippets</li>
+    <li>Video testimonial (bonus, ₹200 credit): 30-second selfie testimonial</li>
+  </ul>
+
+  <h4>Deliver the FULL premium experience</h4>
+  <p>Same engine output, same 15-min personalization, same email template, same WhatsApp message. <strong>Don't cut corners — the pilot is your template.</strong></p>
+
+  <h4>Store outputs in</h4>
+  <pre>candidates_horoscope/case-studies/
+  ├── 01-pilot-software-engineer-bangalore.md
+  ├── 02-pilot-teacher-mumbai.md
+  ├── 03-pilot-mother-delhi.md
+  ├── 04-pilot-student-pune.md
+  └── 05-pilot-business-owner-hyderabad.md</pre>
+  <p>These become anonymized content for Reels, social proof in your bio link, and validation that your workflow works.</p>
+</div>
+
+<div class="channel tier2">
+  <div class="channel-header">
+    <span class="channel-tier">Tier 2B</span>
+    <h3 style="margin:0">Reddit (low-frequency, high-quality)</h3>
+  </div>
+  <ul>
+    <li>Subreddits: r/astrology, r/BaZi, r/IndianAstrology, r/spirituality</li>
+    <li>2–3 genuine comments/week answering questions about Day Masters, 용신, etc.</li>
+    <li>Link in profile (NOT in comments — gets you banned)</li>
+    <li>Position as practitioner, not promoter</li>
+    <li>Over time, builds E-E-A-T for SEO</li>
+  </ul>
+</div>
+
+<div class="channel tier2">
+  <div class="channel-header">
+    <span class="channel-tier">Tier 2C</span>
+    <h3 style="margin:0">Quora (long-term SEO)</h3>
+  </div>
+  <ul>
+    <li>Answer: "What is Korean Saju?", "What does my Day Master mean?", "How is Korean Saju different from Vedic astrology?"</li>
+    <li>2,000+ word answers with charts and examples</li>
+    <li>Link to your Instagram/WhatsApp in profile</li>
+    <li>Old answers keep driving traffic for years (passive lead gen)</li>
+  </ul>
+</div>
+
+<h3>Tier 3: Paid Marketing (after 20+ customers)</h3>
+
+<div class="channel tier3">
+  <div class="channel-header">
+    <span class="channel-tier">Tier 3A</span>
+    <h3 style="margin:0">Instagram / Facebook Ads</h3>
+  </div>
+  <p><strong>Only start when:</strong> 5+ testimonials, organic Reels getting &gt;1k views, free lead magnet in place.</p>
+
+  <h4>Budget</h4>
+  <p>₹500–1,000/day test. Scale to ₹2k/day once cost-per-lead is &lt;₹100.</p>
+
+  <h4>Funnel</h4>
+  <ol>
+    <li>Ad: "Your Day Master reveals your stress pattern — free sample inside"</li>
+    <li>Landing page: free "Day Master one-pager" PDF in exchange for email</li>
+    <li>Email sequence: 3 emails over 7 days with insights + CTA to paid Reading</li>
+    <li>WhatsApp: closer for ₹1,499 sale</li>
+  </ol>
+
+  <h4>Targeting</h4>
+  <ul>
+    <li>India, 22–45</li>
+    <li>Female-skewed (60F/40M based on astrology app demographics)</li>
+    <li>Interests: tarot, astrology, spirituality, mindfulness, self-improvement</li>
+    <li>Lookalike audiences based on your WhatsApp contact list (after 100+)</li>
+  </ul>
+</div>
+
+<h3>Channels to SKIP for now</h3>
+<ul>
+  <li><span class="dont">❌ Twitter/X</span> — wrong audience for this niche in India</li>
+  <li><span class="dont">❌ LinkedIn</span> — wrong demographic, too professional for astrology</li>
+  <li><span class="dont">❌ TikTok</span> — banned in India</li>
+  <li><span class="dont">❌ Google Ads</span> — too expensive for unproven funnel, save for Phase 5</li>
+  <li><span class="dont">❌ Pinterest</span> — wrong demographic for paid astrology</li>
+  <li><span class="dont">❌ Telegram</span> — works for crypto, not for this niche in India</li>
+  <li><span class="dont">❌ Own website/blog</span> — premature; Instagram bio link is enough</li>
+</ul>
+</section>
+
+<!-- ============== 5. FUNNEL ============== -->
+<section id="funnel">
+<h2>5. The 1-Page Funnel — Minimum Viable Landing Page</h2>
+
+<p>You don't need a website yet. Two options, pick based on volume.</p>
+
+<h3>Option A: WhatsApp-only (Day 1, recommended to start)</h3>
+
+<h4>Instagram bio</h4>
+<pre>🌙 Korean Saju (사주) Readings
+📜 Classical tradition · 경락고요 · 적천수
+✨ Get your Reading → WhatsApp below
+📩 DM for free Day Master sample</pre>
+
+<h4>WhatsApp click-to-chat URL format</h4>
+<pre>https://wa.me/91XXXXXXXXXX?text=Hi%2C%20I%27d%20like%20a%20Korean%20Saju%20Reading</pre>
+
+<h4>Auto-reply (set up in WhatsApp Business)</h4>
+<pre>🌙 Thanks for reaching out!
+
+To prepare your Korean Saju Reading, I need:
+
+1. Full name
+2. Date of birth (DD/MM/YYYY)
+3. Exact birth time (or "approximate")
+4. Birth city
+5. Gender
+
+I'll send you a payment link within a few hours.
+Reading delivered in 24-48h as a beautiful PDF.
+
+✨ Free Day Master sample available — just ask!</pre>
+
+<h4>When they reply with details</h4>
+<pre>Perfect, thank you 🌙
+
+Your Reading covers:
+• Day Master portrait
+• Career & wealth chapter
+• Relationships & compatibility style
+• Health tendencies
+• Major luck periods (next 10-20 years)
+• Practical guidance + favorable elements
+
+Price: ₹1,499
+Delivery: 24-48h after payment
+
+I'll send the Razorpay payment link in a moment.</pre>
+
+<h4>After payment confirmed</h4>
+<pre>Payment received — thank you 🙏
+
+Your Reading is in progress. I'll send it within 24-48h
+via email + WhatsApp.
+
+If you have a specific question you'd like me to address,
+let me know now.</pre>
+
+<h3>Option B: Google Form (Day 3, when getting 3+ DMs/day)</h3>
+<p>Create form with fields: Full name, Date of birth, Birth time, Birth city, Gender, Email, Relationship status (optional), "What's your main question for the Reading?" (text area). Auto-saves to Google Sheets. Set up email notification. You follow up on WhatsApp with payment link.</p>
+
+<p><strong>Recommendation:</strong> Start with Option A. Graduate to Option B once you're getting 3+ DMs/day or starting to forget details.</p>
+</section>
+
+<!-- ============== 6. LEAD MAGNET ============== -->
+<section id="leadmagnet">
+<h2>6. Free Lead Magnet — The Day Master One-Pager</h2>
+
+<p>Before customers pay ₹1,499, give them a taste. A 1-page PDF for free.</p>
+
+<h3>Generate it</h3>
+<pre>$ cd /mnt/data2/git_repos/saju
+
+# For a real lead (use their actual birth data)
+$ python -m saju_engine \
+    --name "Lead Name" \
+    --dob 1990-06-15 \
+    --time 10:30 \
+    --location "Delhi, IN" \
+    --utc-offset-min 330 \
+    --format spark \
+    --tier spark \
+    --output-file /tmp/day-master-sample.md
+
+$ ./tools/build-pdf.sh /tmp/day-master-sample.md</pre>
+<p>Or use the existing candidate reports as samples (anonymized).</p>
+
+<h3>Use it as</h3>
+<ul>
+  <li><strong>Instagram DM response</strong> when someone says "I'm interested but not sure": "Let me send you a free sample so you can see what you get"</li>
+  <li><strong>Lead magnet for ads</strong> (later, Phase Tier 3)</li>
+  <li><strong>Email attachment</strong> for "Is this for me?" leads</li>
+  <li><strong>WhatsApp broadcast</strong> to your status viewers (occasional, not spammy)</li>
+</ul>
+
+<h3>What to include in the sample</h3>
+<ul>
+  <li>Their Day Master in 한자 (e.g., <em>丙火</em>)</li>
+  <li>One-line Day Master description (e.g., "丙 = The Sun — bright, generous, visionary")</li>
+  <li>Element balance mini-chart</li>
+  <li>One teaser insight (e.g., "Your favorable element is Earth — grounding will help you most")</li>
+  <li>CTA: "Want the full 12-page Reading? ₹1,499 → WhatsApp +91-XXXXXXXXXX"</li>
+</ul>
+<p>This works because it gives value upfront (they learn something real about themselves) AND shows what the paid product looks like.</p>
+</section>
+
+<!-- ============== 7. CHECKLIST ============== -->
+<section id="checklist">
+<h2>7. Operational Checklist (Day 1 → Day 14)</h2>
+
+<h3>Day 1–2: Setup</h3>
+<ul class="checklist">
+  <li>Create Instagram business account (use your existing personal if you have one)</li>
+  <li>Set up Linktree with WhatsApp link (free)</li>
+  <li>Set up WhatsApp Business with auto-reply (free)</li>
+  <li>Draft the DM intake script (copy from §5 above)</li>
+  <li>Create Razorpay Payment Link template (₹1,499, "Korean Saju Reading")</li>
+  <li>Save all scripts to <code>templates/</code> folder in this repo</li>
+  <li>Take 3 photos of yourself (for Instagram profile + first posts)</li>
+  <li>Write a short bio (50–80 words)</li>
+</ul>
+
+<h3>Day 3–5: Free pilots</h3>
+<ul class="checklist">
+  <li>Pick 5 friends/family — diverse ages, charts, professions</li>
+  <li>Generate 5 readings using the engine (use real birth data)</li>
+  <li>Spend 20 min each personalizing (no shortcuts on pilots)</li>
+  <li>Deliver PDFs to pilots, ask for written testimonials</li>
+  <li>Collect: name, city, biggest insight from the reading, optional 30-sec video</li>
+  <li>Save testimonials in <code>candidates_horoscope/case-studies/</code> (anonymize if needed)</li>
+</ul>
+
+<h3>Day 6–7: Portfolio + first posts</h3>
+<ul class="checklist">
+  <li>Create <code>candidates_horoscope/case-studies/</code> folder with 5 anonymized pilot summaries</li>
+  <li>Post 3 Reels:
+    <ul>
+      <li>Reel 1: Hook "What is Korean Saju?" — educational, 45 sec</li>
+      <li>Reel 2: Highlight one pilot's Day Master insight (with permission, anonymized)</li>
+      <li>Reel 3: Behind-the-scenes — your reading setup, engine output, PDF render</li>
+    </ul>
+  </li>
+  <li>Update bio with first testimonial snippet</li>
+  <li>Send WhatsApp broadcast to your contacts: "I now offer Korean Saju Readings 🌙"</li>
+</ul>
+
+<h3>Day 8–10: First paid customer</h3>
+<ul class="checklist">
+  <li>Someone DMs you → you run the workflow (§3) → deliver within 48h</li>
+  <li>Ask for video testimonial (offer ₹200 off next reading)</li>
+  <li>Post the testimonial Reel (with permission, blur their face if they prefer)</li>
+  <li>Note what worked: which Reel drove the DM? Which hook converted? Double down.</li>
+</ul>
+
+<h3>Day 11–14: Iterate</h3>
+<ul class="checklist">
+  <li>2–3 more paid customers</li>
+  <li>Notice: which Reels get DMs? Double down on those hooks</li>
+  <li>Notice: where do customers get stuck in payment? Fix the link flow</li>
+  <li>Notice: which Day Masters do people ask about most? Make those Reels</li>
+  <li>Adjust pricing if conversion is too low (test ₹999 vs ₹1,499 with different cohorts)</li>
+</ul>
+
+<h3>Day 15–30: 20-customer milestone</h3>
+<ul class="checklist">
+  <li>If you have 5+ customers/week → keep going, hire a part-time reader</li>
+  <li>If you have 1–2/week → tweak hooks, try different content, ask pilots for referrals</li>
+  <li>If you have 0 → reassess pricing or positioning, consider niching down</li>
+</ul>
+
+<h3>Day 30+: Decision point</h3>
+<p>After 30 days and 10+ paid customers, evaluate against the 3 graduation signals (§8).</p>
+</section>
+
+<!-- ============== 8. GRADUATE ============== -->
+<section id="graduate">
+<h2>8. When to Graduate to the Full Architecture</h2>
+
+<p><strong>Don't build the web app until you see ALL 3 signals:</strong></p>
+
+<table>
+  <thead>
+    <tr><th>Signal</th><th>Threshold</th><th>Why it matters</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Consistent demand</strong></td><td>5+ paid customers/week for 4 weeks straight</td><td>Proves product-market fit. Worth the 12-week build.</td></tr>
+    <tr><td><strong>Manual time bottleneck</strong></td><td>Spending 20+ hrs/week on delivery</td><td>Proves automation ROI. Your time is the limiting factor.</td></tr>
+    <tr><td><strong>Quality holds</strong></td><td>Refund/complaint rate &lt;10%</td><td>Proves the engine + your personalization scales.</td></tr>
+  </tbody>
+</table>
+
+<h3>Decision matrix</h3>
+<div class="decision-grid">
+  <div class="decision-cell warn">
+    <h4>0 of 3 signals</h4>
+    <p>Keep manual. Don't build.</p>
+  </div>
+  <div class="decision-cell">
+    <h4>1 of 3 (usually just demand)</h4>
+    <p>Keep manual, optimize the workflow. Build a Google Form.</p>
+  </div>
+  <div class="decision-cell">
+    <h4>2 of 3 (demand + bottleneck)</h4>
+    <p>Hire a part-time reader. Defer the app.</p>
+  </div>
+  <div class="decision-cell go">
+    <h4>All 3 of 3</h4>
+    <p>Start the architecture plan (Phase 1 of <code>13-architecture-saju-web-cosmicid.md</code>).</p>
+  </div>
+</div>
+
+<blockquote><strong>Hard rule:</strong> Do NOT spend 12 weeks building the web app until you've validated that customers pay at ₹1,499 for a Korean Saju Reading delivered via WhatsApp.</blockquote>
+</section>
+
+<!-- ============== 9. CONTENT ============== -->
+<section id="content">
+<h2>9. Content Ideas — 30 Reels in 30 Days</h2>
+
+<h3>Week 1: Educational (build authority)</h3>
+<ol>
+  <li>"Korean Saju vs Chinese BaZi — what's the difference?"</li>
+  <li>"What is a Day Master?" (60-second explainer)</li>
+  <li>"The 5 elements in 60 seconds"</li>
+  <li>"Why your birth TIME matters more than your birth DATE"</li>
+</ol>
+
+<h3>Week 2: Hooks (drive DMs)</h3>
+<ol start="5">
+  <li>"Comment your birth year — I'll tell you your Day Master"</li>
+  <li>"Day Master 丙 = The Sun. Here's what that means for you"</li>
+  <li>"Day Master 壬 = The Ocean. The deepest of all stems"</li>
+  <li>"If you were born in [month], your zodiac animal is [X] — but your Day Master is more accurate"</li>
+</ol>
+
+<h3>Week 3: Testimonials (social proof)</h3>
+<ol start="9">
+  <li>Pilot 1's biggest insight (anonymized)</li>
+  <li>Pilot 2's biggest insight (anonymized)</li>
+  <li>Pilot 3 video testimonial (with permission)</li>
+  <li>"5 readings, 5 life paths — what I learned"</li>
+</ol>
+
+<h3>Week 4: Behind-the-scenes (build trust)</h3>
+<ol start="13">
+  <li>"How I read a chart — the 5-step process"</li>
+  <li>"What's inside a Korean Saju Reading" (PDF walkthrough)</li>
+  <li>"Why I quote 경락고요 and 적천수"</li>
+  <li>"The difference between a Saju reader and a fortune teller"</li>
+</ol>
+
+<h3>Bonus days (29–30): Deep dives</h3>
+<ol start="17">
+  <li>"용신 — your favorable element, explained"</li>
+  <li>"What 'major luck periods' actually mean for your 20s, 30s, 40s"</li>
+  <li>"Korean Saju vs Vedic astrology — which is more accurate?"</li>
+  <li>"궁합 — how compatibility actually works in classical Saju"</li>
+</ol>
+</section>
+
+<!-- ============== 10. EXPERIMENTS ============== -->
+<section id="experiments">
+<h2>10. Pricing Experiments to Consider</h2>
+
+<p>After 10 customers, you'll have data. Consider:</p>
+
+<table>
+  <thead>
+    <tr><th>Experiment</th><th>Hypothesis</th><th>How to test</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Price ₹999 vs ₹1,499</td>
+      <td>Lower price = more volume but lower quality leads</td>
+      <td>A/B test with two different Reels</td>
+    </tr>
+    <tr>
+      <td>Add ₹499 follow-up question</td>
+      <td>Existing customers want more depth</td>
+      <td>Just ask — offer once, see uptake</td>
+    </tr>
+    <tr>
+      <td>Year-end "year-ahead" Reading ₹999</td>
+      <td>December is peak astrology interest</td>
+      <td>Test in November</td>
+    </tr>
+    <tr>
+      <td>Couples 궁합 ₹1,999</td>
+      <td>Couples buy together</td>
+      <td>Test after 30 single customers</td>
+    </tr>
+  </tbody>
+</table>
+<p><strong>Don't run more than one experiment at a time.</strong> You'll lose attribution.</p>
+</section>
+
+<!-- ============== 11. ASSETS ============== -->
+<section id="assets">
+<h2>11. Existing Assets You Already Have</h2>
+
+<p>Quick wins sitting in your repo:</p>
+
+<table>
+  <thead>
+    <tr><th>Asset</th><th>Location</th><th>Use</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>5+ real candidate charts</td>
+      <td><code>candidates_horoscope/</code></td>
+      <td>Anonymize for case studies</td>
+    </tr>
+    <tr>
+      <td>12운성 tables</td>
+      <td><code>knowledge/06-twelve-stages.md</code></td>
+      <td>"Day Master explainer" Reel content</td>
+    </tr>
+    <tr>
+      <td>Prose scaffold drafts</td>
+      <td><code>tools/saju_engine/prose_scaffold.py</code></td>
+      <td>Cuts your personalization time</td>
+    </tr>
+    <tr>
+      <td>Combine tool</td>
+      <td><code>tools/combine_candidate_report.py</code></td>
+      <td>Add follow-up topics as paid add-ons</td>
+    </tr>
+    <tr>
+      <td>HTML/Playwright PDF backend</td>
+      <td><code>tools/md_to_saju_html_pdf.py</code></td>
+      <td>Premium-looking PDFs for paying customers</td>
+    </tr>
+    <tr>
+      <td>Tiered premium generator</td>
+      <td><code>tools/saju_engine/premium_report.py</code></td>
+      <td>Already does the 9-section layout</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>You already have everything needed to deliver the ₹1,499 Reading.</strong> The architecture plan only adds automation, not new product capability.</p>
+</section>
+
+<!-- ============== 12. RISKS ============== -->
+<section id="risks">
+<h2>12. Risks and Mitigations</h2>
+
+<table>
+  <thead>
+    <tr><th>Risk</th><th>Likelihood</th><th>Mitigation</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>No customers in first 30 days</td><td>Medium</td><td>Iterate hooks, ask pilots for referrals, try Reddit</td></tr>
+    <tr><td>Customers complain about generic advice</td><td>Medium</td><td>Always personalize — never send raw engine draft</td></tr>
+    <tr><td>Birth time uncertain</td><td>High</td><td>Default to 12:00 (noon), note uncertainty, offer rectification later</td></tr>
+    <tr><td>Time zone confusion</td><td>Medium</td><td>Always ask UTC offset or country, cross-verify city</td></tr>
+    <tr><td>Refund request</td><td>Low initially</td><td>7-day no-questions-asked refund policy, build into Terms</td></tr>
+    <tr><td>"Fortune-telling" perception</td><td>Medium</td><td>Position as "self-knowledge tool" not "prediction", use language carefully</td></tr>
+    <tr><td>Competitor copies your hooks</td><td>Low</td><td>Your edge is personalization + classical tradition citations</td></tr>
+    <tr><td>Burnout from personalization</td><td>High after 20 customers</td><td>Hire part-time reader by customer #25</td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ============== 13. METRICS ============== -->
+<section id="metrics">
+<h2>13. Success Metrics to Track Weekly</h2>
+
+<p>Create a simple Google Sheet with these columns:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>DMs received</th>
+      <th>Pilots delivered</th>
+      <th>Paid orders</th>
+      <th>Revenue (₹)</th>
+      <th>Avg delivery time</th>
+      <th>Testimonials collected</th>
+    </tr>
+  </thead>
+</table>
+
+<p>Review weekly. The two key metrics:</p>
+<ol>
+  <li><strong>Conversion rate:</strong> DMs → paid orders (target: 20–30%)</li>
+  <li><strong>Reel performance:</strong> which hooks drive DMs (double down on winners)</li>
+</ol>
+
+<p>After 50 customers, add:</p>
+<ul>
+  <li>Repeat customer rate (% who buy a follow-up)</li>
+  <li>Referral rate (% who came from existing customer's word-of-mouth)</li>
+  <li>Average testimonial rating (if you start collecting)</li>
+</ul>
+</section>
+
+<!-- ============== 14. ACTION ============== -->
+<section id="action">
+<h2>14. What to Do THIS WEEK</h2>
+
+<div class="thesis">
+  <div class="thesis-label">If you do nothing else</div>
+  <p>Do these 7 things in the next 7 days (see §16 for the landing page setup):</p>
+  <ol style="margin-top:12px">
+    <li><strong>Buy a custom domain</strong> on Cloudflare Registrar (₹600–800/yr) — see §16 Step 1</li>
+    <li><strong>Create your 5 pilot readings</strong> — 5 friends/family, full premium experience, collect testimonials</li>
+    <li><strong>Build the landing page</strong> on Carrd.co (₹750/yr, ~3 hours) — see §16 Step 3</li>
+    <li><strong>Set up Razorpay Payment Link</strong> for ₹1,499 with redirect to your /thank-you page</li>
+    <li><strong>Create the Google Form</strong> for intake (name, DOB, time, location, gender, email)</li>
+    <li><strong>Post 3 Instagram Reels</strong> — use the scripts in §9, post one every other day</li>
+    <li><strong>Update Instagram bio</strong> with your new landing page URL</li>
+  </ol>
+</div>
+
+<p>If you do those 7 things, you will have:</p>
+<ul>
+  <li><span class="do">✓</span> 5 testimonials</li>
+  <li><span class="do">✓</span> 3 pieces of content</li>
+  <li><span class="do">✓</span> A working payment flow (works 24/7, no you-time per sale)</li>
+  <li><span class="do">✓</span> A professional discovery surface</li>
+  <li><span class="do">✓</span> A pipeline of warm leads</li>
+</ul>
+
+<p>Within 14 days, you should have 1–3 paid customers. Within 30 days, 5–10 paid customers. Within 90 days, you'll know whether to build the app or keep manual.</p>
+</section>
+
+<!-- ============== 15. PRIVACY ============== -->
+<section id="privacy">
+<h2>15. Privacy &amp; Separation — Don't Use Your Personal Number or WhatsApp Status</h2>
+
+<div class="thesis">
+  <div class="thesis-label">The problem</div>
+  <p>Exposing your personal number on Instagram bio, Razorpay receipts, and WhatsApp Business means every curious browser, failed payment, or angry customer has a permanent line to your family chat. Mixing personal WhatsApp Status with business broadcasts pollutes your private feed. If you ever want to hire a part-time reader, sell the business, or take a break, the personal number is welded in.</p>
+  <p style="margin-top:12px"><strong>The fix:</strong> Keep business and personal in separate silos. Four options, ranked by cost and effort.</p>
+</div>
+
+<h3>Option A — Dedicated SIM + Business WhatsApp (recommended, ₹150/mo)</h3>
+
+<p><strong>Setup:</strong> Buy a cheap prepaid SIM, put it in a second phone or 4G/WiFi tablet, install WhatsApp Business on that device using the new number. Use that number everywhere — Instagram bio, Razorpay link, auto-reply.</p>
+
+<p><strong>Why it works:</strong></p>
+<ul>
+  <li>Your personal number stays private — never published, never leaked via a breach</li>
+  <li>WhatsApp Business gives you auto-reply, <strong>Labels</strong> (e.g., "New Inquiry", "Paid", "Delivered"), <strong>Quick Replies</strong>, and a <strong>Catalog</strong> — features the personal app doesn't have</li>
+  <li>Customers see "Korean Saju by [Name]" as the business name, not your personal contact</li>
+  <li>If you need to hand off to a part-time reader later, you hand off the business number, not your life</li>
+  <li>A tablet on your desk means business WhatsApp stays out of your personal phone</li>
+</ul>
+
+<table>
+  <thead>
+    <tr><th>Item</th><th>One-time</th><th>Monthly</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Prepaid SIM (Airtel/Jio)</td><td>₹100–300</td><td>—</td></tr>
+    <tr><td>₹99–149 plan (data + SMS)</td><td>—</td><td>₹0–149</td></tr>
+    <tr><td>Tablet (used, 7-inch, WiFi-only)</td><td>₹2,000–5,000</td><td>—</td></tr>
+    <tr><td><strong>Total</strong></td><td><strong>₹2,100–5,300</strong></td><td><strong>₹0–149/mo</strong></td></tr>
+  </tbody>
+</table>
+<p><strong>Effort:</strong> 1 hour to set up. 24h for SIM activation via Aadhaar eKYC.</p>
+
+<h3>Option B — Virtual Number via BSP (₹999–1,500/mo)</h3>
+
+<p>Indian virtual-number services (MyOperator, Exotel, TeleCMI) can give you an Indian mobile number that forwards to your existing phone, with business features like IVR, call recording, multi-agent routing.</p>
+
+<p><strong>Why consider:</strong></p>
+<ul>
+  <li>No second device needed</li>
+  <li>Existing personal phone stays your primary device, business calls forward to it</li>
+  <li>Scales to multi-agent when you hire</li>
+</ul>
+
+<p><strong>Why skip for now:</strong></p>
+<ul>
+  <li>Costs ₹1k+/mo <strong>before you have paying customers</strong></li>
+  <li>Designed for call centers — overkill for solo WhatsApp-first business</li>
+  <li>WhatsApp requires SMS verification; most VoIP numbers are blocked by WhatsApp, so you'd still need a real SIM for WhatsApp anyway</li>
+</ul>
+
+<p><strong>Best for:</strong> After 50+ customers/week when you're hiring readers and want a call-center style setup.</p>
+
+<p><strong>Skip Option B</strong> until then. International VoIP numbers (Dingtone, Hushed, TextNow) don't work with WhatsApp in India at all — confirmed blocked.</p>
+
+<h3>Option C — WhatsApp Business API via BSP (₹1,000–5,000/mo, scales best)</h3>
+
+<p><strong>Setup:</strong> WhatsApp Business API is the official business version. Your personal number stays personal; API runs in a web dashboard you log into. Get a <strong>green verified checkmark</strong> (requires Facebook Business verification — 2–7 days).</p>
+
+<table>
+  <thead>
+    <tr><th>BSP</th><th>Cost</th><th>Notes</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Wati.io</strong></td><td>₹1,000/mo (1,000 conv.)</td><td>Easiest onboarding, dashboard UI</td></tr>
+    <tr><td><strong>AiSensy</strong></td><td>₹999/mo</td><td>Indian, popular, good support</td></tr>
+    <tr><td><strong>Interakt</strong></td><td>₹1,499/mo</td><td>By Jio Haptik, good for ecommerce</td></tr>
+    <tr><td><strong>Twilio</strong></td><td>$0.005/msg</td><td>Pay-as-you-go, more setup</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Why consider:</strong></p>
+<ul>
+  <li><strong>No second phone needed</strong> — log into web dashboard from any browser</li>
+  <li><strong>Green checkmark</strong> = instant trust ("verified business")</li>
+  <li><strong>Broadcast lists</strong> for status updates without exposing personal contacts</li>
+  <li><strong>Chatbot flows</strong> can automate the entire intake → payment → delivery funnel</li>
+  <li>Multiple team members can manage the same inbox</li>
+</ul>
+
+<p><strong>Why skip for now:</strong></p>
+<ul>
+  <li>Costs ₹1k+/mo before you have paying customers</li>
+  <li>Requires Facebook Business verification (business docs needed)</li>
+  <li>Overkill for the first 10–30 customers</li>
+</ul>
+
+<p><strong>Best for:</strong> Phase when you have 30+ customers/week and want to scale without more devices.</p>
+
+<h3>Option D — Telegram Bot + Instagram DM only (no phone needed)</h3>
+
+<p>Skip WhatsApp entirely. Use Instagram DM for intake (your personal IG), Telegram bot for delivery, email as backup.</p>
+
+<p><strong>Why consider:</strong></p>
+<ul>
+  <li>Zero new SIM/number needed</li>
+  <li>Telegram bots can run the entire flow: intake form → Razorpay link → PDF delivery, automated</li>
+</ul>
+
+<p><strong>Why skip:</strong></p>
+<ul>
+  <li>Telegram is <strong>not mainstream in India</strong> for astrology — WhatsApp is the default expectation</li>
+  <li>Indian customers expect WhatsApp — you'll lose <strong>30–50% of leads</strong> who refuse to install another app</li>
+  <li>Loses the "personal touch" that high-LTV astrology buyers value</li>
+  <li>Bot development takes 2–3 days vs. 1 hour for WhatsApp Business</li>
+</ul>
+
+<p><strong>Best for:</strong> International customers (US/UK diaspora) where Telegram is acceptable.</p>
+
+<h3>Recommendation: Option A</h3>
+
+<p>For the first 30 customers, <strong>buy the prepaid SIM</strong>. Here's the literal 1-hour setup:</p>
+
+<h4>Step 1: Buy the SIM (20 min)</h4>
+<ul>
+  <li>Walk into any Airtel/Jio store</li>
+  <li>Ask for a "new prepaid SIM with data plan" (₹100 SIM + ₹149 plan = ₹249 total)</li>
+  <li>Bring Aadhaar card for eKYC (instant activation) or passport/voter ID (24h activation)</li>
+  <li>Keep the SIM packet — you'll need the phone number for WhatsApp verification</li>
+</ul>
+
+<h4>Step 2: Set up the device (15 min)</h4>
+<ul>
+  <li>Use a <strong>tablet</strong> (recommended) or <strong>old phone</strong> — keep business WhatsApp off your primary phone</li>
+  <li>Budget tablets: Realme Pad Mini (₹7k new), Samsung Tab A7 Lite (₹8k), Lenovo Tab M7 (₹5k refurbished on OLX)</li>
+  <li>Insert SIM, connect to home WiFi (you don't need data — WhatsApp runs on WiFi)</li>
+  <li>Install <strong>WhatsApp Business</strong> from Play Store (free, separate from regular WhatsApp)</li>
+</ul>
+
+<h4>Step 3: Register WhatsApp Business (5 min)</h4>
+<ul>
+  <li>Open WhatsApp Business, register with the new number</li>
+  <li>Wait for SMS verification code (comes to the new SIM's tablet)</li>
+  <li>Set business name: <strong>"Korean Saju by [Your Name]"</strong> or <strong>"Korean Saju Readings"</strong> — pick one, don't change later</li>
+  <li>Set business category: <strong>"Personal Coach"</strong> or <strong>"Spiritual Advisor"</strong></li>
+  <li>Set business hours: e.g., <strong>Mon–Sat, 10am–8pm IST</strong></li>
+</ul>
+
+<h4>Step 4: Configure the business profile (10 min)</h4>
+<ul>
+  <li>Upload your logo or profile photo (a clean headshot works)</li>
+  <li>Write a 200-char description (use the auto-reply script from §5 as the base)</li>
+  <li>Add business email: the new dedicated Gmail</li>
+  <li>Add business address: optional, your city is fine</li>
+  <li>Set the <strong>greeting message</strong> (sent to first-time contacts after 14 days of inactivity)</li>
+  <li>Set the <strong>away message</strong> (for after-hours)</li>
+</ul>
+
+<h4>Step 5: Set up Quick Replies (5 min)</h4>
+<p>WhatsApp Business lets you save <code>/shortcuts</code> for common messages. Create these three:</p>
+
+<table>
+  <thead>
+    <tr><th>Shortcut</th><th>Message</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>/welcome</code></td>
+      <td>The full intake script from §5 (auto-sent to new contacts)</td>
+    </tr>
+    <tr>
+      <td><code>/paid</code></td>
+      <td>"Payment received — thank you 🙏 Your Reading is in progress. I'll send it within 24-48h via email + WhatsApp. If you have a specific question you'd like me to address, let me know now."</td>
+    </tr>
+    <tr>
+      <td><code>/delivered</code></td>
+      <td>"Your Reading is ready 🌙 Sent to your email just now + attached here. One free follow-up question within 30 days — just message here. Thanks for trusting me with your chart 🙏"</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Type <code>/welcome</code> in any chat, edit, send. Saves you 5 min per customer.</p>
+
+<h4>Step 6: Set up Labels (2 min)</h4>
+<p>Create these labels in WhatsApp Business to track customer status:</p>
+<ul>
+  <li>🟡 <strong>New Inquiry</strong> — just DMed, no details yet</li>
+  <li>🔵 <strong>Awaiting Payment</strong> — details received, payment link sent</li>
+  <li>🟢 <strong>Paid</strong> — payment received, in personalization queue</li>
+  <li>🟣 <strong>Delivered</strong> — PDF sent</li>
+  <li>⚪ <strong>Follow-up</strong> — 30-day window active</li>
+  <li>🔴 <strong>Refund / Issue</strong> — needs attention</li>
+</ul>
+<p>Apply the label when you move between stages. Lets you scan your inbox in 5 seconds and know exactly where every customer is.</p>
+
+<h4>Step 7: Link everything else (5 min)</h4>
+
+<table>
+  <thead>
+    <tr><th>Service</th><th>What to use</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Instagram bio</strong></td><td>Add <code>https://wa.me/91XXXXXXXXXX</code> (replace X's with new number)</td></tr>
+    <tr><td><strong>Razorpay</strong></td><td>Use new business number as contact on Payment Link</td></tr>
+    <tr><td><strong>Gmail</strong></td><td>Create <code>yourname.saju@gmail.com</code> (or <code>readings.yourname@gmail.com</code>)</td></tr>
+    <tr><td><strong>Google Calendar</strong></td><td>Create new calendar "Saju Delivery" — set 48h deadlines for each paid customer</td></tr>
+    <tr><td><strong>Google Sheets</strong></td><td>Customer tracking sheet uses the business email for sign-in</td></tr>
+  </tbody>
+</table>
+
+<h3>What stays personal vs. what goes business</h3>
+
+<table>
+  <thead>
+    <tr><th>Channel</th><th>Personal</th><th>Business</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Phone number</td><td>✓</td><td>—</td></tr>
+    <tr><td>WhatsApp</td><td>—</td><td>✓ (separate number, business app)</td></tr>
+    <tr><td>WhatsApp Status</td><td>✓ (private life)</td><td>— (use Broadcast Lists in business app instead)</td></tr>
+    <tr><td>Instagram account</td><td>✓ (your existing IG)</td><td>— (or create separate business IG after 50 customers)</td></tr>
+    <tr><td>Gmail</td><td>✓ (existing)</td><td>✓ (new dedicated account)</td></tr>
+    <tr><td>Calendar</td><td>✓ (existing)</td><td>✓ (new "Saju Delivery" calendar)</td></tr>
+    <tr><td>Razorpay account</td><td>—</td><td>✓ (your existing business account, separate from personal UPI)</td></tr>
+    <tr><td>Bank account</td><td>✓ (existing personal)</td><td>✓ (current account — required for Razorpay anyway)</td></tr>
+  </tbody>
+</table>
+
+<h3>Decision on Instagram: personal vs. business account</h3>
+
+<table>
+  <thead>
+    <tr><th>Approach</th><th>Pros</th><th>Cons</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Use existing personal IG</strong></td>
+      <td>Faster start, existing followers see content</td>
+      <td>Customers see personal posts mixed with business</td>
+    </tr>
+    <tr>
+      <td><strong>Create separate business IG</strong></td>
+      <td>Clean separation, professional, privacy</td>
+      <td>Starts from 0 followers</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Recommendation for first 30 customers:</strong> Use your existing personal IG. Your existing followers trust you — that trust converts faster than a fresh account's aesthetic separation. <strong>After 50 customers</strong>, consider a dedicated business IG.</p>
+
+<h3>Replacing WhatsApp Status with Broadcast Lists</h3>
+
+<p>You mentioned not wanting to use personal WhatsApp Status. The right business equivalent is <strong>Broadcast Lists</strong> in WhatsApp Business:</p>
+
+<table>
+  <thead>
+    <tr><th>Feature</th><th>Personal WhatsApp Status</th><th>WhatsApp Business Broadcast List</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Visibility</td><td>All your contacts</td><td>Only the customers you add</td></tr>
+    <tr><td>Reach</td><td>Anyone in your contacts</td><td>Only people who have YOUR number saved</td></tr>
+    <tr><td>Frequency</td><td>Limited (24h expiry, 1/day for engagement)</td><td>Unlimited</td></tr>
+    <tr><td>Targeting</td><td>None — broadcast to all</td><td>Per-list segmentation (pilots, paid, dormant)</td></tr>
+    <tr><td>Privacy</td><td>Personal contacts see it</td><td>Your number isn't visible to non-customers</td></tr>
+  </tbody>
+</table>
+
+<p><strong>How to use:</strong></p>
+<ol>
+  <li>After every 5 customers, create a Broadcast List</li>
+  <li>Name it: "Active Customers — June 2026" or "Pilots Only"</li>
+  <li>Add customers who opted in (mention this in your first auto-reply: "You'll receive occasional updates on favorable elements, year-ahead forecasts, and Reading slots")</li>
+  <li>Send monthly updates: new Reel teasers, Day Master spotlights, year-end offers</li>
+  <li><strong>Never</strong> spam — 1 broadcast/month is the ceiling</li>
+</ol>
+
+<p><strong>Customers never see each other</strong> — it's one-to-many, not a group chat. They just get a regular message from your business number.</p>
+
+<h3>Total cost of privacy</h3>
+
+<table>
+  <thead>
+    <tr><th>Option</th><th>One-time</th><th>Monthly</th><th>Time to setup</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>A — Dedicated SIM</strong></td><td>₹2,100–5,300</td><td>₹0–149</td><td>1 hour</td></tr>
+    <tr><td>B — Virtual number</td><td>₹0</td><td>₹999–1,500</td><td>1 day</td></tr>
+    <tr><td>C — WhatsApp Business API</td><td>₹0</td><td>₹1,000–5,000</td><td>1 week (FB verification)</td></tr>
+    <tr><td>D — Telegram bot</td><td>₹0</td><td>₹0</td><td>2–3 days</td></tr>
+  </tbody>
+</table>
+
+<h3>Quick action plan (1 hour total today)</h3>
+<ol class="checklist">
+  <li>Walk into Airtel/Jio store → buy prepaid SIM + ₹149 plan (~₹249 total, 20 min)</li>
+  <li>Activate SIM on tablet or old phone with WhatsApp Business (15 min)</li>
+  <li>Set up the auto-reply, quick replies, labels (15 min)</li>
+  <li>Update Instagram bio with the new wa.me link (2 min)</li>
+  <li>Create the dedicated Gmail <code>yourname.saju@gmail.com</code> (3 min)</li>
+  <li>Create Google Calendar "Saju Delivery" (2 min)</li>
+  <li>Update Razorpay Payment Link to use new number (5 min)</li>
+</ol>
+
+<p><strong>Total cost: ₹150 one-time + ₹149/mo</strong> (and only if you actually use SMS/calling — WhatsApp runs on WiFi).</p>
+</section>
+
+<!-- ============== 16. LANDING PAGE ============== -->
+<section id="landingpage">
+<h2>16. The Landing Page Path — Carrd + Razorpay + Google Form <span style="font-size:14px;background:var(--wood);color:var(--cream);padding:4px 10px;border-radius:4px;margin-left:12px;font-family:'Helvetica Neue',Arial,sans-serif;letter-spacing:0.05em;vertical-align:middle">RECOMMENDED PRIMARY</span></h2>
+
+<div class="thesis">
+  <div class="thesis-label">The thesis</div>
+  <p>A simple landing page with testimonials, sample reports, intake form, and payment link is the <strong>cleanest path from Instagram Reel to paid customer</strong> — better than Instagram DM, comparable to WhatsApp, with <strong>full privacy</strong> (your personal number and WhatsApp stay untouched).</p>
+</div>
+
+<h3>Why this beats Instagram DM and WhatsApp for your situation</h3>
+
+<table>
+  <thead>
+    <tr><th>Factor</th><th>Instagram DM</th><th>WhatsApp Business</th><th>Landing page</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Customer effort</td><td>High (DM → wait → back-and-forth)</td><td>Medium (DM → wait)</td><td><strong>Low (form + pay)</strong></td></tr>
+    <tr><td>Time to intake</td><td>15+ min of DM ping-pong</td><td>5–10 min</td><td><strong>2 min (form)</strong></td></tr>
+    <tr><td>Conversion (cold visitor)</td><td>5–15%</td><td>15–25%</td><td><strong>20–35%</strong></td></tr>
+    <tr><td>Looks professional</td><td>Medium</td><td>Low (just a chat)</td><td><strong>High</strong></td></tr>
+    <tr><td>SEO (Google ranks it)</td><td>❌</td><td>❌</td><td>✅</td></tr>
+    <tr><td>Works without you online</td><td>❌ (needs your reply)</td><td>❌ (needs your reply)</td><td>✅ (form works at 3am)</td></tr>
+    <tr><td>Personal number exposed</td><td>❌</td><td>❌</td><td><strong>❌ (never collected)</strong></td></tr>
+    <tr><td>Personal WhatsApp exposed</td><td>❌</td><td>❌</td><td><strong>❌ (never collected)</strong></td></tr>
+    <tr><td>Set-up time</td><td>0</td><td>1 hr</td><td><strong>4–8 hrs first time</strong></td></tr>
+    <tr><td>Set-up cost</td><td>₹0</td><td>₹150 + tablet</td><td><strong>₹500–1,500</strong></td></tr>
+  </tbody>
+</table>
+
+<p><strong>The killer feature:</strong> A landing page + Razorpay means <strong>a customer can buy at 11pm on a Sunday without you being awake.</strong> Instagram DMs require your reply. WhatsApp requires your reply. Landing page = zero you-time per sale.</p>
+
+<h3>Why this solves the privacy problem completely</h3>
+<p>With a landing page + Razorpay, <strong>you never need to give out your number.</strong> The full flow:</p>
+<ol>
+  <li>Customer → landing page (public, anonymous)</li>
+  <li>Customer → Razorpay (Razorpay handles payment, you see no card details)</li>
+  <li>Customer → Google Form (your dedicated Gmail receives the intake)</li>
+  <li>You → send PDF (from your dedicated Gmail, to customer's email)</li>
+</ol>
+<p>Personal number and personal WhatsApp stay 100% private. This is the cleanest privacy solution short of building a full web app.</p>
+
+<h3>What the page actually contains (4 sections, no fluff)</h3>
+
+<h4>Section 1: Hero</h4>
+<div class="flow">[Your photo, warm lighting, looking at camera]
+
+Korean Saju (사주) Reading
+Classical tradition · 경락고요 · 적천수
+
+A 12-page personal reading of your
+birth chart — your Day Master, your
+favorable element, your next decade.
+
+→ Get your Reading · ₹1,499</div>
+
+<h4>Section 2: What's inside (the 9 sections)</h4>
+<ul>
+  <li>✦ <strong>Day Master Portrait</strong> — who you are at your core, beyond sun signs</li>
+  <li>✦ <strong>Career &amp; Wealth</strong> — where your energy naturally compounds</li>
+  <li>✦ <strong>Relationships</strong> — how you love, who you click with</li>
+  <li>✦ <strong>Health &amp; Vitality</strong> — element-based tendencies to watch</li>
+  <li>✦ <strong>Major Luck Periods</strong> — your next 10-20 years, mapped</li>
+  <li>✦ <strong>Practical Guidance</strong> — colors, directions, foods, timing</li>
+  <li>✦ <strong>Closing Note</strong> — what I'd tell you if we met for coffee</li>
+</ul>
+<p>Delivered as a 12-page PDF in 24-48 hours.</p>
+
+<h4>Section 3: Sample (the magic ingredient)</h4>
+<p>This is the <strong>single most important section</strong>. A real sample preview is the difference between "interesting" and "I trust this person with my birth chart."</p>
+<p>Show a screenshot of page 1 + 2 of a real Reading (anonymize the name). Or embed a 3-page PDF preview using a <code>&lt;embed&gt;</code> tag.</p>
+
+<blockquote>This is Priya's chart. Her Day Master is 壬 (The Ocean). Notice how her career chapter connects to her element balance. The full version has 12 pages.</blockquote>
+
+<h4>Section 4: Testimonials + Buy</h4>
+<p>3+ testimonials with name, age, city, star rating:</p>
+
+<blockquote>"Priya's Reading was eerily accurate about my career timing. The major luck periods mapped perfectly to my actual job changes." — Ananya, 32, Bangalore ★★★★★</blockquote>
+
+<blockquote>"I've had Vedic and Western readings before. This was different — more grounded, more practical. The favorable element advice actually worked." — Rahul, 41, Mumbai ★★★★★</blockquote>
+
+<h4>Buy button (links to Razorpay Payment Link)</h4>
+<div class="flow">Get your Korean Saju Reading
+₹1,499 · 12 pages · 24-48h delivery
+→ Pay with Razorpay</div>
+
+<h4>Below the buy button</h4>
+<div class="flow">What happens after you pay:
+
+1. You fill the intake form (name, DOB, time, location) — 2 minutes
+2. I run the chart through a classical-tradition engine
+3. I personalize each section based on your specifics
+4. PDF delivered to your email within 48 hours
+5. One free follow-up question within 30 days
+
+[7-day refund policy · No questions asked]</div>
+
+<h3>The tech stack: Carrd.co (₹750/yr, ship in 1 day)</h3>
+
+<p><strong>What it is:</strong> Simple landing-page builder. Drag-and-drop, mobile-responsive, custom domain support.</p>
+
+<table>
+  <thead>
+    <tr><th>Carrd feature</th><th>Why it matters for you</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Mobile-perfect automatically</td><td>80%+ of your traffic is mobile</td></tr>
+    <tr><td>Custom domain support</td><td>Use <code>cosmicsaju.com/saju</code> or <code>getmyreading.in</code></td></tr>
+    <tr><td>Form integration</td><td>Connects to Google Forms / Razorpay</td></tr>
+    <tr><td>No code, no hosting</td><td>You focus on copy, not infrastructure</td></tr>
+    <tr><td>Free SSL</td><td>Looks trustworthy (HTTPS, padlock icon)</td></tr>
+    <tr><td>Looks modern</td><td>Better than most hand-coded pages</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Limitations to know:</strong></p>
+<ul>
+  <li>Limited to 1 page (~10 sections) — fine for landing page, not for full web app</li>
+  <li>No blog (you can add a separate blog later if needed)</li>
+  <li>Limited analytics (basic visitor counts only)</li>
+  <li>Doesn't scale to a full web app — you'll rebuild on Next.js if you cross 200+ customers</li>
+</ul>
+
+<p><strong>Alternatives if Carrd feels too limited:</strong></p>
+
+<table>
+  <thead>
+    <tr><th>Tool</th><th>Cost</th><th>When to use</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Carrd.co</strong></td><td>₹750/yr</td><td>Recommended for first 200 customers</td></tr>
+    <tr><td>Framer.com</td><td>₹3,500/yr</td><td>If you want more design freedom + a blog</td></tr>
+    <tr><td>WordPress.com</td><td>₹3,000/yr</td><td>If you want a blog from day 1</td></tr>
+    <tr><td>Next.js + Vercel</td><td>₹0–25k setup + 12 weeks</td><td>After you validate demand</td></tr>
+  </tbody>
+</table>
+
+<h3>Step-by-step setup (1 day, ₹1,500 total)</h3>
+
+<h4>Step 1: Buy domain (₹10, 10 min)</h4>
+<p>Buy on Cloudflare Registrar or any registrar:</p>
+
+<table>
+  <thead>
+    <tr><th>Option</th><th>Cost</th><th>Notes</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>cosmicsaju.com</code> (or <code>saju.cosmicsaju.com</code> subdomain)</td><td>₹0 (subdomain) or ₹800/yr (full)</td><td>You already own <code>cosmic-id</code> brand</td></tr>
+    <tr><td><code>koreansaju.in</code></td><td>₹600/yr</td><td>Clear, India-focused</td></tr>
+    <tr><td><code>getmyreading.com</code></td><td>₹800/yr</td><td>Action-oriented</td></tr>
+    <tr><td><code>yourname.saju.com</code></td><td>varies</td><td>Personal brand</td></tr>
+  </tbody>
+</table>
+<p>For your first 30 customers, <strong>a subdomain is fine</strong>. You can always upgrade to a full domain later.</p>
+
+<h4>Step 2: Sign up for Carrd (₹750, 5 min)</h4>
+<ul>
+  <li>Go to carrd.co → Pro plan ($9/yr ≈ ₹750)</li>
+  <li>Connect your custom domain (CNAME setup, Carrd walks you through it)</li>
+  <li>Free SSL automatically enabled</li>
+</ul>
+
+<h4>Step 3: Build the page (3 hours)</h4>
+<p>Use the <strong>"Landing"</strong> template. Customize with the 4 sections above:</p>
+<ul>
+  <li>Upload your photo (warm, real, not stock)</li>
+  <li>Paste the hero copy</li>
+  <li>Add the 9 sections list</li>
+  <li>Embed the sample chart screenshot</li>
+  <li>Add 3 testimonials (start with your 5 pilot readings)</li>
+  <li>Add the buy button linking to Razorpay Payment Link</li>
+</ul>
+
+<h4>Step 4: Create Razorpay Payment Link (10 min)</h4>
+<p>In Razorpay dashboard:</p>
+<ul>
+  <li>Create Payment Link for <strong>₹1,499</strong></li>
+  <li>Title: "Korean Saju Reading by [Your Name]"</li>
+  <li>Description: "12-page PDF reading delivered within 48 hours"</li>
+  <li>After successful payment: redirect to <code>https://yourdomain.com/thank-you</code></li>
+  <li>Save the link URL — this is what the buy button points to</li>
+</ul>
+
+<h4>Step 5: Create the "Thank You" page (15 min)</h4>
+<p>A second Carrd page at <code>/thank-you</code>:</p>
+<div class="flow">Thank you 🙏
+
+Your payment is confirmed.
+
+To begin your Reading, please fill this 2-minute form:
+
+[Link to Google Form: name, DOB, time, location, gender, email]
+
+You'll receive your 12-page PDF within 24-48 hours.
+
+If you have any questions, email readings@yourdomain.com.</div>
+
+<h4>Step 6: Create the Google Form intake (15 min)</h4>
+<p>Already covered in §5 of this doc. Fields:</p>
+<ul>
+  <li>Full name</li>
+  <li>Date of birth (DD/MM/YYYY)</li>
+  <li>Birth time (HH:MM)</li>
+  <li>Birth city</li>
+  <li>Gender</li>
+  <li>Email address</li>
+  <li>Relationship status (optional)</li>
+  <li>"What's your main question for the Reading?" (text area)</li>
+</ul>
+<p>Form auto-saves to Google Sheets. You get notification on submit.</p>
+
+<h4>Step 7: Update Instagram bio (2 min)</h4>
+<p>Replace the wa.me link with <code>https://yourdomain.com</code>:</p>
+<div class="flow">🌙 Korean Saju (사주) Readings
+📜 Classical tradition · 경락고요 · 적천수
+✨ Get your Reading → link below</div>
+<p>Add the domain URL to the bio (use Linktree if you need a second link).</p>
+
+<h3>The full customer journey</h3>
+<div class="flow">Customer sees your Reel
+        │
+        ▼
+Clicks bio link → opens cosmicsaju.com/saju
+        │
+        ▼
+Reads hero, scrolls to sample chart
+        │
+        ▼
+Sees 3 testimonials
+        │
+        ▼
+Clicks "Get your Reading · ₹1,499"
+        │
+        ▼
+Razorpay opens in new tab
+        │
+        ▼
+Pays via UPI / Card / Net Banking
+        │
+        ▼
+Razorpay redirects to your /thank-you page
+        │
+        ▼
+Customer fills Google Form (2 min)
+        │
+        ▼
+You get email: "Payment received + form filled"
+        │
+        ▼
+You run engine commands (1 min)
+        │
+        ▼
+You personalize (15-20 min)
+        │
+        ▼
+You email PDF
+        │
+        ▼
+You ask for testimonial (optional)</div>
+
+<p><strong>Your time per customer: ~20 min.</strong> Down from 25–30 min with WhatsApp because:</p>
+<ul>
+  <li>No back-and-forth intake (form is pre-filled)</li>
+  <li>No payment link to generate (link is static)</li>
+  <li>No "are you ready to pay?" follow-ups</li>
+</ul>
+
+<h3>When this beats each alternative</h3>
+
+<h4>Landing page beats Instagram DM when:</h4>
+<ul>
+  <li>Customer came from a Reel (warm traffic, ready to buy)</li>
+  <li>Customer is 28+ (prefers paper trail, doesn't want to DM)</li>
+  <li>You're not online 24/7 (DM requires your reply, page doesn't)</li>
+  <li>Customer wants to think before buying (page sits in browser tab, DM disappears)</li>
+  <li>Customer is from Google search (SEO over time)</li>
+</ul>
+
+<h4>Landing page beats WhatsApp when:</h4>
+<ul>
+  <li>You don't want to install WhatsApp Business</li>
+  <li>You don't want a second device</li>
+  <li>Customer is a stranger (WhatsApp feels invasive for cold contact)</li>
+  <li>You want SEO (Google ranks pages, never WhatsApp)</li>
+  <li>You want to look professional (page &gt; chat for ₹1,500 purchase)</li>
+</ul>
+
+<h4>When WhatsApp or Instagram DM still wins:</h4>
+<ul>
+  <li>Customer insists on WhatsApp (some won't convert without it)</li>
+  <li>Customer wants instant Q&amp;A before paying</li>
+  <li>You're doing cold outreach (but you shouldn't be)</li>
+  <li>Customer is 35+ Indian and WhatsApp-native</li>
+</ul>
+
+<p><strong>Realistic loss rate:</strong> 20–40% of leads may not convert because they expected WhatsApp. Build that into your conversion math. If you expect 50 Reel viewers clicking your bio, plan for 10–17 conversions, not 17–25.</p>
+
+<h3>What about WhatsApp as a <em>follow-up</em> channel?</h3>
+<p>You can add WhatsApp Business later, <strong>but as a customer-success channel, not the intake channel:</strong></p>
+<ul>
+  <li>Customer pays via landing page → Razorpay → form</li>
+  <li>They receive PDF via email</li>
+  <li>They have questions → email reply (your dedicated Gmail)</li>
+  <li>For high-LTV customers (Full Map at ₹3,499) → offer a 15-min voice call (dedicated SIM, optional)</li>
+  <li>For the 10–20% who really want WhatsApp → add a WhatsApp Business number later</li>
+</ul>
+<p>This way WhatsApp is a <strong>value-add</strong>, not a requirement. Most customers won't need it.</p>
+
+<h3>Cost summary</h3>
+
+<table>
+  <thead>
+    <tr><th>Component</th><th>Cost</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Domain (<code>cosmicsaju.com</code> subdomain or <code>koreansaju.in</code>)</td><td>₹0–800/yr</td></tr>
+    <tr><td>Carrd Pro plan</td><td>₹750/yr</td></tr>
+    <tr><td>Razorpay (per transaction only)</td><td>2% per sale</td></tr>
+    <tr><td><strong>Total Year 1</strong></td><td><strong>~₹1,500 + 2% per sale</strong></td></tr>
+  </tbody>
+</table>
+
+<p>Compare to:</p>
+<ul>
+  <li>WhatsApp Business (dedicated SIM): ₹150 one-time + ₹149/mo = ₹1,938/yr (similar cost, but uses your time)</li>
+  <li>Full architecture (Phase 5 web app): ₹45k/yr + 12 weeks of your time</li>
+</ul>
+
+<p><strong>Carrd wins on cost AND on shipping speed.</strong></p>
+
+<h3>Decision matrix: which path is right for you?</h3>
+
+<table>
+  <thead>
+    <tr><th>Your situation</th><th>Recommended path</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>You want to ship today, willing to buy domain</td>
+      <td><strong>Landing page (this section)</strong> ⭐</td>
+    </tr>
+    <tr>
+      <td>You don't want to buy anything, willing to install apps</td>
+      <td>WhatsApp Business (§15)</td>
+    </tr>
+    <tr>
+      <td>You want zero setup, willing to lose 30% of leads</td>
+      <td>Instagram DM + Email (§15 alt)</td>
+    </tr>
+    <tr>
+      <td>You want email-only, targeting professionals/NRIs</td>
+      <td>Email-only (§15 alt)</td>
+    </tr>
+    <tr>
+      <td>You're targeting international/Telegram users</td>
+      <td>Telegram (§15 alt)</td>
+    </tr>
+    <tr>
+      <td>You want the eventual full web app</td>
+      <td>Defer to architecture Phase 5</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="thesis" style="margin-top:24px">
+  <div class="thesis-label">The verdict</div>
+  <p><strong>For a first-time solo founder willing to invest ₹1,500 and 4 hours → Landing page is the lowest-risk, highest-conversion path.</strong></p>
+</div>
+</section>
+
+<!-- ============== SOURCES ============== -->
+<footer class="sources">
+<h3>Sources</h3>
+<ul>
+  <li>Saju repo: <code>CLAUDE.md</code>, <code>tools/saju_engine/</code>, <code>tools/build-pdf.sh</code></li>
+  <li>Architecture research: <code>13-architecture-saju-web-cosmicid.md</code> — for the graduate path</li>
+  <li>Market context: <code>02-market-size-and-demand.md</code>, <code>04-feature-demand.md</code>, <code>11-financial-model.md</code></li>
+  <li>Razorpay Payment Links: <a href="https://razorpay.com/docs/payments/payment-links/" target="_blank">razorpay.com/docs/payments/payment-links</a></li>
+  <li>Instagram Reels best practices: <a href="https://business.instagram.com/reels" target="_blank">business.instagram.com/reels</a></li>
+  <li>WhatsApp Business: <a href="https://business.whatsapp.com/" target="_blank">business.whatsapp.com</a></li>
+  <li>WhatsApp Business API BSPs: <a href="https://wati.io" target="_blank">wati.io</a>, <a href="https://aisensy.com" target="_blank">aisensy.com</a>, <a href="https://interakt.ai" target="_blank">interakt.ai</a></li>
+  <li>Indian virtual number services: <a href="https://myoperator.com" target="_blank">myoperator.com</a>, <a href="https://exotel.com" target="_blank">exotel.com</a></li>
+  <li>Carrd.co landing page builder: <a href="https://carrd.co" target="_blank">carrd.co</a></li>
+  <li>Framer.com landing page builder: <a href="https://framer.com" target="_blank">framer.com</a></li>
+  <li>Cloudflare Registrar: <a href="https://cloudflare.com/products/registrar" target="_blank">cloudflare.com/products/registrar</a></li>
+</ul>
+<p style="margin-top:16px;font-size:12px;color:var(--ink-soft);font-style:italic">Companion files: <code>market_research/14-mvp-go-to-market.md</code> (this document's source markdown).</p>
+</footer>
+
+</div>
+</body>
+</html>
