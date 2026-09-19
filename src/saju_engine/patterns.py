@@ -406,6 +406,41 @@ def detect_special_forms(
     return forms
 
 
+def detect_tengod_conflicts(
+    day_master: str,
+    stems: List[str],
+    hidden_stems: List[Tuple[str, str]],
+) -> List[Dict[str, str]]:
+    """Detect classical ten-god-vs-ten-god conflict patterns.
+
+    Added 2026-09-19 (external report review): 상관견관 (傷官見官) — 상관
+    (Hurting Officer) meeting 정관 (Direct Officer) — is documented as a named
+    classical conflict pattern in `knowledge/05-ten-gods.md` ("often read as
+    causing problems with 관성 ... 상관 directly clashing with 정관, the
+    classical 'rebellion against authority' pattern") but had no engine
+    detection anywhere, so a "deep" report never surfaced it even when
+    present — confirmed missing for Harish's chart, which carries three 상관
+    sources (year stem + two hidden) against one hidden 정관.
+
+    This is deliberately narrow and Ground-Rule-1-conservative: only the
+    specific documented pairing (상관 + 정관) is checked. 편관 (Seven Killings)
+    is NOT included — it forms different, separately-named classical patterns
+    (e.g. 식신제살) and conflating it here would invent an undocumented rule.
+    """
+    all_stems = list(stems) + [s for _, s in hidden_stems]
+    tengods = {L.ten_god(day_master, s) for s in all_stems}
+    conflicts: List[Dict[str, str]] = []
+    if "상관" in tengods and "정관" in tengods:
+        conflicts.append({
+            "name_ko": "상관견관",
+            "name_en": "Output Meets Authority",
+            "basis": "Both 상관 (Hurting Officer) and 정관 (Direct Officer) are present among the chart's stems (visible or hidden)",
+            "confidence": "likely",
+            "note": "Classical conflict pattern (knowledge/05-ten-gods.md): 상관's output tends to clash with 정관's orderly authority — often read as friction with rules, institutions, or superiors. A structural tendency to watch, not a fixed event.",
+        })
+    return conflicts
+
+
 def detect_structural_notes(
     branches: List[str],
 ) -> List[Dict[str, str]]:
@@ -474,6 +509,8 @@ def detect_patterns(
       - transformation_grid: 화격 candidate, or None.
       - special_forms: list of 종격 candidates (conservative thresholds).
       - structural_notes: 전국 / 편국 / 삼합국 detections.
+      - tengod_conflicts: named ten-god-vs-ten-god conflicts (currently only
+        상관견관 — see detect_tengod_conflicts).
       - dominant_element: element with highest weighted count.
       - element_balance: weighted element counts.
     """
@@ -530,6 +567,7 @@ def detect_patterns(
         strength_verdict, month_branch=month_branch,
     )
     structural = detect_structural_notes(branches)
+    tengod_conflicts = detect_tengod_conflicts(day_master, stems, hidden_stems)
 
     return {
         "regular_grid": regular_grid,
@@ -558,6 +596,7 @@ def detect_patterns(
         "transformation_grid": transformation,
         "special_forms": special,
         "structural_notes": structural,
+        "tengod_conflicts": tengod_conflicts,
         "dominant_element": dominant_element,
         "element_balance": dict(element_counts),
         "month_tengod": month_tengod,

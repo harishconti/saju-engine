@@ -96,6 +96,28 @@ def test_relationship_style_mentions_spouse_branch(ctx):
     )
 
 
+def test_relationship_style_uses_real_tengod_implication_not_generic_fallback(ctx):
+    """Regression for the 2026-09-19 bug: the personalized implication dict
+    in relationship_style() was keyed by simplified class names ("Output",
+    "Companion", ...) but looked up using the full English gloss
+    ("Hurting Officer (傷官)"), which never matches any key — every chart
+    fell through to the same generic "you bring the querent's full nature
+    into the partnership" sentence regardless of its actual spouse-palace
+    ten-god. Confirmed identical fallback text across every real candidate
+    report (4+ different actual ten-gods, same sentence every time) before
+    this fix. The sample fixture chart's spouse palace is 편인 (Indirect
+    Resource), which should now produce its specific implication sentence.
+    """
+    out = PF.relationship_style(ctx)
+    assert "bring the querent's full nature" not in out, (
+        f"relationship_style regressed to the generic fallback: {out!r}"
+    )
+    assert "spark your curiosity and bring unexpected insights" in out, (
+        f"sample chart's spouse-palace ten-god is 편인 (Indirect Resource); "
+        f"expected its specific implication text, got: {out!r}"
+    )
+
+
 def test_three_mindful_notes_returns_three_bullets(ctx):
     notes = PF.three_mindful_notes(ctx)
     assert isinstance(notes, list)
@@ -147,12 +169,6 @@ def test_closing_note_long_references_specific_features(ctx):
         f"long closing should reference spouse palace {ctx.chart.day.branch}: {out!r}"
     )
     assert ctx.favorable in out, "long closing should reference favorable element"
-
-
-def test_auspicious_date_note_non_empty(ctx):
-    out = PF.auspicious_date_note("2026-07-15", ctx)
-    assert isinstance(out, str)
-    assert ctx.favorable in out
 
 
 def test_year_by_year_note_includes_year_or_caution(ctx):
@@ -270,6 +286,100 @@ def test_spouse_palace_tengod_mentions_day_branch(ctx):
     spouse_tg_en = PF._TENGOD_CLASS.get(spouse_tg_ko, spouse_tg_ko)
     assert spouse_tg_en in out, (
         f"spouse_palace_tengod should reference the spouse-palace ten-god {spouse_tg_en}: {out!r}"
+    )
+
+
+# ── Regression: ten-god class must come from the Korean code, not an ─────
+# ── English-gloss substring match (found 2026-09-19, external review)  ───
+
+class _FakePeriod:
+    """Minimal stand-in for a DaeunPeriod, just the fields these fillers read."""
+    def __init__(self, stem_tengod, stem_tengod_en, start_age=30, end_age=39,
+                 combined="辛亥", branch_element="Water", stem_element="Water",
+                 favorable_status=None):
+        self.stem_tengod = stem_tengod
+        self.stem_tengod_en = stem_tengod_en
+        self.start_age = start_age
+        self.end_age = end_age
+        self.combined = combined
+        self.branch_element = branch_element
+        self.stem_element = stem_element
+        self.favorable_status = favorable_status  # deliberately unused by the fix
+
+
+@pytest.mark.parametrize("ko,en,expected_career_substring", [
+    ("편관", "Seven Killings (偏官)", "structured career moves"),  # Authority
+    ("정관", "Direct Officer (正官)", "structured career moves"),  # Authority
+    ("식신", "Eating God (食神)", "creative output"),              # Output
+    ("상관", "Hurting Officer (傷官)", "creative output"),          # Output
+    ("비견", "Companion (比肩)", "peer-driven"),                   # Companion
+    ("겁재", "Robber (劫財)", "peer-driven"),                       # Companion
+])
+def test_major_luck_theme_row_classifies_by_korean_code_not_english_substring(ko, en, expected_career_substring):
+    """Regression for the 2026-09-19 bug: 편관 ('Seven Killings') and 식신
+    ('Eating God') contain no keyword the old code matched on and silently
+    fell through to the Companion/peer branch; 상관 ('Hurting Officer')
+    wrongly matched the Authority branch via the substring 'Officer' even
+    though 상관 is 식상 (Output), not 관성 (Authority). Confirmed live in
+    Harish's shipped report (10-19 and 2027 both 편관; 60-69 and 2032/2033
+    both 상관/식신) before this fix.
+    """
+    p = _FakePeriod(stem_tengod=ko, stem_tengod_en=en)
+    ctx = {"favorable": "Water", "supporting": "Metal"}
+    career, _relationship = PF.major_luck_theme_row(p, ctx)
+    assert expected_career_substring in career, (
+        f"{ko} ({en}) should classify as giving {expected_career_substring!r}, got {career!r}"
+    )
+
+
+@pytest.mark.parametrize("ko,en,expected_best_substring", [
+    ("편관", "Seven Killings (偏官)", "career moves, credentials"),
+    ("식신", "Eating God (食神)", "creative production"),
+    ("상관", "Hurting Officer (傷官)", "creative production"),
+])
+def test_annual_window_row_classifies_by_korean_code_not_english_substring(ko, en, expected_best_substring):
+    """Same regression as above, for the annual-window "Best Uses" column."""
+    h = _FakePeriod(stem_tengod=ko, stem_tengod_en=en)
+    h.stem = "辛"
+    h.year = 2030
+    ctx = {"favorable": "Water", "supporting": "Metal"}
+    _theme, best, _watch = PF.annual_window_row(h, ctx)
+    assert expected_best_substring in best, (
+        f"{ko} ({en}) should classify as giving {expected_best_substring!r}, got {best!r}"
+    )
+
+
+def test_income_rhythm_does_not_treat_hidden_robber_as_wealth_rooted():
+    """Regression for the 2026-09-19 bug: `if "재" in tg` also matches 겁재
+    (Robber, a 비겁-class ten-god), which contains the character "재" but is
+    not 재성 (Wealth) at all.
+
+    Constructs a chart with a VISIBLE 정재 (so `direct` is legitimately True)
+    but only a hidden main-position 겁재 (no real hidden 정재/편재 at all) — a
+    case where the pre-fix code would wrongly set `wealth_rooted = True` from
+    the 겁재 and claim "The Direct Wealth stem is rooted in a branch," which
+    is false for this chart.
+    """
+    import types
+    from saju_engine import lookup as L
+
+    day_master = "庚"  # Yang Metal
+    assert L.ten_god(day_master, "乙") == "정재"  # visible wealth stem
+    assert L.ten_god(day_master, "辛") == "겁재"  # the hidden stem that used to false-trigger
+    assert "재" in "겁재"  # the substring collision the old code depended on
+
+    fake_pillar_hour = types.SimpleNamespace(hidden_stems=[("main", "辛")])  # 겁재 only
+    fake_pillar_other = types.SimpleNamespace(hidden_stems=[])
+    fake_chart = types.SimpleNamespace(
+        day_master=day_master,
+        pillars=[fake_pillar_other, fake_pillar_other, fake_pillar_other, fake_pillar_hour],
+        ten_gods=[types.SimpleNamespace(tengod="정재")],  # the one visible wealth stem
+    )
+    ctx = {"chart": fake_chart}
+    out = PF.income_rhythm(ctx)
+    assert "rooted in a branch" not in out, (
+        f"income_rhythm should not claim wealth is rooted when only a hidden "
+        f"겁재 (not a real 정재/편재) was found: {out!r}"
     )
 
 

@@ -31,6 +31,31 @@ _TENGOD_CLASS: Dict[str, str] = {
     "편인": "Indirect Resource", "정인": "Direct Resource",
 }
 
+# The five broad 십신 classes (비겁/식상/재성/관성/인성), keyed by the KOREAN
+# ten-god code — not the English gloss. Use this, never a substring check on
+# an English label, to classify a ten-god by class.
+#
+# Bug found 2026-09-19 (external report review): major_luck_theme_row and
+# annual_window_row used to branch on substrings of the English gloss (e.g.
+# `"Officer" in tg`), which silently misclassified 3 of the 10 ten-gods
+# because their English names don't reliably contain their class name:
+# 상관 ("Hurting Officer") wrongly matched the Authority branch via the word
+# "Officer" even though 상관 is 식상 (Output); 식신 ("Eating God") and 편관
+# ("Seven Killings") matched no keyword at all and silently fell through to
+# the Companion/peer branch even though they are Output and Authority
+# respectively. Confirmed live in Harish's report: 2027 (丁未, Seven Killings)
+# and the 10-19 major-luck decade both showed "peer-driven" text instead of
+# authority-pressure text; 2032 (壬子, Hurting Officer) and the 60-69 decade
+# both showed "structured career moves" (Authority text) instead of
+# Output-class text.
+_TENGOD_FIVE_CLASS: Dict[str, str] = {
+    "비견": "Companion", "겁재": "Companion",
+    "식신": "Output", "상관": "Output",
+    "편재": "Wealth", "정재": "Wealth",
+    "편관": "Authority", "정관": "Authority",
+    "편인": "Resource", "정인": "Resource",
+}
+
 # Element → organ mapping (used by health fillers)
 # source: knowledge/15-health-and-body.md § 오행 → Organ Systems
 _ELEMENT_ORGANS: Dict[str, str] = {
@@ -52,6 +77,33 @@ def _ctx_get(ctx: Any, key: str, default: Any = None) -> Any:
 def _plain(text: str) -> str:
     """Wrap a lay restatement as a single-line 'In plain words' blockquote."""
     return f"> **In plain words:** {text}"
+
+
+def period_favorable_status(period: Any, ctx: Any) -> str:
+    """Return a 대운 period's favorable/neutral/unfavorable lean vs. THIS
+    report's final resolved favorable element (``ctx.favorable`` — which
+    already accounts for a reader override), rather than trusting
+    ``period.favorable_status`` directly.
+
+    ``period.favorable_status`` is baked into the chart once, at
+    compute_chart time (see ``daeun_overlay.py``), before any report-level
+    ``favorable_override`` is known — so for an overridden chart (Gurumoorthy,
+    Sruthi, Pawan) it can silently disagree with what the report's Quick
+    Reference / Chart-at-a-Glance actually shows. Found 2026-09-19 alongside
+    the climate-resolution fix in ``daeun_overlay.py`` (which fixed the
+    non-override baseline but, without this render-time recomputation, would
+    have newly exposed the override mismatch here). Every prose filler that
+    narrates 대운/timing favorability should call this instead of reading
+    ``period.favorable_status`` directly.
+    """
+    hits = {getattr(period, "stem_element", None), getattr(period, "branch_element", None)}
+    favorable = _ctx_get(ctx, "favorable")
+    unfavorable = _ctx_get(ctx, "unfavorable")
+    if favorable in hits:
+        return "favorable"
+    if unfavorable and unfavorable in hits:
+        return "unfavorable"
+    return "neutral"
 
 
 def _display_verdict(verdict: str) -> str:
@@ -243,7 +295,12 @@ def income_rhythm(ctx) -> str:
                     tg = L.ten_god(chart.day_master, stem)
                 except Exception:
                     continue
-                if "재" in tg:
+                # NOT a substring check: "재" also occurs inside 겁재 (Robber,
+                # a 비겁-class ten-god, not Wealth) — a substring match here
+                # would wrongly treat a hidden 겁재 as wealth-rooting. Found
+                # 2026-09-19 alongside the English-gloss substring bug in
+                # major_luck_theme_row / annual_window_row.
+                if tg in ("정재", "편재"):
                     wealth_rooted = True
                     break
         if wealth_rooted:
@@ -405,7 +462,7 @@ def red_flag_environments(ctx) -> str:
 def decade_career_strategy(ctx, p) -> str:
     """One paragraph per 대운 connecting ten-god + favorable_status to career phase."""
     tg = p.stem_tengod_en or p.stem_tengod or "—"
-    status = (p.favorable_status or "neutral").lower()
+    status = period_favorable_status(p, ctx)
     branch_elem = p.branch_element or "—"
     stem_elem = p.stem_element or "—"
     fav = _ctx_get(ctx, "favorable", "—")
@@ -432,9 +489,11 @@ def relationship_style(ctx) -> str:
     chart = _ctx_get(ctx, "chart")
     spouse_branch = chart.day.branch
     spouse_tg = "—"
+    spouse_tg_ko = ""
     for hit in chart.ten_gods:
         if hit.position == "day_branch_main":
             spouse_tg = hit.tengod_en or hit.tengod
+            spouse_tg_ko = hit.tengod
             break
     peach = chart.stars.get("peach_blossom", []) if chart.stars else []
     from . import lookup as L
@@ -442,6 +501,17 @@ def relationship_style(ctx) -> str:
         stage = L.twelve_stage(chart.day_master, spouse_branch)
     except Exception:
         stage = "—"
+    # Look up by the simplified class key derived from the KOREAN ten-god
+    # code (via _TENGOD_CLASS), not by `spouse_tg` (the full English gloss,
+    # e.g. "Hurting Officer (傷官)") — the dict below is keyed by the class
+    # name ("Output", "Companion", etc.), which the full gloss never matches.
+    # Bug found 2026-09-19 (external report review): this lookup always
+    # missed and fell through to the generic fallback sentence below,
+    # regardless of the actual spouse-palace ten-god — confirmed identical
+    # fallback text ("you bring the querent's full nature into the
+    # partnership") in every candidate report's Relationship Style
+    # paragraph, across at least 4 different actual ten-gods (Robber,
+    # Indirect Resource, Direct Resource, Hurting Officer).
     implication = {
         "Companion": "you want a partner who feels like an equal — neither admiring nor competing, just present.",
         "Robber": "you are drawn to partners who challenge you, which can be exhilarating or exhausting.",
@@ -452,7 +522,7 @@ def relationship_style(ctx) -> str:
         "Seven Killings": "you want a partner who is strong and direct; passivity is more uncomfortable than conflict.",
         "Direct Resource": "you are drawn to partners who feel grounding, patient, and protective of your inner life.",
         "Indirect Resource": "you are drawn to partners who spark your curiosity and bring unexpected insights.",
-    }.get(spouse_tg, "you bring the querent's full nature into the partnership.")
+    }.get(_TENGOD_CLASS.get(spouse_tg_ko, ""), "you bring your full nature into the partnership.")
     base = (
         f"The spouse palace is **{spouse_branch}** (12-stage: {stage}), whose main hidden stem relates to "
         f"your Day Master as **{spouse_tg}**. In practice, {implication}"
@@ -552,7 +622,7 @@ def three_mindful_notes(ctx) -> List[str]:
         tg = current.stem_tengod_en or current.stem_tengod or "—"
         notes.append(
             f"The current major-luck period (**{current.combined}**, {tg}) carries "
-            f"{'favorable' if (current.favorable_status or '').lower().startswith('favor') else 'mixed'} "
+            f"{'favorable' if period_favorable_status(current, ctx) == 'favorable' else 'mixed'} "
             f"energy for relationships — the next few years are about consolidation rather than reinvention."
         )
     else:
@@ -659,8 +729,8 @@ def marriage_timing_windows(ctx) -> str:
     for p in spans:
         if current_age is not None and not (p.start_age <= current_age <= p.end_age):
             continue
-        if (p.favorable_status or "").lower().startswith("favor"):
-            candidates.append(f"**{p.combined}** (ages {p.start_age}-{p.end_age}, {p.favorable_status})")
+        if period_favorable_status(p, ctx) == "favorable":
+            candidates.append(f"**{p.combined}** (ages {p.start_age}-{p.end_age}, {period_favorable_status(p, ctx)})")
     if not candidates and spans:
         candidates.append(
             f"**{spans[0].combined}** (ages {spans[0].start_age}-{spans[0].end_age}) — "
@@ -872,7 +942,7 @@ def long_term_vitality_strategy(ctx) -> str:
     supportive_periods = []
     conserving_periods = []
     for p in chart.daeun:
-        status = (p.favorable_status or "").lower()
+        status = period_favorable_status(p, ctx)
         if "favor" in status:
             supportive_periods.append(f"ages {p.start_age}-{p.end_age} ({p.combined})")
         elif "challeng" in status or "difficult" in status:
@@ -901,20 +971,19 @@ def long_term_vitality_strategy(ctx) -> str:
 
 def major_luck_theme_row(p, ctx) -> Tuple[str, str]:
     """(career_theme, relationship_theme) for one 대운 row."""
-    tg = p.stem_tengod_en or p.stem_tengod or "—"
-    status = (p.favorable_status or "neutral").lower()
-    fav = _ctx_get(ctx, "favorable", "—")
+    status = period_favorable_status(p, ctx)
     favorable = "favor" in status
-    if "Authority" in tg or "Officer" in tg:
+    cls = _TENGOD_FIVE_CLASS.get(p.stem_tengod, "")
+    if cls == "Authority":
         career = "structured career moves; credentials matter"
         relationship = "commitment or formalization themes"
-    elif "Wealth" in tg:
+    elif cls == "Wealth":
         career = "income, assets, or value-creation themes"
         relationship = "shared resources or lifestyle alignment"
-    elif "Output" in tg:
+    elif cls == "Output":
         career = "creative output, voice, or visible production"
         relationship = "creative partnership or playful dynamic"
-    elif "Resource" in tg:
+    elif cls == "Resource":
         career = "study, mentorship, or skill-building"
         relationship = "nurturing, support, or healing connection"
     else:
@@ -928,13 +997,19 @@ def major_luck_theme_row(p, ctx) -> Tuple[str, str]:
 def major_luck_narrative(p, ctx) -> str:
     """Full 1-paragraph interpretation per 대운."""
     tg = p.stem_tengod_en or p.stem_tengod or "—"
-    status = (p.favorable_status or "neutral").lower()
+    status = period_favorable_status(p, ctx)
     branch_elem = p.branch_element or "—"
     stem_elem = p.stem_element or "—"
     fav = _ctx_get(ctx, "favorable", "—")
+    cls = _TENGOD_FIVE_CLASS.get(p.stem_tengod, "")
+    undertow = (
+        "commitment and visibility" if cls in ("Authority", "Wealth")
+        else "creative exploration" if cls == "Output"
+        else "support and study"
+    )
     return decade_career_strategy(ctx, p) + (
         f" Relationships in this window carry the same **{tg}** undertow — themes of "
-        f"{'commitment and visibility' if 'Officer' in tg or 'Wealth' in tg else 'creative exploration' if 'Output' in tg else 'support and study'} "
+        f"{undertow} "
         f"are likely. The favorable **{fav}** element shows up most clearly in years and months whose "
         f"stem matches it — these are the periods to lean in."
     )
@@ -948,7 +1023,7 @@ def current_period_deep_dive(ctx) -> str:
     if not current:
         return "Current major-luck period is outside the chart's documented 대운 range."
     tg = current.stem_tengod_en or current.stem_tengod or "—"
-    status = (current.favorable_status or "neutral").lower()
+    status = period_favorable_status(current, ctx)
     branch_elem = current.branch_element or "—"
     favorable = "favor" in status
     do = "push visible projects, plant seeds, and request what is owed" if favorable else "conserve, refine, and protect the foundation"
@@ -977,16 +1052,17 @@ def annual_window_row(h, ctx) -> Tuple[str, str, str]:
     sup = _ctx_get(ctx, "supporting", "—")
     favorable = elem in {fav, sup}
     theme = f"{elem} energy + {tg} — a {'favorable-element' if favorable else 'mixed'} year."
-    if "Authority" in tg or "Officer" in tg:
+    cls = _TENGOD_FIVE_CLASS.get(h.stem_tengod, "")
+    if cls == "Authority":
         best = "career moves, credentials, formal commitments"
         watch = "stubborn authority clashes; avoid ego fights"
-    elif "Wealth" in tg:
+    elif cls == "Wealth":
         best = "income launches, negotiations, value-pricing"
         watch = "over-leveraging or risky investments"
-    elif "Output" in tg:
+    elif cls == "Output":
         best = "creative production, writing, speaking, teaching"
         watch = "speaking before thinking; reputation risk"
-    elif "Resource" in tg:
+    elif cls == "Resource":
         best = "study, mentorship, rest, skill-building"
         watch = "over-isolation or missed opportunities"
     else:
@@ -1023,15 +1099,6 @@ def year_by_year_note(h, ctx) -> str:
     return (
         f"This is {year_kind} — best focused on {focus}. "
         f"Caution: {caution}; pace yourself rather than pushing through."
-    )
-
-
-def auspicious_date_note(d: str, ctx) -> str:
-    """1 sentence per auspicious-date candidate."""
-    fav = _ctx_get(ctx, "favorable", "—")
-    return (
-        f"A reasonable candidate if the querent's intended action is supported by **{fav}**-element "
-        f"energy — confirm against the local calendar and the querent's specific question before booking."
     )
 
 
@@ -1561,7 +1628,7 @@ def travel_timing(ctx) -> str:
     favorable_periods = [
         f"ages {p.start_age}-{p.end_age} ({p.combined})"
         for p in chart.daeun
-        if "favor" in (p.favorable_status or "").lower()
+        if period_favorable_status(p, ctx) == "favorable"
     ]
     if favorable_periods:
         return (
@@ -1702,7 +1769,7 @@ def plain_words_timing(ctx) -> str:
             f"Timing works in layers — a roughly ten-year chapter, then the year, then the month. "
             f"Windows that carry {fav} are the ones to act in."
         )
-    status = (getattr(current, "favorable_status", "") or "").lower()
+    status = period_favorable_status(current, ctx)
     if "unfavor" in status or "challeng" in status:
         weather = "a headwind decade — steady effort beats big bets right now"
     elif "favor" in status:

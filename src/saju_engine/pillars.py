@@ -21,6 +21,7 @@ from typing import Any, Dict, Optional, Tuple
 
 import contextlib
 import io
+import math
 import os
 import sys
 
@@ -207,6 +208,63 @@ def _hour_stem_day_stem(raw: Dict[str, Any], eff_hour: int, convention: str) -> 
     return day_stem
 
 
+def _equation_of_time_minutes(year: int, month: int, day: int) -> float:
+    """Equation of time (분시차, 均時差), in minutes, for the given calendar date.
+
+    True (apparent) solar time — the basis for classical 사주 hour-branch
+    determination — is Local Mean Time (LMT, the pure longitude correction
+    sajupy already applies) PLUS the equation of time: the seasonal
+    difference between the mean sun and the true sun caused by Earth's
+    orbital eccentricity and axial tilt. It ranges roughly -14 to +16 minutes
+    across the year and is NOT a classical-interpretation question — it is
+    physics that classical 진태양시 (true solar time) already assumes, the
+    same way the longitude correction does.
+
+    Added 2026-09-19 (external report review): sajupy's own solar-time
+    correction (`sajupy/core.py::_calculate_solar_time_correction`) is pure
+    `(longitude - standard_longitude) * 4`, with no equation-of-time term —
+    confirmed by reading its source. This under-states true-solar-time
+    uncertainty for any birth near an hour-branch boundary (e.g. Harish's,
+    whose stated ~3-minute margin was really closer to ~1 minute once EoT is
+    included). This engine applies EoT itself, on top of sajupy's longitude
+    term, rather than modifying the third-party dependency.
+
+    Formula: the standard Spencer (1971) / NOAA approximation,
+    EoT = 9.87·sin(2B) − 7.53·cos(B) − 1.5·sin(B) minutes, where
+    B = (360/365)·(N − 81) degrees and N is the day of year. Accurate to
+    within about 30 seconds across the year — consistent with the
+    whole-minute precision already used elsewhere in this module.
+    """
+    n = date(year, month, day).timetuple().tm_yday
+    b = math.radians(360.0 / 365.0 * (n - 81))
+    return 9.87 * math.sin(2 * b) - 7.53 * math.cos(b) - 1.5 * math.sin(b)
+
+
+def _apply_equation_of_time(
+    raw: Dict[str, Any],
+    year: int,
+    month: int,
+    day: int,
+    hour: int,
+    minute: int,
+) -> None:
+    """Add the equation of time to sajupy's longitude-only solar correction, in place.
+
+    No-op if sajupy reports no solar correction (e.g. ``use_solar_time=False``
+    or no city/longitude supplied) — there is nothing to refine.
+    """
+    sc = raw.get("solar_correction")
+    if not sc:
+        return
+    base_minutes = sc.get("correction_minutes", 0) or 0
+    eot_minutes = _equation_of_time_minutes(year, month, day)
+    total_minutes = base_minutes + eot_minutes
+    adjusted = datetime(year, month, day, hour, minute) + timedelta(minutes=total_minutes)
+    sc["correction_minutes"] = round(total_minutes, 1)
+    sc["equation_of_time_minutes"] = round(eot_minutes, 1)
+    sc["solar_time"] = adjusted.strftime("%H:%M")
+
+
 def _warn_if_suspicious_longitude(
     raw: Dict[str, Any],
     city: Optional[str],
@@ -340,6 +398,12 @@ def compute_pillars(
 
     # Geocoding sanity checks.
     _warn_if_suspicious_longitude(raw, city, longitude, utc_offset)
+
+    # Refine sajupy's longitude-only solar correction with the equation of
+    # time (see _apply_equation_of_time docstring). No-op if sajupy applied
+    # no correction at all.
+    if use_solar_time:
+        _apply_equation_of_time(raw, year, month, day, hour, minute)
 
     # Compute the solar-adjusted calendar date and expose it as metadata.
     # This is needed both for the hour-stem correction and for downstream

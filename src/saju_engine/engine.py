@@ -28,6 +28,7 @@ from . import strength as STR
 from . import patterns as PAT
 from . import sewoon as SE
 from . import daeun_overlay as DO
+from . import yongsin as YS
 from .chart import Chart, Pillar, TenGodHit, DaeunPeriod
 from .lookup import TENGOD_EN as _TENGOD_EN
 
@@ -315,13 +316,17 @@ def compute_chart(
         strength_verdict=chart.strength_assessment.get("verdict", "") if chart.strength_assessment else "",
     )
 
-    # Major-luck (대운) activation overlay
+    # Major-luck (대운) activation overlay. Uses the climate-resolved 용신
+    # (not the raw strength-heuristic candidate) for the favorable/neutral/
+    # unfavorable lean per period — see daeun_overlay.py's docstring.
+    _resolved_fe = YS.favorable_element(chart)
     chart.daeun = DO.build_daeun_overlays(
         day_master=chart.day_master,
         natal_branches=chart.branches,
         natal_stems=chart.stems,
         strength_assessment=chart.strength_assessment,
         periods=chart.daeun,
+        resolved_favorable=_resolved_fe.element,
     )
 
         # Current major-luck period on the querier's reference date.

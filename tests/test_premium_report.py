@@ -585,6 +585,49 @@ def test_favorable_override_flows_into_report():
     assert "- **Favorable Element:** Fire —" in report
 
 
+def test_lifetime_decade_roadmap_honours_override_not_chart_baked_status():
+    """Regression for the 2026-09-19 override/roadmap mismatch.
+
+    ``chart.daeun[i].favorable_status`` is baked in at compute_chart time
+    (bare-resolved, no override — see daeun_overlay.py). The rendered
+    "Lifetime Decade Roadmap" must instead reflect THIS report's actual
+    favorable_override, or an overridden report (Gurumoorthy, Sruthi, Pawan
+    in production) would show a roadmap that contradicts its own Quick
+    Reference favorable element.
+
+    Harish's chart resolves to Water bare (조후 climate-balanced, hot 巳
+    month). Overriding to Metal here must move the roadmap's favorable rows
+    from the Water decade with no Metal in either stem or branch (60-69,
+    壬子: Water stem + Water branch) to the pure-Metal decades (20-29 戊申,
+    30-39 己酉: Metal branch, and 50-59 辛亥 which is favorable either way
+    since its stem 辛 is itself Metal).
+    """
+    chart = compute_chart(
+        name="Harish-override-regression", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+    bare_report = generate_premium_report(chart, tier="deep")
+    override_report = generate_premium_report(chart, tier="deep", favorable_override="Metal")
+
+    def _roadmap_row(report: str, ages: str) -> str:
+        for line in report.splitlines():
+            if line.startswith(f"| {ages} |"):
+                return line
+        raise AssertionError(f"no roadmap row found for ages {ages}")
+
+    # Bare (Water-resolved): 60-69 (pure Water, no Metal anywhere) favorable;
+    # 20-29 / 30-39 (Metal branch, no Water) neutral.
+    assert _roadmap_row(bare_report, "60–69").endswith("| favorable |")
+    assert _roadmap_row(bare_report, "20–29").endswith("| neutral |")
+
+    # Overridden to Metal: the favorable rows must move accordingly, not stay
+    # pinned to the bare-resolved Water rows.
+    assert _roadmap_row(override_report, "20–29").endswith("| favorable |")
+    assert _roadmap_row(override_report, "30–39").endswith("| favorable |")
+    assert _roadmap_row(override_report, "60–69").endswith("| neutral |")
+
+
 # ── Report-leak regressions (partial 삼형, GridCandidate repr, doubled phrase) ──
 
 def _partial_punishment_chart():
@@ -645,20 +688,30 @@ def test_balanced_chart_growth_area_has_no_doubled_phrase():
 # ── Method-transparency disclosures (external-review feedback, 2026-09-07) ──
 
 def test_solar_time_disclosure_present_with_hour_boundary_flag():
-    chart = _partial_punishment_chart()  # 03:10 clock → 02:56 solar, 4 min from 寅 boundary
+    # 03:10 clock -> 02:58 solar (longitude -13.5 min + equation of time +1.7
+    # min, added 2026-09-19 per the external report review — see
+    # pillars.py::_equation_of_time_minutes), 2 min from the 寅 boundary.
+    chart = _partial_punishment_chart()
     sc = chart.solar_correction or {}
-    assert sc.get("solar_time") == "02:56"
+    assert sc.get("solar_time") == "02:58"
     report = generate_premium_report(chart, tier="deep")
     assert "**Time method:**" in report
-    assert "true solar time **02:56**" in report
+    assert "true solar time **02:58**" in report
+    assert "equation of time" in report, "the EoT breakdown must be disclosed, not silently folded in"
     assert "⚠ Hour-boundary note" in report, "knife-edge births must be flagged"
-    assert "~4 minutes from a 2-hour branch boundary" in report
+    assert "~2 minutes from a 2-hour branch boundary" in report
 
 
 def test_solar_time_note_omitted_when_no_correction_applied():
+    # 2000-06-13 is the date the equation of time is nearest zero (see
+    # pillars.py::_equation_of_time_minutes); combined with longitude on the
+    # exact IST meridian (82.5°E, zero longitude term), total correction
+    # rounds to 0 min and no disclosure should render. A date/longitude
+    # combo that zeroes only the longitude term (e.g. the old 1993-12-11) no
+    # longer suffices on its own now that EoT is applied (added 2026-09-19).
     chart = compute_chart(
-        year=1993, month=12, day=11, hour=2, minute=45,
-        gender="F", longitude=82.5, utc_offset=5.5,  # on the IST meridian → no correction
+        year=2000, month=6, day=13, hour=2, minute=45,
+        gender="F", longitude=82.5, utc_offset=5.5,
         convention="korean",
     )
     report = generate_premium_report(chart, tier="deep")
@@ -689,7 +742,17 @@ def test_daeun_direction_absent_gender_is_disclosed_not_hidden():
 
 
 def test_element_balance_has_methodology_footnote():
+    """The footnote must accurately describe the counting method, not claim a
+    branch's own element is counted separately from its hidden stems (it
+    isn't — see strength.py::_element_counts, which weights only the 4
+    visible stems at 1.0 plus every hidden stem at 0.6/0.3/0.1). The old
+    wording ("8 visible stems and branches") was found 2026-09-19 (external
+    report review) to describe a DIFFERENT method than the code implements,
+    which led an outside reviewer to (incorrectly) conclude the Fire
+    percentage was miscomputed — it wasn't; the prose was just misleading.
+    """
     chart = _sample_chart()
     report = generate_premium_report(chart, tier="deep")
-    assert "Methodology: each element's share counts the 8 visible stems and branches" in report
+    assert "counts the 4 visible stems" in report
+    assert "8 visible stems and branches" not in report
     assert "main qi 0.6, middle 0.3, residual 0.1" in report

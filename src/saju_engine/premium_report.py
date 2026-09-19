@@ -281,15 +281,17 @@ def _solar_time_note(chart) -> List[str]:
         return []
 
     corr = sc.get("correction_minutes")
+    eot = sc.get("equation_of_time_minutes")
     lon = sc.get("longitude")
     std = sc.get("standard_longitude")
     where = ""
     if lon is not None and std is not None:
         where = f" (birthplace {lon}°E vs the {std}°E zone meridian)"
+    eot_clause = f" (longitude {corr - eot:+g} min + equation of time {eot:+g} min)" if eot is not None and corr is not None else ""
 
     lines = [
         f"**Time method:** recorded birth time {original} (local clock) corrected to true solar time **{solar}**"
-        f"{where}{', ' + f'{corr:+g} min' if corr is not None else ''}. "
+        f"{where}{', ' + f'{corr:+g} min' if corr is not None else ''}{eot_clause}. "
         "Hour branches follow 2-hour solar windows, so the pillars above use the corrected time.",
     ]
 
@@ -389,9 +391,11 @@ def _section_chart_at_a_glance(ctx: _ReportContext) -> List[str]:
     lines += _element_balance_table(ctx.chart)
     lines += [
         "",
-        "> _Methodology: each element's share counts the 8 visible stems and branches at weight 1.0 plus "
-        "hidden stems at reduced weights (main qi 0.6, middle 0.3, residual 0.1) because hidden stems are "
-        "submerged qi; the counts are then normalized to 100%._",
+        "> _Methodology: each element's share counts the 4 visible stems (year/month/day/hour) at weight "
+        "1.0, plus every branch's hidden stems (藏干) at reduced weights (main qi 0.6, middle 0.3, "
+        "residual 0.1) — a branch's own elemental weight is carried entirely through its hidden stems "
+        "(its main-qi hidden stem is usually the branch's nominal element), not counted a second time as "
+        "a separate 1.0 entry, since that would double-count it; the counts are then normalized to 100%._",
     ]
     lines += ["", "### Quick Reference", ""]
     lines += [
@@ -942,6 +946,9 @@ def _section_natal_patterns(ctx: _ReportContext) -> List[str]:
     if ctx.chart.six_breaks:
         for a, b in ctx.chart.six_breaks:
             rels.append(("Six Break", f"{a}-{b}", "a disruption of an expected harmony; often appears as a changed plan or external adjustment"))
+    tengod_conflicts = (ctx.chart.patterns or {}).get("tengod_conflicts", [])
+    for c in tengod_conflicts:
+        rels.append((f"{c['name_ko']} ({c['name_en']})", "상관 + 정관", c["note"]))
 
     if rels:
         lines += ["| Pattern | Branches | Classical Note |", "|---|---|---|"]
@@ -1003,7 +1010,7 @@ def _section_major_luck_narrative(ctx: _ReportContext) -> List[str]:
             "",
             f"- **Ten-God theme:** {tg}",
             f"- **Branch element & 12-stage:** {branch_elem} · {stage}",
-            f"- **Favorable lean:** {p.favorable_status or 'neutral'}",
+            f"- **Favorable lean:** {PF.period_favorable_status(p, ctx)}",
             "",
             PF.major_luck_narrative(p, ctx),
             "",
@@ -1032,7 +1039,7 @@ def _section_lifetime_decade_roadmap(ctx: _ReportContext) -> List[str]:
         "|---|---|---|---|",
     ]
     for p in ctx.chart.daeun:
-        status = (p.favorable_status or "neutral").lower()
+        status = PF.period_favorable_status(p, ctx).lower()
         if "favor" in status or status in {"strong", "supporting", "helpful"}:
             lean = "favorable"
         elif "challeng" in status or "difficult" in status or "weak" in status:
@@ -1279,34 +1286,71 @@ def _section_practical_guidance(ctx: _ReportContext, full: bool = False) -> List
     return lines
 
 
-def _section_auspicious_dates(ctx: _ReportContext) -> List[str]:
-    """Draft a 90-day auspicious-dates window for the Full Map tier.
+def _section_auspicious_dates(ctx: _ReportContext, window_days: int = 90, max_dates: int = 5) -> List[str]:
+    """Scan the next `window_days` for real favorable-element, non-clashing days.
 
-    The engine currently marks these as reader-drafted placeholders because
-    precise date selection depends on the querent's specific question and
-    local calendar conventions. The list provides 3–5 candidate windows
-    biased toward the favorable element and away from clashes on the day branch.
+    2026-09-19 fix (external report review): this used to pick 5 FIXED offsets
+    (7/21/42/63/84 days out) regardless of what those dates' actual day-pillars
+    were, then attached a generic templated sentence via
+    ``PF.auspicious_date_note`` that named the favorable element without ever
+    checking whether that specific date's stem matched it or whether its
+    branch clashed the natal day branch. Confirmed live: 2026-10-10 (丁巳) was
+    listed as "supported by Water" despite its branch 巳 directly clashing
+    Harish's natal day branch 亥 (巳亥沖) — exactly the clash this section's own
+    docstring claimed to filter for. Rewritten to reuse the same real
+    day-pillar computation and clash filter as `_section_monthly_lucky_dates`
+    (already validated correct), so a listed date is one whose day-stem
+    element actually matches 용신/희신 and whose day-branch does not clash the
+    natal day branch.
     """
     ref = ctx.chart.reference_date_obj() or datetime.now().date()
-    dates: List[Tuple[str, str]] = []
-    # Pick roughly every ~18 days within the next 90 days, landing on days
-    # whose stem/branch element leans toward the favorable element.
-    candidate_offsets = [7, 21, 42, 63, 84]
-    for offset in candidate_offsets:
+    fav_elems = {ctx.favorable}
+    if ctx.supporting and ctx.supporting != ctx.favorable:
+        fav_elems.add(ctx.supporting)
+    day_branch = ctx.chart.day.branch
+    natal_branches = list(ctx.chart.branches)
+    clashing_branches = set(_branch_clashes(day_branch, natal_branches))
+
+    selected: List[Tuple[date, str, str, str]] = []
+    for offset in range(1, window_days + 1):
         d = ref + timedelta(days=offset)
-        dates.append((d.strftime("%Y-%m-%d (%A)"), PF.auspicious_date_note(d.strftime("%Y-%m-%d"), ctx)))
+        try:
+            hit = SE.derive_ilwoon(ctx.chart.day_master, natal_branches, d.year, d.month, d.day)
+        except Exception:
+            continue
+        stem_elem = L.STEM_INFO.get(hit.stem, {}).get("element", "")
+        if stem_elem not in fav_elems:
+            continue
+        if hit.branch in clashing_branches:
+            continue
+        tengod_note = hit.stem_tengod_en or hit.stem_tengod
+        selected.append((d, hit.combined, tengod_note, stem_elem))
+        if len(selected) >= max_dates:
+            break
 
     lines = [
         "## Auspicious Dates — Next 90 Days",
         "",
-        f"> The next 90-day window from {ref.strftime('%B %Y')} includes the following candidate dates. "
-        "A qualified reader should cross-check each date against the querent's specific natal activations and local calendar before recommending it.",
+        f"> The next {window_days}-day window from {ref.strftime('%B %Y')} includes the following candidate dates — each one's day-stem element matches your favorable ({ctx.favorable}) or supporting ({ctx.supporting}) element, and its day-branch does not clash your natal day branch ({day_branch}). "
+        "A qualified reader should still cross-check each date against the querent's specific question and local calendar before recommending it.",
         "",
-        "| Date | Suggested Use / Reader Note |",
-        "|---|---|",
+        "| Date | Day Pillar | Suggested Use / Reader Note |",
+        "|---|---|---|",
     ]
-    for d, note in dates:
-        lines.append(f"| {d} | {note} |")
+    if selected:
+        for d, combo, tg, stem_elem in selected:
+            role = "favorable" if stem_elem == ctx.favorable else "supporting"
+            lines.append(
+                f"| {d.strftime('%Y-%m-%d (%A)')} | {combo} ({tg}) | "
+                f"A reasonable candidate — the day-stem carries your {role} element ({stem_elem}) and its "
+                f"branch does not clash your natal day branch; confirm against the querent's specific "
+                f"question before booking. |"
+            )
+    else:
+        lines.append(
+            f"| — | — | No day in this {window_days}-day window has a favorable-element, "
+            "non-clashing day-stem; widen the window or use the Monthly Lucky Dates table instead. |"
+        )
     lines += ["", "---", ""]
     return lines
 

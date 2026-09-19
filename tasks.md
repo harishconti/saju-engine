@@ -2,9 +2,12 @@
 
 **Date opened:** 2026-06-02  
 **Last updated:** 2026-09-19  
-**Test count:** 892 pytest cases passing / 10 xfailed (`python3 -m pytest`); engine validation gate
+**Test count:** 916 pytest cases passing / 10 xfailed (`python3 -m pytest`); engine validation gate
 `python3 tools/run_validation.py` → 200 checks (195 PASS / 5 INTERPRETATION / 0 FAIL); landing page
 `npm run build` + 133 vitest cases green.
+**Open decision:** RM (Kim Nam-joon)'s hour pillar sits 17 seconds from the 午/未 boundary after the
+2026-09-19 equation-of-time fix — his public demo materials still use the old 午 reading pending a
+user decision on how to handle a boundary this close (see the 2026-09-19 change log entry).
 **Status:** The **engine** is complete and validated (four Korean 만세력 textbook cross-validation cases, parametrized lookup-table tests, 30×30 Nayin table on the 5-element fallback, special-formations tests). **As of 2026-09-07 the project pivoted the go-to-market from India / ₹ to English-speaking-global / USD** — see `improvements_issues.md` (master doc) and `docs/market-research-2026-09.md` (sourced research). The 3 client-facing engine defects that blocked a paid launch are **fixed** (G1 reviewer-note leak, G2 per-pillar template grammar, G3 용신 single source of truth), plus ₹→USD across the engine, docs, and landing page. **Open P0/P1 (see `improvements_issues.md` §12):** real testimonials, Merchant-of-Record checkout, self-service-app PII/queue hardening, deployment. **Package layout:** engine and PDF packages live under `src/` with direct-run shims and a ReportLab fallback.
 
 This file is the persistent to-do list for the saju project. Items here were either explicitly deferred or surfaced during research.
@@ -326,6 +329,119 @@ Sourced market research: **`docs/market-research-2026-09.md`**. Design spec:
 
 ## Change log
 
+- **2026-09-19 (equation of time + 상관견관 detection, user-approved — Suite → 916)** — Implemented
+  the two items flagged (not auto-fixed) by the external-report review, after explicit user
+  approval. **(1) Equation of time:** added `pillars.py::_equation_of_time_minutes` (standard
+  Spencer/NOAA approximation) and `_apply_equation_of_time`, which refines sajupy's longitude-only
+  solar correction (`sajupy/core.py` confirmed to have no EoT term) by adding the seasonal ~±16
+  min EoT on top, applied in place on `raw["solar_correction"]` right after the sajupy call so
+  every downstream consumer (hour-boundary flag, chart.solar_correction, the report's "Time
+  method" disclosure) picks it up automatically. The disclosure text now shows the longitude/EoT
+  split for transparency. **Re-validated every real candidate's hour pillar for boundary flips
+  before regenerating anything** (the promised check): Harish, Mahesh, Sruthi, Pawan, Gurumoorthy,
+  and Vishnu-Priya are all UNCHANGED (their hour branch survives the ~1-2 min EoT shift) — only
+  cosmetic disclosure text differs. **RM (Kim Nam-joon) is the one exception and was NOT
+  regenerated pending a decision:** his corrected true solar time lands at 13:00:17, just 17
+  *seconds* past the 午→未 hour-branch boundary — a shift ~0-8× smaller than the combined
+  precision of the recorded birth minute, the EoT approximation (~30 sec), and the geocoded
+  longitude, i.e. this is now a genuine coin-flip, not a confident flip to 未. His public
+  landing-page demo materials (`apps/landing-page/public/demo-rm-*.pdf`, `candidates_horoscope/reports/rm/`)
+  still reflect the old (未-adjacent but previously-considered-safe) 午-hour reading; flagged for
+  the user, not silently swapped. **(2) 상관견관 (Output Meets Authority) detection:** added
+  `patterns.py::detect_tengod_conflicts` — checks specifically for 상관 (Hurting Officer) + 정관
+  (Direct Officer) co-presence (visible or hidden), sourced from `knowledge/05-ten-gods.md`;
+  deliberately does NOT extend to 편관 (Seven Killings, which forms separately-named patterns like
+  식신제살). Surfaced as a new row in the "Natal Pattern Analysis" table. Found present in all 6
+  regenerable candidates. Added regression tests for both (`tests/test_pillars.py`,
+  `tests/test_patterns.py`). **Regenerated the 6 unaffected candidates** (base + combined + all
+  PDFs) for the third time today to pick up both changes cumulatively; RM intentionally untouched.
+  Suite: **916 passed / 10 xfailed / 0 failed**.
+- **2026-09-19 (external QA review of Harish's report — 5 real bugs found + fixed, portfolio-wide
+  regen — Suite → 905)** — User shared a third-party AI's line-by-line audit of Harish's report.
+  Verified every claim against live code/output rather than trusting it (some claims were wrong —
+  see below); confirmed and fixed 5 real, previously-unknown defects, all affecting every
+  candidate's report, not just Harish's:
+  1. **Ten-god theme mismapping** (`prose_fillers.py`, 3 functions): `annual_window_row`,
+     `major_luck_theme_row`, and `major_luck_narrative` classified a ten-god's class (Authority/
+     Wealth/Output/Resource/Companion) by substring-matching its ENGLISH gloss (e.g. `"Officer" in
+     tg`). This silently misclassified 3 of 10 ten-gods: 상관 ("Hurting Officer") wrongly matched
+     "Officer" → got Authority-class text instead of Output; 편관 ("Seven Killings") and 식신
+     ("Eating God") matched nothing → both fell through to generic Companion/peer text. Confirmed
+     live in Harish's shipped report (2027/편관, 2032-2033/상관·식신, decades 10-19/60-69). Fixed by
+     adding `_TENGOD_FIVE_CLASS` (Korean-code-keyed) and classifying on `p.stem_tengod` instead.
+  2. **`income_rhythm`'s wealth-rooting check** used `if "재" in tg` on the Korean ten-god string —
+     "재" also occurs inside 겁재 (Robber, 비겁 class), so a hidden 겁재 could be wrongly counted as
+     wealth-rooting. Fixed to `tg in ("정재", "편재")`.
+  3. **`relationship_style`'s personalization was completely dead code** — the `implication` dict is
+     keyed by simplified class names ("Output", "Companion", ...) but was looked up using
+     `hit.tengod_en` (the full English gloss, e.g. "Hurting Officer (傷官)"), which never matches
+     any key. Every single candidate's Relationship Style section rendered the identical generic
+     fallback sentence ("you bring the querent's full nature into the partnership") regardless of
+     their actual spouse-palace ten-god — confirmed across all 7 candidates (4 different real
+     ten-gods, same sentence every time). This was the most significant finding: a "personalized"
+     section that was never actually personalized, for the entire product's history. Fixed by
+     looking up via `_TENGOD_CLASS.get(spouse_tg_ko)` instead.
+  4. **`_section_auspicious_dates` never filtered anything** — picked 5 FIXED day-offsets
+     (7/21/42/63/84 days out) regardless of their actual day-pillar, then attached a generic
+     templated sentence naming the favorable element without checking it. Confirmed: 2026-10-10
+     (丁巳) was listed as "supported by Water" despite its branch 巳 directly clashing Harish's
+     natal day branch 亥 — exactly the clash the section's own docstring claimed to filter for.
+     Rewritten to reuse the same real day-pillar + clash-filter logic already used (and validated
+     correct) by `_section_monthly_lucky_dates`. Removed the now-dead `PF.auspicious_date_note`.
+  5. **Misleading Element Balance methodology footnote** — claimed to count "8 visible stems and
+     branches" at weight 1.0, but the actual code (`strength.py::_element_counts`) only weights the
+     4 visible stems at 1.0; a branch's own element is represented entirely through its hidden
+     stems (never double-counted). The math was always correct; the prose describing it wasn't —
+     this is what led the external review to (incorrectly) claim Fire's 7.6% was "mathematically
+     impossible." Hand-verified Harish's actual weighted sum reproduces 7.6% Fire / 16.5% Wood
+     exactly under the real code path. Fixed the footnote wording; no computation changed.
+  6. **Cosmetic:** Deep-tier cover tagline said "six-year year-by-year timing" while the tier's own
+     headline feature is a 10-Year Forecast table. Fixed to "ten-year."
+  **Claims investigated and found NOT to be bugs** (reviewed, no change made): the element
+  percentages themselves (see #5 — math is correct); the "사 (死)" stage gloss as "phase-ending
+  start" (deliberate non-fatalistic softening applied consistently to all 12 stages, per CLAUDE.md
+  Ground Rules 4/6 — the literal term is still shown elsewhere via `plain_glossary.py` and the hanja
+  glossary); the two "Health & Vitality" sections (deliberately distinct base + deep-dive content,
+  not a stitching artifact — confirmed different text); citation leaks / HTML comments / the
+  engine-draft footer in the `.md` (by design — stripped from PDF only, confirmed 0 leaks in every
+  rebuilt PDF); Harish's Travel & Move Timing having no window before age 50 (an accurate reflection
+  of his chart — his favorable decades genuinely don't start until 50, not a code defect).
+  **Confirmed real, but deliberately NOT fixed pending a decision:** sajupy's solar-time correction
+  is pure longitude-based mean solar time with no equation-of-time term (~±16 min seasonal, ~+1.5-2
+  min in early June) — verified in `sajupy/core.py::_calculate_solar_time_correction`. This means
+  Harish's hour-boundary risk is understated (true margin closer to ~1 minute than the stated ~3).
+  Implementing it is a legitimate, sourceable astronomical correction (not a classical-doctrine
+  question) but would need re-validating every delivered chart's hour pillar for boundary flips —
+  flagged for the user rather than done unilaterally. Also flagged: 상관견관 (Output-meets-Authority
+  conflict) is documented in `knowledge/05-ten-gods.md` but has no engine detection anywhere in
+  `patterns.py` — a real missing feature for "deep" reports, not implemented this pass.
+  **Regenerated the entire candidate portfolio** (Harish, Mahesh, Sruthi, Pawan, Gurumoorthy,
+  Vishnu-Priya, RM — base reports + combined reports + all PDFs) since bugs #1-#4 affected every
+  single one. Added regression tests for all 5 fixes
+  (`tests/test_prose_fillers.py`, `tests/test_premium_report.py`). Suite: **905 passed / 10 xfailed
+  / 0 failed**.
+- **2026-09-19 (daeun favorable-status raw-vs-resolved bug, found + fixed — Suite → 895)** —
+  While preparing a deeper career.md for Harish, found the "Lifetime Decade Roadmap" /
+  "Life Themes by Major Luck Period" favorable-lean labels were computed from the RAW
+  pre-climate `candidate_favorable` (`daeun_overlay.py`), not the resolved 용신 — the same bug
+  class already fixed in `premium_report.py`'s callouts and the career-tier pool, missed here.
+  Fixed `daeun_overlay.py` to accept a `resolved_favorable` param, wired from
+  `yongsin.favorable_element(chart)` in `engine.py`. This alone would have introduced a NEW
+  mismatch for reader-overridden charts (the chart-baked value is set before any
+  `--favorable-override` is known), so also added `premium_report._period_favorable_status`
+  (→ moved to the shared `prose_fillers.period_favorable_status`) and fixed all **10** direct
+  `p.favorable_status` reads across `prose_fillers.py` plus 2 in `compat_report.py` to
+  recompute against the report's actual final resolved element instead. Added regression tests
+  (`test_daeun_overlay.py`, `test_premium_report.py::test_lifetime_decade_roadmap_honours_override_not_chart_baked_status`).
+  **Real-candidate impact, checked and fixed:** Harish + Mahesh (no override — roadmap dates
+  moved to match their already-correct Quick Reference); **Sruthi's and Pawan's shipped base
+  reports were also found stale independent of this fix** — Sruthi's predates the 2026-09-14
+  raw-vs-resolved fix entirely (still said "lean into Metal" and recommended Fire-native Career
+  Archetypes when her actual reader-argued 용신 is Earth), Pawan's "What This Year" line still
+  said Wood instead of his actual Water override. Regenerated both base reports + PDFs;
+  `career.md` for both was already correct (hand-authored separately, unaffected). Gurumoorthy's
+  roadmap was unaffected (coincidentally already correct). Suite: **895 passed / 10 xfailed / 0
+  failed**.
 - **2026-09-19 (Harish full folder rebuild, user-requested)** — Deleted all files in
   `candidates_horoscope/reports/harish/` and rebuilt from scratch: base Deep Destiny report
   regenerated from his birth/location data (1992-06-04 03:10 IST, Pallipattu TN, 79.4408°E), a

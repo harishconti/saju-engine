@@ -49,6 +49,52 @@ def test_daeun_overlay_stem_combination_and_favorable():
     assert overlay["favorable_status"] == "favorable"
 
 
+def test_derive_daeun_overlay_uses_resolved_favorable_over_raw_candidate():
+    """resolved_favorable must win over strength_assessment's raw candidate.
+
+    Regression for the bug found 2026-09-19: daeun_overlay compared each
+    period's element against the RAW strength-heuristic candidate_favorable
+    (pre-climate), not the climate-resolved 용신 — the same bug class already
+    fixed in premium_report.py's callouts and career-tier pool. This silently
+    mis-labelled the "Lifetime Decade Roadmap" favorable/neutral lean for
+    every balanced-DM chart where climate resolved a different element than
+    the raw least-represented-element pick (e.g. Harish: raw Fire, resolved
+    Water).
+    """
+    period = DaeunPeriod(start_age=50, end_age=59, stem="辛", branch="亥")
+    overlay = derive_daeun_overlay(
+        day_master="辛",
+        natal_branches=["申", "巳", "亥", "丑"],
+        natal_stems=["壬", "乙", "辛", "己"],
+        strength_assessment={
+            # Raw candidate (pre-climate) says Fire; the branch 亥 is Water.
+            "candidate_favorable": "Fire",
+            "candidate_unfavorable": None,
+        },
+        period=period,
+        resolved_favorable="Water",  # climate-resolved 용신 for this chart
+    )
+    # Against the raw candidate (Fire) this branch would be "neutral" (no
+    # Fire in {Metal-stem, Water-branch}); against the resolved value (Water)
+    # it is "favorable" because the branch element matches.
+    assert overlay["favorable_status"] == "favorable"
+
+
+def test_harish_regression_daeun_roadmap_uses_climate_resolved_favorable():
+    """End-to-end: Harish's real chart must show climate-resolved (Water)
+    favorability in chart.daeun, not the raw candidate (Fire)."""
+    chart = compute_chart(
+        name="harish-daeun-regression", year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5, gender="M",
+    )
+    by_age = {p.start_age: p for p in chart.daeun}
+    # 50-59 (辛亥) and 60-69 (壬子) both carry the Water branch/stem that
+    # matches the resolved 용신 (Water) — under the pre-fix raw candidate
+    # (Fire) these rendered "neutral".
+    assert by_age[50].favorable_status == "favorable"
+    assert by_age[60].favorable_status == "favorable"
+
+
 def test_build_daeun_overlays_populates_periods():
     """build_daeun_overlays should mutate periods in place and return them."""
     periods = [

@@ -26,6 +26,7 @@ def derive_daeun_overlay(
     natal_stems: List[str],
     strength_assessment: Optional[Dict],
     period: DaeunPeriod,
+    resolved_favorable: Optional[str] = None,
 ) -> Dict:
     """Return an overlay dictionary for a single DaeunPeriod.
 
@@ -37,7 +38,9 @@ def derive_daeun_overlay(
         breaker_present, confidence} for 천간합 with natal stems
       - stem_element / branch_element: 오행 elements
       - favorable_status: 'favorable', 'unfavorable', or 'neutral' vs. the
-        heuristic candidate 용신/기신 (None if strength_assessment unavailable)
+        chart's resolved 용신 (``resolved_favorable`` when given, else the raw
+        heuristic candidate) / the raw heuristic 기신 (None if
+        strength_assessment unavailable)
     """
     # 십신 of 대운天干
     tengod = L.ten_god(day_master, period.stem)
@@ -70,10 +73,18 @@ def derive_daeun_overlay(
     stem_element = L.STEM_INFO.get(period.stem, {}).get("element", "")
     branch_element = L.BRANCH_ELEMENT.get(period.branch, "")
 
-    # Favorability vs. heuristic strength assessment
+    # Favorability vs. the chart's ACTUAL favorable element. Uses
+    # ``resolved_favorable`` (the climate-merged 용신 from
+    # ``yongsin.favorable_element()``) when the caller supplies it, falling
+    # back to the raw strength-heuristic candidate only if it doesn't (e.g. a
+    # caller that hasn't been updated, or a chart with no strength_assessment
+    # at all). There is no climate-resolved 기신 (unfavorable) concept
+    # anywhere in this codebase — ``candidate_unfavorable`` is the raw
+    # strength-heuristic value everywhere it is used (e.g. the "Avoid /
+    # Watch" field in premium_report.py), so it is kept as-is here too.
     favorable_status: Optional[str] = None
     if strength_assessment:
-        fav = strength_assessment.get("candidate_favorable")
+        fav = resolved_favorable if resolved_favorable is not None else strength_assessment.get("candidate_favorable")
         unfav = strength_assessment.get("candidate_unfavorable")
         hits = {stem_element, branch_element}
         if fav in hits:
@@ -101,8 +112,14 @@ def build_daeun_overlays(
     natal_stems: List[str],
     strength_assessment: Optional[Dict],
     periods: List[DaeunPeriod],
+    resolved_favorable: Optional[str] = None,
 ) -> List[DaeunPeriod]:
     """Populate each DaeunPeriod with its activation overlay in-place.
+
+    ``resolved_favorable``: the chart's climate-merged 용신 element (from
+    ``yongsin.favorable_element(chart).element``), used for the
+    favorable/neutral/unfavorable lean instead of the raw strength-heuristic
+    candidate. See ``derive_daeun_overlay`` for why.
 
     Returns the same list so callers can assign it back to the chart.
     """
@@ -113,6 +130,7 @@ def build_daeun_overlays(
             natal_stems=natal_stems,
             strength_assessment=strength_assessment,
             period=period,
+            resolved_favorable=resolved_favorable,
         )
         period.stem_tengod = overlay["stem_tengod"]
         period.stem_tengod_en = overlay["stem_tengod_en"]

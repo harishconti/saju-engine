@@ -4,6 +4,50 @@ from __future__ import annotations
 import pytest
 
 from saju_engine.engine import compute_chart
+from saju_engine.pillars import _equation_of_time_minutes
+
+
+# ── Equation of time (added 2026-09-19, external report review) ──────────
+# sajupy's own solar correction is longitude-only; this engine adds the
+# equation of time on top (pillars.py::_apply_equation_of_time). Reference
+# values below are well-known landmarks of the EoT curve (Spencer/NOAA
+# approximation): the two extrema (~mid-Feb minimum, ~early-Nov maximum) and
+# the zero-crossings (~mid-Apr, ~mid-Jun, ~Sep 1, ~Dec 25).
+
+@pytest.mark.parametrize("month,day,expected_minutes,tolerance", [
+    (2, 11, -14.2, 0.5),   # near the annual minimum
+    (11, 3, 16.4, 0.5),    # near the annual maximum
+    (4, 15, 0.0, 0.3),     # zero-crossing (sundial behind -> ahead of clock)
+    (6, 13, 0.0, 0.3),     # zero-crossing (sundial ahead -> behind clock)
+    (9, 1, 0.0, 1.0),      # zero-crossing (loosely dated — see NOAA figure)
+])
+def test_equation_of_time_matches_known_landmarks(month, day, expected_minutes, tolerance):
+    got = _equation_of_time_minutes(2000, month, day)
+    assert abs(got - expected_minutes) <= tolerance, (
+        f"{month}/{day}: expected ~{expected_minutes} min, got {got:.2f} min"
+    )
+
+
+def test_equation_of_time_shifts_solar_time_relative_to_longitude_only():
+    """A chart's solar_time must reflect longitude + EoT, not longitude alone.
+
+    Uses a birth on the exact IST meridian (82.5°E, zero longitude term) on a
+    date with a well-known non-trivial EoT (~Nov 3, near +16 min) — any
+    correction that appears must come entirely from EoT.
+    """
+    chart = compute_chart(
+        name="EoT-check", gender="M",
+        year=2000, month=11, day=3, hour=10, minute=0,
+        longitude=82.5, utc_offset=5.5, use_solar_time=True,
+    )
+    sc = chart.solar_correction or {}
+    assert sc.get("longitude") == 82.5 == sc.get("standard_longitude")
+    eot = sc.get("equation_of_time_minutes")
+    assert eot is not None and eot > 10, f"expected EoT near +16 min on Nov 3, got {eot}"
+    assert sc.get("correction_minutes") == pytest.approx(eot, abs=0.2), (
+        "correction_minutes should equal the EoT term alone when the longitude term is zero"
+    )
+    assert sc.get("solar_time") != "10:00", "a ~16-minute EoT shift must move the reported solar time"
 
 
 @pytest.mark.parametrize(

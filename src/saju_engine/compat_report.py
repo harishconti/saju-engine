@@ -127,19 +127,43 @@ def _day_master_snapshot(chart: Chart, name: str) -> List[str]:
     return lines
 
 
+def _period_status(period, fe) -> str:
+    """Favorable/neutral/unfavorable lean vs. the FINAL resolved element
+    ``fe`` (which already reflects a reader override, if one was applied via
+    ``compat_score``'s ``favorable_element_a``/``_b`` — see the docstring on
+    ``_daeun_lines`` for why this must not read ``period.favorable_status``
+    directly)."""
+    hits = {period.stem_element, period.branch_element}
+    if fe.element in hits:
+        return "favorable"
+    return "neutral"
+
+
 def _daeun_lines(chart: Chart, name: str) -> List[str]:
-    """Current major-luck period + next two upcoming periods for one partner."""
+    """Current major-luck period + next two upcoming periods for one partner.
+
+    Recomputes each period's favorable/neutral lean against
+    ``favorable_element(chart)`` rather than trusting the chart-baked
+    ``period.favorable_status``. That field is set once at compute_chart
+    time, before any reader override is known; ``compat_score`` (called
+    earlier in ``generate_compat_report``) mutates ``chart.strength_assessment``
+    in place with ``reader_override_favorable`` when a favorable_element_a/_b
+    override was passed, so calling ``favorable_element(chart)`` here (no
+    explicit override arg needed) picks that up automatically. Found
+    2026-09-19 alongside the same bug in daeun_overlay.py / prose_fillers.py.
+    """
     lines: List[str] = []
     cur = getattr(chart, "current_daeun", None)
     if cur is None:
         return lines
 
+    fe = favorable_element(chart)
     lines.append(f"#### Major Luck Timeline — {name}")
     lines.append("")
     lines.append(
         f"**Current period (ages {cur.start_age}–{cur.end_age}):** "
         f"**{cur.combined}** — {cur.stem_tengod_en or cur.stem_tengod} "
-        f"· Favorable status: *{cur.favorable_status}*"
+        f"· Favorable status: *{_period_status(cur, fe)}*"
     )
     if cur.activated_branches:
         rels = ", ".join(sorted(set(cur.relationship_types or [])))
@@ -155,7 +179,7 @@ def _daeun_lines(chart: Chart, name: str) -> List[str]:
             continue
         lines.append(
             f"| {per.start_age}–{per.end_age} | {per.combined} | "
-            f"{per.stem_tengod_en or per.stem_tengod} | {per.favorable_status} |"
+            f"{per.stem_tengod_en or per.stem_tengod} | {_period_status(per, fe)} |"
         )
         seen.add((per.start_age, per.end_age))
         if len(seen) >= 4:

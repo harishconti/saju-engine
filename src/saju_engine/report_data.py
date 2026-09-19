@@ -59,7 +59,7 @@ TIER_CONFIG: Dict[str, Dict[str, str]] = {
         "name": "Deep Destiny Report",
         "price": "$55",
         "pages": "10–12",
-        "tagline": "Full natal reading + six-year year-by-year timing + relationship and business-launch guidance",
+        "tagline": "Full natal reading + ten-year year-by-year timing + relationship and business-launch guidance",
     },
     "spark": {
         "name": "The Spark",

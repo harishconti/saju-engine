@@ -1,7 +1,7 @@
 """Tests for classical grid/pattern detection."""
 from __future__ import annotations
 
-from saju_engine.patterns import detect_patterns
+from saju_engine.patterns import detect_patterns, detect_tengod_conflicts
 
 
 def test_regular_grid_from_month_stem():
@@ -618,3 +618,81 @@ def test_yangin_absent_for_yin_day_master():
     )
     assert result["yangin"]["present"] is False
     assert result["yangin_grid"]["present"] is False
+
+
+# ── 상관견관 (Output Meets Authority) — added 2026-09-19, external review ────
+
+
+def test_tengod_conflict_detects_output_meets_authority_harish_chart():
+    """Harish's real chart (壬申/乙巳/辛亥/己丑, DM 辛): 상관 (壬, year stem + two
+    hidden) and 정관 (hidden 丙 in the month branch 巳) are both present.
+    Confirmed missing from the engine before this fix (external report
+    review, 2026-09-19) — knowledge/05-ten-gods.md documents 상관견관 as a
+    named classical conflict, but nothing detected it.
+    """
+    conflicts = detect_tengod_conflicts(
+        day_master="辛",
+        stems=["壬", "乙", "辛", "己"],
+        hidden_stems=[
+            ("main", "庚"), ("middle", "壬"), ("residual", "戊"),  # 申
+            ("main", "丙"), ("middle", "庚"), ("residual", "戊"),  # 巳
+            ("main", "壬"), ("middle", "甲"),                      # 亥
+            ("main", "己"), ("middle", "癸"), ("residual", "辛"),  # 丑
+        ],
+    )
+    assert len(conflicts) == 1
+    assert conflicts[0]["name_ko"] == "상관견관"
+    assert conflicts[0]["name_en"] == "Output Meets Authority"
+
+
+def test_tengod_conflict_absent_without_direct_officer():
+    """상관 present but no 정관 anywhere (visible or hidden) must not flag
+    상관견관 — this is the specific documented pairing, not a generic
+    식상-vs-관성 check."""
+    conflicts = detect_tengod_conflicts(
+        day_master="辛",  # 상관 = 壬
+        stems=["壬", "乙", "辛", "己"],
+        hidden_stems=[("main", "庚")],  # 겁재, no 관성 at all
+    )
+    assert conflicts == []
+
+
+def test_tengod_conflict_absent_with_seven_killings_only():
+    """편관 (Seven Killings) alone must NOT trigger 상관견관 — that pairing
+    forms separately-named patterns (e.g. 식신제살), not this one. Only the
+    specific 상관+정관 pairing is documented and checked."""
+    conflicts = detect_tengod_conflicts(
+        day_master="辛",  # 상관 = 壬, 편관 = 丁 (not 정관 丙)
+        stems=["壬", "乙", "辛", "己"],
+        hidden_stems=[("main", "丁")],  # 편관, not 정관
+    )
+    assert conflicts == []
+
+
+def test_tengod_conflict_absent_without_output():
+    """정관 present but no 상관 anywhere must not flag 상관견관."""
+    conflicts = detect_tengod_conflicts(
+        day_master="辛",  # 정관 = 丙
+        stems=["丙", "乙", "辛", "己"],
+        hidden_stems=[("main", "戊")],  # 정인, no 식상 at all
+    )
+    assert conflicts == []
+
+
+def test_detect_patterns_surfaces_tengod_conflicts_key():
+    """detect_patterns()'s return dict must expose tengod_conflicts."""
+    result = detect_patterns(
+        day_master="辛",
+        month_stem="乙",
+        month_branch="巳",
+        branches=["申", "巳", "亥", "丑"],
+        stems=["壬", "乙", "辛", "己"],
+        hidden_stems=[
+            ("main", "庚"), ("middle", "壬"), ("residual", "戊"),
+            ("main", "丙"), ("middle", "庚"), ("residual", "戊"),
+            ("main", "壬"), ("middle", "甲"),
+            ("main", "己"), ("middle", "癸"), ("residual", "辛"),
+        ],
+    )
+    assert "tengod_conflicts" in result
+    assert any(c["name_ko"] == "상관견관" for c in result["tengod_conflicts"])
