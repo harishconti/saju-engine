@@ -80,7 +80,7 @@ def main() -> int:
         # subfolder under marriage_compatibility/, named with the partners'
         # actual slugified names. Basic reports use the unsuffixed name;
         # deep reports append "_deep".
-        repo_root = Path(__file__).resolve().parent.parent
+        repo_root = Path(__file__).resolve().parent.parent.parent
         slug_a = _slugify(args.name_a)
         slug_b = _slugify(args.name_b)
         pair_dir = repo_root / "candidates_horoscope" / "marriage_compatibility" / f"{slug_a}_{slug_b}"

@@ -60,6 +60,10 @@ def test_band_coverage_exhaustive():
     assert len(edges) >= 4, f"expected >=4 non-branch edge probes, got {sorted(edges)}"
 
 
+DAMP_BRANCHES = {"辰"}
+DRY_BRANCHES = {"戌"}
+
+
 def test_temperate_rows_have_no_climate_element():
     """Temperate bands must carry no climate element at all.
 
@@ -67,11 +71,10 @@ def test_temperate_rows_have_no_climate_element():
     asserted directly: a temperate band means the 조후 override is OFF, and a
     non-None climate_favorable there would silently fire the merge.
 
-    Every storage month lands on one side or the other here — 丑/未 in the
-    hot/cold sets, 辰/戌 in the temperate branch. The latter two are the pinned
-    寒暖-only scope limit (knowledge/17-climate-method.md §The Fuller 寒暖燥濕
-    Reading), so this assertion is deliberately coupled to the HOT/COLD sets
-    above: widening the engine's model to the full four-way reading fails HERE.
+    2026-09-19: the engine expanded to the full 寒暖燥濕 four-axis model
+    (docs/research/2026-09-validation-climate.md §3), so 辰 (濕→damp) and 戌
+    (燥→dry) now carry their own override and are no longer temperate. Only
+    the four "true" spring/autumn branches (寅卯申酉) remain temperate.
     """
     from saju_engine import climate
 
@@ -79,6 +82,10 @@ def test_temperate_rows_have_no_climate_element():
         got = climate.assess_climate(branch)
         if branch in HOT_BRANCHES or branch in COLD_BRANCHES:
             assert got["band"] in {"hot", "cold"}
+            assert got["climate_favorable"] is not None
+            assert got["climate_supporting"] is not None
+        elif branch in DAMP_BRANCHES or branch in DRY_BRANCHES:
+            assert got["band"] in {"damp", "dry"}
             assert got["climate_favorable"] is not None
             assert got["climate_supporting"] is not None
         else:
@@ -105,7 +112,7 @@ def test_climate_probe_input_guarded():
 _VERDICT_CLASS = {"strong": "strong", "extreme": "strong",
                   "weak": "weak", "extreme_weak": "weak",
                   "balanced": "balanced"}
-_BANDS = {"hot", "cold", "temperate"}
+_BANDS = {"hot", "cold", "damp", "dry", "temperate"}
 _VERDICT_CLASSES = {"strong", "weak", "balanced"}
 
 
@@ -145,7 +152,7 @@ def test_band_verdict_matrix_complete():
     expected_cells = {(b, v) for b in _BANDS for v in _VERDICT_CLASSES}
     missing = expected_cells - set(cells)
     assert not missing, f"band x verdict cells with no corpus chart: {sorted(missing)}"
-    assert len(cells) == 9, f"expected exactly 9 cells, got {len(cells)}: {sorted(cells)}"
+    assert len(cells) == 15, f"expected exactly 15 cells (5 bands x 3 verdict classes), got {len(cells)}: {sorted(cells)}"
 
 
 def test_climate_agrees_covered_both_polarities():

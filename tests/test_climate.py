@@ -22,21 +22,36 @@ def test_cold_branches_favor_fire(branch):
     assert result["climate_supporting"] == "Wood"
 
 
-@pytest.mark.parametrize("branch", ["寅", "卯", "辰", "申", "酉", "戌"])
+@pytest.mark.parametrize("branch", ["寅", "卯", "申", "酉"])
 def test_temperate_branches_have_no_override(branch):
-    """No 조후 override for spring/autumn months — including the two storage
-    months (辰, 戌) the fuller 寒暖燥濕 reading would give a remedy to.
+    """No 조후 override for the four "true" spring/autumn months.
 
-    辰 (濕) and 戌 (燥) are the pinned divergence, not an oversight: the engine
-    implements the 寒暖 (hot/cold) axis only, and widening it moves the
-    client-facing ``band`` value. See knowledge/17-climate-method.md §The Fuller
-    寒暖燥濕 Reading. If that scope ever widens, THIS test is the signal — it is
-    the unit-level half of the pin whose fixture half is band-chen / band-xu.
+    辰 and 戌 are NOT in this list — as of 2026-09-19 they carry their own
+    燥/濕 (dry/damp) remedy via the four-axis model (see
+    test_damp_branch_favors_fire / test_dry_branch_favors_water below), per
+    the sourced table in knowledge/17-climate-method.md §The Fuller 寒暖燥濕
+    Reading (docs/research/2026-09-validation-climate.md §3).
     """
     result = assess_climate(branch)
     assert result["band"] == "temperate"
     assert result["climate_favorable"] is None
     assert result["climate_supporting"] is None
+
+
+def test_damp_branch_favors_fire():
+    """辰 (濕, damp) wants Fire, per the sourced 寒暖燥濕 four-axis reading."""
+    result = assess_climate("辰")
+    assert result["band"] == "damp"
+    assert result["climate_favorable"] == "Fire"
+    assert result["climate_supporting"] == "Wood"
+
+
+def test_dry_branch_favors_water():
+    """戌 (燥, dry) wants Water, per the sourced 寒暖燥濕 four-axis reading."""
+    result = assess_climate("戌")
+    assert result["band"] == "dry"
+    assert result["climate_favorable"] == "Water"
+    assert result["climate_supporting"] == "Metal"
 
 
 def test_unknown_branch_is_temperate():

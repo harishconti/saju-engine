@@ -11,7 +11,7 @@ Ground truth: cited fixtures in `tests/validation/fixtures/` (spec: docs/superpo
 | sewoon | 8 | 8 | 0 | 0 |
 | lookups | 56 | 56 | 0 | 0 |
 | yongsin | 13 | 10 | 3 | 0 |
-| climate | 30 | 30 | 0 | 0 |
+| climate | 36 | 36 | 0 | 0 |
 | compat | 27 | 25 | 2 | 0 |
 | career | 32 | 32 | 0 | 0 |
 
@@ -212,6 +212,12 @@ docs/research/2026-09-validation-yongsin.md.
 | hot-weak-priority | PASS | all checks matched |
 | cold-strong-priority | PASS | all checks matched |
 | cold-strong-scan | PASS | all checks matched |
+| damp-balanced-synth | PASS | all checks matched |
+| damp-strong-synth | PASS | all checks matched |
+| damp-weak-synth | PASS | all checks matched |
+| dry-balanced-synth | PASS | all checks matched |
+| dry-strong-synth | PASS | all checks matched |
+| dry-weak-synth | PASS | all checks matched |
 
 ### W5 climate — three-band classifier and the 조후 × 억부 merge matrix
 
@@ -393,5 +399,5 @@ External cross-check (2026-09-14): all 59 fixtures carry a `source['external']` 
 - W4 용신: CERTIFIED (gate date 2026-09-13). Checks at gate: 13/13 PASS (10 PASS + 3 documented_interpretation).
 - W5 Climate (조후): CERTIFIED (gate date 2026-09-13). Checks at gate: 30/30 PASS (30 PASS; 3 rows carry the documented_interpretation guard (published divergences cross-referenced in source); 16 band (12 branches + 4 edges) + 14 merge covering all 9 band × verdict cells; 0 FAIL).
 - W6 Compat / spouse + career: CERTIFIED (gate date 2026-09-14). Checks at gate: 59/59 PASS (27 compat (the eleven sub-systems A-K + 10 band cut-point edges + 6 score/anchor rows) + 32 career (30 KB12 domain-map + 2 need-keyed tier charts); 2 documented_interpretation (harish × vinothini pillars-only reconstruction; pawan × sruthi stale ya-ja-si chart); 0 FAIL. Gate-time pin tally, re-measured 2026-09-14: 3 bug-lock families / 6 non-strict xfail markers (which parametrize to 10 xfailed tests) / 10 guard tests — 육합 dead code (test_val_compat, 3 locks / 3 fix-immune guards), C9 삼형 shadowing (test_compat, 1 lock parametrized over 5 pairs / 2 guards), C8 order-dependence (test_compat, 1 lock / 2 guards). NOTE: this line previously read '9 non-strict xfail markers'; no scoping reproduces 9 (W6-scoped is 6, suite-wide is 8), so the figure is corrected to the measured value rather than carried. A 4th family pinned at gate time (report_data stale candidate_favorable, 1 lock + 3 guards) was FIXED 2026-09-14; its lock XPASSed (delete-the-marker signal), so the marker is retired and test_report_data now pins the fixed behaviour positively. The fix also resolved the related report_data._career_tiers contradiction — the candidate pool is now keyed on the resolved 용신/희신 families, so both tier fixtures measure possible_tier_reachable true over 12 rows (W6 coverage gap 1 closed). C8 was likewise FIXED 2026-09-14 — compat.py::_canonical_nayin_pair() now resolves the Nayin subject order from the couple (male-first when both genders are known and differ, else lower NAYIN_ORDER index) instead of from the caller's argument order, so one couple has one verdict; see knowledge/11-gunghap.md §C 'Canonical subject order'. Its lock XPASSed, the marker is retired, and test_compat now pins order-independence positively (0 locks / 3 guards). The 육합 dead-code family was FIXED 2026-09-14 as well — compat._branch_pair_lookup now matches each relation row on its branch columns rather than on the whole row, so the 六合 branch is reachable at all four call sites; the defect record and its three pins live in tests/validation/test_val_compat.py. Its 3 locks XPASSed, their markers are retired, and they now stand as positive behaviour pins (L1 cross-pair helper +4, L2 spouse-palace +20, L3 띠 +3). L3 additionally had to be REPAIRED rather than merely un-marked: _pillars_chart hardcoded 甲子 for both charts, so the 띠 sub-system compared 子 with 子 and could never reach a 육합 — permanently unsatisfiable under any candidate fix, which is why it never XPASSed; _pillars_chart now takes a year_branch. Its 3 guards stay, one INVERTED: test_guard_lookup_is_shape_tolerant_for_six_combinations had asserted the pre-fix premise (六合 lookup is False for all six pairs) and failed the moment the helper gained 3-tuple tolerance, so the shape-tolerance contract is now asserted positively. One family remains live and fix-immune (C9). Live marker tally, re-measured 2026-09-14 after all three retirements: 1 W6-scoped non-strict xfail marker (C9, parametrized over 5 pairs = 5 xfailed tests); 3 markers suite-wide once the 2 client-visible climate locks are counted, expanding to 7 xfailed tests — the other 5 xfailed are documented_interpretation escapes (dynamic pytest.xfail on fixture mismatch: 3 W4 용신 + 2 W6 compat), not bug locks. The chain ORDER was deliberately not touched, so the C9 family is otherwise unchanged: four of its five rows still report the shadowing relation the lock names, and the fifth (巳申) now reports 육합 instead of 육파 — a different shadowing kind, still not 삼형, so the row remains xfailed and the lock's status is unmoved. The arity fix alone therefore flips 0 of C9's 5 rows. The premium_report.py instances of that bug class (spec §Known Open Bugs #1) were FIXED 2026-09-14 -- see the W5 note below.).
-- Current validation checks: 189/194 PASS across 8 subsystems.
+- Current validation checks: 195/200 PASS across 8 subsystems.
 - Gate: Campaign COMPLETE — all six workstreams (W1-W6) certified; no successor gate.

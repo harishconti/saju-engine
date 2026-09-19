@@ -680,8 +680,15 @@ def test_compat_order_independence_band_flipping_instance():
 # longer touches ANY sub-system — a fix that re-introduced the dependence
 # through a different sub-system fails here even though the composite matches.
 def test_compat_order_independence_band_stable_all_subsystems_identical():
+    # 2026-09-19: score moved 70->68 (still Strong) after the 조후-vs-억부 gate
+    # broadened to band-extremeness rather than verdict (docs/research/
+    # 2026-09-19-validation-climate.md §5) — Manvitha's 희신 changed from the
+    # strong-DM convention (Earth) to the climate-resolved one (Wood), since
+    # her chart is strong but sits in a cold month (조후 now governs there
+    # too). Her headline 용신 (Fire) is unchanged; order-independence itself
+    # still holds (both directions move together).
     fwd, rev = compat_score(HARISH, MANVITHA), compat_score(MANVITHA, HARISH)
-    assert (fwd.score, rev.score) == (70, 70)
+    assert (fwd.score, rev.score) == (68, 68)
     assert (fwd.band, rev.band) == ("Strong", "Strong")
     differing = [k for k in compat.WEIGHT
                  if getattr(fwd, k).score != getattr(rev, k).score]

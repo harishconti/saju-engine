@@ -1,9 +1,9 @@
 # Project Tasks
 
 **Date opened:** 2026-06-02  
-**Last updated:** 2026-09-14  
-**Test count:** 885 pytest cases passing / 10 xfailed (`python3 -m pytest`); engine validation gate
-`python3 tools/run_validation.py` → 194 checks (189 PASS / 5 INTERPRETATION / 0 FAIL); landing page
+**Last updated:** 2026-09-19  
+**Test count:** 892 pytest cases passing / 10 xfailed (`python3 -m pytest`); engine validation gate
+`python3 tools/run_validation.py` → 200 checks (195 PASS / 5 INTERPRETATION / 0 FAIL); landing page
 `npm run build` + 133 vitest cases green.
 **Status:** The **engine** is complete and validated (four Korean 만세력 textbook cross-validation cases, parametrized lookup-table tests, 30×30 Nayin table on the 5-element fallback, special-formations tests). **As of 2026-09-07 the project pivoted the go-to-market from India / ₹ to English-speaking-global / USD** — see `improvements_issues.md` (master doc) and `docs/market-research-2026-09.md` (sourced research). The 3 client-facing engine defects that blocked a paid launch are **fixed** (G1 reviewer-note leak, G2 per-pillar template grammar, G3 용신 single source of truth), plus ₹→USD across the engine, docs, and landing page. **Open P0/P1 (see `improvements_issues.md` §12):** real testimonials, Merchant-of-Record checkout, self-service-app PII/queue hardening, deployment. **Package layout:** engine and PDF packages live under `src/` with direct-run shims and a ReportLab fallback.
 
@@ -326,6 +326,75 @@ Sourced market research: **`docs/market-research-2026-09.md`**. Design spec:
 
 ## Change log
 
+- **2026-09-19 (Harish full folder rebuild, user-requested)** — Deleted all files in
+  `candidates_horoscope/reports/harish/` and rebuilt from scratch: base Deep Destiny report
+  regenerated from his birth/location data (1992-06-04 03:10 IST, Pallipattu TN, 79.4408°E), a
+  fresh `career.md` deep-dive (wealth-chain/entrepreneurship analysis per `knowledge/12`/`13`),
+  combined report, and both PDFs. Pillars unchanged (壬申/乙巳/辛亥/己丑, Balanced DM, 용신
+  Water/희신 Metal, 정관격) — this was a clean rebuild, not a correction. `luck-timeline.md` and
+  `land-workshop-business.md` were not recreated (only base + career were requested this pass).
+  Suite unchanged at **892 passed / 10 xfailed / 0 failed**.
+- **2026-09-19 (climate methodology expansion, user-approved — Suite 886 → 892; validation CLI
+  194 → 200 checks)** — Implemented the two open methodology decisions the validation campaign
+  had surfaced but deliberately left unbuilt (`knowledge/17-climate-method.md`'s prior "Sourced,
+  Not Implemented" section), after confirming with the user and checking real-candidate impact
+  first. **(1) Expanded `climate.py` from the 寒暖 (hot/cold) two-band model to the full sourced
+  四-axis 寒暖燥濕 model**, adding 辰 (濕/damp → Fire, Wood 희신) and 戌 (燥/dry → Water, Metal 희신) —
+  the per-branch assignments were already sourced from the 2026-09-13 campaign
+  (`docs/research/2026-09-validation-climate.md` §3, cantian.ai + OpenFate) and needed no new
+  research, only implementation + tests. Checked all 7 real candidates' month branches first: none
+  is 辰 or 戌, so no natal report moved. **(2) Broadened the 조후-vs-억부 priority gate in
+  `yongsin.py`** from verdict-gated (조후 governed only for a `balanced` Day Master) to
+  band-extremeness-gated (조후 governs whenever the climate band is non-temperate, regardless of
+  strength verdict) — per the sourced doctrine already on file (`docs/research/
+  2026-09-validation-climate.md` §5: OpenFate "조후와 부억 중 무엇을 우선할까", 두루미사주
+  "억부용신"), which explicitly rejects a fixed verdict-based order in favour of a climate-extremeness
+  condition. **Impact check performed before implementing:** every real candidate is either
+  reader-overridden (always wins outright, unaffected) or already `balanced` (climate already
+  governed, unaffected) — except **Manvitha** (harish_manvitha compat pair), whose strong-DM chart
+  in a cold month keeps its headline 용신 (Fire, already climate-agreeing) but gets a corrected 희신
+  (Earth→Wood), moving the `harish_manvitha` compat score **70→68 (still Strong band)**. Regenerated
+  that report (md + both PDF backends) to match. Updated `knowledge/17-climate-method.md` with the
+  new model/rule and historical notes; updated `tests/test_climate.py`, `tests/test_yongsin_consistency.py`,
+  `tests/test_compat.py`, and the `climate.json`/`yongsin.json`/`compat.json`/`career.json` validation
+  fixtures (added 6 new synthetic damp/dry×verdict fixtures to keep the band×verdict matrix
+  exhaustive). Both changes are product decisions the user explicitly approved, not bug fixes — see
+  the file's own "Historical note (resolved 2026-09-19)" callouts for the before/after. Suite:
+  **892 passed / 10 xfailed / 0 failed**; validation CLI: **200 (PASS 195, INTERPRETATION 5, FAIL 0)**.
+- **2026-09-19 (post-campaign loose-ends closed — Suite 885 → 886)** — Re-audited all prior audit
+  docs (`docs/audits/*`) and the validation-campaign carried loose ends against live code rather
+  than the docs' own claims. Confirmed the raw-vs-resolved favorable-element callout fix (2026-09-14)
+  is live and regression-locked; no action needed. **New engine bug found and fixed:**
+  `md_to_saju_compat_pdf.py`'s default-output branch computed `repo_root =
+  Path(__file__).resolve().parent.parent`, which resolves to `src/` (not the repo root) after the
+  src/ layout migration — the same off-by-one already fixed in `combine_candidate_report.PROJECT_ROOT`
+  but missed here. Every compat PDF built without an explicit `--output` silently landed under
+  `src/candidates_horoscope/...`. Fixed (`.parent.parent.parent`); added
+  `tests/test_compat_pdf_cli.py` to regression-lock it. **Regenerated stale client deliverables:**
+  (1) `pawan_sruthi` compat PDFs (basic + deep) — confirmed via `pdftotext` that the PDFs still
+  showed Pawan's pre-야자시-fix hour pillar (戊子) while the .md had already been corrected to 庚子;
+  rebuilt both from the corrected markdown. (2) **Mahesh's full report set** — confirmed via a fresh
+  `compute_chart()` call that his hour pillar was still pre-fix (丙子 in the shipped report vs. the
+  engine's current 戊子). This is not cosmetic: it flips Day Master strength from 신약 to Balanced
+  and 용신 from Earth to **Fire** (조후 climate-resolved; 희신 Metal→Wood), and removes a spurious
+  정편관혼잡 pattern (only one clean 정관 remains once the hour is corrected). Regenerated
+  `mahesh-report.md` from the engine, rewrote `career.md` and `relationships.md` (the old versions
+  were giving classically inverted advice — recommending Earth/Metal partners and industries,
+  flagging 2026 as an avoid-marriage year when it is now favorable-element), rebuilt
+  `mahesh-combined.md`/`.pdf`/`-html.pdf`. (3) **Harish's `career.md` and `luck-timeline.md`**
+  re-authored from scratch (the originals were deleted for the 2026-09-08 from-scratch regen and are
+  not in this repo's git history — no record of the original "land-workshop-business" follow-up
+  question survived, so `land-workshop-business.md` was intentionally not recreated per user
+  direction); grounded in the corrected Water/희신=Metal chart via `knowledge/12`/`13`/`08`;
+  `harish-combined.md`/`.pdf` rebuilt. All PDFs verified 0 citation/draft leaks; `candidates_horoscope/README.md`
+  updated for both candidates. **Two methodology decisions surfaced by the campaign were put to the
+  user and both were approved for implementation** (not yet built, tracked as new open items below):
+  broadening 조후 (climate) precedence over 억부 (strength-balancing) beyond the current
+  balanced/hot-cold-only scope, and expanding `climate.py` from the current three-band model to the
+  full 궁통보감 寒暖燥濕 (hot/cold/dry/damp) four-axis model — both require new classical-source
+  research before implementation per Ground Rule 1, and both will require re-auditing existing
+  candidates' 용신 for behavior changes once implemented. Suite: **886 passed / 10 xfailed / 0
+  failed**.
 - **2026-09-14 (client-visible item 1 fixed + Harish base report regenerated — Suite 883 → 885)** —
   Fixed the last known instance of the raw-vs-resolved favorable-element bug class:
   `premium_report.py`'s "What This Year Means for You" callout and the Hook-tier one-liner were

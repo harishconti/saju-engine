@@ -141,30 +141,34 @@ def test_climate_no_override_for_temperate_balanced_chart():
     assert "no 조후 override applies" in fe.note
 
 
-def test_climate_fyi_agrees_for_strong_verdict():
-    """A strong Day Master keeps its 억부 pick; climate is an FYI note when it agrees."""
+def test_climate_governs_for_strong_verdict_when_it_agrees():
+    """2026-09-19: 조후 governs the headline for a strong DM in a hot/cold month
+    even when it happens to agree with 억부 (docs/research/2026-09-validation-climate.md §5).
+    """
     chart = _fake_chart("strong", "巳", "Water", "Metal")  # hot month wants Water too
     fe = favorable_element(chart)
-    assert fe.element == "Water"          # unchanged, 억부 wins headline
-    assert fe.supporting == "Metal"       # unchanged
-    assert fe.method == "strong-dm-drain"
+    assert fe.element == "Water"
+    assert fe.supporting == "Metal"
+    assert fe.method == "climate-balanced"
     assert fe.climate_band == "hot"
     assert fe.climate_element == "Water"
     assert fe.climate_agrees is True
-    assert "agreeing with the strength-based pick" in fe.note
+    assert "matches the chart's own least-represented element" in fe.note
 
 
-def test_climate_fyi_disagrees_for_weak_verdict():
-    """A weak Day Master keeps its 억부 pick even when climate disagrees."""
+def test_climate_governs_over_weak_verdict_when_it_disagrees():
+    """2026-09-19: 조후 governs the headline for a weak DM in a hot/cold month
+    even when 억부 would have picked a different element (docs/research/2026-09-validation-climate.md §5).
+    """
     chart = _fake_chart("weak", "亥", "Earth", "Fire")  # cold month wants Fire
     fe = favorable_element(chart)
-    assert fe.element == "Earth"          # unchanged, 억부 wins headline
-    assert fe.supporting == "Fire"        # unchanged
-    assert fe.method == "weak-dm-support"
+    assert fe.element == "Fire"           # 조후 now overrides the weak-DM 억부 pick
+    assert fe.supporting == "Wood"        # climate_supporting, not the 억부 convention
+    assert fe.method == "climate-balanced"
     assert fe.climate_band == "cold"
     assert fe.climate_element == "Fire"
     assert fe.climate_agrees is False
-    assert "strength-balance takes priority" in fe.note
+    assert "climate-balance) check takes priority ahead of 억부" in fe.note
 
 
 def test_supporting_matches_generator_of_headline_when_climate_wins():

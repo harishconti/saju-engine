@@ -15,11 +15,19 @@ The engine's underlying heuristics live in two places:
     chart peaking in summer heat wants Water, one peaking in winter cold
     wants Fire. See knowledge/17-climate-method.md.
 
-This module *merges* the two: for a balanced verdict, 조후 is the classical
-tie-breaker and wins the headline 용신 over the least-represented-element
-fallback. For a strong/weak verdict, 억부 stays authoritative and 조후 is
-surfaced only as a secondary note. A reader override always wins outright.
-This module never invents a new derivation beyond that merge.
+This module *merges* the two. 2026-09-19 (user-approved product decision,
+grounded in docs/research/2026-09-validation-climate.md §5): 조후 governs the
+headline 용신 whenever the chart sits in a non-temperate climate band (hot,
+cold, damp, or dry) — i.e. priority is gated on **climate extremeness**, not
+on the 억부 strength verdict. This matches the sourced doctrine ("조후와
+부억에는 명식을 떠난 고정 순서가 없습니다... 극단적 기후가 다른 기능을 막으면
+조후가 전제가 된다" — OpenFate; "사주가 너무 차거나 너무 더우면 조후를 우선"
+— 두루미사주) more closely than the previous verdict-gated rule, which had no
+direct source support (see the same research doc §5, "그 전제는 뒷받침되지
+않습니다"). For a temperate-month chart, 억부 stays authoritative, since 조후
+has no opinion to offer. A reader override always wins outright over both
+methods, unchanged. This module never invents a new derivation beyond that
+merge.
 """
 from __future__ import annotations
 
@@ -61,7 +69,21 @@ _NOTE_BY_METHOD = {
 }
 
 # Season label used in climate-related note text.
-_SEASON_LABEL = {"hot": "hot summer", "cold": "cold winter"}
+_SEASON_LABEL = {
+    "hot": "hot summer",
+    "cold": "cold winter",
+    "damp": "damp earth-storage",
+    "dry": "dry earth-storage",
+}
+
+# Prose label for the Day Master strength verdict, used only in the climate-
+# governs branch below (the balanced-chart note has its own fixed wording).
+_STRENGTH_LABEL = {
+    "strong": "strong",
+    "extreme": "strong",
+    "weak": "weak",
+    "extreme_weak": "weak",
+}
 
 # Inverse of the generating cycle: for each element, the element that generates it.
 # Used as the strict-classical 희신 default for a reader override (Metal generates
@@ -85,7 +107,8 @@ class FavorableElement:
             always the strict-classical generator of ``element`` except for
             the strong/weak 억부 methods, which use the modern Korean
             secondary-favorable convention (see strength.py).
-        climate_band: "hot" | "cold" | "temperate" — the chart's 조후 band.
+        climate_band: "hot" | "cold" | "damp" | "dry" | "temperate" — the
+            chart's 조후 band.
         climate_element: the classical climate-balancing element, or None for
             a temperate-month chart.
         climate_agrees: whether the climate element matches the raw 억부
@@ -152,8 +175,11 @@ def favorable_element(chart, override: Optional[str] = None) -> FavorableElement
     climate_agrees = (climate_element == raw_favorable) if climate_element else None
     season_label = _SEASON_LABEL.get(climate["band"])
 
-    if verdict == "balanced" and climate_element:
-        # 조후 is the classical tie-breaker when 억부 gives no clear strong/weak signal.
+    if climate_element:
+        # 조후 governs the headline whenever the climate band is non-temperate
+        # (hot/cold/damp/dry), regardless of the 억부 verdict — climate
+        # extremeness is the sourced gate, not the strength verdict. See the
+        # module docstring and docs/research/2026-09-validation-climate.md §5.
         element = climate_element
         supporting = climate["climate_supporting"]
         method = "climate-balanced"
@@ -164,12 +190,20 @@ def favorable_element(chart, override: Optional[str] = None) -> FavorableElement
         else:
             agreement_clause = (
                 f"This overrides the numeric least-represented-element pick ({raw_favorable}), "
-                "which is a weaker signal than the classical climate check for a balanced chart."
+                "which is a weaker signal than the classical climate check here."
+            )
+        if verdict == "balanced":
+            verdict_clause = "The Day Master reads as balanced, so the classical 조후 (climate-balance) check applies"
+        else:
+            strength_label = _STRENGTH_LABEL.get(verdict, verdict)
+            verdict_clause = (
+                f"The Day Master reads as {strength_label}, but the classical 조후 "
+                "(climate-balance) check takes priority ahead of 억부 (strength-balance) here, "
+                "because the chart's climate is extreme rather than mild"
             )
         note = (
-            "The Day Master reads as balanced, so the classical 조후 (climate-balance) check "
-            f"applies: this chart peaks in {season_label} weather, and the classical remedy is "
-            f"{climate_element}. {agreement_clause}"
+            f"{verdict_clause}: this chart peaks in {season_label} conditions, and the classical "
+            f"remedy is {climate_element}. {agreement_clause}"
         )
         return FavorableElement(
             element=element, method=method, confidence="heuristic", note=note,
@@ -177,29 +211,13 @@ def favorable_element(chart, override: Optional[str] = None) -> FavorableElement
             climate_element=climate_element, climate_agrees=climate_agrees,
         )
 
-    # Strong / weak / extreme_weak / extreme, OR a balanced chart born in a
-    # climate-neutral (temperate) month: 억부 stays authoritative.
+    # No climate opinion (temperate month): 억부 stays authoritative regardless
+    # of verdict, since there is nothing for 조후 to govern with.
     element = raw_favorable
     supporting = raw_supporting
     method = _METHOD_BY_VERDICT.get(verdict, "balanced-heuristic")
     base_note = _NOTE_BY_METHOD[method]
-
-    if verdict == "balanced":
-        note = base_note + " Born in a climate-neutral month (spring/autumn), so no 조후 override applies here."
-    elif climate_element:
-        if climate_agrees:
-            note = base_note + (
-                f" (조후 cross-check: this chart's {season_label} climate also favors "
-                f"{climate_element}, agreeing with the strength-based pick.)"
-            )
-        else:
-            note = base_note + (
-                f" (조후 cross-check: this chart's {season_label} climate would favor "
-                f"{climate_element}, but strength-balance takes priority for a strong/weak "
-                "Day Master.)"
-            )
-    else:
-        note = base_note
+    note = base_note + " Born in a climate-neutral month, so no 조후 override applies here."
 
     return FavorableElement(
         element=element, method=method, confidence="heuristic", note=note,

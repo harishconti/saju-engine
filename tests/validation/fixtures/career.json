@@ -1,797 +1,797 @@
 [
-  {
-    "id": "career-domainmap-education-and-training",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Education & Training"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Wood"
-    },
-    "status": "expect_match"
+ {
+  "id": "career-domainmap-education-and-training",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Education & Training"
   },
-  {
-    "id": "career-domainmap-healthcare-and-wellness",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Healthcare & Wellness"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Wood"
-    },
-    "status": "expect_match"
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
   },
-  {
-    "id": "career-domainmap-design-and-publishing",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Design & Publishing"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Wood"
-    },
-    "status": "expect_match"
+  "expected": {
+   "element": "Wood"
   },
-  {
-    "id": "career-domainmap-social-and-environmental-work",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Social & Environmental Work"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Wood"
-    },
-    "status": "expect_match"
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-healthcare-and-wellness",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Healthcare & Wellness"
   },
-  {
-    "id": "career-domainmap-people-development-and-culture",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "People Development & Culture"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: KB12:25-49 places this domain in the Wood family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields None; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3) — https://www.sazasaju.com/blog/career-fortune-guide)",
-      "external": {
-        "citation": "KB12:25-49 places this domain in the Wood family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields None; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3)",
-        "url": "https://www.sazasaju.com/blog/career-fortune-guide"
-      }
-    },
-    "expected": {
-      "element": null
-    },
-    "notes": "mis-map (engine value None pinned; root cause is a keyword-coverage gap -- none of the five element keyword lists in _domain_element contains a substring of this domain, so no element fires and the router returns None). KB12 lists the domain under Wood (:43-48).",
-    "status": "documented_interpretation"
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
   },
-  {
-    "id": "career-domainmap-creative-direction",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Creative Direction"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Wood"
-    },
-    "status": "expect_match"
+  "expected": {
+   "element": "Wood"
   },
-  {
-    "id": "career-domainmap-leadership-and-executive-roles",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Leadership & Executive Roles"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Fire"
-    },
-    "status": "expect_match"
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-design-and-publishing",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Design & Publishing"
   },
-  {
-    "id": "career-domainmap-media-and-performing-arts",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Media & Performing Arts"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Fire"
-    },
-    "status": "expect_match"
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
   },
-  {
-    "id": "career-domainmap-marketing-and-public-relations",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Marketing & Public Relations"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Fire"
-    },
-    "status": "expect_match"
+  "expected": {
+   "element": "Wood"
   },
-  {
-    "id": "career-domainmap-teaching-and-coaching",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Teaching & Coaching"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Fire"
-    },
-    "status": "expect_match"
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-social-and-environmental-work",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Social & Environmental Work"
   },
-  {
-    "id": "career-domainmap-entrepreneurship",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Entrepreneurship"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Fire"
-    },
-    "status": "expect_match"
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
   },
-  {
-    "id": "career-domainmap-public-affairs-and-advocacy",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Public Affairs & Advocacy"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: KB12:25-49 places this domain in the Fire family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields None; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3) — https://www.sazasaju.com/blog/career-fortune-guide)",
-      "external": {
-        "citation": "KB12:25-49 places this domain in the Fire family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields None; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3)",
-        "url": "https://www.sazasaju.com/blog/career-fortune-guide"
-      }
-    },
-    "expected": {
-      "element": null
-    },
-    "notes": "mis-map (engine value None pinned; root cause is a keyword-coverage gap -- no keyword-list substring matches this domain, so the router returns None). KB12 lists the domain under Fire (:58-64).",
-    "status": "documented_interpretation"
+  "expected": {
+   "element": "Wood"
   },
-  {
-    "id": "career-domainmap-real-estate-and-property",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Real Estate & Property"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Earth"
-    },
-    "status": "expect_match"
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-people-development-and-culture",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "People Development & Culture"
   },
-  {
-    "id": "career-domainmap-hospitality-and-food",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Hospitality & Food"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Earth"
-    },
-    "status": "expect_match"
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: KB12:25-49 places this domain in the Wood family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields None; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3) — https://www.sazasaju.com/blog/career-fortune-guide)",
+   "external": {
+    "citation": "KB12:25-49 places this domain in the Wood family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields None; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3)",
+    "url": "https://www.sazasaju.com/blog/career-fortune-guide"
+   }
   },
-  {
-    "id": "career-domainmap-finance-and-accounting",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Finance & Accounting"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Earth"
-    },
-    "status": "expect_match"
+  "expected": {
+   "element": null
   },
-  {
-    "id": "career-domainmap-mediation-and-counselling",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Mediation & Counselling"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: KB12:25-49 places this domain in the Earth family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields 'Fire'; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3) — https://www.sazasaju.com/blog/career-fortune-guide)",
-      "external": {
-        "citation": "KB12:25-49 places this domain in the Earth family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields 'Fire'; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3)",
-        "url": "https://www.sazasaju.com/blog/career-fortune-guide"
-      }
-    },
-    "expected": {
-      "element": "Fire"
-    },
-    "notes": "mis-map (engine value 'Fire' pinned; root cause is substring priority -- fire_keys contains 'media' (a substring of 'Mediation'), which fires before the earth 'counseling' check, and the British spelling 'Counselling' never matches earth's US 'counseling'). KB12 lists the domain under Earth (:74-80).",
-    "status": "documented_interpretation"
+  "notes": "mis-map (engine value None pinned; root cause is a keyword-coverage gap -- none of the five element keyword lists in _domain_element contains a substring of this domain, so no element fires and the router returns None). KB12 lists the domain under Wood (:43-48).",
+  "status": "documented_interpretation"
+ },
+ {
+  "id": "career-domainmap-creative-direction",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Creative Direction"
   },
-  {
-    "id": "career-domainmap-project-management",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Project Management"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Earth"
-    },
-    "status": "expect_match"
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
   },
-  {
-    "id": "career-domainmap-agriculture-and-land",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Agriculture & Land"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Earth"
-    },
-    "status": "expect_match"
+  "expected": {
+   "element": "Wood"
   },
-  {
-    "id": "career-domainmap-law-and-governance",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Law & Governance"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Metal"
-    },
-    "status": "expect_match"
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-leadership-and-executive-roles",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Leadership & Executive Roles"
   },
-  {
-    "id": "career-domainmap-engineering-and-technology",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Engineering & Technology"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Metal"
-    },
-    "status": "expect_match"
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
   },
-  {
-    "id": "career-domainmap-medicine-and-surgery",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Medicine & Surgery"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Metal"
-    },
-    "status": "expect_match"
+  "expected": {
+   "element": "Fire"
   },
-  {
-    "id": "career-domainmap-finance-and-investment",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Finance & Investment"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: KB12:25-49 places this domain in the Metal family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields 'Earth'; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3) — https://www.sazasaju.com/blog/career-fortune-guide)",
-      "external": {
-        "citation": "KB12:25-49 places this domain in the Metal family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields 'Earth'; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3)",
-        "url": "https://www.sazasaju.com/blog/career-fortune-guide"
-      }
-    },
-    "expected": {
-      "element": "Earth"
-    },
-    "notes": "mis-map (engine value 'Earth' pinned; root cause is keyword ordering -- earth_keys contains 'finance', checked before metal_keys' 'investment', so the router claims Earth first). KB12 lists the domain under Metal (:90-96).",
-    "status": "documented_interpretation"
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-media-and-performing-arts",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Media & Performing Arts"
   },
-  {
-    "id": "career-domainmap-quality-and-audit",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Quality & Audit"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Metal"
-    },
-    "status": "expect_match"
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
   },
-  {
-    "id": "career-domainmap-security-and-military",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Security & Military"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Metal"
-    },
-    "status": "expect_match"
+  "expected": {
+   "element": "Fire"
   },
-  {
-    "id": "career-domainmap-strategy-and-consulting",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Strategy & Consulting"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Water"
-    },
-    "status": "expect_match"
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-marketing-and-public-relations",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Marketing & Public Relations"
   },
-  {
-    "id": "career-domainmap-diplomacy-and-international-business",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Diplomacy & International Business"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Water"
-    },
-    "status": "expect_match"
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
   },
-  {
-    "id": "career-domainmap-psychology-and-counseling",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Psychology & Counseling"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: KB12:25-49 places this domain in the Water family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields 'Earth'; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3) — https://www.sazasaju.com/blog/career-fortune-guide)",
-      "external": {
-        "citation": "KB12:25-49 places this domain in the Water family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields 'Earth'; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3)",
-        "url": "https://www.sazasaju.com/blog/career-fortune-guide"
-      }
-    },
-    "expected": {
-      "element": "Earth"
-    },
-    "notes": "mis-map (engine value 'Earth' pinned; root cause is a US/British spelling artifact -- earth_keys' 'counseling' (US spelling, matching 'Counseling') fires before water_keys' 'psychology'). KB12 lists the domain under Water (:106-112).",
-    "status": "documented_interpretation"
+  "expected": {
+   "element": "Fire"
   },
-  {
-    "id": "career-domainmap-arts-and-curation",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Arts & Curation"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Water"
-    },
-    "status": "expect_match"
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-teaching-and-coaching",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Teaching & Coaching"
   },
-  {
-    "id": "career-domainmap-journalism-and-investigation",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Journalism & Investigation"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Water"
-    },
-    "status": "expect_match"
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
   },
-  {
-    "id": "career-domainmap-logistics-and-shipping",
-    "subsystem": "career",
-    "input": {
-      "probe": "domain_map",
-      "domain": "Logistics & Shipping"
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:25-49",
-      "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
-        "url": "https://dk-saju.com/용신별-직업적성"
-      }
-    },
-    "expected": {
-      "element": "Water"
-    },
-    "status": "expect_match"
+  "expected": {
+   "element": "Fire"
   },
-  {
-    "id": "career-tiers-harish",
-    "subsystem": "career",
-    "input": {
-      "probe": "tiers",
-      "name": "tiers-harish",
-      "year": 1992,
-      "month": 6,
-      "day": 4,
-      "hour": 3,
-      "minute": 10,
-      "longitude": 79.42,
-      "utc_offset": 5.5,
-      "use_solar_time": true
-    },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:130-152",
-      "url_or_ref": "용신 vs. Day Master for Career Choice (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four state that work should align with the chart's 용신, not the Day Master's own element, which is exactly the KB12:130-152 priority the engine's need-keyed pool selection now implements (research doc §5.2 recorded the contradiction before the 2026-09-14 fix) — https://dk-saju.com/사주-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four state that work should align with the chart's 용신, not the Day Master's own element, which is exactly the KB12:130-152 priority the engine's need-keyed pool selection now implements (research doc §5.2 recorded the contradiction before the 2026-09-14 fix)",
-        "url": "https://dk-saju.com/사주-직업적성"
-      }
-    },
-    "expected": {
-      "tiers": [
-        {
-          "tier": "**Best Fit**",
-          "domain": "Strategy & Consulting"
-        },
-        {
-          "tier": "**Best Fit**",
-          "domain": "Diplomacy & International Business"
-        },
-        {
-          "tier": "**Best Fit**",
-          "domain": "Arts & Curation"
-        },
-        {
-          "tier": "**Best Fit**",
-          "domain": "Journalism & Investigation"
-        },
-        {
-          "tier": "**Good Fit**",
-          "domain": "Logistics & Shipping"
-        },
-        {
-          "tier": "**Good Fit**",
-          "domain": "Law & Governance"
-        },
-        {
-          "tier": "**Good Fit**",
-          "domain": "Engineering & Technology"
-        },
-        {
-          "tier": "**Possible**",
-          "domain": "Medicine & Surgery"
-        },
-        {
-          "tier": "**Possible**",
-          "domain": "Quality & Audit"
-        },
-        {
-          "tier": "**Possible**",
-          "domain": "Security & Military"
-        },
-        {
-          "tier": "**Possible**",
-          "domain": "Psychology & Counseling"
-        },
-        {
-          "tier": "**Possible**",
-          "domain": "Finance & Investment"
-        }
-      ],
-      "possible_tier_reachable": true
-    },
-    "notes": "KB12:130-152 verbatim: 'The classical priority — from the 용신 logic of the 궁통보감 (窮通寶鑑) lineage as applied in `knowledge/09-interpretation-method.md` Step 3 — is to **align work with what the chart *needs* (용신 / 희신, 喜神), not merely with the Day Master's own element.** Choosing a field that reinforces an already-dominant element pushes the chart further out of balance.' — the classical priority is to align work with the chart's 용신, not the Day Master's own element. Harish reads Day Master Metal with resolved favorable element Water (climate-balanced; the raw strength_assessment candidate_favorable=Fire is overridden) and 희신 Metal. report_data._career_tiers now keys the candidate pool on the resolved 용신 family (Water) then the 희신 family (Metal) — 6 + 6 = 12 candidates — so five Water-family domains score +2, five Metal-family domains score +1, and two score 0. The `i<4` **Best Fit** cut therefore splits the +2 block: four Water domains are Best Fit and the fifth (Logistics & Shipping) opens the **Good Fit** band, which runs on through Law & Governance and Engineering & Technology. The 0-scorers are the two documented mis-maps — Psychology & Counseling (Water family) and Finance & Investment (Metal family) both resolve to Earth in the keyword router because an earlier keyword list claims each — and they land last as **Possible**. **Possible** is now positively reached (i>=7 fires), which closes the campaign's W6 coverage gap 1 — previously the tier existed only as a negative.",
-    "status": "expect_match"
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-entrepreneurship",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Entrepreneurship"
   },
-  {
-    "id": "career-tiers-manvitha",
-    "subsystem": "career",
-    "input": {
-      "probe": "tiers",
-      "name": "tiers-manvitha",
-      "year": 1996,
-      "month": 12,
-      "day": 3,
-      "hour": 21,
-      "minute": 15,
-      "longitude": 78.8242,
-      "utc_offset": 5.5,
-      "use_solar_time": true
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
+  },
+  "expected": {
+   "element": "Fire"
+  },
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-public-affairs-and-advocacy",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Public Affairs & Advocacy"
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: KB12:25-49 places this domain in the Fire family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields None; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3) — https://www.sazasaju.com/blog/career-fortune-guide)",
+   "external": {
+    "citation": "KB12:25-49 places this domain in the Fire family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields None; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3)",
+    "url": "https://www.sazasaju.com/blog/career-fortune-guide"
+   }
+  },
+  "expected": {
+   "element": null
+  },
+  "notes": "mis-map (engine value None pinned; root cause is a keyword-coverage gap -- no keyword-list substring matches this domain, so the router returns None). KB12 lists the domain under Fire (:58-64).",
+  "status": "documented_interpretation"
+ },
+ {
+  "id": "career-domainmap-real-estate-and-property",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Real Estate & Property"
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
+  },
+  "expected": {
+   "element": "Earth"
+  },
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-hospitality-and-food",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Hospitality & Food"
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
+  },
+  "expected": {
+   "element": "Earth"
+  },
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-finance-and-accounting",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Finance & Accounting"
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
+  },
+  "expected": {
+   "element": "Earth"
+  },
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-mediation-and-counselling",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Mediation & Counselling"
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: KB12:25-49 places this domain in the Earth family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields 'Fire'; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3) — https://www.sazasaju.com/blog/career-fortune-guide)",
+   "external": {
+    "citation": "KB12:25-49 places this domain in the Earth family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields 'Fire'; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3)",
+    "url": "https://www.sazasaju.com/blog/career-fortune-guide"
+   }
+  },
+  "expected": {
+   "element": "Fire"
+  },
+  "notes": "mis-map (engine value 'Fire' pinned; root cause is substring priority -- fire_keys contains 'media' (a substring of 'Mediation'), which fires before the earth 'counseling' check, and the British spelling 'Counselling' never matches earth's US 'counseling'). KB12 lists the domain under Earth (:74-80).",
+  "status": "documented_interpretation"
+ },
+ {
+  "id": "career-domainmap-project-management",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Project Management"
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
+  },
+  "expected": {
+   "element": "Earth"
+  },
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-agriculture-and-land",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Agriculture & Land"
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
+  },
+  "expected": {
+   "element": "Earth"
+  },
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-law-and-governance",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Law & Governance"
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
+  },
+  "expected": {
+   "element": "Metal"
+  },
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-engineering-and-technology",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Engineering & Technology"
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
+  },
+  "expected": {
+   "element": "Metal"
+  },
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-medicine-and-surgery",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Medicine & Surgery"
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
+  },
+  "expected": {
+   "element": "Metal"
+  },
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-finance-and-investment",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Finance & Investment"
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: KB12:25-49 places this domain in the Metal family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields 'Earth'; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3) — https://www.sazasaju.com/blog/career-fortune-guide)",
+   "external": {
+    "citation": "KB12:25-49 places this domain in the Metal family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields 'Earth'; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3)",
+    "url": "https://www.sazasaju.com/blog/career-fortune-guide"
+   }
+  },
+  "expected": {
+   "element": "Earth"
+  },
+  "notes": "mis-map (engine value 'Earth' pinned; root cause is keyword ordering -- earth_keys contains 'finance', checked before metal_keys' 'investment', so the router claims Earth first). KB12 lists the domain under Metal (:90-96).",
+  "status": "documented_interpretation"
+ },
+ {
+  "id": "career-domainmap-quality-and-audit",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Quality & Audit"
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
+  },
+  "expected": {
+   "element": "Metal"
+  },
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-security-and-military",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Security & Military"
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
+  },
+  "expected": {
+   "element": "Metal"
+  },
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-strategy-and-consulting",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Strategy & Consulting"
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
+  },
+  "expected": {
+   "element": "Water"
+  },
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-diplomacy-and-international-business",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Diplomacy & International Business"
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
+  },
+  "expected": {
+   "element": "Water"
+  },
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-psychology-and-counseling",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Psychology & Counseling"
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: KB12:25-49 places this domain in the Water family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields 'Earth'; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3) — https://www.sazasaju.com/blog/career-fortune-guide)",
+   "external": {
+    "citation": "KB12:25-49 places this domain in the Water family; dk-saju 용신별 직업적성 and 사자사주 직업운 가이드 independently reach the same element, so the engine's keyword router is the diverging side (engine yields 'Earth'; root cause in notes — a coverage gap, not a doctrine conflict) (research doc §5.3)",
+    "url": "https://www.sazasaju.com/blog/career-fortune-guide"
+   }
+  },
+  "expected": {
+   "element": "Earth"
+  },
+  "notes": "mis-map (engine value 'Earth' pinned; root cause is a US/British spelling artifact -- earth_keys' 'counseling' (US spelling, matching 'Counseling') fires before water_keys' 'psychology'). KB12 lists the domain under Water (:106-112).",
+  "status": "documented_interpretation"
+ },
+ {
+  "id": "career-domainmap-arts-and-curation",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Arts & Curation"
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
+  },
+  "expected": {
+   "element": "Water"
+  },
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-journalism-and-investigation",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Journalism & Investigation"
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
+  },
+  "expected": {
+   "element": "Water"
+  },
+  "status": "expect_match"
+ },
+ {
+  "id": "career-domainmap-logistics-and-shipping",
+  "subsystem": "career",
+  "input": {
+   "probe": "domain_map",
+   "domain": "Logistics & Shipping"
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:25-49",
+   "url_or_ref": "Element to Industry Families (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7) — https://dk-saju.com/용신별-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four publish element→industry-family lists consistent with KB12:25-49 (research doc §7)",
+    "url": "https://dk-saju.com/용신별-직업적성"
+   }
+  },
+  "expected": {
+   "element": "Water"
+  },
+  "status": "expect_match"
+ },
+ {
+  "id": "career-tiers-harish",
+  "subsystem": "career",
+  "input": {
+   "probe": "tiers",
+   "name": "tiers-harish",
+   "year": 1992,
+   "month": 6,
+   "day": 4,
+   "hour": 3,
+   "minute": 10,
+   "longitude": 79.42,
+   "utc_offset": 5.5,
+   "use_solar_time": true
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:130-152",
+   "url_or_ref": "용신 vs. Day Master for Career Choice (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four state that work should align with the chart's 용신, not the Day Master's own element, which is exactly the KB12:130-152 priority the engine's need-keyed pool selection now implements (research doc §5.2 recorded the contradiction before the 2026-09-14 fix) — https://dk-saju.com/사주-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four state that work should align with the chart's 용신, not the Day Master's own element, which is exactly the KB12:130-152 priority the engine's need-keyed pool selection now implements (research doc §5.2 recorded the contradiction before the 2026-09-14 fix)",
+    "url": "https://dk-saju.com/사주-직업적성"
+   }
+  },
+  "expected": {
+   "tiers": [
+    {
+     "tier": "**Best Fit**",
+     "domain": "Strategy & Consulting"
     },
-    "source": {
-      "type": "knowledge",
-      "citation": "knowledge/12-career-and-vocation.md:130-152",
-      "url_or_ref": "용신 vs. Day Master for Career Choice (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four state that work should align with the chart's 용신, not the Day Master's own element, which is exactly the KB12:130-152 priority the engine's need-keyed pool selection now implements (research doc §5.2 recorded the contradiction before the 2026-09-14 fix) — https://dk-saju.com/사주-직업적성)",
-      "external": {
-        "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four state that work should align with the chart's 용신, not the Day Master's own element, which is exactly the KB12:130-152 priority the engine's need-keyed pool selection now implements (research doc §5.2 recorded the contradiction before the 2026-09-14 fix)",
-        "url": "https://dk-saju.com/사주-직업적성"
-      }
+    {
+     "tier": "**Best Fit**",
+     "domain": "Diplomacy & International Business"
     },
-    "expected": {
-      "tiers": [
-        {
-          "tier": "**Best Fit**",
-          "domain": "Leadership & Executive Roles"
-        },
-        {
-          "tier": "**Best Fit**",
-          "domain": "Media & Performing Arts"
-        },
-        {
-          "tier": "**Best Fit**",
-          "domain": "Marketing & Public Relations"
-        },
-        {
-          "tier": "**Best Fit**",
-          "domain": "Teaching & Coaching"
-        },
-        {
-          "tier": "**Good Fit**",
-          "domain": "Entrepreneurship"
-        },
-        {
-          "tier": "**Good Fit**",
-          "domain": "Mediation & Counselling"
-        },
-        {
-          "tier": "**Good Fit**",
-          "domain": "Public Affairs & Advocacy"
-        },
-        {
-          "tier": "**Possible**",
-          "domain": "Real Estate & Property"
-        },
-        {
-          "tier": "**Possible**",
-          "domain": "Hospitality & Food"
-        },
-        {
-          "tier": "**Possible**",
-          "domain": "Finance & Accounting"
-        },
-        {
-          "tier": "**Possible**",
-          "domain": "Project Management"
-        },
-        {
-          "tier": "**Possible**",
-          "domain": "Agriculture & Land"
-        }
-      ],
-      "possible_tier_reachable": true
+    {
+     "tier": "**Best Fit**",
+     "domain": "Arts & Curation"
     },
-    "notes": "Second instance of the KB12:130-152 priority ('The classical priority — from the 용신 logic of the 궁통보감 (窮通寶鑑) lineage as applied in `knowledge/09-interpretation-method.md` Step 3 — is to **align work with what the chart *needs* (용신 / 희신, 喜神), not merely with the Day Master's own element.** Choosing a field that reinforces an already-dominant element pushes the chart further out of balance.') — proves the need-keyed pool selection is systematic, not chart-specific. Manvitha reads Day Master Wood with resolved favorable element Fire (strong-dm-drain; the raw candidate_favorable=Fire agrees) and 희신 Earth. The pool is therefore the Fire family then the Earth family, 6 + 6 = 12 — no Wood domain is served, which is the point: raw candidate_unfavorable='Wood' would subtract 2 from any Wood-family candidate, but under the need-keyed pool none is a candidate at all, so the -2 branch is latent here rather than firing. Six domains score +2 (the five Fire-family entries plus Mediation & Counselling, an Earth-family entry that resolves to Fire because the 'media' substring is tested before the Earth keywords) and six score 0 (Public Affairs & Advocacy, whose keyword router returns None — a documented coverage gap — plus the five remaining Earth entries, whose element Wood can neither match as favorable nor as Day Master). The `i<4` cut still falls inside the +2 block. Every row's `why` now reads the resolved display channel: 'Aligns with your favorable element Fire' for the +2 rows, 'Uses Earth energy in a supportive role to your Wood Day Master' for the Earth rows, and the ten-god fallback for Public Affairs & Advocacy. **Possible** is now positively reached (i>=7 fires), which closes the campaign's W6 coverage gap 1 — previously the tier existed only as a negative.",
-    "status": "expect_match"
-  }
+    {
+     "tier": "**Best Fit**",
+     "domain": "Journalism & Investigation"
+    },
+    {
+     "tier": "**Good Fit**",
+     "domain": "Logistics & Shipping"
+    },
+    {
+     "tier": "**Good Fit**",
+     "domain": "Law & Governance"
+    },
+    {
+     "tier": "**Good Fit**",
+     "domain": "Engineering & Technology"
+    },
+    {
+     "tier": "**Possible**",
+     "domain": "Medicine & Surgery"
+    },
+    {
+     "tier": "**Possible**",
+     "domain": "Quality & Audit"
+    },
+    {
+     "tier": "**Possible**",
+     "domain": "Security & Military"
+    },
+    {
+     "tier": "**Possible**",
+     "domain": "Psychology & Counseling"
+    },
+    {
+     "tier": "**Possible**",
+     "domain": "Finance & Investment"
+    }
+   ],
+   "possible_tier_reachable": true
+  },
+  "notes": "KB12:130-152 verbatim: 'The classical priority — from the 용신 logic of the 궁통보감 (窮通寶鑑) lineage as applied in `knowledge/09-interpretation-method.md` Step 3 — is to **align work with what the chart *needs* (용신 / 희신, 喜神), not merely with the Day Master's own element.** Choosing a field that reinforces an already-dominant element pushes the chart further out of balance.' — the classical priority is to align work with the chart's 용신, not the Day Master's own element. Harish reads Day Master Metal with resolved favorable element Water (climate-balanced; the raw strength_assessment candidate_favorable=Fire is overridden) and 희신 Metal. report_data._career_tiers now keys the candidate pool on the resolved 용신 family (Water) then the 희신 family (Metal) — 6 + 6 = 12 candidates — so five Water-family domains score +2, five Metal-family domains score +1, and two score 0. The `i<4` **Best Fit** cut therefore splits the +2 block: four Water domains are Best Fit and the fifth (Logistics & Shipping) opens the **Good Fit** band, which runs on through Law & Governance and Engineering & Technology. The 0-scorers are the two documented mis-maps — Psychology & Counseling (Water family) and Finance & Investment (Metal family) both resolve to Earth in the keyword router because an earlier keyword list claims each — and they land last as **Possible**. **Possible** is now positively reached (i>=7 fires), which closes the campaign's W6 coverage gap 1 — previously the tier existed only as a negative.",
+  "status": "expect_match"
+ },
+ {
+  "id": "career-tiers-manvitha",
+  "subsystem": "career",
+  "input": {
+   "probe": "tiers",
+   "name": "tiers-manvitha",
+   "year": 1996,
+   "month": 12,
+   "day": 3,
+   "hour": 21,
+   "minute": 15,
+   "longitude": 78.8242,
+   "utc_offset": 5.5,
+   "use_solar_time": true
+  },
+  "source": {
+   "type": "knowledge",
+   "citation": "knowledge/12-career-and-vocation.md:130-152",
+   "url_or_ref": "용신 vs. Day Master for Career Choice (external cross-check 2026-09-14: dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four state that work should align with the chart's 용신, not the Day Master's own element, which is exactly the KB12:130-152 priority the engine's need-keyed pool selection now implements (research doc §5.2 recorded the contradiction before the 2026-09-14 fix) — https://dk-saju.com/사주-직업적성)",
+   "external": {
+    "citation": "dk-saju 용신별 직업적성, dk-saju 사주 직업적성, 사자사주 직업운 가이드 and 사주플러스 직업론 — all four state that work should align with the chart's 용신, not the Day Master's own element, which is exactly the KB12:130-152 priority the engine's need-keyed pool selection now implements (research doc §5.2 recorded the contradiction before the 2026-09-14 fix)",
+    "url": "https://dk-saju.com/사주-직업적성"
+   }
+  },
+  "expected": {
+   "tiers": [
+    {
+     "tier": "**Best Fit**",
+     "domain": "Leadership & Executive Roles"
+    },
+    {
+     "tier": "**Best Fit**",
+     "domain": "Media & Performing Arts"
+    },
+    {
+     "tier": "**Best Fit**",
+     "domain": "Marketing & Public Relations"
+    },
+    {
+     "tier": "**Best Fit**",
+     "domain": "Teaching & Coaching"
+    },
+    {
+     "tier": "**Good Fit**",
+     "domain": "Entrepreneurship"
+    },
+    {
+     "tier": "**Good Fit**",
+     "domain": "Public Affairs & Advocacy"
+    },
+    {
+     "tier": "**Good Fit**",
+     "domain": "People Development & Culture"
+    },
+    {
+     "tier": "**Possible**",
+     "domain": "Education & Training"
+    },
+    {
+     "tier": "**Possible**",
+     "domain": "Healthcare & Wellness"
+    },
+    {
+     "tier": "**Possible**",
+     "domain": "Design & Publishing"
+    },
+    {
+     "tier": "**Possible**",
+     "domain": "Social & Environmental Work"
+    },
+    {
+     "tier": "**Possible**",
+     "domain": "Creative Direction"
+    }
+   ],
+   "possible_tier_reachable": true
+  },
+  "notes": "Second instance of the KB12:130-152 priority ('The classical priority — from the 용신 logic of the 궁통보감 (窮通寶鑑) lineage as applied in `knowledge/09-interpretation-method.md` Step 3 — is to **align work with what the chart *needs* (용신 / 희신, 喜神), not merely with the Day Master's own element.** Choosing a field that reinforces an already-dominant element pushes the chart further out of balance.') — proves the need-keyed pool selection is systematic, not chart-specific. Manvitha reads Day Master Wood with resolved favorable element Fire (strong-dm-drain; the raw candidate_favorable=Fire agrees) and 희신 Earth. The pool is therefore the Fire family then the Earth family, 6 + 6 = 12 — no Wood domain is served, which is the point: raw candidate_unfavorable='Wood' would subtract 2 from any Wood-family candidate, but under the need-keyed pool none is a candidate at all, so the -2 branch is latent here rather than firing. Six domains score +2 (the five Fire-family entries plus Mediation & Counselling, an Earth-family entry that resolves to Fire because the 'media' substring is tested before the Earth keywords) and six score 0 (Public Affairs & Advocacy, whose keyword router returns None — a documented coverage gap — plus the five remaining Earth entries, whose element Wood can neither match as favorable nor as Day Master). The `i<4` cut still falls inside the +2 block. Every row's `why` now reads the resolved display channel: 'Aligns with your favorable element Fire' for the +2 rows, 'Uses Earth energy in a supportive role to your Wood Day Master' for the Earth rows, and the ten-god fallback for Public Affairs & Advocacy. **Possible** is now positively reached (i>=7 fires), which closes the campaign's W6 coverage gap 1 — previously the tier existed only as a negative. 2026-09-19: Good/Possible tiers moved from Earth-family to Wood-family domains after the 조후-vs-억부 gate broadened to band-extremeness (docs/research/2026-09-validation-climate.md §5) — Manvitha's 희신 changed from the strong-DM convention (Earth) to the climate-resolved one (Wood). Best-Fit tier (Fire, her unchanged 용신) is identical. Re-verified 2026-09-19.",
+  "status": "expect_match"
+ }
 ]
