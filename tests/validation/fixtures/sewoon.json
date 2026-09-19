@@ -1,0 +1,170 @@
+[
+  {
+    "id": "sewoon-harish-1992",
+    "subsystem": "sewoon",
+    "input": {
+      "year": 1992, "month": 6, "day": 4, "hour": 3, "minute": 10,
+      "longitude": 79.42, "utc_offset": 5.5, "gender": "M",
+      "convention": "korean", "use_solar_time": true,
+      "reference_year": 1992, "reference_month": 6, "reference_day": 4
+    },
+    "source": [
+      {"citation": "Cross-validation of sewoon anchors against W1-certified pillar layer (pillars.json / test_cross_validate.py: 壬申 乙巳 辛亥 己丑)", "url": "internal — non-circular by construction"},
+      {"citation": "만세력 annual anchor 1984=甲子; 1992 = 壬申 (60-cycle (1992+56)%60=32)", "url": "https://manseryeok.com"}
+    ],
+    "expected": {
+      "annual": {"year": 1992, "pillar": "壬申"},
+      "monthly": {"ym": 199206, "pillar": "乙巳"},
+      "current_daeun": null
+    },
+    "status": "expect_match",
+    "notes": "Reference date = Harish's W1-certified birth date. The sewoon hit for 1992 must equal the certified year pillar 壬申; the 월운 hit for 199206 must equal the certified month pillar 乙巳 (五虎遁 from 壬). Annual idx check: 1984=甲子(0) → 1992=idx 8=壬申. NON-CIRCULAR: expectations come from the W1-certified pillar layer — the expected annual pillar equals the reference chart's W1-certified year pillar and the expected monthly pillar equals its W1-certified month pillar, so sewoon's independent 1984=甲子 annual anchor and 五虎遁 monthly anchor are cross-validated against the certified pillar layer, not against sewoon itself. Longitude corrected 2026-09-14 from 76.33 to 79.42: 76.33 is the known-wrong output of the `--city Pallipat` geocoder (see src/saju_engine/pillars.py:218 and docs/audits/2026-07-05-engine-audit.md C4) and was never Harish's birthplace longitude — the candidate record gives Pallipattu (Tiruvallur) at 79.45°E and the published report corrects -12.2 min to 02:57 solar. The change is pillar-neutral: both 76.33 (-24.7 min, 02:45) and 79.42 (-12.3 min, 02:57) land inside the 丑 hour window, so every expectation in this entry is unchanged."
+  },
+  {
+    "id": "sewoon-gurumoorthy-1964",
+    "subsystem": "sewoon",
+    "input": {
+      "year": 1964, "month": 7, "day": 19, "hour": 8, "minute": 30,
+      "longitude": 79.422, "utc_offset": 5.5, "gender": "M",
+      "convention": "korean", "use_solar_time": true,
+      "reference_year": 1964, "reference_month": 7, "reference_day": 19
+    },
+    "source": [
+      {"citation": "Cross-validation of sewoon anchors against W1-certified pillar layer (test_cross_validate.py: 甲辰 辛未 己巳 戊辰)", "url": "internal — non-circular by construction"},
+      {"citation": "만세력 annual anchor: 1964 = 甲辰", "url": "https://manseryeok.com"}
+    ],
+    "expected": {
+      "annual": {"year": 1964, "pillar": "甲辰"},
+      "monthly": {"ym": 196407, "pillar": "辛未"},
+      "current_daeun": null
+    },
+    "status": "expect_match",
+    "notes": "Reference date = Gurumoorthy's W1-certified birth date (mid-July, ≥3 days from 小暑/立秋). Annual 甲辰; monthly 辛未 (五虎遁 from 甲 year). NON-CIRCULAR: expectations from W1-certified pillars."
+  },
+  {
+    "id": "sewoon-park-1917",
+    "subsystem": "sewoon",
+    "input": {
+      "year": 1917, "month": 11, "day": 14, "hour": 10, "minute": 0,
+      "longitude": 128.74, "utc_offset": 9.0, "gender": "M",
+      "convention": "korean", "use_solar_time": true,
+      "reference_year": 1917, "reference_month": 11, "reference_day": 14
+    },
+    "source": [
+      {"citation": "Cross-validation of sewoon anchors against W1-certified pillar layer (pillars.json park-chung-hee: 丁巳 辛亥 庚申 辛巳)", "url": "internal — non-circular by construction"},
+      {"citation": "만세력 annual anchor: 1917 = 丁巳", "url": "https://manseryeok.com"}
+    ],
+    "expected": {
+      "annual": {"year": 1917, "pillar": "丁巳"},
+      "monthly": {"ym": 191711, "pillar": "辛亥"},
+      "current_daeun": null
+    },
+    "status": "expect_match",
+    "notes": "Reference date = Park Chung-hee's W1-certified birth date (pillars.json, 2+ external sources). Annual 丁巳; monthly 辛亥 (立冬 1917-11-08 passed, 대설 not yet). NON-CIRCULAR."
+  },
+  {
+    "id": "sewoon-kdj-1997-daeun-window",
+    "subsystem": "sewoon",
+    "input": {
+      "year": 1924, "month": 1, "day": 6, "hour": 12, "minute": 0,
+      "longitude": 126.0, "utc_offset": 9.0, "gender": "M",
+      "convention": "korean", "use_solar_time": true,
+      "reference_year": 1997, "reference_month": 12, "reference_day": 19
+    },
+    "source": [
+      {"citation": "moneyluckk.com, 김대중 분석: \"1997년 대선 당선: 정사 대운의 정축년\"", "url": "https://moneyluckk.com"},
+      {"citation": "만세력 annual anchor: 1997 = 丁丑", "url": "https://manseryeok.com"}
+    ],
+    "expected": {
+      "annual": {"year": 1997, "pillar": "丁丑"},
+      "monthly": null,
+      "current_daeun": {"pillar": "丁巳"}
+    },
+    "status": "expect_match",
+    "notes": "Election-day reference (1997-12-19). Validates BOTH the annual anchor (丁丑, externally published) AND the 세수-based current 대운 selection (age 73 → 丁巳 window, start_age 69) — the A5 세수 fix path. Monthly left null (mid-December is close to 대설 12-07; boundary precision is Task 3 scope)."
+  },
+  {
+    "id": "ipchun-park-geun-hye-before",
+    "subsystem": "sewoon",
+    "input": {
+      "year": 1952, "month": 2, "day": 2, "hour": 2, "minute": 0,
+      "longitude": 128.6, "utc_offset": 9.0, "gender": "F",
+      "convention": "korean", "use_solar_time": true,
+      "reference_year": 1997, "reference_month": 2, "reference_day": 3
+    },
+    "source": [
+      {"citation": "fourpillars.net Online Four Pillars Calculator, 양력 1997-02-03 (any birth data), 2026-09-13 (accessed) — Year 丙子 / Month 辛丑 / Day 丙子 / Hour 己丑: the annual pillar on 02-03 is still 丙子, i.e. before 입춘 (1997-02-04 03:57 KST)", "url": "https://fourpillars.net/online4p_V3.php?Lang=en&Sta=r&GEN=-1&HR=2&DD=03&MM=02&YY=1997", "evidence": "tests/validation/evidence/sewoon-ipchun-park-geun-hye-before-fourpillars.png"},
+      {"citation": "fourpillars.net GET for 1997-02-05 shows Year 丁丑 — completes the straddle: the annual pillar flips 丙子→丁丑 exactly at the 02-04 입춘 boundary", "url": "https://fourpillars.net/online4p_V3.php?Lang=en&Sta=r&GEN=-1&HR=2&DD=05&MM=02&YY=1997", "evidence": "tests/validation/evidence/sewoon-ipchun-park-geun-hye-after-fourpillars.png"}
+    ],
+    "expected": {
+      "annual": {"year": 1997, "pillar": "丙子"},
+      "monthly": null,
+      "current_daeun": null
+    },
+    "status": "expect_match",
+    "notes": "세운 입춘 straddle, PRE-side: reference date 1997-02-03 is one day before 입춘 1997-02-04 03:57 KST, so the annual hit for 1997 must still carry the pre-입춘 pillar 丙子 (the prior year's stem-branch), not 丁丑. Chart = park-geun-hye (daeun.json park-geun-hye-daeun, 2 external sources). External confirmation: fourpillars.net renders Year 丙子 for 02-03 and Year 丁丑 for 02-05 — the source itself demonstrates the straddle."
+  },
+  {
+    "id": "ipchun-park-geun-hye-after",
+    "subsystem": "sewoon",
+    "input": {
+      "year": 1952, "month": 2, "day": 2, "hour": 2, "minute": 0,
+      "longitude": 128.6, "utc_offset": 9.0, "gender": "F",
+      "convention": "korean", "use_solar_time": true,
+      "reference_year": 1997, "reference_month": 2, "reference_day": 5
+    },
+    "source": [
+      {"citation": "fourpillars.net Online Four Pillars Calculator, 양력 1997-02-05 (any birth data), 2026-09-13 (accessed) — Year 丁丑 / Month 壬寅 / Day 戊寅 / Hour 癸丑: the annual pillar on 02-05 is 丁丑, i.e. after 입춘 (1997-02-04 03:57 KST); Month 壬寅 also confirms the month-side term flip", "url": "https://fourpillars.net/online4p_V3.php?Lang=en&Sta=r&GEN=-1&HR=2&DD=05&MM=02&YY=1997", "evidence": "tests/validation/evidence/sewoon-ipchun-park-geun-hye-after-fourpillars.png"},
+      {"citation": "만세력 annual anchor: 1997 = 丁丑 (already externally published, sewoon-kdj-1997-daeun-window entry)", "url": "https://fourpillars.net/online4p_V3.php?Lang=en&Sta=r&GEN=-1&HR=2&DD=03&MM=02&YY=1997", "evidence": "tests/validation/evidence/sewoon-ipchun-park-geun-hye-before-fourpillars.png"}
+    ],
+    "expected": {
+      "annual": {"year": 1997, "pillar": "丁丑"},
+      "monthly": null,
+      "current_daeun": null
+    },
+    "status": "expect_match",
+    "notes": "세운 입춘 straddle, POST-side: reference date 1997-02-05 is one day after 입춘, so the annual hit for 1997 must be 丁丑 (the new year's stem-branch, matching the externally published 1997 annual anchor). Pair with ipchun-park-geun-hye-before pins the boundary to the 입춘 day."
+  },
+  {
+    "id": "jeolip-son-heung-min-before",
+    "subsystem": "sewoon",
+    "input": {
+      "year": 1992, "month": 7, "day": 8, "hour": 12, "minute": 0,
+      "longitude": 127.85, "utc_offset": 9.0, "gender": "M",
+      "convention": "korean", "use_solar_time": true,
+      "reference_year": 1992, "reference_month": 7, "reference_day": 6
+    },
+    "source": [
+      {"citation": "fourpillars.net Online Four Pillars Calculator, 양력 1992-07-06 (male 12:00), 2026-09-13 (accessed) — Month 丙午 / Year 壬申 / Day 癸未 / Hour 戊午: on 07-06, one day before 소서 (1992-07-07 05:40 KST), the month pillar is still 丙午", "url": "https://fourpillars.net/online4p_V3.php?Lang=en&Sta=r&GEN=1&HR=12&DD=06&MM=07&YY=1992", "evidence": "tests/validation/evidence/sewoon-jeolip-son-heung-min-before-fourpillars.png"},
+      {"citation": "fourpillars.net GET for 1992-07-08 shows Month 丁未 (also W1-certified in pillars.json solarterm-boundary-son-heung-min via sajumania + fourpillars) — completes the straddle across the 07-07 소서 boundary", "url": "https://fourpillars.net/online4p_V3.php?Lang=en&Sta=r&GEN=1&HR=12&DD=08&MM=07&YY=1992", "evidence": "tests/validation/evidence/sewoon-jeolip-son-heung-min-after-fourpillars.png"}
+    ],
+    "expected": {
+      "annual": null,
+      "monthly": {"ym": 199207, "pillar": "丙午"},
+      "current_daeun": null
+    },
+    "status": "expect_match",
+    "notes": "월운 절입 straddle, PRE-side: reference date 1992-07-06 is before 소서, so the monthly hit for ym 199207 must still carry the pre-절입 pillar 丙午 (the June month), not 丁未. Chart = son-heung-min (W1-certified pillar layer, pillars.json solarterm-boundary-son-heung-min). External confirmation: fourpillars.net renders Month 丙午 for 07-06 and Month 丁未 for 07-08 — the source demonstrates the straddle."
+  },
+  {
+    "id": "jeolip-son-heung-min-after",
+    "subsystem": "sewoon",
+    "input": {
+      "year": 1992, "month": 7, "day": 8, "hour": 12, "minute": 0,
+      "longitude": 127.85, "utc_offset": 9.0, "gender": "M",
+      "convention": "korean", "use_solar_time": true,
+      "reference_year": 1992, "reference_month": 7, "reference_day": 8
+    },
+    "source": [
+      {"citation": "pillars.json solarterm-boundary-son-heung-min (W1-certified): 사주매니아 만세력 양력 1992-07-08 12:00 남 — 년 壬申 / 월 丁未 / 일 乙酉 / 時 壬午; fourpillars.net agrees on all four pillars. The W1-certified 월 pillar 丁未 IS the expected monthly hit for a reference on/after the 소서 boundary", "url": "https://fourpillars.net/online4p_V3.php?Lang=en&Sta=r&GEN=1&HR=12&DD=08&MM=07&YY=1992", "evidence": "tests/validation/evidence/solarterm-boundary-son-heung-min-sajumania.png"},
+      {"citation": "fourpillars.net GET for 1992-07-06 shows Month 丙午 — the pre-boundary side completing the straddle", "url": "https://fourpillars.net/online4p_V3.php?Lang=en&Sta=r&GEN=1&HR=12&DD=06&MM=07&YY=1992", "evidence": "tests/validation/evidence/sewoon-jeolip-son-heung-min-before-fourpillars.png"}
+    ],
+    "expected": {
+      "annual": null,
+      "monthly": {"ym": 199207, "pillar": "丁未"},
+      "current_daeun": null
+    },
+    "status": "expect_match",
+    "notes": "월운 절입 straddle, POST-side: reference date 1992-07-08 (the chart's own birth date) is after 소서, so the monthly hit for ym 199207 must be 丁未 — exactly the W1-certified 월 pillar of this chart. NON-CIRCULAR for the after side: the expectation comes from the W1-certified pillar layer (sajumania + fourpillars), so sewoon's 五虎遁 monthly anchor is cross-validated against the certified layer, not against sewoon itself."
+  }
+]

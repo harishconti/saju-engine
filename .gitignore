@@ -1,0 +1,73 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project-specific installer artifacts
+*.deb
+*.rpm
+
+# Local outputs (keep reports in repo, but ignore temporary renders)
+tmp/
+*.tmp
+
+# Test / coverage artifacts
+.coverage
+.pytest_cache/
+.ruff_cache/
+
+# Node / Next.js (apps/landing-page)
+node_modules/
+.next/
+*.tsbuildinfo
+
+# Tooling scratch / session state
+.playwright-mcp/
+
+# Claude Code artifacts — intentionally tracked.
+# .remember/     = session memory (now.md / today-*.md / core-memories.md)
+# .claude/       = slash commands + permission allowlist
+# These live in the source tree so a re-sync to the publish repo keeps them.
+
+# Client intake records — may contain personal data; not for version control
+candidates_horoscope/intake/*
+!candidates_horoscope/intake/.gitkeep
+
+# Stray dev screenshots
+/landing-hero.png
+/landing-viewport.png
+/time_click.png

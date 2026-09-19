@@ -1,0 +1,976 @@
+[
+  {
+    "id": "c-band-0",
+    "subsystem": "compat",
+    "input": {
+      "probe": "band",
+      "score": 0
+    },
+    "source": {
+      "type": "knowledge",
+      "citation": "knowledge/11-gunghap.md:959-978",
+      "url_or_ref": "Excellent >=80 / Strong 65-79 / Mixed 45-64 / Challenging <45 (external cross-check 2026-09-14: No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3) — https://daysaju.com/guide/gunghap)",
+      "external": {
+        "citation": "No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3)",
+        "url": "https://daysaju.com/guide/gunghap"
+      }
+    },
+    "expected": {
+      "band": "Challenging"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "c-band-44",
+    "subsystem": "compat",
+    "input": {
+      "probe": "band",
+      "score": 44
+    },
+    "source": {
+      "type": "knowledge",
+      "citation": "knowledge/11-gunghap.md:959-978",
+      "url_or_ref": "Excellent >=80 / Strong 65-79 / Mixed 45-64 / Challenging <45 (external cross-check 2026-09-14: No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3) — https://daysaju.com/guide/gunghap)",
+      "external": {
+        "citation": "No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3)",
+        "url": "https://daysaju.com/guide/gunghap"
+      }
+    },
+    "expected": {
+      "band": "Challenging"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "c-band-45",
+    "subsystem": "compat",
+    "input": {
+      "probe": "band",
+      "score": 45
+    },
+    "source": {
+      "type": "knowledge",
+      "citation": "knowledge/11-gunghap.md:959-978",
+      "url_or_ref": "Excellent >=80 / Strong 65-79 / Mixed 45-64 / Challenging <45 (external cross-check 2026-09-14: No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3) — https://daysaju.com/guide/gunghap)",
+      "external": {
+        "citation": "No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3)",
+        "url": "https://daysaju.com/guide/gunghap"
+      }
+    },
+    "expected": {
+      "band": "Mixed"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "c-band-64",
+    "subsystem": "compat",
+    "input": {
+      "probe": "band",
+      "score": 64
+    },
+    "source": {
+      "type": "knowledge",
+      "citation": "knowledge/11-gunghap.md:959-978",
+      "url_or_ref": "Excellent >=80 / Strong 65-79 / Mixed 45-64 / Challenging <45 (external cross-check 2026-09-14: No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3) — https://daysaju.com/guide/gunghap)",
+      "external": {
+        "citation": "No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3)",
+        "url": "https://daysaju.com/guide/gunghap"
+      }
+    },
+    "expected": {
+      "band": "Mixed"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "c-band-65",
+    "subsystem": "compat",
+    "input": {
+      "probe": "band",
+      "score": 65
+    },
+    "source": {
+      "type": "knowledge",
+      "citation": "knowledge/11-gunghap.md:959-978",
+      "url_or_ref": "Excellent >=80 / Strong 65-79 / Mixed 45-64 / Challenging <45 (external cross-check 2026-09-14: No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3) — https://daysaju.com/guide/gunghap)",
+      "external": {
+        "citation": "No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3)",
+        "url": "https://daysaju.com/guide/gunghap"
+      }
+    },
+    "expected": {
+      "band": "Strong"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "c-band-79",
+    "subsystem": "compat",
+    "input": {
+      "probe": "band",
+      "score": 79
+    },
+    "source": {
+      "type": "knowledge",
+      "citation": "knowledge/11-gunghap.md:959-978",
+      "url_or_ref": "Excellent >=80 / Strong 65-79 / Mixed 45-64 / Challenging <45 (external cross-check 2026-09-14: No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3) — https://daysaju.com/guide/gunghap)",
+      "external": {
+        "citation": "No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3)",
+        "url": "https://daysaju.com/guide/gunghap"
+      }
+    },
+    "expected": {
+      "band": "Strong"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "c-band-80",
+    "subsystem": "compat",
+    "input": {
+      "probe": "band",
+      "score": 80
+    },
+    "source": {
+      "type": "knowledge",
+      "citation": "knowledge/11-gunghap.md:959-978",
+      "url_or_ref": "Excellent >=80 / Strong 65-79 / Mixed 45-64 / Challenging <45 (external cross-check 2026-09-14: No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3) — https://daysaju.com/guide/gunghap)",
+      "external": {
+        "citation": "No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3)",
+        "url": "https://daysaju.com/guide/gunghap"
+      }
+    },
+    "expected": {
+      "band": "Excellent"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "c-band-100",
+    "subsystem": "compat",
+    "input": {
+      "probe": "band",
+      "score": 100
+    },
+    "source": {
+      "type": "knowledge",
+      "citation": "knowledge/11-gunghap.md:959-978",
+      "url_or_ref": "Excellent >=80 / Strong 65-79 / Mixed 45-64 / Challenging <45 (external cross-check 2026-09-14: No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3) — https://daysaju.com/guide/gunghap)",
+      "external": {
+        "citation": "No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3)",
+        "url": "https://daysaju.com/guide/gunghap"
+      }
+    },
+    "expected": {
+      "band": "Excellent"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "c-band--1",
+    "subsystem": "compat",
+    "input": {
+      "probe": "band",
+      "score": -1
+    },
+    "source": {
+      "type": "knowledge",
+      "citation": "knowledge/11-gunghap.md:959-978",
+      "url_or_ref": "Excellent >=80 / Strong 65-79 / Mixed 45-64 / Challenging <45 (external cross-check 2026-09-14: No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3) — https://daysaju.com/guide/gunghap)",
+      "external": {
+        "citation": "No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3)",
+        "url": "https://daysaju.com/guide/gunghap"
+      }
+    },
+    "expected": {
+      "band": "Challenging"
+    },
+    "status": "expect_match",
+    "notes": "defensive fall-through: a score outside the nominal 0-100 range must still band, never raise"
+  },
+  {
+    "id": "c-band-101",
+    "subsystem": "compat",
+    "input": {
+      "probe": "band",
+      "score": 101
+    },
+    "source": {
+      "type": "knowledge",
+      "citation": "knowledge/11-gunghap.md:959-978",
+      "url_or_ref": "Excellent >=80 / Strong 65-79 / Mixed 45-64 / Challenging <45 (external cross-check 2026-09-14: No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3) — https://daysaju.com/guide/gunghap)",
+      "external": {
+        "citation": "No external Korean source states a 0-100 composite or the 80/65/45 cut-points; daysaju 궁합 가이드 + 사자사주 궁합 가이드 publish relative weights and verdict adjectives only. KB11:959 already labels the section an engine convention [UNCERTAIN: cut-points are not classical doctrine] (research doc §3)",
+        "url": "https://daysaju.com/guide/gunghap"
+      }
+    },
+    "expected": {
+      "band": "Excellent"
+    },
+    "status": "expect_match",
+    "notes": "defensive fall-through: a score outside the nominal 0-100 range must still band, never raise"
+  },
+  {
+    "id": "c-pillars-daystem-combo",
+    "subsystem": "compat",
+    "input": {
+      "probe": "subsystem",
+      "subsystem": "daystem_combo",
+      "charts": "pillars",
+      "pillars_a": {
+        "year": "壬申",
+        "month": "乙巳",
+        "day": "辛亥",
+        "hour": "己丑"
+      },
+      "dm_a": "辛",
+      "pillars_b": {
+        "year": "丙子",
+        "month": "己亥",
+        "day": "甲戌",
+        "hour": "乙亥"
+      },
+      "dm_b": "甲"
+    },
+    "source": {
+      "type": "published_report",
+      "citation": "candidates_horoscope/marriage_compatibility/harish_manvitha/harish_manvitha_compatibility_deep.md",
+      "url_or_ref": "daystem_combo +0 — harish x manvitha deep compat verdict table; rule base knowledge/11-gunghap.md §A 일간합 (external cross-check 2026-09-14: OpenFate Wiki (배우자궁 합충; 배우자궁 관계) and 사주하루 both treat 天干合 as an attraction signal without requiring 化 — the modern reading the engine takes (KB11:57 carries the school split) (research doc §1 A) — https://wiki.openfate.ai/ko/bazi/relationships-compatibility/combinations-clashes-punishments-and-harms-in-relationships)",
+      "external": {
+        "citation": "OpenFate Wiki (배우자궁 합충; 배우자궁 관계) and 사주하루 both treat 天干合 as an attraction signal without requiring 化 — the modern reading the engine takes (KB11:57 carries the school split) (research doc §1 A)",
+        "url": "https://wiki.openfate.ai/ko/bazi/relationships-compatibility/combinations-clashes-punishments-and-harms-in-relationships"
+      }
+    },
+    "expected": {
+      "score": 0
+    },
+    "notes": "charts=\"pillars\" reproduces only the 7 pillars-only sub-systems (Plan 6 A6, measured 2026-09-14): yongshin, ilju_pair, combined_elements and daeun_sync are OUT OF SCOPE here and must not be asserted from this fixture. yongshin reads strength_assessment; ilju_pair is additively channel-dependent (+5 full / +3 full-PO / +0 PO-PO); combined_elements reads element balance (9 full / 7 PO-PO); daeun_sync is override-immune by construction (A7 — reads only the 'daeun' field).",
+    "status": "expect_match"
+  },
+  {
+    "id": "c-pillars-daybranch",
+    "subsystem": "compat",
+    "input": {
+      "probe": "subsystem",
+      "subsystem": "daybranch",
+      "charts": "pillars",
+      "pillars_a": {
+        "year": "壬申",
+        "month": "乙巳",
+        "day": "辛亥",
+        "hour": "己丑"
+      },
+      "dm_a": "辛",
+      "pillars_b": {
+        "year": "丙子",
+        "month": "己亥",
+        "day": "甲戌",
+        "hour": "乙亥"
+      },
+      "dm_b": "甲"
+    },
+    "source": {
+      "type": "published_report",
+      "citation": "candidates_horoscope/marriage_compatibility/harish_manvitha/harish_manvitha_compatibility_deep.md",
+      "url_or_ref": "daybranch -6 — harish x manvitha deep compat verdict table; rule base knowledge/11-gunghap.md §B 일지 (external cross-check 2026-09-14: OpenFate Wiki 합·충·형·해, 사자사주 배우자궁 가이드 and shunshi.ai 합혼 가이드 — pair tables exact; 합화 interpretation turns on 용신/기신 context, which is why the engine scores the interaction rather than the transformation (research doc §1 B) — https://www.sazasaju.com/blog/spouse-palace-guide)",
+      "external": {
+        "citation": "OpenFate Wiki 합·충·형·해, 사자사주 배우자궁 가이드 and shunshi.ai 합혼 가이드 — pair tables exact; 합화 interpretation turns on 용신/기신 context, which is why the engine scores the interaction rather than the transformation (research doc §1 B)",
+        "url": "https://www.sazasaju.com/blog/spouse-palace-guide"
+      }
+    },
+    "expected": {
+      "score": -6
+    },
+    "notes": "charts=\"pillars\" reproduces only the 7 pillars-only sub-systems (Plan 6 A6, measured 2026-09-14): yongshin, ilju_pair, combined_elements and daeun_sync are OUT OF SCOPE here and must not be asserted from this fixture. yongshin reads strength_assessment; ilju_pair is additively channel-dependent (+5 full / +3 full-PO / +0 PO-PO); combined_elements reads element balance (9 full / 7 PO-PO); daeun_sync is override-immune by construction (A7 — reads only the 'daeun' field).",
+    "status": "expect_match"
+  },
+  {
+    "id": "c-pillars-nayin",
+    "subsystem": "compat",
+    "input": {
+      "probe": "subsystem",
+      "subsystem": "nayin",
+      "charts": "pillars",
+      "pillars_a": {
+        "year": "壬申",
+        "month": "乙巳",
+        "day": "辛亥",
+        "hour": "己丑"
+      },
+      "dm_a": "辛",
+      "pillars_b": {
+        "year": "丙子",
+        "month": "己亥",
+        "day": "甲戌",
+        "hour": "乙亥"
+      },
+      "dm_b": "甲"
+    },
+    "source": {
+      "type": "published_report",
+      "citation": "candidates_horoscope/marriage_compatibility/harish_manvitha/harish_manvitha_compatibility_deep.md",
+      "url_or_ref": "nayin -5 — harish x manvitha deep compat verdict table, PILLARS-ONLY path (no gender supplied); rule base knowledge/11-gunghap.md §C 납음 (external cross-check 2026-09-14: 사자사주 납음오행 정리표, OpenFate 납음 도출법 and 사주플러스 납음법 — three independent derivations of the same arithmetic, all agreeing with the engine's 30x30 pair table (research doc §1 C) — https://www.sazasaju.com/blog/nabeum-ohaeng-guide)",
+      "external": {
+        "citation": "사자사주 납음오행 정리표, OpenFate 납음 도출법 and 사주플러스 납음법 — three independent derivations of the same arithmetic, all agreeing with the engine's 30x30 pair table (research doc §1 C)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      }
+    },
+    "expected": {
+      "score": -5
+    },
+    "notes": "charts=\"pillars\" reproduces only the 7 pillars-only sub-systems (Plan 6 A6, measured 2026-09-14): yongshin, ilju_pair, combined_elements and daeun_sync are OUT OF SCOPE here and must not be asserted from this fixture. yongshin reads strength_assessment; ilju_pair is additively channel-dependent (+5 full / +3 full-PO / +0 PO-PO); combined_elements reads element balance (9 full / 7 PO-PO); daeun_sync is override-immune by construction (A7 — reads only the 'daeun' field). NOTE (re-pinned 2026-09-14, C8 fix): this probe carries NO gender, so the nayin sub-system resolves its subject order through the index tiebreak branch of _canonical_nayin_pair() — the lower NAYIN_ORDER index is subject. Chart A's day pillar 辛亥 is 釵釧金 (index 23) and chart B's 甲戌 is 山頭火 (index 5), so 山頭火 is subject and the relation reads 山頭火(Fire) overcomes 釵釧金(Metal) = 상충 -5. Before the fix the caller's argument order supplied the direction and this probe read the reverse, 상해 -3. See knowledge/11-gunghap.md §C — \"Canonical subject order\".",
+    "status": "expect_match"
+  },
+  {
+    "id": "c-pillars-tengod-cross",
+    "subsystem": "compat",
+    "input": {
+      "probe": "subsystem",
+      "subsystem": "tengod_cross",
+      "charts": "pillars",
+      "pillars_a": {
+        "year": "壬申",
+        "month": "乙巳",
+        "day": "辛亥",
+        "hour": "己丑"
+      },
+      "dm_a": "辛",
+      "pillars_b": {
+        "year": "丙子",
+        "month": "己亥",
+        "day": "甲戌",
+        "hour": "乙亥"
+      },
+      "dm_b": "甲"
+    },
+    "source": {
+      "type": "published_report",
+      "citation": "candidates_horoscope/marriage_compatibility/harish_manvitha/harish_manvitha_compatibility_deep.md",
+      "url_or_ref": "tengod_cross +10 — harish x manvitha deep compat verdict table; rule base knowledge/11-gunghap.md §H 십신 교차 (external cross-check 2026-09-14: daysaju 궁합 가이드 ranks 재성·관성 as the final of five 판단법 steps (성 ranked below 궁) and 사자사주 궁합 가이드 gives 십신 상호 자리 as a modern layer — both agree with the engine's 10-point cross-relationship (research doc §1 G) — https://daysaju.com/guide/gunghap)",
+      "external": {
+        "citation": "daysaju 궁합 가이드 ranks 재성·관성 as the final of five 판단법 steps (성 ranked below 궁) and 사자사주 궁합 가이드 gives 십신 상호 자리 as a modern layer — both agree with the engine's 10-point cross-relationship (research doc §1 G)",
+        "url": "https://daysaju.com/guide/gunghap"
+      }
+    },
+    "expected": {
+      "score": 10
+    },
+    "notes": "charts=\"pillars\" reproduces only the 7 pillars-only sub-systems (Plan 6 A6, measured 2026-09-14): yongshin, ilju_pair, combined_elements and daeun_sync are OUT OF SCOPE here and must not be asserted from this fixture. yongshin reads strength_assessment; ilju_pair is additively channel-dependent (+5 full / +3 full-PO / +0 PO-PO); combined_elements reads element balance (9 full / 7 PO-PO); daeun_sync is override-immune by construction (A7 — reads only the 'daeun' field).",
+    "status": "expect_match"
+  },
+  {
+    "id": "c-pillars-compat-stars",
+    "subsystem": "compat",
+    "input": {
+      "probe": "subsystem",
+      "subsystem": "compat_stars",
+      "charts": "pillars",
+      "pillars_a": {
+        "year": "壬申",
+        "month": "乙巳",
+        "day": "辛亥",
+        "hour": "己丑"
+      },
+      "dm_a": "辛",
+      "pillars_b": {
+        "year": "丙子",
+        "month": "己亥",
+        "day": "甲戌",
+        "hour": "乙亥"
+      },
+      "dm_b": "甲"
+    },
+    "source": {
+      "type": "published_report",
+      "citation": "candidates_horoscope/marriage_compatibility/harish_manvitha/harish_manvitha_compatibility_deep.md",
+      "url_or_ref": "compat_stars +0 — harish x manvitha deep compat verdict table; rule base knowledge/11-gunghap.md §J 신살 (external cross-check 2026-09-14: daysaju 도화 vs 홍염 비교 and OpenFate 관계 궁합 — 홍염 keying identical to the engine's; the 홍양교차 framing differs and is recorded, not reconciled (research doc §1 I) — https://daysaju.com/dohwa-vs-hongyeom-bigyo)",
+      "external": {
+        "citation": "daysaju 도화 vs 홍염 비교 and OpenFate 관계 궁합 — 홍염 keying identical to the engine's; the 홍양교차 framing differs and is recorded, not reconciled (research doc §1 I)",
+        "url": "https://daysaju.com/dohwa-vs-hongyeom-bigyo"
+      }
+    },
+    "expected": {
+      "score": 0
+    },
+    "notes": "charts=\"pillars\" reproduces only the 7 pillars-only sub-systems (Plan 6 A6, measured 2026-09-14): yongshin, ilju_pair, combined_elements and daeun_sync are OUT OF SCOPE here and must not be asserted from this fixture. yongshin reads strength_assessment; ilju_pair is additively channel-dependent (+5 full / +3 full-PO / +0 PO-PO); combined_elements reads element balance (9 full / 7 PO-PO); daeun_sync is override-immune by construction (A7 — reads only the 'daeun' field).",
+    "status": "expect_match"
+  },
+  {
+    "id": "c-pillars-yin-yang",
+    "subsystem": "compat",
+    "input": {
+      "probe": "subsystem",
+      "subsystem": "yin_yang",
+      "charts": "pillars",
+      "pillars_a": {
+        "year": "壬申",
+        "month": "乙巳",
+        "day": "辛亥",
+        "hour": "己丑"
+      },
+      "dm_a": "辛",
+      "pillars_b": {
+        "year": "丙子",
+        "month": "己亥",
+        "day": "甲戌",
+        "hour": "乙亥"
+      },
+      "dm_b": "甲"
+    },
+    "source": {
+      "type": "published_report",
+      "citation": "candidates_horoscope/marriage_compatibility/harish_manvitha/harish_manvitha_compatibility_deep.md",
+      "url_or_ref": "yin_yang +2 — harish x manvitha deep compat verdict table; rule base knowledge/11-gunghap.md §I 음양 (external cross-check 2026-09-14: 한국민족문화대백과사전 궁합 and 위키백과 궁합 (both give the 겉궁합/속궁합 distinction) plus OpenFate 관계 궁합 — framework confirmed; the 2/100 weight is disputed across schools (research doc §1 J, §6.2) — https://encykorea.aks.ac.kr/Article/E0006817)",
+      "external": {
+        "citation": "한국민족문화대백과사전 궁합 and 위키백과 궁합 (both give the 겉궁합/속궁합 distinction) plus OpenFate 관계 궁합 — framework confirmed; the 2/100 weight is disputed across schools (research doc §1 J, §6.2)",
+        "url": "https://encykorea.aks.ac.kr/Article/E0006817"
+      }
+    },
+    "expected": {
+      "score": 2
+    },
+    "notes": "charts=\"pillars\" reproduces only the 7 pillars-only sub-systems (Plan 6 A6, measured 2026-09-14): yongshin, ilju_pair, combined_elements and daeun_sync are OUT OF SCOPE here and must not be asserted from this fixture. yongshin reads strength_assessment; ilju_pair is additively channel-dependent (+5 full / +3 full-PO / +0 PO-PO); combined_elements reads element balance (9 full / 7 PO-PO); daeun_sync is override-immune by construction (A7 — reads only the 'daeun' field).",
+    "status": "expect_match"
+  },
+  {
+    "id": "c-pillars-year-branch",
+    "subsystem": "compat",
+    "input": {
+      "probe": "subsystem",
+      "subsystem": "year_branch",
+      "charts": "pillars",
+      "pillars_a": {
+        "year": "壬申",
+        "month": "乙巳",
+        "day": "辛亥",
+        "hour": "己丑"
+      },
+      "dm_a": "辛",
+      "pillars_b": {
+        "year": "丙子",
+        "month": "己亥",
+        "day": "甲戌",
+        "hour": "乙亥"
+      },
+      "dm_b": "甲"
+    },
+    "source": {
+      "type": "published_report",
+      "citation": "candidates_horoscope/marriage_compatibility/harish_manvitha/harish_manvitha_compatibility_deep.md",
+      "url_or_ref": "year_branch +2 — harish x manvitha deep compat verdict table; rule base knowledge/11-gunghap.md §K 띠 (external cross-check 2026-09-14: 한국민족문화대백과사전 궁합 and 사주하루 — both support the low 띠(年支) weight the engine assigns (research doc §1 K) — https://encykorea.aks.ac.kr/Article/E0006817)",
+      "external": {
+        "citation": "한국민족문화대백과사전 궁합 and 사주하루 — both support the low 띠(年支) weight the engine assigns (research doc §1 K)",
+        "url": "https://encykorea.aks.ac.kr/Article/E0006817"
+      }
+    },
+    "expected": {
+      "score": 2
+    },
+    "notes": "charts=\"pillars\" reproduces only the 7 pillars-only sub-systems (Plan 6 A6, measured 2026-09-14): yongshin, ilju_pair, combined_elements and daeun_sync are OUT OF SCOPE here and must not be asserted from this fixture. yongshin reads strength_assessment; ilju_pair is additively channel-dependent (+5 full / +3 full-PO / +0 PO-PO); combined_elements reads element balance (9 full / 7 PO-PO); daeun_sync is override-immune by construction (A7 — reads only the 'daeun' field).",
+    "status": "expect_match"
+  },
+  {
+    "id": "compat-harish-manvitha",
+    "subsystem": "compat",
+    "input": {
+      "probe": "score",
+      "charts": "birth",
+      "a_name": "harish",
+      "a_year": 1992,
+      "a_month": 6,
+      "a_day": 4,
+      "a_hour": 3,
+      "a_minute": 10,
+      "a_longitude": 79.42,
+      "a_utc_offset": 5.5,
+      "a_gender": "M",
+      "a_use_solar_time": true,
+      "a_early_zi_time": null,
+      "a_korean_yazi": null,
+      "b_name": "manvitha",
+      "b_year": 1996,
+      "b_month": 12,
+      "b_day": 3,
+      "b_hour": 21,
+      "b_minute": 15,
+      "b_longitude": 78.8242,
+      "b_utc_offset": 5.5,
+      "b_gender": "F",
+      "b_use_solar_time": true,
+      "b_early_zi_time": null,
+      "b_korean_yazi": null
+    },
+    "source": {
+      "type": "published_report",
+      "citation": "candidates_horoscope/marriage_compatibility/harish_manvitha/harish_manvitha_compatibility_deep.md",
+      "url_or_ref": "70/100 Strong; the 11-row verdict table reproduced row-for-row, zero reader overrides (external cross-check 2026-09-14: KCI ART002338687 (남기동·김만태 2018, DOI 10.22143/HSS21.9.2.9) confirms 궁>성 — the ordering the engine's weight table encodes structurally — alongside the published report's own 11-row verdict table (research doc §2, §4) — https://doi.org/10.22143/HSS21.9.2.9)",
+      "external": {
+        "citation": "KCI ART002338687 (남기동·김만태 2018, DOI 10.22143/HSS21.9.2.9) confirms 궁>성 — the ordering the engine's weight table encodes structurally — alongside the published report's own 11-row verdict table (research doc §2, §4)",
+        "url": "https://doi.org/10.22143/HSS21.9.2.9"
+      }
+    },
+    "expected": {
+      "score": 70,
+      "band": "Strong",
+      "subsystems": {
+        "daystem_combo": 0,
+        "daybranch": -6,
+        "nayin": -3,
+        "yongshin": 9,
+        "ilju_pair": 5,
+        "combined_elements": 9,
+        "tengod_cross": 10,
+        "daeun_sync": 1,
+        "compat_stars": 0,
+        "yin_yang": 2,
+        "year_branch": 2
+      }
+    },
+    "notes": "The B2 anchor: all 11 sub-systems byte-identical to a published external report, full/full chart sources, no override. The scored subset sums to 20, and 50 + 20 = 70 on the affine 0-100 composite.",
+    "status": "expect_match"
+  },
+  {
+    "id": "compat-harish-vinothini-pillars",
+    "subsystem": "compat",
+    "input": {
+      "probe": "score",
+      "charts": "pillars",
+      "dm_a": "辛",
+      "pillars_a": {
+        "year": "壬申",
+        "month": "乙巳",
+        "day": "辛亥",
+        "hour": "己丑"
+      },
+      "dm_b": "壬",
+      "pillars_b": {
+        "year": "乙亥",
+        "month": "甲申",
+        "day": "壬午",
+        "hour": "己酉"
+      }
+    },
+    "source": {
+      "type": "published_report",
+      "citation": "candidates_horoscope/marriage_compatibility/harish_vinothini/harish_vinothini_compatibility_deep.md",
+      "url_or_ref": "57/100 Mixed (L3-4, L47); both partners' four pillars printed in full at L15-29 (external cross-check 2026-09-14: Pillars-only reconstruction: both partners' four pillars are printed in full in the published report, so this divergence is a chart-input difference between the published run and the engine, not a rule conflict (research doc §3) — https://wiki.openfate.ai/ko/bazi/relationships-compatibility/spouse-palace-relationships-in-bazi-compatibility)",
+      "external": {
+        "citation": "Pillars-only reconstruction: both partners' four pillars are printed in full in the published report, so this divergence is a chart-input difference between the published run and the engine, not a rule conflict (research doc §3)",
+        "url": "https://wiki.openfate.ai/ko/bazi/relationships-compatibility/spouse-palace-relationships-in-bazi-compatibility"
+      }
+    },
+    "expected": {
+      "score": 57,
+      "band": "Mixed"
+    },
+    "notes": "DOCUMENTED DIVERGENCE -- read this before 'fixing' the fixture. The published 57/100 Mixed is a FULL/FULL measurement: the report prints both partners' complete four pillars, so it requires both full pipelines. This entry can only build a pillars-only pair (both sides), which the engine measures at 43/100 Challenging. Neither number is a bug: 57 and 43 are different chart sources, not a scoring disagreement. Plan 6 B3(a) recorded a four-row collapse table with 49/Mixed as the pillars-only figure; 49 is unreachable here -- it is a full/PO measurement (Vinothini's full chart against Harish's pillars), a mode _compat_pair does not implement. The collapse table is therefore FIVE rows, not four: the four A6-predicted collapses plus compat_stars, which A6 placed in the pillars-only set only VACUOUSLY -- compat_stars reads a.stars/b.stars (full-pipeline attributes), a pillars-only chart has empty stars, so the score is 0 by absence. The published vinothini table records compat_stars -2, while PO/PO yields 0, which is the proof. A7: the favorable-element override is INERT on this path -- a pillars-only chart has strength_assessment None, so compat_score's guarded override is silently dropped; and daeun_sync/compat_stars are override-immune by construction (they read only the chart's 'daeun' / 'stars' fields). Vinothini's birth data is unrecoverable from the repo (no date, time, or place survives anywhere in candidates_horoscope/ or the fixtures), so this pillars-only reconstruction STANDS AS FINAL per the 2026-09-13 session record. This entry asserts score+band only -- never the sub-system map, which is not what the published table measured. See knowledge/11-gunghap.md and Plan 6 A6/A7/B3(a).",
+    "status": "documented_interpretation"
+  },
+  {
+    "id": "compat-pawan-sruthi-stale",
+    "subsystem": "compat",
+    "input": {
+      "probe": "score",
+      "charts": "birth",
+      "a_name": "pawan",
+      "a_year": 1991,
+      "a_month": 10,
+      "a_day": 3,
+      "a_hour": 23,
+      "a_minute": 45,
+      "a_longitude": 79.19,
+      "a_utc_offset": 5.5,
+      "a_gender": "M",
+      "a_use_solar_time": true,
+      "a_early_zi_time": null,
+      "a_korean_yazi": null,
+      "b_name": "sruthi",
+      "b_year": 1993,
+      "b_month": 12,
+      "b_day": 11,
+      "b_hour": 2,
+      "b_minute": 45,
+      "b_longitude": 79.32,
+      "b_utc_offset": 5.5,
+      "b_gender": "F",
+      "b_use_solar_time": true,
+      "b_early_zi_time": null,
+      "b_korean_yazi": null
+    },
+    "source": {
+      "type": "published_report",
+      "citation": "candidates_horoscope/marriage_compatibility/pawan_sruthi/pawan_sruthi_compatibility.md",
+      "url_or_ref": "55/100 Mixed; per-sub-system head at L24-30 (daystem_combo +0, daybranch +2, nayin -5, yongshin +12, ilju_pair +1, combined_elements +11, tengod_cross +0) (external cross-check 2026-09-14: Stale ya-ja-si chart: the published pawan_sruthi report predates the 子時 fix, so the engine's current value is ground truth and the published figure is the outdated one (research doc §3) — https://saju-haru.com/blog/gunghap-misread)",
+      "external": {
+        "citation": "Stale ya-ja-si chart: the published pawan_sruthi report predates the 子時 fix, so the engine's current value is ground truth and the published figure is the outdated one (research doc §3)",
+        "url": "https://saju-haru.com/blog/gunghap-misread"
+      }
+    },
+    "expected": {
+      "score": 55,
+      "band": "Mixed"
+    },
+    "notes": "DOCUMENTED DIVERGENCE -- the published report is STALE, and correctly so; the engine value is the corrected one. Pawan's natal chart predates the 야자시 (夜子時) convention fix: the report prints his hour pillar as 戊子, the engine now computes 庚子 (a 23:45 birth in the korean convention). Sruthi's pillars are byte-identical between report and engine (癸酉/甲子/丙寅/己丑), so the whole +5 delta is Pawan's hour pillar. Measured live: 60/100 Mixed, with deltas exactly as B3(b) records -- ilju_pair +1 -> +3, combined_elements +11 -> +9, tengod_cross +0 -> +3, net +5. The band is unchanged (Mixed either way), so the product-visible verdict is stable; the sub-system detail is not. Pawan's report and PDF need regeneration at campaign close. See knowledge/11-gunghap.md and Plan 6 B3(b).",
+    "status": "documented_interpretation"
+  },
+  {
+    "id": "compat-manvitha-harish-reversed",
+    "subsystem": "compat",
+    "input": {
+      "probe": "score",
+      "charts": "birth",
+      "a_name": "manvitha",
+      "a_year": 1996,
+      "a_month": 12,
+      "a_day": 3,
+      "a_hour": 21,
+      "a_minute": 15,
+      "a_longitude": 78.8242,
+      "a_utc_offset": 5.5,
+      "a_gender": "F",
+      "a_use_solar_time": true,
+      "a_early_zi_time": null,
+      "a_korean_yazi": null,
+      "b_name": "harish",
+      "b_year": 1992,
+      "b_month": 6,
+      "b_day": 4,
+      "b_hour": 3,
+      "b_minute": 10,
+      "b_longitude": 79.42,
+      "b_utc_offset": 5.5,
+      "b_gender": "M",
+      "b_use_solar_time": true,
+      "b_early_zi_time": null,
+      "b_korean_yazi": null
+    },
+    "source": {
+      "type": "published_report",
+      "citation": "candidates_horoscope/marriage_compatibility/harish_manvitha/harish_manvitha_compatibility_deep.md",
+      "url_or_ref": "the same published pair read in reverse; re-measured live 2026-09-14 after the C8 fix -- now agrees with the forward read (70 / Strong / nayin -3) (external cross-check 2026-09-14: the nayin pair table is confirmed by three independent sources (사자사주, OpenFate, 사주플러스) and NONE defines an order rule, so the engine declares its own canonical subject order rather than recovering one (research doc §1 C) — https://wiki.openfate.ai/ko/bazi/nayin-methods)",
+      "external": {
+        "citation": "The nayin pair table is confirmed by three independent sources (사자사주, OpenFate, 사주플러스) and none defines an order rule; the engine therefore declares a canonical subject order (knowledge/11-gunghap.md §C) rather than recovering one from a source",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods"
+      }
+    },
+    "expected": {
+      "score": 70,
+      "band": "Strong",
+      "subsystems": {
+        "nayin": -3
+      }
+    },
+    "notes": "C8 order-INDEPENDENCE, band-STABLE instance -- RE-PINNED 2026-09-14. This entry was the reverse-order half of the C8 defect (it previously expected 68 / nayin -5); it now pins the FIXED behaviour. compat_score(a, b) IS symmetric: this pair read F-first scores 70 / Strong / nayin -3, byte-identical to the canonical male-first read of harish x manvitha. The fix is compat.py::_canonical_nayin_pair(), which resolves the subject order from the couple (male-first when both genders are known and differ, else lower NAYIN_ORDER index) before the relation is computed AND displayed, so the direction-bearing relation labels (상합/상구, 상충/상해) can no longer be read off the caller's argument order. Both branches are a NO-OP for every already-canonical (male-first) pair, which is why the harish x manvitha anchor and the b_earth override anchor are unchanged; only this deliberately-reversed entry moved. The band-FLIPPING instance (mahesh x vp, formerly Mixed 64 -> Strong 66, now Mixed 64 both ways) is pinned in tests/test_compat.py, not here, because it needs the pair's own anchors. See knowledge/11-gunghap.md §C -- \"Canonical subject order\".",
+    "status": "expect_match"
+  },
+  {
+    "id": "compat-mahesh-vp",
+    "subsystem": "compat",
+    "input": {
+      "probe": "score",
+      "charts": "birth",
+      "a_name": "mahesh",
+      "a_year": 1995,
+      "a_month": 1,
+      "a_day": 19,
+      "a_hour": 23,
+      "a_minute": 50,
+      "a_longitude": 78.713454,
+      "a_utc_offset": 5.5,
+      "a_gender": "M",
+      "a_use_solar_time": true,
+      "a_early_zi_time": null,
+      "a_korean_yazi": null,
+      "b_name": "vp",
+      "b_year": 2001,
+      "b_month": 6,
+      "b_day": 7,
+      "b_hour": 16,
+      "b_minute": 45,
+      "b_longitude": 76.65,
+      "b_utc_offset": 5.5,
+      "b_gender": "F",
+      "b_use_solar_time": true,
+      "b_early_zi_time": null,
+      "b_korean_yazi": null
+    },
+    "source": {
+      "type": "measured_anchor",
+      "citation": "tests/test_compat.py:_MA_VP_SCORES (L50-62)",
+      "url_or_ref": "the in-repo anchor table the C9 locks are parametrized over; 68/100 Strong forward (external cross-check 2026-09-14: In-repo measured anchor (tests/test_compat.py:_MA_VP_SCORES), the table the C9 삼형-shadowing locks are parametrized over; the 궁>성 ordering it exercises is KCI-confirmed by ART002338687 (research doc §1 B) — https://doi.org/10.22143/HSS21.9.2.9)",
+      "external": {
+        "citation": "In-repo measured anchor (tests/test_compat.py:_MA_VP_SCORES), the table the C9 삼형-shadowing locks are parametrized over; the 궁>성 ordering it exercises is KCI-confirmed by ART002338687 (research doc §1 B)",
+        "url": "https://doi.org/10.22143/HSS21.9.2.9"
+      }
+    },
+    "expected": {
+      "score": 68,
+      "band": "Strong",
+      "subsystems": {
+        "daystem_combo": 0,
+        "daybranch": 6,
+        "nayin": 3,
+        "yongshin": 9,
+        "ilju_pair": 0,
+        "combined_elements": 4,
+        "tengod_cross": -8,
+        "daeun_sync": 3,
+        "compat_stars": 3,
+        "yin_yang": 2,
+        "year_branch": 0
+      }
+    },
+    "notes": "Carries _MA_VP_SCORES verbatim into the fixture corpus, so the anchor table the C9 locks depend on is itself pinned against the engine. No published report covers this pair; the source is the in-repo anchor plus the knowledge file's weight table. Re-pinned 2026-09-14 for the 육합 arity repair (item 3): the day-branch sub-system now scores 6 instead of 2 (the 子丑 spouse palaces take the +20 primary 육합 path), lifting the composite 64 -> 68 and the band Mixed -> Strong. It is the ONLY fixture the arity fix moves -- the two published anchors (harish-manvitha 70/Strong and its override-b-earth 74/Strong) are unchanged, because neither couple's day branches form a 六合 pair.",
+    "status": "expect_match"
+  },
+  {
+    "id": "compat-harish-manvitha-override-b-earth",
+    "subsystem": "compat",
+    "input": {
+      "probe": "score",
+      "charts": "birth",
+      "a_name": "harish",
+      "a_year": 1992,
+      "a_month": 6,
+      "a_day": 4,
+      "a_hour": 3,
+      "a_minute": 10,
+      "a_longitude": 79.42,
+      "a_utc_offset": 5.5,
+      "a_gender": "M",
+      "a_use_solar_time": true,
+      "a_early_zi_time": null,
+      "a_korean_yazi": null,
+      "b_name": "manvitha",
+      "b_year": 1996,
+      "b_month": 12,
+      "b_day": 3,
+      "b_hour": 21,
+      "b_minute": 15,
+      "b_longitude": 78.8242,
+      "b_utc_offset": 5.5,
+      "b_gender": "F",
+      "b_use_solar_time": true,
+      "b_early_zi_time": null,
+      "b_korean_yazi": null,
+      "favorable_element_b": "Earth"
+    },
+    "source": {
+      "type": "measured_anchor",
+      "citation": "docs/superpowers/plans/2026-09-13-engine-validation-plan-6-compat-career.md (A7 table); knowledge/11-gunghap.md §D",
+      "url_or_ref": "A7 measured row: favorable_element_b=Earth against HARISH x MANVITHA -> 74 / yongshin +12 / ilju_pair +6 (external cross-check 2026-09-14: KCI ART002969199 (이수동 2023) confirms the 한난(寒暖)/조습(燥濕) 궁합 model this override exercises; 사주하루 independently lists 용신과 기신 as a reading layer (research doc §1 D) — https://doi.org/10.22143/hss21.14.3.440)",
+      "external": {
+        "citation": "KCI ART002969199 (이수동 2023) confirms the 한난(寒暖)/조습(燥濕) 궁합 model this override exercises; 사주하루 independently lists 용신과 기신 as a reading layer (research doc §1 D)",
+        "url": "https://doi.org/10.22143/hss21.14.3.440"
+      }
+    },
+    "expected": {
+      "score": 74,
+      "band": "Strong",
+      "subsystems": {
+        "daystem_combo": 0,
+        "daybranch": -6,
+        "nayin": -3,
+        "yongshin": 12,
+        "ilju_pair": 6,
+        "combined_elements": 11,
+        "tengod_cross": 10,
+        "daeun_sync": 1,
+        "compat_stars": 0,
+        "yin_yang": 2,
+        "year_branch": 2
+      }
+    },
+    "notes": "A7's override channel, live on the birth path. The override is threaded as reader_override_favorable (deliberately NOT candidate_favorable) so yongsin._reader_confirmed() treats it as an outright reader override the climate merge cannot re-override -- which is why a hand-argued 용신 from the natal reading wins here. Only the b direction changes yongshin/ilju_pair/combined_elements (+9 -> +12, +5 -> +6, +9 -> +11); the other eight sub-systems are invariant. The a direction flips bands (a=Fire -> 64/Mixed), the b direction never does -- all five b elements stay Strong.",
+    "status": "expect_match"
+  },
+  {
+    "id": "compat-harish-manvitha-yongshin",
+    "subsystem": "compat",
+    "input": {
+      "probe": "subsystem",
+      "charts": "birth",
+      "a_name": "harish",
+      "a_year": 1992,
+      "a_month": 6,
+      "a_day": 4,
+      "a_hour": 3,
+      "a_minute": 10,
+      "a_longitude": 79.42,
+      "a_utc_offset": 5.5,
+      "a_gender": "M",
+      "a_use_solar_time": true,
+      "a_early_zi_time": null,
+      "a_korean_yazi": null,
+      "b_name": "manvitha",
+      "b_year": 1996,
+      "b_month": 12,
+      "b_day": 3,
+      "b_hour": 21,
+      "b_minute": 15,
+      "b_longitude": 78.8242,
+      "b_utc_offset": 5.5,
+      "b_gender": "F",
+      "b_use_solar_time": true,
+      "b_early_zi_time": null,
+      "b_korean_yazi": null,
+      "subsystem": "yongshin"
+    },
+    "source": {
+      "type": "published_report",
+      "citation": "candidates_horoscope/marriage_compatibility/harish_manvitha/harish_manvitha_compatibility_deep.md",
+      "url_or_ref": "yongshin +9 — harish x manvitha deep compat verdict table (external cross-check 2026-09-14: KCI ART002969199 (이수동 2023) — 용신 교차 is the paper's subject; 사주하루 independently lists 용신과 기신의 관계 as a modern reading layer (research doc §1 D) — https://doi.org/10.22143/hss21.14.3.440)",
+      "external": {
+        "citation": "KCI ART002969199 (이수동 2023) — 용신 교차 is the paper's subject; 사주하루 independently lists 용신과 기신의 관계 as a modern reading layer (research doc §1 D)",
+        "url": "https://doi.org/10.22143/hss21.14.3.440"
+      }
+    },
+    "expected": {
+      "score": 9
+    },
+    "notes": "charts=\"birth\" — the complementary four of A6's 11 sub-systems. yongshin is NOT pillars-only reproducible: it reads strength_assessment, absent on a pillars-only chart. T1 pinned the other seven from a pillars-only pair; these four can only be asserted through the full pipeline, which is why the corpus covers all 11 sub-systems across two chart sources rather than one. See Plan 6 A6/A7.",
+    "status": "expect_match"
+  },
+  {
+    "id": "compat-harish-manvitha-ilju-pair",
+    "subsystem": "compat",
+    "input": {
+      "probe": "subsystem",
+      "charts": "birth",
+      "a_name": "harish",
+      "a_year": 1992,
+      "a_month": 6,
+      "a_day": 4,
+      "a_hour": 3,
+      "a_minute": 10,
+      "a_longitude": 79.42,
+      "a_utc_offset": 5.5,
+      "a_gender": "M",
+      "a_use_solar_time": true,
+      "a_early_zi_time": null,
+      "a_korean_yazi": null,
+      "b_name": "manvitha",
+      "b_year": 1996,
+      "b_month": 12,
+      "b_day": 3,
+      "b_hour": 21,
+      "b_minute": 15,
+      "b_longitude": 78.8242,
+      "b_utc_offset": 5.5,
+      "b_gender": "F",
+      "b_use_solar_time": true,
+      "b_early_zi_time": null,
+      "b_korean_yazi": null,
+      "subsystem": "ilju_pair"
+    },
+    "source": {
+      "type": "published_report",
+      "citation": "candidates_horoscope/marriage_compatibility/harish_manvitha/harish_manvitha_compatibility_deep.md",
+      "url_or_ref": "ilju_pair +5 — harish x manvitha deep compat verdict table (external cross-check 2026-09-14: daysaju 궁합 가이드 weights 일주 40% > 월주 25% > 시주 20% > 연주 15%, making 일주 the heaviest single pillar; OpenFate 배우자궁 independently gives the same strong/weak palace criteria (research doc §1 E) — https://daysaju.com/guide/gunghap)",
+      "external": {
+        "citation": "daysaju 궁합 가이드 weights 일주 40% > 월주 25% > 시주 20% > 연주 15%, making 일주 the heaviest single pillar; OpenFate 배우자궁 independently gives the same strong/weak palace criteria (research doc §1 E)",
+        "url": "https://daysaju.com/guide/gunghap"
+      }
+    },
+    "expected": {
+      "score": 5
+    },
+    "notes": "charts=\"birth\" — the complementary four of A6's 11 sub-systems. ilju_pair is NOT pillars-only reproducible: it additively channel-dependent: +5 full/full, +3 full/PO, +0 PO/PO. T1 pinned the other seven from a pillars-only pair; these four can only be asserted through the full pipeline, which is why the corpus covers all 11 sub-systems across two chart sources rather than one. See Plan 6 A6/A7.",
+    "status": "expect_match"
+  },
+  {
+    "id": "compat-harish-manvitha-combined-elements",
+    "subsystem": "compat",
+    "input": {
+      "probe": "subsystem",
+      "charts": "birth",
+      "a_name": "harish",
+      "a_year": 1992,
+      "a_month": 6,
+      "a_day": 4,
+      "a_hour": 3,
+      "a_minute": 10,
+      "a_longitude": 79.42,
+      "a_utc_offset": 5.5,
+      "a_gender": "M",
+      "a_use_solar_time": true,
+      "a_early_zi_time": null,
+      "a_korean_yazi": null,
+      "b_name": "manvitha",
+      "b_year": 1996,
+      "b_month": 12,
+      "b_day": 3,
+      "b_hour": 21,
+      "b_minute": 15,
+      "b_longitude": 78.8242,
+      "b_utc_offset": 5.5,
+      "b_gender": "F",
+      "b_use_solar_time": true,
+      "b_early_zi_time": null,
+      "b_korean_yazi": null,
+      "subsystem": "combined_elements"
+    },
+    "source": {
+      "type": "published_report",
+      "citation": "candidates_horoscope/marriage_compatibility/harish_manvitha/harish_manvitha_compatibility_deep.md",
+      "url_or_ref": "combined_elements +9 — harish x manvitha deep compat verdict table (external cross-check 2026-09-14: KCI ART002969199 (이수동 2023) — 한난/조습 are the paper's two axes; 사주하루 lists 오행 균형 as its third modern reading layer (research doc §1 F) — https://doi.org/10.22143/hss21.14.3.440)",
+      "external": {
+        "citation": "KCI ART002969199 (이수동 2023) — 한난/조습 are the paper's two axes; 사주하루 lists 오행 균형 as its third modern reading layer (research doc §1 F)",
+        "url": "https://doi.org/10.22143/hss21.14.3.440"
+      }
+    },
+    "expected": {
+      "score": 9
+    },
+    "notes": "charts=\"birth\" — the complementary four of A6's 11 sub-systems. combined_elements is NOT pillars-only reproducible: it reads the combined element balance, not the pair relation. T1 pinned the other seven from a pillars-only pair; these four can only be asserted through the full pipeline, which is why the corpus covers all 11 sub-systems across two chart sources rather than one. See Plan 6 A6/A7.",
+    "status": "expect_match"
+  },
+  {
+    "id": "compat-harish-manvitha-daeun-sync",
+    "subsystem": "compat",
+    "input": {
+      "probe": "subsystem",
+      "charts": "birth",
+      "a_name": "harish",
+      "a_year": 1992,
+      "a_month": 6,
+      "a_day": 4,
+      "a_hour": 3,
+      "a_minute": 10,
+      "a_longitude": 79.42,
+      "a_utc_offset": 5.5,
+      "a_gender": "M",
+      "a_use_solar_time": true,
+      "a_early_zi_time": null,
+      "a_korean_yazi": null,
+      "b_name": "manvitha",
+      "b_year": 1996,
+      "b_month": 12,
+      "b_day": 3,
+      "b_hour": 21,
+      "b_minute": 15,
+      "b_longitude": 78.8242,
+      "b_utc_offset": 5.5,
+      "b_gender": "F",
+      "b_use_solar_time": true,
+      "b_early_zi_time": null,
+      "b_korean_yazi": null,
+      "subsystem": "daeun_sync"
+    },
+    "source": {
+      "type": "published_report",
+      "citation": "candidates_horoscope/marriage_compatibility/harish_manvitha/harish_manvitha_compatibility_deep.md",
+      "url_or_ref": "daeun_sync +1 — harish x manvitha deep compat verdict table (external cross-check 2026-09-14: 사주하루 and OpenFate 관계 궁합 — 운세 호환 is treated as a soft, direction-similarity signal, matching the engine's low 5-point weight (research doc §1 H) — https://saju-haru.com/blog/gunghap-misread)",
+      "external": {
+        "citation": "사주하루 and OpenFate 관계 궁합 — 운세 호환 is treated as a soft, direction-similarity signal, matching the engine's low 5-point weight (research doc §1 H)",
+        "url": "https://saju-haru.com/blog/gunghap-misread"
+      }
+    },
+    "expected": {
+      "score": 1
+    },
+    "notes": "charts=\"birth\" — the complementary four of A6's 11 sub-systems. daeun_sync is NOT pillars-only reproducible: it reads the chart's 'daeun' field, which a pillars-only chart lacks. T1 pinned the other seven from a pillars-only pair; these four can only be asserted through the full pipeline, which is why the corpus covers all 11 sub-systems across two chart sources rather than one. See Plan 6 A6/A7.",
+    "status": "expect_match"
+  }
+]

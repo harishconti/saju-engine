@@ -1,0 +1,326 @@
+[
+  {
+    "id": "band-yin",
+    "subsystem": "climate",
+    "input": {"probe": "band", "month_branch": "寅"},
+    "source": "knowledge/17-climate-method.md §Three Bands (spring 寅卯辰 = temperate); engine rule verified 2026-09-13",
+    "expected": {"climate": {"band": "temperate", "climate_favorable": null, "climate_supporting": null}},
+    "status": "expect_match"
+  },
+  {
+    "id": "band-mao",
+    "subsystem": "climate",
+    "input": {"probe": "band", "month_branch": "卯"},
+    "source": "knowledge/17-climate-method.md §Three Bands (spring 寅卯辰 = temperate); engine rule verified 2026-09-13",
+    "expected": {"climate": {"band": "temperate", "climate_favorable": null, "climate_supporting": null}},
+    "status": "expect_match"
+  },
+  {
+    "id": "band-chen",
+    "subsystem": "climate",
+    "input": {"probe": "band", "month_branch": "辰"},
+    "source": "knowledge/17-climate-method.md §Three Bands (spring 寅卯辰 = temperate) + §The Fuller 寒暖燥濕 Reading (辰 carries 濕→火 in the sourced four-way reading; the engine bands it temperate BY DOCUMENTED SCOPE — §Why the fuller reading is not implemented); engine rule verified 2026-09-13",
+    "expected": {"climate": {"band": "temperate", "climate_favorable": null, "climate_supporting": null}},
+    "status": "expect_match"
+  },
+  {
+    "id": "band-si",
+    "subsystem": "climate",
+    "input": {"probe": "band", "month_branch": "巳"},
+    "source": "knowledge/17-climate-method.md §Three Bands (summer 巳午未 = hot, Water wanted); engine rule verified 2026-09-13",
+    "expected": {"climate": {"band": "hot", "climate_favorable": "Water", "climate_supporting": "Metal"}},
+    "status": "expect_match"
+  },
+  {
+    "id": "band-wu",
+    "subsystem": "climate",
+    "input": {"probe": "band", "month_branch": "午"},
+    "source": "knowledge/17-climate-method.md §Three Bands (summer 巳午未 = hot, Water wanted); engine rule verified 2026-09-13",
+    "expected": {"climate": {"band": "hot", "climate_favorable": "Water", "climate_supporting": "Metal"}},
+    "status": "expect_match"
+  },
+  {
+    "id": "band-wei",
+    "subsystem": "climate",
+    "input": {"probe": "band", "month_branch": "未"},
+    "source": "knowledge/17-climate-method.md §Three Bands (summer 巳午未 = hot) + §The Fuller 寒暖燥濕 Reading (未 carries 燥→水 in the sourced four-way reading; the engine reaches Water by seasonal-quartet grouping — convergent validity, not identical reasoning); engine rule verified 2026-09-13",
+    "expected": {"climate": {"band": "hot", "climate_favorable": "Water", "climate_supporting": "Metal"}},
+    "status": "expect_match"
+  },
+  {
+    "id": "band-shen",
+    "subsystem": "climate",
+    "input": {"probe": "band", "month_branch": "申"},
+    "source": "knowledge/17-climate-method.md §Three Bands (autumn 申酉戌 = temperate); engine rule verified 2026-09-13",
+    "expected": {"climate": {"band": "temperate", "climate_favorable": null, "climate_supporting": null}},
+    "status": "expect_match"
+  },
+  {
+    "id": "band-you",
+    "subsystem": "climate",
+    "input": {"probe": "band", "month_branch": "酉"},
+    "source": "knowledge/17-climate-method.md §Three Bands (autumn 申酉戌 = temperate); engine rule verified 2026-09-13",
+    "expected": {"climate": {"band": "temperate", "climate_favorable": null, "climate_supporting": null}},
+    "status": "expect_match"
+  },
+  {
+    "id": "band-xu",
+    "subsystem": "climate",
+    "input": {"probe": "band", "month_branch": "戌"},
+    "source": "knowledge/17-climate-method.md §Three Bands (autumn 申酉戌 = temperate) + §The Fuller 寒暖燥濕 Reading (戌 carries 燥→水 in the sourced four-way reading; the engine bands it temperate BY DOCUMENTED SCOPE — §Why the fuller reading is not implemented); engine rule verified 2026-09-13",
+    "expected": {"climate": {"band": "temperate", "climate_favorable": null, "climate_supporting": null}},
+    "status": "expect_match"
+  },
+  {
+    "id": "band-hai",
+    "subsystem": "climate",
+    "input": {"probe": "band", "month_branch": "亥"},
+    "source": "knowledge/17-climate-method.md §Three Bands (winter 亥子丑 = cold, Fire wanted); engine rule verified 2026-09-13",
+    "expected": {"climate": {"band": "cold", "climate_favorable": "Fire", "climate_supporting": "Wood"}},
+    "status": "expect_match"
+  },
+  {
+    "id": "band-zi",
+    "subsystem": "climate",
+    "input": {"probe": "band", "month_branch": "子"},
+    "source": "knowledge/17-climate-method.md §Three Bands (winter 亥子丑 = cold, Fire wanted); engine rule verified 2026-09-13",
+    "expected": {"climate": {"band": "cold", "climate_favorable": "Fire", "climate_supporting": "Wood"}},
+    "status": "expect_match"
+  },
+  {
+    "id": "band-chou",
+    "subsystem": "climate",
+    "input": {"probe": "band", "month_branch": "丑"},
+    "source": "knowledge/17-climate-method.md §Three Bands (winter 亥子丑 = cold) + §The Fuller 寒暖燥濕 Reading (丑 carries 濕→火 in the sourced four-way reading; the engine reaches Fire by seasonal-quartet grouping — convergent validity, not identical reasoning); engine rule verified 2026-09-13",
+    "expected": {"climate": {"band": "cold", "climate_favorable": "Fire", "climate_supporting": "Wood"}},
+    "status": "expect_match"
+  },
+  {
+    "id": "band-edge-empty",
+    "subsystem": "climate",
+    "input": {"probe": "band", "month_branch": ""},
+    "source": "climate.py::assess_climate defensive fall-through (anything outside _HOT_BRANCHES|_COLD_BRANCHES is temperate); pinned in tests/test_climate.py::test_unknown_branch_is_temperate; re-verified 2026-09-13",
+    "expected": {"climate": {"band": "temperate", "climate_favorable": null, "climate_supporting": null}},
+    "status": "expect_match"
+  },
+  {
+    "id": "band-edge-stem",
+    "subsystem": "climate",
+    "input": {"probe": "band", "month_branch": "甲"},
+    "source": "climate.py::assess_climate defensive fall-through — a STEM passed where a month BRANCH is expected must not crash and must not be mis-banded; re-verified 2026-09-13",
+    "expected": {"climate": {"band": "temperate", "climate_favorable": null, "climate_supporting": null}},
+    "status": "expect_match"
+  },
+  {
+    "id": "band-edge-latin",
+    "subsystem": "climate",
+    "input": {"probe": "band", "month_branch": "Z"},
+    "source": "climate.py::assess_climate defensive fall-through — non-CJK input; re-verified 2026-09-13",
+    "expected": {"climate": {"band": "temperate", "climate_favorable": null, "climate_supporting": null}},
+    "status": "expect_match"
+  },
+  {
+    "id": "band-edge-hour-label",
+    "subsystem": "climate",
+    "input": {"probe": "band", "month_branch": "子時"},
+    "source": "climate.py::assess_climate defensive fall-through — a 子時 HOUR label must not be read as the 子 MONTH (it would wrongly fire the cold override); re-verified 2026-09-13",
+    "expected": {"climate": {"band": "temperate", "climate_favorable": null, "climate_supporting": null}},
+    "status": "expect_match"
+  },
+  {
+    "id": "rm-published",
+    "subsystem": "climate",
+    "input": {"probe": "merge", "year": 1994, "month": 9, "day": 12, "hour": 13, "minute": 28, "longitude": 126.98, "utc_offset": 9.0},
+    "source": "candidates_horoscope/reports/rm/rm-report.md (published Favorable Element: Water); knowledge/17-climate-method.md §How This Combines With 억부 (temperate 酉 = no override); engine verified 2026-09-13",
+    "expected": {
+      "climate": {"band": "temperate", "climate_favorable": null, "climate_supporting": null},
+      "strength": {"verdict": "strong", "candidate": "Water"},
+      "fe": {"element": "Water", "method": "strong-dm-drain", "supporting": "Wood",
+             "climate_band": "temperate", "climate_element": null, "climate_agrees": null,
+             "confidence": "heuristic"}
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "gurumoorthy-published",
+    "subsystem": "climate",
+    "input": {"probe": "merge", "year": 1964, "month": 7, "day": 19, "hour": 8, "minute": 30, "longitude": 79.42, "utc_offset": 5.5},
+    "source": "candidates_horoscope/reports/gurumoorthy/gurumoorthy-report.md (published Favorable Element: Metal); knowledge/17-climate-method.md §How This Combines With 억부 (hot 未 = Water override, 억부 Metal already agrees); engine verified 2026-09-13",
+    "expected": {
+      "climate": {"band": "hot", "climate_favorable": "Water", "climate_supporting": "Metal"},
+      "strength": {"verdict": "strong", "candidate": "Metal"},
+      "fe": {"element": "Metal", "method": "strong-dm-drain", "supporting": "Water",
+             "climate_band": "hot", "climate_element": "Water", "climate_agrees": false,
+             "confidence": "heuristic"}
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "harish-published",
+    "subsystem": "climate",
+    "input": {"probe": "merge", "year": 1992, "month": 6, "day": 4, "hour": 3, "minute": 10, "longitude": 79.42, "utc_offset": 5.5},
+    "source": "candidates_horoscope/reports/harish/harish-report.md (published Favorable Element: Water); knowledge/17-climate-method.md §How This Combines With 억부 (hot 巳 x balanced DM = climate-balanced, raw Fire candidate overridden to Water); engine verified 2026-09-13",
+    "expected": {
+      "climate": {"band": "hot", "climate_favorable": "Water", "climate_supporting": "Metal"},
+      "strength": {"verdict": "balanced", "candidate": "Fire"},
+      "fe": {"element": "Water", "method": "climate-balanced", "supporting": "Metal",
+             "climate_band": "hot", "climate_element": "Water", "climate_agrees": false,
+             "confidence": "heuristic"}
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "vishnu-priya-published",
+    "subsystem": "climate",
+    "input": {"probe": "merge", "year": 2001, "month": 6, "day": 7, "hour": 16, "minute": 45, "longitude": 76.65, "utc_offset": 5.5},
+    "source": "candidates_horoscope/reports/vishnu-priya/vishnu-priya-report.md (published Favorable Element: Water); knowledge/17-climate-method.md §How This Combines With 억부 (hot 午 x balanced DM = climate-balanced, raw Water candidate agrees with the 조후 Water); engine verified 2026-09-13",
+    "expected": {
+      "climate": {"band": "hot", "climate_favorable": "Water", "climate_supporting": "Metal"},
+      "strength": {"verdict": "balanced", "candidate": "Water"},
+      "fe": {"element": "Water", "method": "climate-balanced", "supporting": "Metal",
+             "climate_band": "hot", "climate_element": "Water", "climate_agrees": true,
+             "confidence": "heuristic"}
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "sruthi-published",
+    "subsystem": "climate",
+    "input": {"probe": "merge", "year": 1993, "month": 12, "day": 11, "hour": 2, "minute": 45, "longitude": 79.42, "utc_offset": 5.5},
+    "source": "candidates_horoscope/reports/sruthi/sruthi-report.md (published Favorable Element: Earth — DIVERGENT); knowledge/17-climate-method.md §How This Combines With 억부 (cold 子 x balanced DM = climate-balanced fires, raw Metal candidate overridden to Fire); documented_interpretation per Plan 4 T2 divergence #1",
+    "expected": {
+      "climate": {"band": "cold", "climate_favorable": "Fire", "climate_supporting": "Wood"},
+      "strength": {"verdict": "balanced", "candidate": "Metal"},
+      "fe": {"element": "Fire", "method": "climate-balanced", "supporting": "Wood",
+             "climate_band": "cold", "climate_element": "Fire", "climate_agrees": false,
+             "confidence": "heuristic"}
+    },
+    "status": "documented_interpretation"
+  },
+  {
+    "id": "pawan-published",
+    "subsystem": "climate",
+    "input": {"probe": "merge", "year": 1991, "month": 10, "day": 3, "hour": 23, "minute": 45, "longitude": 79.19, "utc_offset": 5.5},
+    "source": "candidates_horoscope/reports/pawan/pawan-report.md (published Favorable Element: Water — DIVERGENT); knowledge/17-climate-method.md §How This Combines With 억부 (temperate 酉 = NO climate override; divergence is from the 억부 balanced-heuristic branch, not climate — the control case); Plan 4 T2 divergence #2; STALE CHART pre-ya-ja-si fix",
+    "expected": {
+      "climate": {"band": "temperate", "climate_favorable": null, "climate_supporting": null},
+      "strength": {"verdict": "balanced", "candidate": "Wood"},
+      "fe": {"element": "Wood", "method": "balanced-heuristic", "supporting": "Water",
+             "climate_band": "temperate", "climate_element": null, "climate_agrees": null,
+             "confidence": "heuristic"}
+    },
+    "status": "documented_interpretation"
+  },
+  {
+    "id": "mahesh-published",
+    "subsystem": "climate",
+    "input": {"probe": "merge", "year": 1995, "month": 1, "day": 19, "hour": 23, "minute": 50, "longitude": 78.713454, "utc_offset": 5.5},
+    "source": "candidates_horoscope/reports/mahesh/mahesh-report.md (published Favorable Element: Earth — DIVERGENT); knowledge/17-climate-method.md §How This Combines With 억부 (cold 丑 x balanced DM = climate-balanced, raw Water candidate overridden to Fire); Plan 4 T2 divergence #3; STALE CHART pre-ya-ja-si fix",
+    "expected": {
+      "climate": {"band": "cold", "climate_favorable": "Fire", "climate_supporting": "Wood"},
+      "strength": {"verdict": "balanced", "candidate": "Water"},
+      "fe": {"element": "Fire", "method": "climate-balanced", "supporting": "Wood",
+             "climate_band": "cold", "climate_element": "Fire", "climate_agrees": false,
+             "confidence": "heuristic"}
+    },
+    "status": "documented_interpretation"
+  },
+  {
+    "id": "weak-cold-agree",
+    "subsystem": "climate",
+    "input": {"probe": "merge", "year": 1984, "month": 11, "day": 10, "hour": 3, "minute": 0, "longitude": 126.98, "utc_offset": 9.0},
+    "source": "knowledge/09-interpretation-method.md Step 3 (용신 derivation) + knowledge/17-climate-method.md §How This Combines With 억부 (cold 亥 x weak DM: 억부 Fire and 조후 Fire agree — climate_agrees True); synthetic chart probe-verified 2026-09-13",
+    "expected": {
+      "climate": {"band": "cold", "climate_favorable": "Fire", "climate_supporting": "Wood"},
+      "strength": {"verdict": "weak", "candidate": "Fire"},
+      "fe": {"element": "Fire", "method": "weak-dm-support", "supporting": "Earth",
+             "climate_band": "cold", "climate_element": "Fire", "climate_agrees": true,
+             "confidence": "heuristic"}
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "weak-cold-priority",
+    "subsystem": "climate",
+    "input": {"probe": "merge", "year": 1980, "month": 1, "day": 20, "hour": 9, "minute": 0, "longitude": 126.98, "utc_offset": 9.0},
+    "source": "knowledge/09-interpretation-method.md Step 3 + knowledge/17-climate-method.md §How This Combines With 억부 (cold 丑 x weak DM: 억부 Metal wins, climate Fire differs — climate_agrees False; the weak branch takes priority over 조후); synthetic chart probe-verified 2026-09-13",
+    "expected": {
+      "climate": {"band": "cold", "climate_favorable": "Fire", "climate_supporting": "Wood"},
+      "strength": {"verdict": "weak", "candidate": "Metal"},
+      "fe": {"element": "Metal", "method": "weak-dm-support", "supporting": "Water",
+             "climate_band": "cold", "climate_element": "Fire", "climate_agrees": false,
+             "confidence": "heuristic"}
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "weak-temperate",
+    "subsystem": "climate",
+    "input": {"probe": "merge", "year": 1984, "month": 8, "day": 20, "hour": 9, "minute": 0, "longitude": 126.98, "utc_offset": 9.0},
+    "source": "knowledge/09-interpretation-method.md Step 3 + knowledge/17-climate-method.md §How This Combines With 억부 (temperate 申 = no 조후 override, weak branch alone decides); synthetic chart probe-verified 2026-09-13",
+    "expected": {
+      "climate": {"band": "temperate", "climate_favorable": null, "climate_supporting": null},
+      "strength": {"verdict": "weak", "candidate": "Wood"},
+      "fe": {"element": "Wood", "method": "weak-dm-support", "supporting": "Fire",
+             "climate_band": "temperate", "climate_element": null, "climate_agrees": null,
+             "confidence": "heuristic"}
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "hot-weak-agree",
+    "subsystem": "climate",
+    "input": {"probe": "merge", "year": 1978, "month": 6, "day": 12, "hour": 9, "minute": 0, "longitude": 126.98, "utc_offset": 9.0},
+    "source": "knowledge/09-interpretation-method.md Step 3 + knowledge/17-climate-method.md §How This Combines With 억부 (hot 午 x weak DM: 억부 Water and 조후 Water agree — climate_agrees True); fills the hot x weak matrix cell; synthetic chart probe-verified 2026-09-13",
+    "expected": {
+      "climate": {"band": "hot", "climate_favorable": "Water", "climate_supporting": "Metal"},
+      "strength": {"verdict": "weak", "candidate": "Water"},
+      "fe": {"element": "Water", "method": "weak-dm-support", "supporting": "Wood",
+             "climate_band": "hot", "climate_element": "Water", "climate_agrees": true,
+             "confidence": "heuristic"}
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "hot-weak-priority",
+    "subsystem": "climate",
+    "input": {"probe": "merge", "year": 1987, "month": 6, "day": 12, "hour": 9, "minute": 0, "longitude": 126.98, "utc_offset": 9.0},
+    "source": "knowledge/09-interpretation-method.md Step 3 + knowledge/17-climate-method.md §How This Combines With 억부 (hot 午 x weak DM: 억부 Metal wins over 조후 Water — climate_agrees False); fills the hot x weak matrix cell with the disagree polarity; synthetic chart probe-verified 2026-09-13",
+    "expected": {
+      "climate": {"band": "hot", "climate_favorable": "Water", "climate_supporting": "Metal"},
+      "strength": {"verdict": "weak", "candidate": "Metal"},
+      "fe": {"element": "Metal", "method": "weak-dm-support", "supporting": "Water",
+             "climate_band": "hot", "climate_element": "Water", "climate_agrees": false,
+             "confidence": "heuristic"}
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "cold-strong-priority",
+    "subsystem": "climate",
+    "input": {"probe": "merge", "year": 1996, "month": 1, "day": 5, "hour": 4, "minute": 0, "longitude": 126.98, "utc_offset": 9.0},
+    "source": "knowledge/09-interpretation-method.md Step 3 + knowledge/17-climate-method.md §How This Combines With 억부 (cold 子 x strong DM: 억부 Water drain wins over 조후 Fire — climate_agrees False; the strong/weak branch takes priority over 조후); fills the cold x strong matrix cell; synthetic chart probe-verified 2026-09-13",
+    "expected": {
+      "climate": {"band": "cold", "climate_favorable": "Fire", "climate_supporting": "Wood"},
+      "strength": {"verdict": "strong", "candidate": "Water"},
+      "fe": {"element": "Water", "method": "strong-dm-drain", "supporting": "Wood",
+             "climate_band": "cold", "climate_element": "Fire", "climate_agrees": false,
+             "confidence": "heuristic"}
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "cold-strong-scan",
+    "subsystem": "climate",
+    "input": {"probe": "merge", "year": 1981, "month": 11, "day": 20, "hour": 20, "minute": 0, "longitude": 126.98, "utc_offset": 9.0},
+    "source": "knowledge/09-interpretation-method.md Step 3 + knowledge/17-climate-method.md §How This Combines With 억부 (cold 亥 x strong DM: 억부 Wood drain wins over 조후 Fire — climate_agrees False); fills the cold x strong matrix cell with a second independent chart; synthetic chart probe-verified 2026-09-13",
+    "expected": {
+      "climate": {"band": "cold", "climate_favorable": "Fire", "climate_supporting": "Wood"},
+      "strength": {"verdict": "strong", "candidate": "Wood"},
+      "fe": {"element": "Wood", "method": "strong-dm-drain", "supporting": "Fire",
+             "climate_band": "cold", "climate_element": "Fire", "climate_agrees": false,
+             "confidence": "heuristic"}
+    },
+    "status": "expect_match"
+  }
+]

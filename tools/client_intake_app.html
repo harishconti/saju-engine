@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saju Reading — Self-Service Intake</title>
+  <style>
+    :root {
+      --bg: #f9f7f2;
+      --card: #ffffff;
+      --ink: #2c241b;
+      --muted: #6b5e51;
+      --accent: #8c6b4a;
+      --accent-light: #c4a57f;
+      --border: #e3dcd1;
+      --fire: #c44d34;
+      --earth: #b8860b;
+      --metal: #708090;
+      --water: #2f6f8f;
+      --wood: #4a7c59;
+      --shadow: 0 4px 24px rgba(44, 36, 27, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Georgia", "Noto Serif", serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 40px 20px 60px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    header h1 {
+      font-size: 1.9rem;
+      margin: 0 0 8px;
+      letter-spacing: -0.02em;
+    }
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+    .card h2 {
+      font-size: 1.25rem;
+      margin: 0 0 18px;
+      color: var(--accent);
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin: 14px 0 6px;
+      font-size: 0.95rem;
+    }
+    label .hint {
+      font-weight: 400;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-left: 4px;
+    }
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    input[type="email"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--ink);
+      font-family: inherit;
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent-light);
+      box-shadow: 0 0 0 3px rgba(196, 165, 127, 0.18);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 560px) {
+      .row { grid-template-columns: 1fr; }
+    }
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .radio-pill {
+      flex: 1 1 auto;
+      min-width: 90px;
+    }
+    .radio-pill input {
+      position: absolute;
+      opacity: 0;
+    }
+    .radio-pill span {
+      display: block;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.15s ease;
+    }
+    .radio-pill input:checked + span,
+    .tier-option input:checked + .tier-box {
+      border-color: var(--accent);
+      background: #faf6ef;
+      box-shadow: 0 0 0 2px var(--accent-light);
+    }
+    .tier-options {
+      display: grid;
+      gap: 14px;
+      margin-top: 8px;
+    }
+    .tier-option {
+      position: relative;
+    }
+    .tier-option input {
+      position: absolute;
+      opacity: 0;
+    }
+    .tier-box {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 16px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .tier-box:hover {
+      border-color: var(--accent-light);
+    }
+    .tier-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      color: #fff;
+    }
+    .tier-badge.sample { background: var(--fire); }
+    .tier-badge.essential { background: var(--earth); }
+    .tier-badge.deep { background: var(--metal); }
+    .tier-body h3 {
+      margin: 0 0 4px;
+      font-size: 1.1rem;
+    }
+    .tier-body p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .tier-price {
+      text-align: right;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .tier-price small {
+      display: block;
+      font-weight: 400;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .deep-example {
+      margin-top: 8px;
+      padding: 10px 14px;
+      background: #f4f0e8;
+      border-left: 3px solid var(--metal);
+      border-radius: 0 10px 10px 0;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+    .concern-note {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    button[type="submit"] {
+      width: 100%;
+      padding: 16px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s ease;
+    }
+    button[type="submit"]:hover {
+      background: #6d5138;
+    }
+    button[type="submit"]:disabled {
+      background: var(--border);
+      cursor: not-allowed;
+    }
+    .disclaimer {
+      margin-top: 18px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    .disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .success {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .success h2 { color: var(--wood); }
+    .error {
+      display: none;
+      background: #fff2f2;
+      border: 1px solid #e6b3b3;
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 14px;
+      color: #7a2e2e;
+    }
+    .spinner {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Korean Saju Reading — Self-Service Intake</h1>
+      <p>Four Pillars of Destiny · 오행 · 음양</p>
+    </header>
+
+    <form id="intake-form" action="/generate" method="POST">
+      <div class="card">
+        <h2>1. Your Details</h2>
+        <label for="name">Full name</label>
+        <input type="text" id="name" name="name" required placeholder="As you would like it to appear on the report">
+
+        <div class="row">
+          <div>
+            <label for="dob">Date of birth</label>
+            <input type="date" id="dob" name="dob" required>
+          </div>
+          <div>
+            <label for="birth_time">Birth time <span class="hint">24-hour clock</span></label>
+            <input type="time" id="birth_time" name="birth_time" required>
+          </div>
+        </div>
+
+        <label for="location">Birth location</label>
+        <input type="text" id="location" name="location" required placeholder="City, state/country (e.g., Mysore, Karnataka, India)">
+
+        <div class="row">
+          <div>
+            <label for="utc_offset">UTC offset <span class="hint">hours</span></label>
+            <input type="number" id="utc_offset" name="utc_offset" value="5.5" step="0.5" required>
+          </div>
+          <div>
+            <label for="timezone">IANA timezone <span class="hint">optional — e.g. Asia/Seoul</span></label>
+            <input type="text" id="timezone" name="timezone" placeholder="Asia/Seoul (overrides numeric offset if valid)">
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label for="email">Email <span class="hint">for delivery</span></label>
+            <input type="email" id="email" name="email" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>2. About You</h2>
+        <label>Sex / Gender <span class="hint">required for 대운 timing</span></label>
+        <div class="radio-group">
+          <label class="radio-pill"><input type="radio" name="gender" value="F" required><span>Female</span></label>
+          <label class="radio-pill"><input type="radio" name="gender" value="M" required><span>Male</span></label>
+        </div>
+
+        <label for="marriage_status">Marriage / relationship status</label>
+        <select id="marriage_status" name="marriage_status" required>
+          <option value="" disabled selected>Select status</option>
+          <option value="single">Single</option>
+          <option value="relationship">In a relationship</option>
+          <option value="married">Married</option>
+          <option value="divorced">Divorced</option>
+          <option value="widowed">Widowed</option>
+          <option value="other">Other / Prefer not to say</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <h2>3. Choose Your Report</h2>
+        <div class="tier-options">
+          <label class="tier-option">
+            <input type="radio" name="tier" value="sample" required>
+            <div class="tier-box">
+              <div class="tier-badge sample">✦</div>
+              <div class="tier-body">
+                <h3>The Hook</h3>
+                <p>Compact cover + four pillars + element balance + Day Master + lucky colors, directions, and numbers. A taste of the deeper reports.</p>
+              </div>
+              <div class="tier-price">Complimentary <small>1 page</small></div>
+            </div>
+          </label>
+
+          <label class="tier-option">
+            <input type="radio" name="tier" value="essential">
+            <div class="tier-box">
+              <div class="tier-badge essential">✦✦</div>
+              <div class="tier-body">
+                <h3>The Essential Report</h3>
+                <p>Cover + four pillars + element balance + quick reference + short Day Master portrait + Career &amp; Wealth overview + Major Luck (대운) table + abbreviated Lucky Attributes + short Closing Note.</p>
+              </div>
+              <div class="tier-price">₹799 <small>6–7 pages</small></div>
+            </div>
+          </label>
+
+          <label class="tier-option">
+            <input type="radio" name="tier" value="deep">
+            <div class="tier-box">
+              <div class="tier-badge deep">✦✦✦</div>
+              <div class="tier-body">
+                <h3>The Deep Destiny Report</h3>
+                <p>Everything in Essential + full Day Master portrait + Relationships + Health &amp; Vitality + Business &amp; Launch Timing + 2025–2030 year-by-year windows + full Practical Guidance + full Closing Note.</p>
+                <div class="deep-example">
+                  <strong>Best example:</strong> the Mahesh combined report — base natal reading + career deep-dive + relationships deep-dive, rendered as a single polished PDF.
+                </div>
+              </div>
+              <div class="tier-price">₹1,499 <small>10–12 pages</small></div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div class="card" id="concern-card">
+        <h2>4. Main Concern <span class="hint">(required for The Deep Destiny Report)</span></h2>
+        <textarea id="main_concern" name="main_concern" placeholder="e.g., career transition timing, marriage prospects, health watchpoints, relocation, starting a business..." disabled></textarea>
+        <p class="concern-note" id="concern-note">Please select The Deep Destiny Report to share your primary focus. It helps the reader tailor the deep-dive sections.</p>
+      </div>
+
+      <button type="submit" id="submit-btn">Generate &amp; Download My Saju Report</button>
+      <p class="disclaimer">
+        Saju describes tendencies and influences, not fixed destinies. This is not a medical, legal, or financial diagnosis.
+        Your birth data is used only to prepare the reading. For Essential and Deep Destiny reports, the PDF is an engine-generated draft that may be reviewed before final delivery.
+      </p>
+
+      <div class="error" id="error"></div>
+      <div class="spinner" id="spinner">Preparing your chart and PDF… this takes about 10–20 seconds.</div>
+    </form>
+
+    <div class="card success" id="success">
+      <h2>Your report is ready.</h2>
+      <p>If the download did not start automatically, check your browser's download bar.</p>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('intake-form');
+    const concern = document.getElementById('main_concern');
+    const concernNote = document.getElementById('concern-note');
+    const submitBtn = document.getElementById('submit-btn');
+    const errorBox = document.getElementById('error');
+    const spinner = document.getElementById('spinner');
+
+    function updateConcern() {
+      const tier = document.querySelector('input[name="tier"]:checked');
+      if (tier && tier.value === 'deep') {
+        concern.disabled = false;
+        concern.setAttribute('required', 'required');
+        concern.parentElement.classList.remove('disabled');
+        concernNote.textContent = 'Share the one area you would like the deep-dive to focus on (career, relationships, health timing, relocation, etc.).';
+      } else {
+        concern.disabled = true;
+        concern.removeAttribute('required');
+        concern.value = '';
+        concern.parentElement.classList.add('disabled');
+        concernNote.textContent = 'Please select The Deep Destiny Report to share your primary focus. It helps the reader tailor the deep-dive sections.';
+      }
+    }
+
+    document.querySelectorAll('input[name="tier"]').forEach(r => r.addEventListener('change', updateConcern));
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorBox.style.display = 'none';
+      errorBox.textContent = '';
+      submitBtn.disabled = true;
+      spinner.style.display = 'block';
+
+      const formData = new FormData(form);
+      try {
+        const res = await fetch('/generate', {
+          method: 'POST',
+          body: formData,
+        });
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          throw new Error(body.detail || body.error || `Server error (${res.status})`);
+        }
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const name = (formData.get('name') || 'saju-reading').replace(/\s+/g, '-').toLowerCase();
+        a.href = url;
+        a.download = `${name}-saju-report.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+
+        form.style.display = 'none';
+        document.getElementById('success').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.style.display = 'block';
+        submitBtn.disabled = false;
+      } finally {
+        spinner.style.display = 'none';
+      }
+    });
+
+    updateConcern();
+  </script>
+</body>
+</html>

@@ -1,0 +1,699 @@
+[
+  {
+    "id": "park-chung-hee",
+    "subsystem": "pillars",
+    "input": {
+      "year": 1917,
+      "month": 11,
+      "day": 14,
+      "hour": 10,
+      "minute": 0,
+      "longitude": 128.74,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true
+    },
+    "source": [
+      {
+        "citation": "김재원, \"[김재원의 주역이야기]박정희 대통령 사주,\" 동아일보, 2013-05-03",
+        "url": "https://www.donga.com/news/Opinion/article/all/20130503/54869960/1"
+      },
+      {
+        "citation": "사주갤러리, \"박정희 대통령 사주풍경,\" 2026-04",
+        "url": "https://www.sajugallery.com/2026/04/park-chung-hee-saju.html"
+      },
+      {
+        "citation": "사주포럼, \"박정희 전 대통령\" 사례연구",
+        "url": "https://www.sajuforum.com/01forum/nm/sarye.php"
+      }
+    ],
+    "expected": {
+      "pillars": {
+        "year": "丁巳",
+        "month": "辛亥",
+        "day": "庚申",
+        "hour": "辛巳"
+      },
+      "solar_correction_minutes": null,
+      "zi_time_type": null
+    },
+    "status": "expect_match",
+    "notes": "사시 (巳時, 9–11 AM) birth. Solar-time correction at 128.74°E shifts wall-clock ~24 minutes earlier; for a 10:00 birth the correction stays inside 巳시, so the hour pillar is the same under both conventions. 寅時 minority view (woojin2383.tistory.com/13551302) gives 戊寅 hour — recorded, not followed (the three cited sources, including the named scholar 김재원, all give 巳時 → 辛巳)."
+  },
+  {
+    "id": "roh-moo-hyun",
+    "subsystem": "pillars",
+    "input": {
+      "year": 1946,
+      "month": 9,
+      "day": 1,
+      "hour": 8,
+      "minute": 0,
+      "longitude": 128.74,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true
+    },
+    "source": [
+      {
+        "citation": "조용헌, \"[조용헌의 江湖동양학] 上. 노무현 대통령 사주,\" 중앙일보",
+        "url": "https://www.joongang.co.kr/article/304898"
+      },
+      {
+        "citation": "조용헌, \"[조용헌의 江湖동양학] 下. 노무현 대통령 사주,\" 중앙일보",
+        "url": "https://www.joongang.co.kr/article/311575"
+      },
+      {
+        "citation": "김재원 (Dong-A Ilbo column) comparative analysis with 박정희, 동아일보, 2013-05-03",
+        "url": "https://www.donga.com/news/Opinion/article/all/20130503/54869960/1"
+      }
+    ],
+    "expected": {
+      "pillars": {
+        "year": "丙戌",
+        "month": "丙申",
+        "day": "戊寅",
+        "hour": "丙辰"
+      },
+      "solar_correction_minutes": null,
+      "zi_time_type": null
+    },
+    "status": "expect_match",
+    "notes": "진시 (辰時, 7–9 AM) birth, Gimhae; 음 1946-08-06 = 양 1946-09-01. Published structure notes: 丙(병화) 3개가 천간에 균일하게 분포 (편인 과다 구조); 寅申沖 + 辰戌沖 동시 작동 (쌍권총 사주)."
+  },
+  {
+    "id": "kim-young-sam",
+    "subsystem": "pillars",
+    "input": {
+      "year": 1929,
+      "month": 1,
+      "day": 14,
+      "hour": 20,
+      "minute": 0,
+      "longitude": 128.7,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true
+    },
+    "source": [
+      {
+        "citation": "Presidential Archives: birth 1928.12.4 (음) ≈ 1929-01-14, Geoje",
+        "url": "https://www.pa.go.kr/online_contents/president/history14.jsp"
+      },
+      {
+        "citation": "선천진로상담연구소, \"제6장 명인들의 사주탐방 _ 1. 한국 역대 대통령\"",
+        "url": "https://career-consulting-center.tistory.com/997"
+      },
+      {
+        "citation": "winwinstory, \"김영삼 사주풀이(feat. 제 14대 대한민국 대통령)\"",
+        "url": "https://winwinstory.tistory.com/entry/김영삼-사주풀이feat-제-14대-대한민국-대통령"
+      },
+      {
+        "citation": "sank1001, \"김영삼 대통령의 사주와 비겁(比劫)\" (clues confirm the same pillars)",
+        "url": "https://sank1001.tistory.com/13498365"
+      }
+    ],
+    "expected": {
+      "pillars": {
+        "year": "戊辰",
+        "month": "乙丑",
+        "day": "己未",
+        "hour": "甲戌"
+      },
+      "solar_correction_minutes": null,
+      "zi_time_type": null
+    },
+    "status": "expect_match",
+    "notes": "술시 (戌時, 19–21:00) assumption: exact birth time is not officially published; the widely cited Saju chart assumes 술시, giving hour pillar 甲戌."
+  },
+  {
+    "id": "lee-myung-bak",
+    "subsystem": "pillars",
+    "input": {
+      "year": 1941,
+      "month": 12,
+      "day": 19,
+      "hour": 6,
+      "minute": 0,
+      "longitude": 135.5,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true
+    },
+    "source": [
+      {
+        "citation": "김기승, 『격국용신정해』 excerpt via career-consulting-center.tistory.com/997",
+        "url": "https://career-consulting-center.tistory.com/997"
+      },
+      {
+        "citation": "김광일철학원장, 주간경향 weekly.khan.co.kr/article/13180",
+        "url": ""
+      }
+    ],
+    "expected": {
+      "pillars": {
+        "year": "辛巳",
+        "month": "庚子",
+        "day": "辛丑",
+        "hour": "辛卯"
+      },
+      "solar_correction_minutes": null,
+      "zi_time_type": null
+    },
+    "status": "expect_match",
+    "notes": "묘시 (卯時, 5–7 AM) theory. Source domain/path transcribed verbatim from the test file (no scheme given there); the 주간경향 citation carries no explicit URL."
+  },
+  {
+    "id": "lee-kun-hee",
+    "subsystem": "pillars",
+    "input": {
+      "year": 1942,
+      "month": 1,
+      "day": 9,
+      "hour": 10,
+      "minute": 0,
+      "longitude": 128.6,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true
+    },
+    "source": [
+      {
+        "citation": "청허의 명리즉설 ch11107.tistory.com/944",
+        "url": "https://ch11107.tistory.com/944"
+      },
+      {
+        "citation": "류동학, 대구신문 idaegu.co.kr/news/articleView.html?idxno=346060",
+        "url": "https://idaegu.co.kr/news/articleView.html?idxno=346060"
+      },
+      {
+        "citation": "역학동 Daum cafe m.cafe.daum.net/2040/MgSK/3871",
+        "url": "https://m.cafe.daum.net/2040/MgSK/3871"
+      }
+    ],
+    "expected": {
+      "pillars": {
+        "year": "辛巳",
+        "month": "辛丑",
+        "day": "壬戌",
+        "hour": "乙巳"
+      },
+      "solar_correction_minutes": null,
+      "zi_time_type": null
+    },
+    "status": "expect_match",
+    "notes": "사시 (巳時, 9–11 AM) theory. Domains transcribed verbatim from the test file; https:// scheme added for the url field only."
+  },
+  {
+    "id": "chung-ju-yung",
+    "subsystem": "pillars",
+    "input": {
+      "year": 1915,
+      "month": 11,
+      "day": 25,
+      "hour": 2,
+      "minute": 0,
+      "longitude": 128.47,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true
+    },
+    "source": [
+      {
+        "citation": "사주갤러리 sajugalery.com/2026/03/Chung-Ju-yung-saju-picture.html",
+        "url": ""
+      },
+      {
+        "citation": "류동학, 경북일보 kyongbuk.co.kr/news/articleView.html?idxno=2048499",
+        "url": "https://kyongbuk.co.kr/news/articleView.html?idxno=2048499"
+      },
+      {
+        "citation": "official birthdate: 한국민족문화대백과사전 / 연합뉴스",
+        "url": ""
+      }
+    ],
+    "expected": {
+      "pillars": {
+        "year": "乙卯",
+        "month": "丁亥",
+        "day": "庚申",
+        "hour": "丁丑"
+      },
+      "solar_correction_minutes": null,
+      "zi_time_type": null
+    },
+    "status": "expect_match",
+    "notes": "축시 (丑時, 1–3 AM) theory. The 'sajugalery.com' spelling is transcribed byte-identically from the test file (not normalized); the citation carries no explicit scheme, so url is left empty."
+  },
+  {
+    "id": "park-geun-hye",
+    "subsystem": "pillars",
+    "input": {
+      "year": 1952,
+      "month": 2,
+      "day": 2,
+      "hour": 2,
+      "minute": 0,
+      "longitude": 128.6,
+      "utc_offset": 9.0,
+      "gender": "F",
+      "convention": "korean",
+      "use_solar_time": true
+    },
+    "source": [
+      {
+        "citation": "박민찬 도선풍수과학원장, 주간한국 weekly.hankooki.com/news/articleView.html?idxno=6413791",
+        "url": "https://weekly.hankooki.com/news/articleView.html?idxno=6413791"
+      },
+      {
+        "citation": "김기승, 『격국용신정해』 excerpt via career-consulting-center.tistory.com/997",
+        "url": "https://career-consulting-center.tistory.com/997"
+      }
+    ],
+    "expected": {
+      "pillars": {
+        "year": "辛卯",
+        "month": "辛丑",
+        "day": "戊寅",
+        "hour": "癸丑"
+      },
+      "solar_correction_minutes": null,
+      "zi_time_type": null
+    },
+    "status": "expect_match",
+    "notes": "축시 (丑時, 1–3 AM) theory. Domains transcribed verbatim from the test file; https:// scheme added for the url field only."
+  },
+  {
+    "id": "moon-jae-in",
+    "subsystem": "pillars",
+    "input": {
+      "year": 1953,
+      "month": 1,
+      "day": 24,
+      "hour": 20,
+      "minute": 0,
+      "longitude": 128.7,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true
+    },
+    "source": [
+      {
+        "citation": "곽재철, 여수넷통뉴스 netongs.com/news/articleView.html?idxno=103160",
+        "url": "https://netongs.com/news/articleView.html?idxno=103160"
+      },
+      {
+        "citation": "life.g-enews.com/view.php?ud=201704110704327830e8b8a793f7_3",
+        "url": "https://life.g-enews.com/view.php?ud=201704110704327830e8b8a793f7_3"
+      },
+      {
+        "citation": "김기승, 『격국용신정해』 excerpt via career-consulting-center.tistory.com/997 (hour is disputed: some sources argue 亥시)",
+        "url": "https://career-consulting-center.tistory.com/997"
+      }
+    ],
+    "expected": {
+      "pillars": {
+        "year": "壬辰",
+        "month": "癸丑",
+        "day": "乙亥",
+        "hour": "丙戌"
+      },
+      "solar_correction_minutes": null,
+      "zi_time_type": null
+    },
+    "status": "expect_match",
+    "notes": "술시 (戌時, 19–21:00) theory. Hour is disputed: some sources argue 亥시 — the test follows the 술시 reading (the 亥시 alternative is recorded in the cited source string)."
+  },
+  {
+    "id": "lee-byung-chul",
+    "subsystem": "pillars",
+    "input": {
+      "year": 1910,
+      "month": 2,
+      "day": 12,
+      "hour": 20,
+      "minute": 0,
+      "longitude": 128.3,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true
+    },
+    "source": [
+      {
+        "citation": "류동학, 경북일보 kyongbuk.co.kr/news/articleView.html?idxno=2048499",
+        "url": "https://kyongbuk.co.kr/news/articleView.html?idxno=2048499"
+      },
+      {
+        "citation": "시사저널 sisajournal.com/news/articleView.html?idxno=174073",
+        "url": "https://sisajournal.com/news/articleView.html?idxno=174073"
+      },
+      {
+        "citation": "hour debate: yavares.tistory.com/910 (alternative 酉시 theory)",
+        "url": "https://yavares.tistory.com/910"
+      }
+    ],
+    "expected": {
+      "pillars": {
+        "year": "庚戌",
+        "month": "戊寅",
+        "day": "戊申",
+        "hour": "壬戌"
+      },
+      "solar_correction_minutes": null,
+      "zi_time_type": null
+    },
+    "status": "expect_match",
+    "notes": "술시 majority theory (戌時, 19–21:00). Alternative 酉시 theory exists (yavares.tistory.com/910) — recorded, not followed."
+  },
+  {
+    "id": "kim-dae-jung",
+    "subsystem": "pillars",
+    "input": {
+      "year": 1924,
+      "month": 1,
+      "day": 6,
+      "hour": 12,
+      "minute": 0,
+      "longitude": 126.0,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true
+    },
+    "source": [
+      {
+        "citation": "pisgah.tistory.com/3824 — \"김대중 대통령 정인격 갑신일주 편관(사주와운세)\"",
+        "url": ""
+      },
+      {
+        "citation": "moneyluckk.com — \"이재명과 김대중 사주 운의 충격적 연결고리\"",
+        "url": ""
+      }
+    ],
+    "expected": {
+      "pillars": {
+        "year": "癸亥",
+        "month": "甲子",
+        "day": "甲申",
+        "hour": null
+      },
+      "solar_correction_minutes": null,
+      "zi_time_type": null
+    },
+    "status": "expect_match",
+    "notes": "Only the three non-hour pillars are asserted (matching the regression test test_textbook_case_kim_dae_jung_three_pillars, which the daeun tests share input with): 癸亥년 甲子월 甲申일. Exact birth time is not publicly documented — the input hour 12 is an arbitrary safe hour and the assertion intentionally ignores hour. The most common early-morning tradition gives 丙寅 (인시); not independently verified, hence hour: null. 子월 (not 丑월): 1924-01-06 falls before 小寒 in the solar-term reckoning used by the published Korean Myeongri sources."
+  },
+  {
+    "id": "hour-boundary-2340",
+    "subsystem": "pillars",
+    "input": {
+      "year": 1990,
+      "month": 6,
+      "day": 15,
+      "hour": 23,
+      "minute": 40,
+      "longitude": 127.0,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true
+    },
+    "source": [
+      {
+        "citation": "포스텔러 (forceteller.com), 야자시 모드 체크, 2026-09-13 (accessed) — 년 庚午 / 월 壬午 / 일 辛亥 / 시 庚子; 양력 1990-06-15 23:40 서울 기준, 태양시 보정 −32분 표기, 음력 1990-05-23",
+        "url": "https://forceteller.com",
+        "evidence": "tests/validation/evidence/hour-boundary-2340-forceteller-yajasi.png"
+      },
+      {
+        "citation": "만세력 닷컴 (manseryeok.com), 추가옵션 야자시 스위치 (기본 체크), 2026-09-13 (accessed) — 년 庚午 / 월 壬午 / 日 辛亥 / 時 庚子; 양력 1990-06-15 23:40 서울, '남중 32분', '절입기준 1990-06-06 07:46 (망종)', 음력 1990-05-23",
+        "url": "https://www.manseryeok.com/result?r=OcShzhMYKUx-cIed3V1Mz6E--knEPpY5veNkZ4voDj_czKV2ltdCRhpNnmaAObCIFXuoGChzSb79bltLUlrgtlZYhCABmrrpWGblVAaLbH66sQwIk2m4j7Mf8k7bkFuZPPA4-6msvKrKPvJlE8UmLd8USoD028ErrhTht3sIBjLbaQXY6e3XPfdsJakl3J5PV2TMmmIw2Y7AumrR-W86nQanb2YsUhwav6Zsyd4_G6t07ns8DSinlJOYogRk6Uc3XP9B5_wk-gvoA6QLHG9HOMM9Fz8TidUjydMaamCrjjxtHZAOMs_pbmqcbEb7z48GC_0P1sJ18ZeDmzLVuWTH1YQB4Ayz_qYAcnYSUGfSNIbA-tlyMPHCSoumWhEhupRHrwPjNrDtrmmwwg0sA1AnL5fyiv0jAUSywlvoqSGazr-4Mlj9rBB09RV4VDu50A",
+        "evidence": "tests/validation/evidence/hour-boundary-2340-manseryeok-dotcom-yajasi.png"
+      },
+      {
+        "citation": "사주매니아 (sajumania.com), '정자시 적용' (조자시 모드), 2026-09-13 (accessed) — 년 庚午 / 월 壬午 / 日 壬子 / 時 庚子. 조자시에서는 일주가 다음날 壬子로 진행하므로 한국 야자시 판독과 직접 비교되지 않음 (엔진 convention='chinese'와는 일치)",
+        "url": "https://sajumania.com",
+        "evidence": "tests/validation/evidence/hour-boundary-2340-sajumania-jojasi.png"
+      }
+    ],
+    "expected": {
+      "pillars": {
+        "year": "庚午",
+        "month": "壬午",
+        "day": "辛亥",
+        "hour": "庚子"
+      },
+      "solar_correction_minutes": null,
+      "zi_time_type": null
+    },
+    "status": "expect_match",
+    "notes": "Category 1 (hour-boundary, 야자시 23:40): engine bug #1 (야자시 hour stem) — the engine previously produced 戊子 (五鼠遁 from the current day's 일간 辛); fixed 2026-09-13 — the korean convention at eff_hour 23 now derives the hour stem from the NEXT day's 일간 (壬 → 庚子), with day 辛亥 retained. GROUND TRUTH: 庚午 壬午 辛亥 庚子 — forceteller + manseryeok.com 야자시 mode (evidence/hour-boundary-2340-*.png). The entry was a deliberate FAIL while the bug was open; now expect_match and PASSes. Sites also confirm the other three pillars and the day-pillar retention. solar_correction_minutes not asserted: both sites state −32분 while the engine computes −32.1 (longitude 127.0 rounding); asserting −32 would fail on rounding, not substance. zi_time_type not asserted (engine label '夜子時 (Korean 야자시)' matches the sites' 야자시 mode semantically but the label is engine-internal). Third site (사주매니아, 조자시) shows day advanced to 壬子 — consistent with engine convention='chinese' (壬子 庚子) and recorded as corroboration of the 조자시 path, not of this fixture."
+  },
+  {
+    "id": "solarterm-boundary-son-heung-min",
+    "subsystem": "pillars",
+    "input": {
+      "year": 1992,
+      "month": 7,
+      "day": 8,
+      "hour": 12,
+      "minute": 0,
+      "longitude": 127.85,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true
+    },
+    "source": [
+      {
+        "citation": "사주매니아 (sajumania.com) 만세력, 양력 1992-07-08 12:00 남 (태양시 보정 미표기), 2026-09-14 (accessed) — 년 壬申 / 월 丁未 / 일 乙酉 / 時 壬午",
+        "url": "https://sajumania.com/",
+        "evidence": "tests/validation/evidence/solarterm-boundary-son-heung-min-sajumania.png"
+      },
+      {
+        "citation": "fourpillars.net Online Four Pillars Calculator, 양력 1992-07-08 12:00 male, 2026-09-14 (accessed) — Hour 壬午 / Day 乙酉 / Month 丁未 / Year 壬申",
+        "url": "https://fourpillars.net/online4p_V3.php?Lang=en&GEN=1&HR=12&DD=08&MM=7&YY=1992&Sta=r",
+        "evidence": "tests/validation/evidence/solarterm-boundary-son-heung-min-fourpillars-net.png"
+      }
+    ],
+    "expected": {
+      "pillars": {
+        "year": "壬申",
+        "month": "丁未",
+        "day": "乙酉",
+        "hour": "壬午"
+      },
+      "solar_correction_minutes": null,
+      "zi_time_type": null
+    },
+    "status": "expect_match",
+    "notes": "Category 2 (절기 boundary): 1992-07-08 sits just past the 소서-window 절입 — 절입 (소서) was 1992-07-07 05:03 KST, so a birth on 07-08 noon is past the 절입 and the 월지 is 未 (월건 丁未); a birth before the 절입 would still carry the prior 월. Both sites agree on all four pillars; engine agrees (solar-time correction at 127.85°E ≈ −28.6 min keeps 12:00 in 午시). solar_correction_minutes not asserted: neither tool states a numeric correction."
+  },
+  {
+    "id": "leap-month-jang-keun-suk",
+    "subsystem": "pillars",
+    "input": {
+      "year": 1987,
+      "month": 8,
+      "day": 4,
+      "hour": 12,
+      "minute": 0,
+      "longitude": 128.6,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true
+    },
+    "source": [
+      {
+        "citation": "사주매니아 (sajumania.com) 만세력, 양력 1987-08-04 12:00 남, 2026-09-14 (accessed) — 년 丁卯 / 월 丁未 / 일 乙酉 / 時 壬午; 음력 1987년 윤6월 11일로 표기 (윤달 처리 확인)",
+        "url": "https://sajumania.com/",
+        "evidence": "tests/validation/evidence/leap-month-jang-keun-suk-sajumania.png"
+      },
+      {
+        "citation": "fourpillars.net Online Four Pillars Calculator, 양력 1987-08-04 12:00 male, 2026-09-14 (accessed) — Hour 壬午 / Day 乙酉 / Month 丁未 / Year 丁卯",
+        "url": "https://fourpillars.net/online4p_V3.php?Lang=en&GEN=1&HR=12&DD=04&MM=8&YY=1987&Sta=r",
+        "evidence": "tests/validation/evidence/leap-month-jang-keun-suk-fourpillars-net.png"
+      }
+    ],
+    "expected": {
+      "pillars": {
+        "year": "丁卯",
+        "month": "丁未",
+        "day": "乙酉",
+        "hour": "壬午"
+      },
+      "solar_correction_minutes": null,
+      "zi_time_type": null
+    },
+    "status": "expect_match",
+    "notes": "Category 3 (윤달 / leap month): 양력 1987-08-04 corresponds to 음력 1987 윤6월 11일 — inside the intercalary month (윤6월 spans 1987-07-26 → 1987-08-23). The lunar date is only context; the pillar computation runs on the Gregorian date, and the 월지 must be 未 (입추 1987-08-08 04:29 KST, so 08-04 is still within 未월 → 월건 丁未). Both sites agree on all four pillars; engine agrees (solar-time correction at 128.6°E ≈ −25.6 min keeps 12:00 in 午시). sajumania displays the 음력 conversion as 윤6월 correctly in the result text though its label column reads '평달' — display quirk recorded in the report, not a data error. solar_correction_minutes not asserted: neither tool states a numeric correction."
+  },
+  {
+    "id": "dst-era-chu-mi-ae",
+    "subsystem": "pillars",
+    "input": {
+      "year": 1956,
+      "month": 6,
+      "day": 22,
+      "hour": 12,
+      "minute": 0,
+      "longitude": 126.98,
+      "utc_offset": 9.0,
+      "gender": "F",
+      "convention": "korean",
+      "use_solar_time": true
+    },
+    "source": [
+      {
+        "citation": "사주매니아 (sajumania.com) 만세력, 양력 1956-06-22 12:00 여, 2026-09-14 (accessed) — 년 丙申 / 월 甲午 / 일 庚申 / 時 壬午",
+        "url": "https://sajumania.com/",
+        "evidence": "tests/validation/evidence/dst-era-chu-mi-ae-sajumania.png"
+      },
+      {
+        "citation": "fourpillars.net Online Four Pillars Calculator, 양력 1956-06-22 12:00 female, 2026-09-14 (accessed) — Hour 壬午 / Day 庚申 / Month 甲午 / Year 丙申",
+        "url": "https://fourpillars.net/online4p_V3.php?Lang=en&GEN=-1&HR=12&DD=22&MM=6&YY=1956&Sta=r",
+        "evidence": "tests/validation/evidence/dst-era-chu-mi-ae-fourpillars-net.png"
+      }
+    ],
+    "expected": {
+      "pillars": {
+        "year": "丙申",
+        "month": "甲午",
+        "day": "庚申",
+        "hour": "壬午"
+      },
+      "solar_correction_minutes": null,
+      "zi_time_type": null
+    },
+    "status": "expect_match",
+    "notes": "Category 4 (DST era 1955–1960): Korea applied DST (+1h) in 1955–1960, so 1956-06-22 12:00 wall-clock = 11:00 true UTC+9 solar time. Both sites IGNORE historical Korean DST (sajumania /info explicitly: '야자시와 썸머타임은 지원하지 않습니다'; fourpillars.net likewise treats the input as plain UTC+9) — i.e. both read the birth as 12:00 UTC+9, matching the engine's utc_offset=9.0 wall-clock reading, so this is expect_match under wall-clock time and NOT a documented_interpretation case. Both sites agree on all four pillars; engine agrees (correction at 126.98°E ≈ −32.1 min keeps 12:00 in 午시). A true-solar-clock reading with DST subtracted (11:00 UTC+9) would give a different 시주 — the fixture pins the wall-clock +9 convention both tools share. solar_correction_minutes not asserted: neither tool states a numeric correction."
+  },
+  {
+    "id": "non-korean-longitude-trump",
+    "subsystem": "pillars",
+    "input": {
+      "year": 1946,
+      "month": 6,
+      "day": 14,
+      "hour": 10,
+      "minute": 54,
+      "longitude": -73.79,
+      "utc_offset": -4.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true
+    },
+    "source": [
+      {
+        "citation": "사주매니아 (sajumania.com) 만세력, 양력 1946-06-14 10:54 남, 2026-09-14 (accessed) — 년 丙戌 / 월 甲午 / 일 己未 / 時 己巳",
+        "url": "https://sajumania.com/",
+        "evidence": "tests/validation/evidence/non-korean-longitude-trump-sajumania.png"
+      },
+      {
+        "citation": "fourpillars.net Online Four Pillars Calculator, 양력 1946-06-14 10:54 male (Queens NY), 2026-09-14 (accessed) — Hour 己巳 / Day 己未 / Month 甲午 / Year 丙戌",
+        "url": "https://fourpillars.net/online4p_V3.php?Lang=en&GEN=1&HR=10&DD=14&MM=6&YY=1946&Sta=r",
+        "evidence": "tests/validation/evidence/non-korean-longitude-trump-fourpillars-net.png"
+      }
+    ],
+    "expected": {
+      "pillars": {
+        "year": "丙戌",
+        "month": "甲午",
+        "day": "己未",
+        "hour": "己巳"
+      },
+      "solar_correction_minutes": null,
+      "zi_time_type": null
+    },
+    "status": "expect_match",
+    "notes": "Category 5 (non-Korean longitude): Queens, NY birth, UTC−4 (1946-06-14 was wartime Eastern War Time UTC−4). Both sites accept the negative offset and agree on all four pillars including the 巳시 hour: the local-time birth 10:54 sits in 巳시 (9–11) both on the clock and after the solar-time shift (engine correction at −73.79°E ≈ −55.2 min keeps 10:54 in 巳시). The 己巳 hour stem follows from the 己未 일간 via 五鼠遁 (甲己 → 甲子 … 己 → 己巳). Engine agrees on all four pillars. solar_correction_minutes not asserted: neither tool states a numeric correction."
+  },
+  {
+    "id": "chinese-convention-kim-yeon-a",
+    "subsystem": "pillars",
+    "input": {
+      "year": 1990,
+      "month": 9,
+      "day": 5,
+      "hour": 23,
+      "minute": 40,
+      "longitude": 126.98,
+      "utc_offset": 9.0,
+      "gender": "F",
+      "convention": "chinese",
+      "use_solar_time": true
+    },
+    "source": [
+      {
+        "citation": "사주매니아 (sajumania.com) 만세력, '정자시 적용' (조자시) 모드, 양력 1990-09-05 23:40 여, 2026-09-14 (accessed) — 년 庚午 / 월 甲申 / 日 甲戌 / 時 甲子",
+        "url": "https://sajumania.com/",
+        "evidence": "tests/validation/evidence/chinese-convention-kim-yeon-a-sajumania.png"
+      },
+      {
+        "citation": "pp.buyiju.com 八字排盤 (mainland Chinese style, 公历, 不使用真太阳时), 양력 1990-09-05 23:40 女, 2026-09-14 (accessed) — 坤造 庚午 甲申 甲戌 甲子; 出生农历 庚午年 七月 十八日 子时; 立秋 1990-08-08 02:46, 白露 1990-09-08 05:38",
+        "url": "https://pp.buyiju.com/bazi/bazi.asp",
+        "evidence": "tests/validation/evidence/chinese-convention-kim-yeon-a-buyiju.png"
+      }
+    ],
+    "expected": {
+      "pillars": {
+        "year": "庚午",
+        "month": "甲申",
+        "day": "甲戌",
+        "hour": "甲子"
+      },
+      "solar_correction_minutes": null,
+      "zi_time_type": null
+    },
+    "status": "expect_match",
+    "notes": "Category 6 (Chinese 조자시 convention at 23:40): the day pillar ADVANCES to the next day (甲戌, 1990-09-06) and the 시주 천간 derives from the advanced day's 일간 via 五鼠遁 (甲己 → 甲子), giving 甲子. Two independent mainland-style sources agree: 사주매니아 정자시 모드 (조자시-only per its /info: '야자시와 썸머타임은 지원하지 않습니다') and pp.buyiju.com (mainland 八字排盤). Both also place the month in 申월 (立秋 1990-08-08 02:46 KST → 甲申; 白露 1990-09-08 05:38, so 09-05 is still past 立秋). Engine convention='chinese' agrees on all four pillars. THIRD SOURCE DISAGREEMENT (documented): fourpillars.net returns 庚午 甲申 癸酉 甲子 — it uses a 晚子時 hybrid (day pillar STAYS at 癸酉 while the hour stem still derives from the NEXT day's 일간 甲 → 甲子), a third school not implemented by the engine; screenshot tests/validation/evidence/chinese-convention-kim-yeon-a-fourpillars-net.png. Recorded as a school disagreement, not an engine bug (the engine implements only korean 야자시 vs chinese 조자시 by design). solar_correction_minutes not asserted: no tool states a numeric correction."
+  },
+  {
+    "id": "hour-boundary-0015",
+    "subsystem": "pillars",
+    "input": {
+      "year": 1990,
+      "month": 6,
+      "day": 15,
+      "hour": 0,
+      "minute": 15,
+      "longitude": 127.0,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": false
+    },
+    "source": [
+      {
+        "citation": "사주매니아 (sajumania.com) 만세력, '정자시 적용' (조자시-only, 야자시·썸머타임 미지원 per its /info — 태양시 보정 미적용), 양력 1990-06-15 00:15 남, 2026-09-13 (accessed) — 년 庚午 / 월 壬午 / 일 辛亥 / 時 戊子; 음력 1990-05-23 子時",
+        "url": "https://sajumania.com",
+        "evidence": "tests/validation/evidence/hour-boundary-0015-sajumania.png"
+      },
+      {
+        "citation": "卜易居八字排盤 (pp.buyiju.com), 真太阳时 '不使用' (태양시 보정 OFF 명시 선택), 公历 1990年6月15日0时15分(北京时间) 男, 2026-09-13 (accessed) — 乾造 庚午 壬午 辛亥 戊子; 出生农历 庚午年 五月 廿三日 子时; 芒种 1990-06-06 06:46, 小暑 1990-07-07 17:01",
+        "url": "https://pp.buyiju.com/bazi/bazi.asp",
+        "evidence": "tests/validation/evidence/hour-boundary-0015-buyiju.png"
+      }
+    ],
+    "expected": {
+      "pillars": {
+        "year": "庚午",
+        "month": "壬午",
+        "day": "辛亥",
+        "hour": "戊子"
+      },
+      "solar_correction_minutes": null,
+      "zi_time_type": null
+    },
+    "status": "expect_match",
+    "notes": "Category 1 second seed (hour-boundary, 조자시 arm at 00:15 — complements hour-boundary-2340's 야자시 23:40 arm). WHY use_solar_time=false: at Seoul 127°E the solar correction (~−32 min vs the 135°E standard meridian) legitimately rolls a 00:15 clock birth back to 23:43 of 06-14 — the PREVIOUS day's 야자시 path, a distinct behavior already regression-tested in tests/test_pillars.py. This seed pins the SAME-DAY 조자시 arm: the calendar day is retained (일주 辛亥 for 1990-06-15) and the 시주 천간 derives from the CURRENT day's 일간 辛 via 五鼠遁 (丙辛 → 戊子), giving 戊子. GROUND TRUTH: 庚午 壬午 辛亥 戊子 — two independent sources in solar-correction-OFF mode agree on all four pillars (사주매니아 정자시 mode, which applies no 태양시 보정; pp.buyiju.com with 真太阳时 '不使用' explicitly selected). Engine (use_solar_time=false) agrees on all four pillars. No disagreement between sources. solar_correction_minutes not asserted: with the correction disabled the engine returns null and neither tool states a numeric correction. zi_time_type not asserted (engine-internal label; 00:15 is plain 조자시, not a 子時 crossover)."
+  }
+]

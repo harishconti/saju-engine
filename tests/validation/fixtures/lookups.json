@@ -1,0 +1,1960 @@
+[
+  {
+    "id": "tengod-jia",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "ten_god",
+      "day_master": "甲"
+    },
+    "source": [
+      {
+        "citation": "knowledge/05-ten-gods.md:44 — Master Reference Table, 甲 row (연해자평 ten-god framework)"
+      },
+      {
+        "citation": "sajumyth.com — 십신 10종 한 페이지 정리: 정·편 4쌍 + 비견·겁재 (external cross-check 2026-09-13)",
+        "url": "https://sajumyth.com/column/ten-gods-10-detailed"
+      },
+      {
+        "citation": "sazasaju.com — 사주 십성(십신) 뜻과 보는 법, 10가지 십성표 (external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/sipsin-guide"
+      }
+    ],
+    "expected": {
+      "gods": {
+        "甲": "비견",
+        "乙": "겁재",
+        "丙": "식신",
+        "丁": "상관",
+        "戊": "편재",
+        "己": "정재",
+        "庚": "편관",
+        "辛": "정관",
+        "壬": "편인",
+        "癸": "정인"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "tengod-eul",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "ten_god",
+      "day_master": "乙"
+    },
+    "source": [
+      {
+        "citation": "knowledge/05-ten-gods.md:45 — Master Reference Table, 乙 row"
+      },
+      {
+        "citation": "sajumyth.com — 십신 10종 한 페이지 정리: 정·편 4쌍 + 비견·겁재 (external cross-check 2026-09-13)",
+        "url": "https://sajumyth.com/column/ten-gods-10-detailed"
+      },
+      {
+        "citation": "sazasaju.com — 사주 십성(십신) 뜻과 보는 법, 10가지 십성표 (external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/sipsin-guide"
+      }
+    ],
+    "expected": {
+      "gods": {
+        "甲": "겁재",
+        "乙": "비견",
+        "丙": "상관",
+        "丁": "식신",
+        "戊": "정재",
+        "己": "편재",
+        "庚": "정관",
+        "辛": "편관",
+        "壬": "정인",
+        "癸": "편인"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "tengod-byeong",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "ten_god",
+      "day_master": "丙"
+    },
+    "source": [
+      {
+        "citation": "knowledge/05-ten-gods.md:46 — Master Reference Table, 丙 row"
+      },
+      {
+        "citation": "sajumyth.com — 십신 10종 한 페이지 정리: 정·편 4쌍 + 비견·겁재 (external cross-check 2026-09-13)",
+        "url": "https://sajumyth.com/column/ten-gods-10-detailed"
+      },
+      {
+        "citation": "sazasaju.com — 사주 십성(십신) 뜻과 보는 법, 10가지 십성표 (external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/sipsin-guide"
+      }
+    ],
+    "expected": {
+      "gods": {
+        "甲": "편인",
+        "乙": "정인",
+        "丙": "비견",
+        "丁": "겁재",
+        "戊": "식신",
+        "己": "상관",
+        "庚": "편재",
+        "辛": "정재",
+        "壬": "편관",
+        "癸": "정관"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "tengod-jeong",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "ten_god",
+      "day_master": "丁"
+    },
+    "source": [
+      {
+        "citation": "knowledge/05-ten-gods.md:47 — Master Reference Table, 丁 row"
+      },
+      {
+        "citation": "sajumyth.com — 십신 10종 한 페이지 정리: 정·편 4쌍 + 비견·겁재 (external cross-check 2026-09-13)",
+        "url": "https://sajumyth.com/column/ten-gods-10-detailed"
+      },
+      {
+        "citation": "sazasaju.com — 사주 십성(십신) 뜻과 보는 법, 10가지 십성표 (external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/sipsin-guide"
+      }
+    ],
+    "expected": {
+      "gods": {
+        "甲": "정인",
+        "乙": "편인",
+        "丙": "겁재",
+        "丁": "비견",
+        "戊": "상관",
+        "己": "식신",
+        "庚": "정재",
+        "辛": "편재",
+        "壬": "정관",
+        "癸": "편관"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "tengod-mu",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "ten_god",
+      "day_master": "戊"
+    },
+    "source": [
+      {
+        "citation": "knowledge/05-ten-gods.md:48 — Master Reference Table, 戊 row"
+      },
+      {
+        "citation": "sajumyth.com — 십신 10종 한 페이지 정리: 정·편 4쌍 + 비견·겁재 (external cross-check 2026-09-13)",
+        "url": "https://sajumyth.com/column/ten-gods-10-detailed"
+      },
+      {
+        "citation": "sazasaju.com — 사주 십성(십신) 뜻과 보는 법, 10가지 십성표 (external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/sipsin-guide"
+      }
+    ],
+    "expected": {
+      "gods": {
+        "甲": "편관",
+        "乙": "정관",
+        "丙": "편인",
+        "丁": "정인",
+        "戊": "비견",
+        "己": "겁재",
+        "庚": "식신",
+        "辛": "상관",
+        "壬": "편재",
+        "癸": "정재"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "tengod-gi",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "ten_god",
+      "day_master": "己"
+    },
+    "source": [
+      {
+        "citation": "knowledge/05-ten-gods.md:49 — Master Reference Table, 己 row"
+      },
+      {
+        "citation": "sajumyth.com — 십신 10종 한 페이지 정리: 정·편 4쌍 + 비견·겁재 (external cross-check 2026-09-13)",
+        "url": "https://sajumyth.com/column/ten-gods-10-detailed"
+      },
+      {
+        "citation": "sazasaju.com — 사주 십성(십신) 뜻과 보는 법, 10가지 십성표 (external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/sipsin-guide"
+      }
+    ],
+    "expected": {
+      "gods": {
+        "甲": "정관",
+        "乙": "편관",
+        "丙": "정인",
+        "丁": "편인",
+        "戊": "겁재",
+        "己": "비견",
+        "庚": "상관",
+        "辛": "식신",
+        "壬": "정재",
+        "癸": "편재"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "tengod-gyeong",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "ten_god",
+      "day_master": "庚"
+    },
+    "source": [
+      {
+        "citation": "knowledge/05-ten-gods.md:50 — Master Reference Table, 庚 row"
+      },
+      {
+        "citation": "sajumyth.com — 십신 10종 한 페이지 정리: 정·편 4쌍 + 비견·겁재 (external cross-check 2026-09-13)",
+        "url": "https://sajumyth.com/column/ten-gods-10-detailed"
+      },
+      {
+        "citation": "sazasaju.com — 사주 십성(십신) 뜻과 보는 법, 10가지 십성표 (external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/sipsin-guide"
+      }
+    ],
+    "expected": {
+      "gods": {
+        "甲": "편재",
+        "乙": "정재",
+        "丙": "편관",
+        "丁": "정관",
+        "戊": "편인",
+        "己": "정인",
+        "庚": "비견",
+        "辛": "겁재",
+        "壬": "식신",
+        "癸": "상관"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "tengod-sin",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "ten_god",
+      "day_master": "辛"
+    },
+    "source": [
+      {
+        "citation": "knowledge/05-ten-gods.md:51 — Master Reference Table, 辛 row"
+      },
+      {
+        "citation": "sajumyth.com — 십신 10종 한 페이지 정리: 정·편 4쌍 + 비견·겁재 (external cross-check 2026-09-13)",
+        "url": "https://sajumyth.com/column/ten-gods-10-detailed"
+      },
+      {
+        "citation": "sazasaju.com — 사주 십성(십신) 뜻과 보는 법, 10가지 십성표 (external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/sipsin-guide"
+      }
+    ],
+    "expected": {
+      "gods": {
+        "甲": "정재",
+        "乙": "편재",
+        "丙": "정관",
+        "丁": "편관",
+        "戊": "정인",
+        "己": "편인",
+        "庚": "겁재",
+        "辛": "비견",
+        "壬": "상관",
+        "癸": "식신"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "tengod-im",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "ten_god",
+      "day_master": "壬"
+    },
+    "source": [
+      {
+        "citation": "knowledge/05-ten-gods.md:52 — Master Reference Table, 壬 row"
+      },
+      {
+        "citation": "sajumyth.com — 십신 10종 한 페이지 정리: 정·편 4쌍 + 비견·겁재 (external cross-check 2026-09-13)",
+        "url": "https://sajumyth.com/column/ten-gods-10-detailed"
+      },
+      {
+        "citation": "sazasaju.com — 사주 십성(십신) 뜻과 보는 법, 10가지 십성표 (external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/sipsin-guide"
+      }
+    ],
+    "expected": {
+      "gods": {
+        "甲": "식신",
+        "乙": "상관",
+        "丙": "편재",
+        "丁": "정재",
+        "戊": "편관",
+        "己": "정관",
+        "庚": "편인",
+        "辛": "정인",
+        "壬": "비견",
+        "癸": "겁재"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "tengod-gye",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "ten_god",
+      "day_master": "癸"
+    },
+    "source": [
+      {
+        "citation": "knowledge/05-ten-gods.md:53 — Master Reference Table, 癸 row"
+      },
+      {
+        "citation": "sajumyth.com — 십신 10종 한 페이지 정리: 정·편 4쌍 + 비견·겁재 (external cross-check 2026-09-13)",
+        "url": "https://sajumyth.com/column/ten-gods-10-detailed"
+      },
+      {
+        "citation": "sazasaju.com — 사주 십성(십신) 뜻과 보는 법, 10가지 십성표 (external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/sipsin-guide"
+      }
+    ],
+    "expected": {
+      "gods": {
+        "甲": "상관",
+        "乙": "식신",
+        "丙": "정재",
+        "丁": "편재",
+        "戊": "정관",
+        "己": "편관",
+        "庚": "정인",
+        "辛": "편인",
+        "壬": "겁재",
+        "癸": "비견"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "stage-jia",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "twelve_stage",
+      "day_master": "甲"
+    },
+    "source": [
+      {
+        "citation": "knowledge/06-twelve-stages.md:52–58 — 甲 Yang Wood, forward from 亥"
+      },
+      {
+        "citation": "ko.wikipedia.org — 십이운성: 10 천간 조견표 (갑목 亥 장생 순행, 卯 제왕; external cross-check 2026-09-13)",
+        "url": "https://ko.wikipedia.org/wiki/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1"
+      },
+      {
+        "citation": "dk-saju.com — 십이운성 총정리: 양간 순행/음간 역행, 을목 午 장생 (external cross-check 2026-09-13)",
+        "url": "https://www.dk-saju.com/unseong/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1-%EC%B4%9D%EC%A0%95%EB%A6%AC"
+      }
+    ],
+    "expected": {
+      "stages": {
+        "子": "목욕",
+        "丑": "관대",
+        "寅": "건록",
+        "卯": "제왕",
+        "辰": "쇠",
+        "巳": "병",
+        "午": "사",
+        "未": "묘",
+        "申": "절",
+        "酉": "태",
+        "戌": "양",
+        "亥": "장생"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "stage-eul",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "twelve_stage",
+      "day_master": "乙"
+    },
+    "source": [
+      {
+        "citation": "knowledge/06-twelve-stages.md:60–66 — 乙 Yin Wood, backward from 午"
+      },
+      {
+        "citation": "ko.wikipedia.org — 십이운성: 10 천간 조견표 (갑목 亥 장생 순행, 卯 제왕; external cross-check 2026-09-13)",
+        "url": "https://ko.wikipedia.org/wiki/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1"
+      },
+      {
+        "citation": "dk-saju.com — 십이운성 총정리: 양간 순행/음간 역행, 을목 午 장생 (external cross-check 2026-09-13)",
+        "url": "https://www.dk-saju.com/unseong/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1-%EC%B4%9D%EC%A0%95%EB%A6%AC"
+      }
+    ],
+    "expected": {
+      "stages": {
+        "子": "병",
+        "丑": "쇠",
+        "寅": "제왕",
+        "卯": "건록",
+        "辰": "관대",
+        "巳": "목욕",
+        "午": "장생",
+        "未": "양",
+        "申": "태",
+        "酉": "절",
+        "戌": "묘",
+        "亥": "사"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "stage-byeong",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "twelve_stage",
+      "day_master": "丙"
+    },
+    "source": [
+      {
+        "citation": "knowledge/06-twelve-stages.md:68–72 — 丙 Yang Fire, forward from 寅"
+      },
+      {
+        "citation": "ko.wikipedia.org — 십이운성: 10 천간 조견표 (갑목 亥 장생 순행, 卯 제왕; external cross-check 2026-09-13)",
+        "url": "https://ko.wikipedia.org/wiki/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1"
+      },
+      {
+        "citation": "dk-saju.com — 십이운성 총정리: 양간 순행/음간 역행, 을목 午 장생 (external cross-check 2026-09-13)",
+        "url": "https://www.dk-saju.com/unseong/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1-%EC%B4%9D%EC%A0%95%EB%A6%AC"
+      }
+    ],
+    "expected": {
+      "stages": {
+        "子": "태",
+        "丑": "양",
+        "寅": "장생",
+        "卯": "목욕",
+        "辰": "관대",
+        "巳": "건록",
+        "午": "제왕",
+        "未": "쇠",
+        "申": "병",
+        "酉": "사",
+        "戌": "묘",
+        "亥": "절"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "stage-jeong",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "twelve_stage",
+      "day_master": "丁"
+    },
+    "source": [
+      {
+        "citation": "knowledge/06-twelve-stages.md:74–78 — 丁 Yin Fire, backward from 酉"
+      },
+      {
+        "citation": "ko.wikipedia.org — 십이운성: 10 천간 조견표 (갑목 亥 장생 순행, 卯 제왕; external cross-check 2026-09-13)",
+        "url": "https://ko.wikipedia.org/wiki/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1"
+      },
+      {
+        "citation": "dk-saju.com — 십이운성 총정리: 양간 순행/음간 역행, 을목 午 장생 (external cross-check 2026-09-13)",
+        "url": "https://www.dk-saju.com/unseong/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1-%EC%B4%9D%EC%A0%95%EB%A6%AC"
+      }
+    ],
+    "expected": {
+      "stages": {
+        "子": "절",
+        "丑": "묘",
+        "寅": "사",
+        "卯": "병",
+        "辰": "쇠",
+        "巳": "제왕",
+        "午": "건록",
+        "未": "관대",
+        "申": "목욕",
+        "酉": "장생",
+        "戌": "양",
+        "亥": "태"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "stage-mu",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "twelve_stage",
+      "day_master": "戊"
+    },
+    "source": [
+      {
+        "citation": "knowledge/06-twelve-stages.md:80–86 — 戊 Yang Earth shares Fire's cycle"
+      },
+      {
+        "citation": "ko.wikipedia.org — 십이운성: 10 천간 조견표 (갑목 亥 장생 순행, 卯 제왕; external cross-check 2026-09-13)",
+        "url": "https://ko.wikipedia.org/wiki/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1"
+      },
+      {
+        "citation": "dk-saju.com — 십이운성 총정리: 양간 순행/음간 역행, 을목 午 장생 (external cross-check 2026-09-13)",
+        "url": "https://www.dk-saju.com/unseong/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1-%EC%B4%9D%EC%A0%95%EB%A6%AC"
+      }
+    ],
+    "expected": {
+      "stages": {
+        "子": "태",
+        "丑": "양",
+        "寅": "장생",
+        "卯": "목욕",
+        "辰": "관대",
+        "巳": "건록",
+        "午": "제왕",
+        "未": "쇠",
+        "申": "병",
+        "酉": "사",
+        "戌": "묘",
+        "亥": "절"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "stage-gi",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "twelve_stage",
+      "day_master": "己"
+    },
+    "source": [
+      {
+        "citation": "knowledge/06-twelve-stages.md:88–92 — 己 Yin Earth shares 丁's cycle"
+      },
+      {
+        "citation": "ko.wikipedia.org — 십이운성: 10 천간 조견표 (갑목 亥 장생 순행, 卯 제왕; external cross-check 2026-09-13)",
+        "url": "https://ko.wikipedia.org/wiki/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1"
+      },
+      {
+        "citation": "dk-saju.com — 십이운성 총정리: 양간 순행/음간 역행, 을목 午 장생 (external cross-check 2026-09-13)",
+        "url": "https://www.dk-saju.com/unseong/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1-%EC%B4%9D%EC%A0%95%EB%A6%AC"
+      }
+    ],
+    "expected": {
+      "stages": {
+        "子": "절",
+        "丑": "묘",
+        "寅": "사",
+        "卯": "병",
+        "辰": "쇠",
+        "巳": "제왕",
+        "午": "건록",
+        "未": "관대",
+        "申": "목욕",
+        "酉": "장생",
+        "戌": "양",
+        "亥": "태"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "stage-gyeong",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "twelve_stage",
+      "day_master": "庚"
+    },
+    "source": [
+      {
+        "citation": "knowledge/06-twelve-stages.md:94–98 — 庚 Yang Metal, forward from 巳"
+      },
+      {
+        "citation": "ko.wikipedia.org — 십이운성: 10 천간 조견표 (갑목 亥 장생 순행, 卯 제왕; external cross-check 2026-09-13)",
+        "url": "https://ko.wikipedia.org/wiki/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1"
+      },
+      {
+        "citation": "dk-saju.com — 십이운성 총정리: 양간 순행/음간 역행, 을목 午 장생 (external cross-check 2026-09-13)",
+        "url": "https://www.dk-saju.com/unseong/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1-%EC%B4%9D%EC%A0%95%EB%A6%AC"
+      }
+    ],
+    "expected": {
+      "stages": {
+        "子": "사",
+        "丑": "묘",
+        "寅": "절",
+        "卯": "태",
+        "辰": "양",
+        "巳": "장생",
+        "午": "목욕",
+        "未": "관대",
+        "申": "건록",
+        "酉": "제왕",
+        "戌": "쇠",
+        "亥": "병"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "stage-sin",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "twelve_stage",
+      "day_master": "辛"
+    },
+    "source": [
+      {
+        "citation": "knowledge/06-twelve-stages.md:100–106 — 辛 Yin Metal, backward from 子"
+      },
+      {
+        "citation": "ko.wikipedia.org — 십이운성: 10 천간 조견표 (갑목 亥 장생 순행, 卯 제왕; external cross-check 2026-09-13)",
+        "url": "https://ko.wikipedia.org/wiki/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1"
+      },
+      {
+        "citation": "dk-saju.com — 십이운성 총정리: 양간 순행/음간 역행, 을목 午 장생 (external cross-check 2026-09-13)",
+        "url": "https://www.dk-saju.com/unseong/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1-%EC%B4%9D%EC%A0%95%EB%A6%AC"
+      }
+    ],
+    "expected": {
+      "stages": {
+        "子": "장생",
+        "丑": "양",
+        "寅": "태",
+        "卯": "절",
+        "辰": "묘",
+        "巳": "사",
+        "午": "병",
+        "未": "쇠",
+        "申": "제왕",
+        "酉": "건록",
+        "戌": "관대",
+        "亥": "목욕"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "stage-im",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "twelve_stage",
+      "day_master": "壬"
+    },
+    "source": [
+      {
+        "citation": "knowledge/06-twelve-stages.md:108–114 — 壬 Yang Water, forward from 申"
+      },
+      {
+        "citation": "ko.wikipedia.org — 십이운성: 10 천간 조견표 (갑목 亥 장생 순행, 卯 제왕; external cross-check 2026-09-13)",
+        "url": "https://ko.wikipedia.org/wiki/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1"
+      },
+      {
+        "citation": "dk-saju.com — 십이운성 총정리: 양간 순행/음간 역행, 을목 午 장생 (external cross-check 2026-09-13)",
+        "url": "https://www.dk-saju.com/unseong/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1-%EC%B4%9D%EC%A0%95%EB%A6%AC"
+      }
+    ],
+    "expected": {
+      "stages": {
+        "子": "제왕",
+        "丑": "쇠",
+        "寅": "병",
+        "卯": "사",
+        "辰": "묘",
+        "巳": "절",
+        "午": "태",
+        "未": "양",
+        "申": "장생",
+        "酉": "목욕",
+        "戌": "관대",
+        "亥": "건록"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "stage-gye",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "twelve_stage",
+      "day_master": "癸"
+    },
+    "source": [
+      {
+        "citation": "knowledge/06-twelve-stages.md:116–122 — 癸 Yin Water, backward from 卯"
+      },
+      {
+        "citation": "ko.wikipedia.org — 십이운성: 10 천간 조견표 (갑목 亥 장생 순행, 卯 제왕; external cross-check 2026-09-13)",
+        "url": "https://ko.wikipedia.org/wiki/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1"
+      },
+      {
+        "citation": "dk-saju.com — 십이운성 총정리: 양간 순행/음간 역행, 을목 午 장생 (external cross-check 2026-09-13)",
+        "url": "https://www.dk-saju.com/unseong/%EC%8B%AD%EC%9D%B4%EC%9A%B4%EC%84%B1-%EC%B4%9D%EC%A0%95%EB%A6%AC"
+      }
+    ],
+    "expected": {
+      "stages": {
+        "子": "건록",
+        "丑": "관대",
+        "寅": "목욕",
+        "卯": "장생",
+        "辰": "양",
+        "巳": "태",
+        "午": "절",
+        "未": "묘",
+        "申": "사",
+        "酉": "병",
+        "戌": "쇠",
+        "亥": "제왕"
+      }
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-01-haejunggeum",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "海中金"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:284 — 海中금, Gold in the Sea (납음오행)"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "甲",
+          "子"
+        ],
+        [
+          "乙",
+          "丑"
+        ]
+      ],
+      "element": "Metal"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-02-nojunghwa",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "爐中火"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:285 — 爐中火, Fire in the Furnace"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "丙",
+          "寅"
+        ],
+        [
+          "丁",
+          "卯"
+        ]
+      ],
+      "element": "Fire"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-03-daerimmok",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "大林木"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:286 — 大林木, Forest Wood"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "戊",
+          "辰"
+        ],
+        [
+          "己",
+          "巳"
+        ]
+      ],
+      "element": "Wood"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-04-nobangto",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "路傍土"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:287 — 路傍土, Roadside Earth"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "庚",
+          "午"
+        ],
+        [
+          "辛",
+          "未"
+        ]
+      ],
+      "element": "Earth"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-05-geumbonggeum",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "劍鋒金"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:288 — 劍鋒金, Sword-Edge Metal"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "壬",
+          "申"
+        ],
+        [
+          "癸",
+          "酉"
+        ]
+      ],
+      "element": "Metal"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-06-sanduhwa",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "山頭火"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:289 — 山頭火, Mountain-Top Fire"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "甲",
+          "戌"
+        ],
+        [
+          "乙",
+          "亥"
+        ]
+      ],
+      "element": "Fire"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-07-ganhasu",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "澗下水"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:290 — 澗下水, Water Under the Stream"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "丙",
+          "子"
+        ],
+        [
+          "丁",
+          "丑"
+        ]
+      ],
+      "element": "Water"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-08-seongduto",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "城頭土"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:291 — 城頭土, City-Wall Earth"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "戊",
+          "寅"
+        ],
+        [
+          "己",
+          "卯"
+        ]
+      ],
+      "element": "Earth"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-09-baengnapgeum",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "白蠟金"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:292 — 白蠟金, White Wax Metal"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "庚",
+          "辰"
+        ],
+        [
+          "辛",
+          "巳"
+        ]
+      ],
+      "element": "Metal"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-10-yangnyumok",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "楊柳木"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:293 — 楊柳木, Willow Wood"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "壬",
+          "午"
+        ],
+        [
+          "癸",
+          "未"
+        ]
+      ],
+      "element": "Wood"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-11-cheonjungsu",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "泉中水"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:294 — 泉中水, Spring Water"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "甲",
+          "申"
+        ],
+        [
+          "乙",
+          "酉"
+        ]
+      ],
+      "element": "Water"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-12-oksangto",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "屋上土"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:295 — 屋上土, Rooftop Earth"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "丙",
+          "戌"
+        ],
+        [
+          "丁",
+          "亥"
+        ]
+      ],
+      "element": "Earth"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-13-byeokryeokhwa",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "霹靂火"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:296 — 霹靂火, Thunder Fire"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "戊",
+          "子"
+        ],
+        [
+          "己",
+          "丑"
+        ]
+      ],
+      "element": "Fire"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-14-songbaengmok",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "松柏木"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:297 — 松柏木, Pine-Cypress Wood"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "庚",
+          "寅"
+        ],
+        [
+          "辛",
+          "卯"
+        ]
+      ],
+      "element": "Wood"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-15-jangryusu",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "長流水"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:298 — 長流水, Long-Flowing Water"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "壬",
+          "辰"
+        ],
+        [
+          "癸",
+          "巳"
+        ]
+      ],
+      "element": "Water"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-16-sajunggeum",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "沙中金"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:299 — 沙中金, Sand Gold"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "甲",
+          "午"
+        ],
+        [
+          "乙",
+          "未"
+        ]
+      ],
+      "element": "Metal"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-17-sanhahwa",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "山下火"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:300 — 山下火, Mountain-Foot Fire"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "丙",
+          "申"
+        ],
+        [
+          "丁",
+          "酉"
+        ]
+      ],
+      "element": "Fire"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-18-pyeongjimok",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "平地木"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:301 — 平地木, Flatland Wood"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "戊",
+          "戌"
+        ],
+        [
+          "己",
+          "亥"
+        ]
+      ],
+      "element": "Wood"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-19-byeksangto",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "壁上土"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:302 — 壁上土, Wall Earth"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "庚",
+          "子"
+        ],
+        [
+          "辛",
+          "丑"
+        ]
+      ],
+      "element": "Earth"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-20-geumbakgeum",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "金箔金"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:303 — 金箔金, Gold-Leaf Metal"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "壬",
+          "寅"
+        ],
+        [
+          "癸",
+          "卯"
+        ]
+      ],
+      "element": "Metal"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-21-bokdeunghwa",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "覆燈火"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:304 — 覆燈火, Lamp Fire"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "甲",
+          "辰"
+        ],
+        [
+          "乙",
+          "巳"
+        ]
+      ],
+      "element": "Fire"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-22-cheonhasu",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "天河水"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:305 — 天河水, Milky-Way Water"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "丙",
+          "午"
+        ],
+        [
+          "丁",
+          "未"
+        ]
+      ],
+      "element": "Water"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-23-daeyeokto",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "大驛土"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:306 — 大驛土, Post-Horse Earth"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "戊",
+          "申"
+        ],
+        [
+          "己",
+          "酉"
+        ]
+      ],
+      "element": "Earth"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-24-chaeseongeum",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "釵釧金"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:307 — 釵釧金, Hairpin-Bracket Metal"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "庚",
+          "戌"
+        ],
+        [
+          "辛",
+          "亥"
+        ]
+      ],
+      "element": "Metal"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-25-sangjeomok",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "桑柘木"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:308 — 桑柘木, Mulberry Wood"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "壬",
+          "子"
+        ],
+        [
+          "癸",
+          "丑"
+        ]
+      ],
+      "element": "Wood"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-26-daegyesu",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "大溪水"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:309 — 大溪水, Great Stream Water"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "甲",
+          "寅"
+        ],
+        [
+          "乙",
+          "卯"
+        ]
+      ],
+      "element": "Water"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-27-sajungto",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "沙中土"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:310 — 沙中土, Sand Earth"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "丙",
+          "辰"
+        ],
+        [
+          "丁",
+          "巳"
+        ]
+      ],
+      "element": "Earth"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-28-cheonsanghwa",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "天上火"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:311 — 天上火, Heavenly Fire"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "戊",
+          "午"
+        ],
+        [
+          "己",
+          "未"
+        ]
+      ],
+      "element": "Fire"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-29-seoknyumok",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "石榴木"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:312 — 石榴木, Pomegranate Wood"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "庚",
+          "申"
+        ],
+        [
+          "辛",
+          "酉"
+        ]
+      ],
+      "element": "Wood"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "nayin-30-daehaesu",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "nayin",
+      "nayin": "大海水"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:313 — 大海水, Great Sea Water"
+      },
+      {
+        "citation": "sazasaju.com — 납음오행 정리표: 60갑자 30쌍 (전체 표 대조 확인, external cross-check 2026-09-13)",
+        "url": "https://www.sazasaju.com/blog/nabeum-ohaeng-guide"
+      },
+      {
+        "citation": "wiki.openfate.ai — 육십갑자 납음표 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/nayin-methods/nayin-table-for-the-sixty-jiazi"
+      }
+    ],
+    "expected": {
+      "jiazi": [
+        [
+          "壬",
+          "戌"
+        ],
+        [
+          "癸",
+          "亥"
+        ]
+      ],
+      "element": "Water"
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "xunkong-gapja-xun",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "xunkong",
+      "xun_start": "甲子"
+    },
+    "source": [
+      {
+        "citation": "knowledge/00-glossary.md:34 — 공망 rule; 甲子旬 (day pillars 甲子–癸酉) leaves 戌亥 absent"
+      },
+      {
+        "citation": "wiki.openfate.ai — 갑자순 공망 술해: 6 순 공망 지지 대조 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/void/jia-zi-decade-void-xu-and-hai"
+      },
+      {
+        "citation": "shunshi.ai — 순공(旬空) 뜻 (external cross-check 2026-09-13)",
+        "url": "https://shunshi.ai/ko/wiki/liuyao/duangua/xunkong"
+      }
+    ],
+    "expected": {
+      "absent": [
+        "戌",
+        "亥"
+      ]
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "xunkong-gapsul-xun",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "xunkong",
+      "xun_start": "甲戌"
+    },
+    "source": [
+      {
+        "citation": "knowledge/00-glossary.md:34 — 甲戌旬 (甲戌–癸未) leaves 申酉 absent"
+      },
+      {
+        "citation": "wiki.openfate.ai — 갑자순 공망 술해: 6 순 공망 지지 대조 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/void/jia-zi-decade-void-xu-and-hai"
+      },
+      {
+        "citation": "shunshi.ai — 순공(旬空) 뜻 (external cross-check 2026-09-13)",
+        "url": "https://shunshi.ai/ko/wiki/liuyao/duangua/xunkong"
+      }
+    ],
+    "expected": {
+      "absent": [
+        "申",
+        "酉"
+      ]
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "xunkong-gapsin-xun",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "xunkong",
+      "xun_start": "甲申"
+    },
+    "source": [
+      {
+        "citation": "knowledge/00-glossary.md:34 — 甲申旬 (甲申–癸巳) leaves 午未 absent"
+      },
+      {
+        "citation": "wiki.openfate.ai — 갑자순 공망 술해: 6 순 공망 지지 대조 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/void/jia-zi-decade-void-xu-and-hai"
+      },
+      {
+        "citation": "shunshi.ai — 순공(旬空) 뜻 (external cross-check 2026-09-13)",
+        "url": "https://shunshi.ai/ko/wiki/liuyao/duangua/xunkong"
+      }
+    ],
+    "expected": {
+      "absent": [
+        "午",
+        "未"
+      ]
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "xunkong-gap-o-xun",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "xunkong",
+      "xun_start": "甲午"
+    },
+    "source": [
+      {
+        "citation": "knowledge/00-glossary.md:34 — 甲午旬 (甲午–癸卯) leaves 辰巳 absent"
+      },
+      {
+        "citation": "wiki.openfate.ai — 갑자순 공망 술해: 6 순 공망 지지 대조 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/void/jia-zi-decade-void-xu-and-hai"
+      },
+      {
+        "citation": "shunshi.ai — 순공(旬空) 뜻 (external cross-check 2026-09-13)",
+        "url": "https://shunshi.ai/ko/wiki/liuyao/duangua/xunkong"
+      }
+    ],
+    "expected": {
+      "absent": [
+        "辰",
+        "巳"
+      ]
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "xunkong-gapjin-xun",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "xunkong",
+      "xun_start": "甲辰"
+    },
+    "source": [
+      {
+        "citation": "knowledge/00-glossary.md:34 — 甲辰旬 (甲辰–癸丑) leaves 寅卯 absent"
+      },
+      {
+        "citation": "wiki.openfate.ai — 갑자순 공망 술해: 6 순 공망 지지 대조 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/void/jia-zi-decade-void-xu-and-hai"
+      },
+      {
+        "citation": "shunshi.ai — 순공(旬空) 뜻 (external cross-check 2026-09-13)",
+        "url": "https://shunshi.ai/ko/wiki/liuyao/duangua/xunkong"
+      }
+    ],
+    "expected": {
+      "absent": [
+        "寅",
+        "卯"
+      ]
+    },
+    "status": "expect_match"
+  },
+  {
+    "id": "xunkong-gapin-xun",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "xunkong",
+      "xun_start": "甲寅"
+    },
+    "source": [
+      {
+        "citation": "knowledge/00-glossary.md:34 — 甲寅旬 (甲寅–癸亥) leaves 子丑 absent"
+      },
+      {
+        "citation": "wiki.openfate.ai — 갑자순 공망 술해: 6 순 공망 지지 대조 (external cross-check 2026-09-13)",
+        "url": "https://wiki.openfate.ai/ko/bazi/void/jia-zi-decade-void-xu-and-hai"
+      },
+      {
+        "citation": "shunshi.ai — 순공(旬空) 뜻 (external cross-check 2026-09-13)",
+        "url": "https://shunshi.ai/ko/wiki/liuyao/duangua/xunkong"
+      }
+    ],
+    "expected": {
+      "absent": [
+        "子",
+        "丑"
+      ]
+    },
+    "status": "expect_match"
+  }
+]

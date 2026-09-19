@@ -1,0 +1,361 @@
+[
+  {
+    "id": "weak-cold-agree",
+    "subsystem": "yongsin",
+    "input": {
+      "year": 1984,
+      "month": 11,
+      "day": 10,
+      "hour": 3,
+      "longitude": 126.98,
+      "utc_offset": 9.0
+    },
+    "source": "Synthetic chart exercising the weak-DM + cold-climate AGREE branch. Merge rule: knowledge/09-interpretation-method.md Step 3 (weak 일간 → 용신 = 인성 resource of the Day Master; here 戊 ← Fire) + knowledge/17-climate-method.md merge table row 'strong/weak verdicts: 억부 authoritative, climate as cross-check note' — the cold 亥 month would favor Fire anyway, so the two methods agree. Pillars verified by probe 2026-09-13 (Plan 4 grounding). (external cross-check 2026-09-13: 두루미사주 억부용신 — '신약 사주의 억부용신은 인성(생해주기)·비겁(같은 편 만들기) 중에서 잡습니다' — https://www.durumisaju.com/dict/yongshin/eokbu; 사자사주 용신 5종 — 신약 → 인성 1순위·비겁 — https://www.sazasaju.com/blog/yongsin-guide)",
+    "status": "expect_match",
+    "expected": {
+      "strength": {
+        "verdict": "weak",
+        "candidate": "Fire"
+      },
+      "fe": {
+        "element": "Fire",
+        "method": "weak-dm-support",
+        "supporting": "Earth",
+        "climate_band": "cold",
+        "climate_element": "Fire",
+        "climate_agrees": true
+      }
+    }
+  },
+  {
+    "id": "weak-cold-priority",
+    "subsystem": "yongsin",
+    "input": {
+      "year": 1980,
+      "month": 1,
+      "day": 20,
+      "hour": 9,
+      "longitude": 126.98,
+      "utc_offset": 9.0
+    },
+    "source": "Synthetic chart exercising the weak-DM + cold-climate DISAGREE branch — 억부 priority. Merge rule: knowledge/09-interpretation-method.md Step 3 (weak 일간 壬 → 인성 Metal) + knowledge/17-climate-method.md merge table row 'strong/weak verdicts: 억부 authoritative, climate as cross-check note' — the cold 丑 month would favor Fire, but strength-balance takes priority and climate is only a note. Pillars verified by probe 2026-09-13. (external cross-check 2026-09-13: 두루미사주 억부용신 — '신약 사주의 억부용신은 인성·비겁 중에서 잡습니다' + conditional '일반적으로 사주가 너무 차거나 너무 더우면 조후를 우선하고, 그렇지 않으면 억부를 우선하는 견해가 많습니다' (this chart: strong/weak verdict ⇒ 억부 authoritative, cold band as note) — https://www.durumisaju.com/dict/yongshin/eokbu; 사자사주 — https://www.sazasaju.com/blog/yongsin-guide)",
+    "status": "expect_match",
+    "expected": {
+      "strength": {
+        "verdict": "weak",
+        "candidate": "Metal"
+      },
+      "fe": {
+        "element": "Metal",
+        "method": "weak-dm-support",
+        "supporting": "Water",
+        "climate_band": "cold",
+        "climate_element": "Fire",
+        "climate_agrees": false
+      }
+    }
+  },
+  {
+    "id": "weak-temperate",
+    "subsystem": "yongsin",
+    "input": {
+      "year": 1984,
+      "month": 8,
+      "day": 20,
+      "hour": 9,
+      "longitude": 126.98,
+      "utc_offset": 9.0
+    },
+    "source": "Synthetic chart exercising the weak-DM + temperate month branch (no 조후 interaction). Merge rule: knowledge/09-interpretation-method.md Step 3 (weak 일간 丙 → 인성 Wood) + knowledge/17-climate-method.md three-band table (申 = temperate month → no climate override). Pillars verified by probe 2026-09-13. (external cross-check 2026-09-13: 두루미사주 억부용신 — 신약 → 인성·비겁 (temperate month ⇒ pure 억부 branch) — https://www.durumisaju.com/dict/yongshin/eokbu; OpenFate — '기후가 이미 운용 가능하면 부억이 먼저일 수 있습니다' — https://wiki.openfate.ai/ko/bazi/useful-gods-climate/climate-vs-strength-priority)",
+    "status": "expect_match",
+    "expected": {
+      "strength": {
+        "verdict": "weak",
+        "candidate": "Wood"
+      },
+      "fe": {
+        "element": "Wood",
+        "method": "weak-dm-support",
+        "supporting": "Fire",
+        "climate_band": "temperate",
+        "climate_element": null,
+        "climate_agrees": null
+      }
+    }
+  },
+  {
+    "id": "rm-published",
+    "subsystem": "yongsin",
+    "input": {
+      "year": 1994,
+      "month": 9,
+      "day": 12,
+      "hour": 13,
+      "minute": 28,
+      "longitude": 126.98,
+      "utc_offset": 9.0
+    },
+    "source": "Published client verdict: candidates_horoscope/reports/rm/rm-report.md:49-52 — Strength Strong; Favorable Element Water (explicitly 'an engine reading'); Supporting Wood; Avoid Metal. Derived by knowledge/09-interpretation-method.md Step 3 (strong 일간 辛 → 용신 = 식상 output element Water; 희신 = 재성 Wood, modern-Korean convention per strength.py). Chart on the campaign-current engine (post ya-ja-si fix; rm birth is 13:28, unaffected). Pillars verified by probe 2026-09-13. (external cross-check 2026-09-13: 두루미사주 억부용신 — '신강 사주의 억부용신은 식상(빼주기)·재성(쓰게 하기)·관성(눌러주기) 중에서 잡고' (strong 辛 → 식상 Water, 희신 재성 Wood) — https://www.durumisaju.com/dict/yongshin/eokbu; 사자사주 — https://www.sazasaju.com/blog/yongsin-guide)",
+    "status": "expect_match",
+    "expected": {
+      "strength": {
+        "verdict": "strong",
+        "candidate": "Water"
+      },
+      "fe": {
+        "element": "Water",
+        "method": "strong-dm-drain",
+        "supporting": "Wood",
+        "climate_band": "temperate",
+        "climate_element": null,
+        "climate_agrees": null
+      }
+    }
+  },
+  {
+    "id": "gurumoorthy-published",
+    "subsystem": "yongsin",
+    "input": {
+      "year": 1964,
+      "month": 7,
+      "day": 19,
+      "hour": 8,
+      "minute": 30,
+      "longitude": 79.42,
+      "utc_offset": 5.5
+    },
+    "source": "Published client verdict: candidates_horoscope/reports/gurumoorthy/gurumoorthy-report.md:49-50 — Favorable Element Metal (reader-confirmed); Supporting Water; Avoid Earth. Derived by knowledge/09-interpretation-method.md Step 3 (strong 일간 己 → 식상 output element Metal; 희신 재성 Water). method is NOT checked here: the report's reader-confirmed label is a process fact about how the pick was argued, while this entry validates the resolved verdict (element + supporting). knowledge/17-climate-method.md merge note applies (hot 未 month would favor Water; strength-balance takes priority — matches the engine note verbatim). Pillars verified by probe 2026-09-13. (external cross-check 2026-09-13: 두루미사주 억부용신 — 신강 → 식상·재성·관성 중 잡음 (strong 己 → 식상 Metal; hot 未 month climate note matches knowledge/17 conditional rule) — https://www.durumisaju.com/dict/yongshin/eokbu; 사자사주 (적천수 억부론 근거) — https://www.sazasaju.com/blog/yongsin-guide)",
+    "status": "expect_match",
+    "expected": {
+      "strength": {
+        "verdict": "strong",
+        "candidate": "Metal"
+      },
+      "fe": {
+        "element": "Metal",
+        "method": null,
+        "supporting": "Water",
+        "climate_band": "hot",
+        "climate_element": "Water",
+        "climate_agrees": false
+      }
+    }
+  },
+  {
+    "id": "harish-published",
+    "subsystem": "yongsin",
+    "input": {
+      "year": 1992,
+      "month": 6,
+      "day": 4,
+      "hour": 3,
+      "minute": 10,
+      "longitude": 79.42,
+      "utc_offset": 5.5
+    },
+    "source": "Published client verdict: candidates_horoscope/reports/harish/harish-report.md:50 — Favorable Element Water, climate-explained (report regenerated 2026-09-13 after the climate/조후 engine fix landed), Supporting Metal. Derived by knowledge/17-climate-method.md merge rule 'balanced verdict + non-temperate month → 조후 climate element wins the headline': the numeric 억부 pick is Fire (least-represented), which the engine note explicitly says it overrides; hot 巳 month → climate Water. Pillars verified by probe 2026-09-13. (external cross-check 2026-09-13: OpenFate 조후 vs 부억 — '극단적 기후가 다른 기능을 막으면 조후가 전제가 되고' (balanced DM + hot 巳 month ⇒ climate-balanced Water) — https://wiki.openfate.ai/ko/bazi/useful-gods-climate/climate-vs-strength-priority; 두루미사주 — '사주가 너무 차거나 너무 더우면 조후를 우선' — https://www.durumisaju.com/dict/yongshin/eokbu)",
+    "status": "expect_match",
+    "expected": {
+      "strength": {
+        "verdict": "balanced",
+        "candidate": "Fire"
+      },
+      "fe": {
+        "element": "Water",
+        "method": "climate-balanced",
+        "supporting": "Metal",
+        "climate_band": "hot",
+        "climate_element": "Water",
+        "climate_agrees": false
+      }
+    }
+  },
+  {
+    "id": "vishnu-priya-published",
+    "subsystem": "yongsin",
+    "input": {
+      "year": 2001,
+      "month": 6,
+      "day": 7,
+      "hour": 16,
+      "minute": 45,
+      "longitude": 76.65,
+      "utc_offset": 5.5
+    },
+    "source": "Published client verdict: candidates_horoscope/reports/vishnu-priya/vishnu-priya-report.md:44-46 — Balanced; Water climate-balanced, noting it 'matches the chart's own least-represented element, reinforcing the pick'; Supporting Metal. Same knowledge/17 merge rule as harish-published, plus the agrees=True reinforcing case. Pillars verified by probe 2026-09-13. (external cross-check 2026-09-13: OpenFate 조후 vs 부억 — extreme climate as prerequisite (hot month, balanced DM ⇒ climate-balanced Water; agrees=True reinforcing case) — https://wiki.openfate.ai/ko/bazi/useful-gods-climate/climate-vs-strength-priority; 사자사주 — 궁통보감 '계절에 따른 조후를 가장 우선시' — https://www.sazasaju.com/blog/yongsin-guide)",
+    "status": "expect_match",
+    "expected": {
+      "strength": {
+        "verdict": "balanced",
+        "candidate": "Water"
+      },
+      "fe": {
+        "element": "Water",
+        "method": "climate-balanced",
+        "supporting": "Metal",
+        "climate_band": "hot",
+        "climate_element": "Water",
+        "climate_agrees": true
+      }
+    }
+  },
+  {
+    "id": "sruthi-published",
+    "subsystem": "yongsin",
+    "input": {
+      "year": 1993,
+      "month": 12,
+      "day": 11,
+      "hour": 2,
+      "minute": 45,
+      "longitude": 79.42,
+      "utc_offset": 5.5
+    },
+    "source": "Published client verdict: candidates_horoscope/reports/sruthi/sruthi-report.md:48-50 — Balanced; Favorable Element Earth 'confirmed by the reader'; Supporting Fire. DOCUMENTED DIVERGENCE: the engine without an override reads Fire climate-balanced (cold 子 month; knowledge/17 merge rule), while the published pick was argued by the reader under the pre-climate-method convention (least-represented-element reading). expected.element carries the PUBLISHED value so the divergence renders as INTERPRETATION with full detail; expected.method and expected.strength pin the engine's own behavior so a regression on those still shows in the detail. The companion entry sruthi-reader-override proves the reader's pick is exactly reproducible through the override channel. (external cross-check 2026-09-13: OpenFate — '조후와 부억에는 명식을 떠난 고정 순서가 없습니다' (per-chart divergence on borderline balanced charts is the documented school split; reader-argued Earth vs engine climate-balanced Fire — see docs/research/2026-09-validation-yongsin.md §3) — https://wiki.openfate.ai/ko/bazi/useful-gods-climate/climate-vs-strength-priority)",
+    "status": "documented_interpretation",
+    "expected": {
+      "strength": {
+        "verdict": "balanced",
+        "candidate": "Metal"
+      },
+      "fe": {
+        "element": "Earth",
+        "method": "climate-balanced",
+        "supporting": null
+      }
+    }
+  },
+  {
+    "id": "pawan-published",
+    "subsystem": "yongsin",
+    "input": {
+      "year": 1991,
+      "month": 10,
+      "day": 3,
+      "hour": 23,
+      "minute": 45,
+      "longitude": 79.19,
+      "utc_offset": 5.5
+    },
+    "source": "Published client verdict: candidates_horoscope/reports/pawan/pawan-report.md:49-50 — Water (confirmed by the reader); Supporting Metal. STALE CHART: the 23:45 birth was re-charted by the user-ordered ya-ja-si hour-stem fix (Plan 1), so the published reading was made on the pre-fix chart; the client report regen is deferred to campaign close. expected.element carries the PUBLISHED value (renders INTERPRETATION by design); expected.method + expected.strength pin the current chart's engine behavior (balanced, temperate 酉 month → balanced-heuristic least-represented Wood, supporting Water). (external cross-check 2026-09-13: OpenFate — '기후가 이미 운용 가능하면 부억이 먼저일 수 있습니다' (temperate 酉 month, balanced DM ⇒ balanced-heuristic least-represented) — https://wiki.openfate.ai/ko/bazi/useful-gods-climate/climate-vs-strength-priority; 사자사주 함정 1 — '부족한 오행을 용신으로 착각' — https://www.sazasaju.com/blog/yongsin-guide)",
+    "status": "documented_interpretation",
+    "expected": {
+      "strength": {
+        "verdict": "balanced",
+        "candidate": "Wood"
+      },
+      "fe": {
+        "element": "Water",
+        "method": "balanced-heuristic",
+        "supporting": null
+      }
+    }
+  },
+  {
+    "id": "mahesh-published",
+    "subsystem": "yongsin",
+    "input": {
+      "year": 1995,
+      "month": 1,
+      "day": 19,
+      "hour": 23,
+      "minute": 50,
+      "longitude": 78.713454,
+      "utc_offset": 5.5
+    },
+    "source": "Published client verdict: candidates_horoscope/reports/mahesh/mahesh-report.md:42-45 — Weak; Favorable Element Earth ('generates Metal and buffers Fire authority pressure'); Supporting Metal; Avoid Fire. STALE CHART: the 23:50 birth was re-charted by the ya-ja-si fix (Plan 1) — the published reading was made on the pre-fix chart and on a weak verdict the current chart no longer produces (now balanced, score 1.22); report regen deferred to campaign close. expected.element carries the PUBLISHED value (renders INTERPRETATION by design); expected.method + expected.strength + expected.fe.supporting pin the current chart's engine behavior (cold 丑 month → climate-balanced Fire, supporting Wood). (external cross-check 2026-09-13: OpenFate — no fixed order; documented divergence between reader-argued Earth and engine climate-balanced Fire on the post-ya-ja-si chart — https://wiki.openfate.ai/ko/bazi/useful-gods-climate/climate-vs-strength-priority; 두루미사주 — https://www.durumisaju.com/dict/yongshin/eokbu)",
+    "status": "documented_interpretation",
+    "expected": {
+      "strength": {
+        "verdict": "balanced",
+        "candidate": "Water"
+      },
+      "fe": {
+        "element": "Earth",
+        "method": "climate-balanced",
+        "supporting": "Wood"
+      }
+    }
+  },
+  {
+    "id": "sruthi-reader-override",
+    "subsystem": "yongsin",
+    "input": {
+      "year": 1993,
+      "month": 12,
+      "day": 11,
+      "hour": 2,
+      "minute": 45,
+      "longitude": 79.42,
+      "utc_offset": 5.5,
+      "override": "Earth"
+    },
+    "source": "Reader-override channel check (layer C), explicit-argument path. Same sruthi chart as sruthi-published with override='Earth' — the reader's published pick (sruthi-report.md:48-50, 'confirmed by the reader'). knowledge/17-climate-method.md merge table: 'reader override wins over both 억부 and 조후'. The reader-confirmed path (yongsin.py::_reader_confirmed) builds a fresh FavorableElement with the strict-classical 희신 (Fire generates Earth, knowledge/03-five-elements.md) and default climate fields. This is also the exact value the hand-crafted natal reading publishes (Supporting Fire), proving natal/compat agreement. (external cross-check 2026-09-13: OpenFate hub — '제일 용신과 보조 희신(第一用神與輔助喜神)' (primary 용신 + supporting 희신 role split; reader override reproduces the published pick) — https://wiki.openfate.ai/ko/bazi/useful-gods-climate; 사자사주 용신·희신 용어 정리 — https://www.sazasaju.com/blog/yongsin-guide)",
+    "status": "expect_match",
+    "expected": {
+      "fe": {
+        "element": "Earth",
+        "method": "reader-confirmed",
+        "confidence": "reader-confirmed",
+        "supporting": "Fire",
+        "climate_band": "temperate",
+        "climate_element": null,
+        "climate_agrees": null
+      }
+    }
+  },
+  {
+    "id": "sruthi-chart-override",
+    "subsystem": "yongsin",
+    "input": {
+      "year": 1993,
+      "month": 12,
+      "day": 11,
+      "hour": 2,
+      "minute": 45,
+      "longitude": 79.42,
+      "utc_offset": 5.5,
+      "reader_override_favorable": "Earth"
+    },
+    "source": "Reader-override channel check (layer C), chart-level path — the wiring compat.py:1344-1355 uses when a reader-argued 용신 is passed to generate_compat_report (favorable_element_a/_b set strength_assessment['reader_override_favorable']). Must produce the identical FavorableElement to sruthi-reader-override so the natal and compat products cannot disagree. (external cross-check 2026-09-13: OpenFate hub — 용신/희신 role split (chart-level override channel must equal the explicit-argument channel) — https://wiki.openfate.ai/ko/bazi/useful-gods-climate; 두루미사주 — https://www.durumisaju.com/dict/yongshin/eokbu)",
+    "status": "expect_match",
+    "expected": {
+      "fe": {
+        "element": "Earth",
+        "method": "reader-confirmed",
+        "confidence": "reader-confirmed",
+        "supporting": "Fire",
+        "climate_band": "temperate",
+        "climate_element": null,
+        "climate_agrees": null
+      }
+    }
+  },
+  {
+    "id": "gurumoorthy-override",
+    "subsystem": "yongsin",
+    "input": {
+      "year": 1964,
+      "month": 7,
+      "day": 19,
+      "hour": 8,
+      "minute": 30,
+      "longitude": 79.42,
+      "utc_offset": 5.5,
+      "override": "Water"
+    },
+    "source": "Reader-override channel check (layer C): override beats strength even on a strong-DM chart. Same gurumoorthy chart as gurumoorthy-published with override='Water' (a classical 조후-flavored pick for the hot 未 month). knowledge/17-climate-method.md merge table: reader override wins over the strong-dm-drain Metal pick. supporting = strict-classical generator Metal (Metal generates Water), NOT the modern 억부 supporting. (external cross-check 2026-09-13: OpenFate — '조후와 부억에는 명식을 떠난 고정 순서가 없습니다' (override='Water' = a reader's climate-flavored pick on a strong-DM chart; reader override wins) — https://wiki.openfate.ai/ko/bazi/useful-gods-climate/climate-vs-strength-priority; 사자사주 — https://www.sazasaju.com/blog/yongsin-guide)",
+    "status": "expect_match",
+    "expected": {
+      "fe": {
+        "element": "Water",
+        "method": "reader-confirmed",
+        "confidence": "reader-confirmed",
+        "supporting": "Metal",
+        "climate_band": "temperate",
+        "climate_element": null,
+        "climate_agrees": null
+      }
+    }
+  }
+]

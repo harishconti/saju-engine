@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saju — 두 분 궁합 / Compatibility Reading — Intake</title>
+  <style>
+    :root {
+      --bg: #f9f7f2;
+      --card: #ffffff;
+      --ink: #2c241b;
+      --muted: #6b5e51;
+      --accent: #8c6b4a;
+      --accent-light: #c4a57f;
+      --border: #e3dcd1;
+      --fire: #c44d34;
+      --earth: #b8860b;
+      --metal: #708090;
+      --water: #2f6f8f;
+      --wood: #4a7c59;
+      --shadow: 0 4px 24px rgba(44, 36, 27, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Georgia", "Noto Serif", serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+    .wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 40px 20px 60px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    header h1 {
+      font-size: 1.9rem;
+      margin: 0 0 8px;
+      letter-spacing: -0.02em;
+    }
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 760px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+    .card.partner-a { border-top: 4px solid var(--wood); }
+    .card.partner-b { border-top: 4px solid var(--fire); }
+    .card h2 {
+      font-size: 1.15rem;
+      margin: 0 0 16px;
+      color: var(--accent);
+    }
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: 0.92rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+    .field input, .field select, .field textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font: inherit;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    .field input:focus, .field textarea:focus, .field select:focus {
+      outline: 2px solid var(--accent-light);
+      outline-offset: 1px;
+    }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .row-3 { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; }
+    .radio-row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .radio-pill { display: flex; align-items: center; gap: 6px; }
+    .shared-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 20px;
+      box-shadow: var(--shadow);
+    }
+    .shared-card h2 {
+      font-size: 1.2rem;
+      margin: 0 0 16px;
+      color: var(--accent);
+    }
+    button[type="submit"] {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: var(--card);
+      border: none;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 24px;
+      letter-spacing: 0.02em;
+    }
+    button[type="submit"]:hover { background: var(--accent-light); }
+    .pricing {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 14px 18px;
+      background: linear-gradient(135deg, #f4ecdc, #e8dbc1);
+      border-radius: 12px;
+      margin-bottom: 18px;
+      color: var(--ink);
+    }
+    .pricing .amount {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .status {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 0.95rem;
+      display: none;
+    }
+    .status.ok { background: #e6f4ea; color: #1e4620; display: block; }
+    .status.err { background: #fbe9e7; color: #5d2222; display: block; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>두 분 궁합 — Compatibility Reading</h1>
+      <p>Two natal charts read together across the classical Korean Myeongri compatibility sub-systems.</p>
+    </header>
+
+    <div class="pricing">
+      <span>Compatibility Reading —</span>
+      <span class="amount">Basic ₹799 / Deep ₹1,499</span>
+      <span>· Basic ≈4 pages · Deep 9–10 pages · both include composite score + guidance</span>
+    </div>
+
+    <form id="compat-form" action="/compat/generate" method="POST" enctype="multipart/form-data">
+      <div class="grid-2">
+        <!-- Partner A -->
+        <div class="card partner-a">
+          <h2>Partner A · 甲 (Partner A)</h2>
+          <div class="field">
+            <label for="name_a">Full name (성함)</label>
+            <input type="text" id="name_a" name="name_a" required placeholder="As it should appear on the report">
+          </div>
+          <div class="row-2">
+            <div class="field">
+              <label for="dob_a">Date of birth (생년월일)</label>
+              <input type="date" id="dob_a" name="dob_a" required>
+            </div>
+            <div class="field">
+              <label for="birth_time_a">Birth time (출생시각)</label>
+              <input type="time" id="birth_time_a" name="birth_time_a" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="location_a">Birth location (출생지)</label>
+            <input type="text" id="location_a" name="location_a" required placeholder="City, state/country (e.g., Mysore, Karnataka, India)">
+          </div>
+          <div class="row-3">
+            <div class="field">
+              <label for="utc_offset_a">UTC offset (시간대)</label>
+              <input type="number" id="utc_offset_a" name="utc_offset_a" step="0.25" min="-12" max="14" required value="5.5" placeholder="e.g., 5.5 for IST">
+            </div>
+            <div class="field">
+              <label for="timezone_a">IANA timezone</label>
+              <input type="text" id="timezone_a" name="timezone_a" placeholder="Asia/Kolkata">
+            </div>
+          </div>
+          <div class="field">
+            <label for="favorable_element_a">Manual 용신 override (optional)</label>
+            <select id="favorable_element_a" name="favorable_element_a">
+              <option value="" selected>Use engine heuristic</option>
+              <option value="Wood">Wood · 목</option>
+              <option value="Fire">Fire · 화</option>
+              <option value="Earth">Earth · 토</option>
+              <option value="Metal">Metal · 금</option>
+              <option value="Water">Water · 수</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Gender (성별)</label>
+            <div class="radio-row">
+              <label class="radio-pill"><input type="radio" name="gender_a" value="F" required><span>Female</span></label>
+              <label class="radio-pill"><input type="radio" name="gender_a" value="M"><span>Male</span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Partner B -->
+        <div class="card partner-b">
+          <h2>Partner B · 乙 (Partner B)</h2>
+          <div class="field">
+            <label for="name_b">Full name (성함)</label>
+            <input type="text" id="name_b" name="name_b" required placeholder="As it should appear on the report">
+          </div>
+          <div class="row-2">
+            <div class="field">
+              <label for="dob_b">Date of birth (생년월일)</label>
+              <input type="date" id="dob_b" name="dob_b" required>
+            </div>
+            <div class="field">
+              <label for="birth_time_b">Birth time (출생시각)</label>
+              <input type="time" id="birth_time_b" name="birth_time_b" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="location_b">Birth location (출생지)</label>
+            <input type="text" id="location_b" name="location_b" required placeholder="City, state/country">
+          </div>
+          <div class="row-3">
+            <div class="field">
+              <label for="utc_offset_b">UTC offset (시간대)</label>
+              <input type="number" id="utc_offset_b" name="utc_offset_b" step="0.25" min="-12" max="14" required value="5.5" placeholder="e.g., 5.5 for IST">
+            </div>
+            <div class="field">
+              <label for="timezone_b">IANA timezone</label>
+              <input type="text" id="timezone_b" name="timezone_b" placeholder="Asia/Kolkata">
+            </div>
+          </div>
+          <div class="field">
+            <label for="favorable_element_b">Manual 용신 override (optional)</label>
+            <select id="favorable_element_b" name="favorable_element_b">
+              <option value="" selected>Use engine heuristic</option>
+              <option value="Wood">Wood · 목</option>
+              <option value="Fire">Fire · 화</option>
+              <option value="Earth">Earth · 토</option>
+              <option value="Metal">Metal · 금</option>
+              <option value="Water">Water · 수</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Gender (성별)</label>
+            <div class="radio-row">
+              <label class="radio-pill"><input type="radio" name="gender_b" value="F" required><span>Female</span></label>
+              <label class="radio-pill"><input type="radio" name="gender_b" value="M"><span>Male</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="shared-card">
+        <h2>Shared details · 공통 정보</h2>
+        <div class="field">
+          <label for="email">Email (이메일) — where the PDF will be delivered</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="field">
+          <label for="main_concern">What is the central question for this reading? (궁합의 중심 질문)</label>
+          <textarea id="main_concern" name="main_concern" required rows="4"
+                    placeholder="e.g., long-term compatibility outlook, marriage timing, conflict patterns to watch, parenting alignment, family-wealth compatibility..."></textarea>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="tier_select">Report tier</label>
+        <select id="tier_select" name="tier">
+          <option value="basic" selected>Basic — ~4-page compatibility snapshot (₹799)</option>
+          <option value="deep">Deep — full 11-sub-system + timing overlay (₹1,499)</option>
+        </select>
+      </div>
+
+      <button type="submit">Generate Compatibility PDF</button>
+      <p class="disclaimer">
+        <strong>Privacy:</strong> Your submission is saved as a local JSON file for the reader to process.
+        This form is intended for a private, single-operator demo; a production service would use encrypted storage
+        and a background queue instead of an immediate in-browser download.
+      </p>
+      <div id="status" class="status"></div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('compat-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = document.getElementById('status');
+      const formData = new FormData(e.target);
+
+      status.className = 'status';
+      status.textContent = 'Generating PDF...';
+
+      try {
+        const r = await fetch('/compat/generate', {
+          method: 'POST',
+          body: formData,
+        });
+        if (!r.ok) {
+          const text = await r.text();
+          throw new Error(text || `HTTP ${r.status}`);
+        }
+        const blob = await r.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'compat-reading.pdf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        status.className = 'status ok';
+        status.textContent = 'PDF generated and downloaded.';
+      } catch (err) {
+        status.className = 'status err';
+        status.textContent = 'Error: ' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>

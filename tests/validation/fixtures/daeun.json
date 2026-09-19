@@ -1,0 +1,491 @@
+[
+  {
+    "id": "park-chung-hee-daeun",
+    "subsystem": "daeun",
+    "input": {
+      "year": 1917,
+      "month": 11,
+      "day": 14,
+      "hour": 10,
+      "minute": 0,
+      "longitude": 128.74,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true,
+      "n_periods": 7
+    },
+    "source": [
+      {
+        "citation": "대운 table, woojin2383 blog (박정희 사주 분석)",
+        "url": "https://woojin2383.tistory.com/13551302"
+      },
+      {
+        "citation": "김재원, \"[김재원의 주역이야기]박정희 대통령 사주,\" 동아일보, 2013-05-03",
+        "url": "https://www.donga.com/news/Opinion/article/all/20130503/54869960/1"
+      },
+      {
+        "citation": "사주포럼, \"박정희 전 대통령\" 사례연구",
+        "url": "https://www.sajuforum.com/01forum/nm/sarye.php"
+      }
+    ],
+    "expected": {
+      "start_age": 2,
+      "start_age_accept": null,
+      "periods": [
+        "庚戌",
+        "己酉",
+        "戊申",
+        "丁未",
+        "丙午",
+        "乙巳",
+        "甲辰"
+      ]
+    },
+    "status": "expect_match",
+    "notes": "丁巳년 (음) + 남명 → 역행. Birth month 丙申 (idx 33); first period 庚戌 (idx 47) — the classical reverse-stepping gap of 14 (next-to-next previous 60-cycle row). 대운수 2."
+  },
+  {
+    "id": "roh-moo-hyun-daeun",
+    "subsystem": "daeun",
+    "input": {
+      "year": 1946,
+      "month": 9,
+      "day": 1,
+      "hour": 8,
+      "minute": 0,
+      "longitude": 128.74,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true,
+      "n_periods": 6
+    },
+    "source": [
+      {
+        "citation": "조용헌 노무현 사주 분석 (published 대운 table)",
+        "url": "https://blog.naver.com/PostView.naver?blogId=joyhun&logNo=220956588383"
+      },
+      {
+        "citation": "사주갤러리, 노무현 대통령 사례",
+        "url": "https://www.sajugallery.com"
+      }
+    ],
+    "expected": {
+      "start_age": null,
+      "start_age_accept": [
+        2,
+        3
+      ],
+      "periods": [
+        "丁酉",
+        "戊戌",
+        "己亥",
+        "庚子",
+        "辛丑",
+        "壬寅"
+      ]
+    },
+    "status": "expect_match",
+    "notes": "丙戌년 (양) + 남명 → 순행 from 丙申. Next 절입 寒露 1946-10-08 (~37 days) ÷ 3 → start age 2–3 (published table uses Korean counting; engine floors). Floor lock: sequence is the strong check."
+  },
+  {
+    "id": "kim-dae-jung-daeun",
+    "subsystem": "daeun",
+    "input": {
+      "year": 1924,
+      "month": 1,
+      "day": 6,
+      "hour": 12,
+      "minute": 0,
+      "longitude": 126.0,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true,
+      "n_periods": 8
+    },
+    "source": [
+      {
+        "citation": "moneyluckk.com, 김대중 사주 분석 (\"1997년 대선 당선: 정사 대운의 정축년\")",
+        "url": "https://moneyluckk.com"
+      },
+      {
+        "citation": "선천진로상담연구소, 명인들의 사주탐방 (역대 대통령)",
+        "url": "https://career-consulting-center.tistory.com/997"
+      }
+    ],
+    "expected": {
+      "start_age": 9,
+      "start_age_accept": null,
+      "periods": [
+        "癸亥",
+        "壬戌",
+        "辛酉",
+        "庚申",
+        "己未",
+        "戊午",
+        "丁巳",
+        "丙辰"
+      ]
+    },
+    "status": "expect_match",
+    "notes": "癸亥년 (음) + 남명 → 역행 from 甲子. Next 절입 立春 ~1924-02-04 (~29 days) ÷ 3 → 대운수 9. 1997 丁丑 falls inside the 丁巳 window (start_age 69)."
+  },
+  {
+    "id": "kim-young-sam-daeun",
+    "subsystem": "daeun",
+    "input": {
+      "year": 1929,
+      "month": 1,
+      "day": 14,
+      "hour": 20,
+      "minute": 0,
+      "longitude": 128.7,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true,
+      "n_periods": 8
+    },
+    "source": [
+      {
+        "citation": "winwinstory, \"김영삼 사주풀이(feat. 제 14대 대한민국 대통령)\"",
+        "url": "https://winwinstory.tistory.com/entry/김영삼-사주풀이feat-제-14대-대한민국-대통령"
+      },
+      {
+        "citation": "sank1001, \"김영삼 대통령의 사주와 비겁(比劫)\"",
+        "url": "https://sank1001.tistory.com/13498365"
+      },
+      {
+        "citation": "대통령기록관 (birth 1928.12.4 음력, 거제)",
+        "url": "https://www.pa.go.kr/online_contents/president/history14.jsp"
+      }
+    ],
+    "expected": {
+      "start_age": 6,
+      "start_age_accept": null,
+      "periods": [
+        "丙寅",
+        "丁卯",
+        "戊辰",
+        "己巳",
+        "庚午",
+        "辛未",
+        "壬申",
+        "癸酉"
+      ]
+    },
+    "status": "expect_match",
+    "notes": "戊辰년 (양) + 남명 → 순행 from 乙丑. Next 절입 立春 ~1929-02-04 (~21 days) ÷ 3 → 대운수 6 (published tables listing 7 use Korean counting). 壬申/癸酉 windows cover the 1992 election / 1993 inauguration."
+  },
+  {
+    "id": "lee-myung-bak-daeun",
+    "subsystem": "daeun",
+    "input": {
+      "year": 1941,
+      "month": 12,
+      "day": 19,
+      "hour": 6,
+      "minute": 0,
+      "longitude": 135.5,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true,
+      "n_periods": 7
+    },
+    "source": [
+      {
+        "citation": "이명박 사주 분석 (published 대운 table, age-4 start in Korean counting)",
+        "url": "https://www.sajugallery.com"
+      },
+      {
+        "citation": "사주포럼 사례연구",
+        "url": "https://www.sajuforum.com/01forum/nm/sarye.php"
+      }
+    ],
+    "expected": {
+      "start_age": null,
+      "start_age_accept": [
+        3,
+        4
+      ],
+      "periods": [
+        "己亥",
+        "戊戌",
+        "丁酉",
+        "丙申",
+        "乙未",
+        "甲午",
+        "癸巳"
+      ]
+    },
+    "status": "expect_match",
+    "notes": "辛巳년 (음) + 남명 → 역방향 from 庚子. Published table starts at Korean age 4 (inclusive day count, 11.37→12); engine floors to Western 3. Sequence identical — the floor-regression lock this entry documents."
+  },
+  {
+    "id": "lee-kun-hee-daeun",
+    "subsystem": "daeun",
+    "input": {
+      "year": 1942,
+      "month": 1,
+      "day": 9,
+      "hour": 10,
+      "minute": 0,
+      "longitude": 128.6,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true,
+      "n_periods": 8
+    },
+    "source": [
+      {
+        "citation": "Daum cafe 이건희 사주 대운표 (age-2 start Korean counting)",
+        "url": "https://m.cafe.daum.net"
+      },
+      {
+        "citation": "사주갤러리, 이건희 회장 사례",
+        "url": "https://www.sajugallery.com"
+      }
+    ],
+    "expected": {
+      "start_age": null,
+      "start_age_accept": [
+        1,
+        2
+      ],
+      "periods": [
+        "庚子",
+        "己亥",
+        "戊戌",
+        "丁酉",
+        "丙申",
+        "乙未",
+        "甲午",
+        "癸巳"
+      ]
+    },
+    "status": "expect_match",
+    "notes": "辛巳년 (음) + 남명 → 역방향 from 辛丑. Published table starts Korean age 2; engine floors to Western 1. Same 60-cycle set, one-year offset only."
+  },
+  {
+    "id": "chung-ju-yung-daeun",
+    "subsystem": "daeun",
+    "input": {
+      "year": 1915,
+      "month": 11,
+      "day": 25,
+      "hour": 2,
+      "minute": 0,
+      "longitude": 128.47,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true,
+      "n_periods": 8
+    },
+    "source": [
+      {
+        "citation": "정주영 사주 분석 (published 역행 대운표 丙戌…戊寅)",
+        "url": "https://blog.naver.com"
+      },
+      {
+        "citation": "사주포럼 사례연구",
+        "url": "https://www.sajuforum.com/01forum/nm/sarye.php"
+      }
+    ],
+    "expected": {
+      "start_age": null,
+      "start_age_accept": [
+        5,
+        6
+      ],
+      "periods": [
+        "丙戌",
+        "乙酉",
+        "甲申",
+        "癸未",
+        "壬午",
+        "辛巳",
+        "庚辰",
+        "己卯"
+      ]
+    },
+    "status": "expect_match",
+    "notes": "乙卯년 (음) + 남명 → 역행 from 丁亥. Published set 丙戌…戊寅 reverse-ordered; engine's forward sequence starts age 5 (Korean tables 6)."
+  },
+  {
+    "id": "park-geun-hye-daeun",
+    "subsystem": "daeun",
+    "input": {
+      "year": 1952,
+      "month": 2,
+      "day": 2,
+      "hour": 2,
+      "minute": 0,
+      "longitude": 128.6,
+      "utc_offset": 9.0,
+      "gender": "F",
+      "convention": "korean",
+      "use_solar_time": true,
+      "n_periods": 8
+    },
+    "source": [
+      {
+        "citation": "manseryeok.com result page (여명, 1952-02-02 02:00 대구, 절입기준 소한 1952-01-06 18:09; 대운 壬寅@1 (1953-02-27) → 癸卯@11 → 甲辰@21 … 순행)",
+        "url": "https://www.manseryeok.com/result?r=hoSdv-mf4UO_xrLyqV3ZoL9gf57Yhm5BSthkSBFYpFJofK1oYnKI2ZRQla2mWzl0A038ruK-4qAueIfhOztT40rzq7tETOEAP0WDRU4t1_VHDvV0dRghaO_-BD-yhIzxB2S0VkgmuQ8ihFoVJbSaF6uXS4_L3P3aKo4psOOtk51twUpd386HaTaQ0D5mlOIEkj1FKlU2SQryHyJtTFqjji7lmBpKesEVS4sbdGny_FLB3TzFO7CeJv6yxa--HQX2FvtTtz6SyRMLnN3z3q0UfTqUtRYgzdJ5tTwUwsxKbAg_QB0tGpvahf4P9Z_pvbWrbTML4ci8snUuvyhDBk3HWNBhhGVpcqqgtbCUTSQL_PSwMfnH0_wce1Xc4lyqfmIn7TTrXuF-vsuXmVM6NsVlbjUwGq6I-3i7hzaDW4wOq-O_vhs_kyHsklsoPY6SK8Ddawk1"
+      },
+      {
+        "citation": "fourpillars.net online calculator (pillars 癸丑/戊寅/辛丑/辛卯; luck 壬寅 1-11 → 癸卯 11-21 → 甲辰 21-31 …)",
+        "url": "https://fourpillars.net/online4p_V3.php?Lang=en&Sta=r&GEN=-1&HR=2&DD=2&MM=2&YY=1952"
+      }
+    ],
+    "expected": {
+      "start_age": 1,
+      "start_age_accept": null,
+      "periods": [
+        "壬寅",
+        "癸卯",
+        "甲辰",
+        "乙巳",
+        "丙午",
+        "丁未",
+        "戊申",
+        "己酉"
+      ]
+    },
+    "status": "expect_match",
+    "notes": "辛卯년 (음) + 여명 → 순행 (female-direction edge: 음년 여). 대운수 1 (band 1–3): next 절입 입춘 1952-02-05 06:12 is 3.175 days away ÷ 3 ≈ 1.06, engine floors to 1; manseryeok labels 壬寅@1 exactly. Evidence: evidence/female-direction-park-geun-hye-manseryeok.png, evidence/female-direction-park-geun-hye-fourpillars.png"
+  },
+  {
+    "id": "kim-tae-hee-daeun",
+    "subsystem": "daeun",
+    "input": {
+      "year": 1980,
+      "month": 3,
+      "day": 29,
+      "hour": 12,
+      "minute": 0,
+      "longitude": 129.3,
+      "utc_offset": 9.0,
+      "gender": "F",
+      "convention": "korean",
+      "use_solar_time": true,
+      "n_periods": 8
+    },
+    "source": [
+      {
+        "citation": "manseryeok.com result page (여명, 1980-03-29 12:00 울산 남중 27분, 절입기준 경칩 1980-03-05 19:16; 대운 戊寅 first 1988-02-01 label \"8\" → 丁丑@1998 → 丙子@2008 역행)",
+        "url": "https://www.manseryeok.com/result?r=nxP3hd-O83ZJQN2t8rRtz-2CUJ46bL6r6US03yHTeKVW3GXORY2i_T5K05mAgM6COOORKmtLRcLUnhiwfkuhXIbDTWzonPR-unloIJ1uaSSMKXDal6DEOPyVSdO12GHmVn54R6z61m7a5kH_azZweyvTi4-OvoJa7zL4Ds7e-P93c_xZLFeJX8z98WOl5t66-PhlPizHCoq87qdZvDWef_8pWjX7Om6rWwlaQpq6k8MZg9pbThGKxVuv-UVJSpUiAWQtPoDjBFJuGFgankQkHMmtSWShiYqIjqpGgbmlFGfdKsI9X32GY-p4T1ZCL4h8kEp0xkYZXyxfDHceys57HW-nFwCl0R0fIueZCG5m5wObNkOfqi4q16wzZqy4ZneDnHzhmilY1J065BBWREzXYBVJdkv4E6k8K0MDLMF2pTwSHnTyVZtLc4D0Is5jAMsOq8CtVA"
+      },
+      {
+        "citation": "fourpillars.net online calculator (pillars 甲午/辛丑/己卯/庚申; luck 戊寅 8-18 → 丁丑 18-28 → 丙子 28-38 … 역행)",
+        "url": "https://fourpillars.net/online4p_V3.php?Lang=en&Sta=r&GEN=-1&HR=12&DD=29&MM=3&YY=1980"
+      }
+    ],
+    "expected": {
+      "start_age": 7,
+      "start_age_accept": null,
+      "periods": [
+        "戊寅",
+        "丁丑",
+        "丙子",
+        "乙亥",
+        "甲戌",
+        "癸酉",
+        "壬申",
+        "辛未"
+      ]
+    },
+    "status": "expect_match",
+    "notes": "庚申년 (양) + 여명 → 역행 (female-direction edge: 양년 여). 대운수 7 (band 7–9): 역행 uses days back to the PREVIOUS 절입 — 경칩 1980-03-05 19:16 → ~23.7 days ÷ 3 ≈ 7.9, engine floors to 7; sources label 8 (manseryeok Korean counting; fourpillars band 8-18 inclusive), and the 1988-02-01 manseryeok start date floors to Western 7. Evidence: evidence/female-reverse-kim-tae-hee-manseryeok.png, evidence/female-reverse-kim-tae-hee-fourpillars.png"
+  },
+  {
+    "id": "moon-jae-in-daeun",
+    "subsystem": "daeun",
+    "input": {
+      "year": 1953,
+      "month": 1,
+      "day": 24,
+      "hour": 20,
+      "minute": 0,
+      "longitude": 128.7,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true,
+      "n_periods": 8
+    },
+    "source": [
+      {
+        "citation": "manseryeok.com result page (남명, 1953-01-24 20:00 부산 남중 35분, 절입기준 소한 1953-01-06 00:02; 대운 甲寅 첫 대운 1956-09-05 @3 → 乙卯@13 (1966) → 丙辰@23 … 순행)",
+        "url": "https://www.manseryeok.com/result?r=X35Q2at5Vwf2y-oRW1uZRGRHQnL7u2kZgs8-ko1-uUJ-LmJNHYAqjQvd4BQmDYaHEOR7lfnEQYnjmdpGDKbLF579TNNNR2hiSaRC4LpWsIVmJ-LpCOY62NY_sqM0I8TXnTWU-_Y7xl8O02GxHEzJw_EhMe97ab7GddizaV1PnKdvxblrNnA51Rlog9B5e_97p-4VXqnTLlPf_bLGBf-tdsWFZeSad2V5iwZ9wUBhESomKxhPlQ20l3IBWejP8W3-bKuJJMQOD8mV0Mzjoq6adivG382bSON-3_qUNXWRlCrn72ZfT0V47ooCsSYWCDz7V4UeuGK4kQt5EJd-PlS7OlL30qLLBtVTs6KlDkSTtVNIk_JJO2fX1GhshE5hzsv6UW5r1EkfY8KpkT22D4PKtd_cOejaqZq5HUsZdT-sHr4Y5m0h98eqZj7zfrd9TpsKaHbq"
+      },
+      {
+        "citation": "fourpillars.net online calculator (pillars 丙戌/乙亥/癸丑/壬辰 = W1-certified; luck 甲寅 3-13 → 乙卯 13-23 → 丙辰 23-33 …)",
+        "url": "https://fourpillars.net/online4p_V3.php?Lang=en&Sta=r&GEN=1&HR=20&DD=24&MM=1&YY=1953"
+      }
+    ],
+    "expected": {
+      "start_age": 3,
+      "start_age_accept": null,
+      "periods": [
+        "甲寅",
+        "乙卯",
+        "丙辰",
+        "丁巳",
+        "戊午",
+        "己未",
+        "庚申",
+        "辛酉"
+      ]
+    },
+    "status": "expect_match",
+    "notes": "壬辰년 (양) + 남명 → 순행 from 癸丑. 대운수 3 (band 1–3): next 절입 입춘 1953-02-04 ~10.8 days ÷ 3 → 3.6, engine floors to 3; manseryeok labels 甲寅@3 exactly. Pillar layer W1-certified (pillars.json moon-jae-in). Evidence: evidence/moon-jae-in-daeun-manseryeok.png, evidence/moon-jae-in-daeun-fourpillars.png"
+  },
+  {
+    "id": "kim-yeon-a-daeun",
+    "subsystem": "daeun",
+    "input": {
+      "year": 1990,
+      "month": 9,
+      "day": 5,
+      "hour": 12,
+      "minute": 0,
+      "longitude": 126.98,
+      "utc_offset": 9.0,
+      "gender": "F",
+      "convention": "korean",
+      "use_solar_time": true,
+      "n_periods": 8
+    },
+    "source": [
+      {
+        "citation": "manseryeok.com result page (여명, 1990-09-05 12:00 서울 남중 31분, 음력 1990-07-17, 절입기준 입추 1990-08-08 03:45; 대운 癸未 first 1999-10-15 label \"9\" → 壬午@19 (2009~2019) → 辛巳@29 … pure 역행; per-대운 세운 2008=戊子, 2018=戊戌, 2028=戊申)",
+        "url": "https://www.manseryeok.com/result?r=pANIITnB2pPtIqYocaq9-hJBeMm123lzTOK1sz25pmGrtDtpqZzmrv_zq8oFWREwEjJGZ1r4-h8ncMbE8cwfZCkNw2OpbXiEtEcWNv98BkAsydmI-vGHGRfolGxwmZYYAFF3-rhfNbt425Jr9cnI0sPdr__UyYJmDjTDUphVwMPqtLxKqAmQrHBHuy52NEXyhQzzuFT-cLlzM-osYNBw4uRas_fpiEfmbl2fUsnUQwQAuYuIKoiPb4pRw3XJowC2AXZ50BD3rgdbklw4XLdJ3X_fnd1XDMGMEBTgZxj8W-4jniL5J9zc78QcLQHLdyfE25LHAZG01njEM69sDeXK2CrUii1S7qw_Dc3DKLgNHjMlyMRopoUIObFwv9hnihBPM4UUq_NMaip6EyNh8lj4PYOMypVMUPm1pFL2HUCjzVmqG4m11I5X2hPmjQSv7gH7Pl4"
+      },
+      {
+        "citation": "fourpillars.net online calculator (pillars 戊午/癸酉/甲申/庚午; luck 癸未 9-19 → 壬午 19-29 → 辛巳 29-39 … 역행)",
+        "url": "https://fourpillars.net/online4p_V3.php?Lang=en&Sta=r&GEN=-1&HR=12&DD=5&MM=9&YY=1990"
+      }
+    ],
+    "expected": {
+      "start_age": 9,
+      "start_age_accept": null,
+      "periods": [
+        "癸未",
+        "壬午",
+        "辛巳",
+        "庚辰",
+        "己卯",
+        "戊寅",
+        "丁丑",
+        "丙子"
+      ]
+    },
+    "status": "expect_match",
+    "notes": "庚午년 (양) + 여명 → 역행 (female-direction edge: 양년 여). 대운수 9 (band 7–9): 역행 uses days back to the PREVIOUS 절입 — 입추 1990-08-08 03:45 → ~28.35 days ÷ 3 ≈ 9.45, engine floors to 9; manseryeok label \"9\" (1999-10-15 start → Western 9) and fourpillars band 9-19 agree exactly with the engine floor. Evidence: evidence/kim-yeon-a-daeun-manseryeok.png, evidence/kim-yeon-a-daeun-fourpillars.png"
+  }
+]

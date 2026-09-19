@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "saju-engine"
+version = "0.2.0"
+description = "Korean Saju (Four Pillars of Destiny) calculation engine and PDF toolchain"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Harish Gurumoorthy"}
+]
+keywords = ["saju", "bazi", "four-pillars", "korean", "myeongri", "astrology"]
+dependencies = [
+    "sajupy>=0.2.0",
+    "reportlab>=4.1",
+    "markdown-it-py>=3.0",
+]
+
+[project.optional-dependencies]
+pdf = ["reportlab>=4.1"]
+html = ["playwright>=1.40"]
+web = [
+    "fastapi>=0.110",
+    "uvicorn>=0.25",
+    "python-multipart>=0.0.9",
+]
+dev = [
+    "pytest>=7.0",
+    "ruff>=0.4.0",
+]
+
+[project.scripts]
+saju-engine = "saju_engine.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
