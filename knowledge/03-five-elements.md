@@ -44,7 +44,7 @@ Wood → Earth → Water → Fire → Metal → Wood
 - **Fire overcomes Metal:** Fire melts metal.
 - **Metal overcomes Wood:** Axe cuts tree.
 
-The element that "overcomes" is **exerted** (its energy is spent in the act), and the element that is "overcome" is **subdued**. In 십신 terms, the overrcomer is the **관성 (Officer)** of the overcome. See `05-ten-gods.md`.
+The element that "overcomes" is **exerted** (its energy is spent in the act), and the element that is "overcome" is **subdued**. In 십신 terms, the overcomer is the **관성 (Officer)** of the overcome. See `05-ten-gods.md`.
 
 ## The Two Sub-Cycles
 

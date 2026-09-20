@@ -15,6 +15,8 @@ If the querent gives a Gregorian date but no pillars, ask them to compute the pi
 
 If the querent does not know the birth time, **proceed without the hour pillar** and note that the hour pillar would add detail. Do not invent a default time.
 
+> **Scope note (added 2026-09-20, external report review, 3rd pass).** "Do not auto-derive the pillars in this skill" governs an interactive reading conducted directly in this Claude-driven skill, where pillar math has not been independently checked in that conversation. It does not describe `src/saju_engine`'s packaged report-generation engine (`compute_chart()`), which *does* auto-derive the four pillars from a birth date/time/location — that is a separate, independently validated code path (see `docs/openwiki/architecture/engine.md` and the engine's own test suite) and is the intended way client-facing reports (`candidates_horoscope/`) are produced. A reader of this knowledge base alone, without that context, could otherwise read this file as contradicting the product it documents.
+
 ## Step 1 · Identify the Day Master (일간, 日干)
 
 The Day Master is the **stem of the day pillar**. Write it at the top of the analysis with its full identification:
@@ -44,7 +46,7 @@ Determine whether the Day Master is **신강 (身強, strong)** or **신약 (身
 2. **관성 (Authority) presence:** Stems that control the Day Master.
 3. **재성 (Wealth) presence:** Stems that the Day Master controls (drain).
 4. **식상 (Output) presence:** Stems that the Day Master generates (drain).
-5. **Empty branches (공망) on the Day Master.**
+5. **Natal branches sitting in the day pillar's 공망 (void).** *(Reworded 2026-09-20 — external report review, 4th pass: 공망 is computed relative to the day pillar's 순 (旬) in the 60-cycle and applies to branches, not to "the Day Master" — a stem — directly.)*
 
 ### Quick Reference
 
@@ -68,28 +70,42 @@ The 용신 is **the single most important key** to a chart's reading. It is the 
 
 ### Logic
 
-1. **If 신강 (Day Master is strong):** The chart has too much of the Day Master. The 용신 is one of the elements that **drains or controls** the Day Master:
+**0. First, check whether 조후 (climate-balance) governs at all** — see
+`knowledge/17-climate-method.md`, revised 2026-09-19. Priority between 조후
+and 억부 (strength-balance) is gated on **climate extremeness, not on the
+strength verdict**: a chart born in the hot summer months (巳午未), the cold
+winter months (亥子丑), or the two 燥/濕 storage months 辰 (damp) / 戌 (dry) has
+a non-temperate climate band, and 조후 governs the headline 용신 there
+**regardless of whether the Day Master reads as 신강, 신약, or balanced.**
+This is the sourced classical doctrine (조후와 부억에는 명식을 떠난 고정 순서가
+없습니다 — priority follows climate extremeness, not verdict), not a
+tie-breaker reserved for balanced charts only. Only for a **temperate-month
+birth** (寅卯申酉, i.e. none of the eight non-temperate branches above — 巳午未
++ 亥子丑 + 辰/戌 = 8, matching 12 − 8 = 4 temperate branches) does 조후
+have no opinion, and the 억부 logic below (Steps 1–3) becomes the primary
+signal.
+
+1. **If 신강 (Day Master is strong) — and the month is temperate:** The chart has too much of the Day Master. The 용신 is one of the elements that **drains or controls** the Day Master:
    - **식상 (Output)** is the most common first choice for 신강 — it channels the Day Master's energy out.
    - **재성 (Wealth)** is the second choice.
    - **관성 (Authority)** is the third choice (sometimes first if the chart is heavily insubordinate).
-2. **If 신약 (Day Master is weak):** The chart needs to support the Day Master. The 용신 is one of the elements that **strengthens** it:
+2. **If 신약 (Day Master is weak) — and the month is temperate:** The chart needs to support the Day Master. The 용신 is one of the elements that **strengthens** it:
    - **인성 (Resource)** is the most common first choice — it feeds the Day Master.
    - **비겁 (Companion)** is the second choice.
 3. **If special grid (종격, 화격):** The 용신 may be the **dominant element** of the chart (the element of the chart's overall character), not the Day Master's element.
-4. **If the Day Master is balanced (neither clearly 신강 nor 신약):** Apply the
-   **조후 (climate-balance) check** — see `knowledge/17-climate-method.md`. A
-   chart born in the hot summer months (巳午未) wants Water; a chart born in
-   the cold winter months (亥子丑) wants Fire. This classical tie-breaker
-   takes priority over a bare "least-represented element" count. For a
-   temperate-month birth (寅卯辰申酉戌), climate has no strong opinion and the
-   least-represented element remains the fallback.
+4. **If the Day Master is balanced and the month is temperate:** the 억부
+   logic above has no clear strong/weak signal either, so fall back to the
+   chart's numeric least-represented element as a weaker, provisional
+   candidate — see `knowledge/17-climate-method.md` for the exact merge.
 
-> For a **strong or weak** Day Master, still note the 조후 climate as a
-> cross-check (`knowledge/17-climate-method.md`): if it agrees with the
-> 억부-based 용신 above, say so — it strengthens the reading. If it disagrees,
-> note the tension explicitly rather than silently picking one; a clear
-> strength imbalance stays the primary signal, but the reader should be aware
-> of the climate tension when nuancing the reading.
+> **Historical note (resolved 2026-09-19):** an earlier version of this file
+> gated 조후 on the verdict (balanced-only) and told the reader that "a clear
+> strength imbalance stays the primary signal" for strong/weak charts even in
+> a non-temperate month. That premise was found to have no direct classical
+> source support (see `docs/research/2026-09-validation-climate.md` §5) and
+> is superseded by Step 0 above. If you see report prose or older notes
+> repeating the verdict-gated framing, treat it as stale and defer to this
+> file's current Step 0.
 
 ### 희신 (Supporting Element)
 

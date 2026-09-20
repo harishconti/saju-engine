@@ -21,7 +21,7 @@ The cycle is the same twelve stages; what varies by stem is **where it starts** 
 | 11 | 태 | 胎 | Embryo, gestation, potential |
 | 12 | 양 | 養 | Nurturing, incubation, preparing for birth |
 
-> Note: 묘 (墓, tomb) and 양 (養, nurturing) are sometimes written as 고 (庫, storehouse) in some schools, but the meanings are similar.
+> Note: 묘 (墓, tomb) is sometimes written as 고 (庫, storehouse) in some schools, but the meanings are similar. *(Corrected 2026-09-20 — external report review, 4th pass: 양 (養, nurturing) was previously included in this equivalence too, but 養 is never written 庫 — only 墓/묘 corresponds to the four storage branches.)*
 
 ## Direction of the Cycle
 

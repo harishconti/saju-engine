@@ -173,6 +173,19 @@ def test_translate_inline_drops_unmapped_cjk():
     assert "龍" not in translate_inline("Hello 龍 world")
 
 
+def test_translate_inline_maps_gusin_not_just_its_last_syllable():
+    """Regression for a 2026-09-20 bug (found while regenerating Harish's
+    PDF after adding the Avoid/Watch 기신/구신/한신 field): `KOR_REPL` had
+    entries for 기신 and 한신 but not 구신 — the untranslated term fell
+    through to single-syllable CJK translation, where its second syllable
+    "신" collided with the Stem 辛's romanization ("Sin (Yin Metal)"),
+    producing the nonsensical "Earth (Sin (Yin Metal), restrains Water)"
+    in the shipped PDF."""
+    out = translate_inline("구신, restrains Water")
+    assert "Sin (Yin Metal)" not in out
+    assert "Restraining Element" in out
+
+
 def test_md_to_pdf_honors_tier_in_md_mode(tmp_path):
     """--tier is forwarded to build_pdf() even in existing-markdown (mode 1) path."""
     md_path = tmp_path / "tier.md"

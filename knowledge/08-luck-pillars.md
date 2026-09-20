@@ -34,7 +34,7 @@ In simpler terms: **same-yang-year-and-gender** or **same-yin-year-and-gender** 
 
 ### Starting Age
 
-The starting age is the number of years from the **birth date** to the **previous 節氣 (節, month-opener)** (역행) or **next 節氣 (節, month-opener)** (순행), divided by 3.
+The starting age is the number of days from the **birth date** to the **previous 節氣 (節, month-opener)** (역행) or **next 節氣 (節, month-opener)** (순행), divided by 3. *(Corrected 2026-09-20 — external report review, 4th pass: this line previously said "years," inverting the "3 days = 1 year" rule the very next paragraph correctly states.)*
 
 In other words:
 - For **forward (순행)**: Count the number of days from the birth date to the **next 節氣** (one of the 12 month-opener solar terms: 立春, 驚蟄, 淸明, 立夏, 芒種, 小暑, 立秋, 白露, 寒露, 立冬, 大雪, 小寒). Divide by 3. The result is the starting age.
@@ -42,7 +42,9 @@ In other words:
 
 > 1 day = 4 months of life. 3 days = 1 year. So 10 days = ~3.3 years.
 
-> **Note on terminology:** the Korean 명리 tradition uses the 12 **節氣 (節, month-openers)** for the starting-age calculation, not the 24 jieqi as a whole. The 24-jieqi version (counting to the next 節 OR 中) gives systematically shorter starting ages and is **not** the standard Korean convention. (Verified against Sruthi, Pawan, and Harish readings 2026-06-03.)
+> **Note on terminology:** the Korean 명리 tradition uses the 12 **節氣 (節, month-openers)** for the starting-age calculation, not the 24 jieqi as a whole. The 24-jieqi version (counting to the next 節 OR 中) gives systematically shorter starting ages and is **not** the standard Korean convention.
+>
+> **Provenance note (revised 2026-09-20):** this rule was previously footnoted as "verified against Sruthi, Pawan, and Harish readings" — that is circular (the product's own generated reports cannot validate the classical convention the product itself implements) and has been removed. The 12-節氣 vs. 24-jieqi distinction stated above still stands as the documented engine behavior; it has not been independently cross-checked against an external classical or academic source in this file. Treat it as the implemented convention, not as externally verified doctrine, until such a source is added.
 
 The first major luck period begins at this age. Each major luck period lasts **10 years**.
 

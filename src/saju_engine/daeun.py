@@ -247,6 +247,33 @@ def starting_age(
     return days // 3
 
 
+def starting_age_days(
+    year: int,
+    month: int,
+    day: int,
+    direction: str,
+    hour: int = 0,
+    minute: int = 0,
+) -> Optional[int]:
+    """Return the raw day-count to the qualifying 節氣 that `starting_age`
+    floors to a whole year via `days // 3`.
+
+    Bug found 2026-09-20 (external report review, 3rd pass, R19): the report
+    never states the precise 대운수 — knowledge/08's own rule is "3 days = 1
+    year," so a starting age of, say, 0 actually means "somewhere in [0, 3)
+    years," and a chart whose true offset is ~0.3 years (~4 months) reads
+    identically to one whose offset is 2.9 years under the rounded integer
+    alone. This exposes the underlying day count so report prose can state
+    the precise starting age instead of only the rounded decade label.
+    """
+    prev, nxt = _term_boundary_datetimes(year, month, day, hour, minute)
+    birth_dt = datetime(year, month, day, hour, minute)
+    target = nxt if direction == "forward" else prev
+    if target is None:
+        return None
+    return int(abs((target - birth_dt).total_seconds()) // 86400)
+
+
 # ── Top-level: build the full major-luck sequence ───────────────────────────
 def compute_daeun(
     *,

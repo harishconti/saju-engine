@@ -50,6 +50,7 @@ KOR_REPL = {
     "월주": "Month Pillar", "시주": "Hour Pillar",
     "용신": "Favorable Element", "희신": "Supporting Element",
     "기신": "Unfavorable Element", "한신": "Draining Element",
+    "구신": "Restraining Element",
     "격국": "Chart Structure", "신살": "Star",
     "십신": "Ten Gods", "대운": "Major Luck", "세운": "Annual Luck",
     "월운": "Monthly Luck", "일운": "Daily Luck", "배우자궁": "Spouse Palace",

@@ -1,10 +1,11 @@
 # Project Tasks
 
 **Date opened:** 2026-06-02  
-**Last updated:** 2026-09-19  
-**Test count:** 916 pytest cases passing / 10 xfailed (`python3 -m pytest`); engine validation gate
-`python3 tools/run_validation.py` → 200 checks (195 PASS / 5 INTERPRETATION / 0 FAIL); landing page
-`npm run build` + 133 vitest cases green.
+**Last updated:** 2026-09-20  
+**Test count:** 949 pytest cases passing / 10 xfailed (`python3 -m pytest`); engine validation gate
+`python3 tools/run_validation.py` → 200 checks (195 PASS / 5 INTERPRETATION / 0 FAIL, not re-run this
+round — no engine-math changes, only prose/report-layer fixes); landing page `npm run build` + 133
+vitest cases green.
 **Open decision:** RM (Kim Nam-joon)'s hour pillar sits 17 seconds from the 午/未 boundary after the
 2026-09-19 equation-of-time fix — his public demo materials still use the old 午 reading pending a
 user decision on how to handle a boundary this close (see the 2026-09-19 change log entry).
@@ -327,8 +328,247 @@ Sourced market research: **`docs/market-research-2026-09.md`**. Design spec:
 
 ---
 
-## Change log
+- **2026-09-20 (4th independent QA pass — pure knowledge-base audit, 5 critical + 5 high + 6 medium
+  + 4 low fixed — no engine/code changes)** — User shared a fourth external audit
+  (`saju-kb-audit-report.md`), this time a full read of all 18 `knowledge/*.md` files plus Harish's
+  `career.md` topic file, checking cross-file consistency rather than report output. Verified every
+  claim directly against the cited files (and, where relevant, the implementing code) before
+  editing; every Critical and High item and most Medium/Low items were confirmed real. **Critical:**
+  (C1) `04-yin-yang.md`'s ten-god worked example had the generating direction reversed and named
+  the wrong ten-god (甲's 丙 → wrongly "편인," corrected to 식신, per `05-ten-gods.md`'s own Master
+  Reference Table). (C2) `00-glossary.md` defined all 9 non-비견 ten-god variants by the **stem's
+  own absolute** yin/yang (e.g. "겁재 — Yang-stem peer") instead of **polarity relative to the Day
+  Master** — the correct, sourced rule in `05-ten-gods.md` — reworded all 9 entries. (C3) the
+  glossary's 방합 entry used 寅午戌 (a 삼합 Fire frame) as its own example, conflating 방합 with
+  삼합; fixed the entry and added the actual 방합 sets (previously undocumented in `02-branches.md`
+  too). (C4) 형/삼형 was referenced by 4+ files but defined nowhere — added a 삼형 table (寅巳申,
+  丑戌未, 子卯) to `02-branches.md` and a 형 row to `07`'s Part 3 relation table, matching the
+  engine's existing, correct `lookup.py::THREE_PUNISHMENTS`; does **not** resolve where 삼형 ranks
+  against 충/해/파 (already a documented scope limit in `11-gunghap.md` §B9). (C5) `09`'s Step 3
+  arithmetic said "six non-temperate branches" for a set that is actually eight (巳午未+亥子丑+辰/戌
+  = 8; 12−8=4 matches the 4 temperate branches named) — fixed the count.
+  **High:** (H1) `07`'s Regular Grid Trigger column said "Month **stem**" (the minority 월간 school)
+  while Part 1's own declared method — and the engine — use 월지 hidden-stem 투출; reworded all 9
+  rows. (H2) 원진살's Hanja differed between files (00: 元辰殺, 07: 怨嗔煞) — a different classical
+  term, not a typo; aligned the glossary to 07's more detailed, correct entry; also noted 원진/귀문관
+  share 4 of 6 pairs (not an error, a known feature). (H3) 귀문관살 was defined twice in `07` with
+  contradictory rules — a vague, unimplemented "born in 子/午" rule and a full pair table; confirmed
+  via `stars.py::_GHOST_GATE_PAIRS` that the engine implements the pair table, removed the vague
+  duplicate. (H4) `11-gunghap.md`'s Ground Rule 4 said a wrong birth hour corrupts the *day* pillar
+  — false except at the 23:00 야자시/조자시 boundary; corrected to say hour pillar. (H5)
+  `17-climate-method.md` called its 2-axis (寒暖+燥濕), 5-band (4 remedy bands + Temperate) model
+  "four-axis" in 4 places — renamed to "two-axis."
+  **Medium:** (M1) `01-stems.md`'s hidden-stems column mixed up unrelated stems' own 본기/중기/여기
+  entries (e.g. 甲's row listed 卯/辰 entries that are 乙's/戊's own qi, not 甲's) and inverted
+  본기/중기 for 丙/巳 — replaced the whole column with a simple, correct "본기 of branch(es)" mapping
+  sourced from `02-branches.md`. (M2) `06-twelve-stages.md` wrongly included 양 (養) in the 墓=庫
+  equivalence — 養 is never written 庫; removed. (M3) `08-luck-pillars.md` said "number of **years**"
+  where it meant days, inverting the "3 days = 1 year" rule stated one paragraph later. (M4)
+  corrupted strings: a mixed Hangul/Hanja "도桃花" artifact in `07`, three stray "一" characters
+  appended to 육합/삼합/방합 section headers in `11-gunghap.md`, a duplicated "辛 as 신/신" fake
+  alternate-reading in the glossary, and a nonstandard "처녀궁" entry for the hour pillar (replaced
+  with the standard 자식궁/노년궁 pair) — all fixed; also (own find, while in this section) removed
+  a stray duplicate/wrong glossary entry "소 (so, 酉)" (酉 is 유, already correctly entered under Y).
+  (M5) `04-yin-yang.md`'s "Yin-Yang in Time" section called 卯 "Pure yang" while the file's own
+  branch-polarity table marks 卯 Yin — added a note distinguishing qi-flow polarity (time-of-day)
+  from fixed branch polarity, since both are classical but answer different questions. (M6)
+  Harish's `career.md` misattributed his 편재 to the year pillar (it's the month stem, 乙) and
+  called 亥 a "pure Water branch" when `02-branches.md` gives it a 중기 甲 (Wood) too — softened to
+  "Water-dominant"; regenerated `harish-combined.md`/`.pdf` to pick up both corrections.
+  **Low (4 of 8 addressed; L2 filename drift and L7/L8 reorganization suggestions not applicable /
+  deferred):** (L1) `10-output-template.md`'s Sources list stopped at file 09 — extended to 10-17.
+  (L3) added the 7 missing high-traffic glossary terms the reviewer named (조후, 억부, 투출,
+  지장간, 삼합, 삼형, 배우자궁) plus 자식궁/노년궁 (replacing the removed 처녀궁). (L4) normalized
+  the 午未 육합 element label to "화토" (matching `11-gunghap.md`) with a note on why it doesn't
+  transform to one pure element like the other five pairs. (L5) reworded `09`'s imprecise "Empty
+  branches (공망) on the Day Master" to "natal branches sitting in the day pillar's 공망." (L6)
+  added the same interactive-skill-vs-engine scope note from `09` to `10-output-template.md`'s
+  matching "does not auto-derive pillars" line.
+  No pytest, prose_fillers, or premium_report changes this round — pure `knowledge/*.md` (+ one
+  candidate `career.md`) documentation fixes; full suite unaffected: **949 passed / 10 xfailed / 0
+  failed** (unchanged from before this round, confirming no regressions).
 
+---
+
+- **2026-09-20 (3rd independent QA pass — full KB + report validation report, 9 report bugs + 6 KB
+  defects fixed, 2 self-found bugs, portfolio-wide regen — Suite 921 → 949)** — User shared a third,
+  more comprehensive external audit (`saju-kb-validation-report.md`) covering both Harish's report
+  AND all 18 `knowledge/*.md` files. Verified every claim against live code/knowledge before
+  acting; several items were already fixed by the 2nd-pass round (R3 겁재-decade caution, R4 Water
+  excess/용신 reconciliation, R8 "rooted in a branch," R9 사 gloss re-confirmed correct, R11 gender
+  adaptation, R13 closing-note element, R20 grammar) and needed no further action. Confirmed and
+  fixed:
+  **Report bugs:**
+  1. **R2 (own regression from the 2nd pass): `period_favorable_status` checked only `favorable`,
+     not `supporting`**, while the sibling annual check used `{fav, sup}` — Harish's 40-49 decade
+     (Metal = 희신) was "neutral" while the identical-element 2030 year inside it was "favorable," a
+     direct cross-table contradiction. Fixed the decade-level check to match; corrected the test
+     that had baked in the old (wrong) expectation.
+  2. **R6: missing 신살 scan.** `역마살` (Post Horse, active at natal 巳 via the 亥卯未 triplet) and
+     several other classical stars computed by `stars.py` (겁살, 지살, 월살, 천을귀인, 재살, 천살,
+     육해, 원진, 귀문관, etc.) were computed by the engine but never surfaced in any report. Added a
+     `post_horse` check to Relocation & Direction Guidance and a new "Other Active 신살" subsection
+     to Natal Pattern Analysis, with meanings sourced verbatim from `knowledge/07-special-formations.md`
+     (`report_data._STAR_MEANING`). Deliberately excludes 홍염/양인 (no natal-context source per
+     Ground Rule 1).
+  3. **R10: `_class_counts`/`_dominant_classes` mixed grouping levels.** 식상 (via `_TENGOD_CLASS`)
+     was pre-merged into one "Output" key while 비겁/재성/관성/인성 stayed split by yin/yang variant
+     — `.most_common()` on that mix compared class-level counts against variant-level ones.
+     Confirmed live: Harish's true class distribution is a three-way tie (비겁/식상/인성 = 4 each,
+     재성 = 2, 관성 = 1), but `closing_note_long`/`friendship_social_energy` reported "Output (4),
+     Robber (2)" (dropping two of three tied leaders, surfacing a non-leading class) while
+     `top_strengths` separately concluded "Direct Resource-dominant" from the same chart — two
+     inconsistent claims about the same profile. Root-caused one level deeper than the reviewer's
+     report: `_TENGOD_CLASS`'s merge of 식신/상관 into "Output" was itself the anomaly — `sewoon.py`
+     /`daeun_overlay.py` already use "Eating God"/"Hurting Officer" as the canonical split names, so
+     the merge also silently broke every dict lookup keyed by ten-god class whenever the input came
+     from those modules (`relationship_timing_row`'s `_RELATIONSHIP_THEME_NEUTRAL`, keyed "Output,"
+     never matched a `stem_tengod_en` of "Eating God"/"Hurting Officer"). Split `_TENGOD_CLASS` to
+     match the existing convention; added `_grouped_dominant_classes()` (reuses the pre-existing
+     `_CLASS_TO_DRIVER` re-grouping) for the 3 class-level narrative call sites
+     (`closing_note_long`, `closing_note_short`, `friendship_social_energy`); left `top_strengths`/
+     `skill_levers` on variant-level `_dominant_classes` (now correct on its own, since 식상 is no
+     longer artificially inflated) and added the missing "Eating God"/"Hurting Officer" entries to
+     the 7 dicts keyed by the old merged "Output".
+  4. **R5: 기신/구신/한신 (Avoid/Watch) blank for every balanced/climate-gated chart.**
+     `strength.py`'s balanced-verdict branch never computed `candidate_unfavorable`/
+     `candidate_draining` (only the strong/weak branches did), so the field always rendered "—".
+     Rather than patch the raw heuristic dict (risking a raw-vs-resolved mismatch with
+     `ctx.favorable`, the climate-resolved value — the same bug class fixed in the 1st pass), added
+     `premium_report._avoid_watch_text()`, deriving 기신/구신/한신 directly from `ctx.favorable` via
+     the overcoming/generating cycles knowledge/03 already defines (matches its own worked example:
+     용신=Water → 기신=Fire, 구신=Earth, 한신=Wood).
+  5. **R17: strength verdict had no reasoning block.** Quick Reference said only "Balanced — a
+     seasonal-strength reading," never citing that Harish's 辛 sits at 사 (death/depleted) in the 巳
+     month — a seasonally weak baseline the chart's Earth/Metal support then offsets. Added
+     `prose_fillers.strength_reasoning()`, citing the actual `strength_assessment` inputs (month
+     stage, self/resource score vs. drain score). **Found along the way:** `_STAGE_WEIGHT` scores
+     range 0.0–2.0 and are never negative, so the pre-existing `month_stage_score <= -0.5`
+     "depleted" threshold (also used by `dm_arrival_narrative`) could never fire — 사/절/병 always
+     mis-bucketed as "mixed" instead of depleted. Fixed via a shared `_season_signal()` helper with
+     corrected thresholds.
+  6. **R12: annual activation layer (천간합 / 충·해·파) never surfaced.** The engine already computed
+     `SeWoonHit.activated_branches`/`relationship_types` for every year but no report prose read
+     them; annual-stem-vs-Day-Master 천간합 (e.g. 2026's 丙辛합수) was never checked at all. Added
+     `stem_combinations` to `derive_sewoon()` (via the existing `lookup.stem_combination`) and
+     `prose_fillers.annual_activation_note()`, wired into `year_by_year_note`. Confirmed live: 2026
+     now correctly surfaces both 丙辛합수 (activating Water) and 丑午해 (against Harish's natal 丑
+     hour branch).
+  7. **R7: date-selection filter defects.** The 90-day Auspicious Dates table silently truncated to
+     5 dates and the Monthly Lucky Dates table to 5/month with no basis in `knowledge/16`; both
+     filtered only 충 (clash) against the day branch. Removed the truncation caps; added 해/파
+     filtering against the day OR hour branch via a new `_candidate_day_conflicts()`; added the
+     almanac-caveat sentence `knowledge/16` requires ("not a finished 택일"). Dual-status days
+     (e.g. 寅/申 vs. a natal 亥, simultaneously 육합 and 파/해 partners) are conservatively excluded
+     rather than shown as ambiguous — documented as a deliberate design choice. Event-type layer
+     (개업 → 식상/재성) and an explicit dual-status UI flag are **not** implemented — deferred.
+  8. **R19: 대운수 (major-luck starting age) never stated precisely.** `starting_age()` floors to a
+     whole year (`days // 3`), so Harish's true ~0.3-year (~1-day) offset read identically to a
+     0.0–2.9-year range under the bare "age 0" label. Added `daeun.starting_age_days()` and a
+     `premium_report._daeun_starting_age_note()` stating the precise figure alongside the decade
+     label.
+  9. **R14/R15 (re-confirmed from 1st pass, still correct):** gemstone modern-convention labelling
+     and the 3 corrected element-hour ranges remain in place; no regression.
+  **Self-found bugs (not in the external report), found while implementing the above:**
+  10. `hanja_glossary.inject_hanja()` mid-word-split a single-character glossary term (합=合) when
+      it appeared inside an unlisted longer compound with **nothing after it** requiring the
+      existing right-side "already annotated" guard to fire (e.g. "병신합수" → "병신합 (合)수").
+      Fixed with a symmetric left-word-boundary check; the harder case (a single-char term with
+      Hangul on *neither* side, e.g. "병" at the very start of "병신합수" colliding with the
+      unrelated 12운성 term 병=病) is a known limit documented in a test — the real defense is
+      `annual_activation_note()` pre-annotating its own compound labels with their correct Hanja
+      (e.g. "병신합수 (丙辛合水)") before the text ever reaches the general gloss pass.
+  11. **PDF translation gap:** `src/saju_html/__init__.py`'s `KOR_REPL` had "기신"/"한신" but not
+      "구신" — the untranslated term fell through to single-syllable CJK translation, where "신"
+      collided with the Stem 辛's romanization, rendering "Earth (Sin (Yin Metal), restrains
+      Water)" in the shipped PDF. Added the missing `KOR_REPL` entry.
+  **Knowledge-base fixes (`saju-kb-validation-report.md` Part 3):**
+  K4 — documented the 寅亥/巳申 dual-status (both 육합 and 파) pairs in `02-branches.md` with a
+  precedence note. K5 — documented the hidden-stem weight divergence between the natal convention
+  (0.6/0.3/0.1) and `11-gunghap.md` §F's (1/0.5/0.3) as a scope-language note (unifying them would
+  be a product decision, not a correctness fix). K6 — already substantively resolved by the 2nd
+  pass's `11-gunghap.md` §B9 (진신형/인신충 self-contradiction explicitly flagged and explained,
+  missing 삼형 table carried as a documented `[UNCERTAIN]` scope limit); no further action needed.
+  K8 — added a scope note to `09-interpretation-method.md` distinguishing the interactive
+  skill's "do not auto-derive" rule from the separately-validated `compute_chart()` engine, which
+  does auto-derive by design. K10 — confirmed both open items are actioned: the climate
+  per-branch `[UNCERTAIN]` tag is a legitimate, correctly-scoped epistemic flag (not a forgotten
+  TODO), and harish_manvitha's compatibility score is already regenerated at 68/100 (not the stale
+  70/100 the KB note referenced).
+  **Not changed / deliberately deferred:** R16 (career-domain gap — reverted in the 1st pass after
+  it broke a validated 30-domain invariant; flagged for a user product decision, not decided
+  unilaterally); R18 (month-boundary caution note — reasonable, deferred); R1/R9 (re-reviewed,
+  confirmed not bugs — doctrine already synced via K1, 사 gloss matches knowledge/06 exactly).
+  Added regression tests for every fix (`test_prose_fillers.py`, `test_premium_report.py`,
+  `test_sewoon.py`, `test_daeun.py`, `test_hanja_glossary.py`, `test_pdf.py`). **Regenerated all 6
+  unaffected candidates** (Harish, Mahesh, Sruthi, Pawan, Gurumoorthy, Vishnu-Priya — base +
+  combined + all PDFs, both reportlab and HTML/Playwright backends where applicable) to pick up
+  this round's fixes; RM still untouched pending the equation-of-time hour-pillar decision.
+  Vishnu-Priya's separate `-sample.pdf`/`-essential.pdf`/`-deep.pdf` tier-demo assets were **not**
+  regenerated this round. Suite: **949 passed / 10 xfailed / 0 failed**.
+
+---
+
+- **2026-09-20 (2nd independent QA pass on Harish's report — 8 more real bugs found + fixed —
+  Suite → 921)** — User ran a second, independent AI audit of Harish's regenerated report.
+  Verified every claim against live code rather than trusting it; this reviewer's computational
+  verification (pillars, ten-gods, element math, luck sequence, dates) all independently confirmed
+  correct — the bugs it found were all in the narrative layer, and 8 were real:
+  1. **`closing_note_long` substituted the Day Master's own element for the chart's actual
+     weighted-balance dominant element** — "the chart's element balance leaning toward Metal" when
+     the actual balance leans Water (27.8% vs 25.3%), a direct contradiction with the Element
+     Balance table two sections earlier. Fixed to read `chart.patterns["dominant_element"]`.
+  2. **Health section self-contradiction**: Water was flagged as the "excess" element (kidney/
+     bladder watch) while Grounding Practices (same section) recommended leaning INTO Water. Both
+     readings are individually correct — Water is both Harish's most numerically-present element
+     AND his climate-resolved 용신 — but neither knowledge file states how to reconcile the
+     collision (Ground Rule 1/2: not inventing a resolution). Added an explicit reconciling note
+     instead of presenting both silently.
+  3. **Annual-forecast "watch" text asserted "the Fire element drains rather than feeds"** for
+     every non-favorable year, even for a climate-balanced chart with NO declared 기신 (Quick
+     Reference shows "Avoid/Watch: —") — a specific harm-claim the chart never actually makes.
+     Now only asserts this when the year's element matches a genuinely-declared 기신; otherwise
+     uses neutral language.
+  4. **`income_rhythm` claimed "The Direct Wealth stem is rooted in a branch"** even when the
+     ONLY 정재 in the whole chart is itself a hidden stem with no visible counterpart (Harish:
+     hidden 甲 in 亥, no visible 정재 anywhere) — "rooted" specifically means a visible stem
+     echoed by a hidden one, which cannot be true with no visible stem. Added a distinct,
+     accurate case for hidden-only Direct Wealth.
+  5. **Monthly Lucky Dates listed already-past dates** for the report's own current month — the
+     day-loop always started at day 1 instead of `ref.day + 1` for the current month. Confirmed
+     live: a report generated Sept 19-20 listed "3, 5, 6, 13, 14" for September.
+  6. **Marriage/relationship timing was not gender-adapted** — "Direct Officer → engagement,
+     marriage" was hard-coded for every chart regardless of gender, but the classical spouse-star
+     convention (자평진전, already used in `compat.py::_gendered_spouse_star_note`, sourced from
+     `knowledge/11-gunghap.md` §G) is gender-dependent: 재성 (Wealth) for a male Day Master, 관성
+     (Officer) for a female one. `relationship_timing_row` now takes `gender` and swaps the
+     marriage-coded ten-god accordingly; declines the gendered read when gender is unknown.
+  7. **겁재/비견 (비겁-class) 대운 decades were listed under "wealth or favorable-element" windows**
+     with the same "income, asset, or value-creation" note as genuine 재성 decades — independently
+     flagged by two reviewers now. 비겁-class ten-gods are classically wealth *competitors*
+     (겁재奪財, `knowledge/13-wealth-and-business.md`), not opportunities, even when their element
+     happens to match 용신/희신. Now flagged with the correct classical caution.
+  8. **Cosmetic:** "~1 minutes from a 2-hour branch boundary" singular/plural typo when the
+     distance is exactly 1.
+  **Investigated and found NOT bugs** (verified against the actual code/knowledge files, no
+  change): the auspicious-dates 5-date cap (matches the documented "~18-day spacing" design
+  intent, not a truncation defect); the Monthly Lucky Dates 5-per-month cap (an explicit function
+  parameter, by design); the 사(死) stage gloss ("phase-ending start... one cycle is completing")
+  — checked directly against `knowledge/06-twelve-stages.md`'s own canonical wording ("사 (Death):
+  The phase is ending. New cycle ahead") and found faithfully aligned, not "묘 language" as
+  claimed; "Direct Resource-dominant" in Top 5 Strengths from 2 hidden-only 정인 occurrences —
+  consistent with this engine's uniform, documented convention of counting hidden stems as real
+  십신 presence throughout the whole report (Ten-God Distribution table, Closing Note, etc.), not
+  a one-off inconsistency; year-by-year notes keyed to element rather than the row's named
+  ten-god — a deliberate second advisory lens (elemental daily-practice guidance layered
+  alongside ten-god career guidance), not a factual error. The month-boundary-proximity
+  suggestion (analogous caution to the hour-boundary one, for births near 절기 boundaries) is a
+  reasonable future robustness idea, not implemented this pass (no evidence Harish's birth DATE
+  specifically carries the same documented uncertainty as his birth TIME).
+  **Regenerated the 6 unaffected candidates** (base + combined + all PDFs) for the fourth time
+  today to pick up this round's fixes cumulatively; RM still untouched pending the hour-pillar
+  decision from the previous entry. Added regression tests for all 8 fixes. Suite: **921 passed /
+  10 xfailed / 0 failed**.
 - **2026-09-19 (equation of time + 상관견관 detection, user-approved — Suite → 916)** — Implemented
   the two items flagged (not auto-fixed) by the external-report review, after explicit user
   approval. **(1) Equation of time:** added `pillars.py::_equation_of_time_minutes` (standard

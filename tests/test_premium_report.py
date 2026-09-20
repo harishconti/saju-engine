@@ -433,6 +433,35 @@ def test_premium_report_deep_has_single_wealth_preservation_note():
     assert matches == 1, f"expected 1 Wealth Preservation Note heading, got {matches}"
 
 
+def test_wealth_timing_major_luck_periods_flags_companion_class_as_competition():
+    """Regression for the 2026-09-19 bug (external report review, 2nd + 3rd
+    pass): 겁재/비견 (비겁-class) 대운 decades were listed under 'Major-luck
+    periods that carry wealth or favorable-element energy' with the SAME
+    "income, asset, or value-creation" note as genuine 재성 decades, purely
+    because the decade's stem ELEMENT matched 용신/희신 — but 비겁-class
+    ten-gods are classically read as wealth competitors (겁재奪財,
+    knowledge/13-wealth-and-business.md), not wealth opportunities. Harish's
+    real chart has exactly this: ages 40-49 (庚戌, Robber) and 50-59 (辛亥,
+    Companion) both carry his 희신/용신 element with a 비겁-class ten-god.
+    """
+    chart = compute_chart(
+        name="harish-wealth-periods-regression", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+    report = generate_premium_report(chart, tier="deep")
+    idx = report.find("Major-luck periods that carry wealth")
+    assert idx != -1
+    section = report[idx:idx + 2000]
+    assert "40–49" in section and "50–59" in section
+    assert "wealth *competition*" in section, (
+        f"비겁-class decades must be flagged as wealth competition, not opportunity: {section!r}"
+    )
+    assert section.count("income, asset, or value-creation themes are more likely to surface") == 0, (
+        "the genuine-wealth-note text must not be applied to 비겁-class decades"
+    )
+
+
 def test_premium_report_deep_has_ten_god_distribution_table():
     """Deep tier must include the full Ten-God Distribution Table with
     all 4 pillars and a Hidden Ten-God column."""
@@ -596,11 +625,14 @@ def test_lifetime_decade_roadmap_honours_override_not_chart_baked_status():
     Reference favorable element.
 
     Harish's chart resolves to Water bare (조후 climate-balanced, hot 巳
-    month). Overriding to Metal here must move the roadmap's favorable rows
-    from the Water decade with no Metal in either stem or branch (60-69,
-    壬子: Water stem + Water branch) to the pure-Metal decades (20-29 戊申,
-    30-39 己酉: Metal branch, and 50-59 辛亥 which is favorable either way
-    since its stem 辛 is itself Metal).
+    month), with Metal as the supporting (희신) element — so both Water AND
+    Metal decades count as "favorable" (`period_favorable_status` checks
+    both, per the 2026-09-20 fix; see that function's docstring). Overriding
+    to Metal here must move the roadmap's favorable rows to the Metal-and-
+    Earth decades (Earth generates Metal, so it becomes the new supporting
+    element) — most visibly, the pure-Fire decade (0-9, 丙午: neither Water,
+    Metal, nor Earth) stays neutral under BOTH readings, while a
+    pure-Water decade (60-69, 壬子) is favorable bare but neutral overridden.
     """
     chart = compute_chart(
         name="Harish-override-regression", gender="M",
@@ -616,16 +648,18 @@ def test_lifetime_decade_roadmap_honours_override_not_chart_baked_status():
                 return line
         raise AssertionError(f"no roadmap row found for ages {ages}")
 
-    # Bare (Water-resolved): 60-69 (pure Water, no Metal anywhere) favorable;
-    # 20-29 / 30-39 (Metal branch, no Water) neutral.
+    # Bare (Water-resolved, Metal-supported): 60-69 (pure Water) favorable;
+    # 0-9 (pure Fire, no Water/Metal at all) neutral under both readings.
     assert _roadmap_row(bare_report, "60–69").endswith("| favorable |")
-    assert _roadmap_row(bare_report, "20–29").endswith("| neutral |")
+    assert _roadmap_row(bare_report, "0–9").endswith("| neutral |")
 
-    # Overridden to Metal: the favorable rows must move accordingly, not stay
-    # pinned to the bare-resolved Water rows.
+    # Overridden to Metal (Earth becomes the new supporting element): the
+    # favorable rows must move accordingly, not stay pinned to the
+    # bare-resolved Water/Metal rows.
     assert _roadmap_row(override_report, "20–29").endswith("| favorable |")
     assert _roadmap_row(override_report, "30–39").endswith("| favorable |")
     assert _roadmap_row(override_report, "60–69").endswith("| neutral |")
+    assert _roadmap_row(override_report, "0–9").endswith("| neutral |")
 
 
 # ── Report-leak regressions (partial 삼형, GridCandidate repr, doubled phrase) ──
@@ -756,3 +790,162 @@ def test_element_balance_has_methodology_footnote():
     assert "counts the 4 visible stems" in report
     assert "8 visible stems and branches" not in report
     assert "main qi 0.6, middle 0.3, residual 0.1" in report
+
+
+def test_decade_and_annual_favorable_lean_agree_on_shared_element():
+    """Regression for R2 (external report review, 3rd pass): the decade-level
+    `period_favorable_status` used to check only `favorable`, while the
+    annual-level `annual_window_row` checked `elem in {favorable,
+    supporting}` — a genuine inconsistency. Confirmed live: Harish's 40-49
+    decade (庚戌, stem Metal = his 희신) was "neutral" while 2030 (also 庚戌)
+    inside that exact decade was a "favorable-element year" in the Annual
+    Windows / 10-Year Forecast table — a direct contradiction between two
+    tables describing the same period.
+    """
+    chart = compute_chart(
+        name="Harish-decade-annual-regression", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+    report = generate_premium_report(chart, tier="deep")
+
+    def _row(prefix: str) -> str:
+        for line in report.splitlines():
+            if line.startswith(prefix):
+                return line
+        raise AssertionError(f"no row found for {prefix!r}")
+
+    decade_row = _row("| 40–49 |")
+    # Several tables have a "2030" row (relationship timing, life-themes,
+    # 10-Year Forecast); the 10-Year Forecast row is the 6-column one with a
+    # bare "Robber" ten-god column.
+    year_row = _row("| 2030 | 庚戌 | Robber | ")
+    assert decade_row.endswith("| favorable |"), decade_row
+    assert "favorable-element year" in year_row, year_row
+
+
+# ── R5 — Avoid/Watch (기신/구신/한신) blank for balanced/climate charts ────
+# ── (found 2026-09-20, external report review, 3rd pass) ─────────────────
+
+
+def test_avoid_watch_field_is_populated_for_a_balanced_chart():
+    """`strength.py`'s balanced-verdict branch leaves `candidate_unfavorable`
+    as `None`, so the Quick Reference "Avoid / Watch" field used to render as
+    a bare "—" for every balanced/climate-gated chart (e.g. Harish's,
+    favorable=Water). knowledge/03-five-elements.md's own worked example for
+    a Water 용신 gives 기신=Fire, 구신=Earth, 한신=Wood — the field must name
+    all three, derived from the report's actual resolved favorable element."""
+    chart = compute_chart(
+        name="Harish-avoidwatch-regression", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+    assert chart.strength_assessment["verdict"] == "balanced"
+    report = generate_premium_report(chart, tier="deep")
+    line = next(l for l in report.splitlines() if l.startswith("- **Avoid / Watch:**"))
+    assert line != "- **Avoid / Watch:** —"
+    assert "Fire" in line and "Earth" in line and "Wood" in line
+
+
+# ── R17 — strength verdict has no reasoning block ─────────────────────────
+# ── (found 2026-09-20, external report review, 3rd pass) ─────────────────
+
+
+def test_strength_line_states_a_reasoning_not_just_the_verdict():
+    """knowledge/10-output-template requires verdict + reasoning (season,
+    hidden stems, stem support). The Quick Reference used to say only
+    "Balanced — a seasonal-strength reading" with no argument — confirmed
+    live: it never mentioned that Harish's 辛 sits at 사 (a seasonally weak
+    12운성 stage per knowledge/06) in the 巳 month, which the chart's
+    Earth/Metal support then offsets back to balanced."""
+    chart = compute_chart(
+        name="Harish-strength-reasoning-regression", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+    report = generate_premium_report(chart, tier="deep")
+    line = next(l for l in report.splitlines() if l.startswith("- **Strength:**"))
+    assert "seasonal-strength reading; a full classical analysis" not in line
+    assert "사" in line and "seasonally weak baseline" in line
+    assert "peer" in line or "resource" in line or "drain" in line
+
+
+def test_daeun_starting_age_note_states_precise_age_not_just_decade():
+    """R19: the precise 대운수 must be stated (e.g. "~0.3") alongside the
+    rounded "0-9" decade label, not silently collapsed into it."""
+    chart = compute_chart(
+        name="Harish-r19-regression", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+    report = generate_premium_report(chart, tier="deep")
+    assert "대운수" in report
+    assert "~0.3" in report
+
+
+# ── R7 — date-selection filter defects ────────────────────────────────────
+# ── (found 2026-09-20, external report review, 3rd pass) ─────────────────
+
+
+def _harish_chart_for_dates():
+    return compute_chart(
+        name="Harish-r7-regression", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+
+
+def test_auspicious_dates_not_truncated_to_five():
+    """The 90-day table used to silently cap at 5 dates regardless of how
+    many actually qualified; knowledge/16 gives no basis for that cap."""
+    from saju_engine.premium_report import _ReportContext, _section_auspicious_dates
+    ctx = _ReportContext(_harish_chart_for_dates(), tier="deep", generation_date="2026-09-20")
+    lines = _section_auspicious_dates(ctx)
+    data_rows = [l for l in lines if l.startswith("| 20")]
+    assert len(data_rows) > 5, f"expected more than the old 5-date cap: {len(data_rows)} rows"
+
+
+def test_auspicious_dates_exclude_harm_and_break_not_just_clash():
+    """Confirmed live: candidate days whose branch is 寅 (파 against Harish's
+    natal 亥 day branch) or 申 (해 against 亥) passed the old clash-only
+    filter untouched. Neither may appear as a candidate day-branch now."""
+    from saju_engine.premium_report import _ReportContext, _section_auspicious_dates
+    ctx = _ReportContext(_harish_chart_for_dates(), tier="deep", generation_date="2026-09-20")
+    lines = _section_auspicious_dates(ctx)
+    data_rows = [l for l in lines if l.startswith("| 20")]
+    for row in data_rows:
+        pillar = row.split("|")[2].strip()  # e.g. "庚子 (Robber)"
+        branch = pillar[1]
+        assert branch not in ("寅", "申"), f"寅/申 must be filtered (파/해 vs natal 亥): {row!r}"
+
+
+def test_auspicious_dates_section_has_almanac_caveat():
+    from saju_engine.premium_report import _ReportContext, _section_auspicious_dates
+    ctx = _ReportContext(_harish_chart_for_dates(), tier="deep", generation_date="2026-09-20")
+    lines = "\n".join(_section_auspicious_dates(ctx))
+    assert "Almanac caveat" in lines
+    assert "not a finished 택일" in lines
+
+
+def test_monthly_lucky_dates_not_capped_at_five_and_has_caveat():
+    from saju_engine.premium_report import _ReportContext, _section_monthly_lucky_dates
+    ctx = _ReportContext(_harish_chart_for_dates(), tier="deep", generation_date="2026-09-20")
+    lines = "\n".join(_section_monthly_lucky_dates(ctx, months_ahead=1))
+    assert "Almanac caveat" in lines
+    # October 2026 (a full month) should yield more than 5 qualifying days.
+    lines2 = _section_monthly_lucky_dates(ctx, months_ahead=2)
+    oct_row = next(l for l in lines2 if l.startswith("| October"))
+    dates_cell = oct_row.split("|")[2]
+    assert len(dates_cell.split(",")) > 5, f"expected more than 5 dates: {oct_row!r}"
+
+
+def test_season_signal_correctly_buckets_depleted_month_stages():
+    """Own find while implementing R17: `_STAGE_WEIGHT` scores range 0.0-2.0
+    and are NEVER negative, so the old `<= -0.5` "depleted" threshold could
+    never fire — a Day Master at 사/절 (score 0.0) or 병 (0.2) was always
+    mis-bucketed as "mixed" instead of depleted."""
+    from saju_engine.prose_fillers import _season_signal
+    assert _season_signal(0.0) == "depleted"  # 사, 절
+    assert _season_signal(0.2) == "depleted"  # 병
+    assert _season_signal(2.0) == "supported"  # 제왕
+    assert _season_signal(0.7) == "mixed"  # 양

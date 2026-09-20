@@ -126,3 +126,20 @@ def test_sewoon_date_lichun_rollback():
     assert hit.combined == "乙巳"
     # 乙 (Yin Wood) is 정인 (Direct Resource) to 丙 (Yang Fire).
     assert hit.stem_tengod == "정인"
+
+
+# ── R12 — annual stem-vs-Day-Master 천간합 was never computed ─────────────
+# ── (found 2026-09-20, external report review, 3rd pass) ─────────────────
+
+
+def test_annual_stem_combines_with_day_master():
+    """2026's annual stem 丙 forms 병신합수 with a 辛 Day Master (Harish's
+    real case) — knowledge/08 Part 2 step 3 requires checking "Annual stem
+    vs. natal stems -> 합?", but this was never implemented at all."""
+    hit = derive_sewoon("辛", ["亥", "巳", "亥", "丑"], 2026)
+    assert hit.stem_combinations == [("丙", "辛", "Water", "병신합수")]
+
+
+def test_annual_stem_no_combination_with_day_master_is_empty():
+    hit = derive_sewoon("丙", ["酉", "子", "寅", "丑"], 2026)  # 丙 vs 丙: no combo
+    assert hit.stem_combinations == []

@@ -129,7 +129,7 @@ _ELEMENT_ASSOCIATIONS: Dict[str, Dict[str, str]] = {
         "season": "spring",
         "gemstones": "jade, aventurine, green tourmaline, emerald",
         "foods": "leafy greens, sprouts, sour foods in moderation, fresh herbs",
-        "best_times": "dawn to mid-morning (Wood hours, 3–9 am)",
+        "best_times": "dawn to mid-morning (Wood hours, 3–7 am)",
         "avoid": "excessive white/grey, autumn dryness, and Metal-heavy west orientation",
     },
     "Fire": {
@@ -139,7 +139,7 @@ _ELEMENT_ASSOCIATIONS: Dict[str, Dict[str, str]] = {
         "season": "summer",
         "gemstones": "ruby, garnet, carnelian, red jasper",
         "foods": "bitter greens, red-colored vegetables, warm foods, light spices",
-        "best_times": "midday (Fire hours, 11 am–1 pm) for visibility and momentum",
+        "best_times": "late morning through early afternoon (Fire hours, 9 am–1 pm) for visibility and momentum",
         "avoid": "excessive black/navy, winter cold, and Water-heavy north orientation",
     },
     "Earth": {
@@ -169,7 +169,7 @@ _ELEMENT_ASSOCIATIONS: Dict[str, Dict[str, str]] = {
         "season": "winter",
         "gemstones": "black tourmaline, obsidian, lapis lazuli, aquamarine",
         "foods": "black beans, seaweed, salty foods in moderation, soups and broths",
-        "best_times": "evening through early night (Water hours, 9 pm–3 am) for restoration",
+        "best_times": "evening through midnight (Water hours, 9 pm–1 am) for restoration",
         "avoid": "excessive yellow/ochre, damp stagnation, and Earth-heavy center orientation",
     },
 }
@@ -221,6 +221,16 @@ _CAREER_DOMAINS: Dict[str, List[Tuple[str, str]]] = {
         ("Logistics & Shipping", "supply chain, maritime, travel industry"),
     ],
 }
+# Reviewed 2026-09-20 (external report review): knowledge/12's Water family
+# prose also names "data, networks & platforms" as a 7th item, which this
+# 6-slot table does not carry. NOT changed here — `_CAREER_DOMAINS` is a
+# validated invariant (tests/validation/test_val_career.py::test_pool_structure_invariant,
+# test_domain_map_covers_exactly_all_30_kb12_domains: exactly 5 x 6 = 30
+# domains, one curated representative per KB12 family slot, deliberately not
+# a verbatim 1:1 copy of KB12's prose lists). Swapping in a 7th domain, or
+# swapping out an existing one for it, changes what a real delivered report
+# shows and is a product decision, not a bug fix — flagged for the user
+# rather than decided unilaterally.
 
 
 # ── Grounding practices by favorable element ──────────────────────────────
@@ -664,3 +674,42 @@ def _hidden_stems_str(p: Pillar) -> str:
         label = {"main": "본", "middle": "중", "residual": "여"}.get(role, role)
         parts.append(f"{s} ({label})")
     return ", ".join(parts) if parts else "—"
+
+
+# ── One-line classical meanings for the 신살 (stars) `stars.py` computes ────
+# source: knowledge/07-special-formations.md's own "Meaning:" lines for each
+# star (§Common 신살, §More classical 신살). 도화 (peach_blossom) and 역마
+# (post_horse) are intentionally excluded here — they already have their own
+# dedicated sections elsewhere in the report (Relationship Style / Relocation
+# & Travel) and would be redundant if repeated in a generic star list. 홍염
+# and 양인 are also excluded: this project has no natal-context "Meaning:"
+# line for them (they are documented only for the compatibility/궁합 product,
+# knowledge/11-gunghap.md), and Ground Rule 1 forbids inventing one.
+#
+# Added 2026-09-20 (external report review): stars.py already computes all
+# of these correctly, but no report section ever surfaced them — confirmed
+# missing for Harish, whose chart carries 겁살 (year branch 申), 지살 (day
+# branch 亥), 월살 (hour branch 丑), and 천덕귀인 (day stem 辛), none of which
+# appeared anywhere in his delivered report.
+_STAR_MEANING: Dict[str, str] = {
+    "kong_mang": "the branches here are read as symbolically \"void\" — their themes feel deferred or less solid, not absent.",
+    "canopy": "a scholarly / solitary / artistic marker — often found in those drawn to religion, scholarship, art, or a hermetic path.",
+    "heavenly_noble": "a \"helper\" star — a tendency toward receiving support from an unexpected, noble source at key turning points.",
+    "literary_star": "favorable for academic and literary work, exams, and written expression — a native facility with words and ideas.",
+    "robbery_star": "sudden loss, theft, or unexpected competition — can also mark a capacity for decisive action.",
+    "disaster_star": "mishaps, illness, or obstacles as a recurring theme — classically read as softened by a strong 용신.",
+    "heaven_bane": "external pressures or authority conflicts — \"heaven-sent\" trials.",
+    "earth_bane": "earthly hindrances, delays, or bureaucratic friction.",
+    "annual_bane": "yearly/annual-style friction — a lighter, less emphasized marker in modern Korean readings.",
+    "monthly_bane": "monthly-style friction; some schools also read it for romantic turbulence.",
+    "lost_spirit": "mental dispersion, forgetfulness, or scattered energy; can also indicate hidden schemes.",
+    "general_star": "leadership, command, and organizational ability.",
+    "saddle_star": "advancement, promotion — riding a rising wave.",
+    "six_harm_bane": "covert harm or friction from the six-harm branch direction.",
+    "deep_grudge": "lingering resentment or unfinished conflict — in relationships, recurring arguments that never fully resolve.",
+    "ghost_gate": "sensitivity to hidden matters or the unseen; read here as a descriptive sensitivity marker, not an omen.",
+    "white_tiger": "intensity and sudden force — surgical or martial precision; can bring accidents or conflict if unchecked, alongside a real capacity for decisive action.",
+    "sky_hero": "strong will, charisma, and leadership — with a tendency toward extremity or conflict if the chart is not balanced.",
+    "heavenly_virtue": "virtue, protection, and honorable character — help arriving in times of need; often read as one of the most favorable stars.",
+    "monthly_virtue": "monthly/quarterly support, popularity, and smooth assistance from people around the querent.",
+}

@@ -23,9 +23,20 @@ from .report_data import _PILLAR_AREAS
 
 
 # ── Ten-god class names (English) ────────────────────────────────────────
+# Bug found 2026-09-20 (external report review, 3rd pass): 식신/상관 used to
+# both map to a single merged "Output" key here, while every other class
+# stayed split by yin/yang variant (Companion/Robber, Direct/Indirect Wealth,
+# Direct Officer/Seven Killings, Direct/Indirect Resource) — an inconsistent
+# grouping level that both inflated "Output"'s count in variant-level
+# comparisons (`_dominant_classes`) and silently mismatched every dict here
+# keyed by the class name, since `sewoon.py`/`daeun_overlay.py` already use
+# "Eating God"/"Hurting Officer" as the canonical English names (so any
+# tengod string sourced from those modules, e.g. `stem_tengod_en` in a 세운
+# table, never matched a dict entry keyed "Output"). Split them to match the
+# existing convention and the other four classes' split-by-variant shape.
 _TENGOD_CLASS: Dict[str, str] = {
     "비견": "Companion", "겁재": "Robber",
-    "식신": "Output", "상관": "Output",
+    "식신": "Eating God", "상관": "Hurting Officer",
     "편재": "Indirect Wealth", "정재": "Direct Wealth",
     "편관": "Seven Killings", "정관": "Direct Officer",
     "편인": "Indirect Resource", "정인": "Direct Resource",
@@ -98,8 +109,19 @@ def period_favorable_status(period: Any, ctx: Any) -> str:
     """
     hits = {getattr(period, "stem_element", None), getattr(period, "branch_element", None)}
     favorable = _ctx_get(ctx, "favorable")
+    supporting = _ctx_get(ctx, "supporting")
     unfavorable = _ctx_get(ctx, "unfavorable")
-    if favorable in hits:
+    # Bug found 2026-09-20 (external report review, 3rd pass): this used to
+    # check only `favorable`, not `supporting`, while the sibling annual-year
+    # check (`annual_window_row`) checks `elem in {fav, sup}` — a genuine
+    # inconsistency between this function (introduced 2026-09-19) and the
+    # pre-existing annual logic. Confirmed live: Harish's 40-49 decade
+    # (庚戌, stem Metal = 희신) was labelled "neutral" by this function while
+    # the 2030 (庚戌) YEAR inside that same decade, sharing the identical
+    # qualifying element, was labelled a "favorable-element year" by the
+    # annual check — a direct, client-visible contradiction between two
+    # tables describing the same period.
+    if favorable in hits or (supporting and supporting in hits):
         return "favorable"
     if unfavorable and unfavorable in hits:
         return "unfavorable"
@@ -125,6 +147,34 @@ def _class_counts(chart) -> Counter:
 
 def _dominant_classes(chart, n: int = 2) -> List[Tuple[str, int]]:
     return _class_counts(chart).most_common(n)
+
+
+def _grouped_dominant_classes(chart, n: int = 2) -> List[Tuple[str, int]]:
+    """Dominant 십신 classes at the proper 5-group level (비겁/식상/재성/관성/인성).
+
+    Bug found 2026-09-20 (external report review): `_class_counts` /
+    `_dominant_classes` mix grouping levels — 식상 is pre-merged into one
+    "Output" key, but 비겁/재성/관성/인성 are each kept split by yin/yang
+    variant (Companion/Robber, Direct/Indirect Wealth, Direct Officer/Seven
+    Killings, Direct/Indirect Resource). Calling `.most_common()` on that mix
+    compares a class-level count against variant-level counts and can name a
+    tied or even non-leading variant as "dominant." Confirmed live: Harish's
+    real class distribution is 비겁 4, 식상 4, 인성 4 (a three-way tie), 재성 2,
+    관성 1 — but `_dominant_classes` reported "Output (4), Robber (2)" (dropping
+    two of the three tied leaders and surfacing a class that isn't even in
+    the true top tier), while a SEPARATE function elsewhere concluded
+    "Direct Resource-dominant" from the same chart — two different,
+    inconsistent claims about what dominates the same ten-god profile.
+
+    This reuses the existing `_CLASS_TO_DRIVER` re-grouping (already used
+    correctly elsewhere in this file, e.g. `skill_levers`'s sibling driver
+    tally) rather than inventing a new grouping scheme.
+    """
+    grouped: Counter = Counter()
+    for cls, n_hits in _class_counts(chart).items():
+        driver = _CLASS_TO_DRIVER.get(cls, cls)
+        grouped[driver] += n_hits
+    return grouped.most_common(n)
 
 
 def _element_balance(chart) -> Counter:
@@ -160,6 +210,26 @@ _STAGE_TENDENCY: Dict[str, Tuple[str, str]] = {
 }
 
 
+def _season_signal(month_stage_score: float) -> str:
+    """Classify a 12운성 month-stage score as supported / depleted / mixed.
+
+    Bug found 2026-09-20 (own find, while implementing R17's strength
+    reasoning): `strength.py::_STAGE_WEIGHT` scores range 0.0-2.0 and are
+    NEVER negative (see its own comment: "제왕/건록/관대/장생 are supportive,
+    사/묘/절 are depleted" — the depleted stages score exactly 0.0, not a
+    negative number). The threshold `<= -0.5` used here and in
+    `dm_arrival_narrative` could therefore never fire, so a Day Master at
+    사/절/병 (score 0.0-0.2) was always mis-bucketed as "mixed seasonal
+    support" instead of depleted — confirmed live: Harish's 辛 at 사 (0.0)
+    in 巳 read as "mixed" when knowledge/06 calls 사 an ending/depleted stage.
+    """
+    if month_stage_score >= 1.2:
+        return "supported"
+    if month_stage_score <= 0.3:
+        return "depleted"
+    return "mixed"
+
+
 def dm_arrival_narrative(ctx) -> str:
     """2–3 sentences about how the Day Master 'arrives' in the month branch.
 
@@ -180,18 +250,55 @@ def dm_arrival_narrative(ctx) -> str:
     month_stage = sa.get("month_stage", stage)
     # Use the engine's month-stage score as a second signal, if present.
     month_stage_score = sa.get("month_stage_score", 0.0)
-    if month_stage_score >= 0.5:
-        season_signal = "seasonally supported"
-    elif month_stage_score <= -0.5:
-        season_signal = "seasonally depleted"
-    else:
-        season_signal = "mixed seasonal support"
+    season_signal = {
+        "supported": "seasonally supported", "depleted": "seasonally depleted",
+        "mixed": "mixed seasonal support",
+    }[_season_signal(month_stage_score)]
 
     return (
         f"Your Day Master **{chart.day_master}** meets the month branch **{chart.month.branch}** "
         f"at the **{stage} ({label})** twelve-stage — {description}. "
         f"This is read as a {season_signal} arrival: a tendency in how the querent's core energy "
         f"first enters the world, not a fixed early-life outcome."
+    )
+
+
+def strength_reasoning(ctx) -> str:
+    """One-sentence argument for the strength verdict (season, hidden-stem
+    support, drain) — the reasoning block knowledge/10-output-template
+    requires alongside the bare verdict label.
+
+    Bug found 2026-09-20 (external report review, 3rd pass): the Quick
+    Reference used to state only the verdict ("Balanced — a
+    seasonal-strength reading") with no argument for it, even though
+    `strength_assessment` already carries every input the argument needs —
+    confirmed live: Harish's 辛 sits at 사 (death/depleted, per
+    knowledge/06-twelve-stages.md) in the 巳 month, a seasonally weak
+    baseline, which the chart's Earth/Metal (resource + peer) support then
+    offsets back to balanced; the report never stated this mechanism.
+    """
+    chart = _ctx_get(ctx, "chart")
+    sa = chart.strength_assessment or {}
+    stage = sa.get("month_stage", "—")
+    _, description = _STAGE_TENDENCY.get(stage, ("mixed", "the month branch gives a mixed signal"))
+    month_stage_score = sa.get("month_stage_score", 0.0)
+    season_note = {
+        "supported": "a seasonally supported baseline", "depleted": "a seasonally weak baseline",
+        "mixed": "a mixed seasonal baseline",
+    }[_season_signal(month_stage_score)]
+    self_score = sa.get("self_score", 0.0)
+    resource_score = sa.get("resource_score", 0.0)
+    drain_score = sa.get("drain_score", 0.0)
+    support = self_score + resource_score
+    if support > drain_score * 1.3:
+        offset_note = "peer and resource support (visible and hidden stems) then outweighs the output/wealth/authority drain"
+    elif drain_score > support * 1.3:
+        offset_note = "the output/wealth/authority drain then outweighs the peer and resource support"
+    else:
+        offset_note = "peer/resource support and the output/wealth/authority drain then sit close to even"
+    return (
+        f"the Day Master's stage in the month branch **{chart.month.branch}** is **{stage}** "
+        f"({season_note}, per knowledge/06-twelve-stages.md) — {description} — and {offset_note}."
     )
 
 
@@ -244,7 +351,7 @@ def employment_vs_entrepreneurship(ctx) -> str:
     cls = _class_counts(chart)
     authority = cls.get("Direct Officer", 0) + cls.get("Seven Killings", 0)
     wealth = cls.get("Direct Wealth", 0) + cls.get("Indirect Wealth", 0)
-    output = cls.get("Output", 0)
+    output = cls.get("Eating God", 0) + cls.get("Hurting Officer", 0)
     sa = chart.strength_assessment or {}
     verdict = sa.get("verdict", "balanced")
     parts: List[str] = []
@@ -285,6 +392,13 @@ def income_rhythm(ctx) -> str:
     direct = direct_wealth >= 1
     indirect = indirect_wealth >= 1 and direct_wealth == 0
     from . import lookup as L
+    # Whether 정재 (Direct Wealth) specifically appears on a VISIBLE stem —
+    # "rooted" classically describes a visible stem reinforced by a matching
+    # hidden stem in a branch, so this check is a precondition for that
+    # claim, not the hidden-only case handled separately below.
+    direct_wealth_visible = any(
+        L.ten_god(chart.day_master, s) == "정재" for s in chart.stems
+    )
     wealth_rooted = False
     for p in chart.pillars:
         if not p.hidden_stems:
@@ -305,11 +419,30 @@ def income_rhythm(ctx) -> str:
                     break
         if wealth_rooted:
             break
-    if direct and wealth_rooted:
+    if direct and direct_wealth_visible and wealth_rooted:
         return (
             "Income tends to arrive in **steady increments** — a salaried baseline, retainer work, or "
             "recurring contracts. The Direct Wealth stem is rooted in a branch, so the source is durable "
             "and the rhythm is rarely interrupted by surprise windfalls."
+        )
+    if direct and direct_wealth_visible:
+        return (
+            "Income tends to arrive in **steady increments** — a salaried baseline, retainer work, or "
+            "recurring contracts. The Direct Wealth stem is visible but not echoed in a branch, so the "
+            "source is real but may need more conscious maintenance to stay durable."
+        )
+    if direct:
+        # Bug found 2026-09-19 (external report review, 2nd pass): this
+        # branch used to be unreachable in practice — `direct` alone (no
+        # visibility check) fell straight into the "steady increments...
+        # rooted in a branch" text above even when the only 정재 in the
+        # chart was a HIDDEN stem with no visible counterpart at all (e.g.
+        # Harish: hidden 甲 in 亥, no visible 정재 anywhere) — a specific,
+        # false "rooted" claim about a stem that doesn't visibly exist.
+        return (
+            "The chart carries **Direct Wealth only as a hidden stem** — real, but latent rather than "
+            "actively expressed. Income from a steady, earned source is structurally present but may "
+            "need a deliberate channel (a role, a contract, a platform) to become visible and regular."
         )
     if indirect:
         return (
@@ -334,7 +467,8 @@ def skill_levers(ctx) -> str:
     skill_pool = {
         "Companion": ["peer collaboration", "team facilitation", "honest self-assessment"],
         "Robber": ["competitive positioning", "negotiation", "boundary-setting"],
-        "Output": ["written or verbal communication", "creative production", "presentation craft"],
+        "Eating God": ["craft refinement", "creative production", "steady output routines"],
+        "Hurting Officer": ["written or verbal communication", "sharp critique", "presentation craft"],
         "Direct Wealth": ["financial modelling", "value-pricing", "asset stewardship"],
         "Indirect Wealth": ["deal-sourcing", "investment evaluation", "opportunity spotting"],
         "Direct Officer": ["structured planning", "policy literacy", "conflict mediation"],
@@ -515,7 +649,8 @@ def relationship_style(ctx) -> str:
     implication = {
         "Companion": "you want a partner who feels like an equal — neither admiring nor competing, just present.",
         "Robber": "you are drawn to partners who challenge you, which can be exhilarating or exhausting.",
-        "Output": "you express affection through doing — cooking, building, fixing — not always through words.",
+        "Eating God": "you express affection through doing — cooking, building, fixing — not always through words.",
+        "Hurting Officer": "you express affection candidly, sometimes bluntly, and want a partner who can take direct feedback.",
         "Direct Wealth": "you find steadiness attractive; partners who can hold resources well feel safe.",
         "Indirect Wealth": "you are attracted to variety and the unexpected, which keeps long-term partnerships fresh.",
         "Direct Officer": "you value reliability and a partner who respects clear roles in the relationship.",
@@ -558,7 +693,8 @@ def spouse_palace_tengod(ctx) -> str:
     domain = {
         "Companion": "a peer-like partnership where independence and togetherness stay in balance",
         "Robber": "a lively, sometimes competitive partnership that keeps the querent sharp",
-        "Output": "a creative, doing-oriented partnership; shared projects and conversation matter more than convention",
+        "Eating God": "a creative, doing-oriented partnership; shared projects and quiet craft matter more than convention",
+        "Hurting Officer": "a candid, expressive partnership; direct conversation and shared creative output matter more than convention",
         "Direct Wealth": "a stable, materially grounded partnership where practical care reads as love",
         "Indirect Wealth": "a varied, opportunity-rich partnership that resists rigid routine",
         "Direct Officer": "a structured, respectful partnership with clear roles and reliability",
@@ -633,23 +769,50 @@ def three_mindful_notes(ctx) -> List[str]:
     return notes[:3]
 
 
-def relationship_timing_row(year: int, pillar: str, tengod: str) -> str:
-    """1-line theme for a relationship-timing year (2026–2031)."""
+_RELATIONSHIP_THEME_NEUTRAL: Dict[str, str] = {
+    "Direct Officer": "structure and accountability in relationships and partnerships",
+    "Seven Killings": "intensity and transformation — expect a relationship to demand change",
+    "Direct Wealth": "stability and value-sharing — good for settling into a long-term rhythm",
+    "Indirect Wealth": "variety and social expansion — meeting new people, diversifying the social circle",
+    "Eating God": "creative expression together — shared projects, craft, or quiet collaboration",
+    "Hurting Officer": "candid expression together — direct conversation, art, or public collaboration",
+    "Direct Resource": "support and study — a partner who mentors or grounds you",
+    "Indirect Resource": "intuition and surprise — a relationship that teaches you something unexpected",
+    "Companion": "peer energy — friendships and partnerships strengthen",
+    "Robber": "competition or boundary-setting — be clear about what you will and will not negotiate",
+}
+
+
+def relationship_timing_row(year: int, pillar: str, tengod: str, gender: Optional[str] = None) -> str:
+    """1-line theme for a relationship-timing year (2026–2031).
+
+    The marriage/commitment-coded ten-god is GENDER-DEPENDENT per the
+    classical 자평진전 spouse-star convention already used elsewhere in this
+    project (see `compat.py::_gendered_spouse_star_note`, sourced from
+    `knowledge/11-gunghap.md` §G): for a male Day Master the spouse
+    (wife) indicator is 재성 (Wealth — 정재/편재), not 관성; for a female
+    Day Master it is 관성 (Officer — 정관 positive, 편관 read with caution),
+    matching 명리정종's "남성에게는 정재·편재 모두 긍정, 여성에게는 정관 긍정
+    / 편관 부정."
+
+    Bug found 2026-09-19 (external report review, 2nd pass): this function
+    used to hard-code "Direct Officer -> engagement, marriage, formal
+    commitment" for every chart regardless of gender — a template built for
+    a female querent, applied unchanged to a male one (confirmed live in
+    Harish's report). When gender is unknown, the gendered read is declined
+    (matching the compat.py convention) and a neutral theme is used instead.
+    """
     from . import lookup as L
     # Look up the year's stem element from the pillar's first char (stem).
     stem = pillar[:1] if pillar else "—"
     elem = L.STEM_INFO.get(stem, {}).get("element", "—")
-    class_theme = {
-        "Direct Officer": "structure and visible milestones (engagement, marriage, formal commitment)",
-        "Seven Killings": "intensity and transformation — expect a relationship to demand change",
-        "Direct Wealth": "stability and value-sharing — good for settling into a long-term rhythm",
-        "Indirect Wealth": "variety and social expansion — meeting new people, diversifying the social circle",
-        "Output": "creative expression together — projects, conversations, or artistic collaboration",
-        "Direct Resource": "support and study — a partner who mentors or grounds you",
-        "Indirect Resource": "intuition and surprise — a relationship that teaches you something unexpected",
-        "Companion": "peer energy — friendships and partnerships strengthen",
-        "Robber": "competition or boundary-setting — be clear about what you will and will not negotiate",
-    }
+    class_theme = dict(_RELATIONSHIP_THEME_NEUTRAL)
+    if gender == "M":
+        class_theme["Direct Wealth"] = "structure and visible milestones (engagement, marriage, formal commitment)"
+        class_theme["Indirect Wealth"] = "a relationship-opportunity year — meeting a partner through new circles, or a lower-commitment variety phase"
+    elif gender == "F":
+        class_theme["Direct Officer"] = "structure and visible milestones (engagement, marriage, formal commitment)"
+        class_theme["Seven Killings"] = "intensity or pressure in a relationship — per 명리정종, 편관 years read with more caution than 정관 for a female Day Master; not automatically a commitment year"
     theme = class_theme.get(tengod, "a year that asks the relationship to evolve quietly")
     return f"**{elem}** energy + {tengod}: {theme}."
 
@@ -660,7 +823,7 @@ def friendship_social_energy(ctx) -> str:
     cls = _class_counts(chart)
     fav = _ctx_get(ctx, "favorable", "—")
     unfav = _ctx_get(ctx, "unfavorable") or "the challenging element"
-    dominant = _dominant_classes(chart, 2)
+    dominant = _grouped_dominant_classes(chart, 2)
     dom_classes = ", ".join(f"{c} ({n})" for c, n in dominant) or "Companion"
     attracts = {
         "Wood": "people who are curious, learning, and growing",
@@ -1069,7 +1232,21 @@ def annual_window_row(h, ctx) -> Tuple[str, str, str]:
         best = "peer projects, friendships, self-definition"
         watch = "comparison and competition with peers"
     if not favorable:
-        watch = f"{watch}; the {elem} element drains rather than feeds — slow down"
+        # Only assert the stronger "drains" language when this year's element
+        # matches a chart's specifically-declared 기신 (unfavorable element).
+        # Bug found 2026-09-19 (external report review, 2nd pass): this used
+        # to fire for ANY non-favorable/supporting year, even for a
+        # climate-balanced chart with NO declared 기신 (Quick Reference shows
+        # "Avoid / Watch: —") — asserting a specific harm ("drains rather
+        # than feeds") the chart never actually claims is a direct
+        # contradiction with the empty Avoid/Watch field two sections
+        # earlier. A year that is merely neutral (한신, neither favorable nor
+        # specifically unfavorable) gets softer language instead.
+        unfav = _ctx_get(ctx, "unfavorable", None)
+        if unfav and unfav not in ("—", "") and elem == unfav:
+            watch = f"{watch}; the {elem} element drains rather than feeds — slow down"
+        else:
+            watch = f"{watch}; a neutral year for this chart — steady maintenance over big pushes"
     return theme, best, watch
 
 
@@ -1096,10 +1273,65 @@ def year_by_year_note(h, ctx) -> str:
         "Water": "watch for isolation and depletion",
     }.get(elem, "watch for the chart's natural pressure point")
     year_kind = "**favorable-element year**" if favorable else "an annual energy to navigate consciously"
-    return (
+    base = (
         f"This is {year_kind} — best focused on {focus}. "
         f"Caution: {caution}; pace yourself rather than pushing through."
     )
+    activation = annual_activation_note(h)
+    return f"{base} {activation}" if activation else base
+
+
+_RELATIONSHIP_LABEL: Dict[str, str] = {
+    "clash": "충 (clash)", "combine": "합 (combination)",
+    "harm": "해 (harm)", "break": "파 (break)", "self_punish": "자형 (self-punishment)",
+}
+
+
+_ELEMENT_HANJA: Dict[str, str] = {"Wood": "木", "Fire": "火", "Earth": "土", "Metal": "金", "Water": "水"}
+
+
+def annual_activation_note(h) -> str:
+    """One clause naming this year's natal-chart activations: a 천간합
+    between the annual stem and the Day Master, and/or a branch
+    clash/combine/harm/break against a natal branch (knowledge/08 Part 2
+    step 3: "Annual stem vs. natal stems -> 합?" / "Annual branch vs. natal
+    branches -> 충, 형, 파, 해?").
+
+    Bug found 2026-09-20 (external report review, 3rd pass): the engine
+    already computed `SeWoonHit.activated_branches` / `relationship_types`
+    for every year but no report prose ever read them, so a genuine
+    activation — e.g. 2026's 丙辛합 with the Day Master, or its 丑午 해
+    against a natal 丑 hour branch — was silently absent from every report.
+    Returns "" when the year carries no activation, so callers can append
+    it conditionally without an empty trailing clause.
+    """
+    notes: List[str] = []
+    for stem_a, stem_b, combo_elem, combo_ko in getattr(h, "stem_combinations", []) or []:
+        # The combo label (e.g. "병신합수") is annotated with its own Hanja
+        # inline here, not left for the general `inject_hanja` pass. Bug
+        # found 2026-09-20 (own find, while implementing this function):
+        # the label's individual syllables (합=合, and even 병=病 — the
+        # Stem "丙" transliteration collides with the unrelated 12운성 term
+        # 병=病) are each independently registered in `HANJA_GLOSSARY`, so
+        # glossing this string character-by-character mis-annotated it
+        # mid-word (e.g. "병 (病)신합수"). Supplying the correct compound
+        # Hanja directly makes the text already-annotated, so the general
+        # pass's own "already annotated" lookahead correctly skips it.
+        combo_hanja = f"{stem_a}{stem_b}合{_ELEMENT_HANJA.get(combo_elem, '')}"
+        notes.append(
+            f"the annual stem **{h.stem}** forms **{combo_ko} ({combo_hanja})** with your Day Master, "
+            f"activating {combo_elem}"
+        )
+    seen_types: set = set()
+    for annual_b, natal_b, rel in getattr(h, "activated_branches", []) or []:
+        if rel in seen_types:
+            continue
+        seen_types.add(rel)
+        label = _RELATIONSHIP_LABEL.get(rel, rel)
+        notes.append(f"the annual branch **{annual_b}** and natal **{natal_b}** are in **{label}**")
+    if not notes:
+        return ""
+    return "Also active this year: " + "; ".join(notes) + "."
 
 
 # ── Pattern / Closing fillers ───────────────────────────────────────────
@@ -1362,7 +1594,7 @@ def closing_note_short(ctx) -> str:
     chart = _ctx_get(ctx, "chart")
     fav = _ctx_get(ctx, "favorable", "—")
     dm_en = _ctx_get(ctx, "dm_en", "Day Master")
-    cls = _dominant_classes(chart, 1)
+    cls = _grouped_dominant_classes(chart, 1)
     gift = f"a strong {cls[0][0].lower()} presence that gives the querent real follow-through" if cls else "a clear and workable Day Master foundation"
     return (
         f"This chart's gift is {gift}; the challenge is staying aware of the chart's pressure points "
@@ -1379,16 +1611,26 @@ def closing_note_long(ctx) -> str:
     chart = _ctx_get(ctx, "chart")
     dm = _ctx_get(ctx, "dm", "—")
     dm_en = _ctx_get(ctx, "dm_en", "Day Master")
-    dm_elem = _ctx_get(ctx, "dm_element", "")
     fav = _ctx_get(ctx, "favorable", "—")
     sup = _ctx_get(ctx, "supporting", "—")
     spouse_branch = chart.day.branch
     cls = _class_counts(chart)
-    dominant = _dominant_classes(chart, 2)
+    dominant = _grouped_dominant_classes(chart, 2)
     dom_summary = ", ".join(f"{c} ({n})" for c, n in dominant) or "Companion"
+    # The chart's actual weighted-balance dominant element (chart.patterns
+    # already computes this via the same _element_counts weighting shown in
+    # the Element Balance table) — NOT the Day Master's own native element
+    # (ctx.dm_element), which can differ (e.g. Harish: DM is Metal, but the
+    # chart's weighted balance leans Water). Bug found 2026-09-19 (external
+    # report review, 2nd pass): this sentence used to substitute
+    # ctx.dm_element here, producing "the chart's element balance leaning
+    # toward Metal" for a chart whose actual balance leans Water (27.8% vs
+    # 25.3%) — a direct, client-visible internal contradiction against the
+    # Element Balance table two sections earlier in the same report.
+    balance_elem = (chart.patterns or {}).get("dominant_element") or _ctx_get(ctx, "dm_element", "")
     parts = [
         f"**{dm} ({dm_en})** sits at the centre of this chart, with the chart's element balance leaning "
-        f"toward **{dm_elem}** and a ten-god distribution dominated by **{dom_summary}**.",
+        f"toward **{balance_elem}** and a ten-god distribution dominated by **{dom_summary}**.",
         f"The favorable **{fav}** element (with **{sup}** as the quiet secondary) is the querent's main "
         f"lever — not as a rule to follow, but as a rhythm to listen to.",
         f"The spouse palace **{spouse_branch}** and the chart's relationship dynamics reward the "
@@ -1437,7 +1679,8 @@ def top_strengths(ctx) -> List[str]:
     dominant = _dominant_classes(chart, 3)
     dom_strengths = {
         "Companion": "the ability to collaborate as an equal without losing self",
-        "Output": "the ability to create and produce visible work",
+        "Eating God": "the ability to create and produce visible work at a steady, sustainable pace",
+        "Hurting Officer": "the ability to express sharply and produce work that cuts through noise",
         "Direct Wealth": "the ability to hold and grow resources with discipline",
         "Indirect Wealth": "the ability to spot opportunity and move on it",
         "Direct Officer": "the ability to lead through structure and accountability",
@@ -1544,15 +1787,16 @@ def business_launch_format(ctx) -> str:
     """Best launch format based on Day Master strength + dominant ten-god class."""
     chart = _ctx_get(ctx, "chart")
     cls = _class_counts(chart)
+    output = cls.get("Eating God", 0) + cls.get("Hurting Officer", 0)
     sa = chart.strength_assessment or {}
     verdict = sa.get("verdict", "balanced")
-    if verdict in ("strong", "extreme") and cls.get("Output", 0) >= 1:
+    if verdict in ("strong", "extreme") and output >= 1:
         return (
             "**A public campaign with a clear voice** is the most likely fit. Strong Day Masters with "
             "visible Output stems can carry the visibility, and a public launch reads as confidence "
             "rather than risk. Pair it with a small but engaged audience rather than a mass-broadcast feel."
         )
-    if verdict in ("weak", "extreme_weak") and cls.get("Output", 0) == 0:
+    if verdict in ("weak", "extreme_weak") and output == 0:
         return (
             "**A quiet beta with a small reference audience** is the safest fit. The Day Master needs "
             "time to learn what the work wants to be before the visibility of a public launch. Treat "
@@ -1564,7 +1808,7 @@ def business_launch_format(ctx) -> str:
             "The Authority ten-god gives the launch a stamp of legitimacy, and a partner carries the "
             "parts the querent's chart cannot carry alone."
         )
-    if cls.get("Output", 0) >= 1:
+    if output >= 1:
         return (
             "**An evergreen product that lives on its own voice** is the most likely fit. Output-dominant "
             "charts can sustain a long-running artifact (writing, course, content) more easily than "
@@ -1661,7 +1905,7 @@ _CAREER_DRIVERS: Dict[str, str] = {
 # fine-grained _class_counts label -> coarse driver
 _CLASS_TO_DRIVER: Dict[str, str] = {
     "Direct Wealth": "Wealth", "Indirect Wealth": "Wealth",
-    "Output": "Output",
+    "Eating God": "Output", "Hurting Officer": "Output",
     "Direct Officer": "Authority", "Seven Killings": "Authority",
     "Direct Resource": "Resource", "Indirect Resource": "Resource",
     "Companion": "Companion", "Robber": "Companion",
@@ -1678,7 +1922,8 @@ _TEN_GOD_PLAIN: Dict[str, str] = {
 _SPOUSE_PLAIN: Dict[str, str] = {
     "Companion": "a partner who feels like an equal — independence and closeness held in balance",
     "Robber": "a lively, sometimes competitive partner who keeps you on your toes",
-    "Output": "a partner you do and make things with — shared projects over convention",
+    "Eating God": "a partner you do and make things with — shared projects over convention",
+    "Hurting Officer": "a partner you speak plainly with — candid exchange over convention",
     "Direct Wealth": "a steady, practical partner where everyday care reads as love",
     "Indirect Wealth": "a varied, opportunity-minded partner who resists rigid routine",
     "Direct Officer": "a reliable partner with clear roles and mutual respect",

@@ -94,7 +94,7 @@ For example, in an **甲 갑 (Yang Wood)** chart, an **庚 경 (Yang Metal)** is
 
 ### 4. 관성 (Authority) — 편관 + 정관
 
-**Element:** Controls the Day Master. (Earth → Wood; Metal → Wood; Water → Fire; Fire → Metal; Wood → Earth — wait, that's wrong. The correct control cycle is: Wood → Earth; Earth → Water; Water → Fire; Fire → Metal; Metal → Wood. So whatever controls the Day Master is the 관성.)
+**Element:** Controls the Day Master, per the 상극 (overcoming) cycle in `knowledge/03-five-elements.md` (Wood → Earth → Water → Fire → Metal → Wood, each element controlling the next). Whatever element controls the Day Master's own element is the 관성.
 
 - **편관 (偏官, Seven Killings / 칠살)** — Same polarity. Pressure, competition, discipline through force, military/political authority, the husband (in wife's chart, in one reading), sudden dangers.
 - **정관 (正官, Direct Officer)** — Different polarity. Conventional career, government, exam success, gentle authority, husband (in wife's chart, in another reading), father (in son's chart, in another reading), social status.

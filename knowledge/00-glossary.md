@@ -31,17 +31,17 @@ Korean and Hanja terminology used throughout the Saju knowledge base. Entries ar
 
 - **간지 (ganji, 干支)** — A pair of one Heavenly Stem and one Earthly Branch, forming a 60-cycle (육십갑자). Each pillar in a Saju chart is one 간지.
 - **고려사주 (Goryeo Saju)** — The Korean Saju tradition descended from the Goryeo period, often blended with the Chinese 명리학 mainstream but with distinctively Korean vocabulary and approach.
-- **공망 (gongmang, 空亡)** — "Void / Empty" — the two branches absent from the three-month 절 (jie) group containing the day pillar. Subjects of the void are symbolically weakened or have a "deferred" quality.
+- **공망 (gongmang, 空亡)** — "Void / Empty." The 60-cycle (육십갑자) is divided into six 순 (旬, decade-groups) of ten consecutive stem-branch pairs each; each 순 uses only 10 of the 12 branches, paired against the 10 stems in order. The two branches NOT used in the day pillar's own 순 are that day's 공망 — the branches whose themes are read as symbolically weakened or "deferred" for the querent. (Matches the engine's actual computation, `stars.py::_xun_kong` — keyed to the day pillar's 순, not to any month-based grouping.)
 
 ## B
 
+- **배우자궁 (baeuja-gung, 配偶者宮)** — "Spouse Palace." The day branch (일지) — read for the querent's partner and marriage dynamics. *(Added 2026-09-20 — external report review, 4th pass.)*
 - **반합 (banhap, 半合)** — Half-combination. Two of three branches in a 삼합 (three-harmony) set combine. Strength is partial.
-- **방합 (banghap, 方合)** — Directional harmony. The three branches of a cardinal direction (e.g. 인오술 寅午戌 = Fire) form a complete 삼합 when joined. Also called 삼방합.
+- **방합 (banghap, 方合)** — Directional harmony. The three branches of one cardinal direction — 寅卯辰 (East, Wood), 巳午未 (South, Fire), 申酉戌 (West, Metal), 亥子丑 (North, Water) — form a 방합 when joined; a *distinct* grouping from 삼합 (see `02-branches.md` and `11-gunghap.md` §B3). *(Corrected 2026-09-20 — external report review, 4th pass: the prior wording gave 寅午戌 — itself a 삼합 Fire frame, not a 방합 set — as the example, conflating the two groupings.)*
 
 ## C
 
 - **충 (chung, 沖)** — Direct clash between two branches, six pairs: 자오, 축미, 인신, 묘유, 진술, 사해. Brings disruption, change, sudden events.
-- **처녀궁 (Cheonyeo Palace)** — The hour pillar (시주). Considered the palace of one's later years and children.
 
 ## D
 
@@ -51,20 +51,22 @@ Korean and Hanja terminology used throughout the Saju knowledge base. Entries ar
 
 ## E
 
-- **없음 / N/A** — Not applicable.
+- **억부 (eokbu, 抑扶)** — Strength-balance. The classical principle that argues 용신 from Day Master strength (whether it needs restraining or supporting) — the counterpart method to 조후 (climate-balance). See `03-five-elements.md` and `09-interpretation-method.md`. *(Added 2026-09-20 — external report review, 4th pass.)*
 
 ## G
 
 - **개업 (gaeeop, 開業)** — Business opening / launch. In date selection (택일), favour a day carrying 식상 or 재성 energy in a favourable-element month — see `knowledge/16-date-selection.md`.
 - **격국 (gyeokguk, 格局)** — The structural pattern of the chart. Identified by the most powerful stem in the month branch and the way it relates to the Day Master. Common grids include 정격 (正格), 종격 (從格), 화격 (化格), 식상격 (食傷格), 재격 (財格), 관격 (官格), 인성격 (印格), and the 특수격 (special grids).
+- **경 (Gyeong, 庚)** — Yang Metal stem.
+- **경금 (Gyeong-geum, 庚金)** — Yang Metal.
 - **관성 (gwanseong, 官星)** — Officer / authority star. Generic term for the 관 (Officer) ten-god class. See 십신.
 - **관살 (gwansal)** — Combined 관성 + 칠살 (Seven Killings) for "authority and pressure" in a general sense.
-- **겁재 (geopjae, 劫財)** — Rob Wealth. Yang-stem peer of the Day Master. Ten God class. See 십신.
+- **겁재 (geopjae, 劫財)** — Rob Wealth. **Different-polarity** peer of the Day Master (per `05-ten-gods.md`'s relative-polarity rule — not the stem's own absolute yin/yang; a peer stem of the *same* polarity as the Day Master is 비견 instead). Ten God class. See 십신. *(Corrected 2026-09-20 — external report review, 4th pass.)*
 - **공망 (gongmang, 空亡)** — see above under A.
 
 ## H
 
-- **합 (hap, 合)** — Combination. 천간합 (stem combination) or 지지합 (branch combination). Stem 合 produces a new element (the "합화오행"); branch 합 brings relationships between the participating branches.
+- **합 (hap, 合)** — Combination. 천간합 (stem combination) or 지지합 (branch combination). Stem 合 produces a new element (the "합화오행"); branch 合 brings relationships between the participating branches.
 - **해 (hae, 害)** — Harm. Six pairs, e.g. 자미, 축오, 인사, 묘진, 유술, 신해. Subtler than 충, more like covert friction.
 - **화개살 (Hwagae-sal, 華蓋殺)** — "Canopy Star." Spiritual / artistic / solitary star. Often found in those drawn to religion, scholarship, or a hermetic path.
 - **화격 (Hwagyeok, 化格)** — Transformation Grid. The month stem is a 변 (變, transforming) stem that combines with another stem in the chart to "transform" into a different element, which then becomes the Day Master's adopted element.
@@ -77,19 +79,9 @@ Korean and Hanja terminology used throughout the Saju knowledge base. Entries ar
 ## J
 
 - **자형 (jahyeong, 自刑)** — Self-punishment. Branches that clash with their own nature: 辰辰, 午午, 酉酉, 亥亥.
-
-## K
-
-- **관성 (gwanseong)** — see 십신.
-- **경 (Gyeong, 庚)** — Yang Metal stem.
-- **경금 (Gyeong-geum, 庚金)** — Yang Metal.
-- **겁재 (geopjae)** — Rob Wealth. See 십신.
-
-## L
-
-- **로 (no Hanja)** — see 노 (로, 露). Not in this glossary.
-- **론 (lon)** — not used.
-- **록 (rok, 祿)** — see 건록.
+- **자식궁 (jasik-gung, 子息宮)** — "Children's Palace." The hour pillar (시주), read for offspring and one's later-life legacy. *(Added 2026-09-20 — external report review, 4th pass, replacing a nonstandard "처녀궁" entry that previously stood in for this term.)*
+- **지장간 (jijanggan, 支藏干)** — Hidden Stems. The stem(s) concealed within a branch (본기/중기/여기). See `01-stems.md` and `02-branches.md`.
+- **조후 (johu, 調候)** — Climate-balance. The classical principle that a chart's 용신 can be argued from seasonal temperature/moisture extremes rather than only from Day Master strength (억부). See `17-climate-method.md`.
 
 ## M
 
@@ -100,7 +92,7 @@ Korean and Hanja terminology used throughout the Saju knowledge base. Entries ar
 
 ## N
 
-- **노 (no)** — see 노 (老). Not in this glossary.
+- **노년궁 (nonyeon-gung, 老年宮)** — "Later-Years Palace." An alternate designation for the hour pillar (시주), read for the later stage of life — a synonym pairing with 자식궁 above, not a competing claim. *(Added 2026-09-20 — external report review, 4th pass.)*
 - **년주 (nyeonju, 年柱)** — Year Pillar. The leftmost of the four pillars.
 - **년지 (nyeonji, 年支)** — Year Branch.
 
@@ -111,57 +103,42 @@ Korean and Hanja terminology used throughout the Saju knowledge base. Entries ar
 ## P
 
 - **파 (pa, 破)** — Breakage. Six pairs, e.g. 子酉, 午卯, 辰丑, 未戌, 申巳, 寅亥. Less severe than 충, more about erosion of relationships.
-- **편관 (pyeon-gwan, 偏官)** — Seven Killings (also 칠살 七殺). Yang-stem Officer of opposite polarity. Ten God.
-- **편인 (pyeon-in, 偏印)** — Indirect Resource / "Owl" / "偏印" (편인). Yin-stem 인성. Ten God.
-- **편재 (pyeon-jae, 偏財)** — Indirect Wealth. Yin-stem 재성. Ten God.
-- **폐 (pye)** — not used.
-
-## R
-
-- **로 (no Hanja)** — not used.
+- **편관 (pyeon-gwan, 偏官)** — Seven Killings (also 칠살 七殺). **Same-polarity** Officer relative to the Day Master (per `05-ten-gods.md`'s relative-polarity rule, not the stem's own absolute yin/yang). Ten God. *(Corrected 2026-09-20 — external report review, 4th pass: the prior wording, "Yang-stem Officer of opposite polarity," conflated the stem's own polarity with polarity relative to the Day Master.)*
+- **편인 (pyeon-in, 偏印)** — Indirect Resource / "Owl" / "偏印" (편인). **Same-polarity** 인성 relative to the Day Master. Ten God. *(Corrected 2026-09-20, same reason as 편관 above.)*
+- **편재 (pyeon-jae, 偏財)** — Indirect Wealth. **Same-polarity** 재성 relative to the Day Master. Ten God. *(Corrected 2026-09-20, same reason as 편관 above.)*
 
 ## S
 
 - **사 (sa, 巳)** — Yin Fire branch. Snake.
 - **사주 (saju, 四柱)** — Four Pillars. The complete chart: year, month, day, hour.
-- **상관 (sanggwan, 傷官)** — Hurting Officer. Yin-stem 식신. Ten God.
+- **삼합 (samhap, 三合)** — Three Harmonies. Three branches spread across the cycle that jointly point to one element: 인오술 (Fire), 사유축 (Metal), 신자진 (Water), 해묘미 (Wood). See `02-branches.md`. *(Added 2026-09-20 — external report review, 4th pass.)*
+- **삼형 (samhyeong, 三刑)** — Three Punishments. 寅巳申 and 丑戌未 (three-member sets) plus 子卯 (a two-member set) — see `02-branches.md`'s "Branch Three Punishments" table. Distinct from 자형 (a branch punishing itself). *(Added 2026-09-20 — external report review, 4th pass.)*
+- **상관 (sanggwan, 傷官)** — Hurting Officer. **Different-polarity** 식신 relative to the Day Master (per `05-ten-gods.md`'s relative-polarity rule, not the stem's own absolute yin/yang). Ten God. *(Corrected 2026-09-20 — external report review, 4th pass.)*
 - **상생 (sangsaeng, 相生)** — Generating cycle. Wood→Fire→Earth→Metal→Water→Wood.
 - **상극 (sanggeuk, 相剋)** — Overcoming / controlling cycle. Wood→Earth→Water→Fire→Metal→Wood.
 - **생 (saeng, 生)** — Generating. See 상생.
 - **세운 (seun, 歲運)** — Annual luck. The pillar of the current year.
-- **소 (so, 酉)** — Yin Metal branch. Rooster.
-- **쇄 (soe, 衰)** — Decline. One of the 12운성.
-- **수 (su, 戌)** — Yang Earth branch. Dog.
+- **쇠 (soe, 衰)** — Decline. One of the 12운성.
+- **술 (sul, 戌)** — Yang Earth branch. Dog.
 - **시 (si, 時)** — Hour. As in 시주 (Hour Pillar).
 - **시주 (siju, 時柱)** — Hour Pillar.
-- **식신 (siksin, 食神)** — Eating God. Yang-stem 식상. Ten God.
+- **식신 (siksin, 食神)** — Eating God. **Same-polarity** output relative to the Day Master (per `05-ten-gods.md`'s relative-polarity rule, not the stem's own absolute yin/yang). Ten God. *(Corrected 2026-09-20 — external report review, 4th pass.)*
 - **식상 (siksang, 食傷)** — Output / Expression. Generic term for 식신 + 상관.
 - **신 (shin, 申)** — Yang Metal branch. Monkey.
 - **신살 (shinsal, 神殺)** — Spirit / Star. Special formations that overlay on top of the standard stem/branch analysis. Examples: 도화살, 역마살, 화개살, 귀문관살, 천을귀인, 문창귀인.
 - **십신 (sipsin, 十神)** — Ten Gods. See 십신 section.
 - **십이운성 (sibiunseong, 十二運星)** — Twelve Life Stages. The cyclical states of an element as it progresses through the branches: 장생, 목욕, 관대, 건록, 제왕, 쇠, 병, 사, 묘, 절, 태, 양.
-- **심 (sim)** — see 신 (申). The branch 申 is "shin" in the Korean reading.
-- **쌍 (ssang)** — see 쌍. Not used.
 
 ## T
 
 - **태 (tae, 胎)** — Embryo. One of the 12운성.
 - **태극 (taegeuk, 太極)** — The Supreme Ultimate. Source of Yin and Yang.
 - **택일 (taegil, 擇日)** — Date selection. Ranking candidate days against the natal chart — favouring the 용신 / 희신 element and harmony with the natal day branch, avoiding a 충 to the day or hour branch. The chart-relative layer only; a full 택일 also needs the almanac layer (황도길일 · 손없는날 · 건제십이신 · 28수). See `knowledge/16-date-selection.md`.
+- **투출 (tuchul, 透出)** — "Emerging/Rising Out." A branch's hidden stem (지장간) also appearing as a visible stem elsewhere in the chart — the classical trigger for 격국 (Grid) determination. See `07-special-formations.md` Part 1. *(Added 2026-09-20 — external report review, 4th pass.)*
 
 ## U
 
-- **울 (ul, 戊)** — Yang Earth stem. (Korean reading)
-- **은 (eun, 乙)** — Yin Wood stem.
-- **을 (eul, 乙)** — Same as 은 above. Both readings are used in Korean Saju; 을 is the spelling in modern Korean.
-
-## V
-
-- **없음.**
-
-## W
-
-- **없음.**
+- **을 (eul, 乙)** — Yin Wood stem. The standard modern-Korean reading; see the Quick Lookup table below.
 
 ## Y
 
@@ -169,10 +146,9 @@ Korean and Hanja terminology used throughout the Saju knowledge base. Entries ar
 - **양 (yang, 養)** — Nurturing / "Yang Stage." One of the 12운성. (Same Hanja, different context — disambiguate by meaning.)
 - **역마살 (Yeokma-sal, 驛馬殺)** — "Post Horse Star." Indicates movement, travel, relocation, change of environment.
 - **양택 (yangtaek, 陽宅)** — Dwelling-siting fengshui (풍수). **Out of scope for this knowledge base** — a Saju reading covers only the 오행 / 용신 direction logic, not building layout. See `knowledge/14-directions-and-relocation.md` §Scope Boundary.
-- **연 (yeon, 然)** — not used alone.
 - **용신 (yongsin, 用神)** — Favorable Element. The element most needed to balance the chart. The single most important "key" to interpretation.
 - **운 (un, 運)** — Luck / fortune. As in 운명 (destiny), 대운 (major luck), 세운 (annual luck), 월운 (monthly luck).
-- **원진살 (Wonjin-sal, 元辰殺)** — "Original Spirit Star." Mixed signification; can indicate cleverness, edge, or alienation.
+- **원진살 (Wonjin-sal, 怨嗔煞)** — "Deep Grudge Star." Mixed signification; can indicate cleverness, edge, or alienation. See `07-special-formations.md`. *(Corrected 2026-09-20 — external report review, 4th pass: this entry previously gave the Hanja 元辰殺 ("Original Spirit Star") — a different classical term with a different derivation — while `07-special-formations.md`'s own dedicated entry correctly uses 怨嗔煞; this glossary summary now matches that more detailed source.)*
 - **월 (wol, 月)** — Month.
 - **월운 (wol-un, 月運)** — Monthly luck. The pillar of the current month.
 - **월주 (wolju, 月柱)** — Month Pillar.
@@ -192,22 +168,18 @@ Korean and Hanja terminology used throughout the Saju knowledge base. Entries ar
 - **재다신약 (jaedasinyak, 財多身弱)** — "Much wealth, weak self." 재성 is abundant but the Day Master too weak to carry it; wealth flows in but is not retained and the pull of managing it drains the self. Remedy is to strengthen the self (비겁 / 인성), not chase more 재성. See `knowledge/13-wealth-and-business.md`.
 - **재성 (jaeseong, 財星)** — Wealth. Ten God class. See 십신.
 - **재관살 (jaegwansal)** — A confluence of wealth and authority — classical "wealth and rank" reading.
-- **적 (jeok)** — see 적 (赤). Not used.
 - **적천수 (Jeokcheon-su, 滴天髓)** — Classical reference text for Saju.
-- **정관 (jeong-gwan, 正官)** — Direct Officer. Yin-stem Officer. Ten God.
+- **정관 (jeong-gwan, 正官)** — Direct Officer. **Different-polarity** Officer relative to the Day Master (per `05-ten-gods.md`'s relative-polarity rule, not the stem's own absolute yin/yang). Ten God. *(Corrected 2026-09-20 — external report review, 4th pass.)*
 - **정관격 (jeong-gwan gyeokguk)** — Officer Grid. The month stem is the Day Master's 정관. Often associated with conventional career success and adherence to order.
-- **정인 (jeong-in, 正印)** — Direct Resource. Yang-stem 인성. Ten God.
-- **정재 (jeong-jae, 正財)** — Direct Wealth. Yin-stem 재성. Ten God.
+- **정인 (jeong-in, 正印)** — Direct Resource. **Different-polarity** 인성 relative to the Day Master (per `05-ten-gods.md`'s relative-polarity rule, not the stem's own absolute yin/yang). Ten God. *(Corrected 2026-09-20 — external report review, 4th pass.)*
+- **정재 (jeong-jae, 正財)** — Direct Wealth. **Different-polarity** 재성 relative to the Day Master. Ten God. *(Corrected 2026-09-20, same reason as 정인 above.)*
 - **제왕 (jewang, 帝旺)** — Peak / Emperor's Glory. The fifth of the 12운성, peak of the element.
-- **조 (jo, 巳)** — see 사 (巳). The same Hanja 巳 is read as "사" in Saju usage.
 - **종격 (jonggyeok, 從格)** — "Following" Grid. The Day Master is so weak it cannot stand alone, and follows the dominant element of the chart. Subtypes: 종재, 종관, 종식상, 종인, 종자.
 - **주 (ju, 柱)** — Pillar. As in 사주.
 - **주 (ju, 丑)** — Yin Earth branch. Ox.
 - **지 (ji, 支)** — Branch / 지지 (Earthly Branch).
-- **지 (ji, 巳)** — not used.
 - **지지 (jiji, 支支)** — Earthly Branch (collectively). The twelve branches of the zodiac.
 - **진 (jin, 辰)** — Yang Earth branch. Dragon.
-- **질 (jil)** — see 질 (秩). Not used.
 - **질의자 (jil-uija, 質詢者)** — The person asking the question; the querent.
 
 ---
@@ -239,4 +211,4 @@ Korean and Hanja terminology used throughout the Saju knowledge base. Entries ar
 | 壬 | 임 | im | Yang Water stem |
 | 癸 | 계 | gye | Yin Water stem |
 
-> **Note on romanization:** Some Hanja have multiple Korean readings (e.g. 巳 as 사/지, 辛 as 신/신). The readings above are the **Saju-standard** readings used in classical 명리 texts.
+> **Note on romanization:** Some Hanja have multiple Korean readings (e.g. 巳 as 사/지). The readings above are the **Saju-standard** readings used in classical 명리 texts. *(Corrected 2026-09-20 — external report review, 4th pass: this note previously also cited "辛 as 신/신" — the same reading listed twice, not a genuine alternate-reading example.)*

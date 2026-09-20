@@ -116,9 +116,9 @@ Use this template as the **structure** for every Saju reading. The wording can v
 
 ## Sources & Limits (출처 및 한계)
 
-- **Cited knowledge files:** 00-glossary, 01-stems, 02-branches, 03-five-elements, 04-yin-yang, 05-ten-gods, 06-twelve-stages, 07-special-formations, 08-luck-pillars, 09-interpretation-method.
+- **Cited knowledge files:** 00-glossary, 01-stems, 02-branches, 03-five-elements, 04-yin-yang, 05-ten-gods, 06-twelve-stages, 07-special-formations, 08-luck-pillars, 09-interpretation-method, and (as the specific question requires) 10–17 — 12-career-and-vocation, 13-wealth-and-business, 14-directions-and-relocation, 15-health-and-body, 16-date-selection, 17-climate-method, and 11-gunghap for compatibility readings. *(Added 2026-09-20 — external report review, 4th pass: this list previously stopped at 09, so a generated report's own "Sources" section under-credited the topic files it actually cited.)*
 - **Limits:**
-  - The four pillars are taken as supplied by the querent; this skill does not auto-derive them.
+  - The four pillars are taken as supplied by the querent; this skill does not auto-derive them. *(Scope note: this governs an interactive reading conducted directly in this Claude-driven skill — it does not describe `src/saju_engine`'s packaged report-generation engine, `compute_chart()`, which does auto-derive the four pillars by design; see `09-interpretation-method.md`'s own scope note.)*
   - The hour pillar may be missing; this limits the analysis of children / late life.
   - This reading is a classical 명리 interpretation, not a prediction of fixed events.
   - The querent is encouraged to use this as one of many lenses, not a deterministic one.

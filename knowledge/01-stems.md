@@ -4,18 +4,20 @@ The ten Heavenly Stems are the upper characters of the four pillars. They repres
 
 ## The Ten Stems — Master Table
 
-| # | Hanja | Korean | Element | Yin/Yang | Direction | Season of Peak | Hidden Stems in Branch (when this stem is the main qi) |
+| # | Hanja | Korean | Element | Yin/Yang | Direction | Season of Peak | 본기 (Main Qi) of Branch(es) |
 |---|---|---|---|---|---|---|---|
-| 1 | 甲 | 갑 (gap) | Wood (목) | Yang (양) | East (동) | Spring (춘) | 인(寅) → 甲, 卯(묘) → 乙, 辰(진) → 戊 |
-| 2 | 乙 | 을 (eul) | Wood (목) | Yin (음) | East (동) | Spring (춘) | 卯(묘) → 乙, 辰(진) → 癸 |
-| 3 | 丙 | 병 (byeong) | Fire (화) | Yang (양) | South (남) | Summer (하) | 午(오) → 丁, 巳(사) → 庚 |
-| 4 | 丁 | 정 (jeong) | Fire (화) | Yin (음) | South (남) | Summer (하) | 巳(사) → 丙, 午(오) → 丁 |
-| 5 | 戊 | 무 (mu) | Earth (토) | Yang (양) | Center (중) | Late summer (장하) | 辰(진) → 乙, 戌(술) → 辛 |
-| 6 | 己 | 기 (gi) | Earth (토) | Yin (음) | Center (중) | Late summer (장하) | 午(오) → 丁, 未(미) → 己 |
-| 7 | 庚 | 경 (gyeong) | Metal (금) | Yang (양) | West (서) | Autumn (추) | 申(신) → 庚, 酉(유) → 辛 |
-| 8 | 辛 | 신 (sin) | Metal (금) | Yin (음) | West (서) | Autumn (추) | 酉(유) → 辛, 戌(술) → 丁 |
-| 9 | 壬 | 임 (im) | Water (수) | Yang (양) | North (북) | Winter (동) | 亥(해) → 壬, 子(자) → 癸 |
-| 10 | 癸 | 계 (gye) | Water (수) | Yin (음) | North (북) | Winter (동) | 子(자) → 癸, 亥(해) → 壬 |
+| 1 | 甲 | 갑 (gap) | Wood (목) | Yang (양) | East (동) | Spring (춘) | 寅 (인) |
+| 2 | 乙 | 을 (eul) | Wood (목) | Yin (음) | East (동) | Spring (춘) | 卯 (묘) |
+| 3 | 丙 | 병 (byeong) | Fire (화) | Yang (양) | South (남) | Summer (하) | 巳 (사) |
+| 4 | 丁 | 정 (jeong) | Fire (화) | Yin (음) | South (남) | Summer (하) | 午 (오) |
+| 5 | 戊 | 무 (mu) | Earth (토) | Yang (양) | Center (중) | Late summer (장하) | 辰 (진), 戌 (술) |
+| 6 | 己 | 기 (gi) | Earth (토) | Yin (음) | Center (중) | Late summer (장하) | 丑 (축), 未 (미) |
+| 7 | 庚 | 경 (gyeong) | Metal (금) | Yang (양) | West (서) | Autumn (추) | 申 (신) |
+| 8 | 辛 | 신 (sin) | Metal (금) | Yin (음) | West (서) | Autumn (추) | 酉 (유) |
+| 9 | 壬 | 임 (im) | Water (수) | Yang (양) | North (북) | Winter (동) | 亥 (해) |
+| 10 | 癸 | 계 (gye) | Water (수) | Yin (음) | North (북) | Winter (동) | 子 (자) |
+
+> **Corrected 2026-09-20 (external report review, 4th pass).** The previous "Hidden Stems in Branch" column listed a mix of unrelated 본기/중기/여기 entries under each stem's row — several described a *different* stem's own branch entirely (e.g. 甲's row listed "卯 → 乙, 辰 → 戊," which are 卯's and 辰's *own* 본기, not 甲's), and others inverted 본기/중기 (e.g. 丙's row listed "巳 → 庚," but 巳's 본기 is 丙 and 庚 is only its 중기). This column now shows only the branch(es) where the row's own stem is genuinely the 본기 (main qi), sourced directly from `02-branches.md`'s Hidden Stems table — 戊 and 己 are each 본기 of two branches (the four storage months split Yang/Yin Earth); every other stem is 본기 of exactly one. For a branch's full 본기/중기/여기 breakdown, see `02-branches.md` directly.
 
 > "Season of Peak" tells you when a stem is **at full strength** in nature — this matters when evaluating Day Master strength.
 

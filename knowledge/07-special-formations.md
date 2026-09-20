@@ -15,17 +15,19 @@ The 격국 is the **dominant pattern** of the chart. The classical 자평진전 
 
 ### A. Regular Grids (정격, 正格)
 
+> **Trigger column reads per the classical 투출 method above** (month-branch hidden stem 투출 onto a visible stem = X of the Day Master), matching what `src/saju_engine/patterns.py` implements — not the minority 월간 (visible month stem) school also mentioned above. *(Corrected 2026-09-20 — external report review, 4th pass: this table previously said "Month stem = X," which is the minority school's rule, contradicting Part 1's own declared classical method and the glossary's "most powerful stem in the month branch" phrasing. When the visible 월간 is itself a 투출 of the month branch's hidden stem, both readings agree.)*
+
 | Grid | Korean | Trigger | Day Master tendency | Career / Life tendency |
 |---|---|---|---|---|
-| 비견격 / 겁재격 | 比肩格 / 劫財格 | Month stem = 비견 or 겁재 of Day Master | Day Master strengthened by month | Self-reliance, peer competition, may be stubbornly independent |
-| 식신격 | 食神格 | Month stem = 식신 of Day Master | Day Master strong, channeled through output | Steady, productive, nourishment-oriented, often good in food / care / service |
-| 상관격 | 傷官格 | Month stem = 상관 of Day Master | Day Master strong, output is sharp | Creative, rebellious, sharp in speech, often artistic but may clash with authority |
-| 편재격 | 偏財格 | Month stem = 편재 of Day Master | Day Master strong, wealth is variable | Entrepreneurial, speculative, large income swings, social/visible |
-| 정재격 | 正財格 | Month stem = 정재 of Day Master | Day Master strong, wealth is stable | Conservative finance, steady earning, careful saving, traditional |
-| 편관격 | 偏官格 | Month stem = 편관 (칠살) of Day Master | Day Master strong, authority is forceful | Competitive, high-pressure careers, military/political, sometimes risk of accidents |
-| 정관격 | 正官格 | Month stem = 정관 of Day Master | Day Master strong, authority is conventional | Government, large companies, exams, conventional respectability |
-| 편인격 | 偏印格 | Month stem = 편인 of Day Master | Day Master strong, support is unconventional | Specialized knowledge, solitary scholarship, sometimes strangeness |
-| 정인격 | 正印格 | Month stem = 정인 of Day Master | Day Master strong, support is maternal | Education, certificates, real estate, mother's influence, gradual advancement |
+| 비견격 / 겁재격 | 比肩格 / 劫財格 | 월지 hidden stem 투출 = 비견 or 겁재 of Day Master | Day Master strengthened by month | Self-reliance, peer competition, may be stubbornly independent |
+| 식신격 | 食神格 | 월지 hidden stem 투출 = 식신 of Day Master | Day Master strong, channeled through output | Steady, productive, nourishment-oriented, often good in food / care / service |
+| 상관격 | 傷官格 | 월지 hidden stem 투출 = 상관 of Day Master | Day Master strong, output is sharp | Creative, rebellious, sharp in speech, often artistic but may clash with authority |
+| 편재격 | 偏財格 | 월지 hidden stem 투출 = 편재 of Day Master | Day Master strong, wealth is variable | Entrepreneurial, speculative, large income swings, social/visible |
+| 정재격 | 正財格 | 월지 hidden stem 투출 = 정재 of Day Master | Day Master strong, wealth is stable | Conservative finance, steady earning, careful saving, traditional |
+| 편관격 | 偏官格 | 월지 hidden stem 투출 = 편관 (칠살) of Day Master | Day Master strong, authority is forceful | Competitive, high-pressure careers, military/political, sometimes risk of accidents |
+| 정관격 | 正官格 | 월지 hidden stem 투출 = 정관 of Day Master | Day Master strong, authority is conventional | Government, large companies, exams, conventional respectability |
+| 편인격 | 偏印格 | 월지 hidden stem 투출 = 편인 of Day Master | Day Master strong, support is unconventional | Specialized knowledge, solitary scholarship, sometimes strangeness |
+| 정인격 | 正印格 | 월지 hidden stem 투출 = 정인 of Day Master | Day Master strong, support is maternal | Education, certificates, real estate, mother's influence, gradual advancement |
 
 ### B. Special Grids (특수격, 特殊格)
 
@@ -123,7 +125,7 @@ Some 명리 schools distinguish minor variations in the month branch's hidden-st
 - Born in 申 / 子 / 辰 → 도화 at 酉
 - Born in 亥 / 卯 / 未 → 도화 at 子
 
-> Same pattern for both, in classical Korean 명리. The 도桃花 is the branch where 도화 resides.
+> Same pattern for both, in classical Korean 명리. The 도화 is the branch where 도화 resides. *(Corrected 2026-09-20 — external report review, 4th pass: a mixed Hangul/Hanja artifact, "도桃花," previously stood in for "도화.")*
 
 **Meaning:** Charm, attractiveness, romantic magnetism, artistic sensibility, sensitivity to beauty. Excessive 도화 can indicate romantic complications or vanity. 도화 in the spouse palace (day branch) → very magnetic in relationships.
 
@@ -149,10 +151,11 @@ Some 명리 schools distinguish minor variations in the month branch's hidden-st
 
 #### 귀문관살 (鬼門關殺) — Ghost Gate Star
 
-Less common in modern Korean readings. Generally:
-- Born in 子 or 午 → 귀문관 concern in opposing branches.
+Less common in modern Korean readings. **See the "More classical 신살" section below for the actual branch-pair table this star is checked against** — the rule is a full six-pair lookup (子酉, 丑午, 寅未, 卯申, 辰亥, 巳戌), matching `src/saju_engine/stars.py::_GHOST_GATE_PAIRS`, not a vague "born in 子 or 午" rule.
 
 **Meaning (classical):** Sensitivity to the unseen, sometimes psychic tendencies, sometimes "curse" patterns. **Use with care** — some schools treat this as a serious omen, others as a descriptive overlay only.
+
+*(Corrected 2026-09-20 — external report review, 4th pass: this section previously stated an unimplemented, vague rule ("born in 子 or 午 → concern in opposing branches") that duplicated and contradicted the fuller, engine-matching pair-table definition later in this same file, with no reconciliation note. The vague rule is removed; this entry now points to the authoritative table.)*
 
 #### 천을귀인 (天乙貴人) — Heavenly Noble / Helper Star
 
@@ -245,6 +248,8 @@ A **branch-pair** star. When the day branch (or another natal branch) meets its 
 
 **Meaning:** Sensitivity to hidden matters, the unseen, or unusual life-turning events. Some schools treat it as a serious caution; the classical Korean reading treats it as a **descriptive sensitivity marker** only.
 
+> **Note on overlap with 원진살.** This pair list shares 4 of its 6 pairs with 원진살's list above (丑午, 卯申, 辰亥, 巳戌); only 子/丑↔酉/未 differ (원진: 子未, 寅酉; 귀문관: 子酉, 寅未). Both are genuine, separately-named classical stars — the overlap is a known feature of how these two star systems were historically derived, not a duplication error — but a chart matching one pair often also matches (or nearly matches) the other, so expect the two readings to co-occur. *(Added 2026-09-20 — external report review, 4th pass.)*
+
 #### 괴강살 (魁罡煞) — Sky Hero Star
 
 Based on the **day pillar (일주, 日柱)**. The four classical 괴강 pillars are:
@@ -317,9 +322,12 @@ These were covered in `02-branches.md`; summarized here for quick lookup with re
 |---|---|---|---|---|
 | Combination | 합 | 合 | 육합 (6 pairs) + 삼합 (4 triples) | Binding, attractive, stabilizing |
 | Clash | 충 | 沖 | 子午, 丑未, 寅申, 卯酉, 辰戌, 巳亥 | Disruptive, activating, sudden |
+| Punishment | 형 | 刑 | 삼형 (2 triples + 子卯) + 자형 (4 self-pairs) — see `02-branches.md` | Legal trouble, injury, conflict with authority |
 | Self-punishment | 자형 | 自刑 | 辰辰, 午午, 酉酉, 亥亥 | Inner torment, self-destructive |
 | Harm | 해 | 害 | 6 pairs (see 02) | Covert friction |
 | Break | 파 | 破 | 6 pairs (see 02) | Erosion, lost trust |
+
+> *(Added 2026-09-20 — external report review, 4th pass: this table's title has always included 형, but the row itself was missing — see `02-branches.md`'s "Branch Three Punishments (삼형)" section for the full 寅巳申/丑戌未/子卯 tables.)*
 
 ### When a Relationship "Activates" an Event
 

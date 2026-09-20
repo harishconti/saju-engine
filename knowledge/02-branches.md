@@ -57,9 +57,11 @@ Six pairs of branches combine. The two branches act as a **single unit** for man
 | 卯戌 (묘술) | Fire (화) | Combined warmth, hidden love, alchemy |
 | 辰酉 (진유) | Metal (금) | Combined precision, contractual clarity |
 | 巳申 (사신) | Water (수) | Combined flow, "tortoise-fire" relationship, partnership in tech/career |
-| 午未 (오미) | Earth (화/토) | Combined heat/light, sun at peak, marriage of fire & earth |
+| 午未 (오미) | Earth (화토) | Combined heat/light, sun at peak, marriage of fire & earth |
 
 > For 육합 to **transform** (합화), the combined element must be in **season** at the month branch and the participating branches must not be **separated** by 충 or other disrupting forces. Otherwise, the combination remains a **half-binding** (합而不化).
+
+> **On 午未's "화토" label.** Unlike the other five pairs (each transforming cleanly to one element), 午 (Fire) + 未 (Earth) does not resolve to a single element in most schools — it is read as a Fire-Earth transitional combination, notated 화토 here (not 화/토 — normalized 2026-09-20, external report review, 4th pass, for consistency with `11-gunghap.md`'s notation of the same pair).
 
 ## Branch Three Harmonies (삼합, 三合)
 
@@ -77,6 +79,15 @@ Three branches from the same cardinal direction form a complete three-harmony. T
 ## Directional Harmonies (방합, 方合)
 
 The three branches of a cardinal direction sitting together (without being adjacent) form a 방합. Functionally similar to 삼합 but less concentrated. Sometimes counted alongside 삼합.
+
+| Group | Element | Direction |
+|---|---|---|
+| 寅卯辰 (인묘진) | Wood (목) | East |
+| 巳午未 (사오미) | Fire (화) | South |
+| 申酉戌 (신유술) | Metal (금) | West |
+| 亥子丑 (해자축) | Water (수) | North |
+
+> This is a **different** grouping from 삼합/三合 above — 방합 gathers the three branches of one cardinal direction (a seasonal/spatial grouping), while 삼합 gathers three branches spread across the cycle that jointly point to one element (a structural/energetic grouping). They share the North/East/West/South labels loosely but the branch sets differ (compare to the 삼합 table above). *(Added 2026-09-20 — external report review, 4th pass: this section previously named no sets at all, and `knowledge/00-glossary.md`'s own 방합 entry wrongly used a 삼합 set as its example.)*
 
 ## Branch Clashes (충, 沖) — Six Pairs
 
@@ -97,12 +108,24 @@ Direct opposites in the 12-cycle. Brings disruption, change, sudden events, conf
 
 Four branches that "punish themselves" when appearing in pairs:
 
-- 辰辰 (진진) — Dragon/Dargon
+- 辰辰 (진진) — Dragon/Dragon
 - 午午 (오오) — Horse/Horse
 - 酉酉 (유유) — Rooster/Rooster
 - 亥亥 (해해) — Pig/Pig
 
 Indicates inner torment, self-destructive tendencies, difficulty letting go of patterns.
+
+## Branch Three Punishments (삼형, 三刑)
+
+Two or three branches "punish" each other when they appear together — distinct from 자형 (a single branch repeating itself, above):
+
+| Set | Members | Label | Note |
+|---|---|---|---|
+| 인사신 (寅巳申) | 寅, 巳, 申 | 무은지형 (無恩之刑) — "ungrateful punishment" | Full three-member set. |
+| 축술미 (丑戌未) | 丑, 戌, 未 | 지세지형 (持勢之刑) — "power punishment" | Full three-member set; the three 사고/四庫 (storage) branches. |
+| 자묘 (子卯) | 子, 卯 | 무례지형 (無禮之刑) — "mutual/disrespect punishment" | Only a **two**-member set — 子卯 has no classical third member. |
+
+> Any two members of a three-member set (e.g. 寅+巳 with 申 absent from the chart) still register a partial 삼형, read as weaker than the full triple. 삼형 is generally read as legal trouble, injury, conflict with authority, or self-inflicted setbacks — milder than 충 in most modern Korean schools, more prominent in classical texts. *(Added 2026-09-20 — external report review, 4th pass: this table was referenced by `13-wealth-and-business.md`, `15-health-and-body.md`, `16-date-selection.md`, and `11-gunghap.md` but never actually defined anywhere in the knowledge base — see `11-gunghap.md` §B9 for the fuller history. This documents the sets the engine already correctly implements (`lookup.py::THREE_PUNISHMENTS`); it does not resolve where 삼형 ranks against 충/해/파 in any priority ladder — that remains an open, undecided scope limit per §B9.)*
 
 ## Branch Six Harms (해, 害) and Six Breaks (파, 破)
 
@@ -118,6 +141,8 @@ Both are subtler than 충. Common in classical texts but less decisive in modern
 | 酉戌 (유술) | 寅亥 (인해) |
 
 > These relationships are read as "covert friction" (해) and "erosion of trust" (파). Less weight than 충 in most modern Korean readings; classical texts give them more prominence.
+
+> **Dual-status pairs (added 2026-09-20, external report review, 3rd pass).** Two pairs above are listed under **both** a favorable and an unfavorable table: **寅亥 (인해)** is a 육합 (→ Wood, in the Six Combinations table above) *and* a 파 (in the 파 column above); **巳申 (사신)** is a 육합 (→ Water, in the Six Combinations table above) *and* a 파 (in the 파 column above). This is not a data error — classical 명리 holds both readings simultaneously, and 巳申's 합 additionally only transforms to Water when in-season and undisrupted (see the 합화 note above), so the 파 friction is the more common everyday reading even when the pair is nominally combining. **Precedence when both apply:** read the 합 as the *structural* bond (what draws the two palaces/people together) and the 파 as the *friction* within that bond (what erodes trust even while the bond holds) — not as a contradiction to resolve in favor of one side. A downstream consumer (e.g. `knowledge/16-date-selection.md`'s day-selection filter) that must pick a single favor/avoid verdict for one of these pairs should flag it as **dual-status** rather than silently defaulting to only the 육합 (favourable) reading.
 
 ## Special Branches (특지지)
 

@@ -31,9 +31,14 @@ Day-Master stem is therefore still not an input to `climate.py`: only the month
 branch is. If a full 궁통보감 source text becomes available, expanding to the
 per-stem table is future work.
 
-What this file **does** implement, as of 2026-09-19, is the full **four-axis**
-model below — the 寒暖 (hot/cold) axis plus the 燥濕 (dry/damp) axis — which is
-sourced (see `## Sources`), not invented.
+What this file **does** implement, as of 2026-09-19, is the full **two-axis,
+four-band** model below — the 寒暖 (hot/cold) axis plus the 燥濕 (dry/damp)
+axis, producing four climate remedy-bands (plus Temperate, which needs no
+climate override) — which is sourced (see `## Sources`), not invented.
+*(Corrected 2026-09-20 — external report review, 4th pass: this and the other
+"four-axis" mentions below previously described a model with two axes as
+"four-axis," which does not match either the axis count (two: 寒暖 + 燥濕) or
+the band count (five, including Temperate) — see the table's own heading.)*
 
 ## The Four Climate Bands — The Engine's Implemented Model
 
@@ -71,13 +76,13 @@ axis alone would band temperate, need the 燥濕 axis to get a remedy at all.
 implemented the 寒暖 axis only, banding 辰 and 戌 temperate — a deliberate,
 tested scope limit (see `docs/audits/2026-09-engine-validation-report.md` and
 `docs/research/2026-09-validation-climate.md` §3 for the validation campaign
-that surfaced and fully sourced this gap). Expanding to the full four-axis model
+that surfaced and fully sourced this gap). Expanding to the full two-axis model
 was a **user-approved product decision** (2026-09-19), not a bug fix — it moves
 the client-facing `band` value for any chart born in a 辰 or 戌 month. No current
 candidate report (`candidates_horoscope/reports/`) has a 辰 or 戌 month branch,
 so the expansion does not move any previously-delivered natal report.
 
-`[UNCERTAIN]` — not on the four-axis principle, which is classical and sourced,
+`[UNCERTAIN]` — not on the two-axis principle, which is classical and sourced,
 but on the per-branch element assignments in the table above, which rest on a
 modern practitioner source (cantian.ai) rather than a transcribed classical
 text.
@@ -127,6 +132,6 @@ climate-resolved one (Wood), moving the `harish_manvitha` compat score from
 - `knowledge/11-gunghap.md` §"궁통보감 조후 perspective" — the existing use of
   this concept in this project, for compatibility (궁합) readings.
 - `docs/research/2026-09-validation-climate.md` — the 2026-09-13/19 validation
-  research backing the four-axis table (§3, citing cantian.ai and OpenFate) and
+  research backing the two-axis table (§3, citing cantian.ai and OpenFate) and
   the 조후-vs-억부 priority rule (§5, citing OpenFate's "조후와 부억 중 무엇을
   우선할까" and 두루미사주's "억부용신").

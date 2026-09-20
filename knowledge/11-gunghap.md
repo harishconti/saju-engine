@@ -7,7 +7,7 @@ This file is the classical Korean 명리 reference for **marriage compatibility*
 1. **No single factor decides 궁합.** Classical texts weight day-branch interaction above all else, but every other layer is checked. A perfect 일지 육합 with catastrophic 십신 cross can still fail.
 2. **궁 is greater than 성.** *(see `07-special-formations.md`, Part 2)* Following the academic survey of divorce cases in Korea (남기동·김만태 2018, KCI ART002338687), the **spouse palace (궁, the day branch)** outweighs the **spouse star (성, the 십신 of the spouse)** in determining stability.
 3. **간여지동 (干與支同) is the strongest single red flag** — when the day branch shares the same element as the day master, classical 명리 flags the conjugal bond as **the most unstable** configuration.
-4. **Birth-time accuracy is mandatory.** Wrong hour → wrong day pillar → every 결론 below invalid. Confirm both charts before reading.
+4. **Birth-time accuracy is mandatory.** Wrong hour → wrong hour pillar (and, near the 23:00 야자시/조자시 midnight boundary, possibly a wrong day pillar too) → every 결론 below invalid. Confirm both charts before reading. *(Corrected 2026-09-20 — external report review, 4th pass: the prior wording said a wrong hour corrupts the day pillar unconditionally, which is only true at the midnight-boundary edge case — a wrong hour normally corrupts only the hour pillar.)*
 5. **Day Master gender convention for spouse-star mapping:**
    - **Male querent (남성)**: 재성 (wealth star) = wife indicator (편재 = secondary / later partner, 정재 = primary / first partner in traditional reading).
    - **Female querent (여성)**: 관성 (officer star) = husband indicator (정관 = primary husband, 편관 = 칠살 = second / non-conventional partner).
@@ -121,7 +121,7 @@ A breaking stem **in the same chart** as one of the pair generally dissolves the
 
 Both partners' **day branches** are "spouse palaces" (배우자궁). They interact through the standard 12-branch relationship grammar. *(see `02-branches.md` for full tables.)*
 
-### B1 · 육합 (六合一 — Six Combinations) — strongest favorable
+### B1 · 육합 (六合 — Six Combinations) — strongest favorable
 
 | Pair | Combined element | Korean | Classical weight |
 |---|---|---|---|
@@ -138,7 +138,7 @@ Both partners' **day branches** are "spouse palaces" (배우자궁). They intera
 
 > **⚠ Unsourced — NOT implemented by the engine.** The halving clause above rests on no classical text consulted, and the engine implements no such discount. Read carefully, its own worked examples are **cross-level co-occurrences**, not a same-pair condition: 자축합 (one pair) disturbed by 자미해 (a *different* pair in the same cross), and 인신형 likewise — so the sentence does not state "a pair that is simultaneously 육합 and 해/형 is halved." It is also internally inconsistent with this file: `:137` names 寅申 `인신형`, while **§B4 (`:166`) tabulates the same pair as `인신충`** (육충). Implementing the clause would require converting the strict first-match ladder into an **inventory scan** — a behaviour change, not a bug fix. Deliberately **not** taken. See **§B9**.
 
-### B2 · 삼합 (三合一 — Three Harmonies) into one of 5 element frames
+### B2 · 삼합 (三合 — Three Harmonies) into one of 5 element frames
 
 If either partner's day branch + the other's day branch are **two of three** in a 삼합 frame, this is a **반합 (half-harmony)**:
 
@@ -153,9 +153,9 @@ If either partner's day branch + the other's day branch are **two of three** in 
 
 **Caveat:** 삼합 between two charts is **secondary** to 육합 between day branches. 권인성·곽임성 schools: 삼합 counts as ~half the weight of 육합.
 
-### B3 · 방합 (方合一 — Directional Combination, 4 branches)
+### B3 · 방합 (方合 — Directional Combination, 3 branches)
 
-The four branches of one cardinal direction: 寅卯辰 (East/Wood), 巳午未 (South/Fire), 申酉戌 (West/Metal), 亥子丑 (North/Water). Less concentrated than 삼합. In 궁합 context: when **both partners' branches collectively** cover ≥3 of one directional group, this is a 방합 hint.
+The three branches of one cardinal direction: 寅卯辰 (East/Wood), 巳午未 (South/Fire), 申酉戌 (West/Metal), 亥子丑 (North/Water). Less concentrated than 삼합. In 궁합 context: when **both partners' branches collectively** cover all 3 of one directional group, this is a 방합 hint. *(Corrected 2026-09-20 — external report review, 4th pass: each direction has three branches, not four; "cover ≥3" now reads consistently against a 3-branch set.)*
 
 **Weight:** ~half of 삼합 (i.e. +4). Modern Korean 명리 treats it as informational.
 
@@ -678,6 +678,8 @@ For each of the 5 elements, count:
 - Total per element
 
 Compare to the **ideal** distribution: each element between 15-25% of total weight.
+
+> **Note on hidden-stem weights (added 2026-09-20, external report review, 3rd pass).** This file's hidden-stem weighting (main=1 / middle=0.5 / residual=0.3, i.e. hidden stems weighted 100%/50%/30% of a visible stem) is **not the same scale** as the natal element-balance convention in `knowledge/03-five-elements.md`'s methodology (implemented in `strength.py::_element_counts`), which weights visible=1.0 / main=0.6 / middle=0.3 / residual=0.1. Both are internally consistent within their own product surface (this file's compatibility/union balance vs. the natal percentage-balance table), but a reader comparing a candidate's natal Element Balance % to a 궁합 union's element balance % is comparing two different scales, not the same measurement twice. Neither convention is sourced to a specific classical citation for its exact fractions; unifying them would be a product decision (which scale becomes canonical) rather than a correctness fix, so this is documented rather than changed.
 
 ### Interpretation
 

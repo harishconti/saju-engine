@@ -80,9 +80,11 @@ from .report_data import (
     _SIGNATURES,
     _PILLAR_POSITION_LABELS,
     _PILLAR_AREAS,
+    _STAR_MEANING,
     _strength_label,
     normalize_tier,
 )
+from .stars import STAR_LABELS
 
 
 # Re-exported from `report_data` so callers that imported them from
@@ -305,8 +307,9 @@ def _solar_time_note(chart) -> List[str]:
     raw = (minutes - 60) % 120  # 0 at odd-hour marks
     dist_to_boundary = min(raw, 120 - raw)
     if dist_to_boundary <= HOUR_BOUNDARY_MARGIN_MIN:
+        unit = "minute" if dist_to_boundary == 1 else "minutes"
         lines.append(
-            f"> **⚠ Hour-boundary note:** the corrected time is only ~{dist_to_boundary} minutes from a "
+            f"> **⚠ Hour-boundary note:** the corrected time is only ~{dist_to_boundary} {unit} from a "
             "2-hour branch boundary. If the recorded clock time carries even a few minutes of error, the "
             "neighboring hour pillar is a plausible alternative — treat the hour pillar (and its palace "
             "themes) as lower-confidence in this reading."
@@ -334,6 +337,56 @@ def _daeun_direction_note(chart) -> str:
         f"**Luck direction:** {direction}, {arrow} — derived from a {polarity.lower()} year stem "
         f"({chart.year.stem}) and {gender_en} gender, per the classical rule (yang year + male, "
         "or yin year + female → forward; otherwise backward)."
+    )
+
+
+def _daeun_starting_age_note(chart) -> str:
+    """State the precise 대운수 (major-luck starting age), not just the
+    rounded decade label.
+
+    Bug found 2026-09-20 (external report review, 3rd pass, R19): knowledge/08's
+    rule is "3 days = 1 year," so an integer starting age of 0 really means
+    "somewhere in [0, 3) years" — a chart starting at ~4 months reads
+    identically to one starting at 2.9 years under the bare integer.
+    Confirmed live: Harish's own days-to-절기 count is ~1 day, i.e. a
+    starting age of ~0.3 years (~4 months after birth), not a clean "age 0."
+    """
+    gender = getattr(chart, "gender", None)
+    if gender not in ("M", "F") or not getattr(chart, "daeun", []):
+        return ""
+    from .lookup import daeun_direction
+    from .daeun import starting_age_days
+
+    direction = daeun_direction(chart.year.stem, gender)
+    date_to_use = chart.effective_date or chart.birth_date
+    time_to_use = "00:00"
+    if chart.solar_correction and chart.solar_correction.get("solar_time"):
+        time_to_use = chart.solar_correction["solar_time"]
+    elif chart.birth_time:
+        time_to_use = chart.birth_time
+    try:
+        hh, mm = (int(x) for x in time_to_use.split(":"))
+    except (ValueError, AttributeError):
+        hh, mm = 0, 0
+    try:
+        days = starting_age_days(
+            int(date_to_use[:4]), int(date_to_use[5:7]), int(date_to_use[8:10]),
+            direction, hour=hh, minute=mm,
+        )
+    except Exception:
+        return ""
+    if days is None:
+        return ""
+    precise_age = round(days / 3, 1)
+    months = round(days * 4 / 3)
+    start_age = chart.daeun[0].start_age if chart.daeun else int(precise_age)
+    day_word = "day" if days == 1 else "days"
+    month_word = "month" if months == 1 else "months"
+    return (
+        f"**대운수 (starting age):** ~{precise_age} (~{days} {day_word} to the qualifying 節氣 ÷ 3, "
+        f"per knowledge/08's \"3 days = 1 year\" rule) — the first major-luck period begins "
+        f"roughly {months} {month_word} after birth, inside the **{start_age}-{start_age + 9}** decade "
+        f"label shown below, not precisely at its first birthday."
     )
 
 
@@ -373,6 +426,46 @@ def _section_cover(ctx: _ReportContext, compact: bool = False) -> List[str]:
     return lines
 
 
+def _avoid_watch_text(ctx: _ReportContext) -> str:
+    """Text for the Quick Reference 'Avoid / Watch' (기신/구신/한신) field.
+
+    Bug found 2026-09-20 (external report review, 3rd pass): `strength.py`'s
+    balanced-DM branch leaves `candidate_unfavorable` as `None` (the
+    strong/weak branches compute a DM-relative 기신, but the classical
+    "generates/overcomes 용신" formula the balanced branch actually needs is
+    a 용신-relative one — see knowledge/03-five-elements.md's own worked
+    example: 용신=Water -> 기신=Fire, 구신=Earth, 한신=Wood), so for every
+    balanced/climate-gated chart (e.g. Harish's) this field rendered as a
+    bare "—" with no guidance at all.
+
+    Rather than patch `strength.py`'s raw heuristic dict (which would risk
+    a raw-vs-resolved mismatch: `ctx.favorable` is the climate-resolved
+    용신 from `yongsin.py`, which can differ from the heuristic's own
+    `candidate_favorable` — the exact class of bug fixed elsewhere this
+    session), this derives 기신/구신/한신 directly from `ctx.favorable`
+    (the value the rest of the report already shows) using the same
+    overcoming/generating cycles knowledge/03 defines. This mirrors the
+    already-correct strong/weak branches, which keep their existing
+    DM-relative 기신 text unchanged.
+    """
+    if ctx.unfavorable and ctx.unfavorable != "—":
+        return ctx.unfavorable
+    fav = ctx.favorable
+    gisin = L.OVERCOMES.get(fav)  # 기신: the element 용신 overcomes
+    gusin = next((k for k, v in L.OVERCOMES.items() if v == fav), None)  # 구신: restrains 용신
+    hansin = L.GENERATES.get(fav)  # 한신: drains 용신 (용신 generates this)
+    if not (gisin or gusin or hansin):
+        return "—"
+    parts = []
+    if gisin:
+        parts.append(f"{gisin} (기신, watch)")
+    if gusin:
+        parts.append(f"{gusin} (구신, restrains {fav})")
+    if hansin:
+        parts.append(f"{hansin} (한신, drains {fav})")
+    return " · ".join(parts)
+
+
 def _section_chart_at_a_glance(ctx: _ReportContext) -> List[str]:
     lines = [
         "## Chart at a Glance",
@@ -400,10 +493,10 @@ def _section_chart_at_a_glance(ctx: _ReportContext) -> List[str]:
     lines += ["", "### Quick Reference", ""]
     lines += [
         f"- **Day Master:** {ctx.dm_en}",
-        f"- **Strength:** {ctx.strength_label} — a seasonal-strength reading; a full classical analysis may refine it.",
+        f"- **Strength:** {ctx.strength_label} — {PF.strength_reasoning(ctx)}",
         f"- **Favorable Element:** {ctx.favorable} — {ctx.favorable_note}",
         f"- **Supporting Element:** {ctx.supporting}",
-        f"- **Avoid / Watch:** {ctx.unfavorable or '—'}",
+        f"- **Avoid / Watch:** {_avoid_watch_text(ctx)}",
     ]
     if ctx.current_daeun:
         lines.append(
@@ -740,7 +833,7 @@ def _section_relationships(ctx: _ReportContext, mode: str = "standard") -> List[
             annual_hits = []
         for h in annual_hits:
             tg = h.stem_tengod_en or h.stem_tengod or "—"
-            note = PF.relationship_timing_row(h.year, h.combined, tg)
+            note = PF.relationship_timing_row(h.year, h.combined, tg, gender=ctx.chart.gender)
             lines.append(
                 f"| {h.year} | {h.combined} ({tg}) | {note} |"
             )
@@ -837,10 +930,34 @@ def _section_health_vitality(ctx: _ReportContext) -> List[str]:
         "Chart-derived first draft — review against `knowledge/03-five-elements.md` "
         "organ mapping. Not a medical diagnosis.",
     )
+    excess_line = f"- **Element excess:** {excess} — pay attention to the {_ELEMENT_ORGANS.get(excess, 'associated')} system."
+    if excess == ctx.favorable:
+        # Bug found 2026-09-19 (external report review, 2nd pass): the raw
+        # numeric-abundance "excess" read (knowledge/15-health-and-body.md
+        # §Excess vs. Deficiency) and the climate/억부-resolved 용신
+        # (knowledge/17-climate-method.md) can name the SAME element — here
+        # Water is both Harish's most numerically-present element (27.8%)
+        # AND his resolved 용신. Presenting both independently produced a
+        # direct contradiction: "watch for Water excess" next to Grounding
+        # Practices that recommend MORE Water-element activity. Neither
+        # knowledge file states how to reconcile this collision (Ground
+        # Rule 1/2: not inventing a resolution), so this surfaces the
+        # tension explicitly instead of silently presenting both as if
+        # unrelated.
+        excess_line += (
+            f" This is also your favorable element (용신) — classical 조후/억부 "
+            f"resolution reads a chart's own 용신 as the element it structurally "
+            f"needs, not a harmful surplus, even when it is also the most "
+            f"numerically prominent one. The caution here is about extreme, "
+            f"further concentration (e.g. through diet, environment, or timing "
+            f"choices layered on top of an already-abundant element), not about "
+            f"the element itself — which the Grounding Practices below still "
+            f"recommend leaning into."
+        )
     lines += [
         "### Primary Watchpoints",
         "",
-        f"- **Element excess:** {excess} — pay attention to the {_ELEMENT_ORGANS.get(excess, 'associated')} system.",
+        excess_line,
         f"- **Element deficiency:** {deficient} — the {_ELEMENT_ORGANS.get(deficient, 'associated')} system may need gentle support.",
         f"- {PF.depleted_element_health(ctx)}",
         "",
@@ -989,6 +1106,23 @@ def _section_natal_patterns(ctx: _ReportContext) -> List[str]:
         "",
     ]
     _append_callout(lines, PF.plain_words_pattern(ctx), ctx)
+
+    # Other active 신살 — engine-computed but, before this fix, never
+    # surfaced anywhere in the report. See _STAR_MEANING's docstring
+    # (report_data.py) for what's deliberately excluded (도화/역마, already
+    # covered elsewhere; 홍염/양인, no natal-context source).
+    active_stars = [
+        (key, positions) for key, positions in (ctx.chart.stars or {}).items()
+        if positions and key in _STAR_MEANING
+    ]
+    if active_stars:
+        lines += ["", "### Other Active 신살", ""]
+        for key, positions in active_stars:
+            label = STAR_LABELS.get(key, key)
+            where = ", ".join(positions)
+            lines.append(f"- **{label}** (at {where}): {_STAR_MEANING[key]}")
+        lines.append("")
+
     lines += ["---", ""]
     return lines
 
@@ -1091,7 +1225,33 @@ def _section_wealth_timing(ctx: _ReportContext) -> List[str]:
         lines.append("**Major-luck periods that carry wealth or favorable-element energy:**")
         lines.append("")
         for p in wealth_periods[:4]:
-            lines.append(f"- Ages {p.start_age}–{p.end_age} ({p.combined}, {p.stem_tengod_en or p.stem_tengod}) — a window where income, asset, or value-creation themes are more likely to surface.")
+            tg_label = p.stem_tengod_en or p.stem_tengod
+            cls = PF._TENGOD_FIVE_CLASS.get(p.stem_tengod, "")
+            if cls == "Wealth":
+                note = "a window where income, asset, or value-creation themes are more likely to surface."
+            elif cls == "Companion":
+                # Bug found 2026-09-19 (external report review, 2nd pass,
+                # independently corroborated by a 3rd review): 겁재/비견
+                # decades were listed here with the SAME wealth-opportunity
+                # note as genuine 재성 decades, purely because the stem
+                # ELEMENT happened to match 용신/희신 — but 비겁-class
+                # ten-gods are classically read as wealth COMPETITORS
+                # (겁재奪財, knowledge/13-wealth-and-business.md), the
+                # opposite framing. This decade is included because its
+                # element supports overall balance, not because it
+                # specifically brings wealth.
+                note = (
+                    "your favorable element is active here, supporting overall stability — but its ten-god "
+                    "is a peer/rival type (겁재奪財), classically read as wealth *competition* rather than "
+                    "opportunity; keep shared-money agreements explicit here rather than expecting income "
+                    "growth from it directly."
+                )
+            else:
+                note = (
+                    "your favorable element is active here, supporting overall balance rather than "
+                    "specifically signaling a wealth-influx window."
+                )
+            lines.append(f"- Ages {p.start_age}–{p.end_age} ({p.combined}, {tg_label}) — {note}")
         lines.append("")
 
     lines += [
@@ -1126,9 +1286,25 @@ def _section_relocation_directions(ctx: _ReportContext) -> List[str]:
         "",
         PF.travel_timing(ctx),
         "",
-        "---",
-        "",
     ]
+    # 역마살 (Post Horse Star) — bug found 2026-09-20 (external report
+    # review): the engine already computes this correctly (`stars.py`'s
+    # `post_horse`), but no report section ever surfaced it, even though it
+    # is the one classical star most directly relevant to a Travel &
+    # Relocation section. Confirmed missing for Harish, whose natal month
+    # branch 巳 IS his 역마 branch (亥卯未 day-branch triplet -> 역마 at 巳).
+    post_horse = (ctx.chart.stars or {}).get("post_horse", []) if ctx.chart.stars else []
+    if post_horse:
+        branches_str = ", ".join(post_horse)
+        lines += [
+            f"**역마살 (驛馬殺, Post Horse Star) is natally active at {branches_str}** — this classical "
+            "star indicates a tendency toward movement: travel, relocation, or change of environment "
+            "as a recurring life theme rather than a one-time event *(see knowledge/07-special-formations.md)*. "
+            "Years or major-luck periods that activate this branch again tend to bring relocation or "
+            "travel decisions to the foreground.",
+            "",
+        ]
+    lines += ["---", ""]
     return lines
 
 
@@ -1143,6 +1319,11 @@ def _section_timing(
         heading,
         "",
         f"{_daeun_direction_note(ctx.chart)}",
+    ]
+    age_note = _daeun_starting_age_note(ctx.chart)
+    if age_note:
+        lines += ["", age_note]
+    lines += [
         "",
         "### Major Luck Periods",
         "",
@@ -1276,18 +1457,29 @@ def _section_practical_guidance(ctx: _ReportContext, full: bool = False) -> List
             f"- **Direction:** {_ELEMENT_ASSOCIATIONS.get(ctx.favorable, {}).get('direction', '—')}",
             f"- **Numbers:** {_ELEMENT_ASSOCIATIONS.get(ctx.favorable, {}).get('numbers', '—')}",
             f"- **Season:** {_ELEMENT_ASSOCIATIONS.get(ctx.favorable, {}).get('season', '—')}",
-            f"- **Gemstones:** {_ELEMENT_ASSOCIATIONS.get(ctx.favorable, {}).get('gemstones', '—')}",
+            f"- **Gemstones (modern, optional):** {_ELEMENT_ASSOCIATIONS.get(ctx.favorable, {}).get('gemstones', '—')}",
             f"- **Foods:** {_ELEMENT_ASSOCIATIONS.get(ctx.favorable, {}).get('foods', '—')}",
             f"- **Best Times:** {_ELEMENT_ASSOCIATIONS.get(ctx.favorable, {}).get('best_times', '—')}",
             f"- **Avoid:** {_ELEMENT_ASSOCIATIONS.get(ctx.favorable, {}).get('avoid', '—')}",
             f"- **Business Lucky Numbers:** {_business_numbers(ctx)}",
+            "",
+            # Bug found 2026-09-20 (external report review): knowledge/14
+            # requires gemstone lists to be presented as "an optional,
+            # clearly-labelled extra — never as derived doctrine," but the
+            # card previously listed them as a plain fact alongside classical
+            # doctrine (direction/colour/season/number). The inline label
+            # above plus this footnote satisfy that requirement.
+            "> _Direction, colours, season, and numbers above are classical "
+            "오행 방위 doctrine (`knowledge/03-five-elements.md`). Gemstones are a "
+            "modern popular-astrology convention, not classical 명리 (命理) — "
+            "optional, not analytically load-bearing._",
         ]
     lines += ["", "---", ""]
     return lines
 
 
-def _section_auspicious_dates(ctx: _ReportContext, window_days: int = 90, max_dates: int = 5) -> List[str]:
-    """Scan the next `window_days` for real favorable-element, non-clashing days.
+def _section_auspicious_dates(ctx: _ReportContext, window_days: int = 90) -> List[str]:
+    """Scan the next `window_days` for real favorable-element, non-conflicting days.
 
     2026-09-19 fix (external report review): this used to pick 5 FIXED offsets
     (7/21/42/63/84 days out) regardless of what those dates' actual day-pillars
@@ -1302,14 +1494,28 @@ def _section_auspicious_dates(ctx: _ReportContext, window_days: int = 90, max_da
     (already validated correct), so a listed date is one whose day-stem
     element actually matches 용신/희신 and whose day-branch does not clash the
     natal day branch.
+
+    2026-09-20 fix (external report review, 3rd pass, R7): (a) the table
+    silently truncated to 5 dates regardless of how many actually qualified
+    in the 90-day window — knowledge/16 gives no basis for that cap, so this
+    now lists every qualifying day; (b) the filter checked only 충 (clash)
+    against the day branch — knowledge/16 also requires avoiding 해 (harm)
+    and 파 (break) against the day OR hour branch "when a cleaner day
+    exists," so a day like 寅 (파 against a natal 亥 day branch) or 申 (해
+    against 亥) is now excluded too, via `_candidate_day_conflicts`. A day
+    that is simultaneously a natal 육합 partner and a 충/해/파 partner (the
+    dual-status pairs knowledge/02 lists, e.g. 寅亥) is conservatively
+    excluded here rather than shown as ambiguous — the caveat below tells
+    the reader why the list may look short.
     """
     ref = ctx.chart.reference_date_obj() or datetime.now().date()
     fav_elems = {ctx.favorable}
     if ctx.supporting and ctx.supporting != ctx.favorable:
         fav_elems.add(ctx.supporting)
     day_branch = ctx.chart.day.branch
+    hour_branch = ctx.chart.hour.branch if ctx.chart.hour else None
+    watch_branches = [b for b in (day_branch, hour_branch) if b]
     natal_branches = list(ctx.chart.branches)
-    clashing_branches = set(_branch_clashes(day_branch, natal_branches))
 
     selected: List[Tuple[date, str, str, str]] = []
     for offset in range(1, window_days + 1):
@@ -1321,18 +1527,19 @@ def _section_auspicious_dates(ctx: _ReportContext, window_days: int = 90, max_da
         stem_elem = L.STEM_INFO.get(hit.stem, {}).get("element", "")
         if stem_elem not in fav_elems:
             continue
-        if hit.branch in clashing_branches:
+        if _candidate_day_conflicts(hit.branch, watch_branches):
             continue
         tengod_note = hit.stem_tengod_en or hit.stem_tengod
         selected.append((d, hit.combined, tengod_note, stem_elem))
-        if len(selected) >= max_dates:
-            break
 
     lines = [
         "## Auspicious Dates — Next 90 Days",
         "",
-        f"> The next {window_days}-day window from {ref.strftime('%B %Y')} includes the following candidate dates — each one's day-stem element matches your favorable ({ctx.favorable}) or supporting ({ctx.supporting}) element, and its day-branch does not clash your natal day branch ({day_branch}). "
-        "A qualified reader should still cross-check each date against the querent's specific question and local calendar before recommending it.",
+        f"> The next {window_days}-day window from {ref.strftime('%B %Y')} includes the following candidate dates — each one's day-stem element matches your favorable ({ctx.favorable}) or supporting ({ctx.supporting}) element, and its day-branch does not clash, harm, or break your natal day branch ({day_branch})"
+        + (f" or hour branch ({hour_branch})" if hour_branch else "")
+        + ". A qualified reader should still cross-check each date against the querent's specific question and local calendar before recommending it.",
+        "",
+        "> **Almanac caveat:** this is a chart-relative shortlist, not a finished 택일 (auspicious-date selection) — a full 택일 also weighs the day's own 건제십이신/28수 almanac assignment, the specific event type, and local custom, none of which this engine computes *(see knowledge/16-date-selection.md)*.",
         "",
         "| Date | Day Pillar | Suggested Use / Reader Note |",
         "|---|---|---|",
@@ -1343,13 +1550,13 @@ def _section_auspicious_dates(ctx: _ReportContext, window_days: int = 90, max_da
             lines.append(
                 f"| {d.strftime('%Y-%m-%d (%A)')} | {combo} ({tg}) | "
                 f"A reasonable candidate — the day-stem carries your {role} element ({stem_elem}) and its "
-                f"branch does not clash your natal day branch; confirm against the querent's specific "
-                f"question before booking. |"
+                f"branch does not clash, harm, or break your natal day/hour branch; confirm against the "
+                f"querent's specific question before booking. |"
             )
     else:
         lines.append(
             f"| — | — | No day in this {window_days}-day window has a favorable-element, "
-            "non-clashing day-stem; widen the window or use the Monthly Lucky Dates table instead. |"
+            "non-conflicting day-stem; widen the window or use the Monthly Lucky Dates table instead. |"
         )
     lines += ["", "---", ""]
     return lines
@@ -1646,26 +1853,48 @@ def _section_30_day_plan(ctx: _ReportContext) -> List[str]:
     return lines
 
 
-def _branch_clashes(day_branch: str, natal_branches: List[str]) -> List[str]:
-    """Return natal branches that clash with the given day branch."""
-    clashing = []
-    for a, c in L.SIX_CLASHES:
-        if day_branch == a:
-            clashing.append(c)
-        elif day_branch == c:
-            clashing.append(a)
-    return clashing
+def _candidate_day_conflicts(candidate_branch: str, watch_branches: List[str]) -> List[str]:
+    """Return relation labels ("충"/"해"/"파") the candidate day's branch has
+    against any of `watch_branches` (the natal day AND hour branches).
+
+    Bug found 2026-09-20 (external report review, 3rd pass, R7): the
+    auspicious/lucky-date filters only ever checked 충 (clash) against the
+    natal DAY branch. knowledge/16-date-selection also requires avoiding
+    days that repeat 해 (harm) or 파 (break) against the day *or hour*
+    branch "when a cleaner day exists" — confirmed live: candidate days
+    whose branch is 寅 (파 against Harish's natal 亥 day branch) or 申 (해
+    against 亥) were passing the old clash-only filter untouched.
+    """
+    hits: List[str] = []
+    for wb in watch_branches:
+        pair = {candidate_branch, wb}
+        if any(pair == {a, c} for a, c in L.SIX_CLASHES):
+            hits.append("충")
+        if any(pair == {a, c} for a, c in L.SIX_HARMS):
+            hits.append("해")
+        if any(pair == {a, c} for a, c in L.SIX_BREAKS):
+            hits.append("파")
+    return hits
 
 
-def _section_monthly_lucky_dates(ctx: _ReportContext, months_ahead: int = 3, max_per_month: int = 5) -> List[str]:
-    """Generate Monthly Lucky Dates for the Deep tier using daily-luck overlays."""
+def _section_monthly_lucky_dates(ctx: _ReportContext, months_ahead: int = 3, max_per_month: Optional[int] = None) -> List[str]:
+    """Generate Monthly Lucky Dates for the Deep tier using daily-luck overlays.
+
+    2026-09-20 fix (external report review, 3rd pass, R7): this used to
+    silently cap each month at 5 dates and only check 충 (clash) against the
+    day branch. knowledge/16 gives no basis for the cap (typical qualifying
+    counts run ~10-12/month) and also requires checking 해/파 against the
+    day OR hour branch — both fixed the same way as `_section_auspicious_dates`.
+    """
     ref = ctx.chart.reference_date_obj() or datetime.now().date()
     lines = [
         "## Monthly Lucky Dates",
         "",
-        f"The next **{months_ahead} months** of favorable days, selected when the daily stem element matches your **{ctx.favorable}** or **{ctx.supporting}** element and the day branch does not clash your natal day branch.",
+        f"The next **{months_ahead} months** of favorable days, selected when the daily stem element matches your **{ctx.favorable}** or **{ctx.supporting}** element and the day branch does not clash, harm, or break your natal day or hour branch.",
         "",
-        "> _Methodology: each row filters the daily-luck (일운) stems to those whose element matches your favorable or supporting element, then drops any day whose branch clashes your natal day branch._",
+        "> _Methodology: each row filters the daily-luck (일운) stems to those whose element matches your favorable or supporting element, then drops any day whose branch clashes, harms, or breaks against your natal day or hour branch._",
+        "",
+        "> **Almanac caveat:** this is a chart-relative shortlist, not a finished 택일 — a full 택일 also weighs the day's own almanac assignment, the specific event type, and local custom *(see knowledge/16-date-selection.md)*.",
         "",
         "| Month | Favorable Dates | Energy Note |",
         "|---|---|---|",
@@ -1675,6 +1904,8 @@ def _section_monthly_lucky_dates(ctx: _ReportContext, months_ahead: int = 3, max
     if ctx.supporting and ctx.supporting != ctx.favorable:
         fav_elems.add(ctx.supporting)
     day_branch = ctx.chart.day.branch
+    hour_branch = ctx.chart.hour.branch if ctx.chart.hour else None
+    watch_branches = [b for b in (day_branch, hour_branch) if b]
     natal_branches = list(ctx.chart.branches)
 
     # Advance by calendar months (year, month) rather than fixed 30-day chunks,
@@ -1686,10 +1917,18 @@ def _section_monthly_lucky_dates(ctx: _ReportContext, months_ahead: int = 3, max
             if month > 12:
                 month = 1
                 year += 1
-        # Walk through each day of the month.
+        # Walk through each day of the month. For the CURRENT month
+        # (month_offset == 0), start at ref.day + 1, not day 1 — a date
+        # already in the past when the report was generated is not a usable
+        # suggestion. Bug found 2026-09-19 (external report review, 2nd
+        # pass): this used to always start at day 1, so a report generated
+        # mid-month listed already-elapsed dates for its own current month
+        # (confirmed live: a report generated Sept 19/20 listing "3, 5, 6,
+        # 13, 14" for September).
         _, last_day = calendar.monthrange(year, month)
+        first_day = ref.day + 1 if month_offset == 0 else 1
         selected: List[Tuple[int, str, str]] = []
-        for day in range(1, last_day + 1):
+        for day in range(first_day, last_day + 1):
             try:
                 hit = SE.derive_ilwoon(ctx.chart.day_master, natal_branches, year, month, day)
             except Exception:
@@ -1697,11 +1936,11 @@ def _section_monthly_lucky_dates(ctx: _ReportContext, months_ahead: int = 3, max
             stem_elem = L.STEM_INFO.get(hit.stem, {}).get("element", "")
             if stem_elem not in fav_elems:
                 continue
-            if hit.branch in _branch_clashes(day_branch, natal_branches):
+            if _candidate_day_conflicts(hit.branch, watch_branches):
                 continue
             tengod_note = hit.stem_tengod_en or hit.stem_tengod
             selected.append((day, hit.combined, tengod_note))
-            if len(selected) >= max_per_month:
+            if max_per_month is not None and len(selected) >= max_per_month:
                 break
 
         month_label = date(year, month, min(ref.day, last_day)).strftime("%B %Y")

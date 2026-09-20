@@ -35,6 +35,16 @@ class SeWoonHit:
     # Each tuple: (annual_branch, natal_branch, relationship_type)
     relationship_types: List[str] = field(default_factory=list)
     # deduplicated list of relationship types for quick filtering
+    stem_combinations: List[Tuple[str, str, str, str]] = field(default_factory=list)
+    # Each tuple: (stem_a, stem_b, combined_element, korean_name), (stem_a,
+    # stem_b) in the table's own canonical order (matching korean_name's
+    # reading order, e.g. "병신합수" reads 丙 before 辛) —
+    # 천간합 between the annual stem and a natal stem (knowledge/08 Part 2
+    # step 3: "Annual stem vs. natal stems → 합?"). Bug found 2026-09-20
+    # (external report review, 3rd pass): this check was never implemented
+    # at all — e.g. 2026's 丙 combining with Harish's 辛 Day Master (丙辛합수)
+    # was silently absent from every report despite being, per the
+    # reviewer, "a major 2026 reading element."
 
     def __post_init__(self):
         self.combined = f"{self.stem}{self.branch}"
@@ -174,6 +184,22 @@ def derive_sewoon(
             activated.append((branch, nb, rel))
             types.add(rel)
 
+    combos: List[Tuple[str, str, str, str]] = []
+    dm_combo = L.stem_combination(day_master, stem)
+    if dm_combo:
+        combo_elem, combo_ko, _ = dm_combo
+        # `korean_name` (e.g. "병신합수") reads the pair in the table's own
+        # canonical order, not necessarily (day_master, stem) argument
+        # order — find that order so the Hanja built from it in
+        # `annual_activation_note` matches (avoids a "辛丙合水" for a
+        # "병신합수" label, which reads 丙 first).
+        stem_a, stem_b = day_master, stem
+        for sa, sb, _elem, _ko in L.TEN_STEM_COMBINATIONS:
+            if {sa, sb} == {day_master, stem}:
+                stem_a, stem_b = sa, sb
+                break
+        combos.append((stem_a, stem_b, combo_elem, combo_ko))
+
     return SeWoonHit(
         year=year,
         stem=stem,
@@ -182,6 +208,7 @@ def derive_sewoon(
         stem_tengod_en=tengod_en,
         activated_branches=activated,
         relationship_types=sorted(types),
+        stem_combinations=combos,
     )
 
 

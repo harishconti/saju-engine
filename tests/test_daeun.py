@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-from saju_engine.daeun import starting_age
+from saju_engine.daeun import starting_age, starting_age_days
 from saju_engine.lookup import daeun_direction
 
 
@@ -93,6 +93,31 @@ def test_starting_age_backward_fractional_day_floors_correctly():
     2 days → age 0.
     """
     assert starting_age(2024, 2, 6, "backward", 20, 0) == 0
+
+
+# ── R19 — precise 대운수 was never exposed, only the rounded integer year ──
+# ── (found 2026-09-20, external report review, 3rd pass) ─────────────────
+
+
+def test_starting_age_days_matches_starting_age_floor_division():
+    """`starting_age_days() // 3` must equal `starting_age()` for the same
+    inputs — `starting_age_days` exposes the raw day count that `starting_age`
+    silently floors, so report prose can state the precise 대운수 (e.g.
+    Harish: ~1 day -> ~0.3 years, not a bare "age 0")."""
+    days = starting_age_days(1992, 6, 4, "forward", 2, 59)
+    assert days is not None
+    assert days // 3 == starting_age(1992, 6, 4, "forward", 2, 59)
+
+
+def test_harish_starting_age_days_is_small_not_a_clean_zero():
+    """Harish's real starting age rounds to the integer 0, but the true
+    offset is ~1 day (~0.3 years, ~4 months) — the reviewer's exact
+    complaint that "the first 대운 begins ~4 months after birth" was
+    invisible behind the clean "0" decade label."""
+    days = starting_age_days(1992, 6, 4, "forward", 2, 59)
+    assert days is not None
+    assert 0 <= days <= 3
+    assert starting_age(1992, 6, 4, "forward", 2, 59) == 0
 
 
 def test_compute_daeun_n_periods():

@@ -10,7 +10,7 @@
 
 **Day Master:** Bing (Yang Fire, 丙火)
 
-**Report generated:** 2026-09-19 · **Report ID:** CID-sruthi-20260919-DEEP
+**Report generated:** 2026-09-20 · **Report ID:** CID-sruthi-20260920-DEEP
 
 *Delivered by CosmicSaju · cosmicsaju.com*
 
@@ -45,10 +45,10 @@
 ### Quick Reference
 
 - **Day Master:** Bing (Yang Fire, 丙火)
-- **Strength:** Balanced — a seasonal-strength reading; a full classical analysis may refine it.
+- **Strength:** Balanced — the Day Master's stage in the month branch **子** is **태 (胎)** (a mixed seasonal baseline, per knowledge/06-twelve-stages.md) — new potential is forming; early life may feel preparatory rather than openly productive — and the output/wealth/authority drain then outweighs the peer and resource support.
 - **Favorable Element:** Earth — Favorable element confirmed by the reader from the full classical analysis.
 - **Supporting Element:** Fire
-- **Avoid / Watch:** —
+- **Avoid / Watch:** Water (기신 (忌神), watch) · Wood (구신, restrains Earth) · Metal (한신 (閒神), drains Earth)
 - **Current Major Luck:** 丁卯 (ages 28-37)
 - **Luck direction:** forward, advancing from the month pillar — derived from a yin year stem (癸) and female gender, per the classical rule (yang year + male, or yin year + female → forward; otherwise backward).
 - **Pattern / Formation:** 정관격 / Direct Officer Grid
@@ -106,7 +106,7 @@ Born in a **Fire** chart with the engine reading as **balanced**, the way you me
 
 Your growth edge is to consciously cultivate **Earth** energy — the favorable element — so that your Fire nature has the right container and outlet.
 
-Your Day Master **丙** meets the month branch **子** at the **태 (gestational start)** twelve-stage — new potential is forming; early life may feel preparatory rather than openly productive. This is read as a seasonally supported arrival: a tendency in how the querent's core energy first enters the world, not a fixed early-life outcome.
+Your Day Master **丙** meets the month branch **子** at the **태 (gestational start)** twelve-stage — new potential is forming; early life may feel preparatory rather than openly productive. This is read as a mixed seasonal support arrival: a tendency in how the querent's core energy first enters the world, not a fixed early-life outcome.
 
 ### Four Pillars, One by One
 
@@ -200,7 +200,7 @@ A double pull between Authority and Wealth suggests a hybrid path: a credible in
 
 ### Income Rhythm
 
-Income tends to arrive in **steady increments** — a salaried baseline, retainer work, or recurring contracts. The Direct Wealth stem is rooted in a branch, so the source is durable and the rhythm is rarely interrupted by surprise windfalls.
+The chart carries **Direct Wealth only as a hidden stem** — real, but latent rather than actively expressed. Income from a steady, earned source is structurally present but may need a deliberate channel (a role, a contract, a platform) to become visible and regular.
 
 ### Skill-Levers to Develop
 
@@ -229,11 +229,11 @@ With a **Direct Resource (正印)** ten-god over a **Earth** branch (stem elemen
 
 **Ages 18-27 — 丙寅**
 
-With a **Companion (比肩)** ten-god over a **Wood** branch (stem element Fire), this is a transition and adapt decade. Use the mixed energy to refine skills and reposition rather than to launch new ventures. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation.
+With a **Companion (比肩)** ten-god over a **Wood** branch (stem element Fire), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation.
 
 **Ages 28-37 — 丁卯**
 
-With a **Robber (劫財)** ten-god over a **Wood** branch (stem element Fire), this is a transition and adapt decade. Use the mixed energy to refine skills and reposition rather than to launch new ventures. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation.
+With a **Robber (劫財)** ten-god over a **Wood** branch (stem element Fire), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation.
 
 **Ages 38-47 — 戊辰**
 
@@ -245,7 +245,7 @@ With a **Hurting Officer (傷官)** ten-god over a **Fire** branch (stem element
 
 **Ages 58-67 — 庚午**
 
-With a **Indirect Wealth (偏財)** ten-god over a **Fire** branch (stem element Metal), this is a transition and adapt decade. Use the mixed energy to refine skills and reposition rather than to launch new ventures. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation.
+With a **Indirect Wealth (偏財)** ten-god over a **Fire** branch (stem element Metal), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation.
 
 **Ages 68-77 — 辛未**
 
@@ -283,7 +283,7 @@ The spouse palace **寅** (12-stage: 장생) carries a main hidden stem that rel
 
 - **도화 (Peach Blossom)** is not natally active, so your social style leans toward depth rather than breadth — protect your close-circle time.
 - A natal six-combination between **子** and **丑** draws the partner into a transformation toward **Earth** energy — expect the relationship to ask for adaptation.
-- The current major-luck period (**丁卯**, Robber (劫財) — a rival for the same resources — competition in money or love *(see knowledge/05-ten-gods.md)*) carries mixed energy for relationships — the next few years are about consolidation rather than reinvention.
+- The current major-luck period (**丁卯**, Robber (劫財) — a rival for the same resources — competition in money or love *(see knowledge/05-ten-gods.md)*) carries favorable energy for relationships — the next few years are about consolidation rather than reinvention.
 
 ### Key Relationship Timing
 
@@ -293,14 +293,14 @@ The spouse palace **寅** (12-stage: 장생) carries a main hidden stem that rel
 |---|---|---|
 | 2026 | 丙午 (Companion) | **Fire** energy + Companion: peer energy — friendships and partnerships strengthen. |
 | 2027 | 丁未 (Robber) | **Fire** energy + Robber: competition or boundary-setting — be clear about what you will and will not negotiate. |
-| 2028 | 戊申 (Eating God) | **Earth** energy + Eating God: a year that asks the relationship to evolve quietly. |
-| 2029 | 己酉 (Hurting Officer) | **Earth** energy + Hurting Officer: a year that asks the relationship to evolve quietly. |
+| 2028 | 戊申 (Eating God) | **Earth** energy + Eating God: creative expression together — shared projects, craft, or quiet collaboration. |
+| 2029 | 己酉 (Hurting Officer) | **Earth** energy + Hurting Officer: candid expression together — direct conversation, art, or public collaboration. |
 | 2030 | 庚戌 (Indirect Wealth) | **Metal** energy + Indirect Wealth: variety and social expansion — meeting new people, diversifying the social circle. |
 | 2031 | 辛亥 (Direct Wealth) | **Metal** energy + Direct Wealth: stability and value-sharing — good for settling into a long-term rhythm. |
 
 ### Friendship & Social Energy
 
-Friend and social energy is shaped by the chart's dominant classes — **Direct Officer (3), Output (3)** — so the querent tends to give and receive in those modes. The querent is naturally drawn to people who are grounded, practical, and steady, and tends to feel drained by people who drain rather than nourish. Social settings where the favorable **Earth** element is present (a community garden for Wood, a quiet studio for Water, a workshop for Metal) tend to feel more nourishing than large unstructured gatherings.
+Friend and social energy is shaped by the chart's dominant classes — **Authority (3), Output (3)** — so the querent tends to give and receive in those modes. The querent is naturally drawn to people who are grounded, practical, and steady, and tends to feel drained by people who drain rather than nourish. Social settings where the favorable **Earth** element is present (a community garden for Wood, a quiet studio for Water, a workshop for Metal) tend to feel more nourishing than large unstructured gatherings.
 
 ### Relationship Deep-Dive
 
@@ -308,7 +308,7 @@ Friend and social energy is shaped by the chart's dominant classes — **Direct 
 With the spouse palace **寅** sitting in the **장생** 12-stage and carrying hidden-stem ten-gods of **편인, 비견, 식신**, the querent bonds through a mix of presence and discernment. The day branch's stage matters: a **절 (絶)/병 (病)/사 (死)** stage asks for openness and vitality, while a **묘 (墓)/관/충 (沖)** stage leans toward reserve and selectivity. The hidden-stem ten-gods colour the undercurrent — Resource — the resource group — support, learning, and what sustains you *(see knowledge/05-ten-gods.md)* leans into safety, Output into creative play, Wealth into stability. Read this as the emotional baseline; the 대운/세운 overlays show when the querent's bond patterns shift most.
 
 #### Marriage Timing Windows
-The strongest windows for commitment decisions in the current and next major-luck periods: **丁卯** (ages 28-37) — favorable-element years within this window are the strongest commitment windows. Within those windows, the annual pillars whose stem element matches the favorable element are the cleanest moments to formalize; clash years are better for deepening privately.
+The strongest windows for commitment decisions in the current and next major-luck periods: **丁卯** (ages 28-37, favorable). Within those windows, the annual pillars whose stem element matches the favorable element are the cleanest moments to formalize; clash years are better for deepening privately.
 
 #### Family Dynamics
 The year pillar **酉** carries ancestral and parental themes; its main hidden stem shapes how the querent absorbs (or pushes back on) family-of-origin patterns. The month pillar **子** is the career and sibling palace — its dynamics surface in how the querent shows up among peers and early mentors. The hour pillar **丑** speaks to children and later life — its hidden stems indicate what the querent is likely to pass on, and what they will need to consciously teach.
@@ -375,6 +375,17 @@ The chart's dominant pattern candidate is **정관격 (Direct Officer Grid)**. A
 
 > **In plain words:** The chart's organising theme is conventional respectability and structure — credentials, large institutions, examinations, and public trust.
 
+
+### Other Active 신살 (神殺)
+
+- **천을귀인 (天乙貴人)** (at 酉): a "helper" star — a tendency toward receiving support from an unexpected, noble source at key turning points.
+- **재살 (災煞)** (at 子): mishaps, illness, or obstacles as a recurring theme — classically read as softened by a strong 용신 (用神).
+- **천살 (天煞)** (at 丑): external pressures or authority conflicts — "heaven-sent" trials.
+- **지살 (地煞)** (at 寅): earthly hindrances, delays, or bureaucratic friction.
+- **육해 (六害)** (at 酉): covert harm or friction from the six-harm branch direction.
+- **원진 (怨嗔)** (at 寅-酉): lingering resentment or unfinished conflict — in relationships, recurring arguments that never fully resolve.
+- **귀문관 (鬼門關)** (at 子-酉): sensitivity to hidden matters or the unseen; read here as a descriptive sensitivity marker, not an omen.
+
 ---
 
 ## Wealth & Investment Timing
@@ -388,10 +399,10 @@ This section identifies where wealth ten-gods appear in the natal chart and whic
 
 **Major-luck periods that carry wealth or favorable-element energy:**
 
-- Ages 18–27 (丙寅, Companion (比肩) — a peer or equal — support, solidarity, and rivalry in equal measure *(see knowledge/05-ten-gods.md)*) — a window where income, asset, or value-creation themes are more likely to surface.
-- Ages 28–37 (丁卯, Robber (劫財)) — a window where income, asset, or value-creation themes are more likely to surface.
-- Ages 38–47 (戊辰, Eating God (食神) — gentle output — talent, making, teaching, slow enjoyable accumulation *(see knowledge/05-ten-gods.md)*) — a window where income, asset, or value-creation themes are more likely to surface.
-- Ages 48–57 (己巳, Hurting Officer (傷官) — sharp output — bold expression, creativity, friction with rules and authority *(see knowledge/05-ten-gods.md)*) — a window where income, asset, or value-creation themes are more likely to surface.
+- Ages 18–27 (丙寅, Companion (比肩) — a peer or equal — support, solidarity, and rivalry in equal measure *(see knowledge/05-ten-gods.md)*) — your favorable element is active here, supporting overall stability — but its ten-god is a peer/rival type (겁재奪財), classically read as wealth *competition* rather than opportunity; keep shared-money agreements explicit here rather than expecting income growth from it directly.
+- Ages 28–37 (丁卯, Robber (劫財)) — your favorable element is active here, supporting overall stability — but its ten-god is a peer/rival type (겁재奪財), classically read as wealth *competition* rather than opportunity; keep shared-money agreements explicit here rather than expecting income growth from it directly.
+- Ages 38–47 (戊辰, Eating God (食神) — gentle output — talent, making, teaching, slow enjoyable accumulation *(see knowledge/05-ten-gods.md)*) — your favorable element is active here, supporting overall balance rather than specifically signaling a wealth-influx window.
+- Ages 48–57 (己巳, Hurting Officer (傷官) — sharp output — bold expression, creativity, friction with rules and authority *(see knowledge/05-ten-gods.md)*) — your favorable element is active here, supporting overall balance rather than specifically signaling a wealth-influx window.
 
 ### Investment Style Cue
 
@@ -413,7 +424,7 @@ Classical Saju associates each element with a direction and a quality of space. 
 
 ### Travel & Move Timing
 
-Travel and relocation are most likely to feel aligned during the favorable **Earth**-element years and months, and especially during major-luck periods: ages 8-17 (乙丑), ages 38-47 (戊辰), ages 48-57 (己巳). Relocations outside those windows may bring temporary benefit but require more adjustment; plan for a longer settling-in period rather than expecting instant payoff.
+Travel and relocation are most likely to feel aligned during the favorable **Earth**-element years and months, and especially during major-luck periods: ages 8-17 (乙丑), ages 18-27 (丙寅), ages 28-37 (丁卯). Relocations outside those windows may bring temporary benefit but require more adjustment; plan for a longer settling-in period rather than expecting instant payoff.
 
 ---
 
@@ -458,24 +469,26 @@ For a **Fire** Day Master, the most aligned launch window is **summer (peak Fire
 
 **Luck direction:** forward, advancing from the month pillar — derived from a yin year stem (癸) and female gender, per the classical rule (yang year + male, or yin year + female → forward; otherwise backward).
 
+**대운수 (starting age):** ~8.3 (~25 days to the qualifying 節氣 ÷ 3, per knowledge/08's "3 days = 1 year" rule) — the first major-luck period begins roughly 33 months after birth, inside the **8-17** decade label shown below, not precisely at its first birthday.
+
 ### Major Luck Periods
 
 | Age | Pillar | Element Theme | Ten-God | Career Theme | Relationship Theme |
 |---|---|---|---|---|---|
 | 8-17 | 乙丑 | Earth | Direct Resource (正印) | study, mentorship, or skill-building | nurturing, support, or healing connection |
-| 18-27 | 丙寅 | Wood | Companion (比肩) | peer-driven or self-defined work (mixed — protect, don't overcommit) | friendship-based or peer dynamic |
-| 28-37 | 丁卯 | Wood | Robber (劫財) | peer-driven or self-defined work (mixed — protect, don't overcommit) | friendship-based or peer dynamic |
+| 18-27 | 丙寅 | Wood | Companion (比肩) | peer-driven or self-defined work | friendship-based or peer dynamic |
+| 28-37 | 丁卯 | Wood | Robber (劫財) | peer-driven or self-defined work | friendship-based or peer dynamic |
 | 38-47 | 戊辰 | Earth | Eating God (食神) | creative output, voice, or visible production | creative partnership or playful dynamic |
 | 48-57 | 己巳 | Fire | Hurting Officer (傷官) | creative output, voice, or visible production | creative partnership or playful dynamic |
-| 58-67 | 庚午 | Fire | Indirect Wealth (偏財) | income, assets, or value-creation themes (mixed — protect, don't overcommit) | shared resources or lifestyle alignment |
+| 58-67 | 庚午 | Fire | Indirect Wealth (偏財) | income, assets, or value-creation themes | shared resources or lifestyle alignment |
 | 68-77 | 辛未 | Earth | Direct Wealth (正財) | income, assets, or value-creation themes | shared resources or lifestyle alignment |
 | 78-87 | 壬申 | Metal | Seven Killings (偏官) | structured career moves; credentials matter (mixed — protect, don't overcommit) | commitment or formalization themes |
 
 ### Current Period Deep-Dive
 
-This decade carries a **Robber (劫財)** ten-god over a **Wood** branch — a mixed window that asks for measured moves rather than bold ones. The stem ten-god is the *outer theme* — what the world sees and asks of the querent — while the branch element is the *underlying terrain* — the quieter emotional and circumstantial backdrop. Read them together rather than separately; mismatches between outer theme and inner terrain are where this decade is most likely to surprise.
+This decade carries a **Robber (劫財)** ten-god over a **Wood** branch — a clearly favorable window for visible wins. The stem ten-god is the *outer theme* — what the world sees and asks of the querent — while the branch element is the *underlying terrain* — the quieter emotional and circumstantial backdrop. Read them together rather than separately; mismatches between outer theme and inner terrain are where this decade is most likely to surprise.
 
-Specifically: **do** conserve, refine, and protect the foundation; **avoid** long commitments whose payoff is years away. Within this decade, years and months whose stem element matches the favorable **Earth** energy are the cleanest moments for major commitments; the annual windows table below shows them. Years dominated by the unfavorable element are best used for rest, review, and quiet preparation.
+Specifically: **do** push visible projects, plant seeds, and request what is owed; **avoid** starting too many things at once. Within this decade, years and months whose stem element matches the favorable **Earth** energy are the cleanest moments for major commitments; the annual windows table below shows them. Years dominated by the unfavorable element are best used for rest, review, and quiet preparation.
 
 ### 10-Year Forecast
 
@@ -485,29 +498,29 @@ Specifically: **do** conserve, refine, and protect the foundation; **avoid** lon
 | 2027 | 丁未 | Robber | Fire energy + Robber — a favorable-element year. | peer projects, friendships, self-definition | comparison and competition with peers |
 | 2028 | 戊申 | Eating God | Earth energy + Eating God — a favorable-element year. | creative production, writing, speaking, teaching | speaking before thinking; reputation risk |
 | 2029 | 己酉 | Hurting Officer | Earth energy + Hurting Officer — a favorable-element year. | creative production, writing, speaking, teaching | speaking before thinking; reputation risk |
-| 2030 | 庚戌 | Indirect Wealth | Metal energy + Indirect Wealth — a mixed year. | income launches, negotiations, value-pricing | over-leveraging or risky investments; the Metal element drains rather than feeds — slow down |
-| 2031 | 辛亥 | Direct Wealth | Metal energy + Direct Wealth — a mixed year. | income launches, negotiations, value-pricing | over-leveraging or risky investments; the Metal element drains rather than feeds — slow down |
-| 2032 | 壬子 | Seven Killings | Water energy + Seven Killings — a mixed year. | career moves, credentials, formal commitments | stubborn authority clashes; avoid ego fights; the Water element drains rather than feeds — slow down |
-| 2033 | 癸丑 | Direct Officer | Water energy + Direct Officer — a mixed year. | career moves, credentials, formal commitments | stubborn authority clashes; avoid ego fights; the Water element drains rather than feeds — slow down |
-| 2034 | 甲寅 | Indirect Resource | Wood energy + Indirect Resource — a mixed year. | study, mentorship, rest, skill-building | over-isolation or missed opportunities; the Wood element drains rather than feeds — slow down |
-| 2035 | 乙卯 | Direct Resource | Wood energy + Direct Resource — a mixed year. | study, mentorship, rest, skill-building | over-isolation or missed opportunities; the Wood element drains rather than feeds — slow down |
+| 2030 | 庚戌 | Indirect Wealth | Metal energy + Indirect Wealth — a mixed year. | income launches, negotiations, value-pricing | over-leveraging or risky investments; a neutral year for this chart — steady maintenance over big pushes |
+| 2031 | 辛亥 | Direct Wealth | Metal energy + Direct Wealth — a mixed year. | income launches, negotiations, value-pricing | over-leveraging or risky investments; a neutral year for this chart — steady maintenance over big pushes |
+| 2032 | 壬子 | Seven Killings | Water energy + Seven Killings — a mixed year. | career moves, credentials, formal commitments | stubborn authority clashes; avoid ego fights; a neutral year for this chart — steady maintenance over big pushes |
+| 2033 | 癸丑 | Direct Officer | Water energy + Direct Officer — a mixed year. | career moves, credentials, formal commitments | stubborn authority clashes; avoid ego fights; a neutral year for this chart — steady maintenance over big pushes |
+| 2034 | 甲寅 | Indirect Resource | Wood energy + Indirect Resource — a mixed year. | study, mentorship, rest, skill-building | over-isolation or missed opportunities; a neutral year for this chart — steady maintenance over big pushes |
+| 2035 | 乙卯 | Direct Resource | Wood energy + Direct Resource — a mixed year. | study, mentorship, rest, skill-building | over-isolation or missed opportunities; a neutral year for this chart — steady maintenance over big pushes |
 
 ### Year-by-Year Notes
 
 A quick reading of each year's energy relative to your Day Master and favorable element. Treat these as timing cues, not predictions.
 
-- **2026 · 丙午 (Companion):** This is **favorable-element year** — best focused on visibility, speaking, and visible output. Caution: watch for burnout from over-visibility; pace yourself rather than pushing through.
-- **2027 · 丁未 (Robber):** This is **favorable-element year** — best focused on visibility, speaking, and visible output. Caution: watch for burnout from over-visibility; pace yourself rather than pushing through.
-- **2028 · 戊申 (Eating God):** This is **favorable-element year** — best focused on grounding, routines, and supporting others. Caution: watch for over-responsibility and worry; pace yourself rather than pushing through.
-- **2029 · 己酉 (Hurting Officer):** This is **favorable-element year** — best focused on grounding, routines, and supporting others. Caution: watch for over-responsibility and worry; pace yourself rather than pushing through.
-- **2030 · 庚戌 (Indirect Wealth):** This is an annual energy to navigate consciously — best focused on refinement, precision, and clear boundaries. Caution: watch for rigidity and harsh self-judgment; pace yourself rather than pushing through.
-- **2031 · 辛亥 (Direct Wealth):** This is an annual energy to navigate consciously — best focused on refinement, precision, and clear boundaries. Caution: watch for rigidity and harsh self-judgment; pace yourself rather than pushing through.
-- **2032 · 壬子 (Seven Killings):** This is an annual energy to navigate consciously — best focused on reflection, listening, and quiet study. Caution: watch for isolation and depletion; pace yourself rather than pushing through.
-- **2033 · 癸丑 (Direct Officer):** This is an annual energy to navigate consciously — best focused on reflection, listening, and quiet study. Caution: watch for isolation and depletion; pace yourself rather than pushing through.
+- **2026 · 丙午 (Companion):** This is **favorable-element year** — best focused on visibility, speaking, and visible output. Caution: watch for burnout from over-visibility; pace yourself rather than pushing through. Also active this year: the annual branch **午** and natal **子** are in **충 (clash)**; the annual branch **午** and natal **丑** are in **해 (harm)**.
+- **2027 · 丁未 (Robber):** This is **favorable-element year** — best focused on visibility, speaking, and visible output. Caution: watch for burnout from over-visibility; pace yourself rather than pushing through. Also active this year: the annual branch **未** and natal **子** are in **해 (harm)**; the annual branch **未** and natal **丑** are in **충 (clash)**.
+- **2028 · 戊申 (Eating God):** This is **favorable-element year** — best focused on grounding, routines, and supporting others. Caution: watch for over-responsibility and worry; pace yourself rather than pushing through. Also active this year: the annual branch **申** and natal **寅** are in **충 (clash)**.
+- **2029 · 己酉 (Hurting Officer):** This is **favorable-element year** — best focused on grounding, routines, and supporting others. Caution: watch for over-responsibility and worry; pace yourself rather than pushing through. Also active this year: the annual branch **酉** and natal **酉** are in **자형 (self-punishment)**; the annual branch **酉** and natal **子** are in **파 (break)**.
+- **2030 · 庚戌 (Indirect Wealth):** This is an annual energy to navigate consciously — best focused on refinement, precision, and clear boundaries. Caution: watch for rigidity and harsh self-judgment; pace yourself rather than pushing through. Also active this year: the annual branch **戌** and natal **酉** are in **해 (harm)**.
+- **2031 · 辛亥 (Direct Wealth):** This is an annual energy to navigate consciously — best focused on refinement, precision, and clear boundaries. Caution: watch for rigidity and harsh self-judgment; pace yourself rather than pushing through. Also active this year: the annual stem **辛** forms **병신합수 (丙辛合水)** with your Day Master, activating Water; the annual branch **亥** and natal **寅** are in **합 (combination)**.
+- **2032 · 壬子 (Seven Killings):** This is an annual energy to navigate consciously — best focused on reflection, listening, and quiet study. Caution: watch for isolation and depletion; pace yourself rather than pushing through. Also active this year: the annual branch **子** and natal **酉** are in **파 (break)**; the annual branch **子** and natal **丑** are in **합 (combination)**.
+- **2033 · 癸丑 (Direct Officer):** This is an annual energy to navigate consciously — best focused on reflection, listening, and quiet study. Caution: watch for isolation and depletion; pace yourself rather than pushing through. Also active this year: the annual branch **丑** and natal **子** are in **합 (combination)**.
 - **2034 · 甲寅 (Indirect Resource):** This is an annual energy to navigate consciously — best focused on growth, learning, and creative expansion. Caution: watch for over-effort and stiffness; pace yourself rather than pushing through.
-- **2035 · 乙卯 (Direct Resource):** This is an annual energy to navigate consciously — best focused on growth, learning, and creative expansion. Caution: watch for over-effort and stiffness; pace yourself rather than pushing through.
+- **2035 · 乙卯 (Direct Resource):** This is an annual energy to navigate consciously — best focused on growth, learning, and creative expansion. Caution: watch for over-effort and stiffness; pace yourself rather than pushing through. Also active this year: the annual branch **卯** and natal **酉** are in **충 (clash)**.
 
-> **In plain words:** You are currently in a mixed decade — pick your moments using the year and month tables. Zoom in with the year and month windows that carry Earth.
+> **In plain words:** You are currently in a tailwind decade — a good stretch to push on the things that matter. Zoom in with the year and month windows that carry Earth.
 
 
 ---
@@ -528,17 +541,17 @@ With a **Direct Resource (正印)** ten-god over a **Earth** branch (stem elemen
 
 - **Ten-God theme:** Companion (比肩)
 - **Branch element & 12-stage:** Wood · 장생
-- **Favorable lean:** neutral
+- **Favorable lean:** favorable
 
-With a **Companion (比肩)** ten-god over a **Wood** branch (stem element Fire), this is a transition and adapt decade. Use the mixed energy to refine skills and reposition rather than to launch new ventures. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Companion (比肩)** undertow — themes of support and study are likely. The favorable **Earth** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
+With a **Companion (比肩)** ten-god over a **Wood** branch (stem element Fire), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Companion (比肩)** undertow — themes of support and study are likely. The favorable **Earth** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
 
 ### Ages 28–37: 丁卯
 
 - **Ten-God theme:** Robber (劫財)
 - **Branch element & 12-stage:** Wood · 목욕 (沐浴)
-- **Favorable lean:** neutral
+- **Favorable lean:** favorable
 
-With a **Robber (劫財)** ten-god over a **Wood** branch (stem element Fire), this is a transition and adapt decade. Use the mixed energy to refine skills and reposition rather than to launch new ventures. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Robber (劫財)** undertow — themes of support and study are likely. The favorable **Earth** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
+With a **Robber (劫財)** ten-god over a **Wood** branch (stem element Fire), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Robber (劫財)** undertow — themes of support and study are likely. The favorable **Earth** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
 
 ### Ages 38–47: 戊辰
 
@@ -560,9 +573,9 @@ With a **Hurting Officer (傷官)** ten-god over a **Fire** branch (stem element
 
 - **Ten-God theme:** Indirect Wealth (偏財)
 - **Branch element & 12-stage:** Fire · 제왕 (帝旺)
-- **Favorable lean:** neutral
+- **Favorable lean:** favorable
 
-With a **Indirect Wealth (偏財)** ten-god over a **Fire** branch (stem element Metal), this is a transition and adapt decade. Use the mixed energy to refine skills and reposition rather than to launch new ventures. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Indirect Wealth (偏財)** undertow — themes of commitment and visibility are likely. The favorable **Earth** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
+With a **Indirect Wealth (偏財)** ten-god over a **Fire** branch (stem element Metal), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Indirect Wealth (偏財)** undertow — themes of commitment and visibility are likely. The favorable **Earth** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
 
 ### Ages 68–77: 辛未
 
@@ -591,11 +604,11 @@ A single-glance view of all 8 major-luck periods in your life and the favorable 
 | Ages | Pillar | Ten-God | Favorable Lean |
 |---|---|---|---|
 | 8–17 | 乙丑 | Direct Resource (正印) | favorable |
-| 18–27 | 丙寅 | Companion (比肩) | neutral |
-| 28–37 | 丁卯 | Robber (劫財) | neutral |
+| 18–27 | 丙寅 | Companion (比肩) | favorable |
+| 28–37 | 丁卯 | Robber (劫財) | favorable |
 | 38–47 | 戊辰 | Eating God (食神) | favorable |
 | 48–57 | 己巳 | Hurting Officer (傷官) | favorable |
-| 58–67 | 庚午 | Indirect Wealth (偏財) | neutral |
+| 58–67 | 庚午 | Indirect Wealth (偏財) | favorable |
 | 68–77 | 辛未 | Direct Wealth (正財) | favorable |
 | 78–87 | 壬申 | Seven Killings (偏官) | neutral |
 
@@ -605,15 +618,28 @@ A single-glance view of all 8 major-luck periods in your life and the favorable 
 
 ## Auspicious Dates — Next 90 Days
 
-> The next 90-day window from September 2026 includes the following candidate dates — each one's day-stem element matches your favorable (Earth) or supporting (Fire) element, and its day-branch does not clash your natal day branch (寅). A qualified reader should still cross-check each date against the querent's specific question and local calendar before recommending it.
+> The next 90-day window from September 2026 includes the following candidate dates — each one's day-stem element matches your favorable (Earth) or supporting (Fire) element, and its day-branch does not clash, harm, or break your natal day branch (寅) or hour branch (丑). A qualified reader should still cross-check each date against the querent's specific question and local calendar before recommending it.
+
+> **Almanac caveat:** this is a chart-relative shortlist, not a finished 택일 (auspicious-date selection) — a full 택일 also weighs the day's own 건제십이신/28수 almanac assignment, the specific event type, and local custom, none of which this engine computes *(see knowledge/16-date-selection.md)*.
 
 | Date | Day Pillar | Suggested Use / Reader Note |
 |---|---|---|
-| 2026-09-20 (Sunday) | 丁酉 (Robber) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash your natal day branch; confirm against the querent's specific question before booking. |
-| 2026-09-21 (Monday) | 戊戌 (Eating God) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash your natal day branch; confirm against the querent's specific question before booking. |
-| 2026-09-22 (Tuesday) | 己亥 (Hurting Officer) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash your natal day branch; confirm against the querent's specific question before booking. |
-| 2026-09-29 (Tuesday) | 丙午 (Companion) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash your natal day branch; confirm against the querent's specific question before booking. |
-| 2026-09-30 (Wednesday) | 丁未 (Robber) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash your natal day branch; confirm against the querent's specific question before booking. |
+| 2026-09-21 (Monday) | 戊戌 (Eating God) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
+| 2026-10-02 (Friday) | 己酉 (Hurting Officer) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
+| 2026-10-19 (Monday) | 丙寅 (Companion) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
+| 2026-10-20 (Tuesday) | 丁卯 (Robber) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
+| 2026-10-29 (Thursday) | 丙子 (Companion) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
+| 2026-10-30 (Friday) | 丁丑 (Robber) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
+| 2026-10-31 (Saturday) | 戊寅 (Eating God) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
+| 2026-11-01 (Sunday) | 己卯 (Hurting Officer) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
+| 2026-11-08 (Sunday) | 丙戌 (Companion) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
+| 2026-11-10 (Tuesday) | 戊子 (Eating God) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
+| 2026-11-11 (Wednesday) | 己丑 (Hurting Officer) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
+| 2026-11-19 (Thursday) | 丁酉 (Robber) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
+| 2026-11-20 (Friday) | 戊戌 (Eating God) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
+| 2026-12-01 (Tuesday) | 己酉 (Hurting Officer) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
+| 2026-12-18 (Friday) | 丙寅 (Companion) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
+| 2026-12-19 (Saturday) | 丁卯 (Robber) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
 
 ---
 
@@ -643,7 +669,7 @@ When this chart goes out of balance, the most common early signals are: agitatio
 
 ### Long-Term Vitality Strategy
 
-**Renewal windows** — the chart's energy supports new health practices and increased capacity during: ages 8-17 (乙丑), ages 38-47 (戊辰), ages 48-57 (己巳). Use these decades to build resilience.
+**Renewal windows** — the chart's energy supports new health practices and increased capacity during: ages 8-17 (乙丑), ages 18-27 (丙寅), ages 28-37 (丁卯). Use these decades to build resilience.
 
 Across all periods, the **Earth** element's daily practices (its season, foods, colors, and rhythms) are the simplest and most reliable countermeasure — small daily inputs compound more than occasional heroic efforts.
 
@@ -651,24 +677,26 @@ Across all periods, the **Earth** element's daily practices (its season, foods, 
 
 ## Monthly Lucky Dates
 
-The next **12 months** of favorable days, selected when the daily stem element matches your **Earth** or **Fire** element and the day branch does not clash your natal day branch.
+The next **12 months** of favorable days, selected when the daily stem element matches your **Earth** or **Fire** element and the day branch does not clash, harm, or break your natal day or hour branch.
 
-> _Methodology: each row filters the daily-luck (일운 (日運)) stems to those whose element matches your favorable or supporting element, then drops any day whose branch clashes your natal day branch._
+> _Methodology: each row filters the daily-luck (일운 (日運)) stems to those whose element matches your favorable or supporting element, then drops any day whose branch clashes, harms, or breaks against your natal day or hour branch._
+
+> **Almanac caveat:** this is a chart-relative shortlist, not a finished 택일 — a full 택일 also weighs the day's own almanac assignment, the specific event type, and local custom *(see knowledge/16-date-selection.md)*.
 
 | Month | Favorable Dates | Energy Note |
 |---|---|---|
-| September 2026 | 1, 2, 9, 10, 11 | 戊寅 (Eating God) / 己卯 (Hurting Officer) / 丙戌 (Companion) |
-| October 2026 | 2, 9, 10, 11, 12 | 己酉 (Hurting Officer) / 丙辰 (Companion) / 丁巳 (Robber) |
-| November 2026 | 1, 8, 9, 10, 11 | 己卯 (Hurting Officer) / 丙戌 (Companion) / 丁亥 (Robber) |
-| December 2026 | 1, 8, 9, 10, 11 | 己酉 (Hurting Officer) / 丙辰 (Companion) / 丁巳 (Robber) |
-| January 2027 | 7, 8, 9, 10, 18 | 丙戌 (Companion) / 丁亥 (Robber) / 戊子 (Eating God) |
-| February 2027 | 6, 7, 8, 9, 16 | 丙辰 (Companion) / 丁巳 (Robber) / 戊午 (Eating God) |
-| March 2027 | 1, 8, 9, 10, 11 | 己卯 (Hurting Officer) / 丙戌 (Companion) / 丁亥 (Robber) |
-| April 2027 | 7, 8, 9, 10, 17 | 丙辰 (Companion) / 丁巳 (Robber) / 戊午 (Eating God) |
-| May 2027 | 7, 8, 9, 10, 18 | 丙戌 (Companion) / 丁亥 (Robber) / 戊子 (Eating God) |
-| June 2027 | 6, 7, 8, 9, 16 | 丙辰 (Companion) / 丁巳 (Robber) / 戊午 (Eating God) |
-| July 2027 | 6, 7, 8, 9, 17 | 丙戌 (Companion) / 丁亥 (Robber) / 戊子 (Eating God) |
-| August 2027 | 5, 6, 7, 8, 15 | 丙辰 (Companion) / 丁巳 (Robber) / 戊午 (Eating God) |
+| September 2026 | 21 | 戊戌 (Eating God) |
+| October 2026 | 2, 19, 20, 29, 30, 31 | 己酉 (Hurting Officer) / 丙寅 (Companion) / 丁卯 (Robber) |
+| November 2026 | 1, 8, 10, 11, 19, 20 | 己卯 (Hurting Officer) / 丙戌 (Companion) / 戊子 (Eating God) |
+| December 2026 | 1, 18, 19, 28, 29, 30, 31 | 己酉 (Hurting Officer) / 丙寅 (Companion) / 丁卯 (Robber) |
+| January 2027 | 7, 9, 10, 18, 19, 30 | 丙戌 (Companion) / 戊子 (Eating God) / 己丑 (Hurting Officer) |
+| February 2027 | 16, 17, 26, 27, 28 | 丙寅 (Companion) / 丁卯 (Robber) / 丙子 (Companion) |
+| March 2027 | 1, 8, 10, 11, 19, 20, 31 | 己卯 (Hurting Officer) / 丙戌 (Companion) / 戊子 (Eating God) |
+| April 2027 | 17, 18, 27, 28, 29, 30 | 丙寅 (Companion) / 丁卯 (Robber) / 丙子 (Companion) |
+| May 2027 | 7, 9, 10, 18, 19, 30 | 丙戌 (Companion) / 戊子 (Eating God) / 己丑 (Hurting Officer) |
+| June 2027 | 16, 17, 26, 27, 28, 29 | 丙寅 (Companion) / 丁卯 (Robber) / 丙子 (Companion) |
+| July 2027 | 6, 8, 9, 17, 18, 29 | 丙戌 (Companion) / 戊子 (Eating God) / 己丑 (Hurting Officer) |
+| August 2027 | 15, 16, 25, 26, 27, 28 | 丙寅 (Companion) / 丁卯 (Robber) / 丙子 (Companion) |
 
 > _For business-critical decisions, confirm the chosen date against the specific action type and consult a qualified reader._
 
@@ -680,8 +708,8 @@ The next **12 months** of favorable days, selected when the daily stem element m
 
 - **Fire Day Master strength** — radiant presence and the ability to light up a room.
 - **Direct Officer-dominant** — the ability to lead through structure and accountability.
-- **Output-dominant** — the ability to create and produce visible work.
 - **Direct Wealth-dominant** — the ability to hold and grow resources with discipline.
+- **Indirect Resource-dominant** — the ability to synthesize across domains and see patterns.
 - **Favorable Earth responsiveness** — the chart has a clear lever for growth, which not every chart does.
 
 ### Top 5 Growth Areas
@@ -707,11 +735,13 @@ The next **12 months** of favorable days, selected when the daily stem element m
 - **Direction:** center
 - **Numbers:** 0, 5
 - **Season:** transitions between seasons
-- **Gemstones:** citrine, tiger's eye, yellow jasper, amber
+- **Gemstones (modern, optional):** citrine, tiger's eye, yellow jasper, amber
 - **Foods:** whole grains, yellow and orange root vegetables, mildly sweet foods
 - **Best Times:** stable routines at season transitions and late afternoon (1–3 pm)
 - **Avoid:** excessive green, early-spring wind, and Wood-heavy east orientation
 - **Business Lucky Numbers:** 0, 5 (favorable Earth) and 2, 7 (supporting Fire)
+
+> _Direction, colours, season, and numbers above are classical 오행 (五行) 방위 doctrine (`knowledge/03-five-elements.md`). Gemstones are a modern popular-astrology convention, not classical 명리 (命理) — optional, not analytically load-bearing._
 
 ---
 
@@ -725,7 +755,7 @@ Listen once in full, then return to the chapters that match the season you are i
 
 ## Closing Note
 
-**丙 (Bing (Yang Fire, 丙火))** sits at the centre of this chart, with the chart's element balance leaning toward **Fire** and a ten-god distribution dominated by **Direct Officer (3), Output (3)**. The favorable **Earth** element (with **Fire** as the quiet secondary) is the querent's main lever — not as a rule to follow, but as a rhythm to listen to. The spouse palace **寅** and the chart's relationship dynamics reward the querent for showing up consistently rather than performing. The six-combination between **子** and **丑** is a quiet asset — partnerships or projects that bring two palaces into harmony, with the querent's role often as the connector. Across a full lifetime, this chart rewards the querent who studies their own patterns and acts with the favorable element rather than against it. The work is not to fix the chart; it is to use what is already there well.
+**丙 (Bing (Yang Fire, 丙火))** sits at the centre of this chart, with the chart's element balance leaning toward **Water** and a ten-god distribution dominated by **Authority (3), Output (3)**. The favorable **Earth** element (with **Fire** as the quiet secondary) is the querent's main lever — not as a rule to follow, but as a rhythm to listen to. The spouse palace **寅** and the chart's relationship dynamics reward the querent for showing up consistently rather than performing. The six-combination between **子** and **丑** is a quiet asset — partnerships or projects that bring two palaces into harmony, with the querent's role often as the connector. Across a full lifetime, this chart rewards the querent who studies their own patterns and acts with the favorable element rather than against it. The work is not to fix the chart; it is to use what is already there well.
 
 ---
 

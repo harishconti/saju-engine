@@ -4,6 +4,7 @@ CLAUDE.md requires technical Saju terms to appear with both Korean (한글) and
 Hanja (한자) on first use. This map is shared by report builders; each builder
 tracks which terms it has already injected.
 """
+import re
 from typing import Dict
 
 HANJA_GLOSSARY: Dict[str, str] = {
@@ -107,8 +108,36 @@ def inject_hanja(text: str, already_used: set, glossary: Dict[str, str] = HANJA_
         if idx == -1:
             continue
         # Avoid re-annotating a term that already has Hanja nearby.
+        #
+        # Bug found 2026-09-20 (external report review): the original check
+        # here only looked IMMEDIATELY after `term`'s own end for an opening
+        # paren. That misses every case where `term` is a prefix of a longer
+        # compound word that already carries its Hanja a few Hangul
+        # characters later — e.g. "역마" is a prefix of "역마살"; text already
+        # containing "역마살 (驛馬殺, Post Horse Star)" has "살", not "(",
+        # immediately after "역마", so the old check inserted a second,
+        # word-splitting annotation mid-compound: "역마 (驛馬)살 (驛馬殺, ...)".
+        # This happened even for compounds that are NOT themselves a second
+        # glossary key (역마살 isn't a HANJA_GLOSSARY key; 천덕귀인 is — both
+        # forms of the bug are real and are both fixed by this one check).
+        #
+        # Fix: after `term`, allow up to 6 more Hangul syllables (a generous
+        # bound — covers suffixes like 살/귀인/살성 etc.) before requiring the
+        # "(" that marks an existing annotation.
         after = idx + len(term)
-        if after < len(text) and text[after:].lstrip().startswith("("):
+        lookahead = text[after:after + 8]
+        if re.match(r"^[가-힣]{0,6}\s*\(", lookahead):
+            continue
+        # Bug found 2026-09-20 (own find, while implementing R12's annual-
+        # activation note): the checks above only ever looked AFTER `term`.
+        # A single-character glossary entry like "합" (合) can also sit
+        # embedded on the LEFT side of an unlisted longer compound —
+        # confirmed live: "병신합수" (a 천간합 label built at render time,
+        # not itself a glossary key) matched "합" mid-word and rendered as
+        # the split "병신합 (合)수". Require a left word-boundary too: skip
+        # when the character immediately before `term` is itself Hangul,
+        # since that means `term` is only a fragment of a larger compound.
+        if idx > 0 and re.match(r"[가-힣]", text[idx - 1]):
             continue
         annotated = f"{term} ({hanja})"
         text = text[:idx] + annotated + text[idx + len(term):]

@@ -79,17 +79,19 @@ The yin-yang polarity decides the **specific** ten god within each class:
 | 관성 (Authority) | 편관 (偏官, Seven Killings) | 정관 (正官, Direct Officer) |
 | 인성 (Resource) | 편인 (偏印, Indirect Resource) | 정인 (正印, Direct Resource) |
 
-> Example: 丙 (Yang Fire) appearing in the chart of an 甲 (Yang Wood) day master. 丙 generates 甲 (Fire feeds Wood), so 丙 is a **인성 (Resource)**. Because 丙 is **yang** and the Day Master 甲 is **yang**, same polarity → **편인 (Indirect Resource)**. If the Day Master were 乙 (Yin Wood), then 丙 would be a **정인 (Direct Resource)**.
+> Example: 丙 (Yang Fire) appearing in the chart of an 甲 (Yang Wood) day master. 甲 generates 丙 (Wood feeds Fire), so 丙 is what the Day Master **produces** — 식상 (Output), not 인성 (per `03-five-elements.md`'s generating cycle: Wood → Fire → Earth → Metal → Water → Wood; the generator is 인성 *to the generated*, so from 甲's own side, what it generates is its 식상). Because 丙 is **yang** and the Day Master 甲 is **yang**, same polarity → **식신 (Eating God)**. If the Day Master were 乙 (Yin Wood), different polarity → 丙 would be a **상관 (Hurting Officer)**. *(Corrected 2026-09-20 — external report review, 4th pass: the prior wording reversed the generating direction and named the wrong ten-god, contradicting `05-ten-gods.md`'s own Master Reference Table, which gives 甲 row → 丙 = 식신 and 乙 row → 丙 = 상관.)*
 
 ## Yin-Yang in Time
 
+> **Note on axis (added 2026-09-20 — external report review, 4th pass).** The labels below describe **qi-flow polarity** — the waxing/waning of yang and yin through the solar day (sunrise → noon → sunset → midnight), per Core Principle 3 above. This is a **different axis** from the fixed **branch polarity** table earlier in this file (子寅辰午申戌 = Yang branches, 丑卯巳未酉亥 = Yin branches). The two can disagree for a given branch without contradiction — e.g. 卯 is a structurally **Yin** branch but sits at the qi-flow moment of "Pure yang (sunrise)," because the sun is rising even though 卯's fixed branch-polarity classification is Yin. Both readings are classical; use branch polarity for chart-structure questions (yin/yang balance counts) and qi-flow polarity for time-of-day / seasonal-moment questions.
+
 The cycle of a day (and by extension the cycle of a year, a life):
 
-- **子 (23:00–01:00):** Pure yin turning to yang. Mid-night. New yang begins to stir.
-- **卯 (05:00–07:00):** Pure yang (sunrise). Mid-morning. Yang at first bloom.
-- **午 (11:00–13:00):** Yang at peak. Mid-day. Sun at zenith.
-- **酉 (17:00–19:00):** Pure yin (sunset). Mid-evening. Yin at first bloom.
-- **亥 (21:00–23:00):** Yin at peak. Late night. Yang about to be reborn.
+- **子 (23:00–01:00):** Pure yin turning to yang (qi-flow). Mid-night. New yang begins to stir.
+- **卯 (05:00–07:00):** Pure yang (qi-flow, sunrise). Mid-morning. Yang at first bloom.
+- **午 (11:00–13:00):** Yang at peak (qi-flow). Mid-day. Sun at zenith.
+- **酉 (17:00–19:00):** Pure yin (qi-flow, sunset). Mid-evening. Yin at first bloom.
+- **亥 (21:00–23:00):** Yin at peak (qi-flow). Late night. Yang about to be reborn.
 
 In a Saju reading, the **hour pillar** captures the "moment" of birth — what yin-yang energy was dominant at that time.
 

@@ -180,6 +180,49 @@ def test_year_by_year_note_includes_year_or_caution(ctx):
     assert isinstance(note, str) and note.strip()
 
 
+# ── R12 — annual activation layer (천간합 / 충/합/형/파/해) never surfaced ──
+# ── (found 2026-09-20, external report review, 3rd pass) ─────────────────
+
+
+def test_annual_activation_note_surfaces_2026_activations_for_harish():
+    """Confirmed live: Harish's 2026 (丙午) forms 병신합수 with his 辛 Day
+    Master, and 午 harms his natal 丑 hour branch — knowledge/08 Part 2 step
+    3 requires checking both, but the engine computed them and no report
+    prose ever read the result."""
+    from saju_engine import sewoon as SE
+    chart = compute_chart(
+        name="harish-r12-regression", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+    hit = SE.build_sewoon_range(chart.day_master, chart.branches, 2026, 2026)[0]
+    note = PF.annual_activation_note(hit)
+    assert "병신합수" in note
+    assert "해 (harm)" in note
+
+
+def test_annual_activation_note_empty_when_nothing_activates():
+    from saju_engine.sewoon import derive_sewoon
+    hit = derive_sewoon("甲", ["寅", "卯"], 2099)  # unlikely to activate anything
+    if not hit.stem_combinations and not hit.activated_branches:
+        assert PF.annual_activation_note(hit) == ""
+
+
+def test_year_by_year_note_appends_activation_when_present(ctx):
+    from saju_engine import sewoon as SE
+    chart = compute_chart(
+        name="harish-r12-year-note-regression", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+    from saju_engine.premium_report import _ReportContext
+    harish_ctx = _ReportContext(chart, tier="deep", generation_date="2026-09-20")
+    hit = SE.build_sewoon_range(chart.day_master, chart.branches, 2026, 2026)[0]
+    note = PF.year_by_year_note(hit, harish_ctx)
+    assert "Also active this year" in note
+    assert "병신합수" in note
+
+
 def test_major_luck_theme_row_returns_pair(ctx):
     """major_luck_theme_row returns (career, relationship) themes for a 대운."""
     chart = compute_chart(**SAMPLE_BIRTH)
@@ -372,6 +415,7 @@ def test_income_rhythm_does_not_treat_hidden_robber_as_wealth_rooted():
     fake_pillar_other = types.SimpleNamespace(hidden_stems=[])
     fake_chart = types.SimpleNamespace(
         day_master=day_master,
+        stems=["乙", "庚", "庚", "庚"],  # the visible 정재 (乙) plus 3 filler self-stems
         pillars=[fake_pillar_other, fake_pillar_other, fake_pillar_other, fake_pillar_hour],
         ten_gods=[types.SimpleNamespace(tengod="정재")],  # the one visible wealth stem
     )
@@ -383,3 +427,135 @@ def test_income_rhythm_does_not_treat_hidden_robber_as_wealth_rooted():
     )
 
 
+def test_income_rhythm_does_not_claim_rooted_for_hidden_only_direct_wealth():
+    """Regression for the 2026-09-19 bug (external report review, 2nd pass):
+    income_rhythm used to claim "The Direct Wealth stem is rooted in a
+    branch" whenever ANY 정재 was found via `_class_counts` (which counts
+    visible AND hidden stems), even when the ONLY 정재 in the whole chart is
+    itself a hidden stem with no visible counterpart at all — "rooted"
+    specifically means a visible stem echoed by a hidden one, which cannot
+    be true if there is no visible stem to begin with.
+
+    Harish's real chart is exactly this case: his only 정재 is 甲, hidden as
+    the middle qi of the day branch 亥; no stem in his four visible pillars
+    (壬乙辛己) is 정재.
+    """
+    from saju_engine import lookup as L
+
+    chart = compute_chart(
+        name="harish-income-regression", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+    assert not any(L.ten_god(chart.day_master, s) == "정재" for s in chart.stems), (
+        "test premise: Harish must have no VISIBLE 정재 stem"
+    )
+    out = PF.income_rhythm({"chart": chart})
+    assert "rooted in a branch" not in out, (
+        f"must not claim a hidden-only Direct Wealth stem is 'rooted': {out!r}"
+    )
+    assert "hidden stem" in out, f"should name the actual (hidden-only) situation: {out!r}"
+
+
+
+
+# ── relationship_timing_row gender adaptation — added 2026-09-19, external ──
+# ── report review, 2nd pass ──────────────────────────────────────────────
+
+
+def test_relationship_timing_row_male_marriage_code_is_wealth_not_officer():
+    """For a male Day Master, 재성 (Wealth) is the classical spouse indicator
+    (자평진전, per knowledge/11-gunghap.md §G / compat.py::_gendered_spouse_star_note),
+    not 관성. Direct Wealth years should carry the marriage-coded theme;
+    Direct Officer must NOT (that was the bug — a female-chart template
+    applied unconditionally)."""
+    male_wealth_note = PF.relationship_timing_row(2026, "甲子", "Direct Wealth", gender="M")
+    assert "marriage" in male_wealth_note
+    male_officer_note = PF.relationship_timing_row(2026, "甲子", "Direct Officer", gender="M")
+    assert "marriage" not in male_officer_note
+
+
+def test_relationship_timing_row_female_marriage_code_is_officer():
+    """For a female Day Master, 정관 (Direct Officer) remains the classical
+    spouse indicator — this is the one case the old code got right, and
+    must not regress."""
+    female_officer_note = PF.relationship_timing_row(2026, "甲子", "Direct Officer", gender="F")
+    assert "marriage" in female_officer_note
+    female_wealth_note = PF.relationship_timing_row(2026, "甲子", "Direct Wealth", gender="F")
+    assert "marriage" not in female_wealth_note
+
+
+def test_relationship_timing_row_declines_gendered_read_when_gender_unknown():
+    """No gender supplied -> neutral theme, not a silently-defaulted guess."""
+    note = PF.relationship_timing_row(2026, "甲子", "Direct Officer", gender=None)
+    assert "marriage" not in note
+
+
+# ── R10 — dominant ten-god class must not mix grouping levels ────────────
+# ── (found 2026-09-20, external report review, 3rd pass) ─────────────────
+
+
+@pytest.fixture
+def harish_chart():
+    return compute_chart(
+        name="harish-r10-regression", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+
+
+def test_class_counts_no_longer_merges_eating_god_and_hurting_officer(harish_chart):
+    """`_TENGOD_CLASS` used to map both 식신 and 상관 to one merged "Output"
+    key while every other class stayed split by yin/yang variant — an
+    inconsistent grouping level that inflated Output's count relative to
+    the (correctly split) other classes, and silently mismatched every
+    dict keyed by class name against tengod strings from `sewoon.py` /
+    `daeun_overlay.py` (which already use "Eating God" / "Hurting Officer").
+    """
+    counts = PF._class_counts(harish_chart)
+    assert "Output" not in counts
+    assert counts["Hurting Officer"] == 3
+    assert counts["Eating God"] == 1
+
+
+def test_variant_level_dominant_class_is_the_true_leader_not_a_merged_tie(harish_chart):
+    """Confirmed live: `_dominant_classes` used to report "Output (4)" as the
+    top variant, produced only by merging 식신(1) and 상관(3) — hiding that
+    상관 (Hurting Officer) alone is the true, uniquely-dominant variant (3),
+    ahead of every other variant (all <= 2)."""
+    dominant = PF._dominant_classes(harish_chart, 1)
+    assert dominant[0] == ("Hurting Officer", 3)
+
+
+def test_grouped_dominant_classes_surfaces_full_three_way_tie(harish_chart):
+    """Confirmed live: Harish's true 5-class distribution is a three-way tie
+    at 4 (비겁/식상/인성), with 재성=2 and 관성=1 trailing — but the old
+    `_dominant_classes(chart, 2)` reported "Output (4), Robber (2)",
+    dropping two of the three tied leaders and surfacing a class (재성)
+    that isn't even in the true top tier. `_grouped_dominant_classes` must
+    report all three tied leaders at the correct count."""
+    top3 = dict(PF._grouped_dominant_classes(harish_chart, 3))
+    assert top3 == {"Output": 4, "Companion": 4, "Resource": 4}
+
+
+def test_closing_note_long_and_friendship_agree_with_top_strengths_leader(harish_chart):
+    """The reviewer's exact complaint: `closing_note_long` claimed
+    "Output (4), Robber (2)" while `top_strengths` (a separate function,
+    same chart) concluded "Direct Resource-dominant" — two different,
+    inconsistent claims about what dominates the same ten-god profile.
+    After the fix, the class-level narrative (closing_note_long,
+    friendship_social_energy) must draw from the same properly-grouped
+    counts, and the variant-level narrative (top_strengths) must name the
+    true leading variant (Hurting Officer) rather than a tied non-leader."""
+    ctx = _ReportContext(harish_chart, tier="deep", generation_date="2026-09-20")
+    closing = PF.closing_note_long(ctx)
+    friendship = PF.friendship_social_energy(ctx)
+    for out in (closing, friendship):
+        assert "Output (4)" in out and "Companion (4)" in out, (
+            f"expected the true tied class-level leaders (Output/Companion at 4 each): {out!r}"
+        )
+    strengths = PF.top_strengths(ctx)
+    assert any("Hurting Officer-dominant" in s for s in strengths), (
+        f"top_strengths should name the true, uniquely-leading variant (Hurting Officer, 3) "
+        f"as its first dominant-class pick, not a merged or tied-non-leader name: {strengths!r}"
+    )
