@@ -262,13 +262,6 @@ class _ReportContext:
 
 
 # ── Method-transparency disclosures ──────────────────────────────────────────
-# Hour-branch windows are 2-hour solar windows starting on odd hours (子 23:00,
-# 丑 01:00, 寅 03:00, …). A corrected solar time within this many minutes of a
-# window boundary is a "knife-edge" birth: the neighboring hour pillar is a
-# plausible alternative and the hour pillar should carry lower confidence.
-HOUR_BOUNDARY_MARGIN_MIN = 10
-
-
 def _solar_time_note(chart) -> List[str]:
     """True-solar-time disclosure, including a knife-edge hour-boundary flag.
 
@@ -297,22 +290,20 @@ def _solar_time_note(chart) -> List[str]:
         "Hour branches follow 2-hour solar windows, so the pillars above use the corrected time.",
     ]
 
-    # Knife-edge flag: distance from the nearest odd-hour boundary
-    # (branch windows start on odd hours: 子 23:00, 丑 01:00, 寅 03:00, …).
-    try:
-        hh, mm = (int(x) for x in solar.split(":"))
-    except (ValueError, AttributeError):
-        return lines
-    minutes = hh * 60 + mm
-    raw = (minutes - 60) % 120  # 0 at odd-hour marks
-    dist_to_boundary = min(raw, 120 - raw)
-    if dist_to_boundary <= HOUR_BOUNDARY_MARGIN_MIN:
+    # Knife-edge flag: sourced from pillars.py's `_hour_boundary_info`, the
+    # single source of truth for the boundary-chart policy (I7, 2026-09-20:
+    # see pillars.py's HOUR_BOUNDARY_MARGIN_MIN docstring), so this
+    # disclosure can't drift out of sync with the engine's own check.
+    boundary = sc.get("hour_boundary")
+    if boundary:
+        dist_to_boundary = boundary["distance_minutes"]
         unit = "minute" if dist_to_boundary == 1 else "minutes"
         lines.append(
             f"> **⚠ Hour-boundary note:** the corrected time is only ~{dist_to_boundary} {unit} from a "
             "2-hour branch boundary. If the recorded clock time carries even a few minutes of error, the "
-            "neighboring hour pillar is a plausible alternative — treat the hour pillar (and its palace "
-            "themes) as lower-confidence in this reading."
+            f"neighboring hour pillar (**{boundary['alternate_hour_pillar']}**, vs the primary "
+            f"**{boundary['primary_hour_pillar']}** used above) is a plausible alternative — treat the hour "
+            "pillar (and its palace themes) as lower-confidence in this reading."
         )
     return lines
 

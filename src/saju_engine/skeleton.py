@@ -254,13 +254,14 @@ def generate_skeleton(
 
     if chart.strength_assessment:
         sa = chart.strength_assessment
+        rounded_counts = {k: round(v, 1) for k, v in sa["element_counts"].items()}
         lines += [
             f"- **Verdict**: {sa['verdict']}",
             f"- **Candidate 용신**: {sa['candidate_favorable']}",
             f"- **Candidate 희신**: {sa['candidate_supporting']}",
             f"- **Candidate 기신**: {sa.get('candidate_unfavorable') or '—'}",
-            f"- **Total score**: {sa['total_score']}",
-            f"- **Element counts**: {sa['element_counts']}",
+            f"- **Total score**: {round(sa['total_score'], 2)}",
+            f"- **Element counts**: {rounded_counts}",
             f"- **Note**: {sa['note']}",
         ]
     else:

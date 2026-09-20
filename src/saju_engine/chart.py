@@ -137,6 +137,17 @@ class ReferenceData:
     reference_date: str = ""
 
 
+def _round_floats(obj: Any, ndigits: int = 2) -> Any:
+    """Recursively round floats in a JSON-ready structure (dict/list/scalar)."""
+    if isinstance(obj, float):
+        return round(obj, ndigits)
+    if isinstance(obj, dict):
+        return {k: _round_floats(v, ndigits) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_round_floats(v, ndigits) for v in obj]
+    return obj
+
+
 @dataclass
 class Chart:
     """A fully-derived Saju chart ready for interpretation."""
@@ -440,7 +451,10 @@ class Chart:
         """Serialize the chart to a JSON string.
 
         Uses strict JSON serialization so accidental non-serializable objects
-        surface as errors rather than being silently stringified.
+        surface as errors rather than being silently stringified. Floats are
+        rounded to 2 decimal places here (display boundary only — `to_dict()`
+        keeps full precision for internal callers) so clients never see
+        binary-float artifacts like ``1.9000000000000001``.
         """
         import json
-        return json.dumps(self.to_dict(), indent=indent, ensure_ascii=ensure_ascii)
+        return json.dumps(_round_floats(self.to_dict()), indent=indent, ensure_ascii=ensure_ascii)

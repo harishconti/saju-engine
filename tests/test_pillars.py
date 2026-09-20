@@ -205,3 +205,87 @@ def test_leap_month_date_accepted():
     assert c_before.day.combined == "戊申"
     assert c_during.day.combined == "己酉"
     assert c_after.day.combined == "庚戌"
+
+
+# ── Boundary-chart policy (codified 2026-09-20, external report review I7) ──
+# The engine never silently picks a side on a knife-edge hour: when the
+# corrected solar time falls within HOUR_BOUNDARY_MARGIN_MIN of a branch-
+# window edge, it must also emit the neighboring alternate pillar in
+# `solar_correction["hour_boundary"]`, so JSON/CLI consumers and report
+# authors see both readings rather than one silently-chosen hour pillar.
+
+def test_hour_boundary_flag_present_for_knife_edge_chart():
+    # 03:10 clock at 79.12°E -> 02:58 solar (2 min before the 寅 boundary at
+    # 03:00) — same fixture as test_premium_report.py's partial-punishment
+    # chart. Effective hour branch is 丑; the neighboring 寅 pillar is the
+    # plausible alternative if the clock time carries a few minutes of error.
+    c = compute_chart(
+        name="Harish", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.12, utc_offset=5.5, use_solar_time=True,
+        convention="korean",
+    )
+    boundary = (c.solar_correction or {}).get("hour_boundary")
+    assert boundary is not None, "a 2-minute-margin birth must be flagged as a knife-edge hour"
+    assert boundary["distance_minutes"] == 2
+    assert boundary["primary_hour_pillar"] == c.hour.combined
+    assert boundary["alternate_hour_pillar"][1] == "寅"
+
+
+def test_hour_boundary_flag_absent_mid_window():
+    # 10:00 clock at 82.5°E is the exact IST meridian (zero longitude term);
+    # any residual correction is EoT-only and lands well inside the 巳 window.
+    c = compute_chart(
+        name="MidWindow", gender="M",
+        year=2000, month=6, day=13, hour=10, minute=0,
+        longitude=82.5, utc_offset=5.5, use_solar_time=True,
+        convention="korean",
+    )
+    assert (c.solar_correction or {}).get("hour_boundary") is None
+
+
+def test_hour_boundary_excludes_the_zi_hour_edge():
+    # 22:55 clock at 92°E -> solar ~23:33, 3 minutes into 子 (which starts at
+    # 23:00) — within the margin, but the 子 edge is deliberately excluded
+    # (see pillars.py::_hour_boundary_info) because it also flips which
+    # calendar day's stem drives the hour stem under 야자시, a compound
+    # decision this mechanism does not attempt to re-derive.
+    c = compute_chart(
+        name="ZiEdge", gender="M",
+        year=2000, month=1, day=1, hour=22, minute=55,
+        longitude=92.0, utc_offset=5.5, use_solar_time=True,
+        convention="korean",
+    )
+    assert c.hour.branch == "子"
+    assert (c.solar_correction or {}).get("hour_boundary") is None
+
+
+def test_rm_boundary_case_pinned():
+    # RM (Kim Nam-joon), 1994-09-12 13:28 KST, Seoul (candidates_horoscope/
+    # reports/rm/). Longitude pinned explicitly (126.9783°E, Nominatim's
+    # answer for "Seoul" as of 2026-09-20) rather than re-geocoding, because
+    # sajupy's city geocoder is a live network call and is not guaranteed
+    # stable run-to-run (see docs/audits/2026-09-20-i4-i7-followup.md) — the
+    # committed rm-report.md was in fact generated against a different
+    # geocoded longitude than this test observes today. This fixture pins
+    # the CURRENT engine's reading so a future geocoder/formula change can't
+    # silently flip RM's hour pillar without a test failing; it does not
+    # assert which of 乙未/甲午 is the "correct" hour for RM — that is an
+    # open reader decision (see the audit doc).
+    c = compute_chart(
+        name="RM", gender="M",
+        year=1994, month=9, day=12, hour=13, minute=28,
+        longitude=126.9783, utc_offset=9.0, use_solar_time=True,
+        convention="korean",
+    )
+    boundary = (c.solar_correction or {}).get("hour_boundary")
+    assert boundary == {
+        "distance_minutes": 0,
+        "primary_hour_pillar": "乙未",
+        "alternate_hour_pillar": "甲午",
+        "note": (
+            "Corrected solar time is within the boundary margin of a 2-hour "
+            "branch window; the alternate hour pillar is a plausible reading "
+            "if the recorded clock time carries a few minutes of error."
+        ),
+    }

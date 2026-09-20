@@ -76,6 +76,7 @@ from reportlab.platypus import (  # noqa: E402
     TableStyle,
 )
 
+from saju_engine.cli_validators import utc_offset_float  # noqa: E402
 from saju_html import (  # noqa: E402
     ELEMENT_COLORS,
     ELEMENT_EMOJI,
@@ -923,9 +924,9 @@ def main():
     ap.add_argument("--birth-minute", type=int, default=0)
     ap.add_argument("--city", default="")
     ap.add_argument("--longitude", type=float, default=None)
-    ap.add_argument("--utc-offset", type=float, default=9.0)
-    ap.add_argument("--use-solar-time", action="store_true", default=True)
-    ap.add_argument("--no-solar-time", dest="use_solar_time", action="store_false")
+    ap.add_argument("--utc-offset", type=utc_offset_float, default=9.0)
+    ap.add_argument("--no-solar-time", dest="use_solar_time", action="store_false", default=True,
+                    help="Disable true solar-time correction (enabled by default).")
     ap.add_argument("--convention", choices=["korean", "chinese"], default="korean",
                     help="Korean (야자시, default) or Chinese (조자시) Zi-hour convention.")
     # Legacy aliases kept for backward compatibility.

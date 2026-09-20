@@ -11,6 +11,7 @@ import argparse
 import sys
 from datetime import datetime
 
+from .cli_validators import utc_offset_float
 from .engine import compute_chart
 from .premium_report import generate_premium_report
 from .skeleton import generate_skeleton
@@ -69,16 +70,6 @@ def _day_int(s: str) -> int:
     return v
 
 
-def _utc_offset_float(s: str) -> float:
-    try:
-        v = float(s)
-    except ValueError as exc:
-        raise argparse.ArgumentTypeError(f"utc-offset must be a number, got {s!r}") from exc
-    if not -12 <= v <= 14:
-        raise argparse.ArgumentTypeError(f"utc-offset must be in [-12, 14], got {v}")
-    return v
-
-
 def _build_parser() -> argparse.ArgumentParser:
     ap = _HelpfulParser(
         prog="saju-engine",
@@ -94,7 +85,7 @@ def _build_parser() -> argparse.ArgumentParser:
                     help="Birth city for longitude geocoding (e.g., 'Pallipat').")
     ap.add_argument("--longitude", type=float, default=None,
                     help="Birth longitude in decimal degrees (east positive). Overrides city.")
-    ap.add_argument("--utc-offset", type=_utc_offset_float, default=None,
+    ap.add_argument("--utc-offset", type=utc_offset_float, default=None,
                     help="UTC offset in hours (required; e.g. 5.5 for India, 9 for Korea). Range [-12, 14].")
     ap.add_argument("--no-solar-time", dest="use_solar_time", action="store_false",
                     default=True, help="Disable true solar-time correction.")

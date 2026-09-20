@@ -97,6 +97,61 @@ def _hour_stem(day_stem: str, hour_branch: str) -> str:
     return L.STEM_ORDER[(start + branch_idx) % 10]
 
 
+# Boundary-chart policy (codified 2026-09-20, external report review I7):
+# hour branches are 2-hour solar windows starting on odd hours (子 23:00,
+# 丑 01:00, 寅 03:00, …). A corrected solar time within this many minutes of a
+# window edge is a "knife-edge" birth — a few minutes of recorded-clock error
+# would flip the hour pillar. Policy: never silently pick a side. The engine
+# always reports the branch its own math lands on as `hour_pillar`, but when
+# within the margin it also emits `hour_boundary` (distance + the neighboring
+# alternate pillar) in `solar_correction`, so JSON/CLI consumers and report
+# authors see both readings and the reader decides which to narrate — see
+# `knowledge/09-interpretation-method.md` Step 0 and premium_report.py's
+# `_solar_time_note`, which renders this as the "⚠ Hour-boundary note".
+HOUR_BOUNDARY_MARGIN_MIN = 10
+
+_BRANCH_ORDER = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
+
+
+def _hour_boundary_info(
+    eff_hour: int,
+    eff_minute: int,
+    correct_branch: str,
+    correct_stem: str,
+    day_stem: str,
+) -> Optional[Dict[str, Any]]:
+    """Return boundary-margin metadata when the hour is a knife-edge case.
+
+    Returns None when the corrected time is not within
+    ``HOUR_BOUNDARY_MARGIN_MIN`` of a branch-window edge, or when the
+    ambiguous edge is the 子 (23:00/01:00) boundary — that boundary also
+    flips which calendar day (and therefore which day-stem) drives the hour
+    stem under the Korean 야자시 convention, a compound decision this helper
+    does not attempt to re-derive; the existing 子 handling in
+    `_hour_stem_day_stem` already covers that case on its own terms.
+    """
+    minutes = eff_hour * 60 + eff_minute
+    raw_mod = (minutes - 60) % 120
+    dist = min(raw_mod, 120 - raw_mod)
+    if dist > HOUR_BOUNDARY_MARGIN_MIN:
+        return None
+    idx = _BRANCH_ORDER.index(correct_branch)
+    alt_branch = _BRANCH_ORDER[(idx - 1) % 12] if raw_mod <= 60 else _BRANCH_ORDER[(idx + 1) % 12]
+    if correct_branch == "子" or alt_branch == "子":
+        return None
+    alt_stem = _hour_stem(day_stem, alt_branch)
+    return {
+        "distance_minutes": dist,
+        "primary_hour_pillar": f"{correct_stem}{correct_branch}",
+        "alternate_hour_pillar": f"{alt_stem}{alt_branch}",
+        "note": (
+            "Corrected solar time is within the boundary margin of a 2-hour "
+            "branch window; the alternate hour pillar is a plausible reading "
+            "if the recorded clock time carries a few minutes of error."
+        ),
+    }
+
+
 def _day_stem_for_date(year: int, month: int, day: int) -> str:
     """Return the day-stem for a calendar date using the 60-cycle anchor.
 
@@ -265,11 +320,22 @@ def _apply_equation_of_time(
     sc["solar_time"] = adjusted.strftime("%H:%M")
 
 
+# Time-zone standard meridians (utc_offset * 15) are a political convention,
+# not a geographic one: a zone can be adopted to match a neighbor rather than
+# the zone's own longitude. Korea Standard Time (UTC+9) uses Japan's 135°E
+# meridian, but Korean cities sit near 124-131°E, and classical Korean Saju
+# practice corrects against 127.5°E (the meridian Korea used 1908-1912 and
+# 1954-1961) rather than 135°E. Without this override, every correctly
+# geocoded Korean city trips the "verify the city name" warning below.
+_KOREAN_SAJU_STANDARD_MERIDIAN = 127.5
+
+
 def _warn_if_suspicious_longitude(
     raw: Dict[str, Any],
     city: Optional[str],
     user_longitude: Optional[float],
     utc_offset: float,
+    convention: str = "korean",
 ) -> None:
     """Emit a stderr warning if the resolved longitude looks suspicious.
 
@@ -300,7 +366,10 @@ def _warn_if_suspicious_longitude(
     if source != "geocoded":
         return
 
-    standard_lon = utc_offset * 15.0
+    if convention == "korean" and utc_offset == 9.0:
+        standard_lon = _KOREAN_SAJU_STANDARD_MERIDIAN
+    else:
+        standard_lon = utc_offset * 15.0
     if user_longitude is not None and abs(geocoded - user_longitude) > 5.0:
         sys.stderr.write(
             f"Warning: geocoded longitude for '{city}' is {geocoded}°, but "
@@ -397,7 +466,7 @@ def compute_pillars(
         sys.stderr.write(_captured_text + "\n")
 
     # Geocoding sanity checks.
-    _warn_if_suspicious_longitude(raw, city, longitude, utc_offset)
+    _warn_if_suspicious_longitude(raw, city, longitude, utc_offset, convention)
 
     # Refine sajupy's longitude-only solar correction with the equation of
     # time (see _apply_equation_of_time docstring). No-op if sajupy applied
@@ -434,6 +503,12 @@ def compute_pillars(
     if correct_hour_stem != raw.get("hour_stem"):
         raw["hour_stem"] = correct_hour_stem
     raw["hour_pillar"] = f"{raw['hour_stem']}{raw['hour_branch']}"
+
+    boundary_info = _hour_boundary_info(
+        eff_hour, eff_minute, correct_hour_branch, correct_hour_stem, hour_stem_day_stem
+    )
+    if boundary_info is not None and raw.get("solar_correction"):
+        raw["solar_correction"]["hour_boundary"] = boundary_info
 
     raw["zi_time_type"] = _derive_zi_time_type(eff_hour, convention)
     raw["convention"] = convention
