@@ -197,3 +197,18 @@ def test_monthly_virtue_stem():
 def test_star_label_mapping():
     assert "겁살" in stars_module.STAR_LABELS["robbery_star"]
     assert "천덕귀인" in stars_module.STAR_LABELS["heavenly_virtue"]
+
+
+def test_xun_kong_hand_table_matches_algorithmic_derivation():
+    """Moved from a module-level loop in `stars.py` (2026-09-20, external
+    code-quality review): a module-level `assert` is stripped under
+    `python -O`, silently disabling this check, and re-ran the 60-entry
+    comparison on every import for no benefit. The hand-built
+    `_DAY_PILLAR_TO_XUN_KONG` table must agree with `_xun_kong_algorithmic`
+    for every pillar in the 60-갑자 cycle."""
+    from saju_engine import lookup as L
+    for pillar in L.JIAZI_CYCLE:
+        assert (
+            stars_module._xun_kong_algorithmic(*pillar)
+            == stars_module._DAY_PILLAR_TO_XUN_KONG[pillar]
+        ), f"공망 table mismatch for {pillar}"

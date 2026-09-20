@@ -196,7 +196,15 @@ def _annual_overlay(chart_a: Chart, chart_b: Chart, name_a: str, name_b: str) ->
     for hit in chart_b.sewoon:
         years.setdefault(hit.year, {})["b"] = hit
 
-    current_year = date.today().year
+    # Bug found 2026-09-20 (external code-quality review): `date.today().year`
+    # made the visible year range silently shift on every real-world day the
+    # report is generated, with no way to pin it for a reproducible test or
+    # a "report as of" regeneration. `Chart.reference_date_obj()` is the
+    # established mechanism the rest of the engine (`premium_report.py`)
+    # already uses for exactly this purpose — it defaults to "now" when the
+    # chart carries no explicit `reference_date`, so behaviour is unchanged
+    # for ordinary callers.
+    current_year = (chart_a.reference_date_obj() or date.today()).year
     lines: List[str] = []
     lines.append("#### Annual Couple Timing Overlay")
     lines.append("")

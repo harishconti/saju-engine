@@ -2,7 +2,7 @@
 
 **Date opened:** 2026-06-02  
 **Last updated:** 2026-09-20  
-**Test count:** 949 pytest cases passing / 10 xfailed (`python3 -m pytest`); engine validation gate
+**Test count:** 952 pytest cases passing / 10 xfailed (`python3 -m pytest`); engine validation gate
 `python3 tools/run_validation.py` → 200 checks (195 PASS / 5 INTERPRETATION / 0 FAIL, not re-run this
 round — no engine-math changes, only prose/report-layer fixes); landing page `npm run build` + 133
 vitest cases green.
@@ -325,6 +325,47 @@ Sourced market research: **`docs/market-research-2026-09.md`**. Design spec:
 - `knowledge/10-output-template.md` — report output structure
 - `knowledge/09-interpretation-method.md` — 9-step interpretation procedure
 - `~/.claude/projects/-mnt-data2-git-repos-saju/memory/` — persistent memory index
+
+---
+
+- **2026-09-20 (5th QA pass — code-quality/architecture review of the engine, 1 real bug + 2 real
+  fragility issues fixed, 1 "High" finding reviewed and NOT actionable — Suite 949 → 952)** — User
+  shared an external code-quality review of the GitHub repo (structural + fragment-level, not a
+  full read). Verified each claim against the actual code before acting. **Reviewed, not a bug:**
+  the review's "High" finding — "no timezone handling anywhere (zero `timezone`/`tzinfo`/`zoneinfo`
+  /`pytz` matches)" — is factually true of the grep but does not describe a defect: this engine (and
+  `sajupy`, which it wraps) deliberately takes an explicit `utc_offset` float + `longitude` instead
+  of IANA timezone objects, which is the standard, correct convention for classical Saju/BaZi
+  calculation — solar-term month/year boundaries are looked up by the querent's own **local**
+  calendar date (no cross-timezone re-projection wanted or needed), and the `solar_correction`
+  mechanism (longitude + equation of time, already extensively validated this session) is what
+  refines the *time-of-day* within that local frame. `compute_chart(utc_offset=5.5, ...)` for India
+  is the intended, already-tested usage (see the W1-W6 validation campaign's Indian candidate
+  fixtures), not a workaround for a missing feature. Adding IANA `zoneinfo` conversion would
+  conflate civil timezone with Saju's local-solar-time convention and risks introducing a new bug,
+  not fixing one — declined.
+  **Real bug fixed:** `compat_report.py::_annual_overlay` called `date.today().year` directly to
+  decide which years the Annual Couple Timing Overlay shows — the visible range silently shifted
+  with the real-world date the report was generated on, and could not be pinned for a reproducible
+  test (the exact `date.today()`/`datetime.now()` non-determinism class of bug already fixed
+  elsewhere in `premium_report.py` this session). Fixed to use `Chart.reference_date_obj()` (the
+  mechanism `premium_report.py` already uses for the same purpose), falling back to `date.today()`
+  only when the chart carries no explicit reference date — no behavior change for ordinary callers.
+  **Fragility issues addressed (Medium/Low, real but narrower than described):** (1) `daeun.py`'s
+  `_parse_calendar()` reads `sajupy`'s own `calendar_data.csv` via a located install path — this is
+  borrowing a third-party dependency's internal data file (not this package's own data, so
+  `importlib.resources` as literally suggested does not apply), but a missing file did surface as a
+  bare, unhelpful `FileNotFoundError`; added an explicit check with an actionable diagnostic
+  (reinstall guidance) before the `open()` call. (2) Two module-level `assert` loops — `lookup.py`'s
+  4-point `JIAZI_CYCLE` sanity check and `stars.py`'s 60-entry hand-table-vs-algorithmic verification
+  for 공망 — ran on every import and are silently no-ops under `python -O`; moved both into
+  `tests/test_lookup.py`/`tests/test_stars.py` as ordinary test functions (same checks, same
+  coverage, now always enforced by the test suite regardless of optimization flags).
+  **Not actioned (recommendations, not defects — noted for the user, not decided unilaterally):**
+  splitting `tasks.md`/triaging `improvements_issues.md`, pinning `requirements.txt` versions, a CI
+  workflow, and a `SajuInput` consolidating dataclass are reasonable suggestions but are
+  product/process decisions or larger refactors, not bugs — left for the user to prioritize.
+  Suite: **952 passed / 10 xfailed / 0 failed**.
 
 ---
 

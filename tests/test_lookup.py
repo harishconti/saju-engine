@@ -441,3 +441,14 @@ def test_three_punishments_table():
         tuple(sorted(["丑", "戌", "未"])),
         tuple(sorted(["子", "卯"])),
     ]
+
+
+def test_jiazi_cycle_sanity_points():
+    """Moved from a module-level `assert` in `lookup.py` (2026-09-20, external
+    code-quality review): a module-level assert is stripped under `python -O`,
+    silently disabling the check, and re-ran on every import for no benefit."""
+    assert L.JIAZI_CYCLE[0] == ("甲", "子")
+    assert L.JIAZI_CYCLE[1] == ("乙", "丑")
+    assert L.JIAZI_CYCLE[10] == ("甲", "戌")
+    assert L.JIAZI_CYCLE[-1] == ("癸", "亥")
+    assert len(L.JIAZI_CYCLE) == 60

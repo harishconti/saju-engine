@@ -145,10 +145,11 @@ def _xun_kong_algorithmic(day_stem: str, day_branch: str) -> List[str]:
     return absent
 
 
-# Verify the hand table against the algorithmic derivation on import.
-for _pillar in L.JIAZI_CYCLE:
-    assert _xun_kong_algorithmic(*_pillar) == _DAY_PILLAR_TO_XUN_KONG[_pillar], \
-        f"空亡 table mismatch for {_pillar}"
+# The hand-built _DAY_PILLAR_TO_XUN_KONG table is verified against this
+# algorithmic derivation in tests/test_stars.py, not here as a module-level
+# loop (moved 2026-09-20, external code-quality review: a module-level
+# `assert` is stripped entirely under `python -O`, silently disabling the
+# check, and re-runs the 60-entry comparison on every import for no benefit).
 
 
 def _xun_kong(day_stem: str, day_branch: str) -> List[str]:

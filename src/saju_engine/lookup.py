@@ -74,11 +74,11 @@ JIAZI_CYCLE: List[Tuple[str, str]] = [
     if True
 ][:60]
 
-# Sanity checks
-assert JIAZI_CYCLE[0]  == ("甲", "子")
-assert JIAZI_CYCLE[1]  == ("乙", "丑")
-assert JIAZI_CYCLE[10] == ("甲", "戌")
-assert JIAZI_CYCLE[-1] == ("癸", "亥")
+# Sanity checks for JIAZI_CYCLE live in tests/test_lookup.py, not here as
+# module-level asserts (moved 2026-09-20, external code-quality review: a
+# module-level `assert` is stripped entirely under `python -O`, silently
+# disabling the check, and re-runs this cheap-but-pointless work on every
+# import instead of once in the test suite).
 
 
 def cycle_index(stem: str, branch: str) -> int:

@@ -421,6 +421,41 @@ def test_generate_compat_report_default_is_basic():
     assert "Mixed" in md or "Strong" in md or "Excellent" in md or "Challenging" in md
 
 
+def test_annual_couple_timing_overlay_uses_chart_reference_date_not_wall_clock():
+    """Regression for a 2026-09-20 external code-quality review finding:
+    `_annual_overlay` used to call `date.today().year` directly to decide
+    which years to show, so the visible range silently shifted with the
+    real-world date the report happened to be generated on, and could not
+    be pinned for a reproducible test. It now reads `Chart.reference_date_obj()`
+    (the mechanism `premium_report.py` already uses for the same purpose),
+    falling back to `date.today()` only when the chart has no reference date."""
+    from saju_engine.compat_report import generate_compat_report
+    pinned_a = compute_chart(
+        name="Mahesh", gender="M", year=1995, month=1, day=19, hour=23, minute=50,
+        longitude=78.713454, utc_offset=5.5, use_solar_time=True,
+        reference_year=2020, reference_month=1, reference_day=1,
+    )
+    pinned_b = compute_chart(
+        name="Vishnu Priya", gender="F", year=2001, month=6, day=7, hour=16, minute=45,
+        longitude=76.65, utc_offset=5.5, use_solar_time=True,
+        reference_year=2020, reference_month=1, reference_day=1,
+    )
+    md = generate_compat_report(pinned_a, pinned_b, "Mahesh", "Vishnu Priya", tier="deep")
+    assert "#### Annual Couple Timing Overlay" in md
+    section = md[md.index("#### Annual Couple Timing Overlay"):]
+    section = section[:section.index("\n\n", section.index("|---"))]
+    years_shown = [int(row.split("|")[1].strip()) for row in section.splitlines() if row.startswith("| 20")]
+    assert years_shown, f"expected at least one year row: {section!r}"
+    # Pinned reference year is 2020; `chart.sewoon` precomputes ref_year ± 2
+    # (2018-2022), and the overlay drops anything before current_year - 1
+    # (2019), so the visible range must be exactly [2019, 2022] — not
+    # whatever `date.today()` (e.g. 2026) would have pulled in.
+    assert min(years_shown) == 2019 and max(years_shown) == 2022, (
+        f"years shown ({years_shown}) should be [2019, 2022] for the pinned "
+        f"reference year 2020, not the wall-clock date: {section!r}"
+    )
+
+
 def test_generate_compat_report_deep_has_all_subsystems():
     """Deep compat report includes the full eleven-sub-system breakdown + timing overlay."""
     from saju_engine.compat_report import generate_compat_report

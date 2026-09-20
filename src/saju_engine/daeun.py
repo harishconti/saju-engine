@@ -138,6 +138,20 @@ def _parse_calendar() -> Dict[str, List[Tuple[date, str, str]]]:
         raise ImportError("sajupy is not importable; cannot locate calendar_data.csv")
     sajupy_dir = os.path.dirname(spec.origin)
     csv_path = os.path.join(sajupy_dir, "calendar_data.csv")
+    if not os.path.isfile(csv_path):
+        # Bug found 2026-09-20 (external code-quality review): this file
+        # lives inside sajupy's own install directory (a third-party
+        # dependency's internal data file, not this package's own data —
+        # sajupy exposes no public API for it), so a raw `open()` failure
+        # here surfaces as an unhelpful bare `FileNotFoundError` with no
+        # hint about the actual cause (a stripped/incomplete sajupy
+        # install). Fail loudly with a diagnostic instead.
+        raise FileNotFoundError(
+            f"sajupy is importable but its calendar_data.csv is missing at "
+            f"{csv_path!r}. This usually means an incomplete or corrupted "
+            f"sajupy install — reinstall with "
+            f"`pip install --user --break-system-packages --force-reinstall sajupy`."
+        )
     by_year: Dict[str, List[Tuple[date, str, str]]] = {}
     with open(csv_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
