@@ -1,17 +1,17 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Harish — Deep Destiny Report · $55
+## Client — Deep Destiny Report · $55
 
 *Full natal reading + ten-year year-by-year timing + relationship and business-launch guidance*
 
 **Born:** 1992-06-04 · 03:10 · Pallipattu, Tamil Nadu
 
 **Time method:** recorded birth time 03:10 (local clock) corrected to true solar time **02:59** (birthplace 79.4408°E vs the 82.5°E zone meridian), -10.5 min (longitude -12.2 min + equation of time +1.7 min). Hour branches follow 2-hour solar windows, so the pillars above use the corrected time.
-> **⚠ Hour-boundary note:** the corrected time is only ~1 minute from a 2-hour branch boundary. If the recorded clock time carries even a few minutes of error, the neighboring hour pillar is a plausible alternative — treat the hour pillar (and its palace themes) as lower-confidence in this reading.
+> **⚠ Hour-boundary note:** the corrected time is only ~1 minute from a 2-hour branch boundary. If the recorded clock time carries even a few minutes of error, the neighboring hour pillar (**庚寅**, vs the primary **己丑** used above) is a plausible alternative — treat the hour pillar (and its palace themes) as lower-confidence in this reading.
 
 **Day Master:** Sin (Yin Metal, 辛金)
 
-**Report generated:** 2026-09-20 · **Report ID:** CID-harish-20260920-DEEP
+**Report generated:** 2026-09-25 · **Report ID:** CID-client-20260925-DEEP
 
 *Delivered by CosmicSaju · cosmicsaju.com*
 
@@ -472,7 +472,7 @@ For a **Metal** Day Master, the most aligned launch window is **autumn (the harv
 
 **Luck direction:** forward, advancing from the month pillar — derived from a yang year stem (壬) and male gender, per the classical rule (yang year + male, or yin year + female → forward; otherwise backward).
 
-**대운수 (starting age):** ~0.3 (~1 day to the qualifying 節氣 ÷ 3, per knowledge/08's "3 days = 1 year" rule) — the first major-luck period begins roughly 1 month after birth, inside the **0-9** decade label shown below, not precisely at its first birthday.
+**대운수 (starting age):** ~0.6 (~1.7 days to the qualifying 節氣 ÷ 3, per knowledge/08's "3 days = 1 year" rule) — the first major-luck period begins roughly 7 months after birth, inside the **0-9** decade label shown below, not precisely at its first birthday.
 
 ### Major Luck Periods
 
@@ -627,8 +627,6 @@ A single-glance view of all 8 major-luck periods in your life and the favorable 
 
 | Date | Day Pillar | Suggested Use / Reader Note |
 |---|---|---|
-| 2026-09-23 (Wednesday) | 庚子 (Robber) | A reasonable candidate — the day-stem carries your supporting element (Metal) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-09-24 (Thursday) | 辛丑 (Companion) | A reasonable candidate — the day-stem carries your supporting element (Metal) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
 | 2026-09-26 (Saturday) | 癸卯 (Eating God) | A reasonable candidate — the day-stem carries your favorable element (Water) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
 | 2026-10-03 (Saturday) | 庚戌 (Robber) | A reasonable candidate — the day-stem carries your supporting element (Metal) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
 | 2026-10-04 (Sunday) | 辛亥 (Companion) | A reasonable candidate — the day-stem carries your supporting element (Metal) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
@@ -694,7 +692,7 @@ The next **12 months** of favorable days, selected when the daily stem element m
 
 | Month | Favorable Dates | Energy Note |
 |---|---|---|
-| September 2026 | 23, 24, 26 | 庚子 (Robber) / 辛丑 (Companion) / 癸卯 (Eating God) |
+| September 2026 | 26 | 癸卯 (Eating God) |
 | October 2026 | 3, 4, 5, 6, 14, 15, 16, 26 | 庚戌 (Robber) / 辛亥 (Companion) / 壬子 (Hurting Officer) |
 | November 2026 | 13, 22, 23, 25 | 辛卯 (Companion) / 庚子 (Robber) / 辛丑 (Companion) |
 | December 2026 | 2, 3, 4, 5, 13, 14, 15, 25 | 庚戌 (Robber) / 辛亥 (Companion) / 壬子 (Hurting Officer) |

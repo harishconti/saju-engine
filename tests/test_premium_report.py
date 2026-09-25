@@ -871,8 +871,17 @@ def test_strength_line_states_a_reasoning_not_just_the_verdict():
 
 
 def test_daeun_starting_age_note_states_precise_age_not_just_decade():
-    """R19: the precise 대운수 must be stated (e.g. "~0.3") alongside the
-    rounded "0-9" decade label, not silently collapsed into it."""
+    """R19: the precise 대운수 must be stated (e.g. "~0.6") alongside the
+    rounded "0-9" decade label, not silently collapsed into it.
+
+    Value corrected 2026-09-25 (external report review, 4th pass): the R19
+    fix itself truncated the day count to a whole day before dividing by 3
+    (1.68 days floored to 1 -> "~0.3"/"~1 month"), and a second, independent
+    bug divided the months conversion by 3 twice ("~1 month" instead of the
+    correct ~7). Both are fixed in daeun.py::starting_age_days and
+    premium_report.py::_daeun_starting_age_note; the true value here is
+    ~1.68 days -> ~0.6 years -> ~7 months.
+    """
     chart = compute_chart(
         name="Harish-r19-regression", gender="M",
         year=1992, month=6, day=4, hour=3, minute=10,
@@ -880,7 +889,8 @@ def test_daeun_starting_age_note_states_precise_age_not_just_decade():
     )
     report = generate_premium_report(chart, tier="deep")
     assert "대운수" in report
-    assert "~0.3" in report
+    assert "~0.6" in report
+    assert "roughly 7 months" in report
 
 
 # ── R7 — date-selection filter defects ────────────────────────────────────

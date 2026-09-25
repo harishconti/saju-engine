@@ -100,20 +100,25 @@ def test_starting_age_backward_fractional_day_floors_correctly():
 
 
 def test_starting_age_days_matches_starting_age_floor_division():
-    """`starting_age_days() // 3` must equal `starting_age()` for the same
-    inputs — `starting_age_days` exposes the raw day count that `starting_age`
-    silently floors, so report prose can state the precise 대운수 (e.g.
-    Harish: ~1 day -> ~0.3 years, not a bare "age 0")."""
+    """`int(starting_age_days()) // 3` must equal `starting_age()` for the
+    same inputs — `starting_age_days` exposes the raw (fractional) day count
+    that `starting_age` silently floors, so report prose can state the
+    precise 대운수 (e.g. Harish: ~1.68 days -> ~0.6 years, not a bare
+    "age 0"). `starting_age_days` itself returns a float since 2026-09-25
+    (external report review, 4th pass) — see its docstring — so the
+    floor-to-whole-day step happens here, not inside it."""
     days = starting_age_days(1992, 6, 4, "forward", 2, 59)
     assert days is not None
-    assert days // 3 == starting_age(1992, 6, 4, "forward", 2, 59)
+    assert int(days) // 3 == starting_age(1992, 6, 4, "forward", 2, 59)
 
 
 def test_harish_starting_age_days_is_small_not_a_clean_zero():
     """Harish's real starting age rounds to the integer 0, but the true
-    offset is ~1 day (~0.3 years, ~4 months) — the reviewer's exact
-    complaint that "the first 대운 begins ~4 months after birth" was
-    invisible behind the clean "0" decade label."""
+    offset is ~1.68 days (~0.6 years, ~7 months) — not the clean "0" the
+    decade label alone would suggest, and not the ~1 day/~0.3 years/~1
+    month an earlier (2026-09-20) partial fix reported after truncating
+    the day count to a whole day before dividing by 3 (corrected
+    2026-09-25, external report review, 4th pass)."""
     days = starting_age_days(1992, 6, 4, "forward", 2, 59)
     assert days is not None
     assert 0 <= days <= 3

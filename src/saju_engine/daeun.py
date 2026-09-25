@@ -268,9 +268,9 @@ def starting_age_days(
     direction: str,
     hour: int = 0,
     minute: int = 0,
-) -> Optional[int]:
-    """Return the raw day-count to the qualifying 節氣 that `starting_age`
-    floors to a whole year via `days // 3`.
+) -> Optional[float]:
+    """Return the raw, **fractional** day-count to the qualifying 節氣 that
+    `starting_age` floors to a whole year via `days // 3`.
 
     Bug found 2026-09-20 (external report review, 3rd pass, R19): the report
     never states the precise 대운수 — knowledge/08's own rule is "3 days = 1
@@ -279,13 +279,26 @@ def starting_age_days(
     identically to one whose offset is 2.9 years under the rounded integer
     alone. This exposes the underlying day count so report prose can state
     the precise starting age instead of only the rounded decade label.
+
+    Bug found 2026-09-25 (external report review, 4th pass): the R19 fix
+    above still truncated to a *whole* day (`int(... // 86400)`) before
+    returning, silently discarding up to just-under-1-day of precision. For
+    Harish, the true offset is 1.68 days (~0.56 years, ~6.7 months); flooring
+    to 1 day first and *then* dividing by 3 produced "~0.3 years (~4
+    months)" — understating the true starting-age offset by roughly a factor
+    of two. This now returns the unfloored fractional day count so
+    `round(days / 3, 1)` downstream is actually precise, not
+    falsely-precise-looking. `starting_age()`'s own integer day-count (used
+    for the decade-boundary year, via its own separate `days // 3`) is
+    unaffected either way — flooring a sub-3-day offset to a whole day
+    before or after does not change which whole year it floors into.
     """
     prev, nxt = _term_boundary_datetimes(year, month, day, hour, minute)
     birth_dt = datetime(year, month, day, hour, minute)
     target = nxt if direction == "forward" else prev
     if target is None:
         return None
-    return int(abs((target - birth_dt).total_seconds()) // 86400)
+    return abs((target - birth_dt).total_seconds()) / 86400.0
 
 
 # ── Top-level: build the full major-luck sequence ───────────────────────────

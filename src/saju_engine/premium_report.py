@@ -369,12 +369,18 @@ def _daeun_starting_age_note(chart) -> str:
     if days is None:
         return ""
     precise_age = round(days / 3, 1)
-    months = round(days * 4 / 3)
+    # 3 days = 1 year = 12 months, so 1 day = 4 months (not 4/3 — a second,
+    # independent bug found alongside the days-truncation bug, external
+    # report review 4th pass, 2026-09-25: this was previously dividing by 3
+    # an extra time, e.g. reporting Harish's ~1.7-day, ~7-month offset as
+    # "roughly 1 month").
+    months = round(days * 4)
     start_age = chart.daeun[0].start_age if chart.daeun else int(precise_age)
-    day_word = "day" if days == 1 else "days"
+    days_display = round(days, 1)
+    day_word = "day" if days_display == 1 else "days"
     month_word = "month" if months == 1 else "months"
     return (
-        f"**대운수 (starting age):** ~{precise_age} (~{days} {day_word} to the qualifying 節氣 ÷ 3, "
+        f"**대운수 (starting age):** ~{precise_age} (~{days_display} {day_word} to the qualifying 節氣 ÷ 3, "
         f"per knowledge/08's \"3 days = 1 year\" rule) — the first major-luck period begins "
         f"roughly {months} {month_word} after birth, inside the **{start_age}-{start_age + 9}** decade "
         f"label shown below, not precisely at its first birthday."
