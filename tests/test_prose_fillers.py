@@ -118,6 +118,46 @@ def test_relationship_style_uses_real_tengod_implication_not_generic_fallback(ct
     )
 
 
+# ── E-8 — relationship_style ignored gender entirely (found 2026-09-25, ──
+# ── external report review) ───────────────────────────────────────────
+
+
+def test_relationship_style_names_gendered_spouse_star_female(ctx):
+    """The sample fixture chart is female; her 부성 (관성, husband star)
+    appears at three positions (year branch, month branch, hour stem) —
+    confirmed independently against chart.ten_gods."""
+    out = PF.relationship_style(ctx)
+    assert "부성 (관성, husband star)" in out
+    assert "자평진전" in out
+
+
+def test_relationship_style_names_gendered_spouse_star_male_in_palace():
+    """Harish (male) has his 처성 (재성, wife star) at the month stem AND
+    inside the spouse palace itself (day branch's middle hidden stem, 甲) —
+    the classically stronger placement, which must be named explicitly."""
+    chart = compute_chart(
+        name="Harish", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5, convention="korean",
+    )
+    ctx2 = _ReportContext(chart, tier="deep", generation_date="2026-09-25")
+    out = PF.relationship_style(ctx2)
+    assert "처성 (재성, wife star)" in out
+    assert "including the spouse palace itself" in out
+
+
+def test_relationship_style_gendered_spouse_star_absent_case():
+    """A chart with no gender set must not attempt the gendered reading at
+    all (the classical mapping only applies once gender is known)."""
+    chart = compute_chart(
+        name="NoGender",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5, convention="korean",
+    )
+    ctx2 = _ReportContext(chart, tier="deep", generation_date="2026-09-25")
+    assert PF.gendered_spouse_star_note(ctx2) == ""
+
+
 def test_three_mindful_notes_returns_three_bullets(ctx):
     notes = PF.three_mindful_notes(ctx)
     assert isinstance(notes, list)
@@ -559,3 +599,43 @@ def test_closing_note_long_and_friendship_agree_with_top_strengths_leader(harish
         f"top_strengths should name the true, uniquely-leading variant (Hurting Officer, 3) "
         f"as its first dominant-class pick, not a merged or tied-non-leader name: {strengths!r}"
     )
+
+
+# ── E-4 — a skewed support/drain sentence must reconcile with a "Balanced" ──
+# ── verdict, not read as contradicting it (found 2026-09-25, external ──────
+# ── report review) ──────────────────────────────────────────────────────
+
+
+def test_strength_reasoning_reconciles_skew_with_balanced_verdict():
+    """1970-03-15 10:00 (Korea) is a balanced chart whose drain (5.9) is
+    well over 1.3x its support (0.6) — exactly the shape that used to read
+    as flatly contradicting "Balanced" ("the drain outweighs the support",
+    full stop). The sentence must now explicitly say what reconciles the
+    two: the month-stage term pulling the total back into the balanced
+    range."""
+    chart = compute_chart(
+        name="skew-test", gender="M",
+        year=1970, month=3, day=15, hour=10, minute=0,
+        longitude=127.0, utc_offset=9.0, convention="korean",
+    )
+    sa = chart.strength_assessment
+    assert sa["verdict"] == "balanced"
+    support = sa["self_score"] + sa["resource_score"]
+    assert sa["drain_score"] > support * 1.3
+    text = PF.strength_reasoning({"chart": chart})
+    assert "the output/wealth/authority drain outweighs the peer and resource support" in text
+    assert "pulls the total back into the balanced range despite that skew" in text
+
+
+def test_strength_reasoning_no_reconciliation_for_strong_weak_charts():
+    """A strong/weak verdict's own skew reinforces its label rather than
+    contradicting it, so the reconciling clause must not appear there."""
+    chart = compute_chart(
+        name="strong-or-weak", gender="M",
+        year=1980, month=6, day=15, hour=10, minute=0,
+        longitude=127.0, utc_offset=9.0, convention="korean",
+    )
+    sa = chart.strength_assessment
+    assert sa["verdict"] in ("strong", "extreme", "weak", "extreme_weak")
+    text = PF.strength_reasoning({"chart": chart})
+    assert "pulls the total back into the balanced range" not in text

@@ -394,6 +394,85 @@ def _derive_zi_time_type(effective_hour: int, convention: str) -> Optional[str]:
     return "早子時 (Chinese 조자시)"
 
 
+# ── Independent month/year pillar verification (E-1, 2026-09-25) ───────────
+# sajupy's month-pillar determination compares a KST-stored 절기 moment
+# against the birth's raw local time with no timezone conversion — the same
+# root cause as daeun.py's starting-age bug (see daeun.KST_OFFSET_HOURS's
+# docstring for the CSV-timezone evidence). For a birth far from KST (the
+# reproduction case: New York, UTC-5, a 14-hour gap — large enough to flip
+# which side of a 절기 boundary the birth falls on, unlike Korea/India's
+# 0-3.5h gaps) this produces a month pillar that does not even fit its own
+# year pillar under 오호둔: 2024-02-04 10:00 EST -> sajupy gives 乙丑, valid
+# only for a 戊/癸-year, while the year pillar stays 甲辰 — sajupy's year and
+# month determinations are evidently inconsistent internally, not just
+# individually wrong. This independently recomputes both the Saju year and
+# the month pillar using the same, now-timezone-correct term-boundary logic
+# 대운수 uses, and *only overrides sajupy's raw values when they disagree* —
+# verified to agree with every externally-sourced ("certified") pillar
+# fixture in this repo's validation suite before being wired in, so the
+# override path is exercised only by the class of birth it targets.
+
+_TERM_TO_MONTH_BRANCH: Dict[str, str] = {
+    "立春": "寅", "驚蟄": "卯", "淸明": "辰", "立夏": "巳",
+    "芒種": "午", "小暑": "未", "立秋": "申", "白露": "酉",
+    "寒露": "戌", "立冬": "亥", "大雪": "子", "小寒": "丑",
+}
+
+# 오호둔 (五虎遁, "five tigers"): the 寅-month stem for each year-stem pair.
+_FIVE_TIGERS: Dict[str, str] = {
+    "甲": "丙", "己": "丙", "乙": "戊", "庚": "戊", "丙": "庚",
+    "辛": "庚", "丁": "壬", "壬": "壬", "戊": "甲", "癸": "甲",
+}
+
+# 1984 is the standard 갑자 (甲子) anchor year — JIAZI_CYCLE[0].
+_YEAR_CYCLE_ANCHOR = 1984
+
+
+def _independent_year_month_pillar(
+    year: int, month: int, day: int, hour: int, minute: int, utc_offset: float,
+) -> Optional[Dict[str, str]]:
+    """Independently derive the Saju year and month pillar from
+    properly-timezone-converted 절기 boundaries.
+
+    Returns None if the birth falls outside the calendar CSV's covered
+    range — callers should then trust sajupy's raw value unchecked, the same
+    fallback `starting_age()` uses.
+    """
+    from .daeun import KST_OFFSET_HOURS, _parse_calendar, _parse_term_time
+
+    by_year = _parse_calendar()
+    tz_shift = timedelta(hours=utc_offset - KST_OFFSET_HOURS)
+    candidates: list = []
+    for y in (year - 1, year, year + 1):
+        for dt, hanja, term_time in by_year.get(str(y), []):
+            candidates.append((_parse_term_time(term_time, dt) + tz_shift, hanja))
+    candidates.sort()
+
+    birth_dt = datetime(year, month, day, hour, minute)
+
+    prev_month_term: Optional[Tuple[datetime, str]] = None
+    lichun_year: Optional[int] = None
+    for term_dt, hanja in candidates:
+        if term_dt > birth_dt:
+            break
+        prev_month_term = (term_dt, hanja)
+        if hanja == "立春":
+            lichun_year = term_dt.year
+    if prev_month_term is None or lichun_year is None:
+        return None
+
+    month_branch = _TERM_TO_MONTH_BRANCH[prev_month_term[1]]
+    idx60 = (lichun_year - _YEAR_CYCLE_ANCHOR) % 60
+    year_stem, year_branch = L.JIAZI_CYCLE[idx60]
+    branch_steps = (L.BRANCH_INDEX[month_branch] - L.BRANCH_INDEX["寅"]) % 12
+    month_stem = L.STEM_ORDER[(L.STEM_ORDER.index(_FIVE_TIGERS[year_stem]) + branch_steps) % 10]
+
+    return {
+        "year_stem": year_stem, "year_branch": year_branch,
+        "month_stem": month_stem, "month_branch": month_branch,
+    }
+
+
 def compute_pillars(
     *,
     year: int,
@@ -512,6 +591,26 @@ def compute_pillars(
 
     raw["zi_time_type"] = _derive_zi_time_type(eff_hour, convention)
     raw["convention"] = convention
+
+    # Independent year/month-pillar cross-check (E-1) — override sajupy's raw
+    # values only when they disagree with the timezone-correct recomputation.
+    independent = _independent_year_month_pillar(
+        eff_date[0], eff_date[1], eff_date[2], eff_hour, eff_minute, utc_offset
+    )
+    if independent is not None:
+        disagreement = {
+            k: {"sajupy": raw.get(k), "corrected": v}
+            for k, v in independent.items()
+            if raw.get(k) != v
+        }
+        if disagreement:
+            raw["year_stem"] = independent["year_stem"]
+            raw["year_branch"] = independent["year_branch"]
+            raw["month_stem"] = independent["month_stem"]
+            raw["month_branch"] = independent["month_branch"]
+            raw["year_pillar"] = f"{independent['year_stem']}{independent['year_branch']}"
+            raw["month_pillar"] = f"{independent['month_stem']}{independent['month_branch']}"
+            raw["year_month_correction"] = disagreement
 
     return raw
 

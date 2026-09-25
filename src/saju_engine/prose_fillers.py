@@ -290,15 +290,35 @@ def strength_reasoning(ctx) -> str:
     resource_score = sa.get("resource_score", 0.0)
     drain_score = sa.get("drain_score", 0.0)
     support = self_score + resource_score
+    skewed = False
     if support > drain_score * 1.3:
-        offset_note = "peer and resource support (visible and hidden stems) then outweighs the output/wealth/authority drain"
+        offset_note = "peer and resource support (visible and hidden stems) outweighs the output/wealth/authority drain"
+        skewed = True
     elif drain_score > support * 1.3:
-        offset_note = "the output/wealth/authority drain then outweighs the peer and resource support"
+        offset_note = "the output/wealth/authority drain outweighs the peer and resource support"
+        skewed = True
     else:
-        offset_note = "peer/resource support and the output/wealth/authority drain then sit close to even"
+        offset_note = "peer/resource support and the output/wealth/authority drain sit close to even"
+    # Bug found 2026-09-25 (external report review, E-4): for a chart whose
+    # overall verdict is "Balanced," a bare, unqualified skew statement here
+    # ("the drain outweighs the support") reads as flatly contradicting the
+    # verdict label a few words earlier — confirmed live: Harish's support
+    # (2.8) and drain (4.1) are genuinely ~46% apart, but total_score also
+    # includes the month-stage term (weight 1.5), which is what actually
+    # pulls the total back into the balanced band despite that skew. Say so
+    # explicitly rather than leaving the reader to reconcile "Balanced" with
+    # a sentence that, read alone, sounds unbalanced. Strong/weak charts are
+    # unaffected — there, a skew in the verdict's own direction reinforces
+    # rather than contradicts the label, so no reconciling clause is needed.
+    reconcile = ""
+    if skewed and sa.get("verdict") == "balanced":
+        reconcile = (
+            " — the month-branch stage above (weighted more heavily in the overall formula) "
+            "is what pulls the total back into the balanced range despite that skew"
+        )
     return (
         f"the Day Master's stage in the month branch **{chart.month.branch}** is **{stage}** "
-        f"({season_note}, per knowledge/06-twelve-stages.md) — {description} — and {offset_note}."
+        f"({season_note}, per knowledge/06-twelve-stages.md) — {description} — and {offset_note}{reconcile}."
     )
 
 
@@ -600,10 +620,18 @@ def decade_career_strategy(ctx, p) -> str:
     branch_elem = p.branch_element or "—"
     stem_elem = p.stem_element or "—"
     fav = _ctx_get(ctx, "favorable", "—")
-    if "favor" in status:
+    # Bug found 2026-09-25 (external report review, E-3 follow-up): a naive
+    # `"favor" in status` substring check matches "unfavorable" too (it
+    # contains "favor"), so a genuinely unfavorable decade was silently
+    # mislabeled "build and rise". Unreachable before the E-3 fix
+    # (period_favorable_status could never actually return "unfavorable"
+    # for a balanced/climate-gated chart), and confirmed to fire the moment
+    # it could — exact-match against the function's only 3 return values
+    # instead of substring-matching.
+    if status == "favorable":
         phase = "build and rise"
         guidance = "Plant several seeds at once — the chart can carry more than one initiative in this window."
-    elif "challeng" in status or "difficult" in status:
+    elif status == "unfavorable":
         phase = "conserve and consolidate"
         guidance = "Protect what already works; defer large bets and focus on craft and relationships."
     else:
@@ -666,7 +694,41 @@ def relationship_style(ctx) -> str:
         base += f" **도화 (Peach Blossom)** is present at **{', '.join(peach)}**, adding warmth and relational magnetism."
     else:
         base += " No **도화** star is natally active, so relationship style is more shaped by the spouse palace and ten-god mix than by overt magnetism."
+    base += " " + gendered_spouse_star_note(ctx)
     return base
+
+
+# Bug found 2026-09-25 (external report review, E-8): this section read only
+# the spouse palace's main hidden stem, ignoring gender entirely — per
+# 자평진전's gendered spouse-star mapping (knowledge/11-gunghap.md §G,
+# already applied for compatibility readings via
+# compat.py::_gendered_spouse_star_note), a male chart's actual spouse
+# indicator is 재성 (wealth star) wherever it appears, and a female chart's
+# is 관성 (officer star) — not exclusively the day branch's main hidden
+# stem. This is the single-chart counterpart of that compat.py function.
+def gendered_spouse_star_note(ctx) -> str:
+    """Name where the querent's classical gendered spouse-star sits, if present."""
+    chart = _ctx_get(ctx, "chart")
+    gender = chart.gender
+    if gender not in ("M", "F"):
+        return ""
+    from .compat import _HUSBAND_STARS, _WIFE_STARS
+    target = _WIFE_STARS if gender == "M" else _HUSBAND_STARS
+    star_label = "처성 (재성, wife star)" if gender == "M" else "부성 (관성, husband star)"
+    hits = [hit for hit in chart.ten_gods if hit.tengod in target]
+    if not hits:
+        return (
+            f"No **{star_label}** appears anywhere in the natal chart (visible or hidden) — the classical "
+            "gendered spouse-star indicator is simply absent here, not a negative signal on its own; the "
+            "spouse-palace reading above still applies *(see knowledge/11-gunghap.md §G)*."
+        )
+    positions = ", ".join(f"**{hit.stem}** ({hit.position.replace('_', ' ')})" for hit in hits)
+    in_palace = any(hit.position.startswith("day_branch") for hit in hits)
+    palace_note = " — including the spouse palace itself, a classically stronger placement" if in_palace else ""
+    return (
+        f"By 자평진전's gendered spouse-star convention, your **{star_label}** appears at {positions}{palace_note} "
+        "*(see knowledge/11-gunghap.md §G)*."
+    )
 
 
 def spouse_palace_tengod(ctx) -> str:
@@ -1106,9 +1168,11 @@ def long_term_vitality_strategy(ctx) -> str:
     conserving_periods = []
     for p in chart.daeun:
         status = period_favorable_status(p, ctx)
-        if "favor" in status:
+        # Exact match, not substring — see decade_career_strategy's E-3
+        # follow-up note; "favor" in status also matches "unfavorable".
+        if status == "favorable":
             supportive_periods.append(f"ages {p.start_age}-{p.end_age} ({p.combined})")
-        elif "challeng" in status or "difficult" in status:
+        elif status == "unfavorable":
             conserving_periods.append(f"ages {p.start_age}-{p.end_age} ({p.combined})")
     parts = []
     if supportive_periods:
@@ -1135,7 +1199,8 @@ def long_term_vitality_strategy(ctx) -> str:
 def major_luck_theme_row(p, ctx) -> Tuple[str, str]:
     """(career_theme, relationship_theme) for one 대운 row."""
     status = period_favorable_status(p, ctx)
-    favorable = "favor" in status
+    # Exact match — see decade_career_strategy's E-3 follow-up note.
+    favorable = status == "favorable"
     cls = _TENGOD_FIVE_CLASS.get(p.stem_tengod, "")
     if cls == "Authority":
         career = "structured career moves; credentials matter"
@@ -1188,7 +1253,8 @@ def current_period_deep_dive(ctx) -> str:
     tg = current.stem_tengod_en or current.stem_tengod or "—"
     status = period_favorable_status(current, ctx)
     branch_elem = current.branch_element or "—"
-    favorable = "favor" in status
+    # Exact match — see decade_career_strategy's E-3 follow-up note.
+    favorable = status == "favorable"
     do = "push visible projects, plant seeds, and request what is owed" if favorable else "conserve, refine, and protect the foundation"
     avoid = "long commitments whose payoff is years away" if not favorable else "starting too many things at once"
     return (

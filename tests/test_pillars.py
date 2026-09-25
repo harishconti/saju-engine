@@ -123,10 +123,17 @@ def test_input_validation():
 @pytest.mark.parametrize(
     "hour,minute,expected_month",
     [
-        # 1993-12-07: 大雪 (Daeseol) boundary is between 11:40 and 11:45 IST per sajupy.
-        # Before the boundary the month branch is 亥; after it is 子.
-        (11, 30, "亥"),
-        (11, 50, "子"),
+        # 1993-12-07: 大雪 (Daeseol). The calendar CSV's raw term_time is
+        # 199312071141 — 11:41 **KST**, not IST (see E-1, 2026-09-25:
+        # sajupy stores 절기 moments in Korea Standard Time regardless of the
+        # querent's own timezone). Converted to IST (UTC+5:30, a -3.5h shift
+        # from KST UTC+9): 11:41 - 3:30 = 08:11 IST — the true boundary,
+        # confirmed empirically (08:00 -> 亥, 08:11 -> 子). An earlier version
+        # of this test compared the raw 11:41 directly against IST clock time
+        # with no conversion, encoding the exact bug this now guards against.
+        # Before the boundary the month branch is 亥; at/after it is 子.
+        (8, 0, "亥"),
+        (8, 11, "子"),
     ],
 )
 def test_solar_term_month_boundary(hour, minute, expected_month):
@@ -136,6 +143,22 @@ def test_solar_term_month_boundary(hour, minute, expected_month):
         longitude=82.5, utc_offset=5.5, use_solar_time=True,
     )
     assert c.month.branch == expected_month
+
+
+def test_solar_term_boundary_far_from_kst_still_correct():
+    """Regression for E-1 (2026-09-25): a birth timezone far from KST (New
+    York, UTC-5, a 14-hour gap — versus IST's 3.5h) must still land on the
+    correct side of a 절기 boundary. Reproduces the audit's exact example:
+    2024-02-04 10:00 EST used to produce month pillar 乙丑, which does not
+    even fit its own year pillar 甲辰 under 오호둔 (乙 as a 丑-month stem only
+    occurs for a 戊/癸-year). The correct pillar is 丙寅."""
+    c = compute_chart(
+        name="NY-E1-regression2", gender="M",
+        year=2024, month=2, day=4, hour=10, minute=0,
+        utc_offset=-5, longitude=-74.0, use_solar_time=True, convention="korean",
+    )
+    assert c.month.combined == "丙寅"
+    assert c.year.combined == "甲辰"
 
 
 def test_high_longitude_honolulu_rolls_day():

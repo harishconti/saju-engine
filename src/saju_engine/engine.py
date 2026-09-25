@@ -144,7 +144,7 @@ def _derive_branch_relationships(chart: Chart):
         chart.three_punishments.append(("子", "卯", "—", "Water-Wood punishment (子卯刑)"))
 
 
-def _build_daeun(chart: Chart, n_periods: int = 8) -> list[DaeunPeriod]:
+def _build_daeun(chart: Chart, n_periods: int = 8, utc_offset: float = 9.0) -> list[DaeunPeriod]:
     if not chart.gender:
         return []
     date_to_use = chart.effective_date or chart.birth_date
@@ -171,6 +171,7 @@ def _build_daeun(chart: Chart, n_periods: int = 8) -> list[DaeunPeriod]:
         n_periods=n_periods,
         hour=hh,
         minute=mm,
+        utc_offset=utc_offset,
     )
 
 
@@ -267,7 +268,9 @@ def compute_chart(
         effective_date=effective_date,
         birth_time=raw.get("birth_time", f"{hour:02d}:{minute:02d}"),
         city=city, longitude=effective_longitude,
+        utc_offset=utc_offset,
         solar_correction=raw.get("solar_correction"),
+        year_month_correction=raw.get("year_month_correction"),
         zi_time_type=raw.get("zi_time_type"),
         convention=raw.get("convention", convention),
         reference_date=f"{ref_year:04d}-{ref_month:02d}-{ref_day:02d}",
@@ -282,7 +285,7 @@ def compute_chart(
     chart.ten_gods = _derive_ten_gods(chart)
     chart.twelve_stages = _derive_twelve_stages(chart)
     _derive_branch_relationships(chart)
-    chart.daeun = _build_daeun(chart, n_periods=n_periods)
+    chart.daeun = _build_daeun(chart, n_periods=n_periods, utc_offset=utc_offset)
 
     # Optional overlays
     all_hidden = [

@@ -32,19 +32,21 @@ Each branch contains **one to three** hidden stems, classified by their prominen
 | Branch | 본기 (Main) | 중기 (Middle) | 여기 (Residual) |
 |---|---|---|---|
 | 子 (자) | 癸 (계, Yin Water) | — | — |
-| 丑 (축) | 己 (기, Yin Earth) | 癸 (계, Yin Water) | 辛 (신, Yin Metal) |
+| 丑 (축) | 己 (기, Yin Earth) | 辛 (신, Yin Metal) | 癸 (계, Yin Water) |
 | 寅 (인) | 甲 (갑, Yang Wood) | 丙 (병, Yang Fire) | 戊 (무, Yang Earth) |
 | 卯 (묘) | 乙 (을, Yin Wood) | — | — |
-| 辰 (진) | 戊 (무, Yang Earth) | 乙 (을, Yin Wood) | 癸 (계, Yin Water) |
+| 辰 (진) | 戊 (무, Yang Earth) | 癸 (계, Yin Water) | 乙 (을, Yin Wood) |
 | 巳 (사) | 丙 (병, Yang Fire) | 庚 (경, Yang Metal) | 戊 (무, Yang Earth) |
 | 午 (오) | 丁 (정, Yin Fire) | 己 (기, Yin Earth) | — |
-| 未 (미) | 己 (기, Yin Earth) | 丁 (정, Yin Fire) | 乙 (을, Yin Wood) |
+| 未 (미) | 己 (기, Yin Earth) | 乙 (을, Yin Wood) | 丁 (정, Yin Fire) |
 | 申 (신) | 庚 (경, Yang Metal) | 壬 (임, Yang Water) | 戊 (무, Yang Earth) |
 | 酉 (유) | 辛 (신, Yin Metal) | — | — |
-| 戌 (술) | 戊 (무, Yang Earth) | 辛 (신, Yin Metal) | 丁 (정, Yin Fire) |
+| 戌 (술) | 戊 (무, Yang Earth) | 丁 (정, Yin Fire) | 辛 (신, Yin Metal) |
 | 亥 (해) | 壬 (임, Yang Water) | 甲 (갑, Yang Wood) | — |
 
 > The hidden stems are **interpreted as ten gods** of the Day Master, just like the visible stems. The 본기 carries the most weight in the branch. When the 본기 is a powerful ally of the Day Master (e.g., 甲 day master with 寅 month), the Day Master is significantly strengthened.
+>
+> **Corrected 2026-09-25 (external report review, E-2).** The four storage/tomb branches (辰戌丑未, 四庫) previously had 중기 and 여기 swapped — e.g. 丑 listed 癸 as 중기 and 辛 as 여기, when the standard classical table (by day-count through the branch's month, with 여기 carried over from the preceding season's element) has 辛 as 중기 and 癸 as 여기. This was not cosmetic: `strength.py` weights 중기 (0.3) and 여기 (0.1) differently, so the swap changed computed element percentages and strength scores for any chart containing one of these four branches. The four "growth" branches (寅申巳亥) and 子午卯酉 were already correct and are unaffected.
 
 ## Branch Six Combinations (육합, 六合)
 

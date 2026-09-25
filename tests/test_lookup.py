@@ -164,14 +164,16 @@ def test_branch_relationships_present():
         ("巳", ("丙", "庚", "戊")),
         # 申: 3 hidden stems (main 庚 + middle 壬 + residual 戊).
         ("申", ("庚", "壬", "戊")),
-        # 丑: 3 hidden stems (main 己 + middle 癸 + residual 辛).
-        ("丑", ("己", "癸", "辛")),
-        # 辰: 3 hidden stems (main 戊 + middle 乙 + residual 癸).
-        ("辰", ("戊", "乙", "癸")),
-        # 未: 3 hidden stems (main 己 + middle 丁 + residual 乙).
-        ("未", ("己", "丁", "乙")),
-        # 戌: 3 hidden stems (main 戊 + middle 辛 + residual 丁).
-        ("戌", ("戊", "辛", "丁")),
+        # 丑: 3 hidden stems (main 己 + middle 辛 + residual 癸).
+        # Corrected 2026-09-25 (external report review, E-2): 중기/여기 were
+        # swapped for all four storage branches (辰戌丑未) — see lookup.py.
+        ("丑", ("己", "辛", "癸")),
+        # 辰: 3 hidden stems (main 戊 + middle 癸 + residual 乙).
+        ("辰", ("戊", "癸", "乙")),
+        # 未: 3 hidden stems (main 己 + middle 乙 + residual 丁).
+        ("未", ("己", "乙", "丁")),
+        # 戌: 3 hidden stems (main 戊 + middle 丁 + residual 辛).
+        ("戌", ("戊", "丁", "辛")),
     ],
 )
 def test_hidden_stems_for_branch(branch, expected):

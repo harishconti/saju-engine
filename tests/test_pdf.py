@@ -2,13 +2,28 @@
 from __future__ import annotations
 
 import os
+import shutil
 import subprocess
 from pathlib import Path
+
+import pytest
 
 from saju_html import translate_inline
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ENV = {**os.environ, "PYTHONPATH": str(PROJECT_ROOT / "src")}
+
+# Bug found 2026-09-25 (external report review, E-10): 5 tests here shell
+# out to the `pdftotext` binary (poppler-utils) to verify PDF text content;
+# on an environment without it installed, `subprocess.run(["pdftotext",
+# ...])` raised a bare FileNotFoundError and hard-failed the test instead of
+# skipping it — a missing optional system dependency is not the same as a
+# real regression. Applied to exactly the functions that call pdftotext,
+# not the whole file, since most tests here don't need it.
+requires_pdftotext = pytest.mark.skipif(
+    shutil.which("pdftotext") is None,
+    reason="pdftotext (poppler-utils) is not installed on this machine",
+)
 
 
 def test_build_pdf_from_markdown():
@@ -67,6 +82,7 @@ def test_build_pdf_from_premium_markdown(tmp_path):
     assert pdf_path.stat().st_size > 1000
 
 
+@requires_pdftotext
 def test_build_pdf_strips_source_citations(tmp_path):
     md_path = tmp_path / "citations.md"
     pdf_path = tmp_path / "citations.pdf"
@@ -110,6 +126,7 @@ def test_build_pdf_strips_source_citations(tmp_path):
     assert "Wood" in pdf_text
 
 
+@requires_pdftotext
 def test_element_balance_emoji_replaced_with_colored_bullet(tmp_path):
     md_path = tmp_path / "elements.md"
     pdf_path = tmp_path / "elements.pdf"
@@ -186,6 +203,7 @@ def test_translate_inline_maps_gusin_not_just_its_last_syllable():
     assert "Restraining Element" in out
 
 
+@requires_pdftotext
 def test_md_to_pdf_honors_tier_in_md_mode(tmp_path):
     """--tier is forwarded to build_pdf() even in existing-markdown (mode 1) path."""
     md_path = tmp_path / "tier.md"
@@ -221,6 +239,7 @@ def test_md_to_pdf_honors_tier_in_md_mode(tmp_path):
     assert "MP3 audio summary" in pdf_text
 
 
+@requires_pdftotext
 def test_md_to_pdf_sample_tier_omits_deep_cover_note(tmp_path):
     """Sample tier should not show the deep-tier MP3 cover note."""
     md_path = tmp_path / "tier.md"
@@ -255,6 +274,7 @@ def test_md_to_pdf_sample_tier_omits_deep_cover_note(tmp_path):
     assert "MP3 audio summary" not in pdf_text
 
 
+@requires_pdftotext
 def test_pdf_no_camelcase_hanja_pair_transliteration(tmp_path):
     """Regression: adjacent Hanja pairs (e.g. 丙寅, 辛未, 甲子) must not be
     transliterated to camelCase tokens in the rendered PDF.

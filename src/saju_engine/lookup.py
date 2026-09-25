@@ -153,18 +153,35 @@ def stem_combination(a: str, b: str) -> Optional[Tuple[str, str, str]]:
 # ── Hidden stems per branch (지장간) ─────────────────────────────────────────
 # From knowledge/02-branches.md
 # Each branch lists its Main / Middle / Residual hidden stems.
+#
+# Fixed 2026-09-25 (external report review, E-2): the four storage/tomb
+# branches (辰戌丑未, 四庫) had their 중기 (middle) and 여기 (residual) stems
+# swapped. The standard classical table (by day-count through the branch's
+# month: 여기 first as a carry-over from the preceding season, then 중기,
+# then 본기 as the dominant majority) is:
+#   丑 (prior month 子=Water): 癸(여기) 辛(중기) 己(본기)
+#   辰 (prior month 卯=Wood):  乙(여기) 癸(중기) 戊(본기)
+#   未 (prior month 午=Fire):  丁(여기) 乙(중기) 己(본기)
+#   戌 (prior month 酉=Metal): 辛(여기) 丁(중기) 戊(본기)
+# This is not cosmetic: strength.py weights middle=0.3 vs residual=0.1
+# differently, so the swap changed computed element percentages and
+# strength scores for any chart containing one of these four branches —
+# confirmed live on Harish's chart (day branch 亥's neighbor 丑 in his hour
+# pillar), where correcting this flips which of Water/Metal reads higher.
+# The four "growth" branches (寅申巳亥) and the four single/double-stem
+# branches (子午卯酉) were already correctly ordered and are unaffected.
 HIDDEN_STEMS: Dict[str, Dict[str, str]] = {
     "子": {"main": "癸"},
-    "丑": {"main": "己", "middle": "癸", "residual": "辛"},
+    "丑": {"main": "己", "middle": "辛", "residual": "癸"},
     "寅": {"main": "甲", "middle": "丙", "residual": "戊"},
     "卯": {"main": "乙"},
-    "辰": {"main": "戊", "middle": "乙", "residual": "癸"},
+    "辰": {"main": "戊", "middle": "癸", "residual": "乙"},
     "巳": {"main": "丙", "middle": "庚", "residual": "戊"},
     "午": {"main": "丁", "middle": "己"},
-    "未": {"main": "己", "middle": "丁", "residual": "乙"},
+    "未": {"main": "己", "middle": "乙", "residual": "丁"},
     "申": {"main": "庚", "middle": "壬", "residual": "戊"},
     "酉": {"main": "辛"},
-    "戌": {"main": "戊", "middle": "辛", "residual": "丁"},
+    "戌": {"main": "戊", "middle": "丁", "residual": "辛"},
     "亥": {"main": "壬", "middle": "甲"},
 }
 

@@ -306,7 +306,7 @@ def test_premium_report_business_launch_window_anchors_on_current_year():
     chart = _sample_chart()
     report = generate_premium_report(chart, tier="deep")
     current_year = chart.sewoon[len(chart.sewoon) // 2].year
-    assert f"### Favorable Windows ({current_year}–{current_year + 5})" in report
+    assert f"### Year-by-Year Launch Timing ({current_year}–{current_year + 5})" in report
 
 
 def test_premium_report_companion_is_focused_timing_read():
@@ -366,7 +366,7 @@ def test_premium_report_deep_price_and_dynamic_window():
     assert "## Relationships" in report
     assert "## Health & Vitality" in report
     assert "## Business & Launch Timing" in report
-    assert f"### Favorable Windows ({current_year}–{current_year + 5})" in report
+    assert f"### Year-by-Year Launch Timing ({current_year}–{current_year + 5})" in report
     assert "### 10-Year Forecast" in report
     assert "## Health & Vitality — Deep-Dive" in report
     assert "## Auspicious Dates — Next 90 Days" in report
@@ -630,9 +630,16 @@ def test_lifetime_decade_roadmap_honours_override_not_chart_baked_status():
     both, per the 2026-09-20 fix; see that function's docstring). Overriding
     to Metal here must move the roadmap's favorable rows to the Metal-and-
     Earth decades (Earth generates Metal, so it becomes the new supporting
-    element) — most visibly, the pure-Fire decade (0-9, 丙午: neither Water,
-    Metal, nor Earth) stays neutral under BOTH readings, while a
-    pure-Water decade (60-69, 壬子) is favorable bare but neutral overridden.
+    element) — a pure-Water decade (60-69, 壬子) is favorable bare but
+    neutral overridden.
+
+    The pure-Fire decade (0-9, 丙午) reads differently under each: Fire is
+    Water's actual 기신 (기신 = the element 용신 overcomes; Water overcomes
+    Fire), so it is genuinely **challenging** under the bare (Water)
+    reading (E-3 fix, 2026-09-25 — before that fix, `ctx.unfavorable` could
+    never be populated for a balanced/climate-gated chart, so this always
+    silently read "neutral" instead). Under the Metal override, Metal's
+    기신 is Wood, not Fire, so 0-9 stays neutral there.
     """
     chart = compute_chart(
         name="Harish-override-regression", gender="M",
@@ -649,9 +656,9 @@ def test_lifetime_decade_roadmap_honours_override_not_chart_baked_status():
         raise AssertionError(f"no roadmap row found for ages {ages}")
 
     # Bare (Water-resolved, Metal-supported): 60-69 (pure Water) favorable;
-    # 0-9 (pure Fire, no Water/Metal at all) neutral under both readings.
+    # 0-9 (pure Fire, Water's actual 기신) challenging.
     assert _roadmap_row(bare_report, "60–69").endswith("| favorable |")
-    assert _roadmap_row(bare_report, "0–9").endswith("| neutral |")
+    assert _roadmap_row(bare_report, "0–9").endswith("| challenging |")
 
     # Overridden to Metal (Earth becomes the new supporting element): the
     # favorable rows must move accordingly, not stay pinned to the
@@ -707,7 +714,14 @@ def test_pattern_candidate_label_is_human_readable():
 
 
 def test_balanced_chart_growth_area_has_no_doubled_phrase():
-    # 1993-09-30 04:00 (Korea) assesses as a balanced chart with no 기신 named.
+    # 1993-09-30 04:00 (Korea) assesses as a balanced chart.
+    #
+    # Updated 2026-09-25 (external report review, E-3): every chart now has
+    # a real, named unfavorable element (this one resolves to Water) — see
+    # _ReportContext.__init__'s E-3 fix — so growth_areas' generic "the
+    # chart's challenging element" fallback (prose_fillers.py, for when no
+    # 기신 could be named) is unreachable code for every chart, not just
+    # this one, and the report correctly names the element instead.
     chart = compute_chart(
         year=1993, month=9, day=30, hour=4, minute=0,
         gender="M", longitude=127.0, utc_offset=9.0,
@@ -716,7 +730,7 @@ def test_balanced_chart_growth_area_has_no_doubled_phrase():
     assert (chart.strength_assessment or {}).get("verdict") == "balanced"
     report = generate_premium_report(chart, tier="deep")
     assert "challenging element element" not in report
-    assert "Working with the chart's challenging element" in report
+    assert "Working with the unfavorable Water element" in report
 
 
 # ── Method-transparency disclosures (external-review feedback, 2026-09-07) ──
@@ -751,6 +765,41 @@ def test_solar_time_note_omitted_when_no_correction_applied():
     report = generate_premium_report(chart, tier="deep")
     # No meaningful correction → no disclosure block (or no correction line).
     assert "true solar time" not in report
+
+
+# ── E-1 — sajupy's month-pillar term-time comparison ignored the birth's ──
+# ── timezone (found 2026-09-25, external report review) ───────────────────
+
+
+def test_year_month_correction_note_for_far_from_kst_birth():
+    """A birth far from KST (New York, UTC-5) whose month pillar sajupy
+    gets wrong (乙丑, which doesn't fit its own year pillar 甲辰 under 오호둔)
+    must surface the correction disclosure, and the corrected pillar (丙寅)
+    must be the one the rest of the report actually uses."""
+    chart = compute_chart(
+        name="NY-disclosure", gender="M",
+        year=2024, month=2, day=4, hour=10, minute=0,
+        utc_offset=-5, longitude=-74.0, use_solar_time=True, convention="korean",
+    )
+    assert chart.month.combined == "丙寅"
+    assert chart.year_month_correction is not None
+    report = generate_premium_report(chart, tier="deep")
+    assert "Year/month correction note" in report
+    assert "丙" in report and "寅" in report
+
+
+def test_year_month_correction_note_omitted_for_kst_adjacent_birth():
+    """Korea/India-timezone births (0-3.5h from KST) essentially never
+    trigger the correction — no disclosure should render for Harish's own
+    chart."""
+    chart = compute_chart(
+        name="Harish-no-correction", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5, convention="korean",
+    )
+    assert chart.year_month_correction is None
+    report = generate_premium_report(chart, tier="deep")
+    assert "Year/month correction note" not in report
 
 
 def test_daeun_direction_disclosed_in_quick_reference_and_timing():
@@ -871,16 +920,22 @@ def test_strength_line_states_a_reasoning_not_just_the_verdict():
 
 
 def test_daeun_starting_age_note_states_precise_age_not_just_decade():
-    """R19: the precise 대운수 must be stated (e.g. "~0.6") alongside the
+    """R19: the precise 대운수 must be stated (e.g. "~0.5") alongside the
     rounded "0-9" decade label, not silently collapsed into it.
 
-    Value corrected 2026-09-25 (external report review, 4th pass): the R19
-    fix itself truncated the day count to a whole day before dividing by 3
-    (1.68 days floored to 1 -> "~0.3"/"~1 month"), and a second, independent
-    bug divided the months conversion by 3 twice ("~1 month" instead of the
-    correct ~7). Both are fixed in daeun.py::starting_age_days and
-    premium_report.py::_daeun_starting_age_note; the true value here is
-    ~1.68 days -> ~0.6 years -> ~7 months.
+    Value corrected twice (external report review):
+    - 2026-09-20 (4th pass): the R19 fix itself truncated the day count to a
+      whole day before dividing by 3 (1.68 days floored to 1 -> "~0.3"/"~1
+      month"), and a second, independent bug divided the months conversion
+      by 3 twice ("~1 month" instead of ~7). Fixed to "~0.6"/"~7 months".
+    - 2026-09-25 (E-1): that "~0.6"/1.68-day figure was itself still wrong —
+      `_term_boundary_datetimes` compared the CSV's KST-stored term time
+      directly against IST birth time with no conversion. Fixed in
+      `_term_boundary_datetimes` (now takes a required `utc_offset`). The
+      true value, 1.5375 days -> 0.5125 years -> 6.15 months, independently
+      matches two external reviewers who used different methods (a
+      Beijing-time-based estimate landing at ~0.51y/6.1mo, and an ephemeris
+      based one landing at ~1.53 days) almost exactly.
     """
     chart = compute_chart(
         name="Harish-r19-regression", gender="M",
@@ -889,8 +944,8 @@ def test_daeun_starting_age_note_states_precise_age_not_just_decade():
     )
     report = generate_premium_report(chart, tier="deep")
     assert "대운수" in report
-    assert "~0.6" in report
-    assert "roughly 7 months" in report
+    assert "~0.5" in report
+    assert "roughly 6 months" in report
 
 
 # ── R7 — date-selection filter defects ────────────────────────────────────
@@ -929,6 +984,37 @@ def test_auspicious_dates_exclude_harm_and_break_not_just_clash():
         assert branch not in ("寅", "申"), f"寅/申 must be filtered (파/해 vs natal 亥): {row!r}"
 
 
+# ── E-11 — date filter checked 충/해/파 but not 형/자형 (found 2026-09-25, ──
+# ── external report review) ─────────────────────────────────────────────
+
+
+@pytest.mark.parametrize(
+    "candidate,watch,expected",
+    [
+        # 戌 vs natal 丑: both members of the 丑戌未 punishment triad.
+        ("戌", ["亥", "丑"], ["형"]),
+        # 亥 repeating natal 亥: self-punishment (亥 is a SELF_PUNISHMENTS branch).
+        ("亥", ["亥", "丑"], ["자형"]),
+        # 子 vs 卯: the documented 2-member special-case punishment.
+        ("子", ["卯"], ["형"]),
+        # 卯 vs 子 (same pair, reversed roles).
+        ("卯", ["子"], ["형"]),
+        # Equal branches that are NOT self-punishing must not falsely flag 형
+        # (e.g. 寅 repeating a natal 寅 — 寅 is a member of the 寅巳申 triad
+        # but is not itself a SELF_PUNISHMENTS branch).
+        ("寅", ["寅"], []),
+        # No relation at all.
+        ("酉", ["亥", "丑"], []),
+        # 未 vs natal 丑: both in the 丑戌未 triad AND a 충 (clash) pair —
+        # both labels must appear.
+        ("未", ["丑"], ["충", "형"]),
+    ],
+)
+def test_candidate_day_conflicts_detects_punishment(candidate, watch, expected):
+    from saju_engine.premium_report import _candidate_day_conflicts
+    assert _candidate_day_conflicts(candidate, watch) == expected
+
+
 def test_auspicious_dates_section_has_almanac_caveat():
     from saju_engine.premium_report import _ReportContext, _section_auspicious_dates
     ctx = _ReportContext(_harish_chart_for_dates(), tier="deep", generation_date="2026-09-20")
@@ -938,15 +1024,25 @@ def test_auspicious_dates_section_has_almanac_caveat():
 
 
 def test_monthly_lucky_dates_not_capped_at_five_and_has_caveat():
+    """Regression for the original R7 cap-at-5 bug (2026-09-20): there must
+    be no artificial truncation. Updated 2026-09-25 (E-11): adding 형/자형
+    to the branch-conflict filter legitimately lowers Harish's real monthly
+    count from ~10-12 (충/해/파 alone) to 4 (his 亥 day branch self-punishes
+    and his 丑 hour branch sits in the 丑戌未 triad) — manually verified
+    against every October 2026 favorable-element day (5, 6, 14, 26 pass;
+    3/15 excluded for 형, 4/16 for 자형, 13/25 for 해, 23 for 해, 24 for
+    충+형). The test now asserts the exact, doctrine-complete count instead
+    of a threshold that assumed the pre-E-11 filter.
+    """
     from saju_engine.premium_report import _ReportContext, _section_monthly_lucky_dates
     ctx = _ReportContext(_harish_chart_for_dates(), tier="deep", generation_date="2026-09-20")
     lines = "\n".join(_section_monthly_lucky_dates(ctx, months_ahead=1))
     assert "Almanac caveat" in lines
-    # October 2026 (a full month) should yield more than 5 qualifying days.
     lines2 = _section_monthly_lucky_dates(ctx, months_ahead=2)
     oct_row = next(l for l in lines2 if l.startswith("| October"))
     dates_cell = oct_row.split("|")[2]
-    assert len(dates_cell.split(",")) > 5, f"expected more than 5 dates: {oct_row!r}"
+    dates = [d.strip() for d in dates_cell.split(",")]
+    assert dates == ["5", "6", "14", "26"], f"unexpected dates: {oct_row!r}"
 
 
 def test_season_signal_correctly_buckets_depleted_month_stages():

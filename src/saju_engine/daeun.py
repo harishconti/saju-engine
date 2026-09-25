@@ -15,7 +15,7 @@ This module:
 """
 from __future__ import annotations
 
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from typing import List, Optional, Tuple
 
 from . import lookup as L
@@ -171,10 +171,32 @@ def _parse_calendar() -> Dict[str, List[Tuple[date, str, str]]]:
     return by_year
 
 
+# Bug found 2026-09-25 (external report review, E-1): sajupy's
+# calendar_data.csv stores `term_time` in Korea Standard Time regardless of
+# the querent's own timezone — confirmed against the raw CSV (1992 芒種:
+# `199206051923`, i.e. 19:23 KST = 10:23 UTC, matching an independent
+# ephemeris's 10:21 UTC) and against sajupy's own source (`core.py`'s
+# `_check_term_time` does a naive `datetime` comparison with no timezone
+# conversion at all, and its docstrings assume "UTC 오프셋 (기본값: 9, 한국
+# 표준시)"). This engine's own `_term_boundary_datetimes` inherited the same
+# naive comparison. For a birth far from KST (the audit's example: New York,
+# UTC-5, a 14-hour gap), this is large enough to flip which side of a 절기
+# boundary a birth falls on, producing a month pillar that doesn't even fit
+# its own year pillar (reproduced and confirmed: 2024-02-04 10:00 EST -> 乙丑,
+# which only fits a 戊/癸-year under the 오호둔 rule, not 2024's 甲). For births
+# near KST (Korea, India — a 3.5h gap), pillars themselves are rarely
+# affected, but the 대운수 (starting-age) day-count still drifts by hours.
+KST_OFFSET_HOURS = 9.0
+
+
 def _term_boundary_datetimes(
-    year: int, month: int, day: int, hour: int = 0, minute: int = 0,
+    year: int, month: int, day: int, hour: int, minute: int, utc_offset: float,
 ) -> Tuple[Optional[datetime], Optional[datetime]]:
-    """Return (prev_term_datetime, next_term_datetime) with term times if available.
+    """Return (prev_term_datetime, next_term_datetime), converted to the
+    birth's own timezone, with term times if available.
+
+    ``utc_offset`` is required (no default) so a caller can't silently
+    reintroduce the KST/local mismatch bug above by forgetting to pass it.
 
     Boundary convention (classical, moment-level — see knowledge/08-luck-pillars.md):
       - prev = the last 節氣 whose moment is **at or before** the birth moment.
@@ -186,10 +208,12 @@ def _term_boundary_datetimes(
         correctly counts forward to the *following* 절기 (and vice-versa).
     """
     by_year = _parse_calendar()
+    # KST -> the birth's own local timezone: local = KST + (utc_offset - 9).
+    tz_shift = timedelta(hours=utc_offset - KST_OFFSET_HOURS)
     candidates: List[Tuple[datetime, str]] = []
     for y in (year - 1, year, year + 1):
         for dt, h, term_time in by_year.get(str(y), []):
-            candidates.append((_parse_term_time(term_time, dt), h))
+            candidates.append((_parse_term_time(term_time, dt) + tz_shift, h))
     candidates.sort()
 
     birth_dt = datetime(year, month, day, hour, minute)
@@ -230,6 +254,7 @@ def starting_age(
     direction: str,
     hour: int = 0,
     minute: int = 0,
+    utc_offset: float = 9.0,
 ) -> int:
     """Return the integer starting age of the first major-luck period.
 
@@ -242,8 +267,12 @@ def starting_age(
     birth moment is compared to the 절기 **moment** — so a birth *after* the
     절기 moment on a 절기 date correctly counts forward to the following 절기,
     and a birth *before* the moment counts backward to the previous 절기.
+
+    ``utc_offset`` defaults to 9.0 (Korea) for convenience, but production
+    callers (``compute_daeun``) always pass the chart's real value — see
+    ``_term_boundary_datetimes``'s KST-conversion note (E-1, 2026-09-25).
     """
-    prev, nxt = _term_boundary_datetimes(year, month, day, hour, minute)
+    prev, nxt = _term_boundary_datetimes(year, month, day, hour, minute, utc_offset)
     birth_dt = datetime(year, month, day, hour, minute)
     if direction == "forward":
         target = nxt   # first 절기 at or after the birth moment
@@ -268,6 +297,7 @@ def starting_age_days(
     direction: str,
     hour: int = 0,
     minute: int = 0,
+    utc_offset: float = 9.0,
 ) -> Optional[float]:
     """Return the raw, **fractional** day-count to the qualifying 節氣 that
     `starting_age` floors to a whole year via `days // 3`.
@@ -292,8 +322,13 @@ def starting_age_days(
     for the decade-boundary year, via its own separate `days // 3`) is
     unaffected either way — flooring a sub-3-day offset to a whole day
     before or after does not change which whole year it floors into.
+
+    Bug found 2026-09-25 (external report review, E-1): also inherited the
+    KST/local timezone mismatch — see ``_term_boundary_datetimes``. For
+    Harish (IST), this alone shifted the "1.68 days" figure above to the
+    correct ~1.53 days once both bugs were fixed together.
     """
-    prev, nxt = _term_boundary_datetimes(year, month, day, hour, minute)
+    prev, nxt = _term_boundary_datetimes(year, month, day, hour, minute, utc_offset)
     birth_dt = datetime(year, month, day, hour, minute)
     target = nxt if direction == "forward" else prev
     if target is None:
@@ -314,6 +349,7 @@ def compute_daeun(
     n_periods: int = 8,
     hour: int = 0,
     minute: int = 0,
+    utc_offset: float = 9.0,
 ) -> List[DaeunPeriod]:
     """Build `n_periods` major-luck periods starting from the calculated age.
 
@@ -325,9 +361,13 @@ def compute_daeun(
     just the calendar date. Pass the **solar-corrected** birth time when the
     chart was computed with `use_solar_time=True`, so the 대운 boundary aligns
     with the same moment the pillars were derived from.
+
+    ``utc_offset`` must be the chart's real birth timezone offset — the
+    calendar's 절기 moments are stored in KST and need this to compare
+    correctly against a non-KST birth (E-1, 2026-09-25).
     """
     direction = L.daeun_direction(year_stem, gender)
-    start_age = starting_age(year, month, day, direction, hour=hour, minute=minute)
+    start_age = starting_age(year, month, day, direction, hour=hour, minute=minute, utc_offset=utc_offset)
     periods: List[DaeunPeriod] = []
     stem, branch = month_stem, month_branch
     for k in range(1, n_periods + 1):

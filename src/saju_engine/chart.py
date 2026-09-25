@@ -75,6 +75,7 @@ class BirthData:
     birth_time: str = ""
     city: Optional[str] = None
     longitude: Optional[float] = None
+    utc_offset: float = 9.0
     solar_correction: Optional[dict] = None
     zi_time_type: Optional[str] = None
     convention: str = "korean"
@@ -159,6 +160,7 @@ class Chart:
     birth_time: str = ""              # "HH:MM"
     city: Optional[str] = None
     longitude: Optional[float] = None
+    utc_offset: float = 9.0            # birth timezone offset in hours (input, not solar-corrected)
 
     # Four pillars
     year: Pillar = None  # type: ignore
@@ -168,6 +170,11 @@ class Chart:
 
     # Solar-time correction info (None when use_solar_time=False)
     solar_correction: Optional[dict] = None
+
+    # Set when the independent, timezone-correct year/month pillar
+    # recomputation disagreed with sajupy's raw value and overrode it
+    # (E-1, 2026-09-25) — None when no correction was needed.
+    year_month_correction: Optional[dict] = None
 
     # 조자시 / 야자시 handling
     zi_time_type: Optional[str] = None  # "夜子時 (Korean 야자시)" | "早子時 (Chinese 조자시)" | None
@@ -248,6 +255,7 @@ class Chart:
             birth_time=self.birth_time,
             city=self.city,
             longitude=self.longitude,
+            utc_offset=self.utc_offset,
             solar_correction=self.solar_correction,
             zi_time_type=self.zi_time_type,
             convention=self.convention,
@@ -332,9 +340,11 @@ class Chart:
             "birth_time": self.birth_time,
             "city": self.city,
             "longitude": self.longitude,
+            "utc_offset": self.utc_offset,
             "convention": self.convention,
             "zi_time_type": self.zi_time_type,
             "solar_correction": self.solar_correction,
+            "year_month_correction": self.year_month_correction,
             "reference_date": self.reference_date,
             "day_master": self.day_master,
             "day_master_info": self.day_master_info,

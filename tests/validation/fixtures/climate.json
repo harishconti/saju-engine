@@ -860,7 +860,43 @@
    "longitude": 126.98,
    "utc_offset": 9.0
   },
-  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (辰 = 濕 → Fire remedy, Wood 희신) + §How This Combines With 억부 (broadened 2026-09-19: 조후 governs whenever the band is non-temperate, regardless of verdict — docs/research/2026-09-validation-climate.md §5); fills the damp x weak matrix cell; synthetic chart probe-verified 2026-09-19",
+  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (辰 = 濕 → Fire remedy, Wood 희신) + §How This Combines With 억부 (broadened 2026-09-19: 조후 governs whenever the band is non-temperate, regardless of verdict — docs/research/2026-09-validation-climate.md §5); synthetic chart probe-verified 2026-09-19. CORRECTED 2026-09-25 (external report review, E-2): strength.verdict changed from 'weak' to 'balanced' after fixing lookup.py's swapped 辰 중기/여기 (this chart is four 辰 branches, maximally sensitive to that bug). The verdict change means this fixture no longer fills the intended damp x weak matrix cell — it now fills damp x balanced instead. A replacement synthetic chart for damp x weak is a follow-up (docs/audits/2026-09-25-engine-audit-verification.md).",
+  "expected": {
+   "climate": {
+    "band": "damp",
+    "climate_favorable": "Fire",
+    "climate_supporting": "Wood"
+   },
+   "strength": {
+    "verdict": "balanced",
+    "candidate": "Metal"
+   },
+   "fe": {
+    "element": "Fire",
+    "method": "climate-balanced",
+    "supporting": "Wood",
+    "climate_band": "damp",
+    "climate_element": "Fire",
+    "climate_agrees": false,
+    "confidence": "heuristic"
+   }
+  },
+  "status": "expect_match"
+ },
+ {
+  "id": "damp-weak-synth-v2",
+  "subsystem": "climate",
+  "input": {
+   "probe": "merge",
+   "year": 1976,
+   "month": 4,
+   "day": 9,
+   "hour": 12,
+   "minute": 0,
+   "longitude": 126.98,
+   "utc_offset": 9.0
+  },
+  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (辰 = 濕 → Fire remedy, Wood 희신) + §How This Combines With 억부 (broadened 2026-09-19: 조후 governs whenever the band is non-temperate, regardless of verdict — docs/research/2026-09-validation-climate.md §5); fills the damp x weak matrix cell, replacing damp-weak-synth which stopped filling it after the 2026-09-25 lookup.py 辰 중기/여기 fix (external report review, E-2) changed its verdict from weak to balanced. Synthetic chart, probe-verified against the corrected engine 2026-09-25 (pillars 丙辰/壬辰/辛卯/甲午 — month branch 辰 alone, not four, so it is not maximally sensitive to the same bug the way damp-weak-synth was).",
   "expected": {
    "climate": {
     "band": "damp",
@@ -869,7 +905,7 @@
    },
    "strength": {
     "verdict": "weak",
-    "candidate": "Metal"
+    "candidate": "Earth"
    },
    "fe": {
     "element": "Fire",
@@ -896,7 +932,7 @@
    "longitude": 126.98,
    "utc_offset": 9.0
   },
-  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (戌 = 燥 → Water remedy, Metal 희신) + §How This Combines With 억부 (broadened 2026-09-19: 조후 governs whenever the band is non-temperate, regardless of verdict — docs/research/2026-09-validation-climate.md §5); fills the dry x balanced matrix cell; synthetic chart probe-verified 2026-09-19",
+  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (戌 = 燥 → Water remedy, Metal 희신) + §How This Combines With 억부 (broadened 2026-09-19: 조후 governs whenever the band is non-temperate, regardless of verdict — docs/research/2026-09-validation-climate.md §5); synthetic chart probe-verified 2026-09-19. CORRECTED 2026-09-25 (external report review, E-2): strength.candidate changed from 'Metal' to 'Water' and fe.climate_agrees from false to true after fixing lookup.py's swapped 戌 중기/여기 (this chart's month branch is 戌). The verdict itself (balanced) is unchanged, so this still fills the dry x balanced matrix cell — but it no longer demonstrates the climate-overrides-a-disagreeing-candidate scenario (climate_agrees is now true, not false). A replacement synthetic chart for dry x balanced x climate_agrees=false is a follow-up (docs/audits/2026-09-25-engine-audit-verification.md).",
   "expected": {
    "climate": {
     "band": "dry",
@@ -905,7 +941,7 @@
    },
    "strength": {
     "verdict": "balanced",
-    "candidate": "Metal"
+    "candidate": "Water"
    },
    "fe": {
     "element": "Water",
@@ -913,7 +949,7 @@
     "supporting": "Metal",
     "climate_band": "dry",
     "climate_element": "Water",
-    "climate_agrees": false,
+    "climate_agrees": true,
     "confidence": "heuristic"
    }
   },

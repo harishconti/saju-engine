@@ -235,7 +235,22 @@ class _ReportContext:
         self.favorable_note = fe.note
         self.favorable_method = fe.method
         self.supporting = fe.supporting
-        self.unfavorable = sa.get("candidate_unfavorable", "—")
+        # Bug found 2026-09-25 (external report review, E-3): strength.py's
+        # balanced-DM branch leaves candidate_unfavorable as None, and this
+        # used to store that raw "—" placeholder directly — so every
+        # decade/annual/business-window favorability check in
+        # prose_fillers.py that reads ctx.unfavorable never actually saw a
+        # real element for a balanced/climate-gated chart (e.g. Harish's),
+        # only a placeholder that could never match anything. Derive the
+        # same 기신 the Quick Reference display text already computes (see
+        # _derive_gisin_gusin_hansin) so every consumer, not just the one
+        # display line, sees it.
+        raw_unfavorable = sa.get("candidate_unfavorable")
+        if raw_unfavorable:
+            self.unfavorable = raw_unfavorable
+        else:
+            gisin, _, _ = _derive_gisin_gusin_hansin(fe.element)
+            self.unfavorable = gisin or "—"
         self.verdict = sa.get("verdict", "balanced")
         self.strength_label = _strength_label(chart)
 
@@ -308,6 +323,29 @@ def _solar_time_note(chart) -> List[str]:
     return lines
 
 
+def _year_month_correction_note(chart) -> List[str]:
+    """Disclose when the year/month pillar was corrected from sajupy's raw
+    value (E-1, 2026-09-25: sajupy compares a KST-stored 절기 moment against
+    the birth's raw local time with no timezone conversion, which can flip
+    which side of a boundary a birth far from KST falls on). Most charts
+    never trigger this — it only fires when the two disagree.
+    """
+    correction = getattr(chart, "year_month_correction", None)
+    if not correction:
+        return []
+    changed = ", ".join(
+        f"{field.replace('_', ' ')} {v['sajupy']} → **{v['corrected']}**"
+        for field, v in correction.items()
+    )
+    return [
+        f"> **⚠ Year/month correction note:** this chart's birth timezone is far enough from "
+        f"Korea Standard Time that the raw calculation tool's year/month-boundary check needed a "
+        f"correction: {changed}. This is an internal calculation-methodology note, not an "
+        "interpretive uncertainty — the corrected pillars above are the ones used throughout this "
+        "reading."
+    ]
+
+
 def _daeun_direction_note(chart) -> str:
     """Disclose the major-luck (대운) direction and its gender input.
 
@@ -363,6 +401,7 @@ def _daeun_starting_age_note(chart) -> str:
         days = starting_age_days(
             int(date_to_use[:4]), int(date_to_use[5:7]), int(date_to_use[8:10]),
             direction, hour=hh, minute=mm,
+            utc_offset=getattr(chart, "utc_offset", 9.0),
         )
     except Exception:
         return ""
@@ -399,6 +438,7 @@ def _section_cover(ctx: _ReportContext, compact: bool = False) -> List[str]:
         f"**Born:** {ctx.chart.birth_date} · {ctx.chart.birth_time} · {ctx.chart.city or '—'}",
         "",
         *_solar_time_note(ctx.chart),
+        *_year_month_correction_note(ctx.chart),
         "",
         f"**Day Master:** {ctx.dm_en}",
         "",
@@ -423,6 +463,31 @@ def _section_cover(ctx: _ReportContext, compact: bool = False) -> List[str]:
     return lines
 
 
+def _derive_gisin_gusin_hansin(fav: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+    """Return (기신, 구신, 한신) derived from the resolved 용신 element via the
+    classical overcoming/generating cycles (knowledge/03-five-elements.md).
+
+    Single source of truth for this derivation — both `_avoid_watch_text`
+    (display text) and `_ReportContext.__init__` (`self.unfavorable`, read
+    by every decade/annual/business-window favorability check in
+    `prose_fillers.py`) call this, so the two can no longer drift apart the
+    way they did before 2026-09-25 (E-3, external report review): the
+    display text derived 기신 correctly, but `self.unfavorable` was left at
+    the raw, un-derived `strength_assessment["candidate_unfavorable"]`
+    placeholder ("—") for every balanced/climate-gated chart, so every
+    consumer of `ctx.unfavorable` besides the Quick Reference line itself
+    never actually saw the real 기신 — confirmed live: Harish's Fire years
+    (2026-27) were labelled "neutral" instead of unfavorable, and Fire
+    decades read as "neutral" in the Lifetime Decade Roadmap, purely
+    because `unfavorable` was stuck at "—" and never matched any real
+    element name.
+    """
+    gisin = L.OVERCOMES.get(fav)  # 기신: the element 용신 overcomes
+    gusin = next((k for k, v in L.OVERCOMES.items() if v == fav), None)  # 구신: restrains 용신
+    hansin = L.GENERATES.get(fav)  # 한신: drains 용신 (용신 generates this)
+    return gisin, gusin, hansin
+
+
 def _avoid_watch_text(ctx: _ReportContext) -> str:
     """Text for the Quick Reference 'Avoid / Watch' (기신/구신/한신) field.
 
@@ -444,13 +509,17 @@ def _avoid_watch_text(ctx: _ReportContext) -> str:
     overcoming/generating cycles knowledge/03 defines. This mirrors the
     already-correct strong/weak branches, which keep their existing
     DM-relative 기신 text unchanged.
+
+    Keyed on `ctx.verdict == "balanced"` (not "is `ctx.unfavorable` still
+    the placeholder") since 2026-09-25 (E-3 fix): `ctx.unfavorable` is no
+    longer ever the bare "—" placeholder by the time this runs — see
+    `_ReportContext.__init__` — so the two branches are told apart by which
+    `strength.py` verdict produced the value, not by its emptiness.
     """
-    if ctx.unfavorable and ctx.unfavorable != "—":
-        return ctx.unfavorable
+    if ctx.verdict != "balanced":
+        return ctx.unfavorable if ctx.unfavorable and ctx.unfavorable != "—" else "—"
     fav = ctx.favorable
-    gisin = L.OVERCOMES.get(fav)  # 기신: the element 용신 overcomes
-    gusin = next((k for k, v in L.OVERCOMES.items() if v == fav), None)  # 구신: restrains 용신
-    hansin = L.GENERATES.get(fav)  # 한신: drains 용신 (용신 generates this)
+    gisin, gusin, hansin = _derive_gisin_gusin_hansin(fav)
     if not (gisin or gusin or hansin):
         return "—"
     parts = []
@@ -1171,9 +1240,18 @@ def _section_lifetime_decade_roadmap(ctx: _ReportContext) -> List[str]:
     ]
     for p in ctx.chart.daeun:
         status = PF.period_favorable_status(p, ctx).lower()
-        if "favor" in status or status in {"strong", "supporting", "helpful"}:
+        # Bug found 2026-09-25 (external report review, E-3 follow-up): a
+        # naive `"favor" in status` substring check matches "unfavorable"
+        # too (it contains "favor"), so a genuinely unfavorable decade was
+        # silently labelled "favorable" here — the exact inversion this
+        # table exists to warn against. Unreachable before the E-3 fix
+        # (period_favorable_status could never return "unfavorable" for a
+        # balanced/climate-gated chart), confirmed to fire the moment it
+        # could (Harish's own pure-Fire 0-9 decade). Exact-match against
+        # the function's only 3 return values instead.
+        if status == "favorable":
             lean = "favorable"
-        elif "challeng" in status or "difficult" in status or "weak" in status:
+        elif status == "unfavorable":
             lean = "challenging"
         else:
             lean = "neutral"
@@ -1693,7 +1771,15 @@ def _section_business_launch(ctx: _ReportContext) -> List[str]:
         "",
         PF.business_launch_format(ctx),
         "",
-        f"### Favorable Windows ({current_year}–{current_year + 5})",
+        # Bug found 2026-09-25 (external report review, E-3 follow-up): this
+        # table lists every year in the window unconditionally — it was
+        # never actually filtered to favorable years — so titling it
+        # "Favorable Windows" overclaimed for any year whose theme reads
+        # "mixed" (unfavorable-element years included, e.g. Harish's 2026
+        # and 2027, both Fire — his actual 기신). Renamed to describe what
+        # the table actually is: a year-by-year reference with tailored
+        # best-use/watch-out guidance, not an exclusively-favorable list.
+        f"### Year-by-Year Launch Timing ({current_year}–{current_year + 5})",
         "",
         "| Year | Pillar | Why It Matters | Suggested Use |",
         "|---|---|---|---|",
@@ -1851,8 +1937,9 @@ def _section_30_day_plan(ctx: _ReportContext) -> List[str]:
 
 
 def _candidate_day_conflicts(candidate_branch: str, watch_branches: List[str]) -> List[str]:
-    """Return relation labels ("충"/"해"/"파") the candidate day's branch has
-    against any of `watch_branches` (the natal day AND hour branches).
+    """Return relation labels ("충"/"해"/"파"/"형"/"자형") the candidate day's
+    branch has against any of `watch_branches` (the natal day AND hour
+    branches).
 
     Bug found 2026-09-20 (external report review, 3rd pass, R7): the
     auspicious/lucky-date filters only ever checked 충 (clash) against the
@@ -1861,6 +1948,19 @@ def _candidate_day_conflicts(candidate_branch: str, watch_branches: List[str]) -
     branch "when a cleaner day exists" — confirmed live: candidate days
     whose branch is 寅 (파 against Harish's natal 亥 day branch) or 申 (해
     against 亥) were passing the old clash-only filter untouched.
+
+    Bug found 2026-09-25 (external report review, E-11): knowledge/16's own
+    line ("a day that repeats a natal 형 (刑, penalty) / 파 (破, break) / 해
+    (害, harm)") names three relations to avoid, but only 파/해 were ever
+    checked — 형 (both the pairwise three-punishment membership and the
+    self-punishment case) was missing entirely. Confirmed live: for Harish
+    (day branch 亥, hour branch 丑), a candidate day of 戌 shares the 丑戌未
+    punishment triad with his natal 丑 and passed unfiltered, and a
+    candidate day of 亥 self-punishes against his own natal 亥 day branch
+    and also passed unfiltered. 원진 (deep-grudge star) is deliberately
+    NOT added here — knowledge/16 does not name it as a date-selection
+    filter criterion (only 충/형/파/해 and harmony are), so adding it would
+    invent a requirement beyond the cited doctrine (Ground Rule 1).
     """
     hits: List[str] = []
     for wb in watch_branches:
@@ -1871,6 +1971,20 @@ def _candidate_day_conflicts(candidate_branch: str, watch_branches: List[str]) -
             hits.append("해")
         if any(pair == {a, c} for a, c in L.SIX_BREAKS):
             hits.append("파")
+        if candidate_branch == wb and wb in L.SELF_PUNISHMENTS:
+            hits.append("자형")
+        elif candidate_branch != wb and any(
+            {candidate_branch, wb} <= {b1, b2, b3}
+            for b1, b2, b3, _label in L.THREE_PUNISHMENTS
+            if b3 != "—"
+        ):
+            hits.append("형")
+    # 子卯 (Water-Wood punishment) is a documented 2-member special case —
+    # THREE_PUNISHMENTS records it with "—" as its third slot, so the
+    # generic 3-member subset check above skips it; check the pair directly.
+    zi_mao = {"子", "卯"}
+    if candidate_branch in zi_mao and any(wb in zi_mao and wb != candidate_branch for wb in watch_branches):
+        hits.append("형")
     return hits
 
 
@@ -1879,9 +1993,17 @@ def _section_monthly_lucky_dates(ctx: _ReportContext, months_ahead: int = 3, max
 
     2026-09-20 fix (external report review, 3rd pass, R7): this used to
     silently cap each month at 5 dates and only check 충 (clash) against the
-    day branch. knowledge/16 gives no basis for the cap (typical qualifying
-    counts run ~10-12/month) and also requires checking 해/파 against the
-    day OR hour branch — both fixed the same way as `_section_auspicious_dates`.
+    day branch. knowledge/16 gives no basis for the cap and also requires
+    checking 해/파 against the day OR hour branch — both fixed the same way
+    as `_section_auspicious_dates`.
+
+    Typical qualifying counts run ~10-12/month under 충/해/파 alone; adding
+    형/자형 (E-11, 2026-09-25 — see `_candidate_day_conflicts`) legitimately
+    lowers that for a chart whose day/hour branches are punishment-prone
+    (Harish's 亥 self-punishes and his 丑 sits in the 丑戌未 triad, so his
+    real count is ~4/month, not ~10-12) — a stricter, more doctrinally
+    complete filter naturally admits fewer days, not evidence of a
+    reintroduced cap.
     """
     ref = ctx.chart.reference_date_obj() or datetime.now().date()
     lines = [
