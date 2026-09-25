@@ -1,23 +1,30 @@
 # claude-context — Claude Code working memory for the saju engine
 
 This directory holds the **Claude Code session artifacts** that produced the engine: the
-persistent memory files and the raw conversation transcripts. They are checked in on purpose —
-they are the provenance record for why the engine looks the way it does, and the audit trail
-behind every decision in `docs/`.
+persistent memory files. They are checked in on purpose — they are the provenance record for
+why the engine looks the way it does, and the audit trail behind every decision in `docs/`.
+
+> **2026-09-25 — `sessions/` scrubbed from history (external review I5).** The raw `.jsonl`
+> transcripts and tool-result dumps embedded real candidates' PII (names, DOBs, birth times,
+> longitudes) inside 340 MB of uncurated tool output — a privacy and repo-bloat risk with no
+> upside over the curated `memory/` files below. Removed from every commit via `git filter-repo
+> --path claude-context/sessions --invert-paths` (a full pre-rewrite backup bundle exists
+> outside the repo); the local files were moved, not deleted, to `~/saju-claude-sessions/` and
+> `claude-context/sessions/` is now gitignored. See `docs/audits/2026-09-20-i4-i7-followup.md`
+> and the original external review for the finding.
 
 ## Layout
 
 ```
 claude-context/
-├── memory/                 Persistent memory files (loaded into context each session)
-│   ├── MEMORY.md           Index — one line per memory
-│   ├── engine-validation-campaign-2026-09.md
-│   ├── saju-open-defects-triage.md
-│   ├── climate-favorable-element-2026-09.md
-│   ├── gtm-pivot-2026-09.md
-│   ├── audit-2026-08-handoff.md
-│   └── user-feedback-scope-decisions.md
-└── sessions/               Raw session transcripts (.jsonl) + per-session subdirectories
+└── memory/                 Persistent memory files (loaded into context each session)
+    ├── MEMORY.md           Index — one line per memory
+    ├── engine-validation-campaign-2026-09.md
+    ├── saju-open-defects-triage.md
+    ├── climate-favorable-element-2026-09.md
+    ├── gtm-pivot-2026-09.md
+    ├── audit-2026-08-handoff.md
+    └── user-feedback-scope-decisions.md
 ```
 
 ## Provenance
@@ -29,9 +36,7 @@ claude-context/
 | **Copied** | 2026-09-19 (plan documented 2026-09-15, actual `rsync` deferred to this date) |
 | **Method** | `rsync -a` (archival, no `--delete`) |
 
-`memory/` is the authoritative copy that Claude Code reads. `sessions/` contains the
-`.jsonl` transcripts for every session run against the engine tree, plus per-session
-subdirectories holding subagent transcripts and tool results.
+`memory/` is the authoritative copy that Claude Code reads.
 
 ## What was excluded, and why
 
@@ -46,18 +51,19 @@ subdirectories holding subagent transcripts and tool results.
   `.ruff_cache/`, `.playwright-mcp/`, `venv/`, `*.pyc`, `*.deb`, `*.rpm`. These are
   reproducible and, in the case of `node_modules/`, hundreds of megabytes.
 
-## Reading these files
+## Reading the (now-external) transcripts
 
-The transcripts are newline-delimited JSON — one event per line — and are large (the largest
-single file is ~40 MB). They are not meant to be read whole. To pull one specific thing out:
+The raw `.jsonl` transcripts still exist at `~/saju-claude-sessions/sessions/` (outside this
+repo, not version-controlled). They are newline-delimited JSON — one event per line — and are
+large (the largest single file is ~40 MB). Not meant to be read whole:
 
 ```bash
 # every user turn in a session
 jq -r 'select(.type=="user") | .message.content' \
-  claude-context/sessions/<session-id>.jsonl | less
+  ~/saju-claude-sessions/sessions/<session-id>.jsonl | less
 
 # search across all sessions without loading them
-rg -n 'some phrase' claude-context/sessions/
+rg -n 'some phrase' ~/saju-claude-sessions/sessions/
 ```
 
 ## A note on scope

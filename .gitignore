@@ -67,6 +67,13 @@ node_modules/
 candidates_horoscope/intake/*
 !candidates_horoscope/intake/.gitkeep
 
+# Raw Claude Code session transcripts — bloat the repo and embed real
+# candidates' PII (names, DOBs, birth times) inside tool-result dumps.
+# Scrubbed from history 2026-09-25 (external review I5); kept locally at
+# ~/saju-claude-sessions/. claude-context/memory/ (curated, small) stays
+# tracked — see claude-context/README.md.
+claude-context/sessions/
+
 # Stray dev screenshots
 /landing-hero.png
 /landing-viewport.png
