@@ -722,3 +722,63 @@ def test_annual_activation_note_keeps_same_relation_against_two_branches():
     assert note.count("natal **巳** are in **해 (harm)**") == 1
     assert "natal **未** are in **해 (harm)**" in note
     assert "형 (punishment)" in note
+
+
+# ── E-12 (2026-09-25 audit) — template / prose defects in Harish's report ──
+
+
+@pytest.fixture
+def harish_ctx() -> _ReportContext:
+    chart = compute_chart(
+        name="harish-e12", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+    return _ReportContext(chart, tier="deep", generation_date="2026-09-26")
+
+
+def test_companion_decade_undertow_is_not_support_and_study(harish_ctx):
+    period = next(p for p in harish_ctx.chart.daeun if p.stem_tengod in ("비견", "겁재"))
+    text = PF.major_luck_narrative(period, harish_ctx)
+    assert "support and study" not in text
+    assert "peer dynamics" in text
+
+
+def test_year_note_keyed_to_ten_god_not_raw_element(harish_ctx):
+    from saju_engine import sewoon as SE
+    # 2026 丙 (Fire) is 정관 (Authority) for a 辛 Day Master, and Fire is his 기신.
+    hit = SE.build_sewoon_range(harish_ctx.chart.day_master, harish_ctx.chart.branches, 2026, 2026)[0]
+    note = PF.year_by_year_note(hit, harish_ctx)
+    assert "visibility, speaking" not in note
+    assert "responsibility, structure" in note
+    assert "challenging element (Fire)" in note
+    # 2030 庚 (Metal) is the 희신, not the 용신.
+    hit = SE.build_sewoon_range(harish_ctx.chart.day_master, harish_ctx.chart.branches, 2030, 2030)[0]
+    assert "supporting-element (Metal) year" in PF.year_by_year_note(hit, harish_ctx)
+
+
+def test_grouped_dominant_classes_keeps_ties(harish_ctx):
+    dominant = PF._grouped_dominant_classes(harish_ctx.chart, 2)
+    assert {c for c, _ in dominant} == {"Output", "Companion", "Resource"}
+
+
+def test_attachment_patterns_names_real_stage_group(harish_ctx):
+    text = PF.attachment_patterns(harish_ctx)
+    assert "묘/관/충" not in text
+    assert "목욕" in text and "supported (strong)" in text
+
+
+def test_travel_timing_names_supporting_element(harish_ctx):
+    text = PF.travel_timing(harish_ctx)
+    assert "supporting **Metal**" in text
+
+
+def test_business_and_health_seasons_agree(harish_ctx):
+    assert "winter" in PF.business_seasonal_note(harish_ctx)
+    rhythm = PF.seasonal_daily_rhythms(harish_ctx)
+    assert "winter" in rhythm and "21:00–01:00" in rhythm and "Twelve Stages" not in rhythm
+
+
+def test_direct_officer_fit_does_not_claim_a_stem():
+    import inspect
+    assert "Direct Officer stem" not in inspect.getsource(PF)

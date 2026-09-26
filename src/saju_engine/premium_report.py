@@ -987,6 +987,27 @@ def _render_compat_snapshot(ctx, partner_chart) -> List[str]:
     return lines
 
 
+def _deficient_is_gisin_note(ctx: _ReportContext, deficient: str) -> str:
+    """Mirror of the excess==용신 reconciliation for the opposite collision.
+
+    E-12 (2026-09-25 audit): a chart born in the peak-Fire month whose 조후
+    remedy is to *cool* Fire could show "Deficient: Fire → support the
+    heart" — the raw-percentage view (knowledge/15-health-and-body.md)
+    contradicting the climate/억부 view the report itself uses for 용신
+    (knowledge/17-climate-method.md). As with the excess case, neither file
+    states how to reconcile the two, so the tension is surfaced, not
+    resolved: support means protecting that organ system, not adding more
+    of the element.
+    """
+    if not deficient or deficient != getattr(ctx, "unfavorable", None):
+        return ""
+    return (
+        f" Note that {deficient} is also this chart's challenging element (기신) under the climate/억부 "
+        f"reading used for its favorable element — so \"support\" here means protecting and resting this "
+        f"system, not deliberately adding more {deficient}-element activity."
+    )
+
+
 def _section_health_vitality(ctx: _ReportContext) -> List[str]:
     pct, _ = _element_balance(ctx.chart)
     excess = max(pct, key=pct.get)
@@ -1021,11 +1042,15 @@ def _section_health_vitality(ctx: _ReportContext) -> List[str]:
             f"the element itself — which the Grounding Practices below still "
             f"recommend leaning into."
         )
+    deficient_line = (
+        f"- **Element deficiency:** {deficient} — the {_ELEMENT_ORGANS.get(deficient, 'associated')} "
+        f"system may need gentle support."
+    ) + _deficient_is_gisin_note(ctx, deficient)
     lines += [
         "### Primary Watchpoints",
         "",
         excess_line,
-        f"- **Element deficiency:** {deficient} — the {_ELEMENT_ORGANS.get(deficient, 'associated')} system may need gentle support.",
+        deficient_line,
         f"- {PF.depleted_element_health(ctx)}",
         "",
         "### Grounding Practices",
@@ -1070,7 +1095,8 @@ def _health_deep_dive(ctx: _ReportContext) -> List[str]:
         "### Body-System Map",
         "",
         f"- **Excess system ({excess}):** {_ELEMENT_ORGANS.get(excess, 'associated')} — watch for signs of over-activity or congestion.\n"
-        f"- **Deficient system ({deficient}):** {_ELEMENT_ORGANS.get(deficient, 'associated')} — gentle rebuilding over time is usually better than forceful stimulation.",
+        f"- **Deficient system ({deficient}):** {_ELEMENT_ORGANS.get(deficient, 'associated')} — gentle rebuilding over time is usually better than forceful stimulation."
+        + _deficient_is_gisin_note(ctx, deficient),
         "",
         "### Stress Signature",
         "",
@@ -1316,11 +1342,16 @@ def _section_wealth_timing(ctx: _ReportContext) -> List[str]:
                 # opposite framing. This decade is included because its
                 # element supports overall balance, not because it
                 # specifically brings wealth.
+                # E-12 (2026-09-25 audit): a 비견 decade was labelled
+                # "겁재奪財" as if its ten-god were 겁재. Name the actual
+                # ten-god; 겁재奪財 is the pattern the whole 비겁 class
+                # triggers (knowledge/13-wealth-and-business.md).
+                tg_ko = p.stem_tengod or "비겁"
                 note = (
                     "your favorable element is active here, supporting overall stability — but its ten-god "
-                    "is a peer/rival type (겁재奪財), classically read as wealth *competition* rather than "
-                    "opportunity; keep shared-money agreements explicit here rather than expecting income "
-                    "growth from it directly."
+                    f"is **{tg_ko}**, a peer/rival (비겁) type that the 겁재奪財 pattern reads as wealth "
+                    "*competition* rather than opportunity; keep shared-money agreements explicit here "
+                    "rather than expecting income growth from it directly."
                 )
             else:
                 note = (
@@ -1403,11 +1434,16 @@ def _section_timing(
         "",
         "### Major Luck Periods",
         "",
-        "| Age | Pillar | Element Theme | Ten-God | Career Theme | Relationship Theme |",
+        "| Age | Pillar | Elements (Stem / Branch) | Ten-God | Career Theme | Relationship Theme |",
         "|---|---|---|---|---|---|",
     ]
     for p in ctx.chart.daeun:
-        elem_theme = L.BRANCH_ELEMENT.get(p.branch, "")
+        # E-12 (2026-09-25 audit): this column used to show only the
+        # branch element under an unlabelled "Element Theme" header (丁未 →
+        # "Earth"), hiding the stem. Show both, labelled.
+        stem_el = L.STEM_INFO.get(p.stem, {}).get("element", "")
+        branch_el = L.BRANCH_ELEMENT.get(p.branch, "")
+        elem_theme = f"{stem_el} / {branch_el}" if stem_el and branch_el else (stem_el or branch_el)
         tg = p.stem_tengod_en or p.stem_tengod or "—"
         career_t, rel_t = PF.major_luck_theme_row(p, ctx)
         lines.append(

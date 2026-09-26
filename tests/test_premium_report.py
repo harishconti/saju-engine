@@ -169,7 +169,7 @@ def test_premium_report_timing_tables():
     chart = _sample_chart()
     report = generate_premium_report(chart)
     # Major luck table header
-    assert "| Age | Pillar | Element Theme | Ten-God |" in report
+    assert "| Age | Pillar | Elements (Stem / Branch) | Ten-God |" in report
     # Annual windows table header
     assert "| Year | Pillar | Annual Ten-God | Overall Theme |" in report
     # Reading tier = 3-year window (current year ± 1). chart.sewoon is the
@@ -1055,3 +1055,28 @@ def test_season_signal_correctly_buckets_depleted_month_stages():
     assert _season_signal(0.2) == "depleted"  # 병
     assert _season_signal(2.0) == "supported"  # 제왕
     assert _season_signal(0.7) == "mixed"  # 양
+
+
+# ── E-12 (2026-09-25 audit) ──────────────────────────────────────────────
+
+
+def _harish_deep_report():
+    from saju_engine.engine import compute_chart
+    from saju_engine.premium_report import generate_premium_report
+    chart = compute_chart(
+        name="harish-e12", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+    return generate_premium_report(chart, tier="deep")
+
+
+def test_e12_deficient_gisin_is_reconciled_and_companion_decade_named():
+    report = _harish_deep_report()
+    # Fire is both the least-present element and the climate-resolved 기신.
+    assert "Fire is also this chart's challenging element (기신)" in report
+    # 辛亥 is a 비견 decade — it must not be labelled as if it were 겁재.
+    line = next(l for l in report.splitlines() if "(辛亥" in l and "peer/rival" in l)
+    assert "**비견**" in line
+    # Major-luck table shows stem AND branch element (丁未 → Fire / Earth).
+    assert "| 丁未 | Fire / Earth |" in report
