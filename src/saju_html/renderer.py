@@ -79,8 +79,17 @@ def _load_css(css_path: Path | None) -> str:
 
 
 def _make_md_parser() -> MarkdownIt:
-    """Return a MarkdownIt instance with tables and basic inline HTML enabled."""
-    md = MarkdownIt("commonmark", {"html": True, "linkify": False})
+    """Return a MarkdownIt instance with tables enabled.
+
+    N-8 (2026-09-26 audit): `html: True` let literal HTML in the markdown
+    body (e.g. a client's name/city/main_concern, interpolated verbatim by
+    the report generators) survive into the HTML that Chromium renders —
+    `<script>`/`<iframe>` included. The report generators never rely on raw
+    HTML passthrough (only CommonMark constructs), so `html: False` closes
+    the injection vector at its source: markdown-it escapes it as literal
+    text instead of parsing it as HTML.
+    """
+    md = MarkdownIt("commonmark", {"html": False, "linkify": False})
     md.enable(["table", "strikethrough"])
     return md
 
@@ -388,7 +397,17 @@ def html_to_pdf(
         # install (common on dev machines / CI images that ship google-chrome)
         # before giving up with an actionable error.
         browser = _launch_browser(p)
-        page = browser.new_page()
+        # N-8 (2026-09-26 audit) defense-in-depth: the report is static markup
+        # printed to PDF, so it never needs to run script or fetch a network
+        # resource. Disabling JS and aborting every non-data: request means
+        # even HTML that slipped past `html: False` above (e.g. a future
+        # bug, or a caller that renders raw HTML directly) can't execute
+        # script or reach an SSRF target.
+        page = browser.new_page(java_script_enabled=False)
+        page.route("**/*", lambda route: (
+            route.continue_() if route.request.url.startswith("data:")
+            else route.abort()
+        ))
         page.set_content(html_doc)
         page.pdf(
             path=str(output_pdf),

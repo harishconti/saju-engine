@@ -32,6 +32,20 @@ def test_client_intake_app_form_paths_resolve_to_tools_dir():
     assert module.COMPAT_FORM_PATH.exists()
 
 
+def test_compat_generate_does_not_forward_raw_candidate_favorable_as_override():
+    """N-7 (2026-09-26 audit): a blank favorable_element_a/_b form field used
+    to fall back to strength_assessment["candidate_favorable"] — the raw,
+    pre-climate 억부 pick — and forward it to generate_compat_report() as a
+    favorable_element_a/_b override. compat.py's compat_score() treats ANY
+    non-empty value there as an outright reader-confirmed override, bypassing
+    the climate merge and mislabeling unreviewed engine output. The fix is to
+    only forward the form field itself, verbatim (never a chart's own
+    strength_assessment), and let favorable_element() resolve the rest."""
+    source = APP_PATH.read_text()
+    assert '.get("candidate_favorable")' not in source
+    assert "strength_assessment[\"candidate_favorable\"]" not in source
+
+
 def test_intake_forms_do_not_default_utc_offset_to_india():
     """F-10 (2026-09-26 audit): both self-service intake forms hard-coded
     value="5.5" (India UTC offset) as the pre-filled default, contradicting

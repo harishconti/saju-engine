@@ -127,6 +127,33 @@ def test_drop_title_block_falls_back_to_h1_only_when_no_hr():
 
 
 @requires_browser
+def test_html_pdf_disables_javascript_and_blocks_network(tmp_path):
+    """N-8 (2026-09-26 audit) defense-in-depth: even if raw HTML reaches
+    html_to_pdf directly (bypassing the markdown-level `html: False` fix),
+    Chromium must not execute script or fetch a non-data: resource — this is
+    a static report printed to PDF, so it never legitimately needs either."""
+    import shutil
+    import subprocess
+
+    from saju_html.renderer import html_to_pdf
+
+    pdf = tmp_path / "injection.pdf"
+    html_to_pdf(
+        "<html><body><p>Original text</p>"
+        '<script>document.body.innerHTML += "<p>INJECTED-BY-SCRIPT</p>";</script>'
+        '<img src="https://example.invalid/tracker.png">'
+        "</body></html>",
+        pdf,
+    )
+    assert pdf.stat().st_size > 100
+    if shutil.which("pdftotext") is None:
+        return
+    text = subprocess.run(["pdftotext", str(pdf), "-"], capture_output=True, text=True).stdout
+    assert "Original text" in text
+    assert "INJECTED-BY-SCRIPT" not in text
+
+
+@requires_browser
 def test_html_pdf_from_markdown(tmp_path):
     """End-to-end: markdown file -> HTML renderer -> PDF on disk."""
     from saju_html.renderer import build_pdf
@@ -330,6 +357,30 @@ def test_html_pdf_premium_report_has_no_knowledge_paths():
         )
 
 
+def test_html_pdf_client_name_html_injection_does_not_survive():
+    """N-8 (2026-09-26 audit): the HTML/Playwright backend rendered markdown
+    with `html: True`, so a client name containing `<script>`/`<iframe>`
+    reached Chromium unescaped via page.set_content() — script execution in
+    the renderer means outbound requests (SSRF) and PDF rewriting. The
+    markdown parser now runs with `html: False`, so any literal HTML in
+    generator-interpolated fields (chart.name here) is escaped as text."""
+    from saju_html.renderer import markdown_to_html
+    from saju_engine.engine import compute_chart
+    from saju_engine.premium_report import generate_premium_report
+
+    payload = '<script>alert(1)</script><iframe src="file:///etc/passwd"></iframe>'
+    chart = compute_chart(
+        name=payload, gender="F", year=2001, month=6, day=7, hour=16, minute=45,
+        longitude=80.27, utc_offset=5.5, use_solar_time=True, convention="korean",
+    )
+    for tier in ("sample", "essential", "deep"):
+        md = generate_premium_report(chart, tier=tier)
+        html = markdown_to_html(md, title="VP", client="VP", tier=tier)
+        assert "<script>" not in html
+        assert "<iframe" not in html
+        assert "&lt;script&gt;" in html
+
+
 # ── Blueprint-alignment tests (CosmicSaju Three-Tier Architecture) ────────
 
 
@@ -431,14 +482,14 @@ def test_html_pdf_render_passes_through_all_wrappers(tmp_path):
     md = (
         "# Deep Destiny Report\n\n"
         "## Lifetime Decade Roadmap\n\n"
-        "<!-- decade-roadmap:start -->\n"
+        "<!-- decade-roadmap:start -->\n\n"
         "| Age | Pillar | Element Theme | Favorable Lean |\n"
         "|---|---|---|---|\n"
         "| 3-12 | 壬寅 | Yang Water | Favorable |\n"
         "| 13-22 | 癸卯 | Yin Water | Favorable |\n"
-        "| 23-32 | 甲辰 | Yang Wood | Neutral |\n"
+        "| 23-32 | 甲辰 | Yang Wood | Neutral |\n\n"
         "<!-- decade-roadmap:end -->\n\n"
-        "<blockquote>Polished blade in autumn wind.</blockquote>\n\n"
+        "> Polished blade in autumn wind.\n\n"
         "🎧 **Your MP3 audio summary is included — delivered with this report.**\n\n"
         "#### Partner Chart Add-On\n\n"
         "*Want a side-by-side compatibility reading? Add a Partner Chart.*\n"

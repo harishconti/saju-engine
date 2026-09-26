@@ -348,22 +348,21 @@ async def compat_generate(
     output_pdf_path = pair_dir / f"{name_filename}.pdf"
 
     def _render() -> Path:
-        # Use the engine's heuristic 용신 by default, but allow an explicit
-        # human-argued override via the form so automated compat does not drift
-        # from a reviewed single-chart reading.
-        fe_a = favorable_element_a or (
-            chart_a.strength_assessment.get("candidate_favorable")
-            if chart_a.strength_assessment else None
-        )
-        fe_b = favorable_element_b or (
-            chart_b.strength_assessment.get("candidate_favorable")
-            if chart_b.strength_assessment else None
-        )
+        # N-7 (2026-09-26 audit): a blank form field used to fall back to the
+        # chart's raw, pre-climate 억부 candidate pick (strength_assessment's
+        # candidate-favorable field) and pass it to generate_compat_report()
+        # as though a
+        # human reader had confirmed it. compat.py's favorable_element_a/_b
+        # treats ANY non-empty value as an outright reader override, bypassing
+        # the climate merge and the report's "reader-confirmed" label. Only
+        # pass an override when the form field itself was actually filled in;
+        # otherwise let favorable_element() resolve the real 용신 for both
+        # charts, same as the single-chart path.
         selected_tier = tier.strip() if tier.strip() in ("basic", "deep") else "basic"
         md = generate_compat_report(
             chart_a, chart_b, name_a=name_a, name_b=name_b,
-            favorable_element_a=fe_a or None,
-            favorable_element_b=fe_b or None,
+            favorable_element_a=favorable_element_a or None,
+            favorable_element_b=favorable_element_b or None,
             tier=selected_tier,
         )
         output_md_path.write_text(md, encoding="utf-8")

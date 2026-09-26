@@ -118,12 +118,20 @@ def _wrap_decade_roadmap(html: str) -> str:
     """Replace the Lifetime Decade Roadmap markdown table with an SVG.
 
     The engine emits a table wrapped in HTML comments
-    `<!-- decade-roadmap:start -->` / `<!-- decade-roadmap:end -->`.
+    `<!-- decade-roadmap:start -->` / `<!-- decade-roadmap:end -->`. N-8
+    (2026-09-26 audit): the markdown parser now runs with `html: False`
+    (a client name/city containing `<script>` must never survive into the
+    HTML Chromium renders), so these markers reach here HTML-escaped —
+    `<p>&lt;!-- decade-roadmap:start --&gt;</p>` — not as literal comments.
     """
     start_match = re.search(
-        r"<!--\s*decade-roadmap:start\s*-->", html, re.IGNORECASE
+        r"(?:<p>)?(?:<!--|&lt;!--)\s*decade-roadmap:start\s*(?:-->|--&gt;)(?:</p>)?",
+        html, re.IGNORECASE,
     )
-    end_match = re.search(r"<!--\s*decade-roadmap:end\s*-->", html, re.IGNORECASE)
+    end_match = re.search(
+        r"(?:<p>)?(?:<!--|&lt;!--)\s*decade-roadmap:end\s*(?:-->|--&gt;)(?:</p>)?",
+        html, re.IGNORECASE,
+    )
     if not start_match or not end_match or end_match.start() < start_match.end():
         return html
     # Extract the table content between the markers.
