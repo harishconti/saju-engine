@@ -418,11 +418,30 @@ def _daeun_starting_age_note(chart) -> str:
     days_display = round(days, 1)
     day_word = "day" if days_display == 1 else "days"
     month_word = "month" if months == 1 else "months"
+    # E-13 (2026-09-25 audit): give the calendar month the first period
+    # starts, and explain the Korean 만세력 display convention — apps round
+    # days ÷ 3 to a whole 대운수 (a remainder of 1.5 days or more rounds up)
+    # and list decades as N, N+10, N+20…, often in Korean age, so a client
+    # cross-checking against an app sees different labels for the same
+    # periods. (Sources: ko.wikipedia 「대운 (사주팔자)」; KNS뉴스 「대운수
+    # 산출법」 — 3일 = 1년, 반올림.)
+    start_note = ""
+    try:
+        from datetime import date, timedelta
+        birth = date(int(date_to_use[:4]), int(date_to_use[5:7]), int(date_to_use[8:10]))
+        start = birth + timedelta(days=days * 365.2422 / 3)
+        start_note = f" (≈ {start.strftime('%b %Y')})"
+    except (ValueError, TypeError):
+        pass
+    daeunsu = int(days / 3 + 0.5)
     return (
         f"**대운수 (starting age):** ~{precise_age} (~{days_display} {day_word} to the qualifying 節氣 ÷ 3, "
         f"per knowledge/08's \"3 days = 1 year\" rule) — the first major-luck period begins "
-        f"roughly {months} {month_word} after birth, inside the **{start_age}-{start_age + 9}** decade "
-        f"label shown below, not precisely at its first birthday."
+        f"roughly {months} {month_word} after birth{start_note}, inside the **{start_age}-{start_age + 9}** "
+        f"decade label shown below, not precisely at its first birthday; each later period changes over at "
+        f"the same point in the year. Korean 만세력 apps round this to a whole **대운수 {daeunsu}** and list "
+        f"decades as {daeunsu}, {daeunsu + 10}, {daeunsu + 20}… (often in Korean age), so their labels can "
+        f"differ from the table below by a year or so while describing the same periods."
     )
 
 

@@ -1080,3 +1080,10 @@ def test_e12_deficient_gisin_is_reconciled_and_companion_decade_named():
     assert "**비견**" in line
     # Major-luck table shows stem AND branch element (丁未 → Fire / Earth).
     assert "| 丁未 | Fire / Earth |" in report
+
+
+def test_e13_daeun_start_note_gives_calendar_month_and_app_convention():
+    report = _harish_deep_report()
+    line = next(l for l in report.splitlines() if "대운수 (starting age)" in l)
+    assert "≈ Dec 1992" in line
+    assert "대운수 1" in line and "1, 11, 21" in line

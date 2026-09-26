@@ -41,6 +41,13 @@ In other words:
 - For **backward (역행)**: Count the number of days from the birth date to the **previous 節氣** (same 12 month-openers). Divide by 3.
 
 > 1 day = 4 months of life. 3 days = 1 year. So 10 days = ~3.3 years.
+>
+> **Display convention (added 2026-09-26, E-13).** Korean 만세력 apps round days ÷ 3 to a whole
+> **대운수** (a remainder of 1.5 days or more rounds up) and list the decades as N, N+10, N+20…, often
+> in Korean age (세는나이). This engine's tables use 10-year age-range labels (0–9, 10–19…) and state the
+> precise fractional start separately, so the two presentations describe the same periods with labels
+> that can differ by about a year. *(Sources: Korean Wikipedia 「대운 (사주팔자)」; KNS뉴스통신
+> 「제31강 대운수 산출법」.)*
 
 > **Note on terminology:** the Korean 명리 tradition uses the 12 **節氣 (節, month-openers)** for the starting-age calculation, not the 24 jieqi as a whole. The 24-jieqi version (counting to the next 節 OR 中) gives systematically shorter starting ages and is **not** the standard Korean convention.
 >
