@@ -131,6 +131,10 @@ Ratings use a 5-star scale. The criteria:
 
 ---
 
+## 2026-09-26 — 희신 convention aligned with the base report
+
+The regenerated base report now shows **희신 = Water** (was Earth). For a **strong** Day Master whose 용신 is the output element (Metal), `knowledge/03-five-elements.md` §Two conventions for 희신 explains that the strict "generates 용신" 희신 (Earth) is the very element that over-strengthens the self — i.e. the 기신 — so the engine uses the modern Korean convention (용신 식상 → 희신 재성 = Water). The base report previously printed Earth as both 희신 and Avoid/Watch. Where this file names "희신 Earth" (the legacy hand reading), read Earth as the chart's saturated foundation, not a lever — which is how the Supporting-fields note above already treats it; the ranking weights (Metal/Water) were already on the modern convention.
+
 ## Sources & Limits
 
 - **Chart:** engine-derived pillars 甲辰 / 辛未 / 己巳 / 戊辰; Day Master 己 (Yin Earth); **신강 (strong)**; reader-argued 용신 **Metal** (식신 direction) / 희신 **Earth** (see `gurumoorthy-report-legacy.md` for the full argument). Pillars re-validated 2026-09-08.
