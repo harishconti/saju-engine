@@ -335,10 +335,11 @@ def _solar_time_note(chart) -> List[str]:
 
 def _year_month_correction_note(chart) -> List[str]:
     """Disclose when the year/month pillar was corrected from sajupy's raw
-    value (E-1, 2026-09-25: sajupy compares a KST-stored 절기 moment against
-    the birth's raw local time with no timezone conversion, which can flip
-    which side of a boundary a birth far from KST falls on). Most charts
-    never trigger this — it only fires when the two disagree.
+    value — either because sajupy compares a KST-stored 절기 moment against
+    the birth's raw local time with no timezone conversion (E-1, 2026-09-25),
+    or because sajupy's own 절기 times are off by up to ~2 hours against the
+    ephemeris table the engine now uses (N-3, 2026-09-26). Most charts never
+    trigger this — it only fires when the two disagree.
     """
     correction = getattr(chart, "year_month_correction", None)
     if not correction:
@@ -348,11 +349,37 @@ def _year_month_correction_note(chart) -> List[str]:
         for field, v in correction.items()
     )
     return [
-        f"> **⚠ Year/month correction note:** this chart's birth timezone is far enough from "
-        f"Korea Standard Time that the raw calculation tool's year/month-boundary check needed a "
-        f"correction: {changed}. This is an internal calculation-methodology note, not an "
+        f"> **⚠ Year/month correction note:** this birth falls close enough to a solar-term "
+        f"(절기) boundary that the raw calculation library's year/month check — which uses "
+        f"less precise term times and ignores the birth timezone — disagreed with this engine's "
+        f"ephemeris-accurate check: {changed}. This is an internal calculation-methodology note, not an "
         "interpretive uncertainty — the corrected pillars above are the ones used throughout this "
         "reading."
+    ]
+
+
+def _term_boundary_note(chart) -> List[str]:
+    """Knife-edge disclosure for a birth within minutes of a month-opener 절기
+    (N-15, 2026-09-26 audit). Sourced from pillars.py's `_term_boundary_info`.
+    """
+    tb = getattr(chart, "term_boundary", None)
+    if not tb:
+        return []
+    mins = tb["distance_minutes"]
+    unit = "minute" if mins == 1 else "minutes"
+    side = "after" if tb["birth_is_after_term"] else "before"
+    alt = f"month pillar **{tb['alternate_month_pillar']}**"
+    primary = f"month pillar **{tb['primary_month_pillar']}**"
+    if tb["alternate_year_pillar"] != tb["primary_year_pillar"]:
+        alt = f"year pillar **{tb['alternate_year_pillar']}** and " + alt
+        primary = f"year pillar **{tb['primary_year_pillar']}** and " + primary
+    return [
+        f"> **⚠ Solar-term boundary note:** this birth is ~{mins} {unit} {side} the {tb['term']} "
+        f"solar term ({tb['term_time_local']} local clock time). If the recorded birth time carries "
+        f"that much error, the {alt} (vs the {primary} used above) would apply instead — "
+        "changing the season of the chart, its strength and favorable element, and the whole "
+        "major-luck (대운) sequence. Please confirm the birth time from a birth certificate or "
+        "hospital record before relying on this reading."
     ]
 
 
@@ -466,6 +493,7 @@ def _section_cover(ctx: _ReportContext, compact: bool = False) -> List[str]:
         "",
         *_solar_time_note(ctx.chart),
         *_year_month_correction_note(ctx.chart),
+        *_term_boundary_note(ctx.chart),
         "",
         f"**Day Master:** {ctx.dm_en}",
         "",

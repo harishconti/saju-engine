@@ -11,10 +11,12 @@ The rules are in knowledge/08-luck-pillars.md, Part 1:
 This module:
   - Computes the 60-cycle index for a given pillar
   - Steps the 60-cycle forward or backward by N
-  - Computes the starting age (delegating the solar-term math to sajupy)
+  - Computes the starting age from the packaged 절기 table (data/solar_terms.csv)
 """
 from __future__ import annotations
 
+import csv
+import os
 from datetime import date, datetime, time, timedelta
 from typing import Dict, List, Optional, Tuple
 
@@ -96,10 +98,9 @@ def step_cycle(stem: str, branch: str, n: int) -> Tuple[str, str]:
 # previous or next 節氣 (month-opener, one of 12), divide by 3.
 # (1 day = 4 months, 3 days = 1 year.)
 #
-# sajupy's calendar_data.csv has all 24 jieqi per year. The 12 節氣 (立春,
-# 驚蟄, 淸明, 立夏, 芒種, 小暑, 立秋, 白露, 寒露, 立冬, 大雪, 小寒) are the
-# month-opener terms that define the 12 Saju months. We use those as the
-# term boundaries.
+# The 12 節氣 (立春, 驚蟄, 淸明, 立夏, 芒種, 小暑, 立秋, 白露, 寒露, 立冬, 大雪,
+# 小寒) are the month-opener terms that define the 12 Saju months. We use
+# those as the term boundaries.
 #
 # The classical Korean 명리 rule (per 적천수, 궁통보감, and standard
 # Korean-school textbooks):
@@ -109,10 +110,14 @@ def step_cycle(stem: str, branch: str, n: int) -> Tuple[str, str]:
 # refinement that doesn't match the canonical tradition — the actual
 # tradition just uses the next/previous 節氣 in the 12-節氣 cycle.
 #
-# Schema of sajupy/calendar_data.csv:
-#   year,month,day,year_pillar,month_pillar,day_pillar,lunar_year,
-#   lunar_month,lunar_day,solar_term_hanja,solar_term_korean,term_time
-# Only rows with solar_term_hanja non-empty are jieqi rows.
+# Term instants come from this package's own `data/solar_terms.csv`, not
+# sajupy's calendar_data.csv. N-3 (2026-09-26 audit): sajupy's term times are
+# off by a median of ~22 min and up to ~114 min against an ephemeris, enough
+# to put a birth in the wrong Saju month. The package table is computed from
+# JPL DE440s by `tools/generate_solar_terms.py` (1899–2101, to the second,
+# cross-checked against an independent PyEphem computation: median 1 s,
+# within ±1 min for 1899–2060 and ±3 min by 2100, where future ΔT dominates).
+# Schema: ``year,term,utc`` (year = KST calendar year of the instant).
 
 # The 12 month-opener 節氣.
 _MONTH_OPENER_TERMS = frozenset({
@@ -120,57 +125,46 @@ _MONTH_OPENER_TERMS = frozenset({
     "立秋", "白露", "寒露", "立冬", "大雪", "小寒",
 })
 
-# Cache the parsed calendar CSV (re-read if file changes between calls)
-# Value is {year: [(date, hanja, term_time), ...]} where term_time is the raw
-# sajupy string YYYYMMDDHHMM (may be empty for non-term rows, but those are
-# filtered out here).
+SOLAR_TERMS_CSV = os.path.join(os.path.dirname(__file__), "data", "solar_terms.csv")
+
+# Cache the parsed term table.
+# Value is {year: [(kst_date, hanja, term_time), ...]} where term_time is the
+# KST instant as YYYYMMDDHHMMSS (the historical sajupy-compatible KST layout,
+# extended with seconds) — see KST_OFFSET_HOURS below.
 _CALENDAR_CACHE: Optional[Dict[str, List[Tuple[date, str, str]]]] = None
 
 
 def _parse_calendar() -> Dict[str, List[Tuple[date, str, str]]]:
-    """Read sajupy/calendar_data.csv and return {year: [(date, hanja, term_time), ...]}.
+    """Read the packaged 절기 table and return {year: [(date, hanja, term_time), ...]}.
 
-    Only month-opener 節氣 rows are kept, sorted by date.
+    Only month-opener 節氣 rows exist in the table; each year's list is
+    sorted by date. Dates and term_time are in KST (UTC+9).
     """
     global _CALENDAR_CACHE
     if _CALENDAR_CACHE is not None:
         return _CALENDAR_CACHE
-    import csv
-    import os
-    # Locate the sajupy package via importlib — robust to install location.
-    import importlib.util
-    spec = importlib.util.find_spec("sajupy")
-    if spec is None or spec.origin is None:
-        raise ImportError("sajupy is not importable; cannot locate calendar_data.csv")
-    sajupy_dir = os.path.dirname(spec.origin)
-    csv_path = os.path.join(sajupy_dir, "calendar_data.csv")
-    if not os.path.isfile(csv_path):
-        # Bug found 2026-09-20 (external code-quality review): this file
-        # lives inside sajupy's own install directory (a third-party
-        # dependency's internal data file, not this package's own data —
-        # sajupy exposes no public API for it), so a raw `open()` failure
-        # here surfaces as an unhelpful bare `FileNotFoundError` with no
-        # hint about the actual cause (a stripped/incomplete sajupy
-        # install). Fail loudly with a diagnostic instead.
+    if not os.path.isfile(SOLAR_TERMS_CSV):
         raise FileNotFoundError(
-            f"sajupy is importable but its calendar_data.csv is missing at "
-            f"{csv_path!r}. This usually means an incomplete or corrupted "
-            f"sajupy install — reinstall with "
-            f"`pip install --user --break-system-packages --force-reinstall sajupy`."
+            f"Packaged solar-term table missing at {SOLAR_TERMS_CSV!r}. "
+            f"Reinstall saju-engine, or regenerate it with "
+            f"`python3 tools/generate_solar_terms.py`."
         )
     by_year: Dict[str, List[Tuple[date, str, str]]] = {}
-    with open(csv_path, "r", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
+    kst = timedelta(hours=KST_OFFSET_HOURS)
+    with open(SOLAR_TERMS_CSV, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(line for line in f if not line.startswith("#"))
         for row in reader:
-            hanja = (row.get("solar_term_hanja") or "").strip()
+            hanja = (row.get("term") or "").strip()
             if hanja not in _MONTH_OPENER_TERMS:
                 continue
             try:
-                y = int(row["year"]); m = int(row["month"]); d = int(row["day"])
-                dt = date(y, m, d)
+                utc = datetime.strptime(row["utc"], "%Y-%m-%dT%H:%M:%SZ")
             except (KeyError, ValueError):
                 continue
-            by_year.setdefault(str(y), []).append((dt, hanja, row.get("term_time", "")))
+            local = utc + kst
+            by_year.setdefault(str(local.year), []).append(
+                (local.date(), hanja, local.strftime("%Y%m%d%H%M%S"))
+            )
     for lst in by_year.values():
         lst.sort()
     _CALENDAR_CACHE = by_year
@@ -192,6 +186,9 @@ def _parse_calendar() -> Dict[str, List[Tuple[date, str, str]]]:
 # which only fits a 戊/癸-year under the 오호둔 rule, not 2024's 甲). For births
 # near KST (Korea, India — a 3.5h gap), pillars themselves are rarely
 # affected, but the 대운수 (starting-age) day-count still drifts by hours.
+# N-3: the packaged table replacing sajupy's CSV stores UTC; `_parse_calendar`
+# converts it to the same KST layout so this conversion stays the single
+# place where term instants are shifted into the birth's own timezone.
 KST_OFFSET_HOURS = 9.0
 
 
@@ -235,10 +232,11 @@ def _term_boundary_datetimes(
 
 
 def _parse_term_time(term_time: str, fallback_date: date) -> datetime:
-    """Parse sajupy ``term_time`` (YYYYMMDDHHMM) into a naive datetime.
+    """Parse a KST ``term_time`` (YYYYMMDDHHMM[SS]) into a naive datetime.
 
     If the string is missing or malformed, fall back to the term date at
-    00:00. The calendar CSV stores term times in a compressed 12-digit format.
+    00:00. The packaged table carries seconds (14 digits); the 12-digit
+    sajupy layout is still accepted.
     """
     if not term_time:
         return datetime.combine(fallback_date, time(0, 0))
@@ -248,7 +246,8 @@ def _parse_term_time(term_time: str, fallback_date: date) -> datetime:
         d = int(term_time[6:8])
         h = int(term_time[8:10])
         mi = int(term_time[10:12])
-        return datetime(y, m, d, h, mi)
+        sec = int(term_time[12:14]) if len(term_time) >= 14 else 0
+        return datetime(y, m, d, h, mi, sec)
     except (ValueError, IndexError):
         return datetime.combine(fallback_date, time(0, 0))
 

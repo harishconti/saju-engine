@@ -17,7 +17,7 @@ All interpretation rules come from the project's ``knowledge/`` directory.
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import contextlib
 import io
@@ -239,22 +239,6 @@ def _compute_adjusted_date(
     return (adjusted.year, adjusted.month, adjusted.day), adjustment_days
 
 
-def _effective_calendar_date(
-    year: int,
-    month: int,
-    day: int,
-    raw: Dict[str, Any],
-    use_solar_time: bool,
-) -> Tuple[int, int, int]:
-    """Return the calendar date that sajupy used after solar-time adjustment."""
-    info = raw.get("solar_correction")
-    if use_solar_time and info:
-        adjusted = raw.get("adjusted_date")
-        if adjusted:
-            return adjusted
-    return year, month, day
-
-
 def _hour_stem_day_stem(raw: Dict[str, Any], eff_hour: int, convention: str) -> str:
     """Return the day-stem that should drive the hour-stem 五鼠遁 calculation.
 
@@ -448,32 +432,38 @@ _FIVE_TIGERS: Dict[str, str] = {
 _YEAR_CYCLE_ANCHOR = 1984
 
 
-def _independent_year_month_pillar(
-    year: int, month: int, day: int, hour: int, minute: int, utc_offset: float,
-) -> Optional[Dict[str, str]]:
-    """Independently derive the Saju year and month pillar from
-    properly-timezone-converted 절기 boundaries.
+# N-15 (2026-09-26 audit, 절기 half): a civil birth time within this many
+# minutes of a month-opener 절기 instant gets a knife-edge disclosure. The
+# term instants themselves are now accurate to seconds (N-3), so the
+# remaining risk is the recorded birth time — and a 절기 flips the month
+# pillar (and at 立春 the year pillar), the 격국, strength, 용신 and the
+# whole 대운 sequence, so the margin is wider than the hour boundary's.
+TERM_BOUNDARY_MARGIN_MIN = 30
 
-    Returns None if the birth falls outside the calendar CSV's covered
-    range — callers should then trust sajupy's raw value unchecked, the same
-    fallback `starting_age()` uses.
-    """
+
+def _term_candidates(
+    year: int, utc_offset: float,
+) -> List[Tuple[datetime, str]]:
+    """Month-opener 절기 instants around `year`, in the birth's civil time."""
     from .daeun import KST_OFFSET_HOURS, _parse_calendar, _parse_term_time
 
     by_year = _parse_calendar()
     tz_shift = timedelta(hours=utc_offset - KST_OFFSET_HOURS)
-    candidates: list = []
+    candidates: List[Tuple[datetime, str]] = []
     for y in (year - 1, year, year + 1):
         for dt, hanja, term_time in by_year.get(str(y), []):
             candidates.append((_parse_term_time(term_time, dt) + tz_shift, hanja))
     candidates.sort()
+    return candidates
 
-    birth_dt = datetime(year, month, day, hour, minute)
 
+def _year_month_pillar_at(
+    candidates: List[Tuple[datetime, str]], moment: datetime,
+) -> Optional[Dict[str, str]]:
     prev_month_term: Optional[Tuple[datetime, str]] = None
     lichun_year: Optional[int] = None
     for term_dt, hanja in candidates:
-        if term_dt > birth_dt:
+        if term_dt > moment:
             break
         prev_month_term = (term_dt, hanja)
         if hanja == "立春":
@@ -490,6 +480,57 @@ def _independent_year_month_pillar(
     return {
         "year_stem": year_stem, "year_branch": year_branch,
         "month_stem": month_stem, "month_branch": month_branch,
+    }
+
+
+def _independent_year_month_pillar(
+    year: int, month: int, day: int, hour: int, minute: int, utc_offset: float,
+) -> Optional[Dict[str, str]]:
+    """Independently derive the Saju year and month pillar from
+    properly-timezone-converted 절기 boundaries.
+
+    Returns None if the birth falls outside the term table's covered
+    range — callers should then trust sajupy's raw value unchecked, the same
+    fallback `starting_age()` uses.
+    """
+    return _year_month_pillar_at(
+        _term_candidates(year, utc_offset), datetime(year, month, day, hour, minute)
+    )
+
+
+def _term_boundary_info(
+    year: int, month: int, day: int, hour: int, minute: int, utc_offset: float,
+) -> Optional[Dict[str, Any]]:
+    """Return knife-edge metadata when the civil birth time is within
+    ``TERM_BOUNDARY_MARGIN_MIN`` of a month-opener 절기 instant, else None.
+
+    Carries the pillars on both sides of the term so the report can name the
+    alternate reading, like `_hour_boundary_info` does for the hour pillar.
+    """
+    candidates = _term_candidates(year, utc_offset)
+    birth_dt = datetime(year, month, day, hour, minute)
+    nearest = min(candidates, key=lambda c: abs((c[0] - birth_dt).total_seconds()), default=None)
+    if nearest is None:
+        return None
+    term_dt, hanja = nearest
+    delta_s = (birth_dt - term_dt).total_seconds()
+    if abs(delta_s) > TERM_BOUNDARY_MARGIN_MIN * 60:
+        return None
+    # The pillar on the far side of the term from the recorded birth moment.
+    other_side = term_dt - timedelta(minutes=1) if delta_s >= 0 else term_dt + timedelta(minutes=1)
+    primary = _year_month_pillar_at(candidates, birth_dt)
+    alternate = _year_month_pillar_at(candidates, other_side)
+    if primary is None or alternate is None:
+        return None
+    return {
+        "term": hanja,
+        "term_time_local": term_dt.strftime("%Y-%m-%d %H:%M:%S"),
+        "distance_minutes": int(round(abs(delta_s) / 60)),
+        "birth_is_after_term": delta_s >= 0,
+        "primary_year_pillar": primary["year_stem"] + primary["year_branch"],
+        "primary_month_pillar": primary["month_stem"] + primary["month_branch"],
+        "alternate_year_pillar": alternate["year_stem"] + alternate["year_branch"],
+        "alternate_month_pillar": alternate["month_stem"] + alternate["month_branch"],
     }
 
 
@@ -610,9 +651,8 @@ def compute_pillars(
             raw["day_branch"] = correct_day_branch
             raw["day_pillar"] = f"{correct_day_stem}{correct_day_branch}"
 
-    # Determine the effective time and date that sajupy used.
+    # Determine the effective time that sajupy used.
     eff_hour, eff_minute = _effective_time(hour, minute, raw, use_solar_time)
-    eff_date = _effective_calendar_date(year, month, day, raw, use_solar_time)
 
     # Recompute the hour branch from the effective time. sajupy already does this
     # when use_solar_time=True, but we repeat it here as an auditable check.
@@ -671,6 +711,10 @@ def compute_pillars(
             raw["year_pillar"] = f"{independent['year_stem']}{independent['year_branch']}"
             raw["month_pillar"] = f"{independent['month_stem']}{independent['month_branch']}"
             raw["year_month_correction"] = disagreement
+
+    term_boundary = _term_boundary_info(year, month, day, hour, minute, utc_offset)
+    if term_boundary is not None:
+        raw["term_boundary"] = term_boundary
 
     return raw
 

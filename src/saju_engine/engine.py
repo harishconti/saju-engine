@@ -287,6 +287,7 @@ def compute_chart(
         utc_offset=utc_offset,
         solar_correction=raw.get("solar_correction"),
         year_month_correction=raw.get("year_month_correction"),
+        term_boundary=raw.get("term_boundary"),
         zi_time_type=raw.get("zi_time_type"),
         convention=raw.get("convention", convention),
         reference_date=f"{ref_year:04d}-{ref_month:02d}-{ref_day:02d}",

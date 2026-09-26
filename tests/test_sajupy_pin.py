@@ -1,10 +1,14 @@
 """N-17 (2026-09-26 audit): the engine reads sajupy's private
 calendar_data.csv directly and works around its internal KST-only term-time
-behaviour (E-1) and imprecision (N-3) — a future sajupy release could change
+behaviour (E-1) — a future sajupy release could change
 the CSV's schema, content, or location, and the compensations here would
 silently stop matching it. `pyproject.toml` now pins `sajupy==0.2.0`; this
 also pins the CSV itself by content hash, so a `pip install --upgrade sajupy`
 that swaps the file is caught immediately instead of silently drifting.
+
+Since N-3 the engine's 절기 instants come from its own packaged ephemeris
+table, but sajupy's CSV still supplies the day pillar and the per-day
+year/month pillars `sewoon.py` uses for annual/monthly luck.
 """
 from __future__ import annotations
 

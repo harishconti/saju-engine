@@ -82,16 +82,18 @@ def test_starting_age_on_solar_term_zero_only_at_or_after_moment():
 
 
 def test_starting_age_at_exact_term_moment_is_zero():
-    # Birth exactly at the 절기 moment (2024-02-04 17:00) → 0 in both directions.
-    assert starting_age(2024, 2, 4, "forward", 17, 0) == 0
-    assert starting_age(2024, 2, 4, "backward", 17, 0) == 0
+    # Birth exactly at the 절기 moment → 0 in both directions. 1990 立春 is
+    # 1990-02-04 02:14:00 UTC = 11:14:00 KST in the packaged ephemeris table
+    # (N-3) — one of the few terms that lands on a whole minute.
+    assert starting_age(1990, 2, 4, "forward", 11, 14) == 0
+    assert starting_age(1990, 2, 4, "backward", 11, 14) == 0
 
 
 def test_starting_age_backward_fractional_day_floors_correctly():
     """Backward elapsed time must be truncated, not rounded toward -inf.
 
     Birth at 2024-02-06 20:00 is 2 days 3 hours after the previous term
-    (입춘 2024-02-04 17:00). The old code did `int(negative // 86400)` and
+    (입춘 2024-02-04 17:27 KST). The old code did `int(negative // 86400)` and
     produced 3 days → age 1; the fix uses `abs(seconds) // 86400` and yields
     2 days → age 0.
     """
