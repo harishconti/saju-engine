@@ -674,12 +674,12 @@ The **union of two charts** has its own element distribution (sum of all 8 stems
 
 For each of the 5 elements, count:
 - Number of visible stems equal to that element
-- Sum of weighted hidden stems (main=1, middle=0.5, residual=0.3) equal to that element
+- Plus each of the 8 branches at weight 1, split among its hidden stems by 월률분야 day shares (`02-branches.md` §월률분야); e.g. 寅 adds 16/30 Wood, 7/30 Fire, 7/30 Earth
 - Total per element
 
 Compare to the **ideal** distribution: each element between 15-25% of total weight.
 
-> **Note on hidden-stem weights (added 2026-09-20, external report review, 3rd pass).** This file's hidden-stem weighting (main=1 / middle=0.5 / residual=0.3, i.e. hidden stems weighted 100%/50%/30% of a visible stem) is **not the same scale** as the natal element-balance convention in `knowledge/03-five-elements.md`'s methodology (implemented in `strength.py::_element_counts`), which weights visible=1.0 / main=0.6 / middle=0.3 / residual=0.1. Both are internally consistent within their own product surface (this file's compatibility/union balance vs. the natal percentage-balance table), but a reader comparing a candidate's natal Element Balance % to a 궁합 union's element balance % is comparing two different scales, not the same measurement twice. Neither convention is sourced to a specific classical citation for its exact fractions; unifying them would be a product decision (which scale becomes canonical) rather than a correctness fix, so this is documented rather than changed.
+> **Note on hidden-stem weights (updated 2026-09-26, N-12).** This file used main=1 / middle=0.5 / residual=0.3, which was not the same scale as the natal element balance and gave branches unequal totals (子 = 1.0 but 寅 = 1.8). The union balance and the natal balance now both use the traditional 월률분야 day shares (`02-branches.md` §월률분야): every branch counts 1.0, the same weight as a visible stem, so natal and 궁합 percentages are the same measurement.
 
 ### Interpretation
 

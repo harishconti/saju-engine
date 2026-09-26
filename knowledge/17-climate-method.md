@@ -99,6 +99,15 @@ Per `knowledge/09-interpretation-method.md` Step 3, **as of 2026-09-19**:
   억부를 우선하는 견해가 많습니다"* (두루미사주) — priority is gated on
   **climate extremeness**, not on the Day Master's strength. See
   `docs/research/2026-09-validation-climate.md` §5.
+- **Chart-level gate (added 2026-09-26, audit finding N-6; option A chosen by the user).** A
+  non-temperate *month* is necessary but not sufficient. The chart itself has to be short of the remedy.
+  적천수 「寒暖」 says 「天道有寒暖 … 人道得之 不可過也」: cold and warmth must not be *excessive*.
+  임철초's commentary warns against judging cold and warm by position alone; the chart has to be
+  examined. So **when the month's remedy element is already the chart's most abundant element**
+  (weighted count, `02-branches.md` §월률분야), the chart is not climate-extreme in that direction.
+  조후 does not take the headline: 억부 does, and the reading is marked for the reader to confirm.
+  This is an ordinal test. No source gives a numeric threshold for "too cold/hot", so none is set
+  (Ground Rule 1). Research: `docs/research/2026-09-26-climate-gate-n6.md`.
 - **Temperate month:** 억부 stays authoritative for the headline 용신, since
   조후 has no opinion to offer in a mild season.
 - **Reader override:** always wins outright over both methods, unchanged.

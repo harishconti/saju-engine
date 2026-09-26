@@ -211,12 +211,12 @@
    "longitude": 79.42,
    "utc_offset": 5.5
   },
-  "source": "Published client verdict: candidates_horoscope/reports/sruthi/sruthi-report.md:48-50 — Balanced; Favorable Element Earth 'confirmed by the reader'; Supporting Fire. DOCUMENTED DIVERGENCE: the engine without an override reads Fire climate-balanced (cold 子 month; knowledge/17 merge rule), while the published pick was argued by the reader under the pre-climate-method convention (least-represented-element reading). expected.element carries the PUBLISHED value so the divergence renders as INTERPRETATION with full detail; expected.method and expected.strength pin the engine's own behavior so a regression on those still shows in the detail. The companion entry sruthi-reader-override proves the reader's pick is exactly reproducible through the override channel. (external cross-check 2026-09-13: OpenFate — '조후와 부억에는 명식을 떠난 고정 순서가 없습니다' (per-chart divergence on borderline balanced charts is the documented school split; reader-argued Earth vs engine climate-balanced Fire — see docs/research/2026-09-validation-yongsin.md §3) — https://wiki.openfate.ai/ko/bazi/useful-gods-climate/climate-vs-strength-priority)",
+  "source": "[2026-09-26, N-12: expected.strength re-pinned to the current engine (weak, score -2.2) after branch qi moved to 월률분야 day shares (knowledge/02-branches.md §월률분야). Only the engine-pinned strength changed; the published/reader 용신 comparison is unchanged.] Published client verdict: candidates_horoscope/reports/sruthi/sruthi-report.md:48-50 — Balanced; Favorable Element Earth 'confirmed by the reader'; Supporting Fire. DOCUMENTED DIVERGENCE: the engine without an override reads Fire climate-balanced (cold 子 month; knowledge/17 merge rule), while the published pick was argued by the reader under the pre-climate-method convention (least-represented-element reading). expected.element carries the PUBLISHED value so the divergence renders as INTERPRETATION with full detail; expected.method and expected.strength pin the engine's own behavior so a regression on those still shows in the detail. The companion entry sruthi-reader-override proves the reader's pick is exactly reproducible through the override channel. (external cross-check 2026-09-13: OpenFate — '조후와 부억에는 명식을 떠난 고정 순서가 없습니다' (per-chart divergence on borderline balanced charts is the documented school split; reader-argued Earth vs engine climate-balanced Fire — see docs/research/2026-09-validation-yongsin.md §3) — https://wiki.openfate.ai/ko/bazi/useful-gods-climate/climate-vs-strength-priority)",
   "status": "documented_interpretation",
   "expected": {
    "strength": {
-    "verdict": "balanced",
-    "candidate": "Metal"
+    "verdict": "weak",
+    "candidate": "Wood"
    },
    "fe": {
     "element": "Earth",

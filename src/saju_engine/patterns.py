@@ -656,7 +656,7 @@ def detect_patterns(
                 f"(knowledge/07 §B.4); {candidate.basis}"
             )
 
-    element_counts = _element_counts(stems, hidden_stems)
+    element_counts = _element_counts(stems, hidden_stems, branches)
     dominant_element = element_counts.most_common(1)[0][0] if element_counts else None
 
     stem_combos = detect_stem_combinations(

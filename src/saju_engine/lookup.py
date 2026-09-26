@@ -198,6 +198,44 @@ HIDDEN_STEMS: Dict[str, Dict[str, str]] = {
 }
 
 
+# ── 월률분야 (月律分野): day shares of each branch's 30-day month ──────────
+# N-12 (2026-09-26 audit; user decision: the traditional method). Element
+# weights used to come from fixed role weights (main 0.6 / middle 0.3 /
+# residual 0.1) over the HIDDEN_STEMS table above, so a branch's total qi
+# depended on how many stems it lists: 子卯酉 = 0.6, 午亥 = 0.9, the rest
+# 1.0 — the purest 왕지 underweighted by up to 40%. 월률분야 assigns each
+# stem its share of the branch's 30 days (초기 → 중기 → 정기), so every branch
+# totals exactly 30 days = 1.0. Table per knowledge/02-branches.md
+# §월률분야 (source: 연해자평 / 삼명통회 lineage, as tabulated at
+# https://www.sajustudy.com/133). It includes the 초기 stems of the 왕지 and
+# of 午/亥 (子 壬, 卯 甲, 酉 庚, 午 丙, 亥 戊) that the simplified HIDDEN_STEMS
+# table omits; those count toward element weight only, not toward 투출 or
+# the hidden-stem ten-god lists, which keep using HIDDEN_STEMS.
+WOLRYUL_BUNYA: Dict[str, List[Tuple[str, int]]] = {
+    "子": [("壬", 10), ("癸", 20)],
+    "丑": [("癸", 9), ("辛", 3), ("己", 18)],
+    "寅": [("戊", 7), ("丙", 7), ("甲", 16)],
+    "卯": [("甲", 10), ("乙", 20)],
+    "辰": [("乙", 9), ("癸", 3), ("戊", 18)],
+    "巳": [("戊", 7), ("庚", 7), ("丙", 16)],
+    "午": [("丙", 10), ("己", 9), ("丁", 11)],
+    "未": [("丁", 9), ("乙", 3), ("己", 18)],
+    "申": [("戊", 7), ("壬", 7), ("庚", 16)],
+    "酉": [("庚", 10), ("辛", 20)],
+    "戌": [("辛", 9), ("丁", 3), ("戊", 18)],
+    "亥": [("戊", 7), ("甲", 7), ("壬", 16)],
+}
+
+
+def branch_qi_elements(branch: str) -> Dict[str, float]:
+    """Element weights of `branch`'s qi from its 월률분야 day shares (sums to 1.0)."""
+    out: Dict[str, float] = {}
+    for stem, days in WOLRYUL_BUNYA[branch]:
+        el = STEM_INFO[stem]["element"]
+        out[el] = out.get(el, 0.0) + days / 30.0
+    return out
+
+
 # ── Five-elements generating and overcoming cycles ──────────────────────────
 # From knowledge/03-five-elements.md
 GENERATES: Dict[str, str] = {

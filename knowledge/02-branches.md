@@ -48,6 +48,29 @@ Each branch contains **one to three** hidden stems, classified by their prominen
 >
 > **Corrected 2026-09-25 (external report review, E-2).** The four storage/tomb branches (辰戌丑未, 四庫) previously had 중기 and 여기 swapped — e.g. 丑 listed 癸 as 중기 and 辛 as 여기, when the standard classical table (by day-count through the branch's month, with 여기 carried over from the preceding season's element) has 辛 as 중기 and 癸 as 여기. This was not cosmetic: `strength.py` weights 중기 (0.3) and 여기 (0.1) differently, so the swap changed computed element percentages and strength scores for any chart containing one of these four branches. The four "growth" branches (寅申巳亥) and 子午卯酉 were already correct and are unaffected.
 
+### 월률분야 (月律分野) — how much of each branch each hidden stem holds
+
+*(Added 2026-09-26, audit finding N-12; the traditional method, chosen by user decision.)* Each branch rules a 30-day solar month. In the 월률분야 tradition that month is split among the branch's hidden stems: 초기 (初氣, the carry-over from the previous season) first, then 중기, then 정기 (正氣, = 본기). Each stem's share of the 30 days is its share of the branch's qi. **Every branch therefore totals the same 30 days.** This is the rule for **element weight** (element balance, Day Master strength, the 궁합 union balance).
+
+| Branch | 초기 (days) | 중기 (days) | 정기 / 본기 (days) |
+|---|---|---|---|
+| 子 | 壬 10 | — | 癸 20 |
+| 丑 | 癸 9 | 辛 3 | 己 18 |
+| 寅 | 戊 7 | 丙 7 | 甲 16 |
+| 卯 | 甲 10 | — | 乙 20 |
+| 辰 | 乙 9 | 癸 3 | 戊 18 |
+| 巳 | 戊 7 | 庚 7 | 丙 16 |
+| 午 | 丙 10 | 己 9 | 丁 11 |
+| 未 | 丁 9 | 乙 3 | 己 18 |
+| 申 | 戊 7 | 壬 7 | 庚 16 |
+| 酉 | 庚 10 | — | 辛 20 |
+| 戌 | 辛 9 | 丁 3 | 戊 18 |
+| 亥 | 戊 7 | 甲 7 | 壬 16 |
+
+- **Source:** the 연해자평 (淵海子平) / 삼명통회 (三命通會) lineage, as tabulated at <https://www.sajustudy.com/133>. That page notes that schools vary in detail: some treat the 왕지 as holding one stem, and some split 午 into only 초기 and 정기. Where they vary, this table is the common Korean version.
+- **Relation to the table above:** the 초기 stems of 子 (壬), 卯 (甲), 酉 (庚), 午 (丙) and 亥 (戊) are not in the simplified 지장간 table above. They count toward **element weight only**. 투출 (grid selection) and the hidden-stem ten-god lists keep using the table above.
+- **Why it matters:** the earlier fixed role weights (본기 0.6 / 중기 0.3 / 여기 0.1) gave 子卯酉 a total of 0.6, 午亥 0.9 and the rest 1.0. That underweighted the purest single-element branches by up to 40%. Under 월률분야, 子 is 1.0 Water and 寅 is 16/30 Wood, 7/30 Fire and 7/30 Earth.
+
 ## Branch Six Combinations (육합, 六合)
 
 Six pairs of branches combine. The two branches act as a **single unit** for many readings, including: marriage, partnerships, hidden agreements, locked energy.

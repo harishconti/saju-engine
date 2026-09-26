@@ -19,8 +19,10 @@
   절기 table `src/saju_engine/data/solar_terms.csv`, replacing sajupy's CSV for term instants), N-5
   (월령 by element relation, `strength.month_relation()`), N-9 (month-branch 양인격/건록격 + distinct
   non-month patterns), N-13 (`--timezone`, `saju_engine.timezones`), N-15 (절기 knife-edge note),
-  N-18, N-19. Still open: N-6 (research done, awaiting choice), N-12 (decision needed), N-21 (not in
-  repo). Suite **1132 passed / 9 xfailed**; validation `204 (PASS 200, INTERPRETATION 4, FAIL 0)`.
+  N-18, N-19, and by user decision N-6 (조후 override skipped when the remedy is already the chart's
+  most abundant element → 억부 + requires_reader) and N-12 (branch qi by traditional 월률분야 day shares,
+  natal and 궁합 alike — `lookup.WOLRYUL_BUNYA`). Only N-21 (not in repo) remains. Suite **1139 passed /
+  9 xfailed**; validation `205 (PASS 201, INTERPRETATION 4, FAIL 0)`. Client reports need regen.
   The paragraph below is the earlier state.
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"
   below and `docs/audits/2026-09-26-deep-engine-audit-verification.md` for the live tracker of the

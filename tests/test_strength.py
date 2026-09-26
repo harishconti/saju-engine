@@ -185,3 +185,41 @@ def test_balanced_tie_is_surfaced_not_silently_wood():
     assert sa["balanced_tie"] and len(sa["balanced_tie"]) > 1
     assert sa["candidate_favorable"] in sa["balanced_tie"]
     assert sa["candidate_favorable"] != "Wood"
+
+
+# ── N-12 (2026-09-26 audit): 월률분야 branch weights ────────────────────────
+
+
+def test_every_branch_totals_one_unit_of_qi():
+    from saju_engine import lookup as L
+
+    for b in "子丑寅卯辰巳午未申酉戌亥":
+        assert sum(days for _, days in L.WOLRYUL_BUNYA[b]) == 30, b
+        assert abs(sum(L.branch_qi_elements(b).values()) - 1.0) < 1e-9, b
+
+
+def test_pure_peak_branch_no_longer_underweighted():
+    # 子 used to contribute 0.6 Water (main 癸 only); 寅 contributed 1.0.
+    from saju_engine.strength import _element_counts
+
+    zi = _element_counts([], [("main", "癸")], ["子"])
+    yin = _element_counts([], [("main", "甲"), ("middle", "丙"), ("residual", "戊")], ["寅"])
+    assert zi["Water"] == 1.0
+    assert abs(sum(yin.values()) - 1.0) < 1e-9
+    assert abs(yin["Wood"] - 16 / 30) < 1e-9
+
+
+def test_wu_and_hai_include_their_chugi_stems():
+    from saju_engine import lookup as L
+
+    assert abs(L.branch_qi_elements("午")["Fire"] - 21 / 30) < 1e-9   # 丙10 + 丁11
+    assert abs(L.branch_qi_elements("亥")["Earth"] - 7 / 30) < 1e-9   # 戊 초기
+
+
+def test_engine_element_counts_use_wolryul_bunya():
+    from saju_engine import compute_chart
+
+    c = compute_chart(name="n12", gender="M", year=1992, month=6, day=4, hour=3,
+                      minute=10, longitude=79.42, utc_offset=5.5)
+    counts = c.strength_assessment["element_counts"]
+    assert abs(sum(counts.values()) - 8.0) < 1e-9  # 4 stems + 4 branches at 1.0 each

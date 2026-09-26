@@ -131,6 +131,10 @@ class FavorableElement:
     hansin: Optional[str] = None        # 한신 (閑神)
     unfavorable_method: str = ""        # "dm-relative" | "derived-from-yongsin"
     requires_reader: bool = False       # True for the balanced folk heuristic
+    # N-6 (2026-09-26 audit): set when the month's 조후 remedy was NOT
+    # applied because the chart already holds that element in the greatest
+    # amount — the chart is not extreme in that direction.
+    climate_gate: Optional[str] = None  # None | "remedy-already-dominant"
 
 
 def _derive_from_yongsin(fav: str):
@@ -188,7 +192,7 @@ def _with_unfavorable(fe: "FavorableElement", sa: dict) -> "FavorableElement":
         gusin=gusin if gusin not in (fe.element, fe.supporting) else None,
         hansin=hansin if hansin not in (fe.element, fe.supporting) else None,
         unfavorable_method=method,
-        requires_reader=fe.method == "balanced-heuristic",
+        requires_reader=fe.method == "balanced-heuristic" or fe.requires_reader,
     )
 
 
@@ -240,6 +244,38 @@ def favorable_element(chart, override: Optional[str] = None) -> FavorableElement
     climate_element = climate["climate_favorable"]
     climate_agrees = (climate_element == raw_favorable) if climate_element else None
     season_label = _SEASON_LABEL.get(climate["band"])
+
+    # N-6 (2026-09-26 audit; option A chosen by the user — research in
+    # docs/research/2026-09-26-climate-gate-n6.md). The month band alone does
+    # not make a chart climate-extreme: 적천수 「寒暖」 says cold and warmth
+    # must not be *excessive* (不可過也), and 임철초's commentary warns
+    # against judging them by position alone. When the prescribed remedy is
+    # already the chart's most abundant element, the chart is not short of
+    # it, so 조후 does not take the headline: fall back to 억부 and flag the
+    # chart for the reader. This is an ordinal test — no source gives a
+    # numeric threshold, so none is invented (Ground Rule 1).
+    counts = sa.get("element_counts") or {}
+    remedy_dominant = bool(
+        climate_element and counts
+        and counts.get(climate_element, 0.0) >= max(counts.values()) - 1e-9
+    )
+    if climate_element and remedy_dominant:
+        element = raw_favorable
+        supporting = raw_supporting
+        method = _METHOD_BY_VERDICT.get(verdict, "balanced-heuristic")
+        note = (
+            _NOTE_BY_METHOD[method]
+            + f" Born in {season_label} conditions, whose classical 조후 remedy is {climate_element} — but "
+            f"{climate_element} is already this chart's most abundant element, so the chart is not "
+            "climate-extreme in that direction and the climate override is not applied. A reader "
+            "should confirm this 용신."
+        )
+        return _with_unfavorable(FavorableElement(
+            element=element, method=method, confidence="heuristic", note=note,
+            supporting=supporting, climate_band=climate["band"],
+            climate_element=climate_element, climate_agrees=climate_agrees,
+            requires_reader=True, climate_gate="remedy-already-dominant",
+        ), sa)
 
     if climate_element:
         # 조후 governs the headline whenever the climate band is non-temperate

@@ -32,13 +32,13 @@ NOT STARTED = not yet investigated or fixed this pass.
 | N-3 | P1 | **FIXED** | `b5b4e5d` | sajupy's 절기 table is imprecise by up to 114 min; needs an ephemeris-sourced replacement table shipped as package data. |
 | N-4 | P1 | **FIXED** | `abfc6c1` | Current 대운 selected 1.3–2.4 years early (세수 vs. floored-elapsed-year convention mismatch). |
 | N-5 | P1 | **FIXED** (decision implemented) | `5fc7d40` | Yin Day Master strength inversion. 월령 input is now the month branch's element relation (knowledge/09 Step 2), applied to all stems; knowledge/06/09 updated first. |
-| N-6 | P1 | NEEDS DECISION → **research done, awaiting choice** (`docs/research/2026-09-26-climate-gate-n6.md`) | — | 조후 overrides 용신 from month branch alone, not chart-level extremeness. User asked for more research before deciding a threshold. |
+| N-6 | P1 | **FIXED** (option A, user decision) | see fix log | 조후 overrides 용신 from month branch alone, not chart-level extremeness. User asked for more research before deciding a threshold. |
 | N-7 | P1 | **FIXED** | `23f92d2` | Web compat path forwarded a chart's raw pre-climate 억부 pick as a "reader-confirmed" override. |
 | N-8 | P1 | **FIXED** | `23f92d2` | HTML/Playwright backend rendered markdown with `html: True` — a client name containing `<script>`/`<iframe>` reached Chromium unescaped. |
 | N-9 | P2 | **FIXED** | `10c3706`, `60d0f79` | 문창귀인 갑→해 typo fixed (→사); 천덕귀인 doc/table contradiction fixed (engine already fixed prior session, F-2). 양인격/건록격: month branch = classical grid, year/day/hour = distinct non-month pattern (decision implemented). |
 | N-10 | P2 | **FIXED** | `d95c10b` | Compat cover's "top 3 red flags" were picked alphabetically, not by severity. |
 | N-11 | P2 | **FIXED** | `6a106a2` | "This year" prose stated the Gregorian year instead of the 사주 year (사주 year is prior year before 입춀). |
-| N-12 | P2 | NEEDS DECISION | — | Hidden-stem qi weights give unequal branch totals (왕지 underweighted by 10–40%). |
+| N-12 | P2 | **FIXED** (월률분야, user decision) | see fix log | Hidden-stem qi weights give unequal branch totals (왕지 underweighted by 10–40%). |
 | N-13 | P2 | **FIXED** | `14d3b9b` | No DST/historical-offset handling; intake default offset still 5.5 in one path per the audit (superseded by F-10 for the two HTML forms — verify `client_intake_form.html`/CLI still need it). |
 | N-14 | P2 | **FIXED** | `b63fbfd` | Web app overwrote curated client deliverables, blocked the event loop, and echoed raw exception text to clients. |
 | N-15 | P2 | **FIXED** | `8693ca3`, `b5b4e5d` | 子-hour boundary disclosed (compound-edge flag); 절기-proximity (±30 min) disclosure with both-side pillars added. |
@@ -50,7 +50,7 @@ NOT STARTED = not yet investigated or fixed this pass.
 | N-21 | P3 | NOT ACTIONABLE HERE | — | `apps/landing-page`'s `src/`/`src/proxy.ts` is not in this repo at all — nothing to fix from inside `saju-engine`. |
 | N-22 | P3 | **FIXED** | `33fef13` | Test suite overwrote the tracked client PDF `sruthi-report.pdf` (and two Playwright tests with the same pattern) on every run. |
 
-**Tally (updated 2026-09-26, second session):** 19 FIXED, 2 NEEDS DECISION (N-6 research done; N-12 not yet decided), 1 not actionable in this repo.
+**Tally (updated 2026-09-26, second session):** 21 FIXED, 1 not actionable in this repo (N-21).
 
 ---
 
@@ -130,6 +130,23 @@ NOT STARTED = not yet investigated or fixed this pass.
 - **`14d3b9b` — N-13.** `saju_engine.timezones.resolve_utc_offset()` (IANA, DST, historical Korean
   offsets, ambiguous/skipped-hour notes); CLI `--timezone`; web app has no 5.5 default and 400s on an
   unknown zone; forms take .25 offsets; the JSON intake form now collects timezone/offset.
+
+- **N-6 + N-12 (user decisions: "follow the suggestion and the traditional method").**
+  **N-12:** branch qi now follows the traditional 월률분야 (月律分野) day shares: every branch = 30 days
+  = 1.0, split 초기/중기/정기 (`lookup.WOLRYUL_BUNYA`, `lookup.branch_qi_elements`; table and source in
+  knowledge/02 §월률분야). This is used by the natal element balance / strength (`strength._element_counts`
+  when given branches) and by the 궁합 union balance (`compat._element_strength`). Natal and 궁합 are
+  now on one scale, which resolves knowledge/11 §F's documented mismatch. The 초기 stems missing from
+  the simplified 지장간 table (子壬 卯甲 酉庚 午丙 亥戊) count for weight only, not for 투출 or ten-gods.
+  **N-6 (option A):** when the month's 조후 remedy is already the chart's most abundant element,
+  `favorable_element()` falls back to 억부 with `requires_reader=True` and
+  `climate_gate="remedy-already-dominant"` (knowledge/17 and knowledge/09 Step 3 updated first).
+  Re-baseline: three synthetic climate fixtures re-probed; dry-balanced-synth-v2 became the N-6 gate
+  lock; new cold-balanced-synth fills the cold×balanced cell sruthi-published left; compat fixtures
+  harish-manvitha (combined_elements 9→4), -override-b-earth (11→6), -combined-elements, mahesh-vp
+  (62/Mixed → 65/Strong) and pawan-sruthi-stale (50→47) re-pinned, with notes saying the published
+  reports predate N-12. Client natal impact: only Sruthi's engine strength moves (balanced → weak); her
+  reader-confirmed Earth 용신 is unchanged. No client chart hits the N-6 gate.
 
 ---
 
@@ -216,11 +233,6 @@ pattern-dependent validation fixtures.)
 
 ## Still open
 
-- **N-6** — research done (`docs/research/2026-09-26-climate-gate-n6.md`); needs the user to pick an
-  option (recommended: A, the ordinal "remedy already dominant → fall back to 억부" rule).
-- **N-12** (hidden-stem qi weights) — needs a decision between normalising each branch's total qi to
-  1.0 and 월률분야 day-share weights. It touches element-balance percentages, strength, `dominant_element`,
-  종격 thresholds and compat, so it needs a fixture re-baseline like N-5.
 - **N-21** — not fixable from inside this repo; `apps/landing-page`'s own source tree (and
   `DEPLOY.md`'s described `src/proxy.ts`) is simply not present here to audit or fix.
 
@@ -229,8 +241,10 @@ pattern-dependent validation fixtures.)
 Per the audit's own note: N-4 (already fixed) can change an existing report's "Current Major Luck"
 headline. N-5 is now implemented: across the eight client charts in `tools/regen/`, only **Mahesh's**
 strength verdict changes (balanced → strong; 丑 is a resource month for 庚), and no headline 용신
-changes. N-3/N-9 change no client pillars or reported grid names. N-6 and N-12 would change
-deliverables once implemented.
+changes. N-3/N-9 change no client pillars or reported grid names. N-12 changes every report's
+Element Balance percentages, Sruthi's engine strength (balanced → weak; reader 용신 unchanged), and
+the compat scores Mahesh×VP (62 → 65, Mixed → Strong) and Pawan×Sruthi (50 → 47). No client hits
+the N-6 gate.
 No candidate reports have been regenerated as part of this tracker — `tools/regen_client_reports.sh`
 should be run and the Quick Reference blocks diffed before re-sending anything, once the doctrinal
 items above are actually implemented.

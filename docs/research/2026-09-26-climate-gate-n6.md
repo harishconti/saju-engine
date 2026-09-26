@@ -1,6 +1,6 @@
 # N-6 research: when should 조후 (climate) override 억부?
 
-**Status:** research done 2026-09-26; **needs a user decision** before any code change (Ground Rule 1).
+**Status:** research done 2026-09-26; **option A chosen by the user and implemented** (`yongsin.favorable_element`, `climate_gate="remedy-already-dominant"`).
 **Finding:** `docs/audits/2026-09-26-deep-engine-audit.md` §N-6. **Tracker:** `docs/audits/2026-09-26-deep-engine-audit-verification.md`.
 
 ## The question

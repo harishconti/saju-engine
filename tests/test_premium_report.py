@@ -716,23 +716,25 @@ def test_pattern_candidate_label_is_human_readable():
 
 
 def test_balanced_chart_growth_area_has_no_doubled_phrase():
-    # 1993-09-30 04:00 (Korea) assesses as a balanced chart.
+    # 1993-09-30 02:00 (Korea) assesses as a balanced chart (moved from 04:00
+    # on 2026-09-26: N-12's 월률분야 branch weights made 04:00 read weak).
     #
     # Updated 2026-09-25 (external report review, E-3): every chart now has
     # a real, named unfavorable element (this one resolves to Water) — see
     # _ReportContext.__init__'s E-3 fix — so growth_areas' generic "the
     # chart's challenging element" fallback (prose_fillers.py, for when no
     # 기신 could be named) is unreachable code for every chart, not just
-    # this one, and the report correctly names the element instead.
+    # this one, and the report correctly names the element instead (Metal
+    # for the 02:00 chart; the 04:00 chart named Water).
     chart = compute_chart(
-        year=1993, month=9, day=30, hour=4, minute=0,
+        year=1993, month=9, day=30, hour=2, minute=0,
         gender="M", longitude=127.0, utc_offset=9.0,
         convention="korean",
     )
     assert (chart.strength_assessment or {}).get("verdict") == "balanced"
     report = generate_premium_report(chart, tier="deep")
     assert "challenging element element" not in report
-    assert "Working with the unfavorable Water element" in report
+    assert "Working with the unfavorable Metal element" in report
 
 
 # ── Method-transparency disclosures (external-review feedback, 2026-09-07) ──
@@ -859,7 +861,8 @@ def test_element_balance_has_methodology_footnote():
     report = generate_premium_report(chart, tier="deep")
     assert "counts the 4 visible stems" in report
     assert "8 visible stems and branches" not in report
-    assert "main qi 0.6, middle 0.3, residual 0.1" in report
+    # N-12 (2026-09-26): branch qi is split by 월률분야 day shares.
+    assert "월률분야" in report and "each of the 4 branches at weight 1.0" in report
 
 
 def test_decade_and_annual_favorable_lean_agree_on_shared_element():

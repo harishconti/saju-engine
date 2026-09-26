@@ -519,7 +519,7 @@
     "nayin": -3,
     "yongshin": 5,
     "ilju_pair": 3,
-    "combined_elements": 9,
+    "combined_elements": 4,
     "tengod_cross": 10,
     "daeun_sync": 1,
     "compat_stars": 0,
@@ -527,7 +527,7 @@
     "year_branch": 2
    }
   },
-  "notes": "The B2 anchor: all 11 sub-systems byte-identical to a published external report, full/full chart sources, no override. The scored subset sums to 20, and 50 + 20 = 70 on the affine 0-100 composite. 2026-09-19: score moved 70->68 after the 조후-vs-억부 gate broadened to band-extremeness (docs/research/2026-09-validation-climate.md §5) — Manvitha's 희신 changed from the strong-DM convention (Earth) to the climate-resolved one (Wood); her headline 용신 (Fire) is unchanged. Only ilju_pair moved (5->3); band stays Strong. This is a real, user-approved engine-behavior change; the published harish_manvitha compat report/PDF needs regeneration to match — tracked separately. Re-verified 2026-09-19. | 2026-09-26 (E-3/E-5 single resolution): compat 용신/십신 scoring now reads the resolved 기신 from yongsin.favorable_element (derived from the resolved 용신 for balanced/climate/reader charts) instead of strength.py's raw candidate_unfavorable, which was None for balanced charts. Re-pinned to the new engine output; the published compat reports are regenerated in the same change set.",
+  "notes": "[2026-09-26, N-12: expected re-pinned to the current engine after the element balance moved from fixed hidden-stem role weights to 월률분야 day shares (knowledge/02-branches.md §월률분야; knowledge/11-gunghap.md §F): subsystems.combined_elements 9→4. The published report cited in `source` predates N-12 and must be regenerated.] The B2 anchor: all 11 sub-systems byte-identical to a published external report, full/full chart sources, no override. The scored subset sums to 20, and 50 + 20 = 70 on the affine 0-100 composite. 2026-09-19: score moved 70->68 after the 조후-vs-억부 gate broadened to band-extremeness (docs/research/2026-09-validation-climate.md §5) — Manvitha's 희신 changed from the strong-DM convention (Earth) to the climate-resolved one (Wood); her headline 용신 (Fire) is unchanged. Only ilju_pair moved (5->3); band stays Strong. This is a real, user-approved engine-behavior change; the published harish_manvitha compat report/PDF needs regeneration to match — tracked separately. Re-verified 2026-09-19. | 2026-09-26 (E-3/E-5 single resolution): compat 용신/십신 scoring now reads the resolved 기신 from yongsin.favorable_element (derived from the resolved 용신 for balanced/climate/reader charts) instead of strength.py's raw candidate_unfavorable, which was None for balanced charts. Re-pinned to the new engine output; the published compat reports are regenerated in the same change set.",
   "status": "expect_match"
  },
  {
@@ -610,10 +610,10 @@
    }
   },
   "expected": {
-   "score": 50,
+   "score": 47,
    "band": "Mixed"
   },
-  "notes": "RESOLVED 2026-09-26: the published pair was regenerated after the 2026-09-25 engine audit fixes, so it is no longer stale. Inputs now match the natal reports (Sruthi 79.45°E, not 79.32; reader-argued 용신 Water for Pawan and Earth for Sruthi). History: the pre-regeneration report printed Pawan's hour as 戊子 (pre-야자시 fix) and scored 55; the engine measured 60 without overrides; the E-3/E-5 single 기신 resolution then added 기신 penalties (일주 −2, 십신 교차 −2). The id keeps its '-stale' suffix only for traceability.",
+  "notes": "[2026-09-26, N-12: expected re-pinned to the current engine after the element balance moved from fixed hidden-stem role weights to 월률분야 day shares (knowledge/02-branches.md §월률분야; knowledge/11-gunghap.md §F): score 50→47. The published report cited in `source` predates N-12 and must be regenerated.] RESOLVED 2026-09-26: the published pair was regenerated after the 2026-09-25 engine audit fixes, so it is no longer stale. Inputs now match the natal reports (Sruthi 79.45°E, not 79.32; reader-argued 용신 Water for Pawan and Earth for Sruthi). History: the pre-regeneration report printed Pawan's hour as 戊子 (pre-야자시 fix) and scored 55; the engine measured 60 without overrides; the E-3/E-5 single 기신 resolution then added 기신 penalties (일주 −2, 십신 교차 −2). The id keeps its '-stale' suffix only for traceability.",
   "status": "expect_match"
  },
  {
@@ -707,13 +707,13 @@
    }
   },
   "expected": {
-   "score": 62,
-   "band": "Mixed",
+   "score": 65,
+   "band": "Strong",
    "subsystems": {
     "daystem_combo": 0,
     "daybranch": 6,
     "nayin": 3,
-    "yongshin": 5,
+    "yongshin": 8,
     "ilju_pair": 0,
     "combined_elements": 4,
     "tengod_cross": -10,
@@ -723,7 +723,7 @@
     "year_branch": 0
    }
   },
-  "notes": "Carries _MA_VP_SCORES verbatim into the fixture corpus, so the anchor table the C9 locks depend on is itself pinned against the engine. No published report covers this pair; the source is the in-repo anchor plus the knowledge file's weight table. Re-pinned 2026-09-14 for the 육합 arity repair (item 3): the day-branch sub-system now scores 6 instead of 2 (the 子丑 spouse palaces take the +20 primary 육합 path), lifting the composite 64 -> 68 and the band Mixed -> Strong. It is the ONLY fixture the arity fix moves -- the two published anchors (harish-manvitha 70/Strong and its override-b-earth 74/Strong) are unchanged, because neither couple's day branches form a 六合 pair. | 2026-09-26 (E-3/E-5 single resolution): compat 용신/십신 scoring now reads the resolved 기신 from yongsin.favorable_element (derived from the resolved 용신 for balanced/climate/reader charts) instead of strength.py's raw candidate_unfavorable, which was None for balanced charts. Re-pinned to the new engine output; the published compat reports are regenerated in the same change set.",
+  "notes": "[2026-09-26, N-12: expected re-pinned to the current engine after the element balance moved from fixed hidden-stem role weights to 월률분야 day shares (knowledge/02-branches.md §월률분야; knowledge/11-gunghap.md §F): score 62→65, band Mixed→Strong, subsystems.yongshin 5→8. The published report cited in `source` predates N-12 and must be regenerated.] Carries _MA_VP_SCORES verbatim into the fixture corpus, so the anchor table the C9 locks depend on is itself pinned against the engine. No published report covers this pair; the source is the in-repo anchor plus the knowledge file's weight table. Re-pinned 2026-09-14 for the 육합 arity repair (item 3): the day-branch sub-system now scores 6 instead of 2 (the 子丑 spouse palaces take the +20 primary 육합 path), lifting the composite 64 -> 68 and the band Mixed -> Strong. It is the ONLY fixture the arity fix moves -- the two published anchors (harish-manvitha 70/Strong and its override-b-earth 74/Strong) are unchanged, because neither couple's day branches form a 六合 pair. | 2026-09-26 (E-3/E-5 single resolution): compat 용신/십신 scoring now reads the resolved 기신 from yongsin.favorable_element (derived from the resolved 용신 for balanced/climate/reader charts) instead of strength.py's raw candidate_unfavorable, which was None for balanced charts. Re-pinned to the new engine output; the published compat reports are regenerated in the same change set.",
   "status": "expect_match"
  },
  {
@@ -776,7 +776,7 @@
     "nayin": -3,
     "yongshin": 8,
     "ilju_pair": 6,
-    "combined_elements": 11,
+    "combined_elements": 6,
     "tengod_cross": 10,
     "daeun_sync": 1,
     "compat_stars": 0,
@@ -784,7 +784,7 @@
     "year_branch": 2
    }
   },
-  "notes": "A7's override channel, live on the birth path. The override is threaded as reader_override_favorable (deliberately NOT candidate_favorable) so yongsin._reader_confirmed() treats it as an outright reader override the climate merge cannot re-override -- which is why a hand-argued 용신 from the natal reading wins here. Only the b direction changes yongshin/ilju_pair/combined_elements (+9 -> +12, +5 -> +6, +9 -> +11); the other eight sub-systems are invariant. The a direction flips bands (a=Fire -> 64/Mixed), the b direction never does -- all five b elements stay Strong. | 2026-09-26 (E-3/E-5 single resolution): compat 용신/십신 scoring now reads the resolved 기신 from yongsin.favorable_element (derived from the resolved 용신 for balanced/climate/reader charts) instead of strength.py's raw candidate_unfavorable, which was None for balanced charts. Re-pinned to the new engine output; the published compat reports are regenerated in the same change set.",
+  "notes": "[2026-09-26, N-12: expected re-pinned to the current engine after the element balance moved from fixed hidden-stem role weights to 월률분야 day shares (knowledge/02-branches.md §월률분야; knowledge/11-gunghap.md §F): subsystems.combined_elements 11→6. The published report cited in `source` predates N-12 and must be regenerated.] A7's override channel, live on the birth path. The override is threaded as reader_override_favorable (deliberately NOT candidate_favorable) so yongsin._reader_confirmed() treats it as an outright reader override the climate merge cannot re-override -- which is why a hand-argued 용신 from the natal reading wins here. Only the b direction changes yongshin/ilju_pair/combined_elements (+9 -> +12, +5 -> +6, +9 -> +11); the other eight sub-systems are invariant. The a direction flips bands (a=Fire -> 64/Mixed), the b direction never does -- all five b elements stay Strong. | 2026-09-26 (E-3/E-5 single resolution): compat 용신/십신 scoring now reads the resolved 기신 from yongsin.favorable_element (derived from the resolved 용신 for balanced/climate/reader charts) instead of strength.py's raw candidate_unfavorable, which was None for balanced charts. Re-pinned to the new engine output; the published compat reports are regenerated in the same change set.",
   "status": "expect_match"
  },
  {
@@ -923,9 +923,9 @@
    }
   },
   "expected": {
-   "score": 9
+   "score": 4
   },
-  "notes": "charts=\"birth\" — the complementary four of A6's 11 sub-systems. combined_elements is NOT pillars-only reproducible: it reads the combined element balance, not the pair relation. T1 pinned the other seven from a pillars-only pair; these four can only be asserted through the full pipeline, which is why the corpus covers all 11 sub-systems across two chart sources rather than one. See Plan 6 A6/A7.",
+  "notes": "[2026-09-26, N-12: expected re-pinned to the current engine after the element balance moved from fixed hidden-stem role weights to 월률분야 day shares (knowledge/02-branches.md §월률분야; knowledge/11-gunghap.md §F): combined_elements.score 9→4. The published report cited in `source` predates N-12 and must be regenerated.] charts=\"birth\" — the complementary four of A6's 11 sub-systems. combined_elements is NOT pillars-only reproducible: it reads the combined element balance, not the pair relation. T1 pinned the other seven from a pillars-only pair; these four can only be asserted through the full pipeline, which is why the corpus covers all 11 sub-systems across two chart sources rather than one. See Plan 6 A6/A7.",
   "status": "expect_match"
  },
  {

@@ -71,11 +71,15 @@ MANVITHA = _chart(1996, 12, 3, 21, 15, 78.8242, 5.5, "F", "Manvitha")
 # `_resolved_unfavorable` (derived from each partner's resolved 용신) instead
 # of strength.py's raw `candidate_unfavorable`, which was None for balanced
 # charts, so 기신 penalties could never fire for them.
+#
+# 2026-09-26 (N-12): "yongshin" 5 -> 8 — cross-supply reads each partner's
+# element percentages, which now weight every branch at 1.0 by 월률분야 day
+# shares instead of the old main 1 / middle 0.5 / residual 0.3.
 _MA_VP_SCORES = {
     "daystem_combo": 0,
     "daybranch": 6,
     "nayin": 3,
-    "yongshin": 5,
+    "yongshin": 8,
     "ilju_pair": 0,
     "combined_elements": 4,
     "tengod_cross": -10,
@@ -791,9 +795,12 @@ def test_compat_score_is_symmetric():
 # 2026-09-26: 68/Strong -> 62/Mixed in both directions once 기신 penalties
 # could fire for balanced charts (E-3/E-5 single resolution, see
 # _MA_VP_SCORES). Order-independence — the property guarded — still holds.
+#
+# 2026-09-26 (N-12): 62/Mixed -> 65/Strong in both directions (yongshin
+# cross-supply 5 -> 8 under 월률분야 branch weights).
 def test_compat_order_independence_band_flipping_instance():
-    assert compat_score(MAHESH, VP).band == "Mixed"
-    assert compat_score(VP, MAHESH).band == "Mixed"
+    assert compat_score(MAHESH, VP).band == "Strong"
+    assert compat_score(VP, MAHESH).band == "Strong"
     assert compat_score(MAHESH, VP).nayin.score == 3
     assert compat_score(VP, MAHESH).nayin.score == 3
 

@@ -605,10 +605,9 @@ def _section_chart_at_a_glance(ctx: _ReportContext) -> List[str]:
     lines += [
         "",
         "> _Methodology: each element's share counts the 4 visible stems (year/month/day/hour) at weight "
-        "1.0, plus every branch's hidden stems (藏干) at reduced weights (main qi 0.6, middle 0.3, "
-        "residual 0.1) — a branch's own elemental weight is carried entirely through its hidden stems "
-        "(its main-qi hidden stem is usually the branch's nominal element), not counted a second time as "
-        "a separate 1.0 entry, since that would double-count it; the counts are then normalized to 100%._",
+        "1.0, plus each of the 4 branches at weight 1.0, split among its hidden stems (藏干) by the "
+        "classical 월률분야 (月律分野) day shares of the branch's 30-day month (e.g. 寅 = 戊 7 / 丙 7 / "
+        "甲 16 days); the counts are then normalized to 100%._",
     ]
     lines += ["", "### Quick Reference", ""]
     lines += [

@@ -89,6 +89,12 @@ birth** (寅卯申酉, i.e. none of the eight non-temperate branches above — �
 have no opinion, and the 억부 logic below (Steps 1–3) becomes the primary
 signal.
 
+**Exception (2026-09-26, N-6):** the month band is necessary but not sufficient. If the
+month's climate remedy is **already the chart's most abundant element**, the chart is not
+climate-extreme in that direction (적천수 「寒暖」: 「不可過也」, cold and warmth must not be *excessive*).
+Use the 억부 logic below for the headline and mark the 용신 for the reader to confirm.
+See `17-climate-method.md` §How This Combines With 억부.
+
 1. **If 신강 (Day Master is strong) — and the month is temperate:** The chart has too much of the Day Master. The 용신 is one of the elements that **drains or controls** the Day Master:
    - **식상 (Output)** is the most common first choice for 신강 — it channels the Day Master's energy out.
    - **재성 (Wealth)** is the second choice.

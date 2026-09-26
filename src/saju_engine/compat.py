@@ -671,18 +671,17 @@ def compat_nayin(a: Chart, b: Chart) -> CompatSubResult:
 def _element_strength(chart: Chart) -> Dict[str, float]:
     """Return a percent distribution of elements (0–100 each) for `chart`.
 
-    Weights follow knowledge/11-gunghap.md §F: visible stems = 1; hidden stems
-    main=1, middle=0.5, residual=0.3.
+    Weights follow knowledge/11-gunghap.md §F: visible stems = 1; each branch
+    = 1, split by its 월률분야 day shares (N-12, 2026-09-26 audit — the old
+    main 1 / middle 0.5 / residual 0.3 weights gave 子卯酉 1.0 of qi but 寅
+    1.8, the same inequality as the natal balance).
     """
     counts: Dict[str, float] = {"Wood": 0, "Fire": 0, "Earth": 0, "Metal": 0, "Water": 0}
     for s in chart.stems:
         counts[L.STEM_INFO[s]["element"]] += 1.0
     for b in chart.branches:
-        hidden = L.HIDDEN_STEMS.get(b, {})
-        for role, s in hidden.items():
-            weight = {"main": 1.0, "middle": 0.5, "residual": 0.3}.get(role, 0.0)
-            if weight:
-                counts[L.STEM_INFO[s]["element"]] += weight
+        for el, w in L.branch_qi_elements(b).items():
+            counts[el] += w
     total = sum(counts.values()) or 1
     return {e: v / total * 100 for e, v in counts.items()}
 

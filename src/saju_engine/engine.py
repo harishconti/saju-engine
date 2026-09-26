@@ -337,6 +337,7 @@ def compute_chart(
         month_branch=chart.month.branch,
         stems=chart.stems,
         hidden_stems=all_hidden,
+        branches=chart.branches,
     )
 
     # Structural / grid pattern candidates (non-interpretive flags)

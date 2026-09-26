@@ -272,3 +272,35 @@ def test_reader_override_confirming_eokbu_keeps_dm_relative_gisin():
                       longitude=79.42, utc_offset=5.5)
     fe = favorable_element(c, override="Metal")
     assert (fe.unfavorable, fe.unfavorable_method) == ("Earth", "dm-relative")
+
+
+# ── N-6 (2026-09-26 audit, option A): 조후 gated on the chart, not the month ──
+
+
+def test_climate_override_skipped_when_remedy_already_dominant():
+    """A 戌 (dry) month prescribes Water; when Water is already the chart's
+    most abundant element the chart is not dry, so 억부 keeps the headline
+    and the reader is asked to confirm (적천수 「寒暖」 不可過也)."""
+    from saju_engine import compute_chart
+    from saju_engine.yongsin import favorable_element
+
+    c = compute_chart(name="n6", gender="M", year=1970, month=10, day=10, hour=3,
+                      minute=0, longitude=126.98, utc_offset=9.0)
+    counts = c.strength_assessment["element_counts"]
+    assert max(counts, key=counts.get) == "Water"
+    fe = favorable_element(c)
+    assert fe.climate_element == "Water"
+    assert fe.climate_gate == "remedy-already-dominant"
+    assert fe.method != "climate-balanced" and fe.element != "Water"
+    assert fe.requires_reader is True
+    assert "already this chart's most abundant element" in fe.note
+
+
+def test_climate_override_still_applies_when_remedy_is_scarce():
+    from saju_engine import compute_chart
+    from saju_engine.yongsin import favorable_element
+
+    c = compute_chart(name="n6", gender="M", year=1992, month=6, day=4, hour=3,
+                      minute=10, longitude=79.42, utc_offset=5.5)
+    fe = favorable_element(c)
+    assert fe.method == "climate-balanced" and fe.climate_gate is None

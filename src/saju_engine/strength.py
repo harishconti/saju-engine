@@ -14,7 +14,7 @@ Rules sourced from:
 from __future__ import annotations
 
 from collections import Counter
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from . import lookup as L
 
@@ -100,15 +100,24 @@ _STAGE_WEIGHT = {
 def _element_counts(
     stems: List[str],
     hidden_stems: List[Tuple[str, str]],
+    branches: Optional[List[str]] = None,
 ) -> Counter:
-    """Count element occurrences across visible stems and hidden stems.
+    """Count element weight across visible stems (1.0 each) and branches.
 
-    Hidden stems are weighted lower than visible stems because they are
-    submerged qi.
+    With ``branches`` (the engine's path), each branch contributes exactly
+    1.0 of qi split by its 월률분야 day shares (`lookup.branch_qi_elements`;
+    N-12, 2026-09-26 audit). Without it, the legacy role weights over
+    ``hidden_stems`` (main 0.6 / middle 0.3 / residual 0.1) are used — kept
+    only for direct callers that pass hidden stems without their branches.
     """
     counts: Counter = Counter()
     for s in stems:
         counts[L.STEM_INFO[s]["element"]] += 1.0
+    if branches is not None:
+        for b in branches:
+            for el, w in L.branch_qi_elements(b).items():
+                counts[el] += w
+        return counts
     for role, s in hidden_stems:
         weight = {"main": 0.6, "middle": 0.3, "residual": 0.1}.get(role, 0.3)
         counts[L.STEM_INFO[s]["element"]] += weight
@@ -120,8 +129,12 @@ def assess_strength(
     month_branch: str,
     stems: List[str],
     hidden_stems: List[Tuple[str, str]],
+    branches: Optional[List[str]] = None,
 ) -> Dict:
     """Return a heuristic strength assessment for the Day Master.
+
+    Pass ``branches`` (the four natal branches) to weight branch qi by
+    월률분야 day shares (N-12); see `_element_counts`.
 
     The result contains:
       - element_counts: weighted stem counts by element
@@ -136,7 +149,7 @@ def assess_strength(
       - candidate_draining: candidate 한신 element
     """
     dm_element = L.STEM_INFO[day_master]["element"]
-    counts = _element_counts(stems, hidden_stems)
+    counts = _element_counts(stems, hidden_stems, branches)
 
     # Descriptive 12운성 stage of the Day Master itself (knowledge/06).
     month_stage = L.twelve_stage(day_master, month_branch)
@@ -288,12 +301,14 @@ def element_balance_counts(chart) -> Counter:
 
     stems: List[str] = []
     hidden: List[Tuple[str, str]] = []
+    branches: Optional[List[str]] = None
     if hasattr(chart, "stems"):
         stems = chart.stems
     if hasattr(chart, "pillars"):
         for p in chart.pillars:
             hidden.extend(getattr(p, "hidden_stems", []))
-    return _element_counts(stems, hidden)
+        branches = [p.branch for p in chart.pillars]
+    return _element_counts(stems, hidden, branches)
 
 
 def element_balance_pct(chart) -> Dict[str, float]:
