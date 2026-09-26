@@ -187,6 +187,7 @@ _ENGLISH_ALIASES: Dict[str, str] = {
     "비견격": "비견", "겁재격": "겁재", "식신격": "식신", "상관격": "상관",
     "편재격": "편재", "정재격": "정재", "편관격": "편관", "정관격": "정관",
     "편인격": "편인", "정인격": "정인",
+    "양인격": "양인", "건록격": "건록",
     "Companion Grid": "비견", "Direct Officer Grid": "정관", "Eating God Grid": "식신",
     "Direct Wealth Grid": "정재",
 }

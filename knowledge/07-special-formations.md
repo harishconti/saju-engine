@@ -99,7 +99,9 @@ A breaker is considered **effective** only when it is powerful — i.e. rooted i
 
 #### 3. 양인격 (羊刃格, Blade of the Sheep) — Day Master is in its 제왕 branch
 
-A specific 격국 where the Day Master is in its peak branch (제왕 in the 12운성 cycle) and that branch appears in the **year, day, or hour pillar**.
+*(Revised 2026-09-26, audit finding N-9: the month-branch rule was added. The earlier year/day/hour rule is kept under its own label, by user decision. See `docs/audits/2026-09-26-deep-engine-audit-verification.md`.)*
+
+The blade (양인) branch is the Day Master's peak branch (제왕 in the 12운성 cycle):
 
 - 甲 day master in 卯 (제왕) → 양인
 - 丙 day master in 午 → 양인
@@ -107,16 +109,32 @@ A specific 격국 where the Day Master is in its peak branch (제왕 in the 12�
 - 庚 day master in 酉 → 양인
 - 壬 day master in 子 → 양인
 
+Two conventions are recorded here. They are labeled differently and never merged:
+
+| Where the blade branch sits | Label | Convention |
+|---|---|---|
+| **Month branch (월령)** | **양인격** (月刃) | 자평진전 (子平眞詮) defines the grid by 월령. A month-branch 양인 is the grid. It replaces the 겁재격/비견격 name that the Part 1 투출 method would give this month-비겁 structure. |
+| **Year, day, or hour pillar** | **Non-month 양인** (related, not the grid) | This file's earlier rule. It is read as a strong-self overlay of the same "double-edged" kind, weaker than the 월령 grid. A blade in the **day branch** is the **일인 (日刃)** case (丙午, 戊午, 壬子 days). |
+
+> **Source status.** The 자평진전 월령 definition and the 일인 name come from the 2026-09-26 audit. They have not been checked against a primary text in this repo. The two-label treatment is the user's decision for that unverified fork (Ground Rule 2): the classical grid name is kept for the 월령 case only.
+
 양인격 is read as a **double-edged sword**: the querent has great personal power, decisiveness, and capacity, but also the tendency to act recklessly, be isolated, or attract conflict.
 
 #### 4. 건록격 (建祿格) — Day Master is in its 건록 branch
 
-A sub-pattern where the Day Master is in its 건록 (earning / strong) branch:
+The 건록 (earning / strong) branch of the Day Master:
 - 甲 in 寅 (건록)
 - 丙 in 巳
 - 戊 in 巳
 - 庚 in 申
 - 壬 in 亥
+
+The same two-label split applies:
+
+| Where the 건록 branch sits | Label | Convention |
+|---|---|---|
+| **Month branch (월령)** | **건록격** | 자평진전: 月令 건록. It replaces the 비견격 name that the Part 1 투출 method would give. |
+| **Year, day, or hour pillar** | **Non-month 건록** (related, not the grid) | Self-reliance support. In the **hour branch** it is the **귀록 (歸祿)** case. |
 
 건록격 is favorable — the querent has natural self-sufficiency and earning capacity. Often a person with steady income and quiet confidence.
 

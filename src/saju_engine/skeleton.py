@@ -101,13 +101,20 @@ def _patterns_str(chart: Chart) -> str:
     if p.get("yangin", {}).get("present"):
         parts.append(f"**양인 (Blade Star)**: {p['yangin']['blade_branch']} at positions {p['yangin']['positions']} — {p['yangin']['note']}")
     if p.get("yangin_grid", {}).get("present"):
+        parts.append(f"**양인격 (Blade Grid)**: {p['yangin_grid']['blade_branch']} month branch — {p['yangin_grid']['note']}")
+    if p.get("yangin_non_month", {}).get("present"):
         parts.append(
-            f"**양인격 (Blade Grid)**: {p['yangin_grid']['blade_branch']} at positions "
-            f"{p['yangin_grid']['positions']} — {p['yangin_grid']['note']}"
+            f"**Non-month 양인 (Blade outside the month)**: {p['yangin_non_month']['blade_branch']} at positions "
+            f"{p['yangin_non_month']['positions']} — {p['yangin_non_month']['note']}"
         )
 
     if p.get("jianlu", {}).get("present"):
-        parts.append(f"**건禄格 (Jianlu)**: {p['jianlu']['jianlu_branch']} at positions {p['jianlu']['positions']} — {p['jianlu']['note']}")
+        parts.append(f"**건록격 (Established Salary Grid)**: {p['jianlu']['jianlu_branch']} month branch — {p['jianlu']['note']}")
+    if p.get("jianlu_non_month", {}).get("present"):
+        parts.append(
+            f"**Non-month 건록 (Salary branch outside the month)**: {p['jianlu_non_month']['jianlu_branch']} at positions "
+            f"{p['jianlu_non_month']['positions']} — {p['jianlu_non_month']['note']}"
+        )
 
     combos = p.get("stem_combinations", [])
     if combos:

@@ -66,13 +66,17 @@ def test_yangin_detection():
     # Star-level 양인 appears anywhere the blade branch is found.
     assert result["yangin"]["present"] is True
     assert 0 in result["yangin"]["positions"]
-    # Grid-level 양인격 excludes the month pillar (positions 0,2,3 only).
+    # N-9: the month-branch blade is the classical 양인격 (자평진전 월령)...
     assert result["yangin_grid"]["present"] is True
-    assert 1 not in result["yangin_grid"]["positions"]
+    assert result["yangin_grid"]["positions"] == [1]
+    # ...and the year/day/hour blades are the distinct non-month pattern.
+    assert result["yangin_non_month"]["positions"] == [0, 2, 3]
+    assert result["yangin_non_month"]["day_blade"] is True
 
 
-def test_yangin_star_vs_grid_distinction():
-    """B11: 양인 in the month pillar registers as a star but not as a grid."""
+def test_yangin_month_branch_is_the_grid():
+    """N-9 (2026-09-26 audit): 양인 in the month pillar is the 양인격 grid
+    (자평진전 월령 convention); B11 used to exclude exactly this case."""
     result = detect_patterns(
         day_master="丙",
         month_stem="甲",
@@ -83,7 +87,41 @@ def test_yangin_star_vs_grid_distinction():
     )
     assert result["yangin"]["present"] is True
     assert result["yangin"]["positions"] == [1]
+    assert result["yangin_grid"]["present"] is True
+    assert result["yangin_non_month"]["present"] is False
+
+
+def test_yangin_outside_month_is_non_month_pattern_not_grid():
+    result = detect_patterns(
+        day_master="丙",
+        month_stem="甲",
+        month_branch="子",
+        branches=["午", "子", "寅", "丑"],
+        stems=["丙", "甲", "丙", "己"],
+        hidden_stems=[("main", "癸")],
+    )
     assert result["yangin_grid"]["present"] is False
+    assert result["yangin_non_month"]["positions"] == [0]
+    assert result["yangin_non_month"]["day_blade"] is False
+
+
+def test_month_bijie_grid_renamed_yangin_and_jianlu():
+    """자평진전 names a month-branch 양인/건록 structure 양인격/건록격, not
+    겁재격/비견격 (the 투출 method's name for it)."""
+    blade = detect_patterns(
+        day_master="丙", month_stem="甲", month_branch="午",
+        branches=["子", "午", "寅", "丑"], stems=["丁", "甲", "丙", "己"],
+        hidden_stems=[("main", "丁"), ("middle", "己")],
+    )
+    assert blade["regular_grid"][0].name_ko == "양인격"
+    assert "자평진전" in blade["regular_grid"][0].basis
+    lu = detect_patterns(
+        day_master="丙", month_stem="癸", month_branch="巳",
+        branches=["子", "巳", "寅", "丑"], stems=["壬", "癸", "丙", "己"],
+        hidden_stems=[("main", "丙"), ("middle", "戊"), ("residual", "庚")],
+    )
+    assert lu["regular_grid"][0].name_ko == "건록격"
+    assert lu["jianlu"]["present"] is True and lu["jianlu"]["positions"] == [1]
 
 
 def test_jianlu_detection():
@@ -96,7 +134,22 @@ def test_jianlu_detection():
         stems=["丙", "甲", "丙", "己"],
         hidden_stems=[("main", "丙")],
     )
+    # N-9: month branch 巳 is the 건록 branch → 건록격; the year-branch 巳 is
+    # the distinct non-month pattern.
     assert result["jianlu"]["present"] is True
+    assert result["jianlu_non_month"]["positions"] == [0]
+    assert result["jianlu_non_month"]["hour_lu"] is False
+
+
+def test_jianlu_outside_month_is_not_the_grid_and_hour_is_guilu():
+    result = detect_patterns(
+        day_master="丙", month_stem="甲", month_branch="子",
+        branches=["寅", "子", "寅", "巳"], stems=["丙", "甲", "丙", "癸"],
+        hidden_stems=[("main", "癸")],
+    )
+    assert result["jianlu"]["present"] is False
+    assert result["jianlu_non_month"]["positions"] == [3]
+    assert result["jianlu_non_month"]["hour_lu"] is True
 
 
 def test_element_balance():

@@ -227,6 +227,7 @@ KOR_REPL = {
     "합거": "combined away", "파격": "broken structure", "관살혼잡": "mixed officers",
     "정편관혼잡": "mixed officers",
     "비견격": "Companion Structure", "겁재격": "Robber Structure",
+    "건록격": "Established Salary Structure", "귀록": "Returning Salary", "일인": "Day Blade",
     "식신격": "Eating God Structure", "상관격": "Hurting Officer Structure",
     "편재격": "Indirect Wealth Structure", "정재격": "Direct Wealth Structure",
     "편관격": "Seven Killings Structure", "정관격": "Direct Officer Structure",

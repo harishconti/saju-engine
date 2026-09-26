@@ -1864,6 +1864,9 @@ _REGULAR_GRID_THEME: Dict[str, str] = {
     "정관격": "conventional respectability and structure — credentials, large institutions, examinations, and public trust",
     "편인격": "specialized or unconventional knowledge — solitary study, unusual expertise, and insight that does not fit the mainstream",
     "정인격": "education, protection, and gradual advancement — certificates, mentors, real estate, and maternal support",
+    # knowledge/07 §B.3-4 (month-branch 양인 / 건록 — N-9, 2026-09-26)
+    "양인격": "great personal power and decisiveness — a double-edged capacity that can also run toward recklessness, isolation, or conflict",
+    "건록격": "natural self-sufficiency and earning capacity — steady income and quiet confidence built on one's own effort",
 }
 
 

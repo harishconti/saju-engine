@@ -579,8 +579,11 @@ def detect_patterns(
 
     Keys:
       - regular_grid: list of GridCandidate for the month-stem grid.
-      - yangin: 양인격 evidence.
-      - jianlu: 건禄格 evidence.
+      - yangin: star-level 양인 (blade branch anywhere).
+      - yangin_grid: 양인격 — blade branch is the month branch (자평진전).
+      - yangin_non_month: blade branch in year/day/hour (distinct pattern).
+      - jianlu: 건록격 — 건록 branch is the month branch (자평진전).
+      - jianlu_non_month: 건록 branch in year/day/hour (distinct pattern).
       - stem_combinations: list of ten-stem combination candidates.
       - transformation_grid: 화격 candidate, or None.
       - special_forms: list of 종격 candidates (conservative thresholds).
@@ -611,21 +614,47 @@ def detect_patterns(
         ))
 
 
+    # 양인 / 건록 (N-9, 2026-09-26 audit; decision recorded in
+    # docs/audits/2026-09-26-deep-engine-audit-verification.md: support both
+    # conventions, labeled differently — knowledge/07 §B.3-4):
+    #   - blade / 건록 branch AS THE MONTH BRANCH (월령) → the classical grid
+    #     양인격 / 건록격 (자평진전 convention). The month-비겁 regular grid is
+    #     renamed accordingly, since 자평진전 names that structure by 월령,
+    #     not 비견격/겁재격.
+    #   - blade / 건록 branch in the year, day or hour pillar → a related but
+    #     distinct non-month pattern (the rule this file used before N-9):
+    #     day-branch blade = 일인 (日刃), hour-branch 건록 = 귀록 (歸祿).
+    #   - the star-level 양인 appears wherever the blade branch is found.
     blade = _BLADE_BRANCH.get(day_master)
     yangin_positions_star = []
-    yangin_positions_grid = []
+    yangin_positions_non_month = []
     if blade:
         yangin_positions_star = [p for p, b in enumerate(branches) if b == blade]
-        # B11: 양인격 (grid) is traditionally read when the blade branch appears
-        # in the year, day, or hour pillar; the star-level 양인 may appear anywhere.
-        yangin_positions_grid = [
-            p for p in yangin_positions_star if p in {0, 2, 3}
-        ]
+        yangin_positions_non_month = [p for p in yangin_positions_star if p in {0, 2, 3}]
+    yangin_month = blade is not None and month_branch == blade
 
     jianlu = _JIANLU_BRANCH.get(day_master)
     jianlu_positions = []
     if jianlu:
         jianlu_positions = [p for p, b in enumerate(branches) if b == jianlu]
+    jianlu_positions_non_month = [p for p in jianlu_positions if p in {0, 2, 3}]
+    jianlu_month = jianlu is not None and month_branch == jianlu
+
+    for candidate in regular_grid:
+        if yangin_month and grid_tengod in ("비견", "겁재"):
+            candidate.name_ko, candidate.name_en = "양인격", "Blade Grid"
+            candidate.basis = (
+                f"월령 {month_branch} is the 양인 (제왕) branch of Day Master {day_master} — "
+                f"자평진전 names this month-비겁 structure 양인격 rather than {grid_tengod}격 "
+                f"(knowledge/07 §B.3); {candidate.basis}"
+            )
+        elif jianlu_month and grid_tengod in ("비견", "겁재"):
+            candidate.name_ko, candidate.name_en = "건록격", "Established Salary Grid"
+            candidate.basis = (
+                f"월령 {month_branch} is the 건록 branch of Day Master {day_master} — "
+                f"자평진전 names this month-비겁 structure 건록격 rather than {grid_tengod}격 "
+                f"(knowledge/07 §B.4); {candidate.basis}"
+            )
 
     element_counts = _element_counts(stems, hidden_stems)
     dominant_element = element_counts.most_common(1)[0][0] if element_counts else None
@@ -686,16 +715,48 @@ def detect_patterns(
         "yangin_grid": {
             "day_master": day_master,
             "blade_branch": blade,
-            "positions": yangin_positions_grid,
-            "present": len(yangin_positions_grid) > 0,
-            "note": "양인격 (blade grid) is read when the blade branch sits in the year, day, or hour pillar per knowledge/07-special-formations.md.",
+            "positions": [1] if yangin_month else [],
+            "present": yangin_month,
+            "note": (
+                "양인격 (blade grid): the blade branch is the month branch (월령 양인), the "
+                "자평진전 grid definition per knowledge/07-special-formations.md §B.3."
+            ) if yangin_month else None,
+        },
+        "yangin_non_month": {
+            "day_master": day_master,
+            "blade_branch": blade,
+            "positions": yangin_positions_non_month,
+            "present": len(yangin_positions_non_month) > 0,
+            "day_blade": 2 in yangin_positions_non_month,
+            "note": (
+                "Blade branch in the year, day or hour pillar — a strong-self pattern related to, "
+                "but distinct from, the month-branch 양인격"
+                + ("; in the day branch it is the 일인 (日刃) case" if 2 in yangin_positions_non_month else "")
+                + " (knowledge/07-special-formations.md §B.3)."
+            ) if yangin_positions_non_month else None,
         },
         "jianlu": {
             "day_master": day_master,
             "jianlu_branch": jianlu,
-            "positions": jianlu_positions,
-            "present": len(jianlu_positions) > 0,
-            "note": "건禄格 indicates natural self-sufficiency and earning capacity." if jianlu_positions else None,
+            "positions": [1] if jianlu_month else [],
+            "present": jianlu_month,
+            "note": (
+                "건록격: the 건록 branch is the month branch (월령 건록), the 자평진전 grid definition "
+                "per knowledge/07-special-formations.md §B.4 — natural self-sufficiency and earning capacity."
+            ) if jianlu_month else None,
+        },
+        "jianlu_non_month": {
+            "day_master": day_master,
+            "jianlu_branch": jianlu,
+            "positions": jianlu_positions_non_month,
+            "present": len(jianlu_positions_non_month) > 0,
+            "hour_lu": 3 in jianlu_positions_non_month,
+            "note": (
+                "건록 branch in the year, day or hour pillar — self-reliance support related to, "
+                "but distinct from, the month-branch 건록격"
+                + ("; in the hour branch it is the 귀록 (歸祿) case" if 3 in jianlu_positions_non_month else "")
+                + " (knowledge/07-special-formations.md §B.4)."
+            ) if jianlu_positions_non_month else None,
         },
         "stem_combinations": stem_combos,
         "transformation_grid": transformation,
