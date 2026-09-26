@@ -884,7 +884,10 @@ def _section_relationships(ctx: _ReportContext, mode: str = "standard") -> List[
         "| Partner Type | Element | Fit Level | Why |",
         "|---|---|---|---|",
     ]
-    for archetype, elem, fit, reason in _compatibility_rows(ctx.dm_element, ctx.favorable, ctx.verdict):
+    for archetype, elem, fit, reason in _compatibility_rows(
+        ctx.dm_element, ctx.favorable, ctx.verdict,
+        supporting=ctx.supporting, unfavorable=ctx.fe.unfavorable,
+    ):
         lines.append(f"| {archetype} | {elem} | {fit} | {reason} |")
 
     lines += [
@@ -1148,10 +1151,31 @@ def _section_natal_patterns(ctx: _ReportContext) -> List[str]:
     rels = []
     if ctx.chart.combinations_6:
         for a, c, elem, pa, pb in ctx.chart.combinations_6:
-            rels.append(("Six Combination", f"{a}+{c}", f"transforms toward {elem} energy between the {pa} and {pb} palaces"))
+            phrase = PF.six_combination_phrase(ctx.chart, a, c, elem).replace("**", "")
+            rels.append(("Six Combination", f"{a}+{c}", f"{phrase}; links the {pa} and {pb} palaces"))
     if ctx.chart.three_harmonies:
         for a, b, c, elem in ctx.chart.three_harmonies:
             rels.append(("Three Harmony", f"{a}+{b}+{c}", f"strengthens {elem} energy through the {a}, {b}, and {c} branches"))
+    # Validation 2026-09-25 (§2.4): half-harmonies, 방합 and natal 천간충 were
+    # computed or computable but never listed here.
+    for b1, b2, frame, elem in getattr(ctx.chart, "half_harmonies", []) or []:
+        centre = next((x for x in frame if x in "子午卯酉"), "")
+        if centre and centre not in (b1, b2):
+            note = (f"two of the {frame} ({elem}) frame without its central branch {centre} — latent; it "
+                    f"activates when {centre} arrives in a luck period")
+        else:
+            note = f"two of the {frame} ({elem}) frame (반합) — a partial {elem} empowerment"
+        rels.append(("Half Harmony", f"{b1}+{b2}", note))
+    for a, b, c, label in getattr(ctx.chart, "directional_harmonies", []) or []:
+        rels.append(("Directional Harmony", f"{a}+{b}+{c}", f"a full seasonal frame ({label}) concentrating that element"))
+    stems = ctx.chart.stems
+    seen_sc = set()
+    for i in range(4):
+        for j in range(i + 1, 4):
+            if L.stem_clash(stems[i], stems[j]) and (stems[i], stems[j]) not in seen_sc:
+                seen_sc.add((stems[i], stems[j]))
+                rels.append(("Stem Clash (천간충)", f"{stems[i]}↔{stems[j]}",
+                             "two same-polarity stems in direct control — tension in what those stems' ten-gods represent"))
     if ctx.chart.clashes:
         for a, c in ctx.chart.clashes:
             rels.append(("Six Clash", f"{a}↔{c}", "a tension or activation between two life palaces; often a call to adjust, release, or decide"))

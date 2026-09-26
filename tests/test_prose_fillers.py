@@ -817,3 +817,44 @@ def test_regular_grid_narrative_keeps_non_breaking_caveat():
                          confidence="likely", note="The month branch is struck (午子 충).")
     fake = SimpleNamespace(chart=SimpleNamespace(patterns={"regular_grid": [cand]}))
     assert "午子 충" in PF.regular_grid_narrative(fake)
+
+
+# ── Validation 2026-09-25 (Harish) follow-ups ──
+
+
+def test_current_decade_names_samhap_and_root(harish_ctx):
+    text = PF.current_period_deep_dive(harish_ctx)
+    assert "巳酉丑 삼합 (Metal)" in text and "건록" in text
+
+
+def test_next_decade_names_combo_and_punishment(harish_ctx):
+    p = next(x for x in harish_ctx.chart.daeun if x.combined == "庚戌")
+    note = PF.decade_structure_note(p, harish_ctx.chart)
+    assert "을경합금" in note and "punishes (형) your natal **丑**" in note
+
+
+def test_annual_lean_reads_branch_too(harish_ctx):
+    from saju_engine import sewoon as SE
+    h = SE.build_sewoon_range(harish_ctx.chart.day_master, harish_ctx.chart.branches, 2029, 2029)[0]
+    assert PF.annual_lean(h, harish_ctx) == ("supporting", "Metal")
+    h = SE.build_sewoon_range(harish_ctx.chart.day_master, harish_ctx.chart.branches, 2027, 2027)[0]
+    assert PF.annual_lean(h, harish_ctx)[0] == "challenging"
+
+
+def test_natal_six_combination_binds_without_transforming_for_harish(harish_ctx):
+    assert not PF.six_combination_transforms(harish_ctx.chart, "巳", "申", "Water")
+    assert "합이불화" in PF.six_combination_phrase(harish_ctx.chart, "巳", "申", "Water")
+
+
+def test_void_year_flagged_for_harish_2034(harish_ctx):
+    from saju_engine import sewoon as SE
+    c = harish_ctx.chart
+    h = SE.build_sewoon_range(c.day_master, c.branches, 2034, 2034, natal_stems=c.stems)[0]
+    assert "공망 year" in PF.year_by_year_note(h, harish_ctx)
+    h = SE.build_sewoon_range(c.day_master, c.branches, 2029, 2029, natal_stems=c.stems)[0]
+    assert "공망" not in PF.year_by_year_note(h, harish_ctx)
+
+
+def test_boss_profile_embodies_yongsin_not_its_controller(harish_ctx):
+    text = PF.boss_team_dynamics(harish_ctx)
+    assert "Water advisor" in text and "Earth anchor" not in text

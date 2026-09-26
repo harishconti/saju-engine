@@ -870,7 +870,10 @@ def test_decade_and_annual_favorable_lean_agree_on_shared_element():
     # bare "Robber" ten-god column.
     year_row = _row("| 2030 | 庚戌 | Robber | ")
     assert decade_row.endswith("| favorable |"), decade_row
-    assert "favorable-element year" in year_row, year_row
+    # 2026-09-26: annual rows now distinguish a 희신 ("supporting-element")
+    # year from a 용신 year (E-12 / validation §2.8); both are the favorable
+    # side, so they still agree with the decade's "favorable".
+    assert "supporting-element year" in year_row, year_row
 
 
 # ── R5 — Avoid/Watch (기신/구신/한신) blank for balanced/climate charts ────
@@ -1101,3 +1104,11 @@ def test_e7_star_basis_is_labelled_and_year_anchor_selectable():
     assert year_chart.to_dict()["star_anchor"] == "year"
     year_report = generate_premium_report(year_chart, tier="deep")
     assert "Counted from your year branch **申** (traditional Korean basis)" in year_report
+
+
+def test_validation_harish_partner_table_and_natal_rows():
+    report = _harish_deep_report()
+    assert "| Radiant, expressive, and momentum-driven | Fire | **Watch** |" in report
+    assert "| Half Harmony | 巳+丑 |" in report
+    assert "乙↔辛" in report
+    assert "numeric least-represented-element pick" not in report

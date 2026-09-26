@@ -240,10 +240,17 @@ def favorable_element(chart, override: Optional[str] = None) -> FavorableElement
             agreement_clause = (
                 "This matches the chart's own least-represented element, reinforcing the pick."
             )
+        elif verdict == "balanced":
+            # Validation 2026-09-25 #6: the balanced-chart least-element pick
+            # is a folk heuristic (E-5) — don't surface it by name in client
+            # text, where it read as a rival 용신 candidate.
+            agreement_clause = (
+                "This takes priority over the chart's simple element count, which is a weaker "
+                "signal than the classical climate check here."
+            )
         else:
             agreement_clause = (
-                f"This overrides the numeric least-represented-element pick ({raw_favorable}), "
-                "which is a weaker signal than the classical climate check here."
+                f"This takes priority over the strength-balance (억부) pick ({raw_favorable})."
             )
         if verdict == "balanced":
             verdict_clause = "The Day Master reads as balanced, so the classical 조후 (climate-balance) check applies"

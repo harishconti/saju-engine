@@ -110,6 +110,15 @@ The 세운 is the **pillar of the current calendar year**. For example, 2026 is 
 | Annual stem is the Day Master's 인성 | Year of support, learning, rest, recovery |
 | Annual stem is the Day Master's 비겁 | Year of competition, partnership, self-reliance |
 
+### 공망 years (세운 공망)
+
+*(Added 2026-09-26, Harish validation follow-up.)* When a 세운's branch is one of the **day pillar's 공망
+branches** (see `00-glossary.md` §공망), the year is read as a **공망 year**: what it brings tends to feel
+less solid or harder to hold onto fully — results arrive "hollow" or deferred, and new ties formed that
+year may be looser. Read it as a dampener on the year's other signals, not as an independent event.
+*Sources:* 정해 만세력 강의 「공망」 (<https://doc.8-codes.com/docs/lecture/20/>); 「공망 세운의 의미와
+개운법」 (<https://brunch.co.kr/@urlifestory/409>).
+
 ## Part 3: 월운 (Monthly Luck)
 
 The 월운 is the pillar of the current month, used for short-horizon timing. Same logic as 세운, narrower window. Often used to refine within an annual reading.

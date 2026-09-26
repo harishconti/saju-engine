@@ -585,6 +585,8 @@ def _compatibility_rows(
     dm_element: str,
     favorable_element: Optional[str],
     verdict: str = "balanced",
+    supporting: Optional[str] = None,
+    unfavorable: Optional[str] = None,
 ) -> List[Tuple[str, str, str, str]]:
     """Return (archetype, element, fit, reason) rows.
 
@@ -639,6 +641,10 @@ def _compatibility_rows(
     def fit_for(elem: str) -> Tuple[str, str]:
         if elem == favorable_element:
             return "**Best**", f"{elem} is your 용신 (favorable element) — the core balance your chart seeks."
+        # The resolved 기신 is never "Compatible" (validation 2026-09-25 #4:
+        # Fire was rated Compatible while the same report listed it as 기신).
+        if unfavorable and elem == unfavorable:
+            return "**Watch**", f"{elem} is your 기신 (challenging element) — it works against the balance your chart seeks."
         if strong:
             # Drain/control group (식상/재성/관성) = secondary favorable.
             if elem in (output, wealth_elem, authority):
@@ -656,8 +662,9 @@ def _compatibility_rows(
                 return "**Watch**", f"{elem} drains or pressures your weak Day Master — handle with care."
         else:
             # Balanced: 희신 = generator of 용신 (strict classical, knowledge/03).
-            if favorable_element and elem == generating.get(favorable_element):
-                return "**Good**", f"{elem} generates your 용신 ({favorable_element}) — secondary support (희신)."
+            hee = supporting or generating.get(favorable_element or "")
+            if favorable_element and elem == hee:
+                return "**Good**", f"{elem} supports your 용신 ({favorable_element}) — secondary support (희신)."
         return "**Compatible**", "Neutral energetic exchange."
 
     rows: List[Tuple[str, str, str, str]] = []

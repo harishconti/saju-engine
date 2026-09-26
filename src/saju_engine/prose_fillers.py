@@ -580,12 +580,16 @@ def boss_team_dynamics(ctx) -> str:
     fav = _ctx_get(ctx, "favorable", "—")
     sa = chart.strength_assessment or {}
     verdict = sa.get("verdict", "balanced")
+    # Keyed to the manager who embodies the chart's 용신 itself. Validation
+    # 2026-09-25 #5: this used to map each 용신 to the element that CONTROLS
+    # it (Water → "Earth anchor", Fire → "Water advisor", …) — i.e. the 구신
+    # — contradicting the same report's Avoid/Watch line.
     complement = {
-        "Wood": "steady Earth mentor",
-        "Fire": "patient Water advisor",
-        "Earth": "visionary Wood leader",
-        "Metal": "warm Fire motivator",
-        "Water": "structured Earth anchor",
+        "Wood": "visionary Wood leader",
+        "Fire": "warm Fire motivator",
+        "Earth": "steady Earth mentor",
+        "Metal": "structured, precise Metal manager",
+        "Water": "patient, perceptive Water advisor",
     }.get(fav, "complementary-element mentor")
     warning = {
         "Wood": "constant crisis mode that fragments Wood's growth",
@@ -595,8 +599,8 @@ def boss_team_dynamics(ctx) -> str:
         "Water": "rigid rules that dam Water's flow",
     }.get(dm_elem, "environments that ignore the Day Master's nature")
     return (
-        f"The ideal manager profile is a **{complement}** — someone whose element complements rather than "
-        f"competes with your Day Master. Watch for {warning}; this is the most common way the querent's "
+        f"The ideal manager profile is a **{complement}** — someone who carries your favorable **{fav}** "
+        f"element, supplying what the chart needs rather than competing with your Day Master. Watch for {warning}; this is the most common way the querent's "
         f"energy gets drained in a team setting."
     )
 
@@ -966,7 +970,9 @@ def attachment_patterns(ctx) -> str:
     )
 
 
-def _marriage_year_signals(h, day_branch: str, gender: str) -> Tuple[int, List[str], List[str]]:
+def _marriage_year_signals(
+    h, day_branch: str, gender: str, void: Tuple[str, ...] = ()
+) -> Tuple[int, List[str], List[str]]:
     """Score one 세운 for commitment timing per knowledge/08-luck-pillars.md
     Part 5b: spouse star in the annual stem, 육합/삼합 into the spouse palace,
     minus 충/형/파 on the palace and the gendered obstruction (상관 for F,
@@ -998,6 +1004,10 @@ def _marriage_year_signals(h, day_branch: str, gender: str) -> Tuple[int, List[s
     if h.stem_tengod == obstruction:
         score -= 1
         neg.append(f"{obstruction} year")
+    if h.branch in void:
+        # 공망 dampens rather than blocks (knowledge/08 §공망 years): noted,
+        # not scored, so it never hides an otherwise-converging year.
+        neg.append("공망 year")
     return score, pos, neg
 
 
@@ -1051,7 +1061,7 @@ def marriage_timing_windows(ctx) -> str:
     scored = []
     cautions = []
     for h in hits:
-        score, pos, neg = _marriage_year_signals(h, day_branch, gender)
+        score, pos, neg = _marriage_year_signals(h, day_branch, gender, tuple(_void_branches(chart)))
         if score >= 2 and pos:
             detail = ", ".join(pos) + (f"; offset by {', '.join(neg)}" if neg else "")
             scored.append((score, h.year, f"**{h.year} {h.combined}** ({detail})"))
@@ -1434,7 +1444,94 @@ def current_period_deep_dive(ctx) -> str:
         f"Within this decade, years and months whose stem element matches the favorable **{fav}** energy are "
         f"the cleanest moments for major commitments; the annual windows table below shows them. "
         f"Years dominated by the unfavorable element are best used for rest, review, and quiet preparation."
+        + decade_structure_note(current, chart)
     )
+
+
+def decade_structure_note(p, chart) -> str:
+    """Structural drivers of a 대운 against the natal chart: 삼합/방합/삼형
+    completions, the Day Master's 12운성 on the decade branch when it is a
+    root (건록/제왕), and 천간합/천간충 with natal stems. Validation
+    2026-09-25 §2.7: Harish's 己酉 decade completes 巳酉丑 金局 with natal
+    巳+丑 and puts 辛 at 건록 — the real reason the decade is supportive —
+    but the deep-dive never mentioned it. Returns "" when nothing applies.
+    """
+    from . import lookup as L
+    notes: List[str] = []
+    for hc in getattr(p, "harmony_completions", []) or []:
+        if hc.status != "full":
+            continue
+        triad = "".join(hc.triad)
+        if hc.kind == "삼형":
+            notes.append(f"its **{p.branch}** completes the **{triad} 삼형** with your natal "
+                         f"**{''.join(hc.matched_natal)}**, a decade-long friction to manage carefully")
+        else:
+            notes.append(f"its **{p.branch}** completes the **{triad} {hc.kind} ({hc.element})** with your "
+                         f"natal **{''.join(hc.matched_natal)}**, concentrating that element for the whole decade")
+    try:
+        stage = L.twelve_stage(chart.day_master, p.branch)
+    except Exception:
+        stage = ""
+    if stage in ("건록", "제왕"):
+        notes.append(f"your Day Master sits at **{stage}** on **{p.branch}** — a strong root for the self")
+    seen_pairs = set()
+    for _a, nb, rel in getattr(p, "activated_branches", []) or []:
+        if rel in ("clash", "punish") and (nb, rel) not in seen_pairs:
+            seen_pairs.add((nb, rel))
+            label = "clashes (충) with" if rel == "clash" else "punishes (형)"
+            notes.append(f"its **{p.branch}** {label} your natal **{nb}**")
+    for c in getattr(p, "stem_combinations", []) or []:
+        notes.append(f"its stem **{c['stem_a']}** combines with your natal **{c['stem_b']}** ({c['korean_name']}), "
+                     f"tying up what that stem represents")
+    for c in getattr(p, "stem_clashes", []) or []:
+        notes.append(f"its stem **{c['stem_a']}** clashes with your natal **{c['stem_b']}** (천간충)")
+    if not notes:
+        return ""
+    return "\n\nStructurally, " + "; ".join(notes) + "."
+
+
+def _void_branches(chart) -> List[str]:
+    """The day pillar's 공망 branches (stars._xun_kong), [] if unavailable."""
+    try:
+        from .stars import _xun_kong
+        return list(_xun_kong(chart.day_master, chart.day.branch))
+    except Exception:
+        return []
+
+
+def void_year_note(h, chart) -> str:
+    """One clause when the 세운 branch is a day-pillar 공망 branch
+    (knowledge/08-luck-pillars.md §공망 years)."""
+    if chart is None or getattr(h, "branch", "") not in _void_branches(chart):
+        return ""
+    return (f"{h.year} is a **공망 year** for your chart ({h.branch} is void for your day pillar) — what it "
+            f"brings may feel less solid, so confirm and document gains rather than assuming they will hold.")
+
+
+def annual_lean(h, ctx) -> Tuple[str, str]:
+    """(lean, element) for one 세운, reading both the stem and the branch.
+
+    lean is "favorable" | "supporting" | "challenging" | "neutral". The
+    annual stem (the year's outer theme) is checked against the 기신 first,
+    then either pillar half against the 용신 / 희신, then the branch against
+    the 기신. Validation 2026-09-25 §2.8: keying on the stem alone read
+    2029 己酉 (酉 = the Day Master's 건록 Metal) as a plain "mixed" year.
+    """
+    from . import lookup as L
+    stem_el = L.STEM_INFO.get(h.stem, {}).get("element", "")
+    branch_el = L.BRANCH_ELEMENT.get(getattr(h, "branch", ""), "")
+    fav = _ctx_get(ctx, "favorable", "")
+    sup = _ctx_get(ctx, "supporting", "")
+    unfav = _ctx_get(ctx, "unfavorable", "")
+    if unfav and stem_el == unfav:
+        return "challenging", stem_el
+    if fav and fav in (stem_el, branch_el):
+        return "favorable", fav
+    if sup and sup in (stem_el, branch_el):
+        return "supporting", sup
+    if unfav and branch_el == unfav:
+        return "challenging", branch_el
+    return "neutral", stem_el
 
 
 def annual_window_row(h, ctx) -> Tuple[str, str, str]:
@@ -1443,10 +1540,15 @@ def annual_window_row(h, ctx) -> Tuple[str, str, str]:
     stem = h.stem
     elem = L.STEM_INFO.get(stem, {}).get("element", "—")
     tg = h.stem_tengod_en or h.stem_tengod or "—"
-    fav = _ctx_get(ctx, "favorable", "—")
-    sup = _ctx_get(ctx, "supporting", "—")
-    favorable = elem in {fav, sup}
-    theme = f"{elem} energy + {tg} — a {'favorable-element' if favorable else 'mixed'} year."
+    lean, lean_elem = annual_lean(h, ctx)
+    favorable = lean in ("favorable", "supporting")
+    branch_elem = L.BRANCH_ELEMENT.get(getattr(h, "branch", ""), "")
+    elem_label = elem if branch_elem in ("", elem) else f"{elem}/{branch_elem}"
+    lean_label = {
+        "favorable": "favorable-element", "supporting": "supporting-element",
+        "challenging": "challenging-element", "neutral": "mixed",
+    }[lean]
+    theme = f"{elem_label} energy + {tg} — a {lean_label} year."
     cls = _TENGOD_FIVE_CLASS.get(h.stem_tengod, "")
     if cls == "Authority":
         best = "career moves, credentials, formal commitments"
@@ -1474,9 +1576,8 @@ def annual_window_row(h, ctx) -> Tuple[str, str, str]:
         # contradiction with the empty Avoid/Watch field two sections
         # earlier. A year that is merely neutral (한신, neither favorable nor
         # specifically unfavorable) gets softer language instead.
-        unfav = _ctx_get(ctx, "unfavorable", None)
-        if unfav and unfav not in ("—", "") and elem == unfav:
-            watch = f"{watch}; the {elem} element drains rather than feeds — slow down"
+        if lean == "challenging":
+            watch = f"{watch}; the {lean_elem} element drains rather than feeds — slow down"
         else:
             watch = f"{watch}; a neutral year for this chart — steady maintenance over big pushes"
     return theme, best, watch
@@ -1493,11 +1594,6 @@ def year_by_year_note(h, ctx) -> str:
     the favorability label separates 용신, 희신 and 기신 years instead of
     calling every 희신 year a "favorable-element year".
     """
-    from . import lookup as L
-    elem = L.STEM_INFO.get(h.stem, {}).get("element", "—")
-    fav = _ctx_get(ctx, "favorable", "—")
-    sup = _ctx_get(ctx, "supporting", "")
-    unfav = _ctx_get(ctx, "unfavorable", "")
     cls = _TENGOD_FIVE_CLASS.get(h.stem_tengod, "")
     focus = {
         "Companion": "independent initiative, peers, and collaboration on equal terms",
@@ -1513,20 +1609,20 @@ def year_by_year_note(h, ctx) -> str:
         "Authority": "watch for pressure, scrutiny, and stress from obligations",
         "Resource": "watch for passivity or leaning too heavily on others",
     }.get(cls, "watch for the chart's natural pressure point")
-    if elem == fav:
-        year_kind = f"a **favorable-element ({elem}) year**"
-    elif sup and elem == sup:
-        year_kind = f"a **supporting-element ({elem}) year**"
-    elif unfav and elem == unfav:
-        year_kind = f"a year of your **challenging element ({elem})** — navigate it consciously"
-    else:
-        year_kind = "an annual energy to navigate consciously"
+    lean, lean_elem = annual_lean(h, ctx)
+    year_kind = {
+        "favorable": f"a **favorable-element ({lean_elem}) year**",
+        "supporting": f"a **supporting-element ({lean_elem}) year**",
+        "challenging": f"a year of your **challenging element ({lean_elem})** — navigate it consciously",
+        "neutral": "an annual energy to navigate consciously",
+    }[lean]
     base = (
         f"This is {year_kind} — best focused on {focus}. "
         f"Caution: {caution}; pace yourself rather than pushing through."
     )
     activation = annual_activation_note(h)
-    return f"{base} {activation}" if activation else base
+    void = void_year_note(h, _ctx_get(ctx, "chart"))
+    return " ".join(x for x in (base, activation, void) if x)
 
 
 _RELATIONSHIP_LABEL: Dict[str, str] = {
@@ -1670,7 +1766,7 @@ def pattern_story(ctx) -> str:
     if chart.combinations_6:
         a, c, elem, pa, pb = chart.combinations_6[0]
         parts.append(
-            f"A six-combination between **{a}** and **{c}** transforms toward **{elem}** energy, "
+            f"A six-combination between **{a}** and **{c}** {six_combination_phrase(chart, a, c, elem)}, "
             f"linking the {pa} and {pb} palaces."
         )
     if chart.three_harmonies:
@@ -1727,6 +1823,29 @@ _REGULAR_GRID_THEME: Dict[str, str] = {
     "편인격": "specialized or unconventional knowledge — solitary study, unusual expertise, and insight that does not fit the mainstream",
     "정인격": "education, protection, and gradual advancement — certificates, mentors, real estate, and maternal support",
 }
+
+
+def six_combination_transforms(chart, a: str, c: str, elem: str) -> bool:
+    """True when a natal 육합 actually transforms (합화) per
+    knowledge/02-branches.md: the combined element must be in season at the
+    month branch and neither member may be struck by a natal 충. Otherwise
+    the pair only binds (합이불화, 合而不化). Validation 2026-09-25 #7: 巳申 was
+    reported as "transforming toward Water" in a 巳 (Fire) month with 巳亥沖.
+    """
+    from . import lookup as L
+    month_elem = L.BRANCH_ELEMENT.get(chart.month.branch, "")
+    if not month_elem or month_elem not in elem:
+        return False
+    struck = {x for pair in (chart.clashes or []) for x in pair}
+    return not ({a, c} & struck)
+
+
+def six_combination_phrase(chart, a: str, c: str, elem: str) -> str:
+    """Client phrase for a natal 육합 — transforms vs. binds without transforming."""
+    if six_combination_transforms(chart, a, c, elem):
+        return f"transforms toward **{elem}** energy"
+    return (f"binds the two branches without transforming (합이불화, 合而不化) — {elem} is not in season at "
+            f"the month branch or a member is struck by a clash, so read it as a tie, not a new {elem} force")
 
 
 def regular_grid_narrative(ctx) -> str:
