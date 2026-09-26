@@ -1,6 +1,8 @@
 """Tests for major-luck (대운) direction and starting age."""
 from __future__ import annotations
 
+from datetime import date
+
 import pytest
 
 from saju_engine.daeun import starting_age, starting_age_days
@@ -193,6 +195,20 @@ def test_compute_daeun_n_periods():
     assert len(periods) == 10
     assert periods[0].start_age == starting_age(1993, 12, 11, "backward")
 
+
+
+def test_first_period_start_date_matches_audit_seoul_example():
+    """N-4 (2026-09-26 audit): reproduces the audit's own worked example
+    (1990-06-15 10:00, Seoul M) — days=22.33 to the qualifying 節氣, so the
+    precise starting age is 22.33/3 ≈ 7.443 years (label 7), and the 2nd
+    decade (label 17) begins 10 years after that: 1990-06-15 + 17.443 years
+    ≈ 2007-11-24, exactly as the audit states."""
+    from saju_engine.daeun import first_period_start_date
+
+    first_start = first_period_start_date(1990, 6, 15, "forward", hour=10, minute=0, utc_offset=9.0)
+    assert first_start == date(1997, 11, 24)
+    second_start = first_start.replace(year=first_start.year + 10)
+    assert second_start == date(2007, 11, 24)
 
 
 def test_module_level_type_hints_resolve():

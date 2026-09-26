@@ -69,7 +69,40 @@ def test_reference_date_overrides_current_overlays():
     assert c.woon[2].year == 203006  # YYYYMM synthetic
     assert c.ilwoon[2].year == 20300615  # YYYYMMDD synthetic
     assert c.current_daeun is not None
-    assert c.current_daeun.start_age <= c.current_age <= c.current_daeun.end_age
+    # N-4 (2026-09-26 audit): `current_daeun` is now selected by comparing
+    # the reference date against each period's precise calendar start date,
+    # not by comparing `current_age` (세수, birth=1, +1 at every 입춘)
+    # against the `start_age`/`end_age` labels (floored elapsed years) — the
+    # two run 1-2 years apart, so asserting they nest is the wrong
+    # invariant. Sruthi's 28-37 (丁卯) period precisely starts 2022-07-05 and
+    # the next (38-47) doesn't begin until 2032-07-05, so 2030-06-15 is still
+    # inside 28-37 even though her 세수 has already ticked over to 38.
+    assert c.current_daeun.combined == "丁卯"
+    assert c.current_daeun.start_age == 28
+
+
+@pytest.mark.parametrize(
+    "ref_year,ref_month,ref_day,expected_start_age,expected_combined",
+    [
+        (2006, 2, 7, 7, "癸未"),
+        (2007, 11, 20, 7, "癸未"),
+        (2007, 11, 24, 17, "甲申"),
+    ],
+)
+def test_current_daeun_does_not_switch_early(ref_year, ref_month, ref_day, expected_start_age, expected_combined):
+    """N-4 (2026-09-26 audit): the audit's own worked example (1990-06-15
+    10:00, Seoul M) — precise 2nd-decade start is 2007-11-24. The bug
+    compared 세수 against the floored elapsed-year start_age label and
+    switched to the 2nd decade at 2006-02-07 — 1.8 years early."""
+    c = compute_chart(
+        name="N4-early-switch", gender="M",
+        year=1990, month=6, day=15, hour=10, minute=0,
+        longitude=127.0, utc_offset=9.0,
+        reference_year=ref_year, reference_month=ref_month, reference_day=ref_day,
+    )
+    assert c.current_daeun is not None
+    assert c.current_daeun.start_age == expected_start_age
+    assert c.current_daeun.combined == expected_combined
 
 
 def test_reference_date_defaults_to_today():

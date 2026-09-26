@@ -344,11 +344,33 @@ def compute_chart(
         resolved_unfavorable=_resolved_fe.unfavorable,
     )
 
-        # Current major-luck period on the querier's reference date.
-    if chart.current_age is not None:
-        chart.current_daeun = next(
-            (p for p in chart.daeun if p.start_age <= chart.current_age <= p.end_age), None
+    # Current major-luck period on the querier's reference date.
+    # N-4 (2026-09-26 audit): comparing `current_age` (세수) against the
+    # daeun periods' `start_age`/`end_age` (floored elapsed-year labels)
+    # mixed two different age conventions and picked the next decade
+    # 1.3-2.4 years early. Compare the reference date directly against each
+    # period's precise start date instead.
+    if chart.gender in ("M", "F") and chart.daeun:
+        bh, bm_ = (int(x) for x in (chart.birth_time or "00:00").split(":"))
+        by_, bmo_, bd_ = (int(x) for x in chart.birth_date.split("-"))
+        direction = L.daeun_direction(chart.year.stem, chart.gender)
+        first_start = D.first_period_start_date(
+            by_, bmo_, bd_, direction, hour=bh, minute=bm_, utc_offset=utc_offset,
         )
+        if first_start is not None and ref_date >= first_start:
+            def _period_start(k: int) -> date:
+                try:
+                    return first_start.replace(year=first_start.year + 10 * k)
+                except ValueError:
+                    # 29 Feb in a decade whose target year isn't a leap year.
+                    return first_start.replace(year=first_start.year + 10 * k, day=28)
+
+            for idx, p in enumerate(chart.daeun):
+                period_start = _period_start(idx)
+                next_start = _period_start(idx + 1) if idx + 1 < len(chart.daeun) else None
+                if ref_date >= period_start and (next_start is None or ref_date < next_start):
+                    chart.current_daeun = p
+                    break
 
     # Annual-luck window around the reference date
     chart.sewoon = SE.current_sewoon(

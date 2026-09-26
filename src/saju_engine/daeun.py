@@ -336,6 +336,43 @@ def starting_age_days(
     return abs((target - birth_dt).total_seconds()) / 86400.0
 
 
+def first_period_start_date(
+    year: int,
+    month: int,
+    day: int,
+    direction: str,
+    hour: int = 0,
+    minute: int = 0,
+    utc_offset: float = 9.0,
+) -> Optional[date]:
+    """Return the precise calendar date the first major-luck period begins.
+
+    N-4 (2026-09-26 audit): `starting_age()`'s `days // 3` is a **floored,
+    elapsed-year** count for the decade LABEL — it runs 1-2 years below
+    `saju_age()`'s 세수 (birth = 1, +1 at every 입춀), so comparing them
+    directly (as `engine.py` used to, to pick the "current" 대운) selected
+    the next decade 1.3-2.4 years before it actually starts. This returns
+    the real calendar date instead.
+
+    Per the "3 days = 1 year" rule, the fractional day count to the
+    qualifying 節氣 maps to years as ``days / 3`` (NOT a ``days``-long
+    offset) — the whole-year part is added as calendar years and the
+    remainder as ``fraction * 365.25`` days, matching how
+    `_daeun_starting_age_note` already states the precise starting age.
+    """
+    days = starting_age_days(year, month, day, direction, hour=hour, minute=minute, utc_offset=utc_offset)
+    if days is None:
+        return None
+    precise_years = days / 3.0
+    whole_years = int(precise_years)
+    birth = date(year, month, day)
+    try:
+        shifted = birth.replace(year=birth.year + whole_years)
+    except ValueError:
+        shifted = birth.replace(year=birth.year + whole_years, day=28)
+    return shifted + timedelta(days=(precise_years - whole_years) * 365.25)
+
+
 # ── Top-level: build the full major-luck sequence ───────────────────────────
 def compute_daeun(
     *,
