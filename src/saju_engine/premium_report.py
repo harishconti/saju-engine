@@ -55,6 +55,7 @@ from typing import List, Optional, Tuple
 from . import lookup as L
 from . import sewoon as SE
 from .chart import Chart, DaeunPeriod
+from .daeun import saju_year
 from . import prose_fillers as PF
 from .hanja_glossary import inject_hanja
 from .plain_glossary import collect_used_terms, gloss_first_use, render_terms_section
@@ -1811,8 +1812,13 @@ def _year_one_liner(chart: Chart, override: Optional[str] = None) -> str:
             f"bring {chart.day_master_info.get('element', '')} energy into clearer focus."
         )
     tengod = sewoon.stem_tengod_en or sewoon.stem_tengod or "annual energy"
+    # N-11 (2026-09-26 audit): the LOOKUP above stays keyed on the raw
+    # Gregorian current_year (chart.sewoon's window is built the same way,
+    # so it already finds the doctrinally-correct pillar) — but stating that
+    # same Gregorian number as the label here was wrong for a reference date
+    # before 입춀 (e.g. "2026 is a 乙巳 year" when 乙巳 is 2025's pillar).
     return (
-        f"{current_year} is a **{sewoon.combined} ({tengod})** year — "
+        f"{saju_year(ref)} is a **{sewoon.combined} ({tengod})** year — "
         f"an invitation to lean into {ctx_favorable_phrase(chart, override)}."
     )
 

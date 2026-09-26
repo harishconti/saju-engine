@@ -14,6 +14,7 @@ from collections import Counter
 from typing import Dict, List, Tuple
 
 from .chart import Chart
+from .daeun import saju_year
 
 
 from .hanja_glossary import inject_hanja
@@ -243,8 +244,13 @@ def _current_time_draft(chart: Chart) -> str:
 
     parts = []
     if ref_year:
+        # N-11 (2026-09-26 audit): the LOOKUP above stays keyed on the raw
+        # Gregorian ref_year (chart.sewoon's window is built the same way,
+        # so this already finds the doctrinally-correct pillar) — only the
+        # human-facing label needs the 사주 year: for a reference date before
+        # 입춀, the active 세운 is still the prior year's.
         parts.append(
-            f"As of {ref_year}, the annual pillar is **{current_sewoon.combined if current_sewoon else '—'}** "
+            f"As of {saju_year(ref)}, the annual pillar is **{current_sewoon.combined if current_sewoon else '—'}** "
             f"({current_sewoon.stem_tengod if current_sewoon else '—'} ten-god)."
         )
     if current_sewoon and current_sewoon.relationship_types:

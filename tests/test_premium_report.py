@@ -953,6 +953,26 @@ def test_daeun_starting_age_note_states_precise_age_not_just_decade():
     assert "roughly 6 months" in report
 
 
+def test_year_one_liner_labels_the_saju_year_not_gregorian():
+    """N-11 (2026-09-26 audit): "{year} is a **{pillar}** year" stated the
+    raw Gregorian reference year. For a reference date between Jan 1 and
+    입춀 (~Feb 4), the active 세운 is still the PRIOR year's — the pillar was
+    already correct (chart.sewoon's window keys off the same Gregorian
+    year), but the label said e.g. "2024 is a ... year" over a pillar that
+    is actually 2023's."""
+    from saju_engine.premium_report import _year_one_liner
+
+    chart = compute_chart(
+        name="Tester", gender="F",
+        year=1993, month=12, day=11, hour=10, minute=0,
+        city="Seoul", utc_offset=9, use_solar_time=True,
+        reference_year=2024, reference_month=1, reference_day=15,
+    )
+    line = _year_one_liner(chart)
+    assert "2023 is a" in line
+    assert "2024 is a" not in line
+
+
 def test_daeun_starting_age_note_is_independent_of_use_solar_time():
     """N-2 (2026-09-26 audit): a 절기 is an absolute instant, and the CSV's
     term times (converted to the birth's timezone) are civil-clock instants

@@ -35,6 +35,27 @@ def _ipchun_date(year: int) -> Optional[datetime]:
     return None
 
 
+def saju_year(d: date) -> int:
+    """Return the 사주 year (연도) of a Gregorian date: on/after that year's
+    입춀 belongs to that year; before it belongs to the prior year.
+
+    N-11 (2026-09-26 audit): client-facing "What This Year Means"/annual-luck
+    prose used `reference_date.year` (the raw Gregorian year) as the CURRENT
+    세운's label. For a reference date between Jan 1 and 입춀 (~Feb 4), the
+    active 세운 is still the PRIOR year's — the pillar shown was already
+    correct (the lookup keys off the same Gregorian year the sewoon window
+    was built from), but the prose then said e.g. "As of 2026, the annual
+    pillar is 乙巳" even though 乙巳 is 2025's canonical pillar, contradicting
+    the chart's own 입춀-based `current_age`/대운 timing. Factored out of
+    `saju_age()`, which already computed this same thing internally for both
+    the birth year and "today".
+    """
+    ipchun = _ipchun_date(d.year)
+    if ipchun is not None and d < ipchun.date():
+        return d.year - 1
+    return d.year
+
+
 def saju_age(birth_date_str: str, today: Optional[date] = None) -> Optional[int]:
     """Return the 사주 세수 (Korean counting age, 입춀-based) on `today`.
 
@@ -58,22 +79,7 @@ def saju_age(birth_date_str: str, today: Optional[date] = None) -> Optional[int]
         today = today.date()
 
     birth = date(by, bm, bd)
-    ipchun_birth = _ipchun_date(by)
-    ipchun_today = _ipchun_date(today.year)
-
-    # 사주 year of birth: birth on/after 입춀 → birth_year; else birth_year - 1.
-    if ipchun_birth is not None and birth < ipchun_birth.date():
-        saju_birth_year = by - 1
-    else:
-        saju_birth_year = by
-
-    # 사주 year of today: today on/after 입춀 → today.year; else today.year - 1.
-    if ipchun_today is not None and today < ipchun_today.date():
-        saju_today_year = today.year - 1
-    else:
-        saju_today_year = today.year
-
-    return saju_today_year - saju_birth_year + 1
+    return saju_year(today) - saju_year(birth) + 1
 
 
 # ── 60-cycle (육십갑자) math ─────────────────────────────────────────────────

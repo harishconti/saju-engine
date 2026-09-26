@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from saju_engine.engine import compute_chart
-from saju_engine.prose_scaffold import generate_prose_scaffold
+from saju_engine.prose_scaffold import _current_time_draft, generate_prose_scaffold
 
 
 def test_scaffold_has_all_sections():
@@ -82,3 +82,21 @@ def test_skeleton_can_disable_scaffold():
     assert "engine-drafted scaffolds" not in s
     assert "Day Master Strength Reasoning (draft)" not in s
     assert "_(argue from season" in s
+
+
+def test_current_time_draft_labels_the_saju_year_not_gregorian():
+    """N-11 (2026-09-26 audit): "As of {year}..." used the raw Gregorian
+    reference year. For a reference date between Jan 1 and 입춀 (~Feb 4),
+    the active 세운 is still the PRIOR year's — the pillar shown was already
+    correct (chart.sewoon's window keys off the same Gregorian year), but
+    the label said e.g. "As of 2024" over a pillar that is actually 2023's,
+    contradicting the chart's own 입춀-based age/대운 timing."""
+    c = compute_chart(
+        name="Tester", gender="F",
+        year=1993, month=12, day=11, hour=10, minute=0,
+        city="Seoul", utc_offset=9, use_solar_time=True,
+        reference_year=2024, reference_month=1, reference_day=15,
+    )
+    draft = _current_time_draft(c)
+    assert "As of 2023," in draft
+    assert "As of 2024," not in draft
