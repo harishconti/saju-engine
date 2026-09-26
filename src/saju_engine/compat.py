@@ -347,6 +347,33 @@ def _cross_branch_score(b1: str, b2: str) -> Tuple[int, Optional[str]]:
     return 0, None
 
 
+# N-10 (2026-09-26 audit): the cover's "top 3 red flags" were picked by
+# `sorted(set(red_flags))[:3]` — alphabetical order, not severity — so a
+# folk cross-star pattern worth -1 to -5 could bump a -25 day-branch clash
+# off the list. Magnitudes below are each token's actual point delta at its
+# point of origin in this file (day-branch 육충 -25, ilju_pair RED FLAG -12,
+# day-branch 자형 -8, nayin 상충 and cross-star 홍양교차 both -5); 간섭 is a
+# dampener on an otherwise-favorable 합 rather than a pure penalty, so it
+# ranks below the hard clashes/punishments. Order matters: more specific/
+# severe tokens are checked first.
+_RED_FLAG_SEVERITY: List[Tuple[str, int]] = [
+    ("육충", 25),
+    ("RED FLAG", 12),
+    ("자형", 8),
+    ("상충", 5),
+    ("홍양교차", 5),
+    ("간섭", 4),
+]
+
+
+def _flag_severity(flag: str) -> int:
+    """Approximate ranking weight for sorting the cover's top-N flag lists."""
+    for token, severity in _RED_FLAG_SEVERITY:
+        if token in flag:
+            return severity
+    return 0
+
+
 def _classify_flag(flag: str) -> Optional[str]:
     """Classify a single sub-system flag as 'red', 'yellow', 'favorable', or None.
 
@@ -1464,8 +1491,9 @@ def compat_score(
             elif bucket == "favorable":
                 favorable.append(f"{sub.label}: {flag}")
 
-    # Top 3 of each.
-    red_flags = sorted(set(red_flags))[:3]
+    # Top 3 of each. Red flags are ranked by severity, not alphabetically
+    # (N-10, 2026-09-26 audit) — ties broken alphabetically for determinism.
+    red_flags = sorted(set(red_flags), key=lambda f: (-_flag_severity(f), f))[:3]
     yellow_flags = sorted(set(yellow_flags))[:5]
     favorable = sorted(set(favorable))[:3]
 

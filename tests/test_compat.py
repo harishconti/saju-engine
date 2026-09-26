@@ -271,6 +271,26 @@ def test_compat_flag_classification_hae_token_not_overmatched():
     assert _classify_flag("해석은 reader가 진행") is None
 
 
+def test_compat_top_red_flags_ranked_by_severity_not_alphabetically():
+    """N-10 (2026-09-26 audit): `red_flags = sorted(set(red_flags))[:3]` picked
+    the top 3 alphabetically by sub-system label, so a -25 day-branch 육충
+    could lose its cover slot to weaker folk flags whose label happens to
+    sort earlier ("Combined..." before "Day-branch...")."""
+    from saju_engine.compat import _flag_severity
+
+    flags = [
+        "Combined element cross-supply: A → B 용신 木 일부 공급 (40%)",
+        "Cross-star overlays: 쌍화개 — both have 화개",
+        "Day-branch interaction (spouse palaces): 일지 육충 子午 (RED FLAG)",
+        "Nayin pair (30x30): 납음 A vs B → 상충",
+    ]
+    ranked = sorted(flags, key=lambda f: (-_flag_severity(f), f))[:3]
+    assert any("육충" in f for f in ranked), (
+        f"the -25 day-branch clash must survive the top-3 cut: {ranked}"
+    )
+    assert ranked[0] == "Day-branch interaction (spouse palaces): 일지 육충 子午 (RED FLAG)"
+
+
 def test_compat_flag_classification_dohwa_seuchyeo_is_yellow():
     """F-9 (2026-09-26 audit): '도화스쳐' (-5, spouse-palace 도화 hit / affair-
     risk flag per knowledge/11-gunghap.md §I) was never bucketed into red or
