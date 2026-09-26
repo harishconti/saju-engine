@@ -17,7 +17,7 @@ from typing import Dict, List, Optional, Tuple
 from . import lookup as L
 from .chart import DaeunPeriod
 from .lookup import TENGOD_EN as _TENGOD_EN
-from .sewoon import _detect_branch_relationship
+from .sewoon import _detect_branch_relationship, _detect_harmony_completions
 
 
 def derive_daeun_overlay(
@@ -34,6 +34,9 @@ def derive_daeun_overlay(
       - stem_tengod / stem_tengod_en: 십신 of the 대운天干
       - activated_branches: list of (daeun_branch, natal_branch, relationship_type)
       - relationship_types: deduplicated relationship names
+      - harmony_completions: list of HarmonyCompletion — 삼합/방합 triads the
+        대운 branch completes (two natal members present) or half-completes
+        (one natal member present) with the natal chart
       - stem_combinations: list of {stem_a, stem_b, combined_element, in_season,
         breaker_present, confidence} for 천간합 with natal stems
       - stem_element / branch_element: 오행 elements
@@ -50,10 +53,10 @@ def derive_daeun_overlay(
     activated: List[Tuple[str, str, str]] = []
     rel_types: set[str] = set()
     for nb in natal_branches:
-        rel = _detect_branch_relationship(period.branch, nb)
-        if rel:
+        for rel in _detect_branch_relationship(period.branch, nb):
             activated.append((period.branch, nb, rel))
             rel_types.add(rel)
+    harmony_completions = _detect_harmony_completions(period.branch, natal_branches)
 
     # Stem combinations (천간합) with natal stems
     stem_combos: List[Dict] = []
@@ -99,6 +102,7 @@ def derive_daeun_overlay(
         "stem_tengod_en": tengod_en,
         "activated_branches": activated,
         "relationship_types": sorted(rel_types),
+        "harmony_completions": harmony_completions,
         "stem_combinations": stem_combos,
         "stem_element": stem_element,
         "branch_element": branch_element,
@@ -136,6 +140,7 @@ def build_daeun_overlays(
         period.stem_tengod_en = overlay["stem_tengod_en"]
         period.activated_branches = overlay["activated_branches"]
         period.relationship_types = overlay["relationship_types"]
+        period.harmony_completions = overlay["harmony_completions"]
         period.stem_combinations = overlay["stem_combinations"]
         period.stem_element = overlay["stem_element"]
         period.branch_element = overlay["branch_element"]

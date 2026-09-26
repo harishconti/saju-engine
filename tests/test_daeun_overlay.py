@@ -115,6 +115,52 @@ def test_build_daeun_overlays_populates_periods():
         assert p.favorable_status is None  # no strength assessment provided
 
 
+# ── E-6 (2026-09-25 audit) ────────────────────────────────────────────────
+
+
+def test_daeun_overlay_surfaces_dual_status_pair():
+    """A 대운 branch that is simultaneously combine+break against a natal
+    branch (寅亥, 巳申) must report both, not just the first match."""
+    period = DaeunPeriod(start_age=30, end_age=39, stem="壬", branch="寅")
+    overlay = derive_daeun_overlay(
+        day_master="丙",
+        natal_branches=["亥"],
+        natal_stems=["壬", "甲", "丙", "戊"],
+        strength_assessment=None,
+        period=period,
+    )
+    rels = {r for _, n, r in overlay["activated_branches"] if n == "亥"}
+    assert rels == {"combine", "break"}
+
+
+def test_daeun_overlay_detects_harmony_completion():
+    """A 대운 branch completing a 삼합 with two natal branches must be
+    surfaced via harmony_completions — this never existed before E-6."""
+    period = DaeunPeriod(start_age=40, end_age=49, stem="甲", branch="辰")
+    overlay = derive_daeun_overlay(
+        day_master="丙",
+        natal_branches=["申", "子", "寅", "丑"],
+        natal_stems=["壬", "甲", "丙", "戊"],
+        strength_assessment=None,
+        period=period,
+    )
+    samhap = [h for h in overlay["harmony_completions"] if h.kind == "삼합"]
+    assert samhap and samhap[0].status == "full" and samhap[0].element == "Water"
+
+
+def test_build_daeun_overlays_populates_harmony_completions_field():
+    periods = [DaeunPeriod(start_age=40, end_age=49, stem="甲", branch="辰")]
+    build_daeun_overlays(
+        day_master="丙",
+        natal_branches=["申", "子"],
+        natal_stems=["丙", "甲", "丙", "戊"],
+        strength_assessment=None,
+        periods=periods,
+    )
+    assert periods[0].harmony_completions
+    assert periods[0].harmony_completions[0].kind == "삼합"
+
+
 def test_engine_populates_daeun_overlay():
     """compute_chart should attach overlays to every 대운 period."""
     c = compute_chart(

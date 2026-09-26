@@ -248,6 +248,27 @@ def test_annual_activation_note_empty_when_nothing_activates():
         assert PF.annual_activation_note(hit) == ""
 
 
+# ── E-6 (2026-09-25 audit) — harmony completions never surfaced in prose ──
+
+
+def test_annual_activation_note_surfaces_full_samhap_completion():
+    """2024's real annual pillar 甲辰 completes 申子辰 (Water) 삼합 against
+    natal 申+子 — this 3-branch fact was never checked anywhere before E-6."""
+    from saju_engine.sewoon import derive_sewoon
+    hit = derive_sewoon("丙", ["申", "子"], 2024)
+    note = PF.annual_activation_note(hit)
+    assert "completes" in note and "삼합" in note and "Water" in note
+    assert "申子" in note or "子申" in note
+
+
+def test_annual_activation_note_surfaces_half_samhap_completion():
+    """Only 申 present -> 반합 (half), worded distinctly from a full completion."""
+    from saju_engine.sewoon import derive_sewoon
+    hit = derive_sewoon("丙", ["申"], 2024)
+    note = PF.annual_activation_note(hit)
+    assert "half-completes" in note and "반합" in note
+
+
 def test_year_by_year_note_appends_activation_when_present(ctx):
     from saju_engine import sewoon as SE
     chart = compute_chart(

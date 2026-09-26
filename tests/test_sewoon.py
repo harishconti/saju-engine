@@ -6,6 +6,7 @@ from saju_engine.sewoon import (
     _monthly_pillar_for_date, _daily_pillar, derive_sewoon,
     build_sewoon_range, derive_woon, current_woon_window,
     derive_ilwoon, current_ilwoon_window,
+    _detect_branch_relationship, _detect_harmony_completions,
 )
 
 
@@ -143,3 +144,76 @@ def test_annual_stem_combines_with_day_master():
 def test_annual_stem_no_combination_with_day_master_is_empty():
     hit = derive_sewoon("丙", ["酉", "子", "寅", "丑"], 2026)  # 丙 vs 丙: no combo
     assert hit.stem_combinations == []
+
+
+# ── E-6 (2026-09-25 audit) ────────────────────────────────────────────────
+# _detect_branch_relationship used to return on the first match in a fixed
+# priority order, silently dropping a pair's second, simultaneous
+# relationship; and no 3-branch (삼합/방합) completion check existed at all.
+
+
+def test_detect_branch_relationship_returns_dual_status_pairs():
+    """knowledge/02-branches.md documents 寅亥 and 巳申 as pairs that are
+    simultaneously a 육합 (combine) and a 파 (break) — not either/or."""
+    assert set(_detect_branch_relationship("寅", "亥")) == {"combine", "break"}
+    assert set(_detect_branch_relationship("巳", "申")) == {"combine", "break"}
+
+
+def test_detect_branch_relationship_single_match_unaffected():
+    """An ordinary (non-dual-status) pair still returns exactly one type."""
+    assert _detect_branch_relationship("子", "午") == ["clash"]
+    assert _detect_branch_relationship("子", "丑") == ["combine"]
+
+
+def test_detect_branch_relationship_no_match_returns_empty_list():
+    assert _detect_branch_relationship("子", "卯") == []
+
+
+def test_detect_harmony_completions_full_samhap():
+    """申子辰 (Water) 삼합: incoming 辰 + natal 申,子 present -> full."""
+    hits = _detect_harmony_completions("辰", ["申", "子", "丑"])
+    samhap = [h for h in hits if h.kind == "삼합"]
+    assert len(samhap) == 1
+    assert samhap[0].status == "full"
+    assert samhap[0].element == "Water"
+    assert set(samhap[0].matched_natal) == {"申", "子"}
+
+
+def test_detect_harmony_completions_half_samhap():
+    """Only one of 申/子 present -> 반합 (half)."""
+    hits = _detect_harmony_completions("辰", ["申", "丑"])
+    samhap = [h for h in hits if h.kind == "삼합"]
+    assert len(samhap) == 1
+    assert samhap[0].status == "half"
+    assert samhap[0].matched_natal == ("申",)
+
+
+def test_detect_harmony_completions_full_banghap():
+    """寅卯辰 (Wood/East) 방합: incoming 卯 + natal 寅,辰 present -> full."""
+    hits = _detect_harmony_completions("卯", ["寅", "辰", "丑"])
+    banghap = [h for h in hits if h.kind == "방합"]
+    assert len(banghap) == 1
+    assert banghap[0].status == "full"
+    assert set(banghap[0].matched_natal) == {"寅", "辰"}
+
+
+def test_detect_harmony_completions_no_natal_members_present():
+    assert _detect_harmony_completions("辰", ["丑", "未"]) == []
+
+
+def test_derive_sewoon_populates_harmony_completions_end_to_end():
+    """2024's real annual pillar is 甲辰 — verified end-to-end against a
+    chart whose natal branches contain 申 and 子, completing 申子辰 (Water)."""
+    hit = derive_sewoon("丙", ["申", "子", "寅", "丑"], 2024)
+    assert hit.combined == "甲辰"
+    samhap = [h for h in hit.harmony_completions if h.kind == "삼합"]
+    assert samhap and samhap[0].status == "full" and samhap[0].element == "Water"
+
+
+def test_derive_sewoon_surfaces_dual_status_pair_end_to_end():
+    """2022's real annual pillar is 壬寅 — against a natal 亥 this is
+    simultaneously combine (寅亥合木) and break (寅亥파), not just one."""
+    hit = derive_sewoon("丙", ["亥"], 2022)
+    assert hit.combined == "壬寅"
+    rels = {r for a, n, r in hit.activated_branches if n == "亥"}
+    assert rels == {"combine", "break"}

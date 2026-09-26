@@ -34,7 +34,7 @@ FIXED = confirmed and corrected, with regression test and evidence linked below.
 | E-3 | P1 | 기신 not plumbed past Quick Reference | **FIXED** (uncovered 5 more dormant bugs in the process) | `_avoid_watch_text` derived 기신/구신/한신 for display only; never wrote back to `strength_assessment["candidate_unfavorable"]`, so every decade/annual/business consumer still saw the placeholder `"—"`. See fix log below. |
 | E-4 | P1 | Strength verdict vs. prose | **FIXED** | Confirmed as a UX inconsistency, not an arithmetic bug — the verdict is correctly inside the current `[-1.5, 1.5]` "balanced" band by definition, but the band is wide enough that unqualified directional prose ("drain outweighs support") reads as contradicting a flat "Balanced" label. Fixed by adding a reconciling clause naming what actually pulls the total back to balanced, only for balanced-verdict charts. |
 | E-5 | P1 | Balanced-DM 용신 folk heuristic | **CONFIRMED as an architecture risk, not live for Harish** | `yongsin.py` falls back to "least-represented element" for balanced DMs not caught by another rule; for Harish 조후 overrides it (already disclosed in-report). Not fixed here — flagged for any balanced chart the 조후 gate doesn't cover. |
-| E-6 | P1 | Annual/decade interaction detector incomplete | **CONFIRMED** | `sewoon.py::_detect_branch_relationship` returns on the *first* match (clash→combine→harm→break→self-punish priority) and never checks for simultaneous relationships; no 3-branch (삼합/방합) completion check exists at all. |
+| E-6 | P1 | Annual/decade interaction detector incomplete | **FIXED** | `sewoon.py::_detect_branch_relationship` returned on the *first* match (clash→combine→harm→break→self-punish priority), silently dropping a pair's second, simultaneous relationship; and no 3-branch (삼합/방합) completion check existed at all. See fix log below. |
 | E-7 | P1 | Knowledge-base star meanings + stem-clash inconsistency | **PARTIAL — stem-clash fixed; 지살/월살 wording deliberately left alone** | The `01-stems.md` "stems don't clash" vs. `08-luck-pillars.md` "check 천간충" inconsistency is fixed (cross-reference added, no new claim invented). The 지살/월살 meaning correction was **not** applied: my own recollection of the classical distinction (지살 as a travel-adjacent but distinct-from-역마 star; 월살 as 고초살/stagnation rather than romance) has real uncertainty, and the original audit's own sourcing for its claimed corrections was not available to verify against — rewriting a knowledge-base doctrine claim on uncertain memory would violate Ground Rule 1 as much as leaving a possibly-wrong claim in place. Left as an open, documented item for whoever has the classical source to confirm. |
 | E-8 | P1 | Relationship section ignores gender | **FIXED** | `relationship_style()` read only `day_branch_main`'s ten-god; no gendered 재성/관성 (spouse-star) scan across the whole chart existed anywhere in `prose_fillers.py`. Fixed by reusing the classical mapping already applied in `compat.py::_gendered_spouse_star_note` (knowledge/11-gunghap.md §G). |
 | E-9 | P2 | 격국 named with no 성격/파격 check | **CONFIRMED** | No occurrence of 파격/성격 logic anywhere in `patterns.py`; 정관격 is asserted from the grid-forming branch alone, independent of the 상관견관/clash facts the same report lists. |
@@ -217,7 +217,44 @@ is None, ...)` marker and applied it to exactly the 5 test functions that shell 
 `shutil.which` monkeypatched to return `None` for `pdftotext`, exactly the 5 affected tests skip and the
 other 7 still run and pass. Full suite: **974 passed, 10 xfailed, 0 failed**.
 
-### Remaining: E-5 (documentation-only, no live bug for Harish), E-6 (interaction-detector
-completeness — sizable), E-7 (KB star meanings + stem-clash inconsistency), E-9 (격국 파격 check —
-needs care), E-12 (misc. template prose — never seen in detail), E-13 (daeun display convention —
-cosmetic, never independently verified).
+### E-6 — FIXED (2026-09-26)
+
+Two independent sub-fixes, both in `sewoon.py` (consumed by `derive_sewoon`/`derive_woon`/
+`derive_ilwoon` and, via `daeun_overlay.py`, by every 대운 period):
+
+1. **Dual-status pairs silently dropped.** `_detect_branch_relationship(a, b)` used to `return` on
+   the first table match, in a fixed clash→combine→harm→break→self-punish order. But
+   `knowledge/02-branches.md`'s own "Dual-status pairs" note (added in the 2026-09-20 review) already
+   documents that **寅亥** and **巳申** are simultaneously a 육합 (combine) *and* a 파 (break) — "not a
+   data error... classical 명리 holds both readings simultaneously." The early-return design meant
+   the engine could only ever report one side. Changed the function to return `List[str]` of every
+   match instead of the first, and updated all 4 call sites (3 in `sewoon.py`, 1 in
+   `daeun_overlay.py`) to iterate the list instead of testing truthiness of a single value. Verified
+   against real annual pillars, not synthetic-only: 2022's real 壬寅 sewoon branch against a natal 亥
+   now reports both `combine` and `break` (previously `combine` only, per the priority order).
+2. **No 3-branch (삼합/방합) completion check existed at all.** Added
+   `HarmonyCompletion` (dataclass) + `_detect_harmony_completions(branch, natal_branches)`, grounded
+   in `knowledge/02-branches.md` §Three Harmonies / §Directional Harmonies ("When all three appear...
+   highly empowered. When two appear... partial empowerment (반합)."). For each of `L.THREE_HARMONIES`
+   / `L.DIRECTIONAL_HARMONIES` triads containing the incoming branch, checks how many of the other two
+   members are present in the natal branches: 2 → `status="full"`, 1 → `status="half"`, 0 → no hit.
+   Threaded through `SeWoonHit.harmony_completions` / `DaeunPeriod.harmony_completions`,
+   `chart.py`'s `to_dict()` serialization (`_harmony_completions_dicts`), and
+   `prose_fillers.py::annual_activation_note` (the only prose consumer of this overlay layer).
+   Verified end-to-end against Harish's real chart (natal branches 申/巳/亥/丑, from his 壬申/乙巳/辛亥/
+   己丑 pillars): his real generated report now shows, e.g., 2032's 壬子 sewoon branch fully completing
+   亥子丑 (Water/North) 방합 with his natal 亥+丑, and half-completing 申子辰 (Water) 삼합 with his
+   natal 申 — both entirely absent before this fix, on a year the report already covers.
+3. **Cosmetic fix found while verifying end-to-end:** the half-completion note's own "(반합)" gloss
+   collided with the general first-use Hanja-glossary pass (반합 is in `HANJA_GLOSSARY`), producing
+   doubled parens "(반합 (半合))" the first time it appeared in a document. Removed the note's own
+   wrapping parens (now "— 반합", letting the glossary pass add "(半合)" once) — same pattern already
+   used for `combo_hanja` in the same function.
+4. **Blast radius, verified empirically:** ran the full suite after each sub-fix; zero pre-existing
+   tests broke (the dual-status and triad-completion behavior was previously entirely absent, not
+   asserted-wrong anywhere) — all 14 new tests are additive. Full suite: **988 passed, 10 xfailed, 0
+   failed** (up from 974/10/0).
+
+### Remaining: E-5 (documentation-only, no live bug for Harish), E-7 (KB star meanings + stem-clash
+inconsistency), E-9 (격국 파격 check — needs care), E-12 (misc. template prose — never seen in detail),
+E-13 (daeun display convention — cosmetic, never independently verified).

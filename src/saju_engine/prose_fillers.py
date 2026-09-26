@@ -1395,6 +1395,26 @@ def annual_activation_note(h) -> str:
         seen_types.add(rel)
         label = _RELATIONSHIP_LABEL.get(rel, rel)
         notes.append(f"the annual branch **{annual_b}** and natal **{natal_b}** are in **{label}**")
+    for hc in getattr(h, "harmony_completions", []) or []:
+        # E-6 (2026-09-25 audit): the engine never checked whether the
+        # annual/decade branch completes a 삼합/방합 triad with the natal
+        # chart at all — knowledge/02-branches.md: "When all three appear...
+        # highly empowered. When two appear... partial empowerment (반합)."
+        triad_label = "".join(hc.triad)
+        others = "".join(hc.matched_natal)
+        if hc.status == "full":
+            notes.append(
+                f"the annual branch **{h.branch}** completes the "
+                f"**{triad_label} {hc.kind} ({hc.element})** with your natal **{others}**"
+            )
+        else:
+            # No trailing "(반합)" gloss here — 반합 is in HANJA_GLOSSARY, so
+            # the general first-use pass appends its own Hanja; wrapping it
+            # in our own parens too would double them ("(반합 (半合))").
+            notes.append(
+                f"the annual branch **{h.branch}** half-completes the **{triad_label} {hc.kind} "
+                f"({hc.element})** with your natal **{others}** — 반합"
+            )
     if not notes:
         return ""
     return "Also active this year: " + "; ".join(notes) + "."

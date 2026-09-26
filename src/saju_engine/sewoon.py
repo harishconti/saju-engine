@@ -14,11 +14,31 @@ its relationship to the natal chart:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 from functools import lru_cache
 
 from . import lookup as L
+
+
+@dataclass
+class HarmonyCompletion:
+    """A 삼합/방합 triad that the incoming (annual/decade/monthly/daily)
+    branch completes or half-completes with the natal chart.
+
+    Source: knowledge/02-branches.md §Branch Three Harmonies / §Directional
+    Harmonies — "When all three appear... highly empowered. When two appear,
+    it is a partial empowerment (반합)." Applied here to a transiting branch
+    arriving against the natal branches, which `_detect_branch_relationship`
+    (pairwise only) can never surface since a triad completion is a 3-branch
+    fact, not a 2-branch one. (E-6, 2026-09-25 audit: "no 3-branch completion
+    check exists at all.")
+    """
+    kind: str                    # "삼합" | "방합"
+    triad: Tuple[str, str, str]
+    element: str
+    status: str                  # "full" | "half"
+    matched_natal: Tuple[str, ...]
 
 
 @dataclass
@@ -35,6 +55,9 @@ class SeWoonHit:
     # Each tuple: (annual_branch, natal_branch, relationship_type)
     relationship_types: List[str] = field(default_factory=list)
     # deduplicated list of relationship types for quick filtering
+    harmony_completions: List[HarmonyCompletion] = field(default_factory=list)
+    # 삼합/방합 triads the incoming branch completes/half-completes; see
+    # HarmonyCompletion above.
     stem_combinations: List[Tuple[str, str, str, str]] = field(default_factory=list)
     # Each tuple: (stem_a, stem_b, combined_element, korean_name), (stem_a,
     # stem_b) in the table's own canonical order (matching korean_name's
@@ -134,24 +157,52 @@ def _monthly_pillar_for_date(year: int, month: int, day: int) -> Tuple[str, str]
     return _monthly_pillar(year, month)
 
 
-def _detect_branch_relationship(a: str, b: str) -> Optional[str]:
-    """Return the relationship type between two branches, or None."""
+def _detect_branch_relationship(a: str, b: str) -> List[str]:
+    """Return every relationship type between two branches (may be more than
+    one — knowledge/02-branches.md documents 寅亥 and 巳申 as "dual-status
+    pairs" that are simultaneously a 합 (combine) and a 파 (break), not an
+    either/or. Fixed 2026-09-25 (E-6 audit): this used to return on the
+    first match in a fixed clash→combine→harm→break→self-punish priority
+    order, so a dual-status pair's second relationship was silently
+    discarded — e.g. 2026's 丙午 sewoon branch 午 combining with a natal 未
+    also never surfaced any simultaneous break/harm it might carry.
+    """
     pair_set = {a, b}
+    rels: List[str] = []
     for x, y in L.SIX_CLASHES:
         if pair_set == {x, y}:
-            return "clash"
+            rels.append("clash")
     for x, y, _ in L.SIX_COMBINATIONS:
         if pair_set == {x, y}:
-            return "combine"
+            rels.append("combine")
     for x, y in L.SIX_HARMS:
         if pair_set == {x, y}:
-            return "harm"
+            rels.append("harm")
     for x, y in L.SIX_BREAKS:
         if pair_set == {x, y}:
-            return "break"
+            rels.append("break")
     if a == b and a in L.SELF_PUNISHMENTS:
-        return "self_punish"
-    return None
+        rels.append("self_punish")
+    return rels
+
+
+def _detect_harmony_completions(branch: str, natal_branches: List[str]) -> List[HarmonyCompletion]:
+    """Detect whether `branch` completes or half-completes a 삼합/방합 triad
+    against the natal branches. See HarmonyCompletion for the doctrine cite.
+    """
+    hits: List[HarmonyCompletion] = []
+    for table, kind in ((L.THREE_HARMONIES, "삼합"), (L.DIRECTIONAL_HARMONIES, "방합")):
+        for a, b, c, label in table:
+            triad = (a, b, c)
+            if branch not in triad:
+                continue
+            others = [m for m in triad if m != branch]
+            matched = tuple(m for m in others if m in natal_branches)
+            if len(matched) == 2:
+                hits.append(HarmonyCompletion(kind, triad, label, "full", matched))
+            elif len(matched) == 1:
+                hits.append(HarmonyCompletion(kind, triad, label, "half", matched))
+    return hits
 
 
 def derive_sewoon(
@@ -179,10 +230,10 @@ def derive_sewoon(
     activated: List[Tuple[str, str, str]] = []
     types: set[str] = set()
     for nb in natal_branches:
-        rel = _detect_branch_relationship(branch, nb)
-        if rel:
+        for rel in _detect_branch_relationship(branch, nb):
             activated.append((branch, nb, rel))
             types.add(rel)
+    harmony_completions = _detect_harmony_completions(branch, natal_branches)
 
     combos: List[Tuple[str, str, str, str]] = []
     dm_combo = L.stem_combination(day_master, stem)
@@ -208,6 +259,7 @@ def derive_sewoon(
         stem_tengod_en=tengod_en,
         activated_branches=activated,
         relationship_types=sorted(types),
+        harmony_completions=harmony_completions,
         stem_combinations=combos,
     )
 
@@ -324,8 +376,7 @@ def derive_woon(
     activated: List[Tuple[str, str, str]] = []
     types: set[str] = set()
     for nb in natal_branches:
-        rel = _detect_branch_relationship(branch, nb)
-        if rel:
+        for rel in _detect_branch_relationship(branch, nb):
             activated.append((branch, nb, rel))
             types.add(rel)
 
@@ -337,6 +388,7 @@ def derive_woon(
         stem_tengod_en=tengod_en,
         activated_branches=activated,
         relationship_types=sorted(types),
+        harmony_completions=_detect_harmony_completions(branch, natal_branches),
     )
 
 
@@ -392,8 +444,7 @@ def derive_ilwoon(
     activated: List[Tuple[str, str, str]] = []
     types: set[str] = set()
     for nb in natal_branches:
-        rel = _detect_branch_relationship(branch, nb)
-        if rel:
+        for rel in _detect_branch_relationship(branch, nb):
             activated.append((branch, nb, rel))
             types.add(rel)
 
@@ -405,6 +456,7 @@ def derive_ilwoon(
         stem_tengod_en=tengod_en,
         activated_branches=activated,
         relationship_types=sorted(types),
+        harmony_completions=_detect_harmony_completions(branch, natal_branches),
     )
 
 

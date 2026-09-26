@@ -53,6 +53,9 @@ class DaeunPeriod:
     stem_tengod_en: str = ""
     activated_branches: List[Tuple[str, str, str]] = field(default_factory=list)
     relationship_types: List[str] = field(default_factory=list)
+    harmony_completions: List[Any] = field(default_factory=list)
+    # List[HarmonyCompletion] (sewoon.py) — 삼합/방합 triads this period's
+    # branch completes/half-completes with the natal chart.
     stem_combinations: List[Dict] = field(default_factory=list)
     stem_element: str = ""
     branch_element: str = ""
@@ -376,6 +379,7 @@ class Chart:
                         for a, n, r in p.activated_branches
                     ],
                     "relationship_types": p.relationship_types,
+                    "harmony_completions": self._harmony_completions_dicts(p.harmony_completions),
                     "stem_combinations": p.stem_combinations,
                     "stem_element": p.stem_element,
                     "branch_element": p.branch_element,
@@ -417,6 +421,7 @@ class Chart:
                 for a, n, r in p.activated_branches
             ],
             "relationship_types": p.relationship_types,
+            "harmony_completions": self._harmony_completions_dicts(p.harmony_completions),
             "stem_combinations": p.stem_combinations,
             "stem_element": p.stem_element,
             "branch_element": p.branch_element,
@@ -436,7 +441,20 @@ class Chart:
                 for a, n, r in h.activated_branches
             ],
             "relationship_types": h.relationship_types,
+            "harmony_completions": self._harmony_completions_dicts(getattr(h, "harmony_completions", [])),
         }
+
+    def _harmony_completions_dicts(self, completions) -> List[Dict[str, Any]]:
+        return [
+            {
+                "kind": c.kind,
+                "triad": list(c.triad),
+                "element": c.element,
+                "status": c.status,
+                "matched_natal": list(c.matched_natal),
+            }
+            for c in (completions or [])
+        ]
 
     def _patterns_dict(self, p):
         """Convert pattern output to JSON-serializable dictionaries."""
