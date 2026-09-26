@@ -1757,7 +1757,8 @@ def regular_grid_narrative(ctx) -> str:
     return (
         f"The engine flags a likely **{candidate.name_ko} ({candidate.name_en})** as the regular grid. "
         f"This points toward a life theme shaped by {theme}. "
-        f"It is a structural tendency, not a career verdict; the ten-god distribution and timing tables refine how it expresses."
+        + (f"{candidate.note} " if candidate.note else "")
+        + "It is a structural tendency, not a career verdict; the ten-god distribution and timing tables refine how it expresses."
     )
 
 

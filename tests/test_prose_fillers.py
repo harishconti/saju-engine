@@ -806,3 +806,14 @@ def test_marriage_timing_without_gender_falls_back():
     c = _ReportContext(chart, tier="deep", generation_date="2026-09-26")
     assert "No gender is recorded" in PF.marriage_timing_windows(c) or \
         "Major-luck data not available" in PF.marriage_timing_windows(c)
+
+
+def test_regular_grid_narrative_keeps_non_breaking_caveat():
+    """A 'likely' grid can still carry a caveat note (월지 충·형 / 신약, E-9
+    residual) — the narrative must not drop it."""
+    from types import SimpleNamespace
+    from saju_engine.patterns import GridCandidate
+    cand = GridCandidate(name_ko="정관격", name_en="Direct Officer Grid", basis="b",
+                         confidence="likely", note="The month branch is struck (午子 충).")
+    fake = SimpleNamespace(chart=SimpleNamespace(patterns={"regular_grid": [cand]}))
+    assert "午子 충" in PF.regular_grid_narrative(fake)

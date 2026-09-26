@@ -506,6 +506,66 @@ def detect_structural_notes(
     return notes
 
 
+def _officer_grid_breakers(day_master: str, stems: List[str]) -> List[str]:
+    """관살혼잡 and 정관 합거 on the visible stems (knowledge/07 §정관격 파격).
+
+    ``stems`` is year/month/day/hour; the Day Master (index 2) is neither an
+    officer nor counted as a 합거 partner (a 정관 combining with the Day
+    Master itself is not read as "taken away").
+    """
+    out: List[str] = []
+    visible = [(i, s, L.ten_god(day_master, s)) for i, s in enumerate(stems) if i != 2]
+    gods = {g for _i, _s, g in visible}
+    if "정관" in gods and "편관" in gods:
+        out.append("관살혼잡 (정관 and 편관 both on the visible stems)")
+    for i, officer, g in visible:
+        if g != "정관":
+            continue
+        partner = next(
+            (o for j, o, _g in visible if j != i and L.stem_combination(officer, o)), None
+        )
+        if partner:
+            out.append(f"정관 합거 ({officer} bound by 천간합 with {partner})")
+            break
+    return out
+
+
+def _officer_grid_caveats(
+    day_master: str,
+    stems: List[str],
+    hidden_stems: List[Tuple[str, str]],
+    month_branch: str,
+    branches: List[str],
+    strength_verdict: str,
+) -> List[str]:
+    """Non-breaking 정관격 caveats: 충·형 on the month branch (purity lowered)
+    and a weak Day Master (needs 인성). knowledge/07 §정관격 — 성격 / 파격."""
+    out: List[str] = []
+    others = [b for i, b in enumerate(branches) if i != 1]
+    hits = []
+    for b in others:
+        if any({month_branch, b} == {x, y} for x, y in L.SIX_CLASHES):
+            hits.append(f"{b}{month_branch} 충")
+        for b1, b2, b3, _label in L.THREE_PUNISHMENTS:
+            members = {m for m in (b1, b2, b3) if m != "—"}
+            if b != month_branch and b in members and month_branch in members:
+                hits.append(f"{b}{month_branch} 형")
+    if hits:
+        out.append(
+            f"The month branch is struck ({', '.join(dict.fromkeys(hits))}), which lowers the "
+            "grid's purity without fully breaking it."
+        )
+    if strength_verdict in ("weak", "extreme_weak"):
+        all_stems = list(stems) + [s for _, s in hidden_stems]
+        has_resource = any(L.ten_god(day_master, s) in ("정인", "편인") for s in all_stems)
+        out.append(
+            "With a weak Day Master the officer can feel like a burden; classically 인성 (Resource) "
+            "must protect the self — "
+            + ("and 인성 is present here." if has_resource else "and 인성 is absent here, so read this grid cautiously.")
+        )
+    return out
+
+
 def detect_patterns(
     day_master: str,
     month_stem: str,
@@ -586,21 +646,33 @@ def detect_patterns(
     tengod_conflicts = detect_tengod_conflicts(day_master, stems, hidden_stems)
 
     # 성격/파격 cross-reference (E-9, 2026-09-25 audit) — see
-    # _GRID_BREAKING_CONFLICTS above for scope and sourcing.
+    # _GRID_BREAKING_CONFLICTS above for scope and sourcing, and
+    # knowledge/07-special-formations.md §정관격 — 성격 / 파격 for the
+    # 2026-09-26 additions (관살혼잡, 정관 합거; 월지 충·형 and 신약 caveats).
     conflict_names = {c["name_ko"] for c in tengod_conflicts}
     for candidate in regular_grid:
         breaking = [
             name for name, broken_god in _GRID_BREAKING_CONFLICTS.items()
             if name in conflict_names and broken_god == grid_tengod
         ]
+        caveats: List[str] = []
+        if grid_tengod == "정관":
+            breaking += _officer_grid_breakers(day_master, stems)
+            caveats = _officer_grid_caveats(
+                day_master, stems, hidden_stems, month_branch, branches, strength_verdict
+            )
+        notes: List[str] = []
         if breaking:
             candidate.confidence = "possible"
-            candidate.note = (
+            notes.append(
                 f"파격 (broken-grid) risk: {', '.join(breaking)} is also present in this "
-                f"chart (knowledge/05-ten-gods.md), which classically complicates a "
-                f"{candidate.name_ko} reading. Read this grid's usual meaning with that "
-                "caveat rather than at full strength."
+                f"chart (knowledge/05-ten-gods.md, knowledge/07-special-formations.md), which "
+                f"classically complicates a {candidate.name_ko} reading. Read this grid's usual "
+                "meaning with that caveat rather than at full strength."
             )
+        notes += caveats
+        if notes:
+            candidate.note = " ".join(notes)
 
     return {
         "regular_grid": regular_grid,

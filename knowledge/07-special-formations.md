@@ -29,6 +29,27 @@ The 격국 is the **dominant pattern** of the chart. The classical 자평진전 
 | 편인격 | 偏印格 | 월지 hidden stem 투출 = 편인 of Day Master | Day Master strong, support is unconventional | Specialized knowledge, solitary scholarship, sometimes strangeness |
 | 정인격 | 正印格 | 월지 hidden stem 투출 = 정인 of Day Master | Day Master strong, support is maternal | Education, certificates, real estate, mother's influence, gradual advancement |
 
+#### 정관격 — 성격 / 파격 (formation vs. broken grid)
+
+*(Added 2026-09-26, E-9 residual of the 2026-09-25 engine audit.)* A named 정관격 is read at full
+strength only when the officer stands "clean". Classical 파격 (破格, broken-grid) conditions:
+
+| Condition | Effect | Reading |
+|---|---|---|
+| **상관견관 (傷官見官)** — 상관 strikes 정관 | 파격 | 자평진전: "상관견관 위화백단 (爲禍百端)". Status and reputation shaken; friction with authority *(see `05-ten-gods.md`)*. |
+| **관살혼잡 (官殺混雜)** — 정관 and 편관 both stand on the visible stems | 파격 | The chart's direction blurs between two authority stars *(= 정편관혼잡 in `05-ten-gods.md`)*. |
+| **정관 합거 (合去)** — the visible 정관 stem is bound by 천간합 with another visible stem | 파격 | The officer is "tied up" and cannot function. |
+| **충·형 on the month branch** | Purity lowered, **not** a full 파격 | "투간한 정관이 충·형·합으로 깨지지 않고 맑게 서 있을수록 격이 또렷합니다." |
+| **Weak Day Master (신약)** | A defect, **not** 파격 | "신약하면 정관이 도리어 부담이 되므로 인성이 일간을 보호해야 합니다" — the grid then depends on 인성 being present. |
+
+The engine (`patterns.py`) downgrades a 정관격 candidate to *possible* for the three 파격 rows and adds
+a caveat note (no downgrade) for the last two. No 성격/파격 rule for the other nine regular grids is
+documented here, so none is applied to them.
+
+*Sources:* 사주보는 두루미 「정관격(正官格)」 — <https://www.durumisaju.com/dict/gyeokguk/jeonggwan-gyeok>
+(상관견관, 관살혼잡, 정관이 합으로 묶이는 경우, 신약 → 인성); 「정관격: 성립 조건과 해석」 —
+<https://www.dk-saju.com/gyeokguk/%EC%A0%95%EA%B4%80%EA%B2%A9> (위화백단; 충·형·합 lower purity).
+
 ### B. Special Grids (특수격, 特殊格)
 
 These grids apply when the Day Master is **either very weak or very strong** in unusual ways. They are read only when their specific conditions are met.
