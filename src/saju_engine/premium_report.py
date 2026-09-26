@@ -313,8 +313,14 @@ def _solar_time_note(chart) -> List[str]:
     if boundary:
         dist_to_boundary = boundary["distance_minutes"]
         unit = "minute" if dist_to_boundary == 1 else "minutes"
+        margin = f"~{dist_to_boundary} {unit}"
+        secs = boundary.get("distance_seconds")
+        if secs is not None and secs < 90:
+            # Sub-minute precision for the tightest cases (audit
+            # 2026-09-25: Harish's real margin is ~28 s, not "~1 minute").
+            margin = f"~{secs} seconds"
         lines.append(
-            f"> **⚠ Hour-boundary note:** the corrected time is only ~{dist_to_boundary} {unit} from a "
+            f"> **⚠ Hour-boundary note:** the corrected time is only {margin} from a "
             "2-hour branch boundary. If the recorded clock time carries even a few minutes of error, the "
             f"neighboring hour pillar (**{boundary['alternate_hour_pillar']}**, vs the primary "
             f"**{boundary['primary_hour_pillar']}** used above) is a plausible alternative — treat the hour "
