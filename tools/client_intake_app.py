@@ -24,6 +24,7 @@ Privacy / deployment note (demo deployment):
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 import sys
@@ -54,6 +55,7 @@ from saju_html.md_to_saju_pdf import build_pdf  # noqa: E402
 from saju_html.md_to_saju_pdf import build_pdf_from_chart  # noqa: E402
 
 app = FastAPI(title="Saju Self-Service Intake")
+log = logging.getLogger("saju.client_intake_app")
 
 # Allow the landing-page Next.js app to call /generate and /compat/generate
 # directly in development. In production, set SAJU_ALLOWED_ORIGINS to the
@@ -229,8 +231,13 @@ async def generate(
         pdf_path = await run_in_threadpool(_generate_pdf, payload, output_pdf)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Failed to generate report: {exc}") from exc
+    except Exception:
+        # N-14 (2026-09-26 audit): an unexpected failure's exception text
+        # (which can include file paths and internal details) used to be
+        # echoed straight into the HTTP response body. Log it server-side
+        # and tell the client only that generation failed.
+        log.exception("PDF generation failed for intake payload name=%r", payload.get("name"))
+        raise HTTPException(status_code=500, detail="Failed to generate report. Please try again.")
 
     return FileResponse(
         path=pdf_path,
@@ -315,39 +322,43 @@ async def compat_generate(
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
-    offset_a = _derive_utc_offset(dob_a, birth_time_a, payload.get("timezone_a"), utc_offset_a)
-    offset_b = _derive_utc_offset(dob_b, birth_time_b, payload.get("timezone_b"), utc_offset_b)
-
-    chart_a = compute_chart(
-        name=name_a or None, gender=gender_a,
-        year=ya, month=ma, day=da, hour=ha, minute=mia,
-        city=location_a or None, utc_offset=offset_a,
-        use_solar_time=True, convention="korean",
-    )
-    chart_b = compute_chart(
-        name=name_b or None, gender=gender_b,
-        year=yb, month=mb, day=db, hour=hb, minute=mib,
-        city=location_b or None, utc_offset=offset_b,
-        use_solar_time=True, convention="korean",
-    )
-
-    # Generate markdown + render PDF in a worker thread (charts can be slow).
-    # Storage convention (2026-07-06, revised): each pair gets its own subfolder
-    # under candidates_horoscope/marriage_compatibility/{slug_a}_{slug_b}/,
-    # containing {slug_a}_{slug_b}_compatibility.{md,pdf} for basic and
-    # ..._compatibility_deep.{md,pdf} for deep. Raw intake JSON still goes to
-    # intake/ for audit.
-    MARRIAGE_DIR = PROJECT_ROOT / "candidates_horoscope" / "marriage_compatibility"
+    # N-14 (2026-09-26 audit): this used to write straight into
+    # candidates_horoscope/marriage_compatibility/{slug_a}_{slug_b}/ — the
+    # SAME curated folder the manual /saju-client workflow uses for reviewed
+    # client deliverables. A public request naming a real past client pair
+    # (e.g. "Pawan" x "Sruthi") silently overwrote their actual PDF, and two
+    # concurrent requests for the same names raced on the same file. This
+    # self-service endpoint now renders into its own per-request scratch
+    # directory under intake/, like /generate already does, and never
+    # touches the curated folder.
+    render_dir = INTAKE_DIR / "compat-renders" / f"{timestamp}-{slug_a}-x-{slug_b}"
+    render_dir.mkdir(parents=True, exist_ok=True)
     selected_tier = tier.strip() if tier.strip() in ("basic", "deep") else "basic"
-    pair_dir = MARRIAGE_DIR / f"{slug_a}_{slug_b}"
-    pair_dir.mkdir(parents=True, exist_ok=True)
     name_filename = f"{slug_a}_{slug_b}_compatibility"
     if selected_tier == "deep":
         name_filename += "_deep"
-    output_md_path = pair_dir / f"{name_filename}.md"
-    output_pdf_path = pair_dir / f"{name_filename}.pdf"
+    output_md_path = render_dir / f"{name_filename}.md"
+    output_pdf_path = render_dir / f"{name_filename}.pdf"
 
     def _render() -> Path:
+        # N-14: compute_chart() also belongs in the worker thread — it used
+        # to run directly in this async handler, blocking the event loop
+        # (and every other in-flight request) for as long as chart
+        # computation took.
+        offset_a = _derive_utc_offset(dob_a, birth_time_a, payload.get("timezone_a"), utc_offset_a)
+        offset_b = _derive_utc_offset(dob_b, birth_time_b, payload.get("timezone_b"), utc_offset_b)
+        chart_a = compute_chart(
+            name=name_a or None, gender=gender_a,
+            year=ya, month=ma, day=da, hour=ha, minute=mia,
+            city=location_a or None, utc_offset=offset_a,
+            use_solar_time=True, convention="korean",
+        )
+        chart_b = compute_chart(
+            name=name_b or None, gender=gender_b,
+            year=yb, month=mb, day=db, hour=hb, minute=mib,
+            city=location_b or None, utc_offset=offset_b,
+            use_solar_time=True, convention="korean",
+        )
         # N-7 (2026-09-26 audit): a blank form field used to fall back to the
         # chart's raw, pre-climate 억부 candidate pick (strength_assessment's
         # candidate-favorable field) and pass it to generate_compat_report()
@@ -358,7 +369,6 @@ async def compat_generate(
         # pass an override when the form field itself was actually filled in;
         # otherwise let favorable_element() resolve the real 용신 for both
         # charts, same as the single-chart path.
-        selected_tier = tier.strip() if tier.strip() in ("basic", "deep") else "basic"
         md = generate_compat_report(
             chart_a, chart_b, name_a=name_a, name_b=name_b,
             favorable_element_a=favorable_element_a or None,
@@ -385,8 +395,12 @@ async def compat_generate(
 
     try:
         pdf_path = await run_in_threadpool(_render)
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Failed to generate compat PDF: {exc}") from exc
+    except Exception:
+        # N-14 (2026-09-26 audit): see the matching note in /generate above.
+        log.exception(
+            "Compat PDF generation failed for name_a=%r name_b=%r", name_a, name_b
+        )
+        raise HTTPException(status_code=500, detail="Failed to generate compatibility report. Please try again.")
 
     download_name = f"{slug_a}_{slug_b}_compatibility.pdf"
     if selected_tier == "deep":

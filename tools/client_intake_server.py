@@ -16,7 +16,7 @@ import sys
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
-from urllib.parse import unquote
+from urllib.parse import unquote_plus
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 INTAKE_DIR = PROJECT_ROOT / "candidates_horoscope" / "intake"
@@ -66,7 +66,11 @@ class _Handler(BaseHTTPRequestHandler):
             payload = json.loads(raw) if raw.strip().startswith("{") else {
                 k: v for k, v in (pair.split("=", 1) for pair in raw.split("&") if "=" in pair)
             }
-            payload = {k: unquote(v).strip() for k, v in payload.items()}
+            # N-14 (2026-09-26 audit): `+` encodes a space in
+            # application/x-www-form-urlencoded bodies (unlike raw percent
+            # escapes) — plain `unquote` left it as a literal "+", so "John
+            # Doe" was stored as "John+Doe".
+            payload = {k: unquote_plus(v).strip() for k, v in payload.items()}
         except Exception as exc:
             self._send_json(400, {"ok": False, "error": f"Invalid payload: {exc}"})
             return

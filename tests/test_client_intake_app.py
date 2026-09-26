@@ -46,6 +46,38 @@ def test_compat_generate_does_not_forward_raw_candidate_favorable_as_override():
     assert "strength_assessment[\"candidate_favorable\"]" not in source
 
 
+def test_compat_generate_never_writes_into_the_curated_deliverable_folder(monkeypatch, tmp_path):
+    """N-14 (2026-09-26 audit): /compat/generate used to render straight into
+    candidates_horoscope/marriage_compatibility/{slug_a}_{slug_b}/ — the same
+    curated folder the manual /saju-client workflow uses for reviewed client
+    deliverables. A public request naming a real past client pair silently
+    overwrote their actual PDF. It must render into its own scratch directory
+    under INTAKE_DIR instead, and never touch the curated folder."""
+    import asyncio
+
+    module = _load_app_module()
+    monkeypatch.setattr(module, "INTAKE_DIR", tmp_path)
+    curated_dir = module.PROJECT_ROOT / "candidates_horoscope" / "marriage_compatibility"
+    before = set(curated_dir.rglob("*")) if curated_dir.exists() else set()
+
+    # Call the route function directly (bypassing the ASGI/HTTP layer, which
+    # this environment's httpx/starlette versions don't agree on for
+    # TestClient) — FastAPI's @app.post decorator returns the plain
+    # coroutine function unchanged, so it's callable like any other async def.
+    response = asyncio.run(module.compat_generate(
+        name_a="N14-Test-A", dob_a="1990-06-15", birth_time_a="10:00",
+        location_a="Seoul", utc_offset_a=9.0, gender_a="M",
+        name_b="N14-Test-B", dob_b="1992-03-20", birth_time_b="14:00",
+        location_b="Seoul", utc_offset_b=9.0, gender_b="F",
+        email="test@example.com", main_concern="", favorable_element_a="",
+        favorable_element_b="", timezone_a="", timezone_b="", tier="basic",
+    ))
+    assert Path(response.path).exists()
+    after = set(curated_dir.rglob("*")) if curated_dir.exists() else set()
+    assert before == after, "compat_generate must never write into the curated deliverable folder"
+    assert any(tmp_path.rglob("*compatibility.pdf")), "PDF should render into the scratch INTAKE_DIR instead"
+
+
 def test_intake_forms_do_not_default_utc_offset_to_india():
     """F-10 (2026-09-26 audit): both self-service intake forms hard-coded
     value="5.5" (India UTC offset) as the pre-filled default, contradicting
