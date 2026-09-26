@@ -435,7 +435,8 @@ def derive_stars(
       - robbery_star (劫煞), disaster_star (災煞), heaven_bane (天煞),
         earth_bane (地煞), annual_bane (年煞), monthly_bane (月煞),
         lost_spirit (亡神), general_star (將星), saddle_star (攀鞍),
-        six_harm_bane (六害): the remaining 십이신살 stars keyed by day-branch triplet.
+        six_harm_bane (六害): the remaining 십이신살 stars keyed by the anchor
+        branch's triplet (see ``anchor`` below).
       - deep_grudge (怨嗔): branch pairs matched in the chart.
       - ghost_gate (鬼門關): branch pairs matched in the chart.
       - white_tiger (白虎): day pillar match, if provided.
@@ -443,7 +444,7 @@ def derive_stars(
       - heavenly_virtue (天德貴人): matching 천간, if month_branch + stems provided.
       - monthly_virtue (月德貴人): matching 천간, if month_branch + stems provided.
 
-    ``anchor`` selects the school for 도화/역마/화개:
+    ``anchor`` selects the school for 도화/역마/화개 and the other 십이신살:
       - ``"day"`` (default): day-branch anchoring, the most common Korean convention.
       - ``"year"``: year-branch anchoring (고법 / alternative school).
     The day-stem-based stars (천을귀인, 문창, 홍염, 양인) are unaffected.
@@ -482,8 +483,10 @@ def derive_stars(
     stars["hongyeom"] = _hongyeom(day_stem, day_branch)
     stars["yangin"] = _yangin(day_stem, day_branch)
 
-    # 십이신살 (十二神殺) — remaining stars keyed by day-branch triplet
-    triplet = _triplet_for_branch(day_branch, _TWELVE_STARS.keys())
+    # 십이신살 (十二神殺) — remaining stars keyed by the same anchor branch as
+    # 도화/역마/화개 (day by default; year for the traditional Korean basis —
+    # knowledge/07-special-formations.md §십이신살 school note, E-7).
+    triplet = _triplet_for_branch(anchor_branch, _TWELVE_STARS.keys())
     if triplet:
         for key, target in _TWELVE_STARS[triplet].items():
             stars[key] = [target] if target in present else []

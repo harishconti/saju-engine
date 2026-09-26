@@ -85,11 +85,9 @@ The 세운 is the **pillar of the current calendar year**. For example, 2026 is 
 2. **Determine the annual element** and its relationship to the Day Master.
 3. **Check for natal activation:**
    - Annual branch vs. natal branches → 충, 합, 형, 파, 해?
-   - Annual stem vs. natal stems → 합? 천간충 pattern? *(see `01-stems.md`'s Stem Clashes section —
-     stems do not clash the way branches do; "천간충" here means the 제/극/생 controlling-and-being-
-     controlled relationships that section describes, read as pressure or hardship rather than the
-     branch-style clash mechanism. Corrected 2026-09-25, external report review, E-7, to resolve the
-     apparent contradiction between this line and that section.)*
+   - Annual stem vs. natal stems → 합 (천간합)? 천간충 (甲庚, 乙辛, 丙壬, 丁癸)? *(see `01-stems.md`
+     §Stem Combinations and §Stem Clashes — check against **every** natal stem, not only the Day
+     Master. Updated 2026-09-26, E-7.)*
 4. **Read the year's theme** as the "weather" of the year.
 
 ### Common Patterns (Cheat Sheet)

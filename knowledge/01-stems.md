@@ -43,10 +43,32 @@ If a combination does not "transform" (합화), it is read as a **half-combinati
 
 ## Stem Clashes (천간충)
 
-A common interpretive note: stems technically do not "clash" the way branches do. However:
+Stems do not clash *mechanically* the way branches do (a branch 충 physically displaces the hidden
+stems of a palace), but Korean 명리 does recognise **four standard 천간충 (天干沖) pairs** — also
+called 칠충 (七沖), because each stem clashes with the stem seven places from it. In each pair the two
+stems share the same yin-yang polarity and one directly controls the other, across opposite directions
+(East Wood vs. West Metal, South Fire vs. North Water):
+
+| Pair | Relation |
+|---|---|
+| 甲庚沖 | Yang Metal controls Yang Wood |
+| 乙辛沖 | Yin Metal controls Yin Wood |
+| 丙壬沖 | Yang Water controls Yang Fire |
+| 丁癸沖 | Yin Water controls Yin Fire |
+
+Read a 천간충 as **tension, pressure, or abrupt change** in what the two stems' ten-gods represent —
+not automatically as misfortune: a clash also checks an excess (견제). 戊 and 己 (Earth, the centre)
+have no 천간충 partner in the four-pair system.
+
+Beyond those four pairs, other stem-to-stem interactions are read through the general 오행 cycles:
 - A stem that **controls** another (e.g. 金 controlling 木) creates a **제 (制, controlling)** relationship, often read as pressure or limitation.
 - A stem that is **controlled by** another (e.g. 木 being controlled by 金) creates a **극 (剋, being overcome)** relationship, often read as hardship or external pressure on the querent's expression.
 - A stem that **generates** another (e.g. 木 generating 火) creates a **생 (生, generating)** relationship, often read as support, nurturing, or expense (depending on the ten-god class).
+
+*(Rewritten 2026-09-26, E-7 of the 2026-09-25 engine audit: this section previously said stems
+"technically do not clash", contradicting `08-luck-pillars.md`'s instruction to check 천간충. Sources:
+Korean Wikipedia 「충 (사주팔자)」 — "천간충에는 갑경충, 을신충, 병임충, 정계충 네 종류가 있습니다";
+정해 만세력 강의 12강 「천간합과 천간충」.)*
 
 ## Stem-by-Stem Profile (일간 관점)
 

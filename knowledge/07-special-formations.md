@@ -197,6 +197,14 @@ The engine also recognizes the following additional classical stars. They are tr
 
 Derived from the **day branch's three-harmony triplet**. The table below gives the star position for each of the four triplets.
 
+> **School note — anchor branch (added 2026-09-26, E-7).** Traditional Korean practice anchors the
+> 12신살 primarily on the **year branch (년지)**; many modern readers use the **day branch (일지)**, and
+> many check both. Both use the same triplet table — only the anchor changes, so a chart's stars can
+> differ completely between the two bases. This engine defaults to the day branch (consistent with its
+> 도화/역마/화개 default) and supports year-branch anchoring via `anchor="year"`. Readers should state
+> which basis they are using. Sources: 두루미사주 12신살 사전 ("년지를 기준으로 삼합 그룹에 따라"),
+> 류동학, 대구신문 「12신살의 이론과 적용」; see `docs/audits/2026-09-25-engine-audit-verification.md`.
+
 | Day-branch triplet | 겁살 (劫煞) | 재살 (災煞) | 천살 (天煞) | 지살 (地煞) | 연살 (年煞) | 월살 (月煞) | 망신 (亡神) | 장성 (將星) | 반안 (攀鞍) | 역마 (驛馬) | 육해 (六害) | 화개 (華蓋) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 寅午戌 | 亥 | 子 | 丑 | 寅 | 卯 | 辰 | 巳 | 午 | 未 | 申 | 酉 | 戌 |
@@ -210,9 +218,9 @@ Derived from the **day branch's three-harmony triplet**. The table below gives t
 - **겁살 (劫煞):** Sudden loss, theft, unexpected competition; can also mark decisive action.
 - **재살 (災煞):** Mishaps, illness, obstacles; often softened by a strong 용신.
 - **천살 (天煞):** External pressures, authority conflicts, "heaven-sent" trials.
-- **지살 (地煞):** Earthly hindrances, delays, bureaucratic friction.
-- **연살 (年煞):** Yearly/annual-style friction; less emphasized in modern Korean readings.
-- **월살 (月煞):** Monthly-style friction; also used for romantic turbulence in some schools.
+- **지살 (地煞):** The movement/departure star — relocation, travel, job or residence changes; the milder, more passive sibling of 역마 (역마 is active, 지살 is change that arrives). *(Corrected 2026-09-26, E-7: previously mis-described as "hindrances, delays".)*
+- **연살 (年煞):** In the 12신살 sequence 연살 falls on the same branch as 도화 (桃花) and is read the same way — charm, attraction, social visibility (see §도화 above). *(Corrected 2026-09-26, E-7.)*
+- **월살 (月煞):** Also called 고초살 (枯焦殺) / 고갈살 (枯渴殺) — the drying-up/stagnation star: slow development, effort that does not yet bear fruit, a need for patience and replenishment. *(Corrected 2026-09-26, E-7: previously mis-described as "romantic turbulence".)*
 - **망신 (亡神):** Mental dispersion, forgetfulness, scattered energy; can indicate hidden schemes.
 - **장성 (將星):** Leadership, command, organizational ability.
 - **반안 (攀鞍):** Advancement, promotion, riding a rising wave.
