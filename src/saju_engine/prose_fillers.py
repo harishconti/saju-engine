@@ -1536,9 +1536,19 @@ def regular_grid_narrative(ctx) -> str:
     if not regular:
         return ""
     candidate = regular[0]
-    if candidate.confidence != "likely":
+    if candidate.confidence not in ("likely", "possible"):
         return ""
     theme = _REGULAR_GRID_THEME.get(candidate.name_ko, "a life theme read from the dominant month-branch ten-god")
+    if candidate.confidence == "possible":
+        # E-9 (2026-09-25 audit): a regular grid only ever reaches "possible"
+        # via patterns.py's 성격/파격 cross-check, which always sets `note`.
+        # Surface that caveat instead of silently dropping the whole theme
+        # sentence — gating strictly on "likely" (the old behavior) made the
+        # grid narrative vanish with no explanation once this could fire.
+        return (
+            f"The engine flags **{candidate.name_ko} ({candidate.name_en})** as the regular grid, but with "
+            f"a caveat: {candidate.note} When intact, this grid points toward a life theme shaped by {theme}."
+        )
     return (
         f"The engine flags a likely **{candidate.name_ko} ({candidate.name_en})** as the regular grid. "
         f"This points toward a life theme shaped by {theme}. "

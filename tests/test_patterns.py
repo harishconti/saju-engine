@@ -457,6 +457,68 @@ def test_transformation_grid_bing_xin_water_combo():
     assert trans["combined_element"] == "Water"
 
 
+# ── E-9 (2026-09-25 audit) — 격국 naming had no 성격/파격 (broken-grid) check ──
+
+
+def test_regular_grid_downgraded_when_sanggwan_gyeon_gwan_present():
+    """Same chart as test_regular_grid_from_month_stem (a real 정관격), which
+    also happens to carry 상관 (己, visible hour stem + hidden). Per
+    knowledge/05-ten-gods.md ("상관견관 = 상관 directly clashing with 정관"),
+    this classically complicates a 정관격 reading — but the two detectors
+    used to run in total isolation, so the grid was asserted 'likely'
+    regardless."""
+    result = detect_patterns(
+        day_master="丙",
+        month_stem="甲",
+        month_branch="子",
+        branches=["酉", "子", "寅", "丑"],
+        stems=["癸", "甲", "丙", "己"],
+        hidden_stems=[("main", "辛"), ("main", "癸"), ("main", "甲"), ("main", "己")],
+    )
+    grid = next(g for g in result["regular_grid"] if g.name_ko == "정관격")
+    assert grid.confidence == "possible"
+    assert "파격" in grid.note and "상관견관" in grid.note
+    assert any(c["name_ko"] == "상관견관" for c in result["tengod_conflicts"])
+
+
+def test_regular_grid_stays_likely_without_conflicting_god():
+    """Same 정관격 setup but with no 상관 anywhere in the chart — the grid
+    must stay at full ('likely') confidence with no 파격 note."""
+    result = detect_patterns(
+        day_master="丙",
+        month_stem="甲",
+        month_branch="子",
+        branches=["酉", "子", "寅", "丑"],
+        stems=["癸", "甲", "丙", "壬"],
+        hidden_stems=[("main", "癸")],
+    )
+    grid = next(g for g in result["regular_grid"] if g.name_ko == "정관격")
+    assert grid.confidence == "likely"
+    assert grid.note == ""
+
+
+def test_regular_grid_downgrade_confined_to_the_targeted_god():
+    """상관견관 present in the chart, but the named grid is 편인격, not
+    정관격 — knowledge/05-ten-gods.md's own wording only names 상관견관 as
+    breaking a 정관 reading, so a 편인격 must NOT be downgraded by it."""
+    result = detect_patterns(
+        day_master="丙",
+        month_stem="甲",
+        month_branch="寅",
+        branches=["寅", "寅", "寅", "寅"],
+        stems=["甲", "甲", "丙", "庚"],
+        hidden_stems=[
+            ("main", "甲"), ("middle", "丙"), ("residual", "戊"),
+            ("main", "癸"), ("main", "己"),
+        ],
+    )
+    grid = next(g for g in result["regular_grid"] if g.name_ko == "편인격")
+    assert grid.confidence == "likely"
+    assert grid.note == ""
+    # The conflict itself is still independently detected and reported.
+    assert any(c["name_ko"] == "상관견관" for c in result["tengod_conflicts"])
+
+
 # ── Special-form (종격) threshold & subtype tests ──────────────────────────────
 
 

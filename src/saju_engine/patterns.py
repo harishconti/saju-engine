@@ -57,6 +57,22 @@ def _grid_stem_by_tuochul(month_branch: str, stems: List[str]) -> Tuple[str, str
     )
 
 
+# 성격/파격 (grid completion / grid-breaking) cross-reference.
+# E-9 (2026-09-25 audit): 격국 naming (regular_grid) and named ten-god
+# conflict patterns (detect_tengod_conflicts) were computed independently —
+# a 정관격 was asserted at "likely" confidence with zero regard for whether
+# 상관견관 (the *same* chart's own already-detected conflict, sourced from
+# knowledge/05-ten-gods.md: "상관견관 = 상관 directly clashing with 정관")
+# was present. This is deliberately narrow: it maps a conflict pattern to
+# the single grid ten-god that knowledge/05-ten-gods.md's own wording names
+# it as breaking, and only downgrades that grid — it does not invent a
+# general 파격 theory beyond what the two already-implemented, already-cited
+# detectors (regular_grid + detect_tengod_conflicts, below) jointly support.
+_GRID_BREAKING_CONFLICTS: Dict[str, str] = {
+    "상관견관": "정관",
+}
+
+
 # Regular grid mapping: month stem ten-god → grid name.
 _REGULAR_GRID: Dict[str, Tuple[str, str]] = {
     "비견": ("비견격", "Companion Grid"),
@@ -568,6 +584,23 @@ def detect_patterns(
     )
     structural = detect_structural_notes(branches)
     tengod_conflicts = detect_tengod_conflicts(day_master, stems, hidden_stems)
+
+    # 성격/파격 cross-reference (E-9, 2026-09-25 audit) — see
+    # _GRID_BREAKING_CONFLICTS above for scope and sourcing.
+    conflict_names = {c["name_ko"] for c in tengod_conflicts}
+    for candidate in regular_grid:
+        breaking = [
+            name for name, broken_god in _GRID_BREAKING_CONFLICTS.items()
+            if name in conflict_names and broken_god == grid_tengod
+        ]
+        if breaking:
+            candidate.confidence = "possible"
+            candidate.note = (
+                f"파격 (broken-grid) risk: {', '.join(breaking)} is also present in this "
+                f"chart (knowledge/05-ten-gods.md), which classically complicates a "
+                f"{candidate.name_ko} reading. Read this grid's usual meaning with that "
+                "caveat rather than at full strength."
+            )
 
     return {
         "regular_grid": regular_grid,

@@ -347,6 +347,26 @@ def test_regular_grid_narrative_uses_grid_candidate(ctx):
         )
 
 
+def test_regular_grid_narrative_surfaces_pagyeok_caveat_instead_of_vanishing():
+    """E-9 (2026-09-25 audit): Harish's real chart is a 정관격 downgraded to
+    'possible' by the new 성격/파격 cross-check (상관견관 present). Before this
+    fix, regular_grid_narrative gated strictly on confidence == 'likely', so
+    the entire grid theme sentence would have silently vanished from his
+    report the moment E-9 could produce a 'possible' regular grid at all —
+    it must instead surface the 파격 caveat."""
+    chart = compute_chart(
+        name="harish-e9-regression", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+    grid = chart.patterns["regular_grid"][0]
+    assert grid.name_ko == "정관격" and grid.confidence == "possible"
+    harish_ctx = _ReportContext(chart, tier="deep", generation_date="2026-09-25")
+    out = PF.regular_grid_narrative(harish_ctx)
+    assert out != ""
+    assert "정관격" in out and "파격" in out and "상관견관" in out
+
+
 def test_special_grid_note_returns_string(ctx):
     out = PF.special_grid_note(ctx)
     assert isinstance(out, str)

@@ -37,7 +37,7 @@ FIXED = confirmed and corrected, with regression test and evidence linked below.
 | E-6 | P1 | Annual/decade interaction detector incomplete | **FIXED** | `sewoon.py::_detect_branch_relationship` returned on the *first* match (clash→combine→harm→break→self-punish priority), silently dropping a pair's second, simultaneous relationship; and no 3-branch (삼합/방합) completion check existed at all. See fix log below. |
 | E-7 | P1 | Knowledge-base star meanings + stem-clash inconsistency | **PARTIAL — stem-clash fixed; 지살/월살 wording deliberately left alone** | The `01-stems.md` "stems don't clash" vs. `08-luck-pillars.md` "check 천간충" inconsistency is fixed (cross-reference added, no new claim invented). The 지살/월살 meaning correction was **not** applied: my own recollection of the classical distinction (지살 as a travel-adjacent but distinct-from-역마 star; 월살 as 고초살/stagnation rather than romance) has real uncertainty, and the original audit's own sourcing for its claimed corrections was not available to verify against — rewriting a knowledge-base doctrine claim on uncertain memory would violate Ground Rule 1 as much as leaving a possibly-wrong claim in place. Left as an open, documented item for whoever has the classical source to confirm. |
 | E-8 | P1 | Relationship section ignores gender | **FIXED** | `relationship_style()` read only `day_branch_main`'s ten-god; no gendered 재성/관성 (spouse-star) scan across the whole chart existed anywhere in `prose_fillers.py`. Fixed by reusing the classical mapping already applied in `compat.py::_gendered_spouse_star_note` (knowledge/11-gunghap.md §G). |
-| E-9 | P2 | 격국 named with no 성격/파격 check | **CONFIRMED** | No occurrence of 파격/성격 logic anywhere in `patterns.py`; 정관격 is asserted from the grid-forming branch alone, independent of the 상관견관/clash facts the same report lists. |
+| E-9 | P2 | 격국 named with no 성격/파격 check | **FIXED** | `patterns.py` computed grid-naming (regular_grid) and named ten-god conflicts (상관견관) in total isolation; 정관격 was asserted at "likely" confidence regardless of a same-chart 상관견관. See fix log below. |
 | E-10 | P2 | PDF tests hard-fail without `pdftotext` | **FIXED** | `tests/test_pdf.py` called `subprocess.run(["pdftotext", ...])` with no `FileNotFoundError` handling or `skipif` guard, in exactly the 5 functions that shell out to it. Fixed with a `shutil.which`-based `skipif` marker; verified both that the 5 skip when `pdftotext` is unavailable and that the other 7 (which don't need it) still run. |
 | E-11 | P2 | Date filter misses 형/자형/원진 | **FIXED (형/자형); 원진 deliberately not added** | `_candidate_day_conflicts` checked only 충/해/파. Fixed for 형 (pairwise three-punishment membership, including the 子卯 2-member special case) and 자형 (self-punishment). 원진 was **not** added — `knowledge/16-date-selection.md` names only 충/형/파/해 as date-selection criteria, so adding 원진 would invent a requirement beyond the cited doctrine (Ground Rule 1). |
 | E-12 | P2 | Misc. template-prose defects | **NOT YET CHECKED** | Relayed list (§E-12 in the source report) not yet seen in full. |
@@ -255,6 +255,42 @@ Two independent sub-fixes, both in `sewoon.py` (consumed by `derive_sewoon`/`der
    asserted-wrong anywhere) — all 14 new tests are additive. Full suite: **988 passed, 10 xfailed, 0
    failed** (up from 974/10/0).
 
+### E-9 — FIXED (2026-09-26)
+
+Deliberately narrow, per Ground Rule 1: `knowledge/07-special-formations.md` (the file `patterns.py`
+cites throughout) has **zero** occurrences of 성격/파격 doctrine — no general theory of what breaks a
+grid is documented anywhere in this codebase, so inventing one would violate the same rule this
+tracker has already declined to cross once (E-7's 지살/월살). But `knowledge/05-ten-gods.md` §Ten-God
+Conflict Patterns already, explicitly, names what 상관견관 does to a 정관 reading ("상관 directly
+clashing with 정관, the classical 'rebellion against authority' pattern") — and `patterns.py` already
+implements both halves (`regular_grid`'s 투출 naming, and `detect_tengod_conflicts`'s 상관견관 check)
+without ever letting them talk to each other. The fix only wires those two already-implemented,
+already-cited detectors together — it adds no new classical claim.
+
+- `patterns.py::_GRID_BREAKING_CONFLICTS` maps `"상관견관" → "정관"` (the one pairing the knowledge file
+  actually names). `detect_patterns` now checks, after computing both `regular_grid` and
+  `tengod_conflicts`, whether the named grid's ten-god matches a present conflict's target; if so, the
+  candidate's `confidence` drops from `"likely"` to `"possible"` and its `note` explains why (파격 risk),
+  citing `knowledge/05-ten-gods.md`. No other grid type or conflict pairing is touched — 편인격/식신격/etc.
+  are structurally exempt since `_GRID_BREAKING_CONFLICTS` only names 정관.
+- **Verified against Harish's real chart** (the exact case the original audit named — "정관격 is
+  asserted... independent of the 상관견관/clash facts the same report lists"): his 정관격 (from 癸 투출)
+  now correctly downgrades to `possible` with a note naming 상관견관, since his chart carries three 상관
+  sources against one hidden 정관.
+- **This exposed a second, dormant bug while verifying end-to-end**, same failure shape as E-3's
+  "favor"/"unfavorable" substring bug: `prose_fillers.py::regular_grid_narrative` gated strictly on
+  `confidence == "likely"` and returned `""` otherwise — since a regular grid could previously *only*
+  ever be `"likely"` (nothing downgraded it), this silently dropped the *entire* grid-theme sentence
+  the moment E-9 made `"possible"` reachable at all, for every future report with a 정관격+상관견관 chart,
+  including Harish's own regenerated report. Fixed by widening the gate to `("likely", "possible")` and,
+  for `"possible"`, surfacing the 파격 caveat text itself instead of silently vanishing — verified
+  end-to-end: Harish's real report now reads "The engine flags **정관격**... but with a caveat: 파격
+  (broken-grid) risk: 상관견관 is also present..." where it previously would have said nothing at all.
+- 4 new tests (3 in `test_patterns.py` — downgrade fires, stays `likely` without the conflicting god,
+  and confined to the one targeted god only; 1 in `test_prose_fillers.py` — the narrative fix,
+  end-to-end against Harish's real chart). Full suite: **992 passed, 10 xfailed, 0 failed** (up from
+  988/10/0).
+
 ### Remaining: E-5 (documentation-only, no live bug for Harish), E-7 (KB star meanings + stem-clash
-inconsistency), E-9 (격국 파격 check — needs care), E-12 (misc. template prose — never seen in detail),
-E-13 (daeun display convention — cosmetic, never independently verified).
+inconsistency), E-12 (misc. template prose — never seen in detail), E-13 (daeun display convention —
+cosmetic, never independently verified).
