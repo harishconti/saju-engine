@@ -680,3 +680,45 @@ def test_strength_reasoning_no_reconciliation_for_strong_weak_charts():
     assert sa["verdict"] in ("strong", "extreme", "weak", "extreme_weak")
     text = PF.strength_reasoning({"chart": chart})
     assert "pulls the total back into the balanced range" not in text
+
+
+# ── E-6 residuals (2026-09-26) — stem checks, 삼형, per-branch dedup ──
+
+
+def _harish_hit(year):
+    from saju_engine import sewoon as SE
+    chart = compute_chart(
+        name="harish-e6-residual", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+    return SE.build_sewoon_range(
+        chart.day_master, chart.branches, year, year, natal_stems=chart.stems
+    )[0]
+
+
+def test_annual_activation_note_surfaces_natal_stem_combo_and_clash():
+    note_2027 = PF.annual_activation_note(_harish_hit(2027))
+    assert "정임합목" in note_2027 and "natal **壬** stem" in note_2027
+    note_2026 = PF.annual_activation_note(_harish_hit(2026))
+    assert "natal **壬** in a **천간충**" in note_2026
+
+
+def test_annual_activation_note_surfaces_sanhyeong_completion():
+    note = PF.annual_activation_note(_harish_hit(2034))
+    assert "寅巳申 삼형" in note and "갑기합토" in note
+
+
+def test_annual_activation_note_keeps_same_relation_against_two_branches():
+    """Dedup is per (relationship, natal branch), not per relationship: a
+    second harm against a different natal branch must still be named."""
+    from saju_engine.sewoon import SeWoonHit
+    hit = SeWoonHit(year=2034, stem="甲", branch="寅", activated_branches=[
+        ("寅", "巳", "harm"), ("寅", "巳", "harm"),   # exact duplicate → once
+        ("寅", "未", "harm"),                          # synthetic second target
+        ("寅", "巳", "punish"),
+    ])
+    note = PF.annual_activation_note(hit)
+    assert note.count("natal **巳** are in **해 (harm)**") == 1
+    assert "natal **未** are in **해 (harm)**" in note
+    assert "형 (punishment)" in note

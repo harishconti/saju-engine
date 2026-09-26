@@ -346,6 +346,7 @@ def compute_chart(
         reference_month=ref_date.month,
         reference_day=ref_date.day,
         window=2,
+        natal_stems=chart.stems,
     )
 
     # Monthly-luck window around the reference date

@@ -1350,6 +1350,7 @@ def year_by_year_note(h, ctx) -> str:
 _RELATIONSHIP_LABEL: Dict[str, str] = {
     "clash": "충 (clash)", "combine": "합 (combination)",
     "harm": "해 (harm)", "break": "파 (break)", "self_punish": "자형 (self-punishment)",
+    "punish": "형 (punishment)",
 }
 
 
@@ -1388,11 +1389,27 @@ def annual_activation_note(h) -> str:
             f"the annual stem **{h.stem}** forms **{combo_ko} ({combo_hanja})** with your Day Master, "
             f"activating {combo_elem}"
         )
-    seen_types: set = set()
+    for stem_a, stem_b, combo_elem, combo_ko, natal_s in getattr(h, "natal_stem_combinations", []) or []:
+        # E-6 (2026-09-25 audit): 천간합 with natal stems other than the DM.
+        combo_hanja = f"{stem_a}{stem_b}合{_ELEMENT_HANJA.get(combo_elem, '')}"
+        notes.append(
+            f"the annual stem **{h.stem}** forms **{combo_ko} ({combo_hanja})** with your natal "
+            f"**{natal_s}** stem, drawing it toward {combo_elem}"
+        )
+    for annual_s, natal_s in getattr(h, "stem_clashes", []) or []:
+        # knowledge/01-stems.md §Stem Clashes — tension/pressure, not doom.
+        notes.append(
+            f"the annual stem **{annual_s}** clashes with your natal **{natal_s}** "
+            f"in a **천간충** (stem clash) — pressure or abrupt change in what that stem represents"
+        )
+    # De-duplicate by (relationship, natal branch), not by relationship
+    # alone — E-6 (2026-09-25 audit): a second harm/clash against a
+    # different natal branch in the same year was silently dropped.
+    seen_pairs: set = set()
     for annual_b, natal_b, rel in getattr(h, "activated_branches", []) or []:
-        if rel in seen_types:
+        if (rel, natal_b) in seen_pairs:
             continue
-        seen_types.add(rel)
+        seen_pairs.add((rel, natal_b))
         label = _RELATIONSHIP_LABEL.get(rel, rel)
         notes.append(f"the annual branch **{annual_b}** and natal **{natal_b}** are in **{label}**")
     for hc in getattr(h, "harmony_completions", []) or []:
@@ -1402,7 +1419,13 @@ def annual_activation_note(h) -> str:
         # highly empowered. When two appear... partial empowerment (반합)."
         triad_label = "".join(hc.triad)
         others = "".join(hc.matched_natal)
-        if hc.status == "full":
+        if hc.kind == "삼형":
+            notes.append(
+                f"the annual branch **{h.branch}** completes the **{triad_label} 삼형 "
+                f"(three-way punishment)** with your natal **{others}** — classically read as friction "
+                f"with rules or authority, injury risk, or self-inflicted setbacks, so a year to move carefully"
+            )
+        elif hc.status == "full":
             notes.append(
                 f"the annual branch **{h.branch}** completes the "
                 f"**{triad_label} {hc.kind} ({hc.element})** with your natal **{others}**"

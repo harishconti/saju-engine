@@ -57,6 +57,8 @@ class DaeunPeriod:
     # List[HarmonyCompletion] (sewoon.py) — 삼합/방합 triads this period's
     # branch completes/half-completes with the natal chart.
     stem_combinations: List[Dict] = field(default_factory=list)
+    stem_clashes: List[Dict] = field(default_factory=list)
+    # 천간충 {stem_a, stem_b} of this period's stem vs. natal stems (E-6).
     stem_element: str = ""
     branch_element: str = ""
     favorable_status: Optional[str] = None
@@ -381,6 +383,7 @@ class Chart:
                     "relationship_types": p.relationship_types,
                     "harmony_completions": self._harmony_completions_dicts(p.harmony_completions),
                     "stem_combinations": p.stem_combinations,
+                    "stem_clashes": p.stem_clashes,
                     "stem_element": p.stem_element,
                     "branch_element": p.branch_element,
                     "favorable_status": p.favorable_status,
@@ -423,6 +426,7 @@ class Chart:
             "relationship_types": p.relationship_types,
             "harmony_completions": self._harmony_completions_dicts(p.harmony_completions),
             "stem_combinations": p.stem_combinations,
+            "stem_clashes": p.stem_clashes,
             "stem_element": p.stem_element,
             "branch_element": p.branch_element,
             "favorable_status": p.favorable_status,
@@ -442,6 +446,17 @@ class Chart:
             ],
             "relationship_types": h.relationship_types,
             "harmony_completions": self._harmony_completions_dicts(getattr(h, "harmony_completions", [])),
+            "stem_combinations": [
+                {"stem_a": a, "stem_b": b, "combined_element": e, "korean_name": k}
+                for a, b, e, k in getattr(h, "stem_combinations", [])
+            ],
+            "natal_stem_combinations": [
+                {"stem_a": a, "stem_b": b, "combined_element": e, "korean_name": k, "natal_stem": n}
+                for a, b, e, k, n in getattr(h, "natal_stem_combinations", [])
+            ],
+            "stem_clashes": [
+                {"stem_a": a, "stem_b": b} for a, b in getattr(h, "stem_clashes", [])
+            ],
         }
 
     def _harmony_completions_dicts(self, completions) -> List[Dict[str, Any]]:

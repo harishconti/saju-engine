@@ -156,7 +156,8 @@ def test_detect_branch_relationship_returns_dual_status_pairs():
     """knowledge/02-branches.md documents 寅亥 and 巳申 as pairs that are
     simultaneously a 육합 (combine) and a 파 (break) — not either/or."""
     assert set(_detect_branch_relationship("寅", "亥")) == {"combine", "break"}
-    assert set(_detect_branch_relationship("巳", "申")) == {"combine", "break"}
+    # 巳申 is also a member pair of the 寅巳申 삼형 (E-6 residual: pairwise 형).
+    assert set(_detect_branch_relationship("巳", "申")) == {"combine", "break", "punish"}
 
 
 def test_detect_branch_relationship_single_match_unaffected():
@@ -166,7 +167,7 @@ def test_detect_branch_relationship_single_match_unaffected():
 
 
 def test_detect_branch_relationship_no_match_returns_empty_list():
-    assert _detect_branch_relationship("子", "卯") == []
+    assert _detect_branch_relationship("子", "辰") == []
 
 
 def test_detect_harmony_completions_full_samhap():
@@ -217,3 +218,54 @@ def test_derive_sewoon_surfaces_dual_status_pair_end_to_end():
     assert hit.combined == "壬寅"
     rels = {r for a, n, r in hit.activated_branches if n == "亥"}
     assert rels == {"combine", "break"}
+
+
+# ── E-6 residuals (2026-09-26): pairwise 형, 삼형 completion, stem checks ──
+# Harish's natal chart 壬申 / 乙巳 / 辛亥 / 己丑 — the audit's worked examples.
+_H_BRANCHES = ["申", "巳", "亥", "丑"]
+_H_STEMS = ["壬", "乙", "辛", "己"]
+
+
+def test_pairwise_punishment_detected():
+    assert "punish" in _detect_branch_relationship("丑", "戌")
+    assert "punish" in _detect_branch_relationship("寅", "巳")
+    assert "punish" in _detect_branch_relationship("子", "卯")
+    assert "punish" not in _detect_branch_relationship("子", "午")
+    # A branch never pairwise-punishes itself (that is 자형).
+    assert "punish" not in _detect_branch_relationship("午", "午")
+
+
+def test_2030_gengxu_punishes_natal_chou():
+    hit = derive_sewoon("辛", _H_BRANCHES, 2030, natal_stems=_H_STEMS)
+    assert hit.combined == "庚戌"
+    assert ("戌", "丑", "punish") in hit.activated_branches
+    # 庚 + natal 乙 → 을경합금
+    assert [c[4] for c in hit.natal_stem_combinations] == ["乙"]
+
+
+def test_2034_jiayin_completes_yinsishen_punishment_and_jiaji_combo():
+    hit = derive_sewoon("辛", _H_BRANCHES, 2034, natal_stems=_H_STEMS)
+    assert hit.combined == "甲寅"
+    kinds = {(hc.kind, hc.status) for hc in hit.harmony_completions}
+    assert ("삼형", "full") in kinds
+    assert [c[3] for c in hit.natal_stem_combinations] == ["갑기합토"]
+
+
+def test_2027_dingwei_combines_natal_ren():
+    hit = derive_sewoon("辛", _H_BRANCHES, 2027, natal_stems=_H_STEMS)
+    assert [(c[3], c[4]) for c in hit.natal_stem_combinations] == [("정임합목", "壬")]
+
+
+def test_stem_clashes_against_all_natal_stems():
+    assert derive_sewoon("辛", _H_BRANCHES, 2026, natal_stems=_H_STEMS).stem_clashes == [("丙", "壬")]
+    assert derive_sewoon("辛", _H_BRANCHES, 2031, natal_stems=_H_STEMS).stem_clashes == [("辛", "乙")]
+
+
+def test_without_natal_stems_only_day_master_checked():
+    """Backward compatibility: callers that don't pass natal_stems get no
+    non-DM combos and only a DM clash check."""
+    hit = derive_sewoon("辛", _H_BRANCHES, 2027)
+    assert hit.natal_stem_combinations == []
+    assert hit.stem_clashes == []
+    assert derive_sewoon("辛", _H_BRANCHES, 2031).stem_clashes == []  # 辛 vs DM 辛: no clash
+    assert derive_sewoon("甲", _H_BRANCHES, 2030).stem_clashes == [("庚", "甲")]

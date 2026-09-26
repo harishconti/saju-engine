@@ -893,7 +893,8 @@ def _section_relationships(ctx: _ReportContext, mode: str = "standard") -> List[
         current_year = (ctx.chart.reference_date_obj() or datetime.now().date()).year
         try:
             annual_hits = SE.build_sewoon_range(
-                ctx.chart.day_master, ctx.chart.branches, current_year, current_year + 5
+                ctx.chart.day_master, ctx.chart.branches, current_year, current_year + 5,
+                natal_stems=ctx.chart.stems,
             )
         except Exception:
             annual_hits = []
@@ -1430,6 +1431,7 @@ def _section_timing(
                 ctx.chart.branches,
                 current_year,
                 current_year + 9,
+                natal_stems=ctx.chart.stems,
             )
             lines += [
                 "### 10-Year Forecast",
@@ -1443,6 +1445,7 @@ def _section_timing(
                 ctx.chart.branches,
                 annual_range[0],
                 annual_range[1],
+                natal_stems=ctx.chart.stems,
             )
             lines += [
                 f"### Annual Windows ({annual_range[0]}–{annual_range[1]})",
@@ -1785,7 +1788,8 @@ def _section_business_launch(ctx: _ReportContext) -> List[str]:
         "|---|---|---|---|",
     ]
     annual_hits = SE.build_sewoon_range(
-        ctx.chart.day_master, ctx.chart.branches, current_year, current_year + 5
+        ctx.chart.day_master, ctx.chart.branches, current_year, current_year + 5,
+        natal_stems=ctx.chart.stems,
     )
     for h in annual_hits:
         theme, best, _watch = PF.annual_window_row(h, ctx)
