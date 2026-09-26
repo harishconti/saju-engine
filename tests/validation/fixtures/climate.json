@@ -356,7 +356,7 @@
    "longitude": 79.42,
    "utc_offset": 5.5
   },
-  "source": "candidates_horoscope/reports/harish/harish-report.md (published Favorable Element: Water); knowledge/17-climate-method.md §How This Combines With 억부 (hot 巳 x balanced DM = climate-balanced, raw Fire candidate overridden to Water); engine verified 2026-09-13",
+  "source": "[2026-09-26, E-5: raw 억부 candidate Fire→Wood — the balanced heuristic no longer offers the in-season element that controls the Day Master (巳 month Fire vs 辛 Metal); headline 용신 Water unchanged.] candidates_horoscope/reports/harish/harish-report.md (published Favorable Element: Water); knowledge/17-climate-method.md §How This Combines With 억부 (hot 巳 x balanced DM = climate-balanced, raw Fire candidate overridden to Water); engine verified 2026-09-13",
   "expected": {
    "climate": {
     "band": "hot",
@@ -365,7 +365,7 @@
    },
    "strength": {
     "verdict": "balanced",
-    "candidate": "Fire"
+    "candidate": "Wood"
    },
    "fe": {
     "element": "Water",

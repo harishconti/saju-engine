@@ -153,12 +153,12 @@
    "longitude": 79.42,
    "utc_offset": 5.5
   },
-  "source": "Published client verdict: candidates_horoscope/reports/harish/harish-report.md:50 — Favorable Element Water, climate-explained (report regenerated 2026-09-13 after the climate/조후 engine fix landed), Supporting Metal. Derived by knowledge/17-climate-method.md merge rule 'balanced verdict + non-temperate month → 조후 climate element wins the headline': the numeric 억부 pick is Fire (least-represented), which the engine note explicitly says it overrides; hot 巳 month → climate Water. Pillars verified by probe 2026-09-13. (external cross-check 2026-09-13: OpenFate 조후 vs 부억 — '극단적 기후가 다른 기능을 막으면 조후가 전제가 되고' (balanced DM + hot 巳 month ⇒ climate-balanced Water) — https://wiki.openfate.ai/ko/bazi/useful-gods-climate/climate-vs-strength-priority; 두루미사주 — '사주가 너무 차거나 너무 더우면 조후를 우선' — https://www.durumisaju.com/dict/yongshin/eokbu)",
+  "source": "[2026-09-26, E-5: raw 억부 candidate Fire→Wood — the balanced heuristic no longer offers the in-season element that controls the Day Master (巳 month Fire vs 辛 Metal); headline 용신 Water unchanged.] Published client verdict: candidates_horoscope/reports/harish/harish-report.md:50 — Favorable Element Water, climate-explained (report regenerated 2026-09-13 after the climate/조후 engine fix landed), Supporting Metal. Derived by knowledge/17-climate-method.md merge rule 'balanced verdict + non-temperate month → 조후 climate element wins the headline': the numeric 억부 pick is Fire (least-represented), which the engine note explicitly says it overrides; hot 巳 month → climate Water. Pillars verified by probe 2026-09-13. (external cross-check 2026-09-13: OpenFate 조후 vs 부억 — '극단적 기후가 다른 기능을 막으면 조후가 전제가 되고' (balanced DM + hot 巳 month ⇒ climate-balanced Water) — https://wiki.openfate.ai/ko/bazi/useful-gods-climate/climate-vs-strength-priority; 두루미사주 — '사주가 너무 차거나 너무 더우면 조후를 우선' — https://www.durumisaju.com/dict/yongshin/eokbu)",
   "status": "expect_match",
   "expected": {
    "strength": {
     "verdict": "balanced",
-    "candidate": "Fire"
+    "candidate": "Wood"
    },
    "fe": {
     "element": "Water",

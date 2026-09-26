@@ -60,8 +60,9 @@ _NOTE_BY_METHOD = {
     ),
     "balanced-heuristic": (
         "The chart is close to balanced, so the least-represented element is offered "
-        "as a starting point only. The final 용신 needs a classical reading of "
-        "temperature, season, and blockage."
+        "as a starting point only — it is a folk heuristic, not a classical ruling, and "
+        "the final 용신 requires the reader's argument from temperature, season, and "
+        "blockage."
     ),
     "reader-confirmed": (
         "Favorable element confirmed by the reader from the full classical analysis."
