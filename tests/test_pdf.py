@@ -346,3 +346,19 @@ def test_pdf_no_camelcase_hanja_pair_transliteration(tmp_path):
     assert "Sin" in pdf_text  # 辛 → Sin
     assert "Mi" in pdf_text   # 未 → Mi
     assert "Gap" in pdf_text  # 甲 → Gap
+
+
+# ── 2026-09-26 report regeneration: PDF translation gaps ──
+
+
+@pytest.mark.parametrize("src,expected", [
+    ("natal **丑** are in **해 (harm)**", "natal **Chuk** are in **harm**"),
+    ("in a **천간충** (stem clash) —", "in a **stem clash** —"),
+    ("**Ten-God theme:** Direct Officer (正官)", "**Ten-God theme:** Direct Officer"),
+    ("forms 병신합수 with", "forms Byeong-Sin Water combination with"),
+    ("half-completes it — 반합 (半合).", "half-completes it — Half Harmony."),
+    ("Hidden: 庚 (본), 壬 (중)", "Hidden: Gyeong (main), Im (middle)"),
+])
+def test_translate_inline_regeneration_gaps(src, expected):
+    from saju_html import translate_inline
+    assert translate_inline(src) == expected

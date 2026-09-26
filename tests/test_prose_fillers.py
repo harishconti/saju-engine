@@ -850,7 +850,7 @@ def test_void_year_flagged_for_harish_2034(harish_ctx):
     from saju_engine import sewoon as SE
     c = harish_ctx.chart
     h = SE.build_sewoon_range(c.day_master, c.branches, 2034, 2034, natal_stems=c.stems)[0]
-    assert "공망 year" in PF.year_by_year_note(h, harish_ctx)
+    assert "공망 — a void year" in PF.year_by_year_note(h, harish_ctx)
     h = SE.build_sewoon_range(c.day_master, c.branches, 2029, 2029, natal_stems=c.stems)[0]
     assert "공망" not in PF.year_by_year_note(h, harish_ctx)
 

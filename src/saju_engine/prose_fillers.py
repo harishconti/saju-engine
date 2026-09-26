@@ -1007,7 +1007,7 @@ def _marriage_year_signals(
     if h.branch in void:
         # 공망 dampens rather than blocks (knowledge/08 §공망 years): noted,
         # not scored, so it never hides an otherwise-converging year.
-        neg.append("공망 year")
+        neg.append("a void (empty) year, so gains may feel less solid")
     return score, pos, neg
 
 
@@ -1504,8 +1504,10 @@ def void_year_note(h, chart) -> str:
     (knowledge/08-luck-pillars.md §공망 years)."""
     if chart is None or getattr(h, "branch", "") not in _void_branches(chart):
         return ""
-    return (f"{h.year} is a **공망 year** for your chart ({h.branch} is void for your day pillar) — what it "
-            f"brings may feel less solid, so confirm and document gains rather than assuming they will hold.")
+    # "공망 —" (em-dash right after the term) keeps plain_glossary's
+    # first-use pass from splicing its gloss mid-phrase.
+    return (f"{h.year} falls in your chart's 공망 — a void year ({h.branch} is empty for your day pillar): "
+            f"what it brings may feel less solid, so confirm and document gains rather than assuming they will hold.")
 
 
 def annual_lean(h, ctx) -> Tuple[str, str]:

@@ -127,7 +127,9 @@ def inject_hanja(text: str, already_used: set, glossary: Dict[str, str] = HANJA_
         # "(" that marks an existing annotation.
         after = idx + len(term)
         lookahead = text[after:after + 8]
-        if re.match(r"^[가-힣]{0,6}\s*\(", lookahead):
+        # [*_]* tolerates markdown emphasis closing the compound before its
+        # parenthetical, e.g. "**천간충** (stem clash)".
+        if re.match(r"^[가-힣]{0,6}[*_]*\s*\(", lookahead):
             continue
         # Bug found 2026-09-20 (own find, while implementing R12's annual-
         # activation note): the checks above only ever looked AFTER `term`.
