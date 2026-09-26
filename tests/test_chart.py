@@ -57,7 +57,6 @@ def test_to_dict_has_no_duplicate_reference_date_key():
     """F-14 (2026-09-26 audit): `to_dict()` emitted the "reference_date" key
     twice (harmless since both were the same value, but a DRY violation)."""
     import inspect
-    from saju_engine.chart import Chart
 
     src = inspect.getsource(Chart.to_dict)
     assert src.count('"reference_date"') == 1

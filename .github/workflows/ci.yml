@@ -31,5 +31,10 @@ jobs:
           python -m playwright install chromium
           python -m playwright install-deps chromium
 
+      - name: Lint (pyflakes rules)
+        run: |
+          pip install ruff
+          ruff check --select F src tools tests
+
       - name: Run pytest
         run: python -m pytest tests/ -q

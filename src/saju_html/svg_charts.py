@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import html
 import re
-from typing import List, Tuple
 
 from saju_html import ELEMENT_COLORS, ELEMENT_EMOJI
 
@@ -146,7 +145,7 @@ def _build_decade_roadmap_svg(rows: list[tuple[str, str, str]]) -> str:
     seg_gap = 4
     total_bar_y = margin_y + 18
     seg_width = (width - 2 * margin_x - seg_gap * (len(rows) - 1)) / len(rows)
-    bar_total_width = seg_width * len(rows) + seg_gap * (len(rows) - 1)
+    seg_width * len(rows) + seg_gap * (len(rows) - 1)
 
     segments: list[str] = []
     for i, (_label, pillar, lean) in enumerate(rows):

@@ -12,7 +12,6 @@ from saju_engine.engine import compute_chart
 from saju_engine.yongsin import FavorableElement, favorable_element
 from saju_engine.premium_report import generate_premium_report
 from saju_engine.compat_report import generate_compat_report
-from saju_engine.climate import assess_climate
 
 
 def _chart(year, month, day, hour, minute, longitude, gender, name="X"):

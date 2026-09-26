@@ -36,7 +36,6 @@ def test_gloss_skips_already_used():
 def test_gloss_does_not_corrupt_markup_or_split_phrases():
     """Regression: gloss injection must never land in structured markup or split
     a noun phrase / list / emphasis span (surfaced regenerating a real report)."""
-    used = set()
     cases = [
         "## Table of Contents\n\n- Monthly Lucky Dates\n- Day Master Portrait\n",  # TOC + substring
         "the Direct Officer (正官) stem values hierarchy",                        # attributive noun

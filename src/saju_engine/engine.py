@@ -76,7 +76,6 @@ def _derive_twelve_stages(chart: Chart) -> list[tuple[str, str, str]]:
 
 def _derive_branch_relationships(chart: Chart):
     """Find 합 / 충 / 형 / 파 / 해 / 삼형 in the natal chart."""
-    pairs = []
     for i, p1 in enumerate(chart.pillars):
         for p2 in chart.pillars[i + 1:]:
             b1, b2 = p1.branch, p2.branch

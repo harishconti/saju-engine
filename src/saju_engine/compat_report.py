@@ -1003,7 +1003,7 @@ def _compact_guidance_bullets(report: CompatReport, name_a: str, name_b: str) ->
         )
     if a.day.stem == b.day.stem:
         bullets.append(
-            f"**Peer dynamic.** You share the same Day Master — easy and familiar, "
+            "**Peer dynamic.** You share the same Day Master — easy and familiar, "
             "but guard against sibling-style competition. Take turns leading."
         )
     db_flags = " ".join(report.daybranch.flags)

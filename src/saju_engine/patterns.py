@@ -491,7 +491,7 @@ def detect_structural_notes(
                     "note": f"A strong {elem} bias in the earthly foundation; the chart leans heavily in that direction.",
                 })
 
-    branches_set = set(branches)
+    set(branches)
     for a, b, c, elem in L.THREE_HARMONIES:
         frame = {a, b, c}
         if all(br in frame for br in branches):
@@ -590,7 +590,7 @@ def detect_patterns(
       - dominant_element: element with highest weighted count.
       - element_balance: weighted element counts.
     """
-    dm_element = L.STEM_INFO[day_master]["element"]
+    L.STEM_INFO[day_master]["element"]
     # Visible month-stem ten-god (retained in the return dict for reference;
     # NOT used to name the regular grid — see the 투출 method below).
     month_tengod = L.ten_god(day_master, month_stem)

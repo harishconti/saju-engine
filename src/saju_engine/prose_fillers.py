@@ -265,7 +265,7 @@ def dm_arrival_narrative(ctx) -> str:
     label, description = _STAGE_TENDENCY.get(stage, ("mixed arrival", "the month branch gives a mixed first impression"))
 
     sa = chart.strength_assessment or {}
-    month_stage = sa.get("month_stage", stage)
+    sa.get("month_stage", stage)
     # Use the engine's month-stage score as a second signal, if present.
     month_stage_score = sa.get("month_stage_score", 0.0)
     season_signal = {
@@ -499,7 +499,7 @@ def skill_levers(ctx) -> str:
     """2–3 skills to cultivate based on dominant ten-god class + favorable element."""
     chart = _ctx_get(ctx, "chart")
     fav = _ctx_get(ctx, "favorable", "—")
-    cls = _class_counts(chart)
+    _class_counts(chart)
     dominant = _dominant_classes(chart, 1)
     dom_class = dominant[0][0] if dominant else "Companion"
     skill_pool = {
@@ -587,7 +587,7 @@ def boss_team_dynamics(ctx) -> str:
     dm_elem = _ctx_get(ctx, "dm_element", "")
     fav = _ctx_get(ctx, "favorable", "—")
     sa = chart.strength_assessment or {}
-    verdict = sa.get("verdict", "balanced")
+    sa.get("verdict", "balanced")
     # Keyed to the manager who embodies the chart's 용신 itself. Validation
     # 2026-09-25 #5: this used to map each 용신 to the element that CONTROLS
     # it (Water → "Earth anchor", Fire → "Water advisor", …) — i.e. the 구신
@@ -904,7 +904,7 @@ def relationship_timing_row(year: int, pillar: str, tengod: str, gender: Optiona
 def friendship_social_energy(ctx) -> str:
     """3–4 sentences on friendship energy."""
     chart = _ctx_get(ctx, "chart")
-    cls = _class_counts(chart)
+    _class_counts(chart)
     fav = _ctx_get(ctx, "favorable", "—")
     unfav = _ctx_get(ctx, "unfavorable") or "the challenging element"
     dominant = _grouped_dominant_classes(chart, 2)
@@ -985,7 +985,6 @@ def _marriage_year_signals(
     Part 5b: spouse star in the annual stem, 육합/삼합 into the spouse palace,
     minus 충/형/파 on the palace and the gendered obstruction (상관 for F,
     겁재 for M). Returns (score, positives, negatives)."""
-    from . import lookup as L
     spouse_class = "Wealth" if gender == "M" else "Authority"
     obstruction = "겁재" if gender == "M" else "상관"
     pos: List[str] = []
@@ -1169,7 +1168,7 @@ def family_dynamics(ctx) -> str:
 
 def overdrive_warning(ctx) -> str:
     """How a <strength_label> <dm_element> Day Master may overdrive."""
-    chart = _ctx_get(ctx, "chart")
+    _ctx_get(ctx, "chart")
     dm_elem = _ctx_get(ctx, "dm_element", "")
     verdict = _ctx_get(ctx, "strength_label", "Balanced")
     organs = _ELEMENT_ORGANS.get(dm_elem, "associated organ systems")
@@ -1193,7 +1192,7 @@ def overdrive_warning(ctx) -> str:
         warning
         + f" In classical Five-Element reading, the **{organs}** are a common watchpoint when "
         + f"energy is overstretched; the **{fav}** element's practices "
-        + f"(its seasons, foods, and rhythms) are the simplest countermeasure."
+        + "(its seasons, foods, and rhythms) are the simplest countermeasure."
     )
 
 
@@ -1227,7 +1226,7 @@ def seasonal_daily_rhythms(ctx) -> str:
     dm_elem = _ctx_get(ctx, "dm_element", "")
     fav = _ctx_get(ctx, "favorable", "—")
     sa = chart.strength_assessment or {}
-    verdict = sa.get("verdict", "balanced")
+    sa.get("verdict", "balanced")
     dm_season = {
         "Wood": "spring", "Fire": "summer", "Earth": "late summer / transitions",
         "Metal": "autumn", "Water": "winter",
@@ -1283,7 +1282,7 @@ def stress_signature(ctx) -> str:
     """3 physical/emotional out-of-balance signals from a fixed pool."""
     chart = _ctx_get(ctx, "chart")
     dm_elem = _ctx_get(ctx, "dm_element", "")
-    unfav = _ctx_get(ctx, "unfavorable") or "the challenging element"
+    _ctx_get(ctx, "unfavorable") or "the challenging element"
     sa = chart.strength_assessment or {}
     verdict = sa.get("verdict", "balanced")
     signals = {
@@ -1314,7 +1313,7 @@ def stress_signature(ctx) -> str:
 
 def recovery_toolkit(ctx) -> str:
     """4 recovery practices for Deep health deep-dive."""
-    chart = _ctx_get(ctx, "chart")
+    _ctx_get(ctx, "chart")
     fav = _ctx_get(ctx, "favorable", "—")
     dm_elem = _ctx_get(ctx, "dm_element", "")
     base = {
@@ -1403,9 +1402,7 @@ def major_luck_theme_row(p, ctx) -> Tuple[str, str]:
 def major_luck_narrative(p, ctx) -> str:
     """Full 1-paragraph interpretation per 대운."""
     tg = p.stem_tengod_en or p.stem_tengod or "—"
-    status = period_favorable_status(p, ctx)
-    branch_elem = p.branch_element or "—"
-    stem_elem = p.stem_element or "—"
+    period_favorable_status(p, ctx)
     fav = _ctx_get(ctx, "favorable", "—")
     cls = _TENGOD_FIVE_CLASS.get(p.stem_tengod, "")
     # E-12 (2026-09-25 audit): every non-Authority/Wealth/Output decade used
@@ -2024,7 +2021,7 @@ def closing_note_short(ctx) -> str:
     """2–3 sentences for Hook/Short closing."""
     chart = _ctx_get(ctx, "chart")
     fav = _ctx_get(ctx, "favorable", "—")
-    dm_en = _ctx_get(ctx, "dm_en", "Day Master")
+    _ctx_get(ctx, "dm_en", "Day Master")
     cls = _grouped_dominant_classes(chart, 1)
     if cls:
         names = [c.lower() for c, _ in cls]
@@ -2050,7 +2047,7 @@ def closing_note_long(ctx) -> str:
     fav = _ctx_get(ctx, "favorable", "—")
     sup = _ctx_get(ctx, "supporting", "—")
     spouse_branch = chart.day.branch
-    cls = _class_counts(chart)
+    _class_counts(chart)
     dominant = _grouped_dominant_classes(chart, 2)
     dom_summary = ", ".join(f"{c} ({n})" for c, n in dominant) or "Companion"
     # The chart's actual weighted-balance dominant element (chart.patterns
@@ -2085,9 +2082,9 @@ def closing_note_long(ctx) -> str:
             f"that bring two palaces into harmony, with the querent's role often as the connector."
         )
     parts.append(
-        f"Across a full lifetime, this chart rewards the querent who studies their own patterns and "
-        f"acts with the favorable element rather than against it. The work is not to fix the chart; "
-        f"it is to use what is already there well."
+        "Across a full lifetime, this chart rewards the querent who studies their own patterns and "
+        "acts with the favorable element rather than against it. The work is not to fix the chart; "
+        "it is to use what is already there well."
     )
     return " ".join(parts)
 
@@ -2111,7 +2108,7 @@ def top_strengths(ctx) -> List[str]:
         "壬": "broad strategic thinking and the ability to hold complex systems",
         "癸": "quiet persistence and the ability to nourish what others start",
     }.get(dm, "the Day Master's natural strengths")
-    cls = _class_counts(chart)
+    _class_counts(chart)
     dominant = _dominant_classes(chart, 3)
     dom_strengths = {
         "Companion": "the ability to collaborate as an equal without losing self",
@@ -2134,7 +2131,7 @@ def top_strengths(ctx) -> List[str]:
         strengths.append("**Noble helper presence** — supportive people tend to appear at the right time in this chart.")
     # Pad to 5 with sensible defaults if short
     while len(strengths) < 5:
-        strengths.append(f"**Steady practice** — the chart rewards consistent effort over heroic bursts.")
+        strengths.append("**Steady practice** — the chart rewards consistent effort over heroic bursts.")
     return strengths[:5]
 
 
@@ -2168,7 +2165,7 @@ def top_growth_areas(ctx) -> List[str]:
 def practical_recommendations(ctx) -> List[str]:
     """5 concrete recommendations."""
     fav = _ctx_get(ctx, "favorable", "—")
-    dm_elem = _ctx_get(ctx, "dm_element", "")
+    _ctx_get(ctx, "dm_element", "")
     rec_pool = {
         "Water": [
             "Add a 20-minute evening walk near water 4× a week",

@@ -5,7 +5,6 @@ its introduction on 2026-09-19 despite being marked "done" in CLAUDE.md.
 from __future__ import annotations
 
 import importlib.util
-import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent

@@ -47,16 +47,21 @@ DOB="${4:-11 December 1993, 02:45 IST (Pallipat, Tamil Nadu)}"
 DAY_MASTER="${5:-Bing Fire (Yang Fire) — the 'Red Tiger'}"
 shift 5 2>/dev/null || shift $#   # remove the positional args; leave flags
 
+# SAJU_OUT_DIR redirects the built PDF elsewhere (e.g. a test's tmp_path)
+# instead of the curated candidates_horoscope/ deliverable folder. The
+# input .md is always read from the real candidate folder.
+OUT_DIR="${SAJU_OUT_DIR:-$PROJECT_ROOT/candidates_horoscope/reports/$NAME}"
+
 if [ "$COMBINED" = "1" ]; then
   INPUT="$PROJECT_ROOT/candidates_horoscope/reports/$NAME/$NAME-combined.md"
   if [ "$USE_HTML" = "1" ]; then
-    OUTPUT="$PROJECT_ROOT/candidates_horoscope/reports/$NAME/$NAME-combined-html.pdf"
+    OUTPUT="$OUT_DIR/$NAME-combined-html.pdf"
   else
-    OUTPUT="$PROJECT_ROOT/candidates_horoscope/reports/$NAME/$NAME-combined.pdf"
+    OUTPUT="$OUT_DIR/$NAME-combined.pdf"
   fi
 else
   INPUT="$PROJECT_ROOT/candidates_horoscope/reports/$NAME/$NAME-report.md"
-  OUTPUT="$PROJECT_ROOT/candidates_horoscope/reports/$NAME/$NAME-report.pdf"
+  OUTPUT="$OUT_DIR/$NAME-report.pdf"
 fi
 
 # Did the user pass --from-chart?

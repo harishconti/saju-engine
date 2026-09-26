@@ -27,7 +27,7 @@ import json
 import os
 import re
 import sys
-from datetime import datetime, timezone as _timezone
+from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo, available_timezones
 

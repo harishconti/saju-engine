@@ -80,11 +80,6 @@ from saju_engine.cli_validators import utc_offset_float  # noqa: E402
 from saju_html import (  # noqa: E402
     ELEMENT_COLORS,
     ELEMENT_EMOJI,
-    BRANCH_MAP,
-    HANJA_MAP,
-    KOR_REPL,
-    STEM_MAP,
-    TENGOD_MAP,
     strip_engine_drafts,
     strip_source_citations,
     translate_inline,

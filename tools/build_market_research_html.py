@@ -323,7 +323,7 @@ def main() -> int:
     # Per-file HTML
     for fname, title, num, slug, body_html in rendered:
         # Per-file TOC: show all docs as a nav strip
-        toc = [
+        [
             (r[1], f"../{r[3]}.html", r[2]) for r in rendered
         ]
         # Render a self-referential combined file at the top

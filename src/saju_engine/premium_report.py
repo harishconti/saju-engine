@@ -50,11 +50,11 @@ from __future__ import annotations
 import calendar
 import re
 from datetime import date, datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 from . import lookup as L
 from . import sewoon as SE
-from .chart import Chart, DaeunPeriod, Pillar
+from .chart import Chart, DaeunPeriod
 from . import prose_fillers as PF
 from .hanja_glossary import inject_hanja
 from .plain_glossary import collect_used_terms, gloss_first_use, render_terms_section
@@ -162,7 +162,6 @@ def _right_now_callout(chart: Chart, override: Optional[str] = None) -> str:
     """
     ref = chart.reference_date_obj()
     current_year = ref.year if ref else None
-    current_age = chart.current_age
     current_daeun = chart.current_daeun
 
     current_sewoon = next((h for h in chart.sewoon if h.year == current_year), None) if current_year else None
@@ -1051,14 +1050,14 @@ def _section_health_vitality(ctx: _ReportContext) -> List[str]:
         # tension explicitly instead of silently presenting both as if
         # unrelated.
         excess_line += (
-            f" This is also your favorable element (용신) — classical 조후/억부 "
-            f"resolution reads a chart's own 용신 as the element it structurally "
-            f"needs, not a harmful surplus, even when it is also the most "
-            f"numerically prominent one. The caution here is about extreme, "
-            f"further concentration (e.g. through diet, environment, or timing "
-            f"choices layered on top of an already-abundant element), not about "
-            f"the element itself — which the Grounding Practices below still "
-            f"recommend leaning into."
+            " This is also your favorable element (용신) — classical 조후/억부 "
+            "resolution reads a chart's own 용신 as the element it structurally "
+            "needs, not a harmful surplus, even when it is also the most "
+            "numerically prominent one. The caution here is about extreme, "
+            "further concentration (e.g. through diet, environment, or timing "
+            "choices layered on top of an already-abundant element), not about "
+            "the element itself — which the Grounding Practices below still "
+            "recommend leaning into."
         )
     deficient_line = (
         f"- **Element deficiency:** {deficient} — the {_ELEMENT_ORGANS.get(deficient, 'associated')} "
@@ -1852,7 +1851,7 @@ def _section_business_launch(ctx: _ReportContext) -> List[str]:
     lines += [
         f"For a {ctx.dm_element} Day Master, the most supportive launch windows tend to come when the annual pillar carries **{ctx.favorable}** or **{ctx.supporting}** energy and does not clash the natal day branch.",
         "",
-        f"### Your Business Lucky Numbers",
+        "### Your Business Lucky Numbers",
         "",
         f"Use **{_business_numbers(ctx)}** in pricing, launch dates, seat numbers, and branding choices where practical. These numbers carry the frequency of your favorable element.",
         "",

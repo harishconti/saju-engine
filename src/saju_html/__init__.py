@@ -7,8 +7,10 @@ Both PDF generators import these maps so translations stay identical.
 from __future__ import annotations
 
 import re
+from typing import List
 
-from saju_engine.report_data import ELEMENT_COLORS, ELEMENT_EMOJI
+from saju_engine.report_data import ELEMENT_COLORS as ELEMENT_COLORS
+from saju_engine.report_data import ELEMENT_EMOJI as ELEMENT_EMOJI
 
 
 # ---------- Translation tables: Korean/Hanja -> English ----------
@@ -109,7 +111,7 @@ KOR_REPL = {
     "재격": "Wealth Structure", "관격": "Officer Structure",
     "충": "clash", "합": "combination", "형": "punishment",
     "파": "break",
-    "육합": "six-combination", "삼합": "three-harmony",
+    "삼합": "three-harmony",
     "일지": "Day Branch",
     # ── Marriage compatibility (궁합) terms ──────────────────────────────────
     "궁합": "Compatibility",
@@ -175,7 +177,6 @@ KOR_REPL = {
     "자형": "self-punishment",
     "삼형": "three-punishment",
     # Descriptors
-    "배우자궁": "Spouse Palace",
     "배우자 복덕": "spouse virtue",
     "일지 본기": "day-branch main hidden stem",
     "공급": "supply",
@@ -195,7 +196,6 @@ KOR_REPL = {
     "시작 대운 상생": "starting Major Luck mutual generation",
     "대운 방향 상이": "different Major-Luck direction",
     "대운 방향 동일": "same Major-Luck direction",
-    "상생": "mutual generation",
     "조후": "climate",
     "점술": "fortune-telling",
     "편의": "familiar ease",
@@ -210,7 +210,6 @@ KOR_REPL = {
     "송기영": "Song Gi-yeong",
     "서전구미록": "Seojeon-gumirok",
     "자평진전": "Japyeong-jinjeon",
-    "명리정종": "Myeongri-jeongjong",
     "도화": "Peach Blossom",
     "역마": "Post Horse",
     "화개": "Canopy",
@@ -219,8 +218,6 @@ KOR_REPL = {
     "결합에서 충분": "sufficient in the union",
     "지지": "Earthly Branches",
     "관계": "relationship",
-    "사람의": "of the people",
-    "성향": "character",
     # Added 2026-09-26 (report regeneration after the 2026-09-25 engine audit):
     # terms that fell through to the CJK-stripping pass in client PDFs.
     "본": "main", "중": "middle", "여": "residual",
@@ -299,7 +296,6 @@ HANJA_MAP = {
     "日運": "Daily Luck",
     "同期": "Synchrony",
     "神殺": "Star",
-    "陰陽": "Yin-Yang",
     "調和": "Harmony",
     "天河水": "Heavenly River Water",
     "爐中火": "Furnace Fire",

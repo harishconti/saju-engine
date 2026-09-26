@@ -63,7 +63,7 @@ def test_reportlab_inline_handles_underscore_italic_without_leaking_underscores(
 def test_build_pdf_falls_back_to_reportlab_when_playwright_unavailable(tmp_path, monkeypatch):
     """If the HTML/Playwright backend cannot print, build_pdf routes to ReportLab."""
     import warnings
-    from saju_html.renderer import build_pdf, html_to_pdf
+    from saju_html.renderer import build_pdf
 
     def _fake_html_to_pdf(*args, **kwargs):
         raise RuntimeError("no browser available")
@@ -186,13 +186,15 @@ def test_html_pdf_compact_mode(tmp_path):
 
 
 @requires_browser
-def test_html_pdf_cli_smoke():
+def test_html_pdf_cli_smoke(tmp_path):
     """CLI wrapper exits 0 and writes a PDF."""
     import subprocess
 
     name = "sruthi"
     input_md = PROJECT_ROOT / "candidates_horoscope" / "reports" / name / f"{name}-report.md"
-    output_pdf = PROJECT_ROOT / "candidates_horoscope" / "reports" / name / f"{name}-html.pdf"
+    # N-22 (2026-09-26 audit): write to a scratch path, not the tracked
+    # client deliverable in candidates_horoscope/reports/sruthi/.
+    output_pdf = tmp_path / f"{name}-html.pdf"
     if not input_md.exists():
         pytest.skip("Sruthi report markdown not present")
 
@@ -223,21 +225,21 @@ def test_html_pdf_cli_smoke():
 
 
 @requires_browser
-def test_html_pdf_wrapper_flag():
+def test_html_pdf_wrapper_flag(tmp_path):
     """build-pdf.sh --html routes to the HTML backend."""
     import subprocess
 
     name = "sruthi"
-    output_pdf = PROJECT_ROOT / "candidates_horoscope" / "reports" / name / f"{name}-report.pdf"
+    # N-22 (2026-09-26 audit): SAJU_OUT_DIR redirects the build away from the
+    # tracked client deliverable in candidates_horoscope/reports/sruthi/.
+    output_pdf = tmp_path / f"{name}-report.pdf"
     input_md = PROJECT_ROOT / "candidates_horoscope" / "reports" / name / f"{name}-report.md"
     if not input_md.exists():
         pytest.skip("Sruthi report markdown not present")
 
-    # Remove prior PDF to be sure we regenerated
-    output_pdf.unlink(missing_ok=True)
     result = subprocess.run(
         [str(PROJECT_ROOT / "tools" / "build-pdf.sh"), "--html", name],
-        env=ENV,
+        env={**ENV, "SAJU_OUT_DIR": str(tmp_path)},
         capture_output=True,
         text=True,
     )

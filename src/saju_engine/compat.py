@@ -39,8 +39,8 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from . import lookup as L
-from .chart import Chart, Pillar
-from .nayin import NAYIN_ORDER, nayin_of, nayin_relation, nayin_relation_detail
+from .chart import Chart
+from .nayin import NAYIN_ORDER, nayin_of, nayin_relation_detail
 from .yongsin import favorable_element
 
 
@@ -923,8 +923,6 @@ def compat_combined_elements(a: Chart, b: Chart) -> CompatSubResult:
         flags.append("결합 오행 불균형 심함")
 
     # Yongshin-union check: does each partner's 용신 appear in the union?
-    sa = a.strength_assessment or {}
-    sb = b.strength_assessment or {}
     fav_a = _resolved_favorable(a)
     fav_b = _resolved_favorable(b)
     if fav_a and union.get(fav_a, 0) >= 15:
@@ -938,7 +936,7 @@ def compat_combined_elements(a: Chart, b: Chart) -> CompatSubResult:
     score = max(-WEIGHT["combined_elements"], min(WEIGHT["combined_elements"], score))
 
     narr = (
-        f"Combined element distribution (avg of both charts): "
+        "Combined element distribution (avg of both charts): "
         + ", ".join(f"{e}={v:.0f}%" for e, v in union.items())
         + ". "
     )

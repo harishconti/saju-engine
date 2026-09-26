@@ -18,7 +18,6 @@ from __future__ import annotations
 from collections import Counter
 from typing import Dict, List, Optional, Tuple
 
-from . import lookup as L
 from .chart import Chart, Pillar
 from .yongsin import favorable_element
 
@@ -104,7 +103,7 @@ _STEM_EN = {
 
 
 # ── Stem imagery profile (used in the Day Master Portrait section) ────────
-from .stem_profiles import _STEM_PROFILE
+from .stem_profiles import _STEM_PROFILE as _STEM_PROFILE
 
 # ── Five Element organ / system mapping (classical, not medical advice) ──────
 # source: knowledge/15-health-and-body.md § 오행 → Organ Systems

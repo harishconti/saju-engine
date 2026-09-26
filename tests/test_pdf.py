@@ -26,17 +26,25 @@ requires_pdftotext = pytest.mark.skipif(
 )
 
 
-def test_build_pdf_from_markdown():
+def test_build_pdf_from_markdown(tmp_path):
+    # N-22 (2026-09-26 audit): this used to point straight at the tracked
+    # client deliverable (candidates_horoscope/reports/sruthi/sruthi-report.pdf)
+    # and overwrite it on every test run. SAJU_OUT_DIR redirects the build to
+    # a scratch directory instead.
     result = subprocess.run(
         ["bash", str(PROJECT_ROOT / "tools" / "build-pdf.sh"), "sruthi"],
         cwd=PROJECT_ROOT,
         capture_output=True,
         text=True,
+        env={**ENV, "SAJU_OUT_DIR": str(tmp_path)},
     )
     assert result.returncode == 0, result.stderr
-    pdf_path = PROJECT_ROOT / "candidates_horoscope" / "reports" / "sruthi" / "sruthi-report.pdf"
+    pdf_path = tmp_path / "sruthi-report.pdf"
     assert pdf_path.exists()
     assert pdf_path.stat().st_size > 1000
+    real_pdf_path = PROJECT_ROOT / "candidates_horoscope" / "reports" / "sruthi" / "sruthi-report.pdf"
+    assert subprocess.run(["git", "status", "--porcelain", "--", str(real_pdf_path)],
+                           cwd=PROJECT_ROOT, capture_output=True, text=True).stdout == ""
 
 
 def test_build_pdf_from_premium_markdown(tmp_path):

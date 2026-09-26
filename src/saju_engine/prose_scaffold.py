@@ -14,8 +14,6 @@ from collections import Counter
 from typing import Dict, List, Tuple
 
 from .chart import Chart
-from . import lookup as L
-from . import daeun as DAEUN
 
 
 from .hanja_glossary import inject_hanja
@@ -238,7 +236,6 @@ def _current_time_draft(chart: Chart) -> str:
     """Draft paragraph for current time-based themes."""
     ref = chart.reference_date_obj()
     ref_year = ref.year if ref else None
-    ref_month = ref.month if ref else None
     current_sewoon = next((h for h in chart.sewoon if h.year == ref_year), None) if ref_year else None
     current_woon = next(
         (h for h in chart.woon if ref and h.year == ref.year * 100 + ref.month), None
