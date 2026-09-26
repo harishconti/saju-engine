@@ -344,20 +344,24 @@ def test_hour_boundary_flag_absent_mid_window():
     assert (c.solar_correction or {}).get("hour_boundary") is None
 
 
-def test_hour_boundary_excludes_the_zi_hour_edge():
-    # 22:55 clock at 92°E -> solar ~23:33, 3 minutes into 子 (which starts at
-    # 23:00) — within the margin, but the 子 edge is deliberately excluded
-    # (see pillars.py::_hour_boundary_info) because it also flips which
-    # calendar day's stem drives the hour stem under 야자시, a compound
-    # decision this mechanism does not attempt to re-derive.
+def test_hour_boundary_flags_the_zi_hour_edge_without_an_alternate_pillar():
+    # 23:30 clock at 127°E/UTC+9 (Seoul-like) -> solar 22:54, 6 minutes
+    # before the 子 boundary (23:00) — within the margin. N-15 (2026-09-26
+    # audit): this used to return no disclosure at all for the 子 edge (see
+    # pillars.py::_hour_boundary_info) because it also flips which calendar
+    # day's stem drives the hour stem under 야자시, a compound decision this
+    # mechanism does not attempt to re-derive — it now still flags the edge
+    # (is_zi_boundary=True) rather than staying silent about it.
     c = compute_chart(
         name="ZiEdge", gender="M",
-        year=2000, month=1, day=1, hour=22, minute=55,
-        longitude=92.0, utc_offset=5.5, use_solar_time=True,
+        year=2000, month=1, day=1, hour=23, minute=30,
+        longitude=127.0, utc_offset=9.0, use_solar_time=True,
         convention="korean",
     )
-    assert c.hour.branch == "子"
-    assert (c.solar_correction or {}).get("hour_boundary") is None
+    boundary = (c.solar_correction or {}).get("hour_boundary")
+    assert boundary is not None
+    assert boundary["is_zi_boundary"] is True
+    assert "alternate_hour_pillar" not in boundary
 
 
 def test_rm_boundary_case_pinned():

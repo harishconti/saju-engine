@@ -752,6 +752,25 @@ def test_solar_time_disclosure_present_with_hour_boundary_flag():
     assert "~2 minutes from a 2-hour branch boundary" in report
 
 
+def test_solar_time_disclosure_flags_zi_hour_edge_without_a_false_alternate():
+    """N-15 (2026-09-26 audit): the 子 (23:00/01:00) hour edge used to get no
+    boundary disclosure at all (see pillars.py::_hour_boundary_info) — the
+    single costliest edge in the chart, since it can also flip which
+    calendar day's stem drives the hour pillar. The report must now warn
+    the reader, without claiming a specific (unresolved) alternate pillar.
+    """
+    chart = compute_chart(
+        name="ZiEdge", gender="M",
+        year=2000, month=1, day=1, hour=23, minute=30,
+        longitude=127.0, utc_offset=9.0, use_solar_time=True,
+        convention="korean",
+    )
+    report = generate_premium_report(chart, tier="deep")
+    assert "⚠ Hour-boundary note" in report
+    assert "子" in report
+    assert "possibly the day pillar" in report
+
+
 def test_solar_time_note_omitted_when_no_correction_applied():
     # 2000-06-13 is the date the equation of time is nearest zero (see
     # pillars.py::_equation_of_time_minutes); combined with longitude on the

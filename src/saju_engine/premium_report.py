@@ -308,13 +308,28 @@ def _solar_time_note(chart) -> List[str]:
             # Sub-minute precision for the tightest cases (audit
             # 2026-09-25: Harish's real margin is ~28 s, not "~1 minute").
             margin = f"~{secs} seconds"
-        lines.append(
-            f"> **⚠ Hour-boundary note:** the corrected time is only {margin} from a "
-            "2-hour branch boundary. If the recorded clock time carries even a few minutes of error, the "
-            f"neighboring hour pillar (**{boundary['alternate_hour_pillar']}**, vs the primary "
-            f"**{boundary['primary_hour_pillar']}** used above) is a plausible alternative — treat the hour "
-            "pillar (and its palace themes) as lower-confidence in this reading."
-        )
+        if boundary.get("is_zi_boundary"):
+            # N-15 (2026-09-26 audit): the 子 (23:00/01:00) edge is a
+            # compound decision (day-stem source, and near 23:00 the day
+            # pillar itself, can both flip) that this engine does not
+            # re-derive automatically — still disclose it, rather than the
+            # silence this used to fall back to.
+            lines.append(
+                f"> **⚠ Hour-boundary note:** the corrected time is only {margin} from the 子 "
+                "(23:00/01:00) hour edge — the single most consequential boundary in the chart. "
+                "If the recorded clock time carries even a few minutes of error, the hour pillar "
+                "**and possibly the day pillar** could differ from the primary reading "
+                f"(**{boundary['primary_hour_pillar']}** used above) — treat this reading as "
+                "lower-confidence and consult a reader for a manual recheck."
+            )
+        else:
+            lines.append(
+                f"> **⚠ Hour-boundary note:** the corrected time is only {margin} from a "
+                "2-hour branch boundary. If the recorded clock time carries even a few minutes of error, the "
+                f"neighboring hour pillar (**{boundary['alternate_hour_pillar']}**, vs the primary "
+                f"**{boundary['primary_hour_pillar']}** used above) is a plausible alternative — treat the hour "
+                "pillar (and its palace themes) as lower-confidence in this reading."
+            )
     return lines
 
 

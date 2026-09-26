@@ -130,12 +130,17 @@ def _hour_boundary_info(
     ``distance_minutes`` rounds to 0 or 1 depending on the path.
 
     Returns None when the corrected time is not within
-    ``HOUR_BOUNDARY_MARGIN_MIN`` of a branch-window edge, or when the
-    ambiguous edge is the 子 (23:00/01:00) boundary — that boundary also
-    flips which calendar day (and therefore which day-stem) drives the hour
-    stem under the Korean 야자시 convention, a compound decision this helper
-    does not attempt to re-derive; the existing 子 handling in
-    `_hour_stem_day_stem` already covers that case on its own terms.
+    ``HOUR_BOUNDARY_MARGIN_MIN`` of a branch-window edge.
+
+    When the ambiguous edge is the 子 (23:00/01:00) boundary, that boundary
+    *also* flips which calendar day (and therefore which day-stem) drives
+    the hour stem under the Korean 야자시 convention — and, right at 23:00,
+    the day pillar itself under the Chinese 조자시 convention. N-15
+    (2026-09-26 audit): this used to return None here with no disclosure at
+    all for the single costliest edge in the whole chart. This helper still
+    does not re-derive the alternate day/hour-stem combination (the existing
+    logic in `_hour_stem_day_stem` covers that on its own terms) but now
+    flags the compound edge so the report can at least warn the reader.
     """
     minutes = eff_hour * 60 + eff_minute
     raw_mod = (minutes - 60) % 120
@@ -145,7 +150,18 @@ def _hour_boundary_info(
     idx = _BRANCH_ORDER.index(correct_branch)
     alt_branch = _BRANCH_ORDER[(idx - 1) % 12] if raw_mod <= 60 else _BRANCH_ORDER[(idx + 1) % 12]
     if correct_branch == "子" or alt_branch == "子":
-        return None
+        return {
+            "distance_minutes": dist,
+            "is_zi_boundary": True,
+            "primary_hour_pillar": f"{correct_stem}{correct_branch}",
+            "note": (
+                "Corrected solar time is within the boundary margin of the 子 "
+                "(23:00/01:00) hour edge. Unlike other hour boundaries, this one "
+                "can also change which calendar day's stem drives the hour pillar "
+                "(and, right at 23:00, the day pillar itself) — a compound "
+                "decision this note does not attempt to resolve automatically."
+            ),
+        }
     alt_stem = _hour_stem(day_stem, alt_branch)
     info: Dict[str, Any] = {
         "distance_minutes": dist,
