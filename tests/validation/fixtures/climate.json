@@ -356,7 +356,7 @@
    "longitude": 79.42,
    "utc_offset": 5.5
   },
-  "source": "candidates_horoscope/reports/harish/harish-report.md (published Favorable Element: Water); knowledge/17-climate-method.md §How This Combines With 억부 (hot 巳 x balanced DM = climate-balanced, raw Fire candidate overridden to Water); engine verified 2026-09-13",
+  "source": "[2026-09-26, E-5: raw 억부 candidate Fire→Wood — the balanced heuristic no longer offers the in-season element that controls the Day Master (巳 month Fire vs 辛 Metal); headline 용신 Water unchanged.] candidates_horoscope/reports/harish/harish-report.md (published Favorable Element: Water); knowledge/17-climate-method.md §How This Combines With 억부 (hot 巳 x balanced DM = climate-balanced, raw Fire candidate overridden to Water); engine verified 2026-09-13",
   "expected": {
    "climate": {
     "band": "hot",
@@ -365,7 +365,7 @@
    },
    "strength": {
     "verdict": "balanced",
-    "candidate": "Fire"
+    "candidate": "Wood"
    },
    "fe": {
     "element": "Water",
@@ -932,7 +932,7 @@
    "longitude": 126.98,
    "utc_offset": 9.0
   },
-  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (戌 = 燥 → Water remedy, Metal 희신) + §How This Combines With 억부 (broadened 2026-09-19: 조후 governs whenever the band is non-temperate, regardless of verdict — docs/research/2026-09-validation-climate.md §5); synthetic chart probe-verified 2026-09-19. CORRECTED 2026-09-25 (external report review, E-2): strength.candidate changed from 'Metal' to 'Water' and fe.climate_agrees from false to true after fixing lookup.py's swapped 戌 중기/여기 (this chart's month branch is 戌). The verdict itself (balanced) is unchanged, so this still fills the dry x balanced matrix cell — but it no longer demonstrates the climate-overrides-a-disagreeing-candidate scenario (climate_agrees is now true, not false). A replacement synthetic chart for dry x balanced x climate_agrees=false is a follow-up (docs/audits/2026-09-25-engine-audit-verification.md).",
+  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (戌 = 燥 → Water remedy, Metal 희신) + §How This Combines With 억부 (broadened 2026-09-19: 조후 governs whenever the band is non-temperate, regardless of verdict — docs/research/2026-09-validation-climate.md §5); synthetic chart probe-verified 2026-09-19. CORRECTED 2026-09-25 (external report review, E-2): strength.candidate changed from 'Metal' to 'Water' and fe.climate_agrees from false to true after fixing lookup.py's swapped 戌 중기/여기 (this chart's month branch is 戌). The verdict itself (balanced) is unchanged, so this still fills the dry x balanced matrix cell — but it no longer demonstrates the climate-overrides-a-disagreeing-candidate scenario (climate_agrees is now true, not false). That sub-case is now covered by dry-balanced-synth-v2 (added 2026-09-26).",
   "expected": {
    "climate": {
     "band": "dry",
@@ -950,6 +950,42 @@
     "climate_band": "dry",
     "climate_element": "Water",
     "climate_agrees": true,
+    "confidence": "heuristic"
+   }
+  },
+  "status": "expect_match"
+ },
+ {
+  "id": "dry-balanced-synth-v2",
+  "subsystem": "climate",
+  "input": {
+   "probe": "merge",
+   "year": 1970,
+   "month": 10,
+   "day": 10,
+   "hour": 3,
+   "minute": 0,
+   "longitude": 126.98,
+   "utc_offset": 9.0
+  },
+  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (戌 = 燥 → Water remedy, Metal 희신) + §How This Combines With 억부. Replaces dry-balanced-synth's lost sub-case (climate overrides a DISAGREEING raw candidate) after the 2026-09-25 E-2 hidden-stem fix flipped that chart's climate_agrees to true. Synthetic chart, probe-verified against the current engine 2026-09-26 (pillars 庚戌/丙戌/癸亥/癸丑; raw balanced least-element candidate Wood, overridden by the dry-band Water remedy).",
+  "expected": {
+   "climate": {
+    "band": "dry",
+    "climate_favorable": "Water",
+    "climate_supporting": "Metal"
+   },
+   "strength": {
+    "verdict": "balanced",
+    "candidate": "Wood"
+   },
+   "fe": {
+    "element": "Water",
+    "method": "climate-balanced",
+    "supporting": "Metal",
+    "climate_band": "dry",
+    "climate_element": "Water",
+    "climate_agrees": false,
     "confidence": "heuristic"
    }
   },

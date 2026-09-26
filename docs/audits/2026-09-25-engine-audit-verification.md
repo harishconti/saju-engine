@@ -33,15 +33,15 @@ FIXED = confirmed and corrected, with regression test and evidence linked below.
 | E-2 | P0 | Hidden-stem order swap (辰戌丑未) | **FIXED** | `lookup.py`'s `HIDDEN_STEMS` had 중기/여기 swapped for all four storage branches; `strength.py` weights them differently (0.3 vs 0.1), so this was a real element-percentage/strength-score bug, not cosmetic. See fix log below. |
 | E-3 | P1 | 기신 not plumbed past Quick Reference | **FIXED** (uncovered 5 more dormant bugs in the process) | `_avoid_watch_text` derived 기신/구신/한신 for display only; never wrote back to `strength_assessment["candidate_unfavorable"]`, so every decade/annual/business consumer still saw the placeholder `"—"`. See fix log below. |
 | E-4 | P1 | Strength verdict vs. prose | **FIXED** | Confirmed as a UX inconsistency, not an arithmetic bug — the verdict is correctly inside the current `[-1.5, 1.5]` "balanced" band by definition, but the band is wide enough that unqualified directional prose ("drain outweighs support") reads as contradicting a flat "Balanced" label. Fixed by adding a reconciling clause naming what actually pulls the total back to balanced, only for balanced-verdict charts. |
-| E-5 | P1 | Balanced-DM 용신 folk heuristic | **CONFIRMED as an architecture risk, not live for Harish** | `yongsin.py` falls back to "least-represented element" for balanced DMs not caught by another rule; for Harish 조후 overrides it (already disclosed in-report). Not fixed here — flagged for any balanced chart the 조후 gate doesn't cover. |
-| E-6 | P1 | Annual/decade interaction detector incomplete | **FIXED** | `sewoon.py::_detect_branch_relationship` returned on the *first* match (clash→combine→harm→break→self-punish priority), silently dropping a pair's second, simultaneous relationship; and no 3-branch (삼합/방합) completion check existed at all. See fix log below. |
-| E-7 | P1 | Knowledge-base star meanings + stem-clash inconsistency | **PARTIAL — stem-clash fixed; 지살/월살 wording deliberately left alone** | The `01-stems.md` "stems don't clash" vs. `08-luck-pillars.md` "check 천간충" inconsistency is fixed (cross-reference added, no new claim invented). The 지살/월살 meaning correction was **not** applied: my own recollection of the classical distinction (지살 as a travel-adjacent but distinct-from-역마 star; 월살 as 고초살/stagnation rather than romance) has real uncertainty, and the original audit's own sourcing for its claimed corrections was not available to verify against — rewriting a knowledge-base doctrine claim on uncertain memory would violate Ground Rule 1 as much as leaving a possibly-wrong claim in place. Left as an open, documented item for whoever has the classical source to confirm. |
+| E-5 | P1 | Balanced-DM 용신 folk heuristic | **FIXED (minimum guard)** | `strength.py`'s balanced fallback no longer offers the element that controls the Day Master when the month is that element's own season (the audit's stated minimum). Harish's raw pick Fire → Wood; headline 용신 unchanged (Water via 조후). The full "return *requires reader argument*" redesign is not done — see Next. |
+| E-6 | P1 | Annual/decade interaction detector incomplete | **FIXED (all 5 sub-items)** | First pass: dual-status pairs + 삼합/방합 completion. 2026-09-26: pairwise 형, 삼형 completion, 천간합/천간충 against every natal stem, per-(relation, branch) prose dedup. See fix log. |
+| E-7 | P1 | Knowledge-base star meanings + stem-clash inconsistency | **FIXED** | 2026-09-26: 지살/월살/연살 meanings corrected against sourced Korean references (see fix log); four 천간충 pairs documented in `01-stems.md`; 12신살 anchor school note added and `stars.py` now honours `anchor="year"` for all 12 stars. |
 | E-8 | P1 | Relationship section ignores gender | **FIXED** | `relationship_style()` read only `day_branch_main`'s ten-god; no gendered 재성/관성 (spouse-star) scan across the whole chart existed anywhere in `prose_fillers.py`. Fixed by reusing the classical mapping already applied in `compat.py::_gendered_spouse_star_note` (knowledge/11-gunghap.md §G). |
 | E-9 | P2 | 격국 named with no 성격/파격 check | **FIXED** | `patterns.py` computed grid-naming (regular_grid) and named ten-god conflicts (상관견관) in total isolation; 정관격 was asserted at "likely" confidence regardless of a same-chart 상관견관. See fix log below. |
 | E-10 | P2 | PDF tests hard-fail without `pdftotext` | **FIXED** | `tests/test_pdf.py` called `subprocess.run(["pdftotext", ...])` with no `FileNotFoundError` handling or `skipif` guard, in exactly the 5 functions that shell out to it. Fixed with a `shutil.which`-based `skipif` marker; verified both that the 5 skip when `pdftotext` is unavailable and that the other 7 (which don't need it) still run. |
 | E-11 | P2 | Date filter misses 형/자형/원진 | **FIXED (형/자형); 원진 deliberately not added** | `_candidate_day_conflicts` checked only 충/해/파. Fixed for 형 (pairwise three-punishment membership, including the 子卯 2-member special case) and 자형 (self-punishment). 원진 was **not** added — `knowledge/16-date-selection.md` names only 충/형/파/해 as date-selection criteria, so adding 원진 would invent a requirement beyond the cited doctrine (Ground Rule 1). |
-| E-12 | P2 | Misc. template-prose defects | **NOT YET CHECKED** | Relayed list (§E-12 in the source report) not yet seen in full. |
-| E-13 | P3 | Daeun decade-label display convention | **NOT YET CHECKED** | Claim: Korean apps show 대운수 as 1/11/21… (ordinal start), this engine shows 0-9/10-19… (age-range). Plausible, cosmetic, not yet verified against a reference app. |
+| E-12 | P2 | Misc. template-prose defects | **FIXED (all 12 rows)** | Source table read directly from `claude/saju-engine-audit-s626hx`. See fix log. |
+| E-13 | P3 | Daeun decade-label display convention | **FIXED** | Verified against Korean references (days ÷ 3, rounded; decades N, N+10…). Report now states the calendar start month and the app convention. |
 
 ## Calculation-layer cross-check (Harish, from the source report's Table 1)
 
@@ -291,6 +291,74 @@ already-cited detectors together — it adds no new classical claim.
   end-to-end against Harish's real chart). Full suite: **992 passed, 10 xfailed, 0 failed** (up from
   988/10/0).
 
-### Remaining: E-5 (documentation-only, no live bug for Harish), E-7 (KB star meanings + stem-clash
-inconsistency), E-12 (misc. template prose — never seen in detail), E-13 (daeun display convention —
-cosmetic, never independently verified).
+### Session 2026-09-26 — E-5, E-6 residuals, E-7, E-12, E-13, sub-minute boundary
+
+The original audit (`docs/audits/2026-09-25-engine-audit.md`) was read directly from branch
+`claude/saju-engine-audit-s626hx` this time, so E-12's table and E-6's full sub-item list were verified
+against source rather than relayed text. Knowledge-base doctrine changes were checked against Korean
+references fetched online (listed per item). Full suite after all items: **1005 passed, 9 skipped, 10
+xfailed, 0 failed** (skips are `pdftotext`/Playwright-dependent tests in this container).
+
+**E-7 — KB (commit `4705db4`).** Sources: 두루미사주 12신살 사전 (<https://www.durumisaju.com/dict/sipisinsal/intro>
+— 년지 basis; 지살 "이동·여행·변화의 자리"; 월살 "메마름·고갈·답답함"), 류동학/대구신문 「12신살의 이론과 적용」
+(<https://www.idaegu.co.kr/news/articleView.html?idxno=396467>), Korean Wikipedia 「충 (사주팔자)」 (four
+천간충 pairs). 지살 → movement/departure (milder 역마); 월살 → 고초살 stagnation; 연살 → same branch as 도화.
+Client-facing `report_data._STAR_MEANING` aligned. 12신살 anchor documented as a school split (year =
+traditional Korean, day = common modern); engine default stays day, `anchor="year"` now applies to all 12.
+Test pins Harish under both bases (year: 巳 겁살, 申 지살, 亥 망신, 丑 반안 — matching the audit).
+
+**E-6 residuals (commit `ff50839`).** Pairwise 형 (`"punish"`) incl. 子卯; full 삼형 completion
+(`HarmonyCompletion.kind == "삼형"`); `derive_sewoon(..., natal_stems=)` adds `natal_stem_combinations` and
+`stem_clashes`; decade overlays add `stem_clashes`; engine + all four premium-report callers pass the chart's
+stems. Verified on every worked example the audit named for Harish: 2026 丙壬 충, 2027 丁壬合, 2030 乙庚合 +
+丑戌 형, 2031 乙辛 충, 2034 甲己合 + 寅巳申 삼형.
+
+**E-12 (commit `7a53a48`).** All 12 rows: Companion-decade undertow; 비견 decade no longer labelled 겁재;
+spouse-stage sentence names the real 12운성 group (no "충 stage"); "Direct Officer stem" → influence;
+major-luck column shows stem/branch elements; `year_by_year_note` keyed to ten-god class and separates
+용신/희신/기신 years; tied dominant classes all named; Business launch window unified with Health on the
+용신 season (per `16-date-selection.md`); branch-hour times replace "per the Twelve Stages"; travel timing
+names the 희신 its decades qualify on; deficient-and-기신 element gets a reconciling note. (The "Favorable
+Windows" row was already fixed under E-3.)
+
+**E-13 (commit `c3567e9`).** Sources: Korean Wikipedia 「대운 (사주팔자)」; KNS뉴스통신 「제31강 대운수
+산출법」. Starting-age note adds the calendar month (Harish ≈ Dec 1992) and the app convention (대운수 1;
+1, 11, 21…).
+
+**E-5 (commit `a245bce`).** Minimum guard only (see summary row). Two validation fixtures + two
+`test_report_data.py` pins that encoded the raw Fire candidate updated with dated notes; the raw/resolved
+divergence they guard still holds (Wood ≠ Water).
+
+**Sub-minute hour boundary (commit `102b8e4`).** `correction_minutes_exact` kept; `hour_boundary` gains
+`distance_seconds`; report shows seconds under 90 s. Harish: ~29 s (audit: 28 s — the 1 s gap is the
+longitude input, 79.4408 vs 79.42). RM: 17 s past 午/未.
+
+## Session 2026-09-26 (continued) — "next set" closed
+
+All seven "next set" items from the first 2026-09-26 pass are done. Full suite: **1038 passed, 5
+skipped, 9 xfailed, 0 failed**.
+
+| # | Item | Status | Commit |
+|---|---|---|---|
+| 1 | Regenerate every client report | **DONE** — all engine-built base/tier/combined reports, two compat pairs, every PDF (incl. HTML backend and landing demos). Hand-written follow-ups reconciled with dated notes; Harish `career.md` timing re-derived. Not regenerable: `harish_vinothini` (no birth data — flagged in-file). Reproducible via `tools/regen_client_reports.sh`. | `2ee1bf9` |
+| 2 | Verify the 23-item Harish validation | **DONE** — every claim checked; the ones not already closed by E-1..E-13 fixed: 기신 partner row, boss profile keyed to the 구신, folk pick named in client text, 합화 season/clash check, half-harmony / 방합 / natal 천간충 rows, branch-aware annual lean, decade structural drivers (巳酉丑 삼합, 건록), 공망 years. Not changed: strength verdict (balanced vs weak is an [UNCERTAIN] reader call; E-4's reconciling clause covers the prose). | `bbf9ba0` |
+| 3 | Single 용신/희신/기신/구신/한신 resolution (E-3/E-5) | **DONE** — `FavorableElement` carries the full role set with provenance; compat, decade overlay, report_data, compat report, premium context and prose_scaffold all read it; balanced temperate charts marked provisional. Follow-up: a reader override that confirms the 억부 pick keeps the 억부 희신/기신. | `ae7cbc4`, `7f1bf26` |
+| 4 | E-8 marriage timing | **DONE** — spouse star + spouse palace rule sourced into `knowledge/08` Part 5b. | `477c938` |
+| 5 | E-9 other 파격 signals | **DONE** — 관살혼잡 and 정관 합거 break the grid; 월지 충·형 and weak DM are caveats (sourced into `knowledge/07`). | `8857b52` |
+| 6 | 12신살 basis in client prose | **DONE** — labelled in the report; `--star-anchor` / `compute_chart(star_anchor=)`. | `8f1c420` |
+| 7 | dry×balanced×disagree fixture | **DONE** — `dry-balanced-synth-v2`. | `6f0020a` |
+
+Also fixed while regenerating (`0f5bd72`): PDF translation gaps (empty "()" from dropped Hanja, "해
+(harm)" rendered as the branch 亥, "병신합수" rendered as "Illness Sin…", ~70 untranslated terms) and a
+Hanja-glossary look-ahead that split "**천간충**".
+
+### Still open (outside this audit's code scope)
+
+- **Vinothini's birth data** is needed to regenerate `harish_vinothini`.
+- **`cross-candidate-business-analysis.md`** idea rankings still rest on June 용신 values (Harish was
+  Earth, now Water); the element table and one wrong line are corrected and a banner warns readers, but
+  the business rankings need a fresh interpretive pass.
+- **Chart signature** sentences are keyed to the Day Master's element only, so 庚 and 辛 share the
+  "jewel kept in velvet" image (seen on Mahesh's 庚 report) — cosmetic, pre-existing.
+- **Birth-time confirmation for Harish** — the validation's own recommendation: the corrected time is
+  ~29 s from the 丑/寅 boundary, so the hour pillar should be confirmed to the minute with the client.

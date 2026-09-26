@@ -6,9 +6,11 @@
 
 **Born:** 2001-06-07 · 16:45 · Mysore
 
+**Time method:** recorded birth time 16:45 (local clock) corrected to true solar time **16:37** (birthplace 80.27°E vs the 82.5°E zone meridian), -7.5 min (longitude -8.9 min + equation of time +1.4 min). Hour branches follow 2-hour solar windows, so the pillars above use the corrected time.
+
 **Day Master:** Sin (Yin Metal, 辛金)
 
-**Report generated:** 2026-07-06 · **Report ID:** CID-vishnu-priya-20260706-SAMPLE
+**Report generated:** 2026-09-26 · **Report ID:** CID-vishnu-priya-20260926-SAMPLE
 
 *Delivered by CosmicSaju · cosmicsaju.com*
 
@@ -24,11 +26,11 @@
 
 ### Element Balance
 
-- 🔴 **Fire:** 26.1%
-- 🟡 **Earth:** 21.7%
-- ⚪ **Metal:** 34.8%
-- 🔵 **Water:** 8.7%
-- 🟢 **Wood:** 8.7%
+- 🔴 **Fire:** 27.8%
+- 🟡 **Earth:** 13.9%
+- ⚪ **Metal:** 40.5%
+- 🔵 **Water:** 5.1%
+- 🟢 **Wood:** 12.7%
 
 ### Quick Read
 
@@ -54,7 +56,7 @@ This is just a snapshot. The full Essential or Deep Destiny report opens the sto
 
 ### Want the Full Story?
 
-This snapshot is just the doorway. The **Essential Report** (₹799) explains your career arc, major luck periods, and lucky-element guide; the **Deep Destiny Report** (₹1,499) adds year-by-year 2025–2030 timing, relationship and business-launch guidance, monthly lucky dates, and an included MP3 audio summary.
+This snapshot is just the doorway. The **Essential Report** ($19) explains your career arc, major luck periods, and lucky-element guide; the **Deep Destiny Report** ($55) adds year-by-year 2026–2031 timing, relationship and business-launch guidance, monthly lucky dates, and an included MP3 audio summary.
 
 ## Closing Note
 

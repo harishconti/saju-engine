@@ -91,6 +91,9 @@ def _build_parser() -> argparse.ArgumentParser:
                     default=True, help="Disable true solar-time correction.")
     ap.add_argument("--convention", choices=["korean", "chinese"], default="korean",
                     help="Zi-hour convention: korean (야자시, default) or chinese (조자시).")
+    ap.add_argument("--star-anchor", choices=["day", "year"], default="day",
+                    help="Branch the 12신살 (and 도화/역마/화개) are counted from: day (default, common "
+                         "modern practice) or year (traditional Korean basis).")
     ap.add_argument("--name", default=None, help="Candidate name (optional).")
     ap.add_argument("--format", choices=["json", "table", "skeleton", "premium"], default="table",
                     help="Output format (default table; skeleton/premium = engine-driven markdown).")
@@ -185,6 +188,7 @@ def _run(args, stdout, stderr, *, deprecated_alias_used: bool = False) -> int:
             reference_year=args.year,
             reference_month=args.month,
             reference_day=args.day,
+            star_anchor=args.star_anchor,
         )
     except ValueError as exc:
         raise SystemExit(str(exc))

@@ -112,8 +112,10 @@ HARISH = compute_chart(
 # resolved element, and the raw field is a *different* element on this chart,
 # so the assertion still discriminates.
 def test_career_why_uses_resolved_favorable_element():
-    # harish diverges with NO override: candidate=Fire, resolved=Water (climate-balanced)
-    assert (HARISH.strength_assessment or {}).get("candidate_favorable") == "Fire"
+    # harish diverges with NO override: candidate=Wood, resolved=Water (climate-balanced).
+    # (Raw candidate was Fire until E-5, 2026-09-26: Fire controls the 辛 DM
+    # and is in season in 巳, so the balanced heuristic now skips it.)
+    assert (HARISH.strength_assessment or {}).get("candidate_favorable") == "Wood"
     assert favorable_element(HARISH).element == "Water"
     phrase = _career_why(HARISH, "Strategy & Consulting")   # _domain_element -> Water
     assert "favorable element Water" in phrase
@@ -156,4 +158,4 @@ def test_stale_branch_is_reachable_for_a_domain_the_resolver_maps_to_water():
 
     assert _domain_element("Strategy & Consulting") == "Water"
     # ...while the raw (stale) field is a different element — the divergence.
-    assert (HARISH.strength_assessment or {}).get("candidate_favorable") == "Fire"
+    assert (HARISH.strength_assessment or {}).get("candidate_favorable") == "Wood"

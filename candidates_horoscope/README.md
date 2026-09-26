@@ -106,6 +106,8 @@ The generated PDF and engine markdown are saved alongside the intake JSON in `ca
 
 ## Index
 
+> **Regeneration (2026-09-26):** every engine-generated report (all six candidates' base reports, Vishnu Priya's and RM's tier files, the combined reports, and the Harish × Manvitha / Pawan × Sruthi compat pairs) and every PDF were regenerated after the 2026-09-25 engine audit fixes (hidden-stem order, timezone-correct solar terms, single 용신/희신/기신 resolution, interaction detection, 파격 checks, spouse-star marriage timing). Hand-written follow-ups were reconciled with dated notes; Harish's `career.md` timing was re-derived. Commands: `tools/regen_client_reports.sh`. Not regenerated: `harish_vinothini` (Vinothini's birth data is not on record — flagged in the file) and the `*-legacy.md` / engine-draft files. `cross-candidate-business-analysis.md` carries a correction banner; its idea rankings still need re-deriving.
+>
 > **Maintenance note (2026-07-01):** Every item in `docs/issues_bugs.md` is now closed. Legacy base reports (Sruthi, Pawan, Gurumoorthy) are tagged with an explicit *legacy-format* banner; they remain accurate but do not yet follow the premium 9-section scaffold used for Vishnu Priya and later candidates. Inline citations were standardized to the `*(see knowledge/...)*` format across all base reports.
 
 | Name | Birth Date | Day Master | Favorable Element | Base Report |
@@ -127,8 +129,8 @@ Two-chart readings live under `candidates_horoscope/marriage_compatibility/` in 
 
 | Pair | Basic | Deep | Score | Band |
 |---|---|---|---|---|
-| Pawan × Sruthi (demo) | [MD](marriage_compatibility/pawan_sruthi/pawan_sruthi_compatibility.md) · [PDF](marriage_compatibility/pawan_sruthi/pawan_sruthi_compatibility.pdf) | [MD](marriage_compatibility/pawan_sruthi/pawan_sruthi_compatibility_deep.md) · [PDF](marriage_compatibility/pawan_sruthi/pawan_sruthi_compatibility_deep.pdf) | 55/100 | Mixed |
-| Harish × Manvitha | [MD](marriage_compatibility/harish_manvitha/harish_manvitha_compatibility.md) · [PDF](marriage_compatibility/harish_manvitha/harish_manvitha_compatibility.pdf) | [MD](marriage_compatibility/harish_manvitha/harish_manvitha_compatibility_deep.md) · [PDF](marriage_compatibility/harish_manvitha/harish_manvitha_compatibility_deep.pdf) | 68/100 *(was 70, corrected 2026-09-19)* | Strong |
+| Pawan × Sruthi (demo) | [MD](marriage_compatibility/pawan_sruthi/pawan_sruthi_compatibility.md) · [PDF](marriage_compatibility/pawan_sruthi/pawan_sruthi_compatibility.pdf) | [MD](marriage_compatibility/pawan_sruthi/pawan_sruthi_compatibility_deep.md) · [PDF](marriage_compatibility/pawan_sruthi/pawan_sruthi_compatibility_deep.pdf) | 50/100 *(was 55; regenerated 2026-09-26)* | Mixed |
+| Harish × Manvitha | [MD](marriage_compatibility/harish_manvitha/harish_manvitha_compatibility.md) · [PDF](marriage_compatibility/harish_manvitha/harish_manvitha_compatibility.pdf) | [MD](marriage_compatibility/harish_manvitha/harish_manvitha_compatibility_deep.md) · [PDF](marriage_compatibility/harish_manvitha/harish_manvitha_compatibility_deep.pdf) | 64/100 *(was 68 Strong; regenerated 2026-09-26 — 기신 penalties now apply to balanced charts)* | Mixed |
 
 The compat engine lives at `src/saju_engine/compat.py` (see `knowledge/11-gunghap.md` for the classical reference).
 

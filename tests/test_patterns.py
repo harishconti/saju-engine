@@ -489,7 +489,9 @@ def test_regular_grid_stays_likely_without_conflicting_god():
         month_stem="甲",
         month_branch="子",
         branches=["酉", "子", "寅", "丑"],
-        stems=["癸", "甲", "丙", "壬"],
+        # Hour stem 乙 (was 壬 until 2026-09-26: 壬 is 편관, so 癸 정관 + 壬
+        # 편관 on the visible stems is a genuine 관살혼잡 파격 now detected).
+        stems=["癸", "甲", "丙", "乙"],
         hidden_stems=[("main", "癸")],
     )
     grid = next(g for g in result["regular_grid"] if g.name_ko == "정관격")
@@ -758,3 +760,37 @@ def test_detect_patterns_surfaces_tengod_conflicts_key():
     )
     assert "tengod_conflicts" in result
     assert any(c["name_ko"] == "상관견관" for c in result["tengod_conflicts"])
+
+
+# ── E-9 residual (2026-09-26): 관살혼잡, 정관 합거, 월지 충·형, 신약 ──
+
+
+def _officer_grid(stems, branches=("酉", "子", "寅", "丑"), verdict=""):
+    result = detect_patterns(
+        day_master="丙", month_stem=stems[1], month_branch=branches[1],
+        branches=list(branches), stems=list(stems), hidden_stems=[("main", "癸")],
+        strength_verdict=verdict,
+    )
+    return next(g for g in result["regular_grid"] if g.name_ko == "정관격")
+
+
+def test_officer_grid_broken_by_mixed_officers():
+    grid = _officer_grid(["癸", "甲", "丙", "壬"])
+    assert grid.confidence == "possible" and "관살혼잡" in grid.note
+
+
+def test_officer_grid_broken_when_officer_is_combined_away():
+    grid = _officer_grid(["癸", "甲", "丙", "戊"])   # 戊癸合
+    assert grid.confidence == "possible" and "정관 합거" in grid.note
+
+
+def test_month_branch_clash_is_a_caveat_not_a_break():
+    grid = _officer_grid(["癸", "甲", "丙", "乙"], branches=("酉", "子", "午", "丑"))
+    assert grid.confidence == "likely"
+    assert "午子 충" in grid.note and "purity" in grid.note
+
+
+def test_weak_day_master_officer_grid_names_resource_need():
+    grid = _officer_grid(["癸", "甲", "丙", "乙"], verdict="weak")
+    assert grid.confidence == "likely"
+    assert "인성 is present" in grid.note

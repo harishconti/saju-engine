@@ -27,6 +27,7 @@ def derive_daeun_overlay(
     strength_assessment: Optional[Dict],
     period: DaeunPeriod,
     resolved_favorable: Optional[str] = None,
+    resolved_unfavorable: Optional[str] = None,
 ) -> Dict:
     """Return an overlay dictionary for a single DaeunPeriod.
 
@@ -39,6 +40,7 @@ def derive_daeun_overlay(
         (one natal member present) with the natal chart
       - stem_combinations: list of {stem_a, stem_b, combined_element, in_season,
         breaker_present, confidence} for 천간합 with natal stems
+      - stem_clashes: list of {stem_a, stem_b} for 천간충 with natal stems
       - stem_element / branch_element: 오행 elements
       - favorable_status: 'favorable', 'unfavorable', or 'neutral' vs. the
         chart's resolved 용신 (``resolved_favorable`` when given, else the raw
@@ -72,6 +74,13 @@ def derive_daeun_overlay(
                 "pair_label": pair_label,
             })
 
+    # 천간충 against every natal stem (knowledge/01-stems.md §Stem Clashes;
+    # E-6, 2026-09-25 audit).
+    stem_clashes: List[Dict] = []
+    for ns in dict.fromkeys(natal_stems):
+        if L.stem_clash(period.stem, ns):
+            stem_clashes.append({"stem_a": period.stem, "stem_b": ns})
+
     # Elements
     stem_element = L.STEM_INFO.get(period.stem, {}).get("element", "")
     branch_element = L.BRANCH_ELEMENT.get(period.branch, "")
@@ -88,7 +97,10 @@ def derive_daeun_overlay(
     favorable_status: Optional[str] = None
     if strength_assessment:
         fav = resolved_favorable if resolved_favorable is not None else strength_assessment.get("candidate_favorable")
-        unfav = strength_assessment.get("candidate_unfavorable")
+        unfav = (
+            resolved_unfavorable if resolved_unfavorable is not None
+            else strength_assessment.get("candidate_unfavorable")
+        )
         hits = {stem_element, branch_element}
         if fav in hits:
             favorable_status = "favorable"
@@ -104,6 +116,7 @@ def derive_daeun_overlay(
         "relationship_types": sorted(rel_types),
         "harmony_completions": harmony_completions,
         "stem_combinations": stem_combos,
+        "stem_clashes": stem_clashes,
         "stem_element": stem_element,
         "branch_element": branch_element,
         "favorable_status": favorable_status,
@@ -117,6 +130,7 @@ def build_daeun_overlays(
     strength_assessment: Optional[Dict],
     periods: List[DaeunPeriod],
     resolved_favorable: Optional[str] = None,
+    resolved_unfavorable: Optional[str] = None,
 ) -> List[DaeunPeriod]:
     """Populate each DaeunPeriod with its activation overlay in-place.
 
@@ -135,6 +149,7 @@ def build_daeun_overlays(
             strength_assessment=strength_assessment,
             period=period,
             resolved_favorable=resolved_favorable,
+            resolved_unfavorable=resolved_unfavorable,
         )
         period.stem_tengod = overlay["stem_tengod"]
         period.stem_tengod_en = overlay["stem_tengod_en"]
@@ -142,6 +157,7 @@ def build_daeun_overlays(
         period.relationship_types = overlay["relationship_types"]
         period.harmony_completions = overlay["harmony_completions"]
         period.stem_combinations = overlay["stem_combinations"]
+        period.stem_clashes = overlay["stem_clashes"]
         period.stem_element = overlay["stem_element"]
         period.branch_element = overlay["branch_element"]
         period.favorable_status = overlay["favorable_status"]

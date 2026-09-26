@@ -129,6 +129,18 @@ TEN_STEM_COMBINATIONS: List[Tuple[str, str, str, str]] = [
     ("戊", "癸", "Fire", "무계합화"),
 ]
 
+# 天干沖 (Stem Clashes / 천간충) — the four standard 칠충 pairs.
+# Source: knowledge/01-stems.md §Stem Clashes (E-7, 2026-09-25 audit).
+STEM_CLASHES: List[Tuple[str, str]] = [
+    ("甲", "庚"), ("乙", "辛"), ("丙", "壬"), ("丁", "癸"),
+]
+
+
+def stem_clash(a: str, b: str) -> bool:
+    """True when the unordered stem pair is one of the four 천간충 pairs."""
+    return frozenset([a, b]) in {frozenset(p) for p in STEM_CLASHES}
+
+
 # Branch element map for transformation-grid season check.
 BRANCH_ELEMENT: Dict[str, str] = {
     "寅": "Wood", "卯": "Wood", "辰": "Earth",

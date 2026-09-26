@@ -311,4 +311,30 @@ def test_rm_boundary_case_pinned():
             "branch window; the alternate hour pillar is a plausible reading "
             "if the recorded clock time carries a few minutes of error."
         ),
+        # True solar time 13:00:17 — 17 s past the 午/未 edge (sub-minute
+        # margin added 2026-09-26 per the 2026-09-25 audit).
+        "distance_seconds": 17,
     }
+
+
+def test_hour_boundary_reports_sub_minute_margin_for_harish():
+    """2026-09-25 audit (calculation-layer table): Harish's corrected solar
+    time is ~02:59:31, i.e. under 30 seconds from the 丑/寅 boundary — the
+    whole-minute distance hid that. distance_seconds carries it."""
+    from saju_engine.engine import compute_chart
+    chart = compute_chart(
+        name="harish-boundary", gender="M", year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+    hb = chart.solar_correction["hour_boundary"]
+    assert 20 <= hb["distance_seconds"] <= 35
+    assert hb["alternate_hour_pillar"] == "庚寅"
+
+
+def test_hour_boundary_distance_seconds_math():
+    from saju_engine.pillars import _hour_boundary_info
+    # 02:59:30 → 30 s before the 03:00 丑/寅 edge.
+    info = _hour_boundary_info(2, 59, "丑", "己", "辛", precise_minutes=2 * 60 + 59.5)
+    assert info["distance_seconds"] == 30
+    # Without precise_minutes the key is absent (backward compatible).
+    assert "distance_seconds" not in _hour_boundary_info(2, 59, "丑", "己", "辛")

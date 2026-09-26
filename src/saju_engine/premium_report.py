@@ -235,22 +235,11 @@ class _ReportContext:
         self.favorable_note = fe.note
         self.favorable_method = fe.method
         self.supporting = fe.supporting
-        # Bug found 2026-09-25 (external report review, E-3): strength.py's
-        # balanced-DM branch leaves candidate_unfavorable as None, and this
-        # used to store that raw "—" placeholder directly — so every
-        # decade/annual/business-window favorability check in
-        # prose_fillers.py that reads ctx.unfavorable never actually saw a
-        # real element for a balanced/climate-gated chart (e.g. Harish's),
-        # only a placeholder that could never match anything. Derive the
-        # same 기신 the Quick Reference display text already computes (see
-        # _derive_gisin_gusin_hansin) so every consumer, not just the one
-        # display line, sees it.
-        raw_unfavorable = sa.get("candidate_unfavorable")
-        if raw_unfavorable:
-            self.unfavorable = raw_unfavorable
-        else:
-            gisin, _, _ = _derive_gisin_gusin_hansin(fe.element)
-            self.unfavorable = gisin or "—"
+        # 기신/구신/한신 come from the same single resolution as 용신/희신
+        # (yongsin.favorable_element, E-3/E-5 2026-09-26) — no second
+        # derivation here that could drift from compat or the decade overlay.
+        self.fe = fe
+        self.unfavorable = fe.unfavorable or "—"
         self.verdict = sa.get("verdict", "balanced")
         self.strength_label = _strength_label(chart)
 
@@ -313,8 +302,14 @@ def _solar_time_note(chart) -> List[str]:
     if boundary:
         dist_to_boundary = boundary["distance_minutes"]
         unit = "minute" if dist_to_boundary == 1 else "minutes"
+        margin = f"~{dist_to_boundary} {unit}"
+        secs = boundary.get("distance_seconds")
+        if secs is not None and secs < 90:
+            # Sub-minute precision for the tightest cases (audit
+            # 2026-09-25: Harish's real margin is ~28 s, not "~1 minute").
+            margin = f"~{secs} seconds"
         lines.append(
-            f"> **⚠ Hour-boundary note:** the corrected time is only ~{dist_to_boundary} {unit} from a "
+            f"> **⚠ Hour-boundary note:** the corrected time is only {margin} from a "
             "2-hour branch boundary. If the recorded clock time carries even a few minutes of error, the "
             f"neighboring hour pillar (**{boundary['alternate_hour_pillar']}**, vs the primary "
             f"**{boundary['primary_hour_pillar']}** used above) is a plausible alternative — treat the hour "
@@ -418,11 +413,30 @@ def _daeun_starting_age_note(chart) -> str:
     days_display = round(days, 1)
     day_word = "day" if days_display == 1 else "days"
     month_word = "month" if months == 1 else "months"
+    # E-13 (2026-09-25 audit): give the calendar month the first period
+    # starts, and explain the Korean 만세력 display convention — apps round
+    # days ÷ 3 to a whole 대운수 (a remainder of 1.5 days or more rounds up)
+    # and list decades as N, N+10, N+20…, often in Korean age, so a client
+    # cross-checking against an app sees different labels for the same
+    # periods. (Sources: ko.wikipedia 「대운 (사주팔자)」; KNS뉴스 「대운수
+    # 산출법」 — 3일 = 1년, 반올림.)
+    start_note = ""
+    try:
+        from datetime import date, timedelta
+        birth = date(int(date_to_use[:4]), int(date_to_use[5:7]), int(date_to_use[8:10]))
+        start = birth + timedelta(days=days * 365.2422 / 3)
+        start_note = f" (≈ {start.strftime('%b %Y')})"
+    except (ValueError, TypeError):
+        pass
+    daeunsu = int(days / 3 + 0.5)
     return (
         f"**대운수 (starting age):** ~{precise_age} (~{days_display} {day_word} to the qualifying 節氣 ÷ 3, "
         f"per knowledge/08's \"3 days = 1 year\" rule) — the first major-luck period begins "
-        f"roughly {months} {month_word} after birth, inside the **{start_age}-{start_age + 9}** decade "
-        f"label shown below, not precisely at its first birthday."
+        f"roughly {months} {month_word} after birth{start_note}, inside the **{start_age}-{start_age + 9}** "
+        f"decade label shown below, not precisely at its first birthday; each later period changes over at "
+        f"the same point in the year. Korean 만세력 apps round this to a whole **대운수 {daeunsu}** and list "
+        f"decades as {daeunsu}, {daeunsu + 10}, {daeunsu + 20}… (often in Korean age), so their labels can "
+        f"differ from the table below by a year or so while describing the same periods."
     )
 
 
@@ -482,10 +496,8 @@ def _derive_gisin_gusin_hansin(fav: str) -> Tuple[Optional[str], Optional[str], 
     because `unfavorable` was stuck at "—" and never matched any real
     element name.
     """
-    gisin = L.OVERCOMES.get(fav)  # 기신: the element 용신 overcomes
-    gusin = next((k for k, v in L.OVERCOMES.items() if v == fav), None)  # 구신: restrains 용신
-    hansin = L.GENERATES.get(fav)  # 한신: drains 용신 (용신 generates this)
-    return gisin, gusin, hansin
+    from .yongsin import _derive_from_yongsin
+    return _derive_from_yongsin(fav)
 
 
 def _avoid_watch_text(ctx: _ReportContext) -> str:
@@ -516,10 +528,11 @@ def _avoid_watch_text(ctx: _ReportContext) -> str:
     `_ReportContext.__init__` — so the two branches are told apart by which
     `strength.py` verdict produced the value, not by its emptiness.
     """
-    if ctx.verdict != "balanced":
+    fe = ctx.fe
+    if fe.unfavorable_method == "dm-relative":
         return ctx.unfavorable if ctx.unfavorable and ctx.unfavorable != "—" else "—"
     fav = ctx.favorable
-    gisin, gusin, hansin = _derive_gisin_gusin_hansin(fav)
+    gisin, gusin, hansin = fe.unfavorable, fe.gusin, fe.hansin
     if not (gisin or gusin or hansin):
         return "—"
     parts = []
@@ -560,7 +573,9 @@ def _section_chart_at_a_glance(ctx: _ReportContext) -> List[str]:
     lines += [
         f"- **Day Master:** {ctx.dm_en}",
         f"- **Strength:** {ctx.strength_label} — {PF.strength_reasoning(ctx)}",
-        f"- **Favorable Element:** {ctx.favorable} — {ctx.favorable_note}",
+        f"- **Favorable Element:** {ctx.favorable}"
+        f"{' *(provisional — requires reader confirmation)*' if ctx.fe.requires_reader else ''}"
+        f" — {ctx.favorable_note}",
         f"- **Supporting Element:** {ctx.supporting}",
         f"- **Avoid / Watch:** {_avoid_watch_text(ctx)}",
     ]
@@ -869,7 +884,10 @@ def _section_relationships(ctx: _ReportContext, mode: str = "standard") -> List[
         "| Partner Type | Element | Fit Level | Why |",
         "|---|---|---|---|",
     ]
-    for archetype, elem, fit, reason in _compatibility_rows(ctx.dm_element, ctx.favorable, ctx.verdict):
+    for archetype, elem, fit, reason in _compatibility_rows(
+        ctx.dm_element, ctx.favorable, ctx.verdict,
+        supporting=ctx.supporting, unfavorable=ctx.fe.unfavorable,
+    ):
         lines.append(f"| {archetype} | {elem} | {fit} | {reason} |")
 
     lines += [
@@ -893,7 +911,8 @@ def _section_relationships(ctx: _ReportContext, mode: str = "standard") -> List[
         current_year = (ctx.chart.reference_date_obj() or datetime.now().date()).year
         try:
             annual_hits = SE.build_sewoon_range(
-                ctx.chart.day_master, ctx.chart.branches, current_year, current_year + 5
+                ctx.chart.day_master, ctx.chart.branches, current_year, current_year + 5,
+                natal_stems=ctx.chart.stems,
             )
         except Exception:
             annual_hits = []
@@ -986,6 +1005,27 @@ def _render_compat_snapshot(ctx, partner_chart) -> List[str]:
     return lines
 
 
+def _deficient_is_gisin_note(ctx: _ReportContext, deficient: str) -> str:
+    """Mirror of the excess==용신 reconciliation for the opposite collision.
+
+    E-12 (2026-09-25 audit): a chart born in the peak-Fire month whose 조후
+    remedy is to *cool* Fire could show "Deficient: Fire → support the
+    heart" — the raw-percentage view (knowledge/15-health-and-body.md)
+    contradicting the climate/억부 view the report itself uses for 용신
+    (knowledge/17-climate-method.md). As with the excess case, neither file
+    states how to reconcile the two, so the tension is surfaced, not
+    resolved: support means protecting that organ system, not adding more
+    of the element.
+    """
+    if not deficient or deficient != getattr(ctx, "unfavorable", None):
+        return ""
+    return (
+        f" Note that {deficient} is also this chart's challenging element (기신) under the climate/억부 "
+        f"reading used for its favorable element — so \"support\" here means protecting and resting this "
+        f"system, not deliberately adding more {deficient}-element activity."
+    )
+
+
 def _section_health_vitality(ctx: _ReportContext) -> List[str]:
     pct, _ = _element_balance(ctx.chart)
     excess = max(pct, key=pct.get)
@@ -1020,11 +1060,15 @@ def _section_health_vitality(ctx: _ReportContext) -> List[str]:
             f"the element itself — which the Grounding Practices below still "
             f"recommend leaning into."
         )
+    deficient_line = (
+        f"- **Element deficiency:** {deficient} — the {_ELEMENT_ORGANS.get(deficient, 'associated')} "
+        f"system may need gentle support."
+    ) + _deficient_is_gisin_note(ctx, deficient)
     lines += [
         "### Primary Watchpoints",
         "",
         excess_line,
-        f"- **Element deficiency:** {deficient} — the {_ELEMENT_ORGANS.get(deficient, 'associated')} system may need gentle support.",
+        deficient_line,
         f"- {PF.depleted_element_health(ctx)}",
         "",
         "### Grounding Practices",
@@ -1069,7 +1113,8 @@ def _health_deep_dive(ctx: _ReportContext) -> List[str]:
         "### Body-System Map",
         "",
         f"- **Excess system ({excess}):** {_ELEMENT_ORGANS.get(excess, 'associated')} — watch for signs of over-activity or congestion.\n"
-        f"- **Deficient system ({deficient}):** {_ELEMENT_ORGANS.get(deficient, 'associated')} — gentle rebuilding over time is usually better than forceful stimulation.",
+        f"- **Deficient system ({deficient}):** {_ELEMENT_ORGANS.get(deficient, 'associated')} — gentle rebuilding over time is usually better than forceful stimulation."
+        + _deficient_is_gisin_note(ctx, deficient),
         "",
         "### Stress Signature",
         "",
@@ -1106,10 +1151,31 @@ def _section_natal_patterns(ctx: _ReportContext) -> List[str]:
     rels = []
     if ctx.chart.combinations_6:
         for a, c, elem, pa, pb in ctx.chart.combinations_6:
-            rels.append(("Six Combination", f"{a}+{c}", f"transforms toward {elem} energy between the {pa} and {pb} palaces"))
+            phrase = PF.six_combination_phrase(ctx.chart, a, c, elem).replace("**", "")
+            rels.append(("Six Combination", f"{a}+{c}", f"{phrase}; links the {pa} and {pb} palaces"))
     if ctx.chart.three_harmonies:
         for a, b, c, elem in ctx.chart.three_harmonies:
             rels.append(("Three Harmony", f"{a}+{b}+{c}", f"strengthens {elem} energy through the {a}, {b}, and {c} branches"))
+    # Validation 2026-09-25 (§2.4): half-harmonies, 방합 and natal 천간충 were
+    # computed or computable but never listed here.
+    for b1, b2, frame, elem in getattr(ctx.chart, "half_harmonies", []) or []:
+        centre = next((x for x in frame if x in "子午卯酉"), "")
+        if centre and centre not in (b1, b2):
+            note = (f"two of the {frame} ({elem}) frame without its central branch {centre} — latent; it "
+                    f"activates when {centre} arrives in a luck period")
+        else:
+            note = f"two of the {frame} ({elem}) frame (반합) — a partial {elem} empowerment"
+        rels.append(("Half Harmony", f"{b1}+{b2}", note))
+    for a, b, c, label in getattr(ctx.chart, "directional_harmonies", []) or []:
+        rels.append(("Directional Harmony", f"{a}+{b}+{c}", f"a full seasonal frame ({label}) concentrating that element"))
+    stems = ctx.chart.stems
+    seen_sc = set()
+    for i in range(4):
+        for j in range(i + 1, 4):
+            if L.stem_clash(stems[i], stems[j]) and (stems[i], stems[j]) not in seen_sc:
+                seen_sc.add((stems[i], stems[j]))
+                rels.append(("Stem Clash (천간충)", f"{stems[i]}↔{stems[j]}",
+                             "two same-polarity stems in direct control — tension in what those stems' ten-gods represent"))
     if ctx.chart.clashes:
         for a, c in ctx.chart.clashes:
             rels.append(("Six Clash", f"{a}↔{c}", "a tension or activation between two life palaces; often a call to adjust, release, or decide"))
@@ -1182,7 +1248,18 @@ def _section_natal_patterns(ctx: _ReportContext) -> List[str]:
         if positions and key in _STAR_MEANING
     ]
     if active_stars:
-        lines += ["", "### Other Active 신살", ""]
+        # E-7 (2026-09-25 audit): name the counting basis — the 12신살 differ
+        # completely between the year- and day-branch schools.
+        anchor = getattr(ctx.chart, "star_anchor", "day")
+        basis_branch = ctx.chart.year.branch if anchor == "year" else ctx.chart.day.branch
+        basis = (
+            f"*Counted from your {'year' if anchor == 'year' else 'day'} branch **{basis_branch}**"
+            + (" (traditional Korean basis)." if anchor == "year" else
+               " (common modern practice; traditional Korean practice counts from the year branch, "
+               "which can give a different set of stars).")
+            + "*"
+        )
+        lines += ["", "### Other Active 신살", "", basis, ""]
         for key, positions in active_stars:
             label = STAR_LABELS.get(key, key)
             where = ", ".join(positions)
@@ -1315,11 +1392,16 @@ def _section_wealth_timing(ctx: _ReportContext) -> List[str]:
                 # opposite framing. This decade is included because its
                 # element supports overall balance, not because it
                 # specifically brings wealth.
+                # E-12 (2026-09-25 audit): a 비견 decade was labelled
+                # "겁재奪財" as if its ten-god were 겁재. Name the actual
+                # ten-god; 겁재奪財 is the pattern the whole 비겁 class
+                # triggers (knowledge/13-wealth-and-business.md).
+                tg_ko = p.stem_tengod or "비겁"
                 note = (
                     "your favorable element is active here, supporting overall stability — but its ten-god "
-                    "is a peer/rival type (겁재奪財), classically read as wealth *competition* rather than "
-                    "opportunity; keep shared-money agreements explicit here rather than expecting income "
-                    "growth from it directly."
+                    f"is **{tg_ko}**, a peer/rival (비겁) type that the 겁재奪財 pattern reads as wealth "
+                    "*competition* rather than opportunity; keep shared-money agreements explicit here "
+                    "rather than expecting income growth from it directly."
                 )
             else:
                 note = (
@@ -1402,11 +1484,16 @@ def _section_timing(
         "",
         "### Major Luck Periods",
         "",
-        "| Age | Pillar | Element Theme | Ten-God | Career Theme | Relationship Theme |",
+        "| Age | Pillar | Elements (Stem / Branch) | Ten-God | Career Theme | Relationship Theme |",
         "|---|---|---|---|---|---|",
     ]
     for p in ctx.chart.daeun:
-        elem_theme = L.BRANCH_ELEMENT.get(p.branch, "")
+        # E-12 (2026-09-25 audit): this column used to show only the
+        # branch element under an unlabelled "Element Theme" header (丁未 →
+        # "Earth"), hiding the stem. Show both, labelled.
+        stem_el = L.STEM_INFO.get(p.stem, {}).get("element", "")
+        branch_el = L.BRANCH_ELEMENT.get(p.branch, "")
+        elem_theme = f"{stem_el} / {branch_el}" if stem_el and branch_el else (stem_el or branch_el)
         tg = p.stem_tengod_en or p.stem_tengod or "—"
         career_t, rel_t = PF.major_luck_theme_row(p, ctx)
         lines.append(
@@ -1430,6 +1517,7 @@ def _section_timing(
                 ctx.chart.branches,
                 current_year,
                 current_year + 9,
+                natal_stems=ctx.chart.stems,
             )
             lines += [
                 "### 10-Year Forecast",
@@ -1443,6 +1531,7 @@ def _section_timing(
                 ctx.chart.branches,
                 annual_range[0],
                 annual_range[1],
+                natal_stems=ctx.chart.stems,
             )
             lines += [
                 f"### Annual Windows ({annual_range[0]}–{annual_range[1]})",
@@ -1785,7 +1874,8 @@ def _section_business_launch(ctx: _ReportContext) -> List[str]:
         "|---|---|---|---|",
     ]
     annual_hits = SE.build_sewoon_range(
-        ctx.chart.day_master, ctx.chart.branches, current_year, current_year + 5
+        ctx.chart.day_master, ctx.chart.branches, current_year, current_year + 5,
+        natal_stems=ctx.chart.stems,
     )
     for h in annual_hits:
         theme, best, _watch = PF.annual_window_row(h, ctx)

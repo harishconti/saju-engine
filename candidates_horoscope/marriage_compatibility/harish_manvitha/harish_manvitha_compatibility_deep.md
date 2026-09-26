@@ -1,7 +1,7 @@
 # Harish × Manvitha — 궁합 (合婚 / Compatibility Reading)
 
-**Composite Score (종합 점수):** **68 / 100**  
-**Verdict Band (평가):** **Strong**  *(see knowledge/11-gunghap.md §Composite Weight)*
+**Composite Score (종합 점수):** **64 / 100**  
+**Verdict Band (평가):** **Mixed**  *(see knowledge/11-gunghap.md §Composite Weight)*
 
 | Partner | Day Master | Day Branch | Day Pillar | Favorable Element |
 |---|---|---|---|---|
@@ -35,7 +35,7 @@
 | Day-stem combination | 일간합 (天干合) | +0 | 12 | Soft |
 | Day-branch interaction (spouse palaces) | 일지 합충형파해 (배우자궁) | -6 | 30 | Yellow Flag |
 | Nayin harmony | 납음오행 (納音五行) | -3 | 5 | Yellow Flag |
-| Favorable element cross-supply | 용신 궁합 (用神 宮合) | +9 | 12 | Strong |
+| Favorable element cross-supply | 용신 궁합 (用神 宮合) | +5 | 12 | Moderate |
 | Day-pillar pair classification | 일주 궁합 (日柱 宮合) | +3 | 15 | Soft |
 | Combined element balance | 결합 오행 (結合 五行) | +9 | 12 | Strong |
 | Ten-god cross-relationship | 십신 교차 (十神 交叉) | +10 | 10 | Strong |
@@ -44,7 +44,7 @@
 | Yin-Yang polarity | 음양 조화 (陰陽 調和) | +2 | 3 | Strong |
 | Year-branch zodiac pair (띠) | 띠 궁합 (支 宮合) | +2 | 3 | Strong |
 
-**Composite Score (종합 점수):** 68/100 → **Strong**
+**Composite Score (종합 점수):** 64/100 → **Mixed**
 
 ### Top Red Flags (주의 사항)
 
@@ -53,7 +53,9 @@
 ### Yellow Flags (관찰 사항)
 
 - 🟡 Day-branch interaction (spouse palaces): B일지·A지지 삼형 戌丑
+- 🟡 Favorable element cross-supply: A에 B의 기신 — the element that unbalances your chart — minimise its influence *(see knowledge/03-five-elements.md)* Metal 과다 (28%)
 - 🟡 Nayin harmony: 납음 釵釧金 vs 山頭火 → 상해 [element-grammar-fallback]
+- 🟡 Ten-god cross-relationship: A의 일간 원소 Metal = B의 기신 [주의]
 - 🟡 Yin-Yang polarity: 결합 음양 불균형 (38% 양)
 
 ### Favorable Points (긍정적 요소)
@@ -62,18 +64,18 @@
 - ✅ Day-pillar pair classification: 배우자 복덕 (용신 일치)
 - ✅ Favorable element cross-supply: A → B 용신 Fire 일부 공급 (9%)
 
-**What 68/100 (Strong) means:** The composite is anchored so that a perfectly neutral chart (all sub-systems scoring 0) lands at 50/100 in the Mixed band; positive classical signals lift it, and negative signals lower it. a solid classical alignment with a few sub-systems needing attention. The favorable layers outweigh the friction points — a workable, durable tendency with known soft spots to mind.
+**What 64/100 (Mixed) means:** The composite is anchored so that a perfectly neutral chart (all sub-systems scoring 0) lands at 50/100 in the Mixed band; positive classical signals lift it, and negative signals lower it. a workable union in which specific sub-systems ask for deliberate attention. Mixed is not a failure — many long, happy marriages sit in this band; the chart simply flags which dimensions want conscious effort rather than riding on natural ease.
 
 *see knowledge/11-gunghap.md §Composite Weight*
 
 ## Who You Are Together (두 사람의 관계 성향)
 
-Together, your spouse palaces (일지) hold a neutral, uncombined relation, your ten-god cross leans complementary, your charts feed each other's favorable element (용신) — each brings what the other needs. This composite is a tendency, not a destiny — the daily relationship is shaped by the choices both of you make over years.
+Together, your spouse palaces (일지) hold a neutral, uncombined relation, your ten-god cross leans complementary. This composite is a tendency, not a destiny — the daily relationship is shaped by the choices both of you make over years.
 
 *see knowledge/11-gunghap.md §B, §G, §D*
 
 
-> **In plain words:** Overall this reads as a solid match — more working with each other than against (68/100). Treat the number as a weather report, not a verdict.
+> **In plain words:** Overall this reads as a workable match with real friction points to manage deliberately (64/100). Treat the number as a weather report, not a verdict.
 
 ## Day-Stem Combination — 일간합 (天干合)
 
@@ -108,11 +110,11 @@ The two day pillars carry the Nayin tones 釵釧金 and 山頭火 (상해). In c
 
 ## Favorable Element Cross-Supply — 용신 궁합 (用神 宮合)
 
-**Score:** +9 / 12  (Strong)
+**Score:** +5 / 12  (Moderate)
 
-용신 cross-supply is the **궁통보감 deciding factor**: does each partner's chart carry the element the other needs? Both partners bring meaningful supply of the other's favorable element. This is a structural complementarity — '서로 용신이 되는' reading. [UNCERTAIN: 궁통보감 treats 용신 alignment as the deciding factor; 적천수 weights it equal with 일지 궁 interaction; modern Korean Myeongri consensus is ~12/100.]
+용신 cross-supply is the **궁통보감 deciding factor**: does each partner's chart carry the element the other needs? Partial cross-supply exists; one partner brings more than the other. [UNCERTAIN: 궁통보감 treats 용신 alignment as the deciding factor; 적천수 weights it equal with 일지 궁 interaction; modern Korean Myeongri consensus is ~12/100.]
 
-**Tags:** `B → A 용신 Water 공급 양호 (31%)`, `A → B 용신 Fire 일부 공급 (9%)`
+**Tags:** `B → A 용신 Water 공급 양호 (31%)`, `A → B 용신 Fire 일부 공급 (9%)`, `A에 B의 기신 Metal 과다 (28%)`
 
 *see knowledge/11-gunghap.md §D*
 
@@ -130,7 +132,7 @@ The two day pillars are **辛亥** (Partner A) and **甲戌** (Partner B). Each 
 
 **Score:** +9 / 12  (Strong)
 
-Combined element distribution (avg of both charts): Wood=22%, Fire=11%, Earth=22%, Metal=15%, Water=29%. The union has some imbalance — over-dominant elements 'rule' the relationship. 궁통보감 framing: one chart may be 寒 (cold), the other 熱 (hot) — complementary climates balance the union.
+Combined element distribution (avg of both charts): Wood=22%, Fire=12%, Earth=22%, Metal=15%, Water=28%. The union has some imbalance — over-dominant elements 'rule' the relationship. 궁통보감 framing: one chart may be 寒 (cold), the other 熱 (hot) — complementary climates balance the union.
 
 **Tags:** `A 용신 Water 결합에서 충분`
 
@@ -142,7 +144,7 @@ Combined element distribution (avg of both charts): Wood=22%, Fire=11%, Earth=22
 
 In 십신 cross-reading, each partner is classified as a specific 십신 of the other's Day Master — you — the reference point the whole chart is read against *(see knowledge/09-interpretation-method.md)*. A→B/B→A 십신 pattern (정관/정재) is classically favorable: 사회적 부부 — 권위·안정 The 자평진전 gendered spouse-star mapping aligns for at least one partner — a soft classical confirmation beyond the 용신 modifier. [UNCERTAIN: 권인성·송기영 uses the fixed pair table above; 적천수 overrides with 용신 여부 (gender-agnostic); 자평진전 adds gendered spouse-star mapping for heterosexual pairs.]
 
-**Tags:** `A (辛)는 B (甲)의 정관 — conventional authority — career structure, rules, status, institutions *(see knowledge/05-ten-gods.md)*`, `B (甲)는 A (辛)의 정재 — steady, earned income and everyday resources — salary and savings *(see knowledge/05-ten-gods.md)*`, `A(남)의 배우자 지표 재성 — the wealth group — how money and resources come and are held *(see knowledge/05-ten-gods.md)* 일치: B는 A의 정재`, `B(여)의 배우자 지표 관성 — the authority group — how you meet rules, status, and institutions *(see knowledge/05-ten-gods.md)* 일치: A는 B의 정관`
+**Tags:** `A (辛)는 B (甲)의 정관 — conventional authority — career structure, rules, status, institutions *(see knowledge/05-ten-gods.md)*`, `B (甲)는 A (辛)의 정재 — steady, earned income and everyday resources — salary and savings *(see knowledge/05-ten-gods.md)*`, `A의 일간 원소 Metal = B의 기신 [주의]`, `A(남)의 배우자 지표 재성 — the wealth group — how money and resources come and are held *(see knowledge/05-ten-gods.md)* 일치: B는 A의 정재`, `B(여)의 배우자 지표 관성 — the authority group — how you meet rules, status, and institutions *(see knowledge/05-ten-gods.md)* 일치: A는 B의 정관`
 
 *see knowledge/11-gunghap.md §G*
 
@@ -201,8 +203,8 @@ The basic reading above evaluates the natal composite across the classical eleve
 | 🔴 Fire | █░░░░░░░░░ | 9.2% |
 | 🟢 Wood | █░░░░░░░░░ | 13.8% |
 | 🟡 Earth | ██░░░░░░░░ | 23.9% |
-| ⚪ Metal | ███░░░░░░░ | 25.7% |
-| 🔵 Water | ███░░░░░░░ | 27.5% |
+| ⚪ Metal | ███░░░░░░░ | 27.5% |
+| 🔵 Water | ███░░░░░░░ | 25.7% |
 
 #### Day Master Snapshot — Harish
 
@@ -210,17 +212,17 @@ The basic reading above evaluates the natal composite across the classical eleve
 - **Seasonal strength verdict:** balanced
 - **Favorable element (용신):** Water
 - **Supporting element (희신):** Metal
-- **Unfavorable / watch element:** None
-- *How this was derived:* The Day Master reads as balanced, so the classical 조후 (climate-balance) check applies: this chart peaks in hot summer conditions, and the classical remedy is Water. This overrides the numeric least-represented-element pick (Fire), which is a weaker signal than the classical climate check here.
+- **Unfavorable / watch element:** Fire
+- *How this was derived:* The Day Master reads as balanced, so the classical 조후 (climate-balance) check applies: this chart peaks in hot summer conditions, and the classical remedy is Water. This takes priority over the chart's simple element count, which is a weaker signal than the classical climate check here.
 
 #### Element Balance — Manvitha
 
 | Element | Presence | Percentage |
 |---|---|---|
-| 🔴 Fire | █░░░░░░░░░ | 13.3% |
+| 🔴 Fire | ██░░░░░░░░ | 15.3% |
 | 🟢 Wood | ███░░░░░░░ | 30.6% |
 | 🟡 Earth | ██░░░░░░░░ | 20.4% |
-| ⚪ Metal | █░░░░░░░░░ | 5.1% |
+| ⚪ Metal | ░░░░░░░░░░ | 3.1% |
 | 🔵 Water | ███░░░░░░░ | 30.6% |
 
 #### Day Master Snapshot — Manvitha
@@ -229,7 +231,7 @@ The basic reading above evaluates the natal composite across the classical eleve
 - **Seasonal strength verdict:** strong
 - **Favorable element (용신):** Fire
 - **Supporting element (희신):** Wood
-- **Unfavorable / watch element:** Wood
+- **Unfavorable / watch element:** Metal
 - *How this was derived:* The Day Master reads as strong, but the classical 조후 (climate-balance) check takes priority ahead of 억부 (strength-balance) here, because the chart's climate is extreme rather than mild: this chart peaks in cold winter conditions, and the classical remedy is Fire. This matches the chart's own least-represented element, reinforcing the pick.
 
 ### Timing & Movement
@@ -241,8 +243,8 @@ The basic reading above evaluates the natal composite across the classical eleve
 | Ages | Pillar | Stem Ten-God | Favorable Status |
 |---|---|---|---|
 | 40–49 | 庚戌 | Robber (劫財) | neutral |
-| 50–59 | 辛亥 | Companion (比肩) | neutral |
-| 60–69 | 壬子 | Hurting Officer (傷官) | neutral |
+| 50–59 | 辛亥 | Companion (比肩) | favorable |
+| 60–69 | 壬子 | Hurting Officer (傷官) | favorable |
 
 #### Major Luck Timeline — Manvitha
 
@@ -251,7 +253,7 @@ The basic reading above evaluates the natal composite across the classical eleve
 
 | Ages | Pillar | Stem Ten-God | Favorable Status |
 |---|---|---|---|
-| 38–47 | 乙未 | Robber (劫財) | unfavorable |
+| 38–47 | 乙未 | Robber (劫財) | neutral |
 | 48–57 | 甲午 | Companion (比肩) | favorable |
 | 58–67 | 癸巳 | Direct Resource (正印) | favorable |
 
@@ -271,7 +273,6 @@ The basic reading above evaluates the natal composite across the classical eleve
 
 ## Practical Guidance (실천 지침)
 
-- **Lean on your shared lucky element.** Cross-용신 supply is strong (sub-system D: 9/12) — each of you brings what the other's chart needs. Consciously build environments, seasons, and activities that activate the favorable element (Water / Fire); both Day Masters benefit at once. *(see knowledge/11-gunghap.md §D)*
 - **Day-stem combination (일간합) is absent.** Attraction must build through shared activities, not first-meeting chemistry — the day-branch layer (below) is your primary anchor. *(see knowledge/11-gunghap.md §A)*
 - **Nayin (납음) clash is present** — a soft, disputed indicator. Don't overweight it on its own; treat it as a reminder to align emotional climate (조후: cold/hot, dry/wet) rather than as a blocking verdict. *(see knowledge/11-gunghap.md §C)*
 - **Yin-Yang polarity is complementary** — opposite Day-Master polarity, a classic complementary dynamic. Honor the differences rather than trying to smooth them out. *(see knowledge/11-gunghap.md §J)*
@@ -279,8 +280,9 @@ The basic reading above evaluates the natal composite across the classical eleve
 
 ## Closing Note (맺음말)
 
-This reading reflects the classical 권인성·곽임성·정봉재·송기영 Korean Myeongri consensus on Harish × Manvitha's natal compatibility, across all eleven sub-systems documented in `knowledge/11-gunghap.md`. The composite score of **68/100 (Strong)** is a tendency indicator, not a destiny. No compatibility reading can account for conscious effort, life circumstances, or the choices both partners make over years. Classical 명리 text guides tendencies; the relationship itself is lived.
+This reading reflects the classical 권인성·곽임성·정봉재·송기영 Korean Myeongri consensus on Harish × Manvitha's natal compatibility, across all eleven sub-systems documented in `knowledge/11-gunghap.md`. The composite score of **64/100 (Mixed)** is a tendency indicator, not a destiny. No compatibility reading can account for conscious effort, life circumstances, or the choices both partners make over years. Classical 명리 text guides tendencies; the relationship itself is lived.
 
+**A note on challenging and mixed verdicts:** these do not mean incompatibility. They mean the chart surfaces patterns that need deliberate, conscious attention — which is a different problem from having no resonance at all. Many long, happy marriages have charts with 'Challenging' compat scores; many short, painful ones have 'Excellent'.
 
 ## Next Steps (다음 단계)
 
@@ -292,13 +294,17 @@ This 두 분 궁합 reading is a static, whole-life composite. To go deeper:
 
 Ask for any of these as a follow-up.
 
+
+*Generated on 2026-09-26.*
+
 ## What the Terms Mean
 
+- **Unfavourable Element (忌神):** the element that unbalances your chart — minimise its influence
+- **Day Master (日干):** you — the reference point the whole chart is read against
 - **Favourable Element (用神):** the element your chart most needs for balance — lean toward it. It is the working target for choices about work, place, colour, and timing.
 - **Primary hidden stem (本氣):** the main hidden stem of a branch — its dominant inner force
 - **Hurting Officer (傷官):** sharp output — bold expression, creativity, friction with rules and authority
 - **Indirect Wealth (偏財):** variable money — deals, commissions, windfalls, higher risk and reward
-- **Day Master (日干):** you — the reference point the whole chart is read against
 - **Direct Officer (正官):** conventional authority — career structure, rules, status, institutions
 - **Direct Wealth (正財):** steady, earned income and everyday resources — salary and savings
 - **Wealth class (財星):** the wealth group — how money and resources come and are held

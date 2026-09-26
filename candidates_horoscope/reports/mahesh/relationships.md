@@ -2,6 +2,15 @@
 
 > Topic file. The base natal reading is at [`mahesh-report.md`](mahesh-report.md). This file is for follow-up queries on relationships, marriage, partner analysis, and compatibility. Append new queries with a dated heading.
 
+## 2026-09-26 — Marriage timing re-derived from the spouse star and spouse palace
+
+The engine audit (E-8, 2026-09-25) found marriage timing was keyed to favorable-element years rather than the classical signals. `knowledge/08-luck-pillars.md` Part 5b now defines it: for a male chart the **재성 (wife star)** in the 대운/세운 plus a **육합/삼합 into the day branch (spouse palace, 戌)**, weakened by **충/형/파** on the palace and by 겁재 years. The regenerated base report's *Marriage Timing Windows* now reads:
+
+- **Strongest converging years:** **2035 乙卯** (정재 year + 卯戌 육합 into the spouse palace) and **2034 甲寅** (편재 year + 寅午戌 삼합 through the palace) — both are 공망 (void) years for his day pillar, so formalise carefully and document commitments.
+- **Better for deepening privately than formalising:** **2027 丁未** (未戌 파/형 on the spouse palace), 2031 (겁재 year), 2033 (丑戌 형 on the palace).
+
+This **supersedes the 2026-09-19 "2027 is the marriage-coded year" anchor above**: 2027's 정관 stem still carries commitment *themes* (the Key Relationship Timing table), but the palace is struck that year, so it reads as a year for serious conversations rather than the cleanest year to formalise. Tendencies only, not predictions.
+
 ## 2026-09-19 — Correction: chart re-derived after the 야자시 hour-stem engine fix
 
 **What changed:** the 2026-06-21 analysis below was built on an hour pillar of **丙子** (편관, Seven Killings, Fire), computed before a Korean 야자시 (夜子時) hour-stem bug fix landed in the engine 2026-09-13 (see [`career.md`](career.md) for the full technical explanation). Mahesh's corrected hour pillar is **戊子** (편인, Indirect Resource, Earth) — the hour star is no longer an Authority (관성) star at all. This does **not** change the spouse-palace analysis below (day branch 戌 is untouched by the hour correction), but it **reverses** the favorable/unfavorable element read: **the chart's favorable element is now Fire (화), not Earth (토)**, resolved via 조후 climate-balance rather than 억부 strength-balancing *(see `knowledge/17-climate-method.md`)*. Every place the 2026-06-21 analysis recommended Earth/Metal partners and cautioned against Fire is **inverted** under the corrected chart, most importantly the **marriage-timing tables**, which had flagged 2026 (丙午, Fire) as a year to avoid — under the correction it is a favorable-element year. **Read the corrected summary and tables below; do not use the superseded per-year marriage guidance further down without cross-checking it against this correction.**

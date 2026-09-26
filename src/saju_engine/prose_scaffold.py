@@ -136,6 +136,17 @@ def _yongsin_draft(chart: Chart) -> str:
             f"The engine suggests cultivating **{fav}** (용신) because it is the most under-represented element, "
             f"with **{sup}** as 희신; this should be argued from the full chart context rather than accepted blindly."
         )
+    # E-3/E-5 (2026-09-26): the paragraph above narrates the raw 억부
+    # heuristic. When the single resolution (climate/reader-aware) lands on a
+    # different set, say so, so the draft never contradicts the report.
+    from .yongsin import favorable_element
+    fe = favorable_element(chart)
+    if (fe.element, fe.supporting, fe.unfavorable) != (fav, sup, sa.get("candidate_unfavorable")):
+        logic += (
+            f" After the climate (조후) and reader-override resolution the chart's working set is "
+            f"용신 **{fe.element}**, 희신 **{fe.supporting}**, 기신 **{fe.unfavorable or '—'}** — "
+            f"use these in the reading."
+        )
     return logic
 
 
@@ -166,7 +177,8 @@ def _career_draft(chart: Chart) -> str:
     authority = cls_counts.get("Authority", 0)
     wealth = cls_counts.get("Wealth", 0)
     output = cls_counts.get("Output", 0)
-    fav = (chart.strength_assessment or {}).get("candidate_favorable", "—")
+    from .yongsin import favorable_element
+    fav = favorable_element(chart).element
 
     parts = [
         f"The ten-god mix shows {authority} Authority (관성), {wealth} Wealth (재성), and {output} Output (식상) occurrences."
@@ -300,11 +312,16 @@ def generate_plain_words(chart: Chart) -> Dict[str, str]:
     """
     from . import prose_fillers as PF
 
+    from .yongsin import favorable_element
+
     sa = chart.strength_assessment or {}
+    fe = favorable_element(chart)
     ctx = {
         "chart": chart,
         "dm_element": chart.day_master_info.get("element", ""),
-        "favorable": sa.get("candidate_favorable", ""),
+        "favorable": fe.element,
+        "supporting": fe.supporting,
+        "unfavorable": fe.unfavorable or "",
         "strength_label": _VERDICT_PLAIN_LABEL.get(sa.get("verdict", ""), ""),
         "current_daeun": chart.current_daeun,
         "pattern_name": "",

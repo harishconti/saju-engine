@@ -169,7 +169,7 @@ def test_premium_report_timing_tables():
     chart = _sample_chart()
     report = generate_premium_report(chart)
     # Major luck table header
-    assert "| Age | Pillar | Element Theme | Ten-God |" in report
+    assert "| Age | Pillar | Elements (Stem / Branch) | Ten-God |" in report
     # Annual windows table header
     assert "| Year | Pillar | Annual Ten-God | Overall Theme |" in report
     # Reading tier = 3-year window (current year ± 1). chart.sewoon is the
@@ -870,7 +870,10 @@ def test_decade_and_annual_favorable_lean_agree_on_shared_element():
     # bare "Robber" ten-god column.
     year_row = _row("| 2030 | 庚戌 | Robber | ")
     assert decade_row.endswith("| favorable |"), decade_row
-    assert "favorable-element year" in year_row, year_row
+    # 2026-09-26: annual rows now distinguish a 희신 ("supporting-element")
+    # year from a 용신 year (E-12 / validation §2.8); both are the favorable
+    # side, so they still agree with the decade's "favorable".
+    assert "supporting-element year" in year_row, year_row
 
 
 # ── R5 — Avoid/Watch (기신/구신/한신) blank for balanced/climate charts ────
@@ -1055,3 +1058,57 @@ def test_season_signal_correctly_buckets_depleted_month_stages():
     assert _season_signal(0.2) == "depleted"  # 병
     assert _season_signal(2.0) == "supported"  # 제왕
     assert _season_signal(0.7) == "mixed"  # 양
+
+
+# ── E-12 (2026-09-25 audit) ──────────────────────────────────────────────
+
+
+def _harish_deep_report():
+    from saju_engine.engine import compute_chart
+    from saju_engine.premium_report import generate_premium_report
+    chart = compute_chart(
+        name="harish-e12", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+    return generate_premium_report(chart, tier="deep")
+
+
+def test_e12_deficient_gisin_is_reconciled_and_companion_decade_named():
+    report = _harish_deep_report()
+    # Fire is both the least-present element and the climate-resolved 기신.
+    assert "Fire is also this chart's challenging element (기신)" in report
+    # 辛亥 is a 비견 decade — it must not be labelled as if it were 겁재.
+    line = next(l for l in report.splitlines() if "(辛亥" in l and "peer/rival" in l)
+    assert "**비견**" in line
+    # Major-luck table shows stem AND branch element (丁未 → Fire / Earth).
+    assert "| 丁未 | Fire / Earth |" in report
+
+
+def test_e13_daeun_start_note_gives_calendar_month_and_app_convention():
+    report = _harish_deep_report()
+    line = next(l for l in report.splitlines() if "대운수 (starting age)" in l)
+    assert "≈ Dec 1992" in line
+    assert "대운수 1" in line and "1, 11, 21" in line
+
+
+def test_e7_star_basis_is_labelled_and_year_anchor_selectable():
+    from saju_engine.engine import compute_chart
+    from saju_engine.premium_report import generate_premium_report
+    kw = dict(name="h", gender="M", year=1992, month=6, day=4, hour=3, minute=10,
+              longitude=79.4408, utc_offset=5.5)
+    day_report = generate_premium_report(compute_chart(**kw), tier="deep")
+    assert "Counted from your day branch **亥**" in day_report
+    year_chart = compute_chart(**kw, star_anchor="year")
+    assert year_chart.stars["earth_bane"] == ["申"]
+    assert year_chart.to_dict()["star_anchor"] == "year"
+    year_report = generate_premium_report(year_chart, tier="deep")
+    assert "Counted from your year branch **申** (traditional Korean basis)" in year_report
+
+
+def test_validation_harish_partner_table_and_natal_rows():
+    report = _harish_deep_report()
+    assert "| Radiant, expressive, and momentum-driven | Fire | **Watch** |" in report
+    assert "| Half Harmony | 巳+丑 |" in report
+    assert "乙↔辛" in report
+    assert "numeric least-represented-element pick" not in report

@@ -180,6 +180,15 @@ def assess_strength(
         # is a folk heuristic, not a classical ruling. The final 용신 must be
         # argued from temperature, blockage, and season per knowledge/09.
         all_elements = ["Wood", "Fire", "Earth", "Metal", "Water"]
+        # E-5 (2026-09-25 audit): never offer the element that controls the
+        # Day Master (관성) when the month branch is that element's own
+        # season — an in-season controller is already commanding the chart
+        # (득령), so a low raw count understates it and "adding more" is the
+        # opposite of balancing. This is the audit's minimum guard; the pick
+        # remains a folk heuristic that the reader must argue (see
+        # yongsin.py's balanced-heuristic note).
+        if L.BRANCH_ELEMENT.get(month_branch) == authority_element:
+            all_elements = [e for e in all_elements if e != authority_element]
         least_present = min(all_elements, key=lambda e: counts.get(e, 0.0))
         candidate_favorable = least_present
         # Supporting element is the one that generates (nourishes) the least-present element.

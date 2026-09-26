@@ -31,7 +31,7 @@ merge.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Optional
 
 from . import lookup as L
@@ -60,8 +60,9 @@ _NOTE_BY_METHOD = {
     ),
     "balanced-heuristic": (
         "The chart is close to balanced, so the least-represented element is offered "
-        "as a starting point only. The final 용신 needs a classical reading of "
-        "temperature, season, and blockage."
+        "as a starting point only — it is a folk heuristic, not a classical ruling, and "
+        "the final 용신 requires the reader's argument from temperature, season, and "
+        "blockage."
     ),
     "reader-confirmed": (
         "Favorable element confirmed by the reader from the full classical analysis."
@@ -123,6 +124,72 @@ class FavorableElement:
     climate_band: str = "temperate"
     climate_element: Optional[str] = None
     climate_agrees: Optional[bool] = None
+    # E-3/E-5 single resolution (2026-09-26): the rest of the five-role set,
+    # resolved once here so every product reads the same values.
+    unfavorable: Optional[str] = None   # 기신 (忌神)
+    gusin: Optional[str] = None         # 구신 (仇神)
+    hansin: Optional[str] = None        # 한신 (閑神)
+    unfavorable_method: str = ""        # "dm-relative" | "derived-from-yongsin"
+    requires_reader: bool = False       # True for the balanced folk heuristic
+
+
+def _derive_from_yongsin(fav: str):
+    """(기신, 구신, 한신) from a 용신 via the classical cycles
+    (knowledge/03-five-elements.md worked example: 용신=Water → 기신=Fire,
+    구신=Earth, 한신=Wood)."""
+    if not fav or fav == "—":
+        return None, None, None
+    gisin = L.OVERCOMES.get(fav)
+    gusin = next((k for k, v in L.OVERCOMES.items() if v == fav), None)
+    hansin = L.GENERATES.get(fav)
+    return gisin, gusin, hansin
+
+
+def _with_unfavorable(fe: "FavorableElement", sa: dict) -> "FavorableElement":
+    """Attach the resolved 기신/구신/한신 to ``fe``.
+
+    Rule: for a pure 억부 resolution (strong/weak Day Master, temperate
+    month, no reader override) the Day-Master-relative 기신 from
+    strength.py stays authoritative — it is the 억부 method's own answer.
+    Everywhere else (climate-resolved, balanced, reader-confirmed), and
+    whenever the raw 기신 would collide with the resolved 용신/희신, 기신 is
+    derived from the resolved 용신 so it can never contradict it. 구신/한신
+    always follow the 용신 cycle. Before this, strength.py's raw
+    ``candidate_unfavorable`` was read directly by compat scoring, the
+    decade overlay, report_data and the compat report, while the natal
+    report derived its own — two answers for one chart (E-3).
+    """
+    gisin, gusin, hansin = _derive_from_yongsin(fe.element)
+    method = "derived-from-yongsin"
+    raw = sa.get("candidate_unfavorable")
+    # A reader override that simply confirms the 억부 pick on a strong/weak
+    # chart keeps the 억부 method's own DM-relative 기신 (e.g. Gurumoorthy:
+    # strong 己, reader-confirmed Metal = the raw pick → 기신 Earth).
+    confirms_eokbu = (
+        fe.method == "reader-confirmed"
+        and sa.get("verdict") in ("strong", "extreme", "weak", "extreme_weak")
+        and fe.element == sa.get("candidate_favorable")
+    )
+    if confirms_eokbu and sa.get("candidate_supporting"):
+        # Same pick as 억부, so the 억부 희신 convention applies too: the
+        # strict "generates 용신" 희신 is the 기신 itself on a strong/weak
+        # chart (knowledge/03-five-elements.md §Two conventions for 희신).
+        fe = replace(fe, supporting=sa["candidate_supporting"])
+    if (
+        (fe.method in ("strong-dm-drain", "weak-dm-support") or confirms_eokbu)
+        and raw
+        and raw not in (fe.element, fe.supporting)
+    ):
+        gisin = raw
+        method = "dm-relative"
+    return replace(
+        fe,
+        unfavorable=gisin,
+        gusin=gusin if gusin not in (fe.element, fe.supporting) else None,
+        hansin=hansin if hansin not in (fe.element, fe.supporting) else None,
+        unfavorable_method=method,
+        requires_reader=fe.method == "balanced-heuristic",
+    )
 
 
 def _reader_confirmed(element: str) -> FavorableElement:
@@ -157,14 +224,13 @@ def favorable_element(chart, override: Optional[str] = None) -> FavorableElement
     Returns:
         A :class:`FavorableElement`.
     """
-    if override:
-        return _reader_confirmed(override)
-
     sa = getattr(chart, "strength_assessment", None) or {}
+    if override:
+        return _with_unfavorable(_reader_confirmed(override), sa)
 
     reader_override = sa.get("reader_override_favorable")
     if reader_override:
-        return _reader_confirmed(reader_override)
+        return _with_unfavorable(_reader_confirmed(reader_override), sa)
 
     verdict = sa.get("verdict", "balanced")
     raw_favorable = sa.get("candidate_favorable") or "—"
@@ -187,10 +253,17 @@ def favorable_element(chart, override: Optional[str] = None) -> FavorableElement
             agreement_clause = (
                 "This matches the chart's own least-represented element, reinforcing the pick."
             )
+        elif verdict == "balanced":
+            # Validation 2026-09-25 #6: the balanced-chart least-element pick
+            # is a folk heuristic (E-5) — don't surface it by name in client
+            # text, where it read as a rival 용신 candidate.
+            agreement_clause = (
+                "This takes priority over the chart's simple element count, which is a weaker "
+                "signal than the classical climate check here."
+            )
         else:
             agreement_clause = (
-                f"This overrides the numeric least-represented-element pick ({raw_favorable}), "
-                "which is a weaker signal than the classical climate check here."
+                f"This takes priority over the strength-balance (억부) pick ({raw_favorable})."
             )
         if verdict == "balanced":
             verdict_clause = "The Day Master reads as balanced, so the classical 조후 (climate-balance) check applies"
@@ -205,11 +278,11 @@ def favorable_element(chart, override: Optional[str] = None) -> FavorableElement
             f"{verdict_clause}: this chart peaks in {season_label} conditions, and the classical "
             f"remedy is {climate_element}. {agreement_clause}"
         )
-        return FavorableElement(
+        return _with_unfavorable(FavorableElement(
             element=element, method=method, confidence="heuristic", note=note,
             supporting=supporting, climate_band=climate["band"],
             climate_element=climate_element, climate_agrees=climate_agrees,
-        )
+        ), sa)
 
     # No climate opinion (temperate month): 억부 stays authoritative regardless
     # of verdict, since there is nothing for 조후 to govern with.
@@ -219,8 +292,8 @@ def favorable_element(chart, override: Optional[str] = None) -> FavorableElement
     base_note = _NOTE_BY_METHOD[method]
     note = base_note + " Born in a climate-neutral month, so no 조후 override applies here."
 
-    return FavorableElement(
+    return _with_unfavorable(FavorableElement(
         element=element, method=method, confidence="heuristic", note=note,
         supporting=supporting, climate_band=climate["band"],
         climate_element=climate_element, climate_agrees=climate_agrees,
-    )
+    ), sa)

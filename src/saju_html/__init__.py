@@ -221,6 +221,32 @@ KOR_REPL = {
     "관계": "relationship",
     "사람의": "of the people",
     "성향": "character",
+    # Added 2026-09-26 (report regeneration after the 2026-09-25 engine audit):
+    # terms that fell through to the CJK-stripping pass in client PDFs.
+    "본": "main", "중": "middle", "여": "residual",
+    "본기": "main qi", "중기": "middle qi", "여기": "residual qi",
+    "방합": "Directional Harmony", "천간충": "Stem Clash", "천간": "Heavenly Stem",
+    "합이불화": "binding without transforming", "이불화": "without transforming",
+    "합거": "combined away", "파격": "broken structure", "관살혼잡": "mixed officers",
+    "정편관혼잡": "mixed officers",
+    "비견격": "Companion Structure", "겁재격": "Robber Structure",
+    "식신격": "Eating God Structure", "상관격": "Hurting Officer Structure",
+    "편재격": "Indirect Wealth Structure", "정재격": "Direct Wealth Structure",
+    "편관격": "Seven Killings Structure", "정관격": "Direct Officer Structure",
+    "편인격": "Indirect Resource Structure", "정인격": "Direct Resource Structure",
+    "만세력": "manseryeok (Korean perpetual calendar)", "방위": "direction",
+    "야자시": "late Rat hour", "억부": "strength-balance", "운성": "-Stage Cycle",
+    "천을귀인": "Heavenly Noble", "천덕귀인": "Heavenly Virtue", "월덕귀인": "Monthly Virtue",
+    "원진": "Deep Grudge", "귀문관": "Ghost Gate", "처성": "wife star", "부성": "husband star",
+    "지살": "Movement Star", "연살": "Annual Star", "월살": "Withering Star",
+    "고초살": "Withering Star", "천살": "Heaven Star", "재살": "Calamity Star",
+    "겁살": "Robbery Star", "망신": "Loss-of-Face", "장성": "General Star", "반안": "Saddle Star",
+    "자영업": "self-employment",
+    # Ten-stem combination names — without these, 병 in "병신합수" matched the
+    # 12-stage term 병 (病, "Illness").
+    "갑기합토": "Gap-Gi Earth combination", "을경합금": "Eul-Gyeong Metal combination",
+    "병신합수": "Byeong-Sin Water combination", "정임합목": "Jeong-Im Wood combination",
+    "무계합화": "Mu-Gye Fire combination",
 }
 
 # Hanja single-character (for inline like 甲, 乙 inside non-fully-translated contexts)
@@ -278,6 +304,19 @@ HANJA_MAP = {
     "天河水": "Heavenly River Water",
     "爐中火": "Furnace Fire",
     "寒": "cold", "熱": "hot",
+    # Added 2026-09-26 (report regeneration after the 2026-09-25 engine audit):
+    # Hanja that previously fell through to the CJK-stripping pass, leaving
+    # dangling "()" in client PDFs.
+    "合": "combination", "沖": "clash", "刑": "punishment", "破": "break",
+    "天干": "Heavenly Stem", "天干沖": "Stem Clash", "半合": "Half Harmony",
+    "三合": "Three Harmony", "六合": "Six Harmony", "合而不化": "binding without transforming",
+    "空亡": "Void", "桃花": "Peach Blossom", "驛馬": "Post Horse", "華蓋": "Canopy",
+    "藏干": "hidden stems", "節氣": "solar term", "日干": "Day Master",
+    "喜神": "Supporting Element", "忌神": "Unfavorable Element", "閒神": "Draining Element",
+    "天乙貴人": "Heavenly Noble", "天德貴人": "Heavenly Virtue", "月德貴人": "Monthly Virtue",
+    "怨嗔": "Deep Grudge", "鬼門關": "Ghost Gate", "地煞": "Movement Star", "年煞": "Annual Star",
+    "月煞": "Withering Star", "天煞": "Heaven Star", "災煞": "Calamity Star", "亡神": "Loss-of-Face",
+    "絶": "Extinction", "財庫": "wealth storehouse", "夜子時": "late Rat hour",
     # Five Element Hanja (often appear after stem names like 辛金)
     "金": "Metal", "木": "Wood", "水": "Water", "火": "Fire", "土": "Earth",
 }
@@ -382,6 +421,15 @@ def translate_inline(text: str) -> str:
       - Text already inside English parentheses is protected from re-translation,
         and exact duplicates like "Direct Officer (Direct Officer)" are collapsed.
     """
+    # A Hangul term immediately glossed in English ("해 (harm)", "**천간충**
+    # (stem clash)") becomes just the English gloss in the English-primary
+    # PDF — translating the Hangul too produced doubles, and single syllables
+    # could mis-translate (해 "harm" read as the branch 亥 "Hae (Pig)").
+    text = re.sub(
+        r"(\*\*)?([가-힯]+)(\*\*)? \(([A-Za-z][^()]*)\)",
+        lambda m: f"{m.group(1) or ''}{m.group(4)}{m.group(3) or ''}",
+        text,
+    )
     protected, placeholders = _protect_parenthetical_english(text)
 
     # Split into CJK runs, placeholders, and plain text.
@@ -442,6 +490,12 @@ def translate_inline(text: str) -> str:
     out = "".join(out_parts)
     # Final safety net: drop any CJK character the maps missed.
     out = _CJK_RE.sub(" ", out)
+    # ...and any parenthetical it left empty ("Half Harmony ()").
+    out = re.sub(r"\(\s*\)", "", out)
+    # Collapse a term followed by its own translation in parens, which the
+    # placeholder dedup above cannot see when the parenthetical was Hanja
+    # (e.g. "Direct Officer (正官)" -> "Direct Officer (Direct Officer)").
+    out = re.sub(r"\b([A-Za-z][\w-]*(?: [\w-]+){0,3}) \((\1)\)", r"\1", out, flags=re.I)
     # Collapse runs of spaces from the substitution.
     out = re.sub(r"  +", " ", out)
     out = re.sub(r" \.", ".", out)

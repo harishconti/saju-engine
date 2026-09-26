@@ -109,3 +109,20 @@ def test_element_balance_helpers_match_strength_assessment():
     pct = element_balance_pct(chart)
     assert sum(pct.values()) == 100.0
     assert all(e in pct for e in ["Wood", "Fire", "Earth", "Metal", "Water"])
+
+
+def test_e5_balanced_heuristic_skips_in_season_controller():
+    """E-5 (2026-09-25 audit): Harish (壬申/乙巳/辛亥/己丑) is balanced with
+    Fire least-represented, but Fire controls the 辛 Day Master and 巳 is
+    Fire's own season — the folk least-element pick must not offer it."""
+    from saju_engine.engine import compute_chart
+    chart = compute_chart(
+        name="harish-e5", gender="M", year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+    sa = chart.strength_assessment
+    assert sa["verdict"] == "balanced"
+    counts = sa["element_counts"]
+    assert min(counts, key=counts.get) == "Fire"      # the raw minimum is still Fire
+    assert sa["candidate_favorable"] != "Fire"        # ...but it is not offered
+    assert sa["candidate_favorable"] == "Wood"

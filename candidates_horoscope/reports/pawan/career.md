@@ -117,7 +117,7 @@ Ratings reflect **elemental affinity + chart structure** (ten-god balance, 격�
 **Don't:**
 
 - ❌ **Don't build a Water-only or pure-logistics business** as a first venture — Water is the regulator, not the Day Master's natural element. **Combine Water with Fire/Metal/Earth** in a single venture.
-- ❌ **Don't take on Wood-dominant business models** (pure publishing, paper products, education-only, forestry) — Wood is 기신 for this chart, would strengthen an already-strong Fire further.
+- ❌ **Don't take on Wood-dominant business models** (pure publishing, paper products, education-only, forestry) — Wood feeds the already-strong Fire — the chart's 기신 (unfavorable element) — and is itself the 한신 that drains the Water 용신 *(see `pawan-report.md` Quick Reference; corrected 2026-09-26 — this line previously called Wood the 기신)*.
 - ❌ **Don't enter loose partnerships** — the month **丁 겁재** standing against the year 辛 정재 and hour 庚 편재 is the **겁재奪財** configuration (`knowledge/05-ten-gods.md:127`), and partnerships are its classic failure mode. **Solo founder or 1–2 co-founders only.**
 - ❌ **Don't over-extend during the 壬辰 major luck (ages 48–57)** — the 편관 (壬) brings **maximum pressure**; over-leverage in this decade is the classical failure mode.
 - ❌ **Don't skip formal education / credentials** — the 乙未 major luck (ages 18–27) gave the **정인 window** for structured learning. If skipped, the 甲午 major luck (28–37) will partially compensate but with more difficulty.
@@ -133,6 +133,10 @@ Ratings reflect **elemental affinity + chart structure** (ten-god balance, 격�
 - Future career-related queries (e.g., "Should I take a job in logistics?" / "When to launch my trading business?") → append here with a dated heading.
 
 ---
+
+## 2026-09-26 — Corrections after the engine audit
+
+The base report was regenerated after the 2026-09-25 engine audit. With the reader-argued Water 용신 the engine now names **Fire as 기신**, Earth as 구신 and Wood as 한신 (it previously named none). The advice in this file is unchanged in substance — Fire-heavy and Wood-heavy models were already flagged — but the Wood line above is re-labelled accordingly. Element percentages moved slightly (Fire 38.0%, Wood 4.2%) after the hidden-stem order fix.
 
 ## Sources & Limits
 

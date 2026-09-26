@@ -120,7 +120,7 @@ def _day_master_snapshot(chart: Chart, name: str) -> List[str]:
     lines.append(f"- **Seasonal strength verdict:** {sa.get('verdict', '—')}")
     lines.append(f"- **Favorable element (용신):** {fe.element}")
     lines.append(f"- **Supporting element (희신):** {fe.supporting}")
-    lines.append(f"- **Unfavorable / watch element:** {sa.get('candidate_unfavorable', '—')}")
+    lines.append(f"- **Unfavorable / watch element:** {fe.unfavorable or '—'}")
     if fe.note:
         lines.append(f"- *How this was derived:* {fe.note}")
     lines.append("")

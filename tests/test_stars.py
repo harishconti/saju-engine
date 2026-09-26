@@ -212,3 +212,24 @@ def test_xun_kong_hand_table_matches_algorithmic_derivation():
             stars_module._xun_kong_algorithmic(*pillar)
             == stars_module._DAY_PILLAR_TO_XUN_KONG[pillar]
         ), f"공망 table mismatch for {pillar}"
+
+
+def test_year_anchor_twelve_stars_harish():
+    """E-7 (2026-09-25 audit): the 12신살 follow the same anchor as 도화/역마/화개.
+
+    Harish (壬申/乙巳/辛亥/己丑). Year-branch basis (申 → 申子辰 triplet) gives
+    巳=겁살, 申=지살, 亥=망신, 丑=반안 — the traditional Korean basis the audit
+    cross-checked. Day-branch basis (亥 → 亥卯未) gives 申=겁살, 亥=지살, 丑=월살.
+    """
+    common = dict(day_stem="辛", day_branch="亥", branches=["申", "巳", "亥", "丑"])
+    year = derive_stars(**common, anchor="year", year_branch="申")
+    assert year["robbery_star"] == ["巳"]
+    assert year["earth_bane"] == ["申"]
+    assert year["lost_spirit"] == ["亥"]
+    assert year["saddle_star"] == ["丑"]
+    assert year["monthly_bane"] == []
+
+    day = derive_stars(**common)
+    assert day["robbery_star"] == ["申"]
+    assert day["earth_bane"] == ["亥"]
+    assert day["monthly_bane"] == ["丑"]

@@ -14,7 +14,7 @@ its relationship to the natal chart:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 from functools import lru_cache
 
@@ -68,6 +68,18 @@ class SeWoonHit:
     # at all — e.g. 2026's 丙 combining with Harish's 辛 Day Master (丙辛합수)
     # was silently absent from every report despite being, per the
     # reviewer, "a major 2026 reading element."
+
+    natal_stem_combinations: List[Tuple[str, str, str, str, str]] = field(default_factory=list)
+    # 천간합 between the annual stem and a natal stem OTHER than the Day
+    # Master: (stem_a, stem_b, combined_element, korean_name, natal_stem),
+    # (stem_a, stem_b) in canonical table order like `stem_combinations`.
+    # Only populated when the caller passes `natal_stems`. E-6 (2026-09-25
+    # audit): knowledge/08 Part 2 step 3 asks for "annual stem vs. natal
+    # stems", not only vs. the Day Master (e.g. 2027 丁 + natal 壬 → 丁壬合).
+    stem_clashes: List[Tuple[str, str]] = field(default_factory=list)
+    # 천간충 (annual_stem, natal_stem) against any natal stem incl. the Day
+    # Master — knowledge/01-stems.md §Stem Clashes. Only populated when the
+    # caller passes `natal_stems` (the Day Master alone is checked otherwise).
 
     def __post_init__(self):
         self.combined = f"{self.stem}{self.branch}"
@@ -183,7 +195,64 @@ def _detect_branch_relationship(a: str, b: str) -> List[str]:
             rels.append("break")
     if a == b and a in L.SELF_PUNISHMENTS:
         rels.append("self_punish")
+    if a != b and _is_pairwise_punishment(a, b):
+        rels.append("punish")
     return rels
+
+
+def _is_pairwise_punishment(a: str, b: str) -> bool:
+    """True when two distinct branches belong to the same 삼형 triad, or are
+    the 2-member 子卯 punishment (knowledge/02-branches.md / 07-special-
+    formations.md; L.THREE_PUNISHMENTS). E-6 (2026-09-25 audit): only 자형
+    was detected in annual/decade overlays, so e.g. 寅巳, 丑戌 and 子卯 were
+    never flagged even though this module's docstring promised "punish".
+    Same rule as premium_report._candidate_day_conflicts's 형 check.
+    """
+    for b1, b2, b3, _label in L.THREE_PUNISHMENTS:
+        members = {m for m in (b1, b2, b3) if m != "—"}
+        if a in members and b in members:
+            return True
+    return False
+
+
+def _stem_overlay(
+    day_master: str,
+    stem: str,
+    natal_stems: Optional[List[str]],
+) -> Tuple[List[Tuple[str, str, str, str, str]], List[Tuple[str, str]]]:
+    """Stem-level activations of an incoming stem against the natal stems
+    other than the Day Master (천간합) and against all natal stems (천간충).
+    The Day-Master 천간합 stays in `stem_combinations` (unchanged contract).
+    """
+    others: List[Tuple[str, str, str, str, str]] = []
+    clashes: List[Tuple[str, str]] = []
+    targets = list(natal_stems) if natal_stems else [day_master]
+    seen_combo: set = set()
+    seen_clash: set = set()
+    for ns in targets:
+        if L.stem_clash(stem, ns) and ns not in seen_clash:
+            seen_clash.add(ns)
+            clashes.append((stem, ns))
+        if ns == day_master or ns in seen_combo:
+            continue
+        combo = L.stem_combination(stem, ns)
+        if combo:
+            seen_combo.add(ns)
+            elem, ko, _ = combo
+            sa, sb = stem, ns
+            for ta, tb, _e, _k in L.TEN_STEM_COMBINATIONS:
+                if {ta, tb} == {stem, ns}:
+                    sa, sb = ta, tb
+                    break
+            others.append((sa, sb, elem, ko, ns))
+    return others, clashes
+
+
+# 삼형 triads that a transiting branch can complete (3-member only — the 子卯
+# pair is fully covered by the pairwise "punish" relationship).
+_PUNISHMENT_TRIADS: List[Tuple[str, str, str, str]] = [
+    t for t in L.THREE_PUNISHMENTS if "—" not in t[:3]
+]
 
 
 def _detect_harmony_completions(branch: str, natal_branches: List[str]) -> List[HarmonyCompletion]:
@@ -202,6 +271,17 @@ def _detect_harmony_completions(branch: str, natal_branches: List[str]) -> List[
                 hits.append(HarmonyCompletion(kind, triad, label, "full", matched))
             elif len(matched) == 1:
                 hits.append(HarmonyCompletion(kind, triad, label, "half", matched))
+    # 삼형 completion (E-6, 2026-09-25 audit: e.g. 2034 甲寅 completing
+    # 寅巳申 against a natal 巳+申). Only the full triad is reported here —
+    # a two-member 형 is already surfaced pairwise as "punish".
+    for a, b, c, label in _PUNISHMENT_TRIADS:
+        triad = (a, b, c)
+        if branch not in triad:
+            continue
+        others = [m for m in triad if m != branch]
+        matched = tuple(m for m in others if m in natal_branches)
+        if len(matched) == 2:
+            hits.append(HarmonyCompletion("삼형", triad, label, "full", matched))
     return hits
 
 
@@ -211,8 +291,12 @@ def derive_sewoon(
     year: int,
     month: int = 7,
     day: int = 1,
+    natal_stems: Optional[List[str]] = None,
 ) -> SeWoonHit:
     """Compute the annual-luck overlay for the given Gregorian date.
+
+    ``natal_stems`` (the four natal stems) enables the stem checks against
+    every natal stem — 천간합 with non-Day-Master stems and 천간충 (E-6).
 
     Saju years change at 立春 (Lichun, ~Feb 4). For dates before Lichun the
     annual pillar belongs to the previous cycle year. Defaults to mid-year so
@@ -250,6 +334,7 @@ def derive_sewoon(
                 stem_a, stem_b = sa, sb
                 break
         combos.append((stem_a, stem_b, combo_elem, combo_ko))
+    natal_combos, clashes = _stem_overlay(day_master, stem, natal_stems)
 
     return SeWoonHit(
         year=year,
@@ -261,6 +346,8 @@ def derive_sewoon(
         relationship_types=sorted(types),
         harmony_completions=harmony_completions,
         stem_combinations=combos,
+        natal_stem_combinations=natal_combos,
+        stem_clashes=clashes,
     )
 
 
@@ -271,10 +358,11 @@ def build_sewoon_range(
     end_year: int,
     month: int = 7,
     day: int = 1,
+    natal_stems: Optional[List[str]] = None,
 ) -> List[SeWoonHit]:
     """Return annual-luck overlays for [start_year, end_year] inclusive."""
     return [
-        derive_sewoon(day_master, natal_branches, y, month, day)
+        derive_sewoon(day_master, natal_branches, y, month, day, natal_stems=natal_stems)
         for y in range(start_year, end_year + 1)
     ]
 
@@ -286,6 +374,7 @@ def current_sewoon(
     reference_month: int = 7,
     reference_day: int = 1,
     window: int = 3,
+    natal_stems: Optional[List[str]] = None,
 ) -> List[SeWoonHit]:
     """Return a window of annual luck around the reference date.
 
@@ -294,7 +383,8 @@ def current_sewoon(
     """
     return build_sewoon_range(day_master, natal_branches,
                               reference_year - window, reference_year + window,
-                              reference_month, reference_day)
+                              reference_month, reference_day,
+                              natal_stems=natal_stems)
 
 
 # ── Monthly luck (월운) ──────────────────────────────────────────────────────

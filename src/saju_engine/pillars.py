@@ -119,8 +119,15 @@ def _hour_boundary_info(
     correct_branch: str,
     correct_stem: str,
     day_stem: str,
+    precise_minutes: Optional[float] = None,
 ) -> Optional[Dict[str, Any]]:
     """Return boundary-margin metadata when the hour is a knife-edge case.
+
+    ``precise_minutes`` (minutes since midnight, fractional) is the corrected
+    solar time before rounding to HH:MM. When given, the result also carries
+    ``distance_seconds``: the audit (2026-09-25, calculation-layer table)
+    found Harish's true margin is ~28 seconds, which the whole-minute
+    ``distance_minutes`` rounds to 0 or 1 depending on the path.
 
     Returns None when the corrected time is not within
     ``HOUR_BOUNDARY_MARGIN_MIN`` of a branch-window edge, or when the
@@ -140,7 +147,7 @@ def _hour_boundary_info(
     if correct_branch == "子" or alt_branch == "子":
         return None
     alt_stem = _hour_stem(day_stem, alt_branch)
-    return {
+    info: Dict[str, Any] = {
         "distance_minutes": dist,
         "primary_hour_pillar": f"{correct_stem}{correct_branch}",
         "alternate_hour_pillar": f"{alt_stem}{alt_branch}",
@@ -150,6 +157,10 @@ def _hour_boundary_info(
             "if the recorded clock time carries a few minutes of error."
         ),
     }
+    if precise_minutes is not None:
+        p_mod = (precise_minutes - 60) % 120
+        info["distance_seconds"] = int(round(min(p_mod, 120 - p_mod) * 60))
+    return info
 
 
 def _day_stem_for_date(year: int, month: int, day: int) -> str:
@@ -316,6 +327,9 @@ def _apply_equation_of_time(
     total_minutes = base_minutes + eot_minutes
     adjusted = datetime(year, month, day, hour, minute) + timedelta(minutes=total_minutes)
     sc["correction_minutes"] = round(total_minutes, 1)
+    # Unrounded total, so the hour-boundary check can measure sub-minute
+    # margins (see _hour_boundary_info's precise_minutes).
+    sc["correction_minutes_exact"] = total_minutes
     sc["equation_of_time_minutes"] = round(eot_minutes, 1)
     sc["solar_time"] = adjusted.strftime("%H:%M")
 
@@ -583,8 +597,13 @@ def compute_pillars(
         raw["hour_stem"] = correct_hour_stem
     raw["hour_pillar"] = f"{raw['hour_stem']}{raw['hour_branch']}"
 
+    precise_minutes = None
+    sc_exact = (raw.get("solar_correction") or {}).get("correction_minutes_exact")
+    if use_solar_time and sc_exact is not None:
+        precise_minutes = (hour * 60 + minute + sc_exact) % 1440
     boundary_info = _hour_boundary_info(
-        eff_hour, eff_minute, correct_hour_branch, correct_hour_stem, hour_stem_day_stem
+        eff_hour, eff_minute, correct_hour_branch, correct_hour_stem, hour_stem_day_stem,
+        precise_minutes=precise_minutes,
     )
     if boundary_info is not None and raw.get("solar_correction"):
         raw["solar_correction"]["hour_boundary"] = boundary_info

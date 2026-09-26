@@ -680,3 +680,181 @@ def test_strength_reasoning_no_reconciliation_for_strong_weak_charts():
     assert sa["verdict"] in ("strong", "extreme", "weak", "extreme_weak")
     text = PF.strength_reasoning({"chart": chart})
     assert "pulls the total back into the balanced range" not in text
+
+
+# ── E-6 residuals (2026-09-26) — stem checks, 삼형, per-branch dedup ──
+
+
+def _harish_hit(year):
+    from saju_engine import sewoon as SE
+    chart = compute_chart(
+        name="harish-e6-residual", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+    return SE.build_sewoon_range(
+        chart.day_master, chart.branches, year, year, natal_stems=chart.stems
+    )[0]
+
+
+def test_annual_activation_note_surfaces_natal_stem_combo_and_clash():
+    note_2027 = PF.annual_activation_note(_harish_hit(2027))
+    assert "정임합목" in note_2027 and "natal **壬** stem" in note_2027
+    note_2026 = PF.annual_activation_note(_harish_hit(2026))
+    assert "natal **壬** in a **천간충**" in note_2026
+
+
+def test_annual_activation_note_surfaces_sanhyeong_completion():
+    note = PF.annual_activation_note(_harish_hit(2034))
+    assert "寅巳申 삼형" in note and "갑기합토" in note
+
+
+def test_annual_activation_note_keeps_same_relation_against_two_branches():
+    """Dedup is per (relationship, natal branch), not per relationship: a
+    second harm against a different natal branch must still be named."""
+    from saju_engine.sewoon import SeWoonHit
+    hit = SeWoonHit(year=2034, stem="甲", branch="寅", activated_branches=[
+        ("寅", "巳", "harm"), ("寅", "巳", "harm"),   # exact duplicate → once
+        ("寅", "未", "harm"),                          # synthetic second target
+        ("寅", "巳", "punish"),
+    ])
+    note = PF.annual_activation_note(hit)
+    assert note.count("natal **巳** are in **해 (harm)**") == 1
+    assert "natal **未** are in **해 (harm)**" in note
+    assert "형 (punishment)" in note
+
+
+# ── E-12 (2026-09-25 audit) — template / prose defects in Harish's report ──
+
+
+@pytest.fixture
+def harish_ctx() -> _ReportContext:
+    chart = compute_chart(
+        name="harish-e12", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+    return _ReportContext(chart, tier="deep", generation_date="2026-09-26")
+
+
+def test_companion_decade_undertow_is_not_support_and_study(harish_ctx):
+    period = next(p for p in harish_ctx.chart.daeun if p.stem_tengod in ("비견", "겁재"))
+    text = PF.major_luck_narrative(period, harish_ctx)
+    assert "support and study" not in text
+    assert "peer dynamics" in text
+
+
+def test_year_note_keyed_to_ten_god_not_raw_element(harish_ctx):
+    from saju_engine import sewoon as SE
+    # 2026 丙 (Fire) is 정관 (Authority) for a 辛 Day Master, and Fire is his 기신.
+    hit = SE.build_sewoon_range(harish_ctx.chart.day_master, harish_ctx.chart.branches, 2026, 2026)[0]
+    note = PF.year_by_year_note(hit, harish_ctx)
+    assert "visibility, speaking" not in note
+    assert "responsibility, structure" in note
+    assert "challenging element (Fire)" in note
+    # 2030 庚 (Metal) is the 희신, not the 용신.
+    hit = SE.build_sewoon_range(harish_ctx.chart.day_master, harish_ctx.chart.branches, 2030, 2030)[0]
+    assert "supporting-element (Metal) year" in PF.year_by_year_note(hit, harish_ctx)
+
+
+def test_grouped_dominant_classes_keeps_ties(harish_ctx):
+    dominant = PF._grouped_dominant_classes(harish_ctx.chart, 2)
+    assert {c for c, _ in dominant} == {"Output", "Companion", "Resource"}
+
+
+def test_attachment_patterns_names_real_stage_group(harish_ctx):
+    text = PF.attachment_patterns(harish_ctx)
+    assert "묘/관/충" not in text
+    assert "목욕" in text and "supported (strong)" in text
+
+
+def test_travel_timing_names_supporting_element(harish_ctx):
+    text = PF.travel_timing(harish_ctx)
+    assert "supporting **Metal**" in text
+
+
+def test_business_and_health_seasons_agree(harish_ctx):
+    assert "winter" in PF.business_seasonal_note(harish_ctx)
+    rhythm = PF.seasonal_daily_rhythms(harish_ctx)
+    assert "winter" in rhythm and "21:00–01:00" in rhythm and "Twelve Stages" not in rhythm
+
+
+def test_direct_officer_fit_does_not_claim_a_stem():
+    import inspect
+    assert "Direct Officer stem" not in inspect.getsource(PF)
+
+
+# ── E-8 residual (2026-09-26) — marriage timing from spouse star/palace ──
+
+
+def test_marriage_timing_uses_spouse_star_and_palace_for_harish(harish_ctx):
+    text = PF.marriage_timing_windows(harish_ctx)
+    assert "재성 (wife star)" in text and "spouse palace **亥**" in text
+    # The audit's worked example: 2034 甲寅 = 정재 year + 寅亥合 into the palace.
+    assert "**2034 甲寅** (정재 spouse-star year, 寅亥 육합 into the spouse palace" in text
+    assert "2030 (겁재 year)" in text
+
+
+def test_marriage_timing_female_uses_officer_star(ctx):
+    text = PF.marriage_timing_windows(ctx)
+    assert "관성 (husband star)" in text
+    assert "spouse-star stem" in text
+
+
+def test_marriage_timing_without_gender_falls_back():
+    chart = compute_chart(**{**SAMPLE_BIRTH, "gender": None})
+    c = _ReportContext(chart, tier="deep", generation_date="2026-09-26")
+    assert "No gender is recorded" in PF.marriage_timing_windows(c) or \
+        "Major-luck data not available" in PF.marriage_timing_windows(c)
+
+
+def test_regular_grid_narrative_keeps_non_breaking_caveat():
+    """A 'likely' grid can still carry a caveat note (월지 충·형 / 신약, E-9
+    residual) — the narrative must not drop it."""
+    from types import SimpleNamespace
+    from saju_engine.patterns import GridCandidate
+    cand = GridCandidate(name_ko="정관격", name_en="Direct Officer Grid", basis="b",
+                         confidence="likely", note="The month branch is struck (午子 충).")
+    fake = SimpleNamespace(chart=SimpleNamespace(patterns={"regular_grid": [cand]}))
+    assert "午子 충" in PF.regular_grid_narrative(fake)
+
+
+# ── Validation 2026-09-25 (Harish) follow-ups ──
+
+
+def test_current_decade_names_samhap_and_root(harish_ctx):
+    text = PF.current_period_deep_dive(harish_ctx)
+    assert "巳酉丑 삼합 (Metal)" in text and "건록" in text
+
+
+def test_next_decade_names_combo_and_punishment(harish_ctx):
+    p = next(x for x in harish_ctx.chart.daeun if x.combined == "庚戌")
+    note = PF.decade_structure_note(p, harish_ctx.chart)
+    assert "을경합금" in note and "punishes (형) your natal **丑**" in note
+
+
+def test_annual_lean_reads_branch_too(harish_ctx):
+    from saju_engine import sewoon as SE
+    h = SE.build_sewoon_range(harish_ctx.chart.day_master, harish_ctx.chart.branches, 2029, 2029)[0]
+    assert PF.annual_lean(h, harish_ctx) == ("supporting", "Metal")
+    h = SE.build_sewoon_range(harish_ctx.chart.day_master, harish_ctx.chart.branches, 2027, 2027)[0]
+    assert PF.annual_lean(h, harish_ctx)[0] == "challenging"
+
+
+def test_natal_six_combination_binds_without_transforming_for_harish(harish_ctx):
+    assert not PF.six_combination_transforms(harish_ctx.chart, "巳", "申", "Water")
+    assert "합이불화" in PF.six_combination_phrase(harish_ctx.chart, "巳", "申", "Water")
+
+
+def test_void_year_flagged_for_harish_2034(harish_ctx):
+    from saju_engine import sewoon as SE
+    c = harish_ctx.chart
+    h = SE.build_sewoon_range(c.day_master, c.branches, 2034, 2034, natal_stems=c.stems)[0]
+    assert "공망 — a void year" in PF.year_by_year_note(h, harish_ctx)
+    h = SE.build_sewoon_range(c.day_master, c.branches, 2029, 2029, natal_stems=c.stems)[0]
+    assert "공망" not in PF.year_by_year_note(h, harish_ctx)
+
+
+def test_boss_profile_embodies_yongsin_not_its_controller(harish_ctx):
+    text = PF.boss_team_dynamics(harish_ctx)
+    assert "Water advisor" in text and "Earth anchor" not in text

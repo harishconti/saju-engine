@@ -224,8 +224,14 @@ def compute_chart(
     reference_year: Optional[int] = None,
     reference_month: Optional[int] = None,
     reference_day: Optional[int] = None,
+    star_anchor: str = "day",
 ) -> Chart:
     """Top-level: compute a fully-derived Saju chart.
+
+    `star_anchor` selects the branch the 12신살 (and 도화/역마/화개) are
+    counted from: ``"day"`` (default, common modern practice) or ``"year"``
+    (traditional Korean basis) — knowledge/07-special-formations.md
+    §십이신살 school note.
 
     `gender` must be 'M' or 'F' (or None to skip 대운 computation).
     `utc_offset` defaults to 9.0 (Korea). Pass 5.5 for India.
@@ -274,6 +280,7 @@ def compute_chart(
         zi_time_type=raw.get("zi_time_type"),
         convention=raw.get("convention", convention),
         reference_date=f"{ref_year:04d}-{ref_month:02d}-{ref_day:02d}",
+        star_anchor=star_anchor,
     )
     chart.year, chart.month, chart.day, chart.hour = _build_pillars(raw)
     chart.day_master = chart.day.stem
@@ -300,6 +307,8 @@ def compute_chart(
         month_branch=chart.month.branch,
         stems=chart.stems,
         day_pillar=(chart.day.stem, chart.day.branch),
+        anchor=star_anchor,
+        year_branch=chart.year.branch,
     )
     chart.strength_assessment = STR.assess_strength(
         day_master=chart.day_master,
@@ -330,6 +339,7 @@ def compute_chart(
         strength_assessment=chart.strength_assessment,
         periods=chart.daeun,
         resolved_favorable=_resolved_fe.element,
+        resolved_unfavorable=_resolved_fe.unfavorable,
     )
 
         # Current major-luck period on the querier's reference date.
@@ -346,6 +356,7 @@ def compute_chart(
         reference_month=ref_date.month,
         reference_day=ref_date.day,
         window=2,
+        natal_stems=chart.stems,
     )
 
     # Monthly-luck window around the reference date

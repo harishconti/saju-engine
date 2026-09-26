@@ -41,6 +41,13 @@ In other words:
 - For **backward (역행)**: Count the number of days from the birth date to the **previous 節氣** (same 12 month-openers). Divide by 3.
 
 > 1 day = 4 months of life. 3 days = 1 year. So 10 days = ~3.3 years.
+>
+> **Display convention (added 2026-09-26, E-13).** Korean 만세력 apps round days ÷ 3 to a whole
+> **대운수** (a remainder of 1.5 days or more rounds up) and list the decades as N, N+10, N+20…, often
+> in Korean age (세는나이). This engine's tables use 10-year age-range labels (0–9, 10–19…) and state the
+> precise fractional start separately, so the two presentations describe the same periods with labels
+> that can differ by about a year. *(Sources: Korean Wikipedia 「대운 (사주팔자)」; KNS뉴스통신
+> 「제31강 대운수 산출법」.)*
 
 > **Note on terminology:** the Korean 명리 tradition uses the 12 **節氣 (節, month-openers)** for the starting-age calculation, not the 24 jieqi as a whole. The 24-jieqi version (counting to the next 節 OR 中) gives systematically shorter starting ages and is **not** the standard Korean convention.
 >
@@ -85,11 +92,9 @@ The 세운 is the **pillar of the current calendar year**. For example, 2026 is 
 2. **Determine the annual element** and its relationship to the Day Master.
 3. **Check for natal activation:**
    - Annual branch vs. natal branches → 충, 합, 형, 파, 해?
-   - Annual stem vs. natal stems → 합? 천간충 pattern? *(see `01-stems.md`'s Stem Clashes section —
-     stems do not clash the way branches do; "천간충" here means the 제/극/생 controlling-and-being-
-     controlled relationships that section describes, read as pressure or hardship rather than the
-     branch-style clash mechanism. Corrected 2026-09-25, external report review, E-7, to resolve the
-     apparent contradiction between this line and that section.)*
+   - Annual stem vs. natal stems → 합 (천간합)? 천간충 (甲庚, 乙辛, 丙壬, 丁癸)? *(see `01-stems.md`
+     §Stem Combinations and §Stem Clashes — check against **every** natal stem, not only the Day
+     Master. Updated 2026-09-26, E-7.)*
 4. **Read the year's theme** as the "weather" of the year.
 
 ### Common Patterns (Cheat Sheet)
@@ -104,6 +109,15 @@ The 세운 is the **pillar of the current calendar year**. For example, 2026 is 
 | Annual stem is the Day Master's 식상 | Year of expression, creativity, output, children |
 | Annual stem is the Day Master's 인성 | Year of support, learning, rest, recovery |
 | Annual stem is the Day Master's 비겁 | Year of competition, partnership, self-reliance |
+
+### 공망 years (세운 공망)
+
+*(Added 2026-09-26, Harish validation follow-up.)* When a 세운's branch is one of the **day pillar's 공망
+branches** (see `00-glossary.md` §공망), the year is read as a **공망 year**: what it brings tends to feel
+less solid or harder to hold onto fully — results arrive "hollow" or deferred, and new ties formed that
+year may be looser. Read it as a dampener on the year's other signals, not as an independent event.
+*Sources:* 정해 만세력 강의 「공망」 (<https://doc.8-codes.com/docs/lecture/20/>); 「공망 세운의 의미와
+개운법」 (<https://brunch.co.kr/@urlifestory/409>).
 
 ## Part 3: 월운 (Monthly Luck)
 
@@ -124,6 +138,28 @@ When reading a period, classical 명리 considers three layers:
 A rule of thumb: **a "trigger" is most powerful when all three layers point in the same direction.** E.g., if the natal chart has 寅申 충, the major luck brings 申, and the annual brings 寅 — the 충 is "doubly activated" and the year may bring a sharp event.
 
 Conversely, if a natal pattern is only weakly present and the time-based luck is "out of phase" with it, the pattern may stay dormant or be neutralized.
+
+## Part 5b: Relationship & Marriage Timing (결혼 시기)
+
+*(Added 2026-09-26, E-8 of the 2026-09-25 engine audit.)* Commitment timing is read from the
+**spouse star** and the **spouse palace**, not from the 용신 alone:
+
+1. **Spouse star (배우자성).** Male querent → 재성 (정재/편재); female querent → 관성 (정관/편관)
+   *(same gender mapping as `11-gunghap.md` §G)*. A 대운 whose stem carries the spouse star **opens a
+   window**; a 세운 whose stem carries it **selects the year** within that window.
+2. **Spouse palace (배우자궁, the day branch).** A 세운/대운 branch that forms **육합 or 삼합** with the
+   day branch is read as the palace being "bound" — meetings and formal commitments cluster here.
+3. **Obstructions.** A year that **충/형/파** the day branch is read as unfavorable for formalising
+   (better for deepening privately), as is a year dominated by the spouse star's classical obstruction —
+   **상관** (which strikes 관성) for a female querent, **겁재** (which contests 재성) for a male.
+4. The more of (1)–(3) converge, the stronger the window. 용신/희신 years remain a supporting
+   (not primary) signal. Phrase every result as a tendency, never a prediction (Ground Rule 4).
+
+*Sources:* 사자사주 「결혼 시기 사주: 배우자 만나는 시기 보는법」 ("배우자를 상징하는 십성(여성: 관성, 남성:
+재성)이 대운이나 세운에 들어오는 타이밍으로 판단", "배우자궁인 일지의 상태가 그 바탕"; checklist: spouse star in
+대운, 세운 strengthening it, 일지 합 with the annual branch, absence of 충/파, weakened 상관/겁재) —
+<https://www.sazasaju.com/blog/marriage-timing-guide>; 정사주 「결혼운사주 보는 법」 —
+<https://jeongsaju.com/blog/marriage-fortune-saju-interpretation>.
 
 ## Part 6: Useful Tables for Speed
 

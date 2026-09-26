@@ -6,12 +6,12 @@
 
 **Born:** 1994-09-12 · 13:28 · Seoul
 
-**Time method:** recorded birth time 13:28 (local clock) corrected to true solar time **12:55** (birthplace 126.9783°E vs the 135.0°E zone meridian), -32.1 min. Hour branches follow 2-hour solar windows, so the pillars above use the corrected time.
-> **⚠ Hour-boundary note:** the corrected time is only ~5 minutes from a 2-hour branch boundary. If the recorded clock time carries even a few minutes of error, the neighboring hour pillar is a plausible alternative — treat the hour pillar (and its palace themes) as lower-confidence in this reading.
+**Time method:** recorded birth time 13:28 (local clock) corrected to true solar time **13:00** (birthplace 126.9783°E vs the 135.0°E zone meridian), -27.7 min (longitude -32.1 min + equation of time +4.4 min). Hour branches follow 2-hour solar windows, so the pillars above use the corrected time.
+> **⚠ Hour-boundary note:** the corrected time is only ~17 seconds from a 2-hour branch boundary. If the recorded clock time carries even a few minutes of error, the neighboring hour pillar (**甲午**, vs the primary **乙未** used above) is a plausible alternative — treat the hour pillar (and its palace themes) as lower-confidence in this reading.
 
 **Day Master:** Sin (Yin Metal, 辛金)
 
-**Report generated:** 2026-09-08 · **Report ID:** CID-rm-kim-nam-joon-20260908-SAMPLE
+**Report generated:** 2026-09-26 · **Report ID:** CID-rm-kim-nam-joon-20260926-SAMPLE
 
 *Delivered by CosmicSaju · cosmicsaju.com*
 
@@ -23,15 +23,15 @@
 
 | Year | Month | Day | Hour |
 |---|---|---|---|
-| 甲戌 | 癸酉 | 辛丑 | 甲午 |
+| 甲戌 | 癸酉 | 辛丑 | 乙未 |
 
 ### Element Balance
 
-- 🔴 **Fire:** 9.3%
-- 🟡 **Earth:** 20.0%
-- ⚪ **Metal:** 26.7%
-- 🔵 **Water:** 17.3%
-- 🟢 **Wood:** 26.7%
+- 🔴 **Fire:** 5.3%
+- 🟡 **Earth:** 23.7%
+- ⚪ **Metal:** 26.3%
+- 🔵 **Water:** 14.5%
+- 🟢 **Wood:** 30.3%
 
 ### Quick Read
 

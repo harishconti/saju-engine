@@ -5,6 +5,14 @@
 **Status:** Observational analysis. Not a binding recommendation. All elemental-affinity-based conclusions; skills, capital, and life circumstances not factored in.
 **Inputs:** Sruthi report (`reports/sruthi/sruthi-report.md`, 2026-06-03 regen), Pawan report (`reports/pawan/pawan-report.md`, 2026-06-03 regen), Harish report (`reports/harish/harish-report.md`, 2026-06-03 regen).
 
+> **⚠ Correction (2026-09-26 — read first):** this analysis predates the September engine fixes
+> (조후 climate method, 2026-09-13; single 용신/기신 resolution and the 2026-09-25 audit). The
+> **current** base reports resolve the three charts as below; §1.1 is updated to match, but the
+> idea rankings and timing sections further down were derived from the June values and have **not**
+> been re-derived. The largest change is **Harish: 용신 Water (was Earth), 기신 Fire, Earth now 구신**,
+> which weakens his fit for the Earth-substrate ideas (real estate, F&B property) and strengthens
+> Water/Metal ones (trading, advisory, logistics). Treat the rankings as provisional until re-derived.
+>
 > **Regen note (2026-06-03):** This file was regenerated to reflect the **corrected Harish chart** (壬申/乙巳/辛亥/己丑 — month and hour pillars corrected, solar-time applied, 寅巳申 三刑 and 寅申沖 removed). The **major-luck sequence and current decade for Harish changed substantially**: the 30s decade is now **己酉 (정인 + 酉 건록)** instead of 辛酉 (비견 + 酉 절), and the 40s decade is now **庚戌 (비견 + 戌)** instead of 壬戌. The 50s decade is **辛亥** (was 癸亥), the 60s decade is **壬子** (was 甲子). All references to "寅巳申 三刑" or "寅申沖" in Harish's chart have been removed. The **structural analysis of overlap and role assignment is preserved** — the corrected chart is **more favorable for the venture** than the prior version.
 >
 > **Regen note (2026-06-03, evening — Sruthi starting-age correction):** Cross-verification with an external 만세력 validator surfaced an engine starting-age bug. The Sruthi major-luck sequence was previously shifted by ~7 years (starting at age ~1 instead of age ~8) because the engine was returning age 0 for all candidates due to a schema-mismatch with `sajupy.get_lunar_month_info()`. The engine now reads `sajupy/calendar_data.csv` directly and applies the canonical 12-節氣 rule. **Sruthi's age windows are all shifted by +7 years**: 0-9 → 8-17, 10-19 → 18-27, 20-29 → 28-37, 30-39 → 38-47, etc. **Her current decade is now 丁卯 (2021-2030)** — peer-competition / learning — not the previously-claimed 戊辰 peak. **The 戊辰 peak decade is 2031-2040 (ages 38-47)**, still the chart's primary Earth-storehouse launch window for her. Pawan and Harish major-luck sequences were unaffected (Pawan = 8 ~8, Harish = 0 ~0) — only the narrative framing needed updating in the per-candidate reports. The 2026-2028 co-firing window conclusion in this document is **preserved**; the 2031-2035 "joint-peak" conclusion is **strengthened** (Sruthi's 戊辰 is now correctly identified as starting in 2031, not in 2023 as the prior version implied).
@@ -27,9 +35,11 @@ The three charts share a **common Earth-favorable baseline** (Sruthi = Earth pri
 
 | Candidate | Day Master | Day branch | Strength | Primary 용신 | Secondary 희신 | 기신 |
 |---|---|---|---|---|---|---|
-| **Sruthi** | 丙 병 (Yang Fire) | 寅 (Yang Wood) | 신강-leaning to balanced | **Earth (土)** | Fire (火) | Water, Metal |
-| **Pawan** | 丙 병 (Yang Fire) | 午 (Yang Fire) | 신강 | **Water (水)** | Metal (金) | Wood, more Fire, more Earth |
-| **Harish** | 辛 신 (Yin Metal) | 亥 (Yang Water) | 신약 (but with visible Earth-resource now) | **Earth (土)** | Metal (金) | Fire, Water |
+| **Sruthi** | 丙 병 (Yang Fire) | 寅 (Yang Wood) | Balanced (engine); reader-argued | **Earth (土)** *(reader-argued)* | Fire (火) | Water (기신) · Wood (구신) · Metal (한신) |
+| **Pawan** | 丙 병 (Yang Fire) | 午 (Yang Fire) | Balanced (engine); Fire-heavy | **Water (水)** *(reader-argued)* | Metal (金) | Fire (기신) · Earth (구신) · Wood (한신) |
+| **Harish** | 辛 신 (Yin Metal) | 亥 (Yang Water) | Balanced (engine; a reader may argue weak) | **Water (水)** *(조후 climate-resolved)* | Metal (金) | Fire (기신) · Earth (구신) · Wood (한신) |
+
+*(Table updated 2026-09-26 from the regenerated base reports' Quick Reference; the June values were Harish 용신 Earth / 기신 Fire, Water and Pawan 기신 Wood, more Fire, more Earth.)*
 
 **What overlaps:**
 
@@ -280,7 +290,7 @@ For each idea: **what it is, which element it primarily activates, the role assi
 
 - **Pure tech / SaaS / app-based business**: All three charts lack **Water (output, communication) as a primary element**. Sruthi has Wood and Fire, Pawan has Fire and Earth, Harish has Metal and Earth — none has **Water as a top-3 element**. Tech/SaaS is **water/wood-dominated** (logic, communication, flow) and is the **least-aligned** cross-candidate industry.
 - **Education-only (K-12 / test prep / edtech)**: Wood + Fire, fits Sruthi (#3) and partially Pawan, but Harish's Metal/Earth does **not** suit pure education. Education-as-a-layer (Idea #3, #4) is the right way to use education, not as a standalone.
-- **Logistics / supply-chain / import-export**: This is **water-dominant** — Pawan's 용신, but **기신 for Sruthi and Harish**. Not a cross-candidate fit.
+- **Logistics / supply-chain / import-export**: This is **water-dominant** — the 용신 for both Pawan and Harish (as of 2026-09-26), but **기신 for Sruthi**. A 2-of-3 fit, not a cross-candidate fit.
 - **Energy / solar / electrical**: Fire + Metal, fits Pawan (#6) and partially Harish, but **fire-presses-metal** for Harish. Not a cross-candidate fit.
 - **Trading / commodities / forex**: Metal + Water, fits Pawan (#5) and Harish (#8), but **not Sruthi** (Trading is **not** in her top-10). Only a 2-of-3 fit.
 - **Pharma / healthcare / biotech**: Mixed elements, **not** in any of the three's top-3 domains. Rejected.

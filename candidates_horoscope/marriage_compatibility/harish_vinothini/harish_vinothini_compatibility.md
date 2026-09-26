@@ -1,5 +1,7 @@
 # Harish × Vinothini — 궁합 (合婚 / Compatibility Reading)
 
+> **⚠ Not regenerated (2026-09-26):** every other compatibility report was regenerated after the 2026-09-25 engine audit fixes (hidden-stem order, single 용신/기신 resolution feeding compat scoring). This one could not be: Vinothini's birth date, time and place are not on record — only her four pillars are — and the engine needs the full birth data for strength, 용신, 대운 and stars. Under the corrected engine, 기신-based penalties now apply to balanced charts, so the score below may move. Supply her birth data to regenerate.
+
 **Composite Score (종합 점수):** **57 / 100**  
 **Verdict Band (평가):** **Mixed**  *(see knowledge/11-gunghap.md §Composite Weight)*
 
