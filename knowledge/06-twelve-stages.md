@@ -148,6 +148,8 @@ For the **Day Master itself**, the stages that strengthen the chart:
 
 > A Day Master in **건록 or 제왕** in the month branch is at **seasonal peak** and is considered **신강 (身強, strong Day Master)**. A Day Master in **사, 묘, 절, 병, or 쇠** in the month branch is **seasonally weak** and considered **신약 (身弱, weak Day Master)** unless supported by other factors.
 
+> **Strength scoring uses the season/element relation, not this stage (decided 2026-09-26, audit finding N-5).** For **yang** stems the stage above tracks the season closely. For **yin** stems it runs the backward 음생양사 (陰生陽死) cycle, so it can point the opposite way from the season: 乙 is at 장생 in 午 (a Fire month that drains Wood) and at 사 in 亥 (a Water month that feeds Wood). The 적천수 commentary tradition (임철초) is critical of using 음장생 for strength; that citation comes from the audit and has not been checked against a primary text in this repo. The governing criterion for 신강/신약 is therefore `09-interpretation-method.md` Step 2: is the month branch the Day Master's own element or peak season, its resource, or an off-season (output / wealth / authority) element? The stage in this file stays the **descriptive** 12운성 reading (temperament, 대운/세운 stage narratives). It is no longer the seasonal input to the strength verdict. The engine follows this rule: `strength.month_relation()`.
+
 ## 12 Stages + Ten Gods
 
 The 12 stages are sometimes layered on top of the 십신 (Ten Gods) reading:

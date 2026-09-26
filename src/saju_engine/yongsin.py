@@ -291,6 +291,13 @@ def favorable_element(chart, override: Optional[str] = None) -> FavorableElement
     method = _METHOD_BY_VERDICT.get(verdict, "balanced-heuristic")
     base_note = _NOTE_BY_METHOD[method]
     note = base_note + " Born in a climate-neutral month, so no 조후 override applies here."
+    tie = sa.get("balanced_tie") if method == "balanced-heuristic" else None
+    if tie:
+        # N-19 (2026-09-26 audit): surface ties instead of silently picking one.
+        note += (
+            f" {', '.join(tie)} are equally least-represented; {element} is offered because "
+            "the birth season supports it least — the reader should weigh the others too."
+        )
 
     return _with_unfavorable(FavorableElement(
         element=element, method=method, confidence="heuristic", note=note,

@@ -939,7 +939,11 @@ def test_strength_line_states_a_reasoning_not_just_the_verdict():
     report = generate_premium_report(chart, tier="deep")
     line = next(l for l in report.splitlines() if l.startswith("- **Strength:**"))
     assert "seasonal-strength reading; a full classical analysis" not in line
-    assert "사" in line and "seasonally weak baseline" in line
+    # N-5 (2026-09-26 audit): the argument is now the month branch's element
+    # relation (巳 Fire controls 辛 Metal — an authority season), per
+    # knowledge/09 Step 2, not the DM's 12운성 stage.
+    assert "巳" in line and "controls the Day Master" in line
+    assert "seasonally weak baseline" in line
     assert "peer" in line or "resource" in line or "drain" in line
 
 

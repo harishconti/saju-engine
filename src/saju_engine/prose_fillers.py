@@ -273,11 +273,25 @@ def dm_arrival_narrative(ctx) -> str:
         "mixed": "mixed seasonal support",
     }[_season_signal(month_stage_score)]
 
+    # N-5 (2026-09-26 audit): the seasonal signal now comes from the month
+    # branch's element relation, which can disagree with a yin stem's own
+    # (음생양사) stage — e.g. 乙 at 장생 in 午, a Fire month that drains Wood.
+    # Say which one the season reading follows instead of leaving the two
+    # labels to contradict each other.
+    from .strength import _STAGE_WEIGHT
+    stage_signal = _season_signal(_STAGE_WEIGHT.get(stage, 0.5))
+    divergence = ""
+    if "month_relation" in sa and stage_signal != _season_signal(month_stage_score):
+        divergence = (
+            " (Seasonal support itself is read from the month branch's element against the Day "
+            "Master's element, per knowledge/09-interpretation-method.md Step 2 — the twelve-stage "
+            "image describes temperament, not the season's strength.)"
+        )
     return (
         f"Your Day Master **{chart.day_master}** meets the month branch **{chart.month.branch}** "
         f"at the **{stage} ({label})** twelve-stage — {description}. "
         f"This is read as a {season_signal} arrival: a tendency in how the querent's core energy "
-        f"first enters the world, not a fixed early-life outcome."
+        f"first enters the world, not a fixed early-life outcome.{divergence}"
     )
 
 
@@ -331,13 +345,34 @@ def strength_reasoning(ctx) -> str:
     reconcile = ""
     if skewed and sa.get("verdict") == "balanced":
         reconcile = (
-            " — the month-branch stage above (weighted more heavily in the overall formula) "
+            " — the month-branch season above (weighted more heavily in the overall formula) "
             "is what pulls the total back into the balanced range despite that skew"
         )
+    # N-5 (2026-09-26 audit): the 월령 signal is the month branch's element
+    # relation to the Day Master (knowledge/09 Step 2), not the DM's own
+    # 12운성 stage — state that relation as the argument.
+    relation = sa.get("month_relation")
+    relation_text = _MONTH_RELATION_TEXT.get(relation)
+    if relation_text is None:
+        return (
+            f"the Day Master's stage in the month branch **{chart.month.branch}** is **{stage}** "
+            f"({season_note}, per knowledge/06-twelve-stages.md) — {description} — and {offset_note}{reconcile}."
+        )
     return (
-        f"the Day Master's stage in the month branch **{chart.month.branch}** is **{stage}** "
-        f"({season_note}, per knowledge/06-twelve-stages.md) — {description} — and {offset_note}{reconcile}."
+        f"the month branch **{chart.month.branch}** {relation_text} ({season_note}, per "
+        f"knowledge/09-interpretation-method.md Step 2), and {offset_note}{reconcile}."
     )
+
+
+# Month branch element vs Day Master element — strength.month_relation().
+_MONTH_RELATION_TEXT = {
+    "peak": "is the Day Master's own element at its seasonal peak",
+    "same": "is the Day Master's own element",
+    "resource": "is the element that generates the Day Master (a resource season)",
+    "output": "is the element the Day Master generates (an output season that draws on it)",
+    "wealth": "is the element the Day Master controls (a wealth season that draws on it)",
+    "authority": "is the element that controls the Day Master (an authority season that presses on it)",
+}
 
 
 # ── Wealth & Career fillers ──────────────────────────────────────────────

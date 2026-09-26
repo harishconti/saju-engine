@@ -38,6 +38,8 @@ Determine whether the Day Master is **신강 (身強, strong)** or **신약 (身
 1. **Seasonal support (월지, 月支):** Is the Day Master in **season**? See `01-stems.md` for Season of Peak.
    - If the month branch is the Day Master's peak season → strongest support.
    - If the month branch is the Day Master's own element (e.g., 甲 day master + 寅 or 卯 month) → strong support.
+   - If the month branch is the element that generates the Day Master (인성 season, e.g., 甲 + 亥 or 子 month) → supportive, but less than the Day Master's own season.
+   - Read this by **element**, the same way for yin and yang stems. Do not read it from the Day Master's own 12운성 stage: for yin stems that stage runs backward and can invert the season. See the note in `06-twelve-stages.md` §Cheat Sheet (N-5, 2026-09-26).
 2. **지 (Branch) support (지지):** Do the year, day, and hour branches contain the Day Master's element in their 본기 or middle hidden stems?
 3. **인성 (Resource) presence:** Does the chart have stems that generate the Day Master (인성)?
 4. **비겁 (Companion) presence:** Does the chart have stems/branches of the same element as the Day Master?

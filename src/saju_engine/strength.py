@@ -7,7 +7,9 @@ still be argued from the full chart context per `knowledge/09-interpretation-met
 
 Rules sourced from:
   - knowledge/03-five-elements.md (generating/overcoming cycles)
-  - knowledge/06-twelve-stages.md (seasonal strength signal)
+  - knowledge/06-twelve-stages.md (12운성 stage weights)
+  - knowledge/09-interpretation-method.md Step 2 (the 월령 signal is the month
+    branch's season relative to the Day Master's *element*)
 """
 from __future__ import annotations
 
@@ -21,26 +23,64 @@ from . import lookup as L
 _GENERATED_BY: Dict[str, str] = {v: k for k, v in L.GENERATES.items()}
 
 
-# Seasonal strength of each element by month branch (solar-term month).
-# Simplified: each branch's season strongly favors its own element and the
-# element it generates. Values are relative weights.
-_MONTH_BRANCH_SEASON = {
-    "寅": {"Wood": 2.0, "Fire": 1.0},
-    "卯": {"Wood": 2.0, "Fire": 1.0},
-    "辰": {"Wood": 1.0, "Earth": 1.5, "Water": 0.5},  # late spring, earth storing
-    "巳": {"Fire": 2.0, "Earth": 1.0, "Metal": 0.5},  # 巳 hides 庚 (Metal 長生)
-    "午": {"Fire": 2.0, "Earth": 1.0},
-    "未": {"Fire": 1.0, "Earth": 2.0},
-    "申": {"Metal": 2.0, "Water": 1.0, "Earth": 0.5},  # 申 hides 戊 (Earth 餘氣)
-    "酉": {"Metal": 2.0, "Water": 1.0},
-    "戌": {"Metal": 1.0, "Earth": 2.0, "Fire": 0.5},  # late autumn, earth storing
-    "亥": {"Water": 2.0, "Wood": 1.0},
-    "子": {"Water": 2.0, "Wood": 1.0},
-    "丑": {"Water": 1.0, "Earth": 2.0, "Metal": 0.5},  # late winter, earth storing
+# 월령 (month-command) support by the month branch's element relation to the
+# Day Master's element — knowledge/09 Step 2, "Seasonal support (월지)":
+#   - month branch is the DM's peak season            -> strongest support
+#   - month branch is the DM's own element             -> strong support
+#   - month branch generates the DM (인성, resource)    -> supportive (Step 2
+#     factor 3: 인성 strengthens), below the DM's own season
+#   - output / wealth / authority month ("off-season") -> no seasonal support
+# Weights reuse the scale `_STAGE_WEIGHT` had (제왕 2.0 / 건록 1.5 ... 사 0.0)
+# so the verdict thresholds below stay calibrated.
+_PEAK_BRANCHES = frozenset("子午卯酉")  # 왕지: the single-element peak of each season
+_MONTH_RELATION_WEIGHT: Dict[str, float] = {
+    "peak": 2.0,
+    "same": 1.5,
+    "resource": 1.0,
+    "output": 0.0,
+    "wealth": 0.0,
+    "authority": 0.0,
 }
 
-# 12운성 strength signal for the Day Master in the month branch.
-# These are relative weights; 제왕/건록/관대/장생 are supportive, 사/묘/절 are depleted.
+
+def month_relation(day_master: str, month_branch: str) -> str:
+    """The month branch's element relation to the Day Master's element — the
+    월령 input to strength scoring.
+
+    N-5 (2026-09-26 audit; decision recorded in
+    docs/audits/2026-09-26-deep-engine-audit-verification.md): strength used
+    to score the Day Master's own 12운성 stage in the month branch. For yin
+    stems that stage runs the backward 음생양사 cycle, so 乙 in 午 (its
+    draining month) scored 장생 (supported) and 乙 in 亥 (its resource month)
+    scored 사 (depleted), inverting yin Day Masters; even for yang stems a
+    few stages sit against the season (庚 장생 in 巳, 戊 장생 in 寅 — both
+    months whose element controls the DM). knowledge/09 Step 2 defines the
+    seasonal signal by element, independent of stem polarity, and that is
+    what this returns. The Day Master's own 12운성 stage (`month_stage`)
+    stays the descriptive reading (knowledge/06).
+
+    Returns one of "peak", "same", "resource", "output", "wealth", "authority".
+    """
+    dm_element = L.STEM_INFO[day_master]["element"]
+    month_element = L.BRANCH_ELEMENT[month_branch]
+    if month_element == dm_element:
+        return "peak" if month_branch in _PEAK_BRANCHES else "same"
+    if L.GENERATES[month_element] == dm_element:
+        return "resource"
+    if L.GENERATES[dm_element] == month_element:
+        return "output"
+    if L.OVERCOMES[dm_element] == month_element:
+        return "wealth"
+    return "authority"
+
+
+_YANG_STEM_OF: Dict[str, str] = {
+    "Wood": "甲", "Fire": "丙", "Earth": "戊", "Metal": "庚", "Water": "壬",
+}
+
+# 12운성 relative weights; 제왕/건록/관대/장생 are supportive, 사/묘/절 are
+# depleted. No longer the 월령 input (see `month_relation`); kept as the
+# season-weakness tie-break in the balanced fallback.
 _STAGE_WEIGHT = {
     "장생": 1.5,
     "목욕": 0.8,
@@ -85,8 +125,9 @@ def assess_strength(
 
     The result contains:
       - element_counts: weighted stem counts by element
-      - month_season_score: seasonal support from the month branch
-      - month_stage_score: 12운성 support in the month branch
+      - month_stage: the Day Master's own (descriptive) 12운성 stage in the month branch
+      - month_relation: month branch element vs DM element (strength input)
+      - month_stage_score: 월령 support, from `month_relation`
       - total_score: combined numeric score
       - verdict: 'strong', 'weak', 'extreme_weak', 'balanced', or 'extreme'
       - candidate_favorable: candidate 용신 element
@@ -97,13 +138,12 @@ def assess_strength(
     dm_element = L.STEM_INFO[day_master]["element"]
     counts = _element_counts(stems, hidden_stems)
 
-    # Seasonal support from month branch
-    season_weights = _MONTH_BRANCH_SEASON.get(month_branch, {})
-    month_season_score = season_weights.get(dm_element, 0.0)
-
-    # 12운성 support in month branch
+    # Descriptive 12운성 stage of the Day Master itself (knowledge/06).
     month_stage = L.twelve_stage(day_master, month_branch)
-    month_stage_score = _STAGE_WEIGHT.get(month_stage, 0.5)
+    # 월령 support: the month branch's element relative to the DM's element
+    # (knowledge/09 Step 2; N-5).
+    relation = month_relation(day_master, month_branch)
+    month_stage_score = _MONTH_RELATION_WEIGHT[relation]
 
     # Self-element score (visible + hidden peers of the Day Master).
     # The Day Master stem itself must not count as self-support; only peer
@@ -140,8 +180,10 @@ def assess_strength(
     )
 
     # Verdict thresholds — tuned to be conservative; extreme scores are rare.
-    # D1 fix: month_season_score removed from total; month_stage_score alone
-    # carries the 월령 signal, so thresholds are lowered accordingly.
+    # D1 fix: month_stage_score alone carries the 월령 signal (the old
+    # `_MONTH_BRANCH_SEASON` score was dropped from the total then, and — N-19,
+    # 2026-09-26 audit — from the module and its JSON output too, since
+    # readers assumed an exported score fed the verdict).
     # D3 fix: symmetric extreme bands for very weak Day Masters.
     if total_score >= 4.0:
         verdict = "extreme"
@@ -164,6 +206,7 @@ def assess_strength(
     #     generates the under-represented 용신 element (unambiguous in this case).
     # All outputs are heuristic candidates only; the final 용신/희신 must be
     # argued from the full chart per knowledge/09-interpretation-method.md.
+    balanced_tie = None
     if verdict in ("strong", "extreme"):
         # Strong Day Master needs outlets, not more support.
         candidate_favorable = output_element      # 食傷 / output channel (drains)
@@ -189,7 +232,20 @@ def assess_strength(
         # yongsin.py's balanced-heuristic note).
         if L.BRANCH_ELEMENT.get(month_branch) == authority_element:
             all_elements = [e for e in all_elements if e != authority_element]
-        least_present = min(all_elements, key=lambda e: counts.get(e, 0.0))
+        # N-19 (2026-09-26 audit): `min()` over this fixed list silently
+        # resolved ties to the first entry (Wood). Ties are now surfaced in
+        # `balanced_tie`; the pick among tied elements prefers the one the
+        # month season supports least (weakest 12운성 weight of that
+        # element's yang stem, i.e. its seasonal lifecycle) — only then list
+        # order.
+        lowest = min(counts.get(e, 0.0) for e in all_elements)
+        tied = [e for e in all_elements if abs(counts.get(e, 0.0) - lowest) < 1e-9]
+        least_present = min(
+            tied,
+            key=lambda e: _STAGE_WEIGHT.get(L.twelve_stage(_YANG_STEM_OF[e], month_branch), 0.5),
+        )
+        if len(tied) > 1:
+            balanced_tie = tied
         candidate_favorable = least_present
         # Supporting element is the one that generates (nourishes) the least-present element.
         candidate_supporting = _GENERATED_BY.get(least_present, least_present)
@@ -200,7 +256,7 @@ def assess_strength(
         "element_counts": dict(counts),
         "month_branch": month_branch,
         "month_stage": month_stage,
-        "month_season_score": month_season_score,
+        "month_relation": relation,
         "month_stage_score": month_stage_score,
         "self_score": self_score,
         "resource_score": resource_score,
@@ -211,6 +267,7 @@ def assess_strength(
         "candidate_supporting": candidate_supporting,
         "candidate_unfavorable": candidate_unfavorable,
         "candidate_draining": candidate_draining,
+        "balanced_tie": balanced_tie,
         "note": "Heuristic only; final 용신 must be argued from the full chart context.",
     }
 

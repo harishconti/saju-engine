@@ -263,11 +263,11 @@
    "longitude": 78.713454,
    "utc_offset": 5.5
   },
-  "source": "Published client verdict: candidates_horoscope/reports/mahesh/mahesh-report.md:42-45 — Weak; Favorable Element Earth ('generates Metal and buffers Fire authority pressure'); Supporting Metal; Avoid Fire. STALE CHART: the 23:50 birth was re-charted by the ya-ja-si fix (Plan 1) — the published reading was made on the pre-fix chart and on a weak verdict the current chart no longer produces (now balanced, score 1.22); report regen deferred to campaign close. expected.element carries the PUBLISHED value (renders INTERPRETATION by design); expected.method + expected.strength + expected.fe.supporting pin the current chart's engine behavior (cold 丑 month → climate-balanced Fire, supporting Wood). (external cross-check 2026-09-13: OpenFate — no fixed order; documented divergence between reader-argued Earth and engine climate-balanced Fire on the post-ya-ja-si chart — https://wiki.openfate.ai/ko/bazi/useful-gods-climate/climate-vs-strength-priority; 두루미사주 — https://www.durumisaju.com/dict/yongshin/eokbu)",
+  "source": "[2026-09-26, N-5: expected.strength re-pinned to the current engine (strong, score 1.93) after strength's 월령 input switched from the Day Master's own 12운성 stage (庚 in 丑 = 묘, 0.3) to the month branch's element relation (丑 Earth generates 庚 Metal = resource month, knowledge/09 Step 2). The headline 용신 is unchanged (cold 丑 → climate Fire).] Published client verdict: candidates_horoscope/reports/mahesh/mahesh-report.md:42-45 — Weak; Favorable Element Earth ('generates Metal and buffers Fire authority pressure'); Supporting Metal; Avoid Fire. STALE CHART: the 23:50 birth was re-charted by the ya-ja-si fix (Plan 1) — the published reading was made on the pre-fix chart and on a weak verdict the current chart no longer produces (now balanced, score 1.22); report regen deferred to campaign close. expected.element carries the PUBLISHED value (renders INTERPRETATION by design); expected.method + expected.strength + expected.fe.supporting pin the current chart's engine behavior (cold 丑 month → climate-balanced Fire, supporting Wood). (external cross-check 2026-09-13: OpenFate — no fixed order; documented divergence between reader-argued Earth and engine climate-balanced Fire on the post-ya-ja-si chart — https://wiki.openfate.ai/ko/bazi/useful-gods-climate/climate-vs-strength-priority; 두루미사주 — https://www.durumisaju.com/dict/yongshin/eokbu)",
   "status": "documented_interpretation",
   "expected": {
    "strength": {
-    "verdict": "balanced",
+    "verdict": "strong",
     "candidate": "Water"
    },
    "fe": {

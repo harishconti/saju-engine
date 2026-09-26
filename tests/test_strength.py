@@ -126,3 +126,62 @@ def test_e5_balanced_heuristic_skips_in_season_controller():
     assert min(counts, key=counts.get) == "Fire"      # the raw minimum is still Fire
     assert sa["candidate_favorable"] != "Fire"        # ...but it is not offered
     assert sa["candidate_favorable"] == "Wood"
+
+
+# ── N-5 (2026-09-26 audit): 월령 by element relation, not the DM's 12운성 ──────
+
+import pytest as _pytest
+
+from saju_engine.strength import assess_strength as _assess, month_relation as _rel
+
+
+@_pytest.mark.parametrize(
+    "dm,branch,relation",
+    [
+        ("乙", "卯", "peak"), ("乙", "寅", "same"), ("甲", "卯", "peak"),
+        ("乙", "亥", "resource"), ("乙", "午", "output"), ("乙", "丑", "wealth"),
+        ("乙", "申", "authority"), ("辛", "巳", "authority"), ("庚", "丑", "resource"),
+        ("戊", "辰", "same"), ("戊", "寅", "authority"),
+    ],
+)
+def test_month_relation(dm, branch, relation):
+    assert _rel(dm, branch) == relation
+
+
+def test_yin_dm_no_longer_inverted_by_backward_12_stage_cycle():
+    """乙 in 午 is 장생 on the backward cycle but 午 is a Fire month that
+    drains Wood; 乙 in 亥 is 사 but 亥 is a Water month that feeds Wood.
+    With identical other stems, the 亥-month chart must score higher."""
+    stems = ["庚", "戊", "乙", "丙"]
+    in_wu = _assess("乙", "午", stems, [])
+    in_hai = _assess("乙", "亥", stems, [])
+    assert in_wu["month_stage"] == "장생" and in_wu["month_relation"] == "output"
+    assert in_hai["month_stage"] == "사" and in_hai["month_relation"] == "resource"
+    assert in_hai["total_score"] > in_wu["total_score"]
+    assert in_wu["month_stage_score"] == 0.0 and in_hai["month_stage_score"] == 1.0
+
+
+def test_yin_and_yang_dm_of_same_element_get_same_month_signal():
+    for branch in "子丑寅卯辰巳午未申酉戌亥":
+        a = _assess("甲", branch, ["甲"], [])["month_stage_score"]
+        b = _assess("乙", branch, ["乙"], [])["month_stage_score"]
+        assert a == b, branch
+
+
+# ── N-19 (2026-09-26 audit): dead season score and silent Wood tie-break ─────
+
+
+def test_month_season_score_no_longer_exported():
+    sa = _assess("甲", "卯", ["甲", "丙"], [])
+    assert "month_season_score" not in sa
+
+
+def test_balanced_tie_is_surfaced_not_silently_wood():
+    # Bare DM with no other elements: Wood=1 (the DM), everything else 0 —
+    # a four-way tie among Fire/Earth/Metal/Water in a 午 month (balanced).
+    sa = _assess("甲", "午", ["甲"], [])
+    if sa["verdict"] != "balanced":
+        _pytest.skip("fixture no longer balanced")
+    assert sa["balanced_tie"] and len(sa["balanced_tie"]) > 1
+    assert sa["candidate_favorable"] in sa["balanced_tie"]
+    assert sa["candidate_favorable"] != "Wood"
