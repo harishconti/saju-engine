@@ -146,15 +146,15 @@ def _derive_branch_relationships(chart: Chart):
 def _build_daeun(chart: Chart, n_periods: int = 8, utc_offset: float = 9.0) -> list[DaeunPeriod]:
     if not chart.gender:
         return []
-    date_to_use = chart.effective_date or chart.birth_date
-    # Sub-day precision (A4): use the solar-corrected birth time when available
-    # so the 절기-moment comparison matches the moment the pillars were derived
-    # from; otherwise fall back to the raw birth_time, then to 00:00.
-    time_to_use = "00:00"
-    if chart.solar_correction and chart.solar_correction.get("solar_time"):
-        time_to_use = chart.solar_correction["solar_time"]
-    elif chart.birth_time:
-        time_to_use = chart.birth_time
+    # N-2 (2026-09-26 audit): a 절기 is an absolute instant, and the calendar's
+    # term times (once converted to this timezone) are civil-clock instants —
+    # so the starting-age count must compare the birth's civil date/time
+    # against them, not the solar-corrected effective_date/solar_time (which
+    # differ by the longitude correction + equation of time). Using solar
+    # time here used to flip which side of a 절기 boundary a birth counted
+    # from, shifting the 대운 starting age.
+    date_to_use = chart.birth_date
+    time_to_use = chart.birth_time or "00:00"
     try:
         hh, mm = (int(x) for x in time_to_use.split(":"))
     except (ValueError, AttributeError):

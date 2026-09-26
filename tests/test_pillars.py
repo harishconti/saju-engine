@@ -186,6 +186,58 @@ def test_solar_term_boundary_far_from_kst_still_correct():
     assert c.year.combined == "甲辰"
 
 
+@pytest.mark.parametrize(
+    "hour,minute,expected_year,expected_month",
+    [
+        # N-2 (2026-09-26 audit): the CSV's 立春 term_time for 2024 is
+        # 17:00 KST. Seoul (longitude 127, utc_offset 9) has a real solar
+        # correction (~-32 min, since Korea's civil clock runs on the 135°E
+        # meridian, not 127°E) — the bug compared this SOLAR time against the
+        # civil-converted term instant, so civil births up to ~17:47 KST were
+        # wrongly pushed into the previous year/month (癸卯/乙丑) instead of
+        # 甲辰/丙寅. Reproduces the audit's own table exactly.
+        (17, 20, "甲辰", "丙寅"),
+        (17, 40, "甲辰", "丙寅"),
+        (17, 55, "甲辰", "丙寅"),
+    ],
+)
+def test_year_month_override_compares_civil_not_solar_time_seoul(
+    hour, minute, expected_year, expected_month
+):
+    c = compute_chart(
+        name="N2-Seoul", gender="M",
+        year=2024, month=2, day=4, hour=hour, minute=minute,
+        longitude=127.0, utc_offset=9.0, use_solar_time=True,
+    )
+    assert c.year.combined == expected_year
+    assert c.month.combined == expected_month
+
+
+@pytest.mark.parametrize(
+    "hour,minute,expected_year,expected_month",
+    [
+        # Same 2024 立春 (17:00 KST), converted to IST (utc_offset 5.5):
+        # 13:30 IST. Mumbai's real longitude (72.9) sits ~38 min west of the
+        # +5.5 standard meridian (82.5), so a civil birth at 13:35-14:10 IST
+        # (after the term) has a SOLAR time of 12:42-13:17 (before the term),
+        # which the bug used to compare instead of the civil clock.
+        (13, 20, "癸卯", "乙丑"),  # before the term either way
+        (13, 35, "甲辰", "丙寅"),  # after the term civilly; solar time still isn't
+        (14, 10, "甲辰", "丙寅"),
+    ],
+)
+def test_year_month_override_compares_civil_not_solar_time_mumbai(
+    hour, minute, expected_year, expected_month
+):
+    c = compute_chart(
+        name="N2-Mumbai", gender="M",
+        year=2024, month=2, day=4, hour=hour, minute=minute,
+        longitude=72.9, utc_offset=5.5, use_solar_time=True,
+    )
+    assert c.year.combined == expected_year
+    assert c.month.combined == expected_month
+
+
 def test_high_longitude_honolulu_rolls_day():
     # Honolulu: 157.86°W, UTC-10. Solar correction pushes 2000-01-01 00:00 back
     # to 23:28 of the previous day, so the day pillar belongs to 1999-12-31.

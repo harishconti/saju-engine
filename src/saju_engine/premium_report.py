@@ -381,12 +381,10 @@ def _daeun_starting_age_note(chart) -> str:
     from .daeun import starting_age_days
 
     direction = daeun_direction(chart.year.stem, gender)
-    date_to_use = chart.effective_date or chart.birth_date
-    time_to_use = "00:00"
-    if chart.solar_correction and chart.solar_correction.get("solar_time"):
-        time_to_use = chart.solar_correction["solar_time"]
-    elif chart.birth_time:
-        time_to_use = chart.birth_time
+    # N-2 (2026-09-26 audit): compare the civil birth time against the 절기
+    # instant, not the solar-corrected time — see `_build_daeun` in engine.py.
+    date_to_use = chart.birth_date
+    time_to_use = chart.birth_time or "00:00"
     try:
         hh, mm = (int(x) for x in time_to_use.split(":"))
     except (ValueError, AttributeError):

@@ -953,6 +953,28 @@ def test_daeun_starting_age_note_states_precise_age_not_just_decade():
     assert "roughly 6 months" in report
 
 
+def test_daeun_starting_age_note_is_independent_of_use_solar_time():
+    """N-2 (2026-09-26 audit): a 절기 is an absolute instant, and the CSV's
+    term times (converted to the birth's timezone) are civil-clock instants
+    — so the starting-age day count must compare the CIVIL birth time
+    against them. `_build_daeun` used to feed the SOLAR-corrected time in
+    instead, so the same birth produced a different (wrong) precise starting
+    age depending only on whether `use_solar_time` was True or False. Fixed:
+    the note is now identical either way, for a birth minutes from a 절기
+    where the solar correction (~-32 min in Seoul) is large enough to matter.
+    """
+    notes = []
+    for use_solar_time in (True, False):
+        chart = compute_chart(
+            name="N2-daeun-regression", gender="M",
+            year=2024, month=2, day=4, hour=17, minute=20,
+            longitude=127.0, utc_offset=9.0, use_solar_time=use_solar_time,
+        )
+        report = generate_premium_report(chart, tier="deep")
+        notes.append(next(l for l in report.splitlines() if "대운수" in l))
+    assert notes[0] == notes[1]
+
+
 # ── R7 — date-selection filter defects ────────────────────────────────────
 # ── (found 2026-09-20, external report review, 3rd pass) ─────────────────
 

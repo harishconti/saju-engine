@@ -358,9 +358,9 @@ def compute_daeun(
 
     ``hour`` and ``minute`` give sub-day precision for the starting-age count
     (see `starting_age`): the birth moment is compared to the 절기 moment, not
-    just the calendar date. Pass the **solar-corrected** birth time when the
-    chart was computed with `use_solar_time=True`, so the 대운 boundary aligns
-    with the same moment the pillars were derived from.
+    just the calendar date. Pass the **civil** birth time (not the
+    solar-corrected time), since the calendar's 절기 moments, once converted
+    to this timezone, are civil-clock instants (N-2, 2026-09-26 audit).
 
     ``utc_offset`` must be the chart's real birth timezone offset — the
     calendar's 절기 moments are stored in KST and need this to compare

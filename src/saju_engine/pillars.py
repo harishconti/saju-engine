@@ -631,8 +631,15 @@ def compute_pillars(
 
     # Independent year/month-pillar cross-check (E-1) — override sajupy's raw
     # values only when they disagree with the timezone-correct recomputation.
+    # N-2 (2026-09-26 audit): a 절기 is an absolute instant. The calendar's
+    # term times, once converted to the birth's own timezone, are civil-clock
+    # instants — so they must be compared against the civil birth time, not
+    # the solar-corrected `eff_hour`/`eff_date` (which differ by the
+    # longitude correction + equation of time, e.g. ~30 min in Seoul). Using
+    # solar time here previously flipped the year/month pillar for any birth
+    # within that gap of a 절기.
     independent = _independent_year_month_pillar(
-        eff_date[0], eff_date[1], eff_date[2], eff_hour, eff_minute, utc_offset
+        year, month, day, hour, minute, utc_offset
     )
     if independent is not None:
         disagreement = {
