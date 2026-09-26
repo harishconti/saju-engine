@@ -50,6 +50,7 @@ not repeated here.
 | N-19 | P3 | Strength | `month_season_score` is computed and exported but unused in the verdict. Ties in the balanced least-present pick always resolve to Wood. |
 | N-20 | P3 | Natal relations | Pairwise 삼형 entries are duplicated when a branch repeats (e.g. `丑寅丑未` lists 丑未 twice). No positions are recorded. |
 | N-21 | P3 | Repo | `apps/landing-page` has config and built PDFs but **no source** (`src/`, incl. the `src/proxy.ts` that `DEPLOY.md` describes). It cannot be audited or rebuilt. |
+| N-22 | P3 | Tests | `tests/test_pdf.py:31-37` runs `build-pdf.sh sruthi`, which **overwrites the tracked client deliverable** `candidates_horoscope/reports/sruthi/sruthi-report.pdf` on every test run. |
 
 ---
 
@@ -420,6 +421,18 @@ positions as `combinations_6` does.
 
 `git ls-files apps/landing-page` shows configs, lighthouse reports and PDFs, but no `src/` or
 `app/`. `DEPLOY.md` documents a `src/proxy.ts` security proxy that can't be reviewed.
+
+
+### N-22 (P3) — Test suite overwrites a client deliverable
+
+`tests/test_pdf.py:31-37` shells out to `tools/build-pdf.sh sruthi` and asserts on the real
+output path. Every `pytest` run rewrites the tracked `sruthi-report.pdf` with a PDF built
+from the current code and timestamp. That dirties the working tree, and a careless
+`git add -A` would commit an unreviewed client file. (It happened during this audit and was
+reverted.)
+
+**Fix:** have `build-pdf.sh` accept an output path (or `$SAJU_OUT_DIR`), and point the test at
+`tmp_path`.
 
 ---
 
