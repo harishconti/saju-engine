@@ -196,8 +196,13 @@ Less common in modern Korean readings. **See the "More classical 신살" section
 
 #### 문창귀인 (文昌貴人) — Literary Star
 
+N-9 (2026-09-26 audit): 甲 was previously listed as → 亥, conflating this star with 甲's
+학당귀인 (亥 is 甲's 12운성 장생 branch, a different star). The classical mnemonic
+「甲乙巳午報君知, 丙戊申宮丁己雞, 庚猪辛鼠壬逢虎, 癸人見兔」 gives 甲 → 巳 — consistent
+with all nine other entries below, which the mnemonic already confirms independently.
+
 **Day-stem-based**:
-- 甲 → 亥
+- 甲 → 巳
 - 乙 → 午
 - 丙 → 申
 - 丁 → 酉
@@ -297,7 +302,12 @@ Based on the **day pillar (일주, 日柱)**. The commonly cited seven 백호대
 
 #### 천덕귀인 (天德貴人) — Heavenly Virtue Noble
 
-Derived from the **month branch (월지, 月支)**. The target stem is looked for among the four natal 천간.
+Derived from the **month branch (월지, 月支)**. The table below mixes stem and branch
+targets: for 卯/午/酉/子 months the target is itself a **branch** (申/亥/寅/巳), so it is
+looked for among the four natal **branches**; for the other eight months the target is
+a **stem**, looked for among the four natal **stems**. N-9 (2026-09-26 audit): the
+engine previously checked all twelve months against the natal stems only, so the star
+could never fire for the four branch-target months.
 
 | 월지 | 천덕귀인 |
 |---|---|

@@ -32,6 +32,16 @@ def test_noble_and_literary():
     assert "申" in stars["literary_star"]
 
 
+def test_literary_star_gap_targets_si_not_hae():
+    """N-9 (2026-09-26 audit): 甲 was previously mapped to 亥 — 甲's 학당귀인
+    (its 12운성 장생 branch), a different star — not its 문창귀인. The
+    classical mnemonic 「甲乙巳午報君知...」 gives 甲 → 巳, consistent with all
+    nine other entries in the table.
+    """
+    stars = derive_stars(day_stem="甲", day_branch="子", branches=["巳"])
+    assert stars["literary_star"] == ["巳"]
+
+
 def test_hongyeom_present_when_day_branch_matches():
     # 甲 day master → 홍염 at 午. Day branch 午 matches.
     stars = derive_stars(day_stem="甲", day_branch="午", branches=["午", "子"])

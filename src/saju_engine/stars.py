@@ -344,7 +344,11 @@ _HEAVENLY_NOBLE: Dict[str, List[str]] = {
 }
 
 _LITERARY_STAR: Dict[str, str] = {
-    "甲": "亥",
+    # N-9 (2026-09-26 audit): 甲 -> 巳 (not 亥, which conflated this with 甲's
+    # 학당귀인 — a different star, the 12운성 장생 branch). Classical mnemonic
+    # 「甲乙巳午報君知, 丙戊申宮丁己雞, 庚猪辛鼠壬逢虎, 癸人見兔」, cross-checked
+    # against knowledge/07-special-formations.md.
+    "甲": "巳",
     "乙": "午",
     "丙": "申",
     "丁": "酉",
