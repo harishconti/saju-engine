@@ -65,14 +65,20 @@ MANVITHA = _chart(1996, 12, 3, 21, 15, 78.8242, 5.5, "F", "Manvitha")
 # truth `yongsin.favorable_element()` (climate-corrected to Fire for his
 # balanced + cold-month chart) instead of the raw, pre-climate
 # `candidate_favorable` field (Water) — see compat.py's `_resolved_favorable`.
+#
+# 2026-09-26 (E-3/E-5 single resolution): "yongshin" 9 -> 5 and
+# "tengod_cross" -8 -> -10 — both now read the resolved 기신 via
+# `_resolved_unfavorable` (derived from each partner's resolved 용신) instead
+# of strength.py's raw `candidate_unfavorable`, which was None for balanced
+# charts, so 기신 penalties could never fire for them.
 _MA_VP_SCORES = {
     "daystem_combo": 0,
     "daybranch": 6,
     "nayin": 3,
-    "yongshin": 9,
+    "yongshin": 5,
     "ilju_pair": 0,
     "combined_elements": 4,
-    "tengod_cross": -8,
+    "tengod_cross": -10,
     "daeun_sync": 3,
     "compat_stars": 3,
     "yin_yang": 2,
@@ -704,9 +710,13 @@ def test_compat_score_is_symmetric():
 # composite 64 -> 68 and the band Mixed -> Strong. The symmetric property is
 # what this guard exists for, so it is re-pinned to the new value in both
 # directions rather than being relaxed to a band-set membership test.
+#
+# 2026-09-26: 68/Strong -> 62/Mixed in both directions once 기신 penalties
+# could fire for balanced charts (E-3/E-5 single resolution, see
+# _MA_VP_SCORES). Order-independence — the property guarded — still holds.
 def test_compat_order_independence_band_flipping_instance():
-    assert compat_score(MAHESH, VP).band == "Strong"
-    assert compat_score(VP, MAHESH).band == "Strong"
+    assert compat_score(MAHESH, VP).band == "Mixed"
+    assert compat_score(VP, MAHESH).band == "Mixed"
     assert compat_score(MAHESH, VP).nayin.score == 3
     assert compat_score(VP, MAHESH).nayin.score == 3
 
@@ -722,9 +732,11 @@ def test_compat_order_independence_band_stable_all_subsystems_identical():
     # her chart is strong but sits in a cold month (조후 now governs there
     # too). Her headline 용신 (Fire) is unchanged; order-independence itself
     # still holds (both directions move together).
+    # 2026-09-26: 68/Strong -> 64/Mixed (both directions) once the resolved
+    # 기신 reached compat scoring (E-3/E-5 single resolution).
     fwd, rev = compat_score(HARISH, MANVITHA), compat_score(MANVITHA, HARISH)
-    assert (fwd.score, rev.score) == (68, 68)
-    assert (fwd.band, rev.band) == ("Strong", "Strong")
+    assert (fwd.score, rev.score) == (64, 64)
+    assert (fwd.band, rev.band) == ("Mixed", "Mixed")
     differing = [k for k in compat.WEIGHT
                  if getattr(fwd, k).score != getattr(rev, k).score]
     assert differing == []

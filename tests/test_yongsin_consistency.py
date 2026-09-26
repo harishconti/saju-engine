@@ -209,3 +209,56 @@ def test_harish_regression_climate_override_to_water():
     assert fe.supporting == "Metal"
     assert fe.method == "climate-balanced"
     assert fe.climate_agrees is False
+
+
+# ── E-3/E-5 single resolution (2026-09-26) ───────────────────────────────
+
+
+def _c(y, m):
+    from saju_engine.engine import compute_chart
+    return compute_chart(name="x", gender="M", year=y, month=m, day=15, hour=12, minute=0,
+                         longitude=127.0, utc_offset=9)
+
+
+def test_full_role_set_resolved_once_for_every_method():
+    from saju_engine.yongsin import favorable_element
+    cases = {
+        "balanced-heuristic": (1980, 3),
+        "climate-balanced": (1980, 4),
+        "strong-dm-drain": (1980, 9),
+        "weak-dm-support": (1983, 3),
+    }
+    for method, (y, m) in cases.items():
+        fe = favorable_element(_c(y, m))
+        assert fe.method == method
+        assert fe.unfavorable and fe.unfavorable not in (fe.element, fe.supporting)
+        assert fe.requires_reader is (method == "balanced-heuristic")
+        expected_src = "dm-relative" if method in ("strong-dm-drain", "weak-dm-support") else "derived-from-yongsin"
+        assert fe.unfavorable_method == expected_src
+
+
+def test_harish_gisin_is_fire_and_compat_reads_the_same_value():
+    from saju_engine.engine import compute_chart
+    from saju_engine.yongsin import favorable_element
+    from saju_engine import compat
+    chart = compute_chart(name="h", gender="M", year=1992, month=6, day=4, hour=3, minute=10,
+                          longitude=79.4408, utc_offset=5.5)
+    fe = favorable_element(chart)
+    assert (fe.element, fe.unfavorable, fe.gusin, fe.hansin) == ("Water", "Fire", "Earth", "Wood")
+    assert compat._resolved_unfavorable(chart) == "Fire"
+    # The raw strength field stays None for a balanced chart — nothing reads it now.
+    assert chart.strength_assessment.get("candidate_unfavorable") is None
+
+
+def test_reader_override_rederives_gisin_from_override():
+    from saju_engine.yongsin import favorable_element
+    fe = favorable_element(_c(1980, 9), override="Fire")
+    assert fe.method == "reader-confirmed"
+    assert fe.unfavorable == "Metal" and fe.unfavorable_method == "derived-from-yongsin"
+
+
+def test_balanced_temperate_report_marks_yongsin_provisional():
+    from saju_engine.premium_report import generate_premium_report
+    report = generate_premium_report(_c(1980, 3), tier="deep")
+    line = next(l for l in report.splitlines() if l.startswith("- **Favorable Element:**"))
+    assert "provisional — requires reader confirmation" in line

@@ -27,6 +27,7 @@ def derive_daeun_overlay(
     strength_assessment: Optional[Dict],
     period: DaeunPeriod,
     resolved_favorable: Optional[str] = None,
+    resolved_unfavorable: Optional[str] = None,
 ) -> Dict:
     """Return an overlay dictionary for a single DaeunPeriod.
 
@@ -96,7 +97,10 @@ def derive_daeun_overlay(
     favorable_status: Optional[str] = None
     if strength_assessment:
         fav = resolved_favorable if resolved_favorable is not None else strength_assessment.get("candidate_favorable")
-        unfav = strength_assessment.get("candidate_unfavorable")
+        unfav = (
+            resolved_unfavorable if resolved_unfavorable is not None
+            else strength_assessment.get("candidate_unfavorable")
+        )
         hits = {stem_element, branch_element}
         if fav in hits:
             favorable_status = "favorable"
@@ -126,6 +130,7 @@ def build_daeun_overlays(
     strength_assessment: Optional[Dict],
     periods: List[DaeunPeriod],
     resolved_favorable: Optional[str] = None,
+    resolved_unfavorable: Optional[str] = None,
 ) -> List[DaeunPeriod]:
     """Populate each DaeunPeriod with its activation overlay in-place.
 
@@ -144,6 +149,7 @@ def build_daeun_overlays(
             strength_assessment=strength_assessment,
             period=period,
             resolved_favorable=resolved_favorable,
+            resolved_unfavorable=resolved_unfavorable,
         )
         period.stem_tengod = overlay["stem_tengod"]
         period.stem_tengod_en = overlay["stem_tengod_en"]

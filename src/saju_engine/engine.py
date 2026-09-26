@@ -330,6 +330,7 @@ def compute_chart(
         strength_assessment=chart.strength_assessment,
         periods=chart.daeun,
         resolved_favorable=_resolved_fe.element,
+        resolved_unfavorable=_resolved_fe.unfavorable,
     )
 
         # Current major-luck period on the querier's reference date.

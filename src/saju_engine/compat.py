@@ -52,6 +52,13 @@ def _resolved_favorable(chart: Chart) -> Optional[str]:
     return element if element and element != "—" else None
 
 
+def _resolved_unfavorable(chart: Chart) -> Optional[str]:
+    """The 기신 for scoring, via the single source of truth (E-3, 2026-09-26)
+    — never the raw ``strength_assessment["candidate_unfavorable"]``, which
+    is None for balanced charts and can contradict a climate/reader 용신."""
+    return favorable_element(chart).unfavorable or None
+
+
 def _resolved_supporting(chart: Chart) -> Optional[str]:
     """The supporting (희신) element for scoring, via the single source of truth."""
     supporting = favorable_element(chart).supporting
@@ -653,12 +660,10 @@ def compat_yongshin(a: Chart, b: Chart) -> CompatSubResult:
     """
     label = "Favorable element cross-supply"
     label_kr = "용신 궁합 (用神 宮合)"
-    sa = a.strength_assessment or {}
-    sb = b.strength_assessment or {}
     fav_a = _resolved_favorable(a)
     fav_b = _resolved_favorable(b)
-    gish_a = sa.get("candidate_unfavorable")
-    gish_b = sb.get("candidate_unfavorable")
+    gish_a = _resolved_unfavorable(a)
+    gish_b = _resolved_unfavorable(b)
 
     flags: List[str] = []
     score = 0
@@ -785,9 +790,8 @@ def _spouse_palace_virtue(chart: Chart) -> Tuple[int, List[str]]:
     Returns (score_delta, flags). 적천수 원칙: 일지 본기 오행이 용신이면 +3,
     희신이면 +2, 기신이면 −3.
     """
-    sa = chart.strength_assessment or {}
     fav = _resolved_favorable(chart)
-    gish = sa.get("candidate_unfavorable")
+    gish = _resolved_unfavorable(chart)
     hee = _resolved_supporting(chart)
     main_hidden = L.HIDDEN_STEMS.get(chart.day.branch, {}).get("main")
     if not main_hidden or not fav:
@@ -1093,12 +1097,10 @@ def compat_tengod_cross(a: Chart, b: Chart) -> CompatSubResult:
 
     # Apply 용신 modifier (적천수): if the partner's day_stem IS my 용신
     # element-class, treat as favorable; if 기신, treat as caution.
-    sa = a.strength_assessment or {}
-    sb = b.strength_assessment or {}
     fav_a = _resolved_favorable(a)
     fav_b = _resolved_favorable(b)
-    gish_a = sa.get("candidate_unfavorable")
-    gish_b = sb.get("candidate_unfavorable")
+    gish_a = _resolved_unfavorable(a)
+    gish_b = _resolved_unfavorable(b)
     elem_a = L.STEM_INFO[s_a]["element"]
     elem_b = L.STEM_INFO[s_b]["element"]
     modifier = 0

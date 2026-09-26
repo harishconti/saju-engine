@@ -762,18 +762,10 @@
     },
     {
      "tier": "**Good Fit**",
-     "domain": "Public Affairs & Advocacy"
-    },
-    {
-     "tier": "**Good Fit**",
-     "domain": "People Development & Culture"
-    },
-    {
-     "tier": "**Possible**",
      "domain": "Education & Training"
     },
     {
-     "tier": "**Possible**",
+     "tier": "**Good Fit**",
      "domain": "Healthcare & Wellness"
     },
     {
@@ -787,11 +779,19 @@
     {
      "tier": "**Possible**",
      "domain": "Creative Direction"
+    },
+    {
+     "tier": "**Possible**",
+     "domain": "Public Affairs & Advocacy"
+    },
+    {
+     "tier": "**Possible**",
+     "domain": "People Development & Culture"
     }
    ],
    "possible_tier_reachable": true
   },
-  "notes": "Second instance of the KB12:130-152 priority ('The classical priority — from the 용신 logic of the 궁통보감 (窮通寶鑑) lineage as applied in `knowledge/09-interpretation-method.md` Step 3 — is to **align work with what the chart *needs* (용신 / 희신, 喜神), not merely with the Day Master's own element.** Choosing a field that reinforces an already-dominant element pushes the chart further out of balance.') — proves the need-keyed pool selection is systematic, not chart-specific. Manvitha reads Day Master Wood with resolved favorable element Fire (strong-dm-drain; the raw candidate_favorable=Fire agrees) and 희신 Earth. The pool is therefore the Fire family then the Earth family, 6 + 6 = 12 — no Wood domain is served, which is the point: raw candidate_unfavorable='Wood' would subtract 2 from any Wood-family candidate, but under the need-keyed pool none is a candidate at all, so the -2 branch is latent here rather than firing. Six domains score +2 (the five Fire-family entries plus Mediation & Counselling, an Earth-family entry that resolves to Fire because the 'media' substring is tested before the Earth keywords) and six score 0 (Public Affairs & Advocacy, whose keyword router returns None — a documented coverage gap — plus the five remaining Earth entries, whose element Wood can neither match as favorable nor as Day Master). The `i<4` cut still falls inside the +2 block. Every row's `why` now reads the resolved display channel: 'Aligns with your favorable element Fire' for the +2 rows, 'Uses Earth energy in a supportive role to your Wood Day Master' for the Earth rows, and the ten-god fallback for Public Affairs & Advocacy. **Possible** is now positively reached (i>=7 fires), which closes the campaign's W6 coverage gap 1 — previously the tier existed only as a negative. 2026-09-19: Good/Possible tiers moved from Earth-family to Wood-family domains after the 조후-vs-억부 gate broadened to band-extremeness (docs/research/2026-09-validation-climate.md §5) — Manvitha's 희신 changed from the strong-DM convention (Earth) to the climate-resolved one (Wood). Best-Fit tier (Fire, her unchanged 용신) is identical. Re-verified 2026-09-19.",
+  "notes": "Second instance of the KB12:130-152 priority ('The classical priority — from the 용신 logic of the 궁통보감 (窮通寶鑑) lineage as applied in `knowledge/09-interpretation-method.md` Step 3 — is to **align work with what the chart *needs* (용신 / 희신, 喜神), not merely with the Day Master's own element.** Choosing a field that reinforces an already-dominant element pushes the chart further out of balance.') — proves the need-keyed pool selection is systematic, not chart-specific. Manvitha reads Day Master Wood with resolved favorable element Fire (strong-dm-drain; the raw candidate_favorable=Fire agrees) and 희신 Earth. The pool is therefore the Fire family then the Earth family, 6 + 6 = 12 — no Wood domain is served, which is the point: raw candidate_unfavorable='Wood' would subtract 2 from any Wood-family candidate, but under the need-keyed pool none is a candidate at all, so the -2 branch is latent here rather than firing. Six domains score +2 (the five Fire-family entries plus Mediation & Counselling, an Earth-family entry that resolves to Fire because the 'media' substring is tested before the Earth keywords) and six score 0 (Public Affairs & Advocacy, whose keyword router returns None — a documented coverage gap — plus the five remaining Earth entries, whose element Wood can neither match as favorable nor as Day Master). The `i<4` cut still falls inside the +2 block. Every row's `why` now reads the resolved display channel: 'Aligns with your favorable element Fire' for the +2 rows, 'Uses Earth energy in a supportive role to your Wood Day Master' for the Earth rows, and the ten-god fallback for Public Affairs & Advocacy. **Possible** is now positively reached (i>=7 fires), which closes the campaign's W6 coverage gap 1 — previously the tier existed only as a negative. 2026-09-19: Good/Possible tiers moved from Earth-family to Wood-family domains after the 조후-vs-억부 gate broadened to band-extremeness (docs/research/2026-09-validation-climate.md §5) — Manvitha's 희신 changed from the strong-DM convention (Earth) to the climate-resolved one (Wood). Best-Fit tier (Fire, her unchanged 용신) is identical. Re-verified 2026-09-19. | 2026-09-26 (E-3/E-5 single resolution): report_data now reads the resolved 기신 (Metal, derived from Manvitha's climate-resolved 용신 Fire) instead of strength.py's raw DM-relative Wood, so the two Wood-routed domains (Education & Training, Healthcare & Wellness) no longer take a stale 기신 −2 and rise to Good Fit, pushing Public Affairs & Advocacy and People Development & Culture to Possible. Re-pinned.",
   "status": "expect_match"
  }
 ]

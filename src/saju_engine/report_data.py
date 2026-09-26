@@ -537,7 +537,7 @@ def _career_tiers(
     supporting = favorable_element(chart, override).supporting
     if supporting == "—":
         supporting = ""
-    unfavorable = (chart.strength_assessment or {}).get("candidate_unfavorable")
+    unfavorable = favorable_element(chart, override).unfavorable
 
     family_order = [e for e in (favorable, supporting) if e in _CAREER_DOMAINS]
     if not family_order and dm_element in _CAREER_DOMAINS:

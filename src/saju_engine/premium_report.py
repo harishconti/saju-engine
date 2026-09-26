@@ -235,22 +235,11 @@ class _ReportContext:
         self.favorable_note = fe.note
         self.favorable_method = fe.method
         self.supporting = fe.supporting
-        # Bug found 2026-09-25 (external report review, E-3): strength.py's
-        # balanced-DM branch leaves candidate_unfavorable as None, and this
-        # used to store that raw "—" placeholder directly — so every
-        # decade/annual/business-window favorability check in
-        # prose_fillers.py that reads ctx.unfavorable never actually saw a
-        # real element for a balanced/climate-gated chart (e.g. Harish's),
-        # only a placeholder that could never match anything. Derive the
-        # same 기신 the Quick Reference display text already computes (see
-        # _derive_gisin_gusin_hansin) so every consumer, not just the one
-        # display line, sees it.
-        raw_unfavorable = sa.get("candidate_unfavorable")
-        if raw_unfavorable:
-            self.unfavorable = raw_unfavorable
-        else:
-            gisin, _, _ = _derive_gisin_gusin_hansin(fe.element)
-            self.unfavorable = gisin or "—"
+        # 기신/구신/한신 come from the same single resolution as 용신/희신
+        # (yongsin.favorable_element, E-3/E-5 2026-09-26) — no second
+        # derivation here that could drift from compat or the decade overlay.
+        self.fe = fe
+        self.unfavorable = fe.unfavorable or "—"
         self.verdict = sa.get("verdict", "balanced")
         self.strength_label = _strength_label(chart)
 
@@ -507,10 +496,8 @@ def _derive_gisin_gusin_hansin(fav: str) -> Tuple[Optional[str], Optional[str], 
     because `unfavorable` was stuck at "—" and never matched any real
     element name.
     """
-    gisin = L.OVERCOMES.get(fav)  # 기신: the element 용신 overcomes
-    gusin = next((k for k, v in L.OVERCOMES.items() if v == fav), None)  # 구신: restrains 용신
-    hansin = L.GENERATES.get(fav)  # 한신: drains 용신 (용신 generates this)
-    return gisin, gusin, hansin
+    from .yongsin import _derive_from_yongsin
+    return _derive_from_yongsin(fav)
 
 
 def _avoid_watch_text(ctx: _ReportContext) -> str:
@@ -541,10 +528,11 @@ def _avoid_watch_text(ctx: _ReportContext) -> str:
     `_ReportContext.__init__` — so the two branches are told apart by which
     `strength.py` verdict produced the value, not by its emptiness.
     """
-    if ctx.verdict != "balanced":
+    fe = ctx.fe
+    if fe.unfavorable_method == "dm-relative":
         return ctx.unfavorable if ctx.unfavorable and ctx.unfavorable != "—" else "—"
     fav = ctx.favorable
-    gisin, gusin, hansin = _derive_gisin_gusin_hansin(fav)
+    gisin, gusin, hansin = fe.unfavorable, fe.gusin, fe.hansin
     if not (gisin or gusin or hansin):
         return "—"
     parts = []
@@ -585,7 +573,9 @@ def _section_chart_at_a_glance(ctx: _ReportContext) -> List[str]:
     lines += [
         f"- **Day Master:** {ctx.dm_en}",
         f"- **Strength:** {ctx.strength_label} — {PF.strength_reasoning(ctx)}",
-        f"- **Favorable Element:** {ctx.favorable} — {ctx.favorable_note}",
+        f"- **Favorable Element:** {ctx.favorable}"
+        f"{' *(provisional — requires reader confirmation)*' if ctx.fe.requires_reader else ''}"
+        f" — {ctx.favorable_note}",
         f"- **Supporting Element:** {ctx.supporting}",
         f"- **Avoid / Watch:** {_avoid_watch_text(ctx)}",
     ]
