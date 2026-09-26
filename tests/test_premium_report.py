@@ -1087,3 +1087,17 @@ def test_e13_daeun_start_note_gives_calendar_month_and_app_convention():
     line = next(l for l in report.splitlines() if "대운수 (starting age)" in l)
     assert "≈ Dec 1992" in line
     assert "대운수 1" in line and "1, 11, 21" in line
+
+
+def test_e7_star_basis_is_labelled_and_year_anchor_selectable():
+    from saju_engine.engine import compute_chart
+    from saju_engine.premium_report import generate_premium_report
+    kw = dict(name="h", gender="M", year=1992, month=6, day=4, hour=3, minute=10,
+              longitude=79.4408, utc_offset=5.5)
+    day_report = generate_premium_report(compute_chart(**kw), tier="deep")
+    assert "Counted from your day branch **亥**" in day_report
+    year_chart = compute_chart(**kw, star_anchor="year")
+    assert year_chart.stars["earth_bane"] == ["申"]
+    assert year_chart.to_dict()["star_anchor"] == "year"
+    year_report = generate_premium_report(year_chart, tier="deep")
+    assert "Counted from your year branch **申** (traditional Korean basis)" in year_report

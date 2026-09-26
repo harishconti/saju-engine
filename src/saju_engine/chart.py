@@ -166,6 +166,7 @@ class Chart:
     city: Optional[str] = None
     longitude: Optional[float] = None
     utc_offset: float = 9.0            # birth timezone offset in hours (input, not solar-corrected)
+    star_anchor: str = "day"           # 12신살 / 도화·역마·화개 anchor: "day" | "year" (E-7)
 
     # Four pillars
     year: Pillar = None  # type: ignore
@@ -346,6 +347,7 @@ class Chart:
             "city": self.city,
             "longitude": self.longitude,
             "utc_offset": self.utc_offset,
+            "star_anchor": self.star_anchor,
             "convention": self.convention,
             "zi_time_type": self.zi_time_type,
             "solar_correction": self.solar_correction,

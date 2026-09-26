@@ -1224,7 +1224,18 @@ def _section_natal_patterns(ctx: _ReportContext) -> List[str]:
         if positions and key in _STAR_MEANING
     ]
     if active_stars:
-        lines += ["", "### Other Active 신살", ""]
+        # E-7 (2026-09-25 audit): name the counting basis — the 12신살 differ
+        # completely between the year- and day-branch schools.
+        anchor = getattr(ctx.chart, "star_anchor", "day")
+        basis_branch = ctx.chart.year.branch if anchor == "year" else ctx.chart.day.branch
+        basis = (
+            f"*Counted from your {'year' if anchor == 'year' else 'day'} branch **{basis_branch}**"
+            + (" (traditional Korean basis)." if anchor == "year" else
+               " (common modern practice; traditional Korean practice counts from the year branch, "
+               "which can give a different set of stars).")
+            + "*"
+        )
+        lines += ["", "### Other Active 신살", "", basis, ""]
         for key, positions in active_stars:
             label = STAR_LABELS.get(key, key)
             where = ", ".join(positions)
