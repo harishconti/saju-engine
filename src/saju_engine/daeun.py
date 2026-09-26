@@ -58,7 +58,11 @@ def saju_year(d: date) -> int:
     return d.year
 
 
-def saju_age(birth_date_str: str, today: Optional[date] = None) -> Optional[int]:
+def saju_age(
+    birth_date_str: str,
+    today: Optional[date] = None,
+    birth_saju_year: Optional[int] = None,
+) -> Optional[int]:
     """Return the 사주 세수 (Korean counting age, 입춀-based) on `today`.
 
     The 대운 ``start_age`` is computed by the 3-day=1-year rule and is expressed
@@ -71,6 +75,13 @@ def saju_age(birth_date_str: str, today: Optional[date] = None) -> Optional[int]
     reckoned from 입춀: a date on/after 입춀 belongs to that solar year; a date
     before 입춀 belongs to the prior year. Returns None if the birth string or
     입춀 data is unavailable.
+
+    ``birth_saju_year`` (optional) is the birth's 사주 year as already fixed
+    by the chart's year pillar. N-18 (2026-09-26 audit): deriving it from the
+    birth *date* alone counts a birth on 입춀 day but before the term instant
+    in the new year, putting 세수 (and the 대운 selection) off by one; the
+    year pillar was decided at instant level, so callers with a chart should
+    pass it.
     """
     try:
         by, bm, bd = (int(x) for x in birth_date_str.split("-"))
@@ -80,8 +91,9 @@ def saju_age(birth_date_str: str, today: Optional[date] = None) -> Optional[int]
     if isinstance(today, datetime):
         today = today.date()
 
-    birth = date(by, bm, bd)
-    return saju_year(today) - saju_year(birth) + 1
+    if birth_saju_year is None:
+        birth_saju_year = saju_year(date(by, bm, bd))
+    return saju_year(today) - birth_saju_year + 1
 
 
 # ── 60-cycle (육십갑자) math ─────────────────────────────────────────────────
@@ -284,9 +296,15 @@ def starting_age(
     else:
         target = prev  # last 절기 at or before the birth moment
     if target is None:
-        # Fall back: use sajupy's lunar→solar to at least get a sensible
-        # approximation, or just return 0 and let the caller flag it.
-        return 0
+        # N-18 (2026-09-26 audit): this used to `return 0` silently ("let the
+        # caller flag it" — no caller did), giving a plausible-looking but
+        # wrong 대운 start. The packaged term table spans 1899-2101, so any
+        # birth inside the engine's validated 1900-2100 range has both
+        # neighbouring terms; reaching here means the input is out of range.
+        raise ValueError(
+            f"No {'next' if direction == 'forward' else 'previous'} 절기 in the term "
+            f"table for {year:04d}-{month:02d}-{day:02d}; the supported range is 1900–2100."
+        )
     # Birth exactly on a 節氣 date is handled by _term_boundary_datetimes,
     # which returns (birth_dt, birth_dt) and yields 0 days.
     # Use absolute seconds before floor division to avoid rounding toward -inf

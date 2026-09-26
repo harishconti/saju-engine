@@ -222,3 +222,45 @@ def test_module_level_type_hints_resolve():
     import typing
     from saju_engine import daeun as daeun_module
     typing.get_type_hints(daeun_module._parse_calendar)
+
+
+# ── N-18 (2026-09-26 audit): range edges ─────────────────────────────────────
+
+
+def test_solar_rollback_before_1900_raises_clear_error():
+    import pytest
+    from saju_engine import compute_chart
+
+    with pytest.raises(ValueError, match="outside the supported 1900–2100"):
+        compute_chart(name="edge", gender="M", year=1900, month=1, day=1, hour=0,
+                      minute=0, longitude=127.0, utc_offset=9.0)
+
+
+def test_late_2100_forward_daeun_has_a_real_start_age():
+    # Used to return 0 silently: sajupy's table had no term after 2100-12-07.
+    days = starting_age_days(2100, 12, 20, "forward", 12, 0, 9.0)
+    assert days is not None and 16 < days < 17  # to 2101 小寒
+    assert starting_age(2100, 12, 20, "forward", 12, 0, 9.0) == 5
+
+
+def test_starting_age_out_of_table_raises_instead_of_zero():
+    import pytest
+
+    with pytest.raises(ValueError, match="1900–2100"):
+        starting_age(2200, 6, 1, "forward", 12, 0, 9.0)
+
+
+def test_saju_age_birth_on_ipchun_day_before_instant_counts_prior_year():
+    """2024 立春 = 17:27 KST. A birth at 10:00 that day is still 癸卯 (2023
+    사주 year), so on 2024-03-01 the 세수 is 2, not 1."""
+    from saju_engine import compute_chart
+    from saju_engine.daeun import saju_age
+
+    c = compute_chart(name="edge", gender="M", year=2024, month=2, day=4, hour=10,
+                      minute=0, longitude=127.0, utc_offset=9.0,
+                      reference_year=2024, reference_month=3, reference_day=1)
+    assert c.year.combined == "癸卯"
+    assert c.current_age == 2
+    # Date-only fallback still available for callers without a chart.
+    assert saju_age("2024-02-04", date(2024, 3, 1)) == 1
+    assert saju_age("2024-02-04", date(2024, 3, 1), birth_saju_year=2023) == 2

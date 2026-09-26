@@ -588,19 +588,32 @@ def compute_pillars(
     # breaks json.loads). Capture stdout during the sajupy call and re-emit any
     # captured text to stderr so JSON/table output stays clean.
     _captured = io.StringIO()
-    with contextlib.redirect_stdout(_captured):
-        raw = calculate_saju(
-            year=year,
-            month=month,
-            day=day,
-            hour=hour,
-            minute=minute,
-            city=city,
-            longitude=longitude,
-            utc_offset=utc_offset,
-            use_solar_time=use_solar_time,
-            early_zi_time=sajupy_early_zi,
-        )
+    try:
+        with contextlib.redirect_stdout(_captured):
+            raw = calculate_saju(
+                year=year,
+                month=month,
+                day=day,
+                hour=hour,
+                minute=minute,
+                city=city,
+                longitude=longitude,
+                utc_offset=utc_offset,
+                use_solar_time=use_solar_time,
+                early_zi_time=sajupy_early_zi,
+            )
+    except ValueError as exc:
+        # N-18 (2026-09-26 audit): a 1900-01-01 birth just after midnight
+        # west of its zone meridian is solar-corrected back to 1899-12-31,
+        # outside sajupy's day table — which surfaced as sajupy's bare
+        # "Could not find data for the given date: 1899-12-31".
+        if "Could not find data" not in str(exc):
+            raise
+        raise ValueError(
+            f"{year:04d}-{month:02d}-{day:02d} {hour:02d}:{minute:02d}: after the true-solar-time "
+            f"correction the birth moment falls outside the supported 1900–2100 calendar range "
+            f"({exc}). Re-run with use_solar_time=False, or check the date."
+        ) from exc
     _captured_text = _captured.getvalue().strip()
     if _captured_text:
         sys.stderr.write(_captured_text + "\n")

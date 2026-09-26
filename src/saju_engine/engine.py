@@ -182,6 +182,13 @@ def _build_daeun(chart: Chart, n_periods: int = 8, utc_offset: float = 9.0) -> l
     )
 
 
+def _saju_year_of_pillar(year_pillar, gregorian_year: int) -> int:
+    """The 사주 year a year pillar denotes: the civil birth year, or the one
+    before it for a birth ahead of that year's 입춘."""
+    idx = L.JIAZI_CYCLE.index((year_pillar.stem, year_pillar.branch))
+    return gregorian_year if idx == (gregorian_year - 1984) % 60 else gregorian_year - 1
+
+
 def _validate_input(
     year: int,
     month: int,
@@ -298,7 +305,11 @@ def compute_chart(
     chart.day_master_info = L.STEM_INFO[chart.day_master]
 
     # 사주 세수 on the querier's reference date; used by all report layers.
-    chart.current_age = D.saju_age(chart.effective_date, ref_date)
+    # The birth's 사주 year comes from the year pillar, which was decided
+    # against the 입춘 instant, not just its date (N-18, 2026-09-26 audit).
+    chart.current_age = D.saju_age(
+        chart.effective_date, ref_date, birth_saju_year=_saju_year_of_pillar(chart.year, year)
+    )
 
     chart.ten_gods = _derive_ten_gods(chart)
     chart.twelve_stages = _derive_twelve_stages(chart)
