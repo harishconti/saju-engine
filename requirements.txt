@@ -1,6 +1,6 @@
 # Core runtime dependencies for the Saju engine and PDF toolchain.
 # Install with: pip install -r requirements.txt
 
-sajupy>=0.2.0
+sajupy==0.2.0
 reportlab>=4.1.0
 markdown-it-py>=3.0

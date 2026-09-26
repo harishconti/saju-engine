@@ -11,9 +11,21 @@
 - **What it is:** Korean Saju (Four Pillars of Destiny / 사주, 四柱) calculation engine, PDF toolchain, and Claude Code skill.
 - **Author:** Harish Gurumoorthy
 - **License:** MIT
-- **Stack:** Python 3.10+, `sajupy>=0.2.0`, `reportlab>=4.1`, optional `playwright`, optional `fastapi`/`uvicorn`.
+- **Stack:** Python 3.10+, `sajupy==0.2.0` (pinned 2026-09-26 — see N-17 below; was `>=0.2.0`), `reportlab>=4.1`, optional `playwright`, optional `fastapi`/`uvicorn`.
 
-## Current State (last updated 2026-09-14)
+## Current State (last updated 2026-09-26)
+
+- **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"
+  below and `docs/audits/2026-09-26-deep-engine-audit-verification.md` for the live tracker of the
+  second pass. **Suite: 1094 passed / 9 xfailed / 0 failed.** Validation gate:
+  `python3 tools/run_validation.py` → `204 (PASS 200, INTERPRETATION 4, FAIL 0)`. `ruff check
+  --select F src tools tests` is now clean and enforced in CI (was not run in CI before this pass).
+  **Three doctrinal items are decided but not yet implemented** — N-5 (yin DM strength should read
+  season/element relation, not 12운성 stage), N-9 (양인격/건록격 should also recognize a
+  month-branch/월령 case, kept distinct from the existing year/day/hour case), and N-6 (조후 gate
+  needs more research before a chart-extremeness threshold is picked). Do not assume these are done
+  — check the tracker doc before relying on strength/조후/grid output for a yin-DM or hot/cold-month
+  chart.
 
 - Engine is feature-complete for the current product scope, now including a 조후 (climate-balance)
   cross-check on top of the existing 억부 (strength-balance) 용신 heuristic — see the 2026-09-13
@@ -226,6 +238,56 @@ history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P
 
 ## Recent Changes to Remember
 
+- **2026-09-26 (second deep engine audit, 11 of 22 fixed + 3 doctrinal decisions recorded, Suite →
+  1094)** — A separate session ran a fresh from-scratch audit
+  (`docs/audits/2026-09-26-deep-engine-audit.md`, N-1..N-22) against the same baseline the
+  F-1..F-16 pass below started from (so it did not know about those fixes), merged via PR #4.
+  Cross-referenced against F-1..F-16 first (N-1/N-9-partial/N-16-partial were already fixed),
+  then fixed the rest of the audit's recommended order: **N-2** (절기 override compared solar time
+  against civil term instants), **N-4** (current 대운 selected 1.3-2.4y early — 세수 vs.
+  floored-elapsed-year mismatch; first fix attempt used the wrong unit conversion, caught by the
+  Kim-Dae-jung validation fixture, not the unit test), **N-7** (web compat mislabeled a raw 억부
+  pick as reader-confirmed), **N-8** (HTML injection into the Playwright PDF backend via
+  `<script>`/`<iframe>` in a client name — `html: False` + JS-disabled Playwright context),
+  **N-10** (compat's top red flags were alphabetical, not by severity), **N-11** ("this year" prose
+  stated the Gregorian year instead of 사주 year — new `daeun.saju_year()` helper), **N-14** (web
+  app overwrote curated client PDFs + blocked the event loop + leaked exceptions), **N-15**
+  (partial: 子-hour boundary now disclosed), **N-16** (remaining lint debt + `ruff` added to CI),
+  **N-17** (pinned `sajupy==0.2.0` + CSV hash test), **N-20** (duplicate pairwise 삼형), **N-22**
+  (tests were overwriting `sruthi-report.pdf` on every run — `build-pdf.sh` gained `SAJU_OUT_DIR`).
+  **Three items are marked doctrinal** (need a sourced decision, not a unilateral fix, per Ground
+  Rule 1) — investigated each against the actual knowledge files (not the audit's word alone) and
+  found genuine internal conflicts, then asked the user: **N-5** (yin DM strength — knowledge/06's
+  12운성-stage cheat sheet vs. knowledge/09 Step 2's season/element criterion, which disagree for
+  yin stems specifically) → decided: switch to season/element, not yet implemented. **N-6** (조후
+  gate — knowledge/17's own cited source says the CHART must be extreme, not just the birth month,
+  but no source gives a numeric threshold) → user asked for more research before deciding, open.
+  **N-9's 양인격/건록격** month-branch question (자평진전's 월령-based grids vs. the current
+  year/day/hour-only rule, uncitable independently) → decided: support both, labeled differently,
+  not yet implemented. Full tracker with fix-log commit hashes:
+  `docs/audits/2026-09-26-deep-engine-audit-verification.md`. **Still open, not started:** N-3
+  (ephemeris-accurate 절기 table — the largest remaining item), N-12 (hidden-stem qi weights), N-13
+  (IANA timezone/DST redesign), N-15's remainder (절기-proximity disclosure), N-18/N-19 (range-edge
+  crashes, dead `month_season_score`). N-21 (landing-page source) is not fixable from this repo —
+  the source simply is not here. Gates: suite **1094 passed / 9 xfailed / 0 failed**; validation
+  `204 (PASS 200, INTERPRETATION 4, FAIL 0)`; `ruff check --select F src tools tests` clean and now
+  in CI.
+- **2026-09-26 (first deep engine audit, 16 of 16 fixed, F-1..F-16)** — Fixed all 16 findings from
+  a from-scratch audit pasted directly into the session (not a repo file): F-1 (P0, EoT-only
+  midnight day-pillar crossing never recomputed the day pillar), F-2 (천덕귀인 branch-target months
+  could never fire), F-3 (`client_intake_app.py` crashed on import, undefined `TOOLS_DIR` — this is
+  N-1 above), F-4 (already-parenthesized terms got double-annotated), F-5 (day-branch 육합+육파
+  double-dipped), F-6 (compat basic tier leaked deep-tier verdict detail), F-7 (conflicting
+  stem/branch daeun-favorability signal defaulted to "favorable" instead of "neutral" — also fixed
+  the same bug duplicated in `prose_fillers.period_favorable_status`), F-8 (annual/monthly pillar
+  out-of-range fallback ignored 입춀), F-9 (도화스쳐 flag never bucketed into red/yellow), F-10
+  (intake forms defaulted UTC offset to India's 5.5), F-11 (`star_anchor` unvalidated by the direct
+  API), F-12 (added a `hidden_stems` validation-lookup kind + a cross-timezone daeun fixture), F-13
+  (essential tier's stale `$19` price), F-14 (`Chart.to_dict()` duplicate `reference_date` key),
+  F-15 (3 duplicate `HANJA_GLOSSARY` keys), F-16 (F821 `Dict`/`List` in `daeun.py`/`sewoon.py`,
+  scoped to only the two files the finding named — the wider repo-scale ruff UP006/UP045 sweep was
+  judged disproportionate for a P3 item). Suite 1034 → 1068 passed / 9 xfailed. Committed and
+  pushed as `3fc4d1f`.
 - **2026-09-14 (full-engine architecture audit, documentation-only)** — Wrote
   `docs/audits/2026-09-14-full-architecture-audit.md`: a design/robustness review of every
   calculation subsystem (distinct from the validation campaign's classical-source-correctness

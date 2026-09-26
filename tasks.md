@@ -1,14 +1,18 @@
 # Project Tasks
 
 **Date opened:** 2026-06-02  
-**Last updated:** 2026-09-20  
-**Test count:** 952 pytest cases passing / 10 xfailed (`python3 -m pytest`); engine validation gate
-`python3 tools/run_validation.py` → 200 checks (195 PASS / 5 INTERPRETATION / 0 FAIL, not re-run this
-round — no engine-math changes, only prose/report-layer fixes); landing page `npm run build` + 133
-vitest cases green.
+**Last updated:** 2026-09-26  
+**Test count:** 1094 pytest cases passing / 9 xfailed (`python3 -m pytest`); engine validation gate
+`python3 tools/run_validation.py` → 204 checks (200 PASS / 4 INTERPRETATION / 0 FAIL); `ruff check
+--select F src tools tests` clean and now enforced in CI.
 **Open decision:** RM (Kim Nam-joon)'s hour pillar sits 17 seconds from the 午/未 boundary after the
 2026-09-19 equation-of-time fix — his public demo materials still use the old 午 reading pending a
 user decision on how to handle a boundary this close (see the 2026-09-19 change log entry).
+**Open doctrinal decisions (2026-09-26 audit, decided but not yet implemented):** N-5 (yin Day
+Master strength should read season/element relation, not 12운성 stage — see
+`docs/audits/2026-09-26-deep-engine-audit-verification.md`), N-9 (양인격/건록격 should also
+recognize a distinct month-branch/월령 case), and N-6 (조후 gate needs more research before a
+chart-extremeness threshold is picked — open, no decision yet).
 **Status:** The **engine** is complete and validated (four Korean 만세력 textbook cross-validation cases, parametrized lookup-table tests, 30×30 Nayin table on the 5-element fallback, special-formations tests). **As of 2026-09-07 the project pivoted the go-to-market from India / ₹ to English-speaking-global / USD** — see `improvements_issues.md` (master doc) and `docs/market-research-2026-09.md` (sourced research). The 3 client-facing engine defects that blocked a paid launch are **fixed** (G1 reviewer-note leak, G2 per-pillar template grammar, G3 용신 single source of truth), plus ₹→USD across the engine, docs, and landing page. **Open P0/P1 (see `improvements_issues.md` §12):** real testimonials, Merchant-of-Record checkout, self-service-app PII/queue hardening, deployment. **Package layout:** engine and PDF packages live under `src/` with direct-run shims and a ReportLab fallback.
 
 This file is the persistent to-do list for the saju project. Items here were either explicitly deferred or surfaced during research.
@@ -328,6 +332,44 @@ Sourced market research: **`docs/market-research-2026-09.md`**. Design spec:
 
 ---
 
+- **2026-09-26 (second deep engine audit — 11 of 22 fixed, 3 doctrinal decisions recorded, Suite
+  1068 → 1094)** — A separate session's from-scratch audit (`docs/audits/
+  2026-09-26-deep-engine-audit.md`, N-1..N-22, merged via PR #4) against the same pre-fix baseline
+  as the F-1..F-16 pass below, so it didn't know those fixes existed. After cross-referencing (N-1,
+  part of N-9, part of N-16 already fixed), closed N-2 (절기 override compared solar time against
+  civil term instants), N-4 (대운 switched 1.3-2.4y early — 세수/elapsed-year convention mismatch),
+  N-7 (compat mislabeled a raw 억부 pick as reader-confirmed), N-8 (HTML injection in the Playwright
+  PDF backend), N-10 (compat red flags sorted alphabetically not by severity), N-11 ("this year"
+  prose used the Gregorian year not 사주 year), N-14 (web app overwrote curated client PDFs,
+  blocked the event loop, leaked exceptions), N-16 (remaining lint debt + `ruff` now in CI), N-17
+  (pinned `sajupy==0.2.0` + CSV hash test), N-20 (duplicate pairwise 삼형), N-22 (tests overwrote
+  the tracked `sruthi-report.pdf`); partially closed N-9 (문창귀인 갑→해 typo) and N-15 (子-hour
+  boundary now disclosed). Investigated all 3 **[doctrinal]** findings against the actual knowledge
+  files (found genuine internal conflicts, not just the audit's word) and asked the user for a
+  ruling on each: **N-5** (yin DM strength: knowledge/06's 12운성-stage cheat sheet vs. knowledge/09
+  Step 2's season/element criterion) → switch to season/element, not yet implemented; **N-6** (조후
+  gate should key off chart-level extremeness per knowledge/17's own cited source, not just birth
+  month, but no source gives a numeric threshold) → user wants more research first; **N-9's**
+  양인격/건록격 month-branch question (자평진전 월령-based grids, uncitable independently) → support
+  both, labeled differently, not yet implemented. Full tracker:
+  `docs/audits/2026-09-26-deep-engine-audit-verification.md`. Still not started: N-3 (ephemeris
+  절기 table), N-12 (hidden-stem qi weights), N-13 (IANA timezone/DST), N-15's remainder, N-18/N-19
+  (range-edge crashes, dead `month_season_score`); N-21 not fixable from this repo. Suite
+  1068 → **1094 passed / 9 xfailed / 0 failed**; validation `204 (PASS 200, INTERPRETATION 4,
+  FAIL 0)`.
+- **2026-09-26 (first deep engine audit — F-1..F-16, all 16 fixed, Suite 1034 → 1068)** — Fixed
+  every finding from a from-scratch audit pasted directly into the session: F-1 (P0, EoT-only
+  midnight day-pillar crossing never recomputed), F-2 (천덕귀인 branch-target months), F-3
+  (`client_intake_app.py` crashed on import), F-4 (already-parenthesized terms double-annotated),
+  F-5 (day-branch 육합+육파 double-dipped), F-6 (compat basic tier leaked deep-tier detail), F-7
+  (conflicting stem/branch daeun-favorability defaulted to "favorable" not "neutral" — also fixed
+  the duplicate bug in `prose_fillers.period_favorable_status`), F-8 (annual/monthly fallback
+  ignored 입춀), F-9 (도화스쳐 flag never bucketed red/yellow), F-10 (intake forms defaulted to
+  India's UTC offset), F-11 (`star_anchor` unvalidated by the direct API), F-12 (`hidden_stems`
+  validation-lookup kind + cross-timezone daeun fixture), F-13 (essential tier's stale `$19`
+  price), F-14 (`Chart.to_dict()` duplicate key), F-15 (3 duplicate `HANJA_GLOSSARY` keys), F-16
+  (F821 `Dict`/`List`, scoped to the two files named — the wider repo-scale ruff sweep was judged
+  disproportionate for a P3 item). Committed and pushed as `3fc4d1f`.
 - **2026-09-20 (5th QA pass — code-quality/architecture review of the engine, 1 real bug + 2 real
   fragility issues fixed, 1 "High" finding reviewed and NOT actionable — Suite 949 → 952)** — User
   shared an external code-quality review of the GitHub repo (structural + fragment-level, not a
