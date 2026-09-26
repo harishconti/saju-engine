@@ -591,28 +591,30 @@
    "b_day": 11,
    "b_hour": 2,
    "b_minute": 45,
-   "b_longitude": 79.32,
+   "b_longitude": 79.45,
    "b_utc_offset": 5.5,
    "b_gender": "F",
    "b_use_solar_time": true,
    "b_early_zi_time": null,
-   "b_korean_yazi": null
+   "b_korean_yazi": null,
+   "favorable_element_a": "Water",
+   "favorable_element_b": "Earth"
   },
   "source": {
    "type": "published_report",
    "citation": "candidates_horoscope/marriage_compatibility/pawan_sruthi/pawan_sruthi_compatibility.md",
-   "url_or_ref": "55/100 Mixed; per-sub-system head at L24-30 (daystem_combo +0, daybranch +2, nayin -5, yongshin +12, ilju_pair +1, combined_elements +11, tengod_cross +0) (external cross-check 2026-09-14: Stale ya-ja-si chart: the published pawan_sruthi report predates the 子時 fix, so the engine's current value is ground truth and the published figure is the outdated one (research doc §3) — https://saju-haru.com/blog/gunghap-misread)",
+   "url_or_ref": "50/100 Mixed — regenerated 2026-09-26 from the current engine (Pawan 庚子 hour under 야자시, Sruthi at 79.45°E to match her natal report, reader overrides Water/Earth as in both natal reports)",
    "external": {
     "citation": "Stale ya-ja-si chart: the published pawan_sruthi report predates the 子時 fix, so the engine's current value is ground truth and the published figure is the outdated one (research doc §3)",
     "url": "https://saju-haru.com/blog/gunghap-misread"
    }
   },
   "expected": {
-   "score": 55,
+   "score": 50,
    "band": "Mixed"
   },
-  "notes": "DOCUMENTED DIVERGENCE -- the published report is STALE, and correctly so; the engine value is the corrected one. Pawan's natal chart predates the 야자시 (夜子時) convention fix: the report prints his hour pillar as 戊子, the engine now computes 庚子 (a 23:45 birth in the korean convention). Sruthi's pillars are byte-identical between report and engine (癸酉/甲子/丙寅/己丑), so the whole +5 delta is Pawan's hour pillar. Measured live: 60/100 Mixed, with deltas exactly as B3(b) records -- ilju_pair +1 -> +3, combined_elements +11 -> +9, tengod_cross +0 -> +3, net +5. The band is unchanged (Mixed either way), so the product-visible verdict is stable; the sub-system detail is not. Pawan's report and PDF need regeneration at campaign close. See knowledge/11-gunghap.md and Plan 6 B3(b).",
-  "status": "documented_interpretation"
+  "notes": "RESOLVED 2026-09-26: the published pair was regenerated after the 2026-09-25 engine audit fixes, so it is no longer stale. Inputs now match the natal reports (Sruthi 79.45°E, not 79.32; reader-argued 용신 Water for Pawan and Earth for Sruthi). History: the pre-regeneration report printed Pawan's hour as 戊子 (pre-야자시 fix) and scored 55; the engine measured 60 without overrides; the E-3/E-5 single 기신 resolution then added 기신 penalties (일주 −2, 십신 교차 −2). The id keeps its '-stale' suffix only for traceability.",
+  "status": "expect_match"
  },
  {
   "id": "compat-manvitha-harish-reversed",

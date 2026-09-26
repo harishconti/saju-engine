@@ -262,3 +262,14 @@ def test_balanced_temperate_report_marks_yongsin_provisional():
     report = generate_premium_report(_c(1980, 3), tier="deep")
     line = next(l for l in report.splitlines() if l.startswith("- **Favorable Element:**"))
     assert "provisional — requires reader confirmation" in line
+
+
+def test_reader_override_confirming_eokbu_keeps_dm_relative_gisin():
+    """Gurumoorthy: strong 己 DM, reader-confirmed Metal (= the raw 억부 pick),
+    so the 억부 method's own 기신 (Earth, the over-strong self) stands."""
+    from saju_engine.engine import compute_chart
+    from saju_engine.yongsin import favorable_element
+    c = compute_chart(name="g", gender="M", year=1964, month=7, day=19, hour=8, minute=30,
+                      longitude=79.42, utc_offset=5.5)
+    fe = favorable_element(c, override="Metal")
+    assert (fe.unfavorable, fe.unfavorable_method) == ("Earth", "dm-relative")

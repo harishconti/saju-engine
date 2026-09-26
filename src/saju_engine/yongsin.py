@@ -162,8 +162,21 @@ def _with_unfavorable(fe: "FavorableElement", sa: dict) -> "FavorableElement":
     gisin, gusin, hansin = _derive_from_yongsin(fe.element)
     method = "derived-from-yongsin"
     raw = sa.get("candidate_unfavorable")
+    # A reader override that simply confirms the 억부 pick on a strong/weak
+    # chart keeps the 억부 method's own DM-relative 기신 (e.g. Gurumoorthy:
+    # strong 己, reader-confirmed Metal = the raw pick → 기신 Earth).
+    confirms_eokbu = (
+        fe.method == "reader-confirmed"
+        and sa.get("verdict") in ("strong", "extreme", "weak", "extreme_weak")
+        and fe.element == sa.get("candidate_favorable")
+    )
+    if confirms_eokbu and sa.get("candidate_supporting"):
+        # Same pick as 억부, so the 억부 희신 convention applies too: the
+        # strict "generates 용신" 희신 is the 기신 itself on a strong/weak
+        # chart (knowledge/03-five-elements.md §Two conventions for 희신).
+        fe = replace(fe, supporting=sa["candidate_supporting"])
     if (
-        fe.method in ("strong-dm-drain", "weak-dm-support")
+        (fe.method in ("strong-dm-drain", "weak-dm-support") or confirms_eokbu)
         and raw
         and raw not in (fe.element, fe.supporting)
     ):
