@@ -67,6 +67,18 @@ def test_full_three_punishment_not_duplicated_as_pairwise():
     assert pairwise == []
 
 
+def test_repeated_branch_does_not_duplicate_pairwise_punishment():
+    """N-20 (2026-09-26 audit): a repeated branch matches the same 삼형 frame
+    via more than one pillar pair — 丑寅丑未 (year/day both 丑, hour 未) hits
+    the 丑戌未 frame through both the (year, hour) and (day, hour) pairs — so
+    the identical 丑未 pairwise entry must appear only once, not twice."""
+    chart = _make_chart(["丑", "寅", "丑", "未"])
+    _derive_branch_relationships(chart)
+    pairwise = [t for t in chart.three_punishments if t[2] == "—"]
+    matches = [t for t in pairwise if {t[0], t[1]} == {"丑", "未"}]
+    assert len(matches) == 1, chart.three_punishments
+
+
 def test_zimao_punishment_still_detected():
     """The two-member 子卯 punishment is still captured."""
     chart = _make_chart(["子", "卯", "寅", "亥"])

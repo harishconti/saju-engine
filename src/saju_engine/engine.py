@@ -127,6 +127,11 @@ def _derive_branch_relationships(chart: Chart):
         if c != "—" and {a, b, c}.issubset(branches):
             chart.three_punishments.append((a, b, c, label))
     # Pairwise 3-punishments: two-of-three in a 삼형 frame when the third is absent.
+    # N-20 (2026-09-26 audit): a repeated branch (e.g. 丑寅丑未) matched the
+    # same 삼형 frame via more than one pillar pair, appending the identical
+    # (b1, b2, label) entry once per matching pair — deduplicate by branch
+    # pair, same as the 반합 loop above (`seen_half`).
+    seen_pairwise_punishment: set = set()
     for i, p1 in enumerate(chart.pillars):
         for p2 in chart.pillars[i + 1:]:
             b1, b2 = p1.branch, p2.branch
@@ -137,7 +142,10 @@ def _derive_branch_relationships(chart: Chart):
                     continue
                 frame = {a, b, c}
                 if b1 in frame and b2 in frame and not frame.issubset(branches):
-                    chart.three_punishments.append((b1, b2, "—", f"삼형 {b1}{b2} ({label})"))
+                    key = (frozenset((b1, b2)), label)
+                    if key not in seen_pairwise_punishment:
+                        seen_pairwise_punishment.add(key)
+                        chart.three_punishments.append((b1, b2, "—", f"삼형 {b1}{b2} ({label})"))
     # 子卯 is a two-member punishment; detect it separately.
     if "子" in branches and "卯" in branches:
         chart.three_punishments.append(("子", "卯", "—", "Water-Wood punishment (子卯刑)"))

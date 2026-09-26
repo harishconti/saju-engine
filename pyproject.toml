@@ -14,7 +14,7 @@ authors = [
 ]
 keywords = ["saju", "bazi", "four-pillars", "korean", "myeongri", "astrology"]
 dependencies = [
-    "sajupy>=0.2.0",
+    "sajupy==0.2.0",
     "reportlab>=4.1",
     "markdown-it-py>=3.0",
 ]
