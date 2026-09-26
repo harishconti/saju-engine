@@ -2,17 +2,16 @@
 
 **Date opened:** 2026-06-02  
 **Last updated:** 2026-09-26  
-**Test count:** 1094 pytest cases passing / 9 xfailed (`python3 -m pytest`); engine validation gate
+**Test count:** 1132 pytest cases passing / 9 xfailed (`python3 -m pytest`); engine validation gate
 `python3 tools/run_validation.py` → 204 checks (200 PASS / 4 INTERPRETATION / 0 FAIL); `ruff check
 --select F src tools tests` clean and now enforced in CI.
 **Open decision:** RM (Kim Nam-joon)'s hour pillar sits 17 seconds from the 午/未 boundary after the
 2026-09-19 equation-of-time fix — his public demo materials still use the old 午 reading pending a
 user decision on how to handle a boundary this close (see the 2026-09-19 change log entry).
-**Open doctrinal decisions (2026-09-26 audit, decided but not yet implemented):** N-5 (yin Day
-Master strength should read season/element relation, not 12운성 stage — see
-`docs/audits/2026-09-26-deep-engine-audit-verification.md`), N-9 (양인격/건록격 should also
-recognize a distinct month-branch/월령 case), and N-6 (조후 gate needs more research before a
-chart-extremeness threshold is picked — open, no decision yet).
+**Open decisions (2026-09-26 audit):** N-6 (조후 gate — research done in
+`docs/research/2026-09-26-climate-gate-n6.md`, option A recommended, awaiting choice) and N-12
+(hidden-stem qi weights — normalise vs 월률분야). N-5 and N-9 are implemented. See
+`docs/audits/2026-09-26-deep-engine-audit-verification.md`.
 **Status:** The **engine** is complete and validated (four Korean 만세력 textbook cross-validation cases, parametrized lookup-table tests, 30×30 Nayin table on the 5-element fallback, special-formations tests). **As of 2026-09-07 the project pivoted the go-to-market from India / ₹ to English-speaking-global / USD** — see `improvements_issues.md` (master doc) and `docs/market-research-2026-09.md` (sourced research). The 3 client-facing engine defects that blocked a paid launch are **fixed** (G1 reviewer-note leak, G2 per-pillar template grammar, G3 용신 single source of truth), plus ₹→USD across the engine, docs, and landing page. **Open P0/P1 (see `improvements_issues.md` §12):** real testimonials, Merchant-of-Record checkout, self-service-app PII/queue hardening, deployment. **Package layout:** engine and PDF packages live under `src/` with direct-run shims and a ReportLab fallback.
 
 This file is the persistent to-do list for the saju project. Items here were either explicitly deferred or surfaced during research.

@@ -29,28 +29,28 @@ NOT STARTED = not yet investigated or fixed this pass.
 |---|---|---|---|---|
 | N-1 | P0 | **FIXED** *(prior session)* | `3fc4d1f` (F-3) | `client_intake_app.py` crashed on import — undefined `TOOLS_DIR`. |
 | N-2 | P1 | **FIXED** | `d57d1ee` | 절기 override compared solar-corrected birth time against civil-clock term instants — corrupted year/month pillars near a boundary. |
-| N-3 | P1 | NOT STARTED | — | sajupy's 절기 table is imprecise by up to 114 min; needs an ephemeris-sourced replacement table shipped as package data. |
+| N-3 | P1 | **FIXED** | `b5b4e5d` | sajupy's 절기 table is imprecise by up to 114 min; needs an ephemeris-sourced replacement table shipped as package data. |
 | N-4 | P1 | **FIXED** | `abfc6c1` | Current 대운 selected 1.3–2.4 years early (세수 vs. floored-elapsed-year convention mismatch). |
-| N-5 | P1 | NEEDS DECISION → **recorded, not yet implemented** | — | Yin Day Master strength inversion. Decision: switch to season/element relation (knowledge/09 Step 2), away from 12운성-stage reading (knowledge/06). See "Doctrinal decisions" below. |
-| N-6 | P1 | NEEDS DECISION → **research requested, not yet implemented** | — | 조후 overrides 용신 from month branch alone, not chart-level extremeness. User asked for more research before deciding a threshold. |
+| N-5 | P1 | **FIXED** (decision implemented) | `5fc7d40` | Yin Day Master strength inversion. 월령 input is now the month branch's element relation (knowledge/09 Step 2), applied to all stems; knowledge/06/09 updated first. |
+| N-6 | P1 | NEEDS DECISION → **research done, awaiting choice** (`docs/research/2026-09-26-climate-gate-n6.md`) | — | 조후 overrides 용신 from month branch alone, not chart-level extremeness. User asked for more research before deciding a threshold. |
 | N-7 | P1 | **FIXED** | `23f92d2` | Web compat path forwarded a chart's raw pre-climate 억부 pick as a "reader-confirmed" override. |
 | N-8 | P1 | **FIXED** | `23f92d2` | HTML/Playwright backend rendered markdown with `html: True` — a client name containing `<script>`/`<iframe>` reached Chromium unescaped. |
-| N-9 | P2 | **PARTIAL** | `10c3706` | 문창귀인 갑→해 typo fixed (→사); 천덕귀인 doc/table contradiction fixed (engine already fixed prior session, F-2). 양인격/건록격 month-branch question: decision recorded (support both, labeled differently), not yet implemented. |
+| N-9 | P2 | **FIXED** | `10c3706`, `60d0f79` | 문창귀인 갑→해 typo fixed (→사); 천덕귀인 doc/table contradiction fixed (engine already fixed prior session, F-2). 양인격/건록격: month branch = classical grid, year/day/hour = distinct non-month pattern (decision implemented). |
 | N-10 | P2 | **FIXED** | `d95c10b` | Compat cover's "top 3 red flags" were picked alphabetically, not by severity. |
 | N-11 | P2 | **FIXED** | `6a106a2` | "This year" prose stated the Gregorian year instead of the 사주 year (사주 year is prior year before 입춀). |
-| N-12 | P2 | NOT STARTED | — | Hidden-stem qi weights give unequal branch totals (왕지 underweighted by 10–40%). |
-| N-13 | P2 | NOT STARTED | — | No DST/historical-offset handling; intake default offset still 5.5 in one path per the audit (superseded by F-10 for the two HTML forms — verify `client_intake_form.html`/CLI still need it). |
+| N-12 | P2 | NEEDS DECISION | — | Hidden-stem qi weights give unequal branch totals (왕지 underweighted by 10–40%). |
+| N-13 | P2 | **FIXED** | `14d3b9b` | No DST/historical-offset handling; intake default offset still 5.5 in one path per the audit (superseded by F-10 for the two HTML forms — verify `client_intake_form.html`/CLI still need it). |
 | N-14 | P2 | **FIXED** | `b63fbfd` | Web app overwrote curated client deliverables, blocked the event loop, and echoed raw exception text to clients. |
-| N-15 | P2 | **PARTIAL** | `8693ca3` | 子-hour boundary now disclosed (compound-edge flag, no false alternate pillar claimed). 절기-proximity disclosure not yet added. |
+| N-15 | P2 | **FIXED** | `8693ca3`, `b5b4e5d` | 子-hour boundary disclosed (compound-edge flag); 절기-proximity (±30 min) disclosure with both-side pillars added. |
 | N-16 | P3 | **FIXED** | `33fef13` | Remaining F821/F601/F401/F541/F811/F841 lint debt; `ruff check --select F` added to CI. |
 | N-17 | P3 | **FIXED** | `c96be17` | `sajupy` was unpinned (`>=0.2.0`); pinned to `==0.2.0` + a test pinning the CSV's own SHA-256. |
-| N-18 | P3 | NOT STARTED | — | Range-edge crashes (1900 rollback, silent start-age-0 post-2100, 입춀-day-vs-instant comparison). |
-| N-19 | P3 | NOT STARTED | — | `month_season_score` computed but unused in the verdict; balanced-fallback ties always resolve to Wood. |
+| N-18 | P3 | **FIXED** | `580e9e8` | Range-edge crashes (1900 rollback, silent start-age-0 post-2100, 입춀-day-vs-instant comparison). |
+| N-19 | P3 | **FIXED** | `5fc7d40` | `month_season_score` computed but unused in the verdict; balanced-fallback ties always resolve to Wood. |
 | N-20 | P3 | **FIXED** | `c96be17` | Duplicate pairwise 삼형 entries when a branch repeats across pillars. |
 | N-21 | P3 | NOT ACTIONABLE HERE | — | `apps/landing-page`'s `src/`/`src/proxy.ts` is not in this repo at all — nothing to fix from inside `saju-engine`. |
 | N-22 | P3 | **FIXED** | `33fef13` | Test suite overwrote the tracked client PDF `sruthi-report.pdf` (and two Playwright tests with the same pattern) on every run. |
 
-**Tally:** 11 FIXED, 3 PARTIAL, 2 NEEDS DECISION (recorded), 5 NOT STARTED, 1 not actionable in this repo.
+**Tally (updated 2026-09-26, second session):** 19 FIXED, 2 NEEDS DECISION (N-6 research done; N-12 not yet decided), 1 not actionable in this repo.
 
 ---
 
@@ -109,6 +109,28 @@ NOT STARTED = not yet investigated or fixed this pass.
   corrected the prose to describe the table's actual mixed stem/branch targets (the engine itself
   was already fixed for this in the prior pass, F-2).
 
+- **`b5b4e5d` — N-3 + N-15 (절기 half).** Package-data 절기 table `src/saju_engine/data/solar_terms.csv`
+  (12 month-opener terms 1899–2101 to the second, JPL DE440s via Skyfield,
+  `tools/generate_solar_terms.py`), replacing sajupy's CSV as the term source. Cross-checked against
+  the audit's PyEphem script: median 1 s, ±1 min to 2060, ±3 min by 2100. New `chart.term_boundary` +
+  "Solar-term boundary note" for births within 30 min of a term. Also removed the dead `eff_date` left
+  by N-2, which had put `ruff --select F` (and so CI) red.
+- **`580e9e8` — N-18.** Clear error for the 1900-01-01 solar rollback; `starting_age()` raises
+  instead of returning 0; `saju_age()` takes the birth's 사주 year from the year pillar (instant-level
+  입춘), not the date.
+- **`5fc7d40` — N-5 + N-19.** `strength.month_relation()` (peak 2.0 / own 1.5 / resource 1.0 /
+  output·wealth·authority 0.0, same scale as before). Applied to **all** stems, not just yin: the
+  "they agree for yang stems" note below turned out to be not quite true (庚 장생 in 巳 and 戊 장생 in
+  寅 sit in months whose element controls the DM). Seven synthetic climate fixtures re-probed to keep
+  their matrix cells; mahesh-published strength re-pinned. Dead `month_season_score` removed; balanced
+  ties surfaced as `balanced_tie`.
+- **`60d0f79` — N-9 remainder.** Month-branch blade/건록 = 양인격/건록격 (the month-비겁 regular grid is
+  renamed); year/day/hour = `yangin_non_month` (day = 일인) / `jianlu_non_month` (hour = 귀록).
+  knowledge/07 §B.3–4 rewritten first.
+- **`14d3b9b` — N-13.** `saju_engine.timezones.resolve_utc_offset()` (IANA, DST, historical Korean
+  offsets, ambiguous/skipped-hour notes); CLI `--timezone`; web app has no 5.5 default and 400s on an
+  unknown zone; forms take .25 offsets; the JSON intake form now collects timezone/offset.
+
 ---
 
 ## Doctrinal decisions (Ground Rule 1)
@@ -140,10 +162,10 @@ away from reading strength off the 12운성 stage table for yin stems. knowledge
 stays as-is for its own descriptive purpose (12운성 narrative, 대운/세운 stage readings) — only the
 strength *scoring* input changes.
 
-**Not yet implemented.** This requires: rewriting `strength.py`'s `month_stage_score` term to use
+**Implemented in `5fc7d40`.** (Was: requires rewriting `strength.py`'s `month_stage_score` term to use
 an element-relation lookup instead of `twelve_stage()`, re-baselining the strength/climate
 validation fixtures, and reviewing existing client reports whose strength verdict may change
-(same review step the audit recommends for N-4/N-6/N-12).
+(same review step the audit recommends for N-4/N-6/N-12).)
 
 ### N-6 — 조후 climate-override gate
 
@@ -164,6 +186,12 @@ as-is. Not yet done — this is open, pending that research (candidate next step
 secondary 궁통보감/적천수 commentary source that gives a concrete chart-extremeness criterion,
 rather than deriving one from scratch).
 
+**Research done (2026-09-26, second session):** `docs/research/2026-09-26-climate-gate-n6.md`. 적천수
+「寒暖」 ("不可過也") and 임철초's commentary (don't judge cold/warm by position alone) support a
+chart-level test; no source gives a numeric threshold. Recommended option A: when the remedy element is
+already the chart's most abundant element, fall back to 억부 with `requires_reader=True` (ordinal, no
+invented number; ~8% of sampled charts). Awaiting the user's choice.
+
 ### N-9 — 양인격/건록격 month-branch position
 
 **Finding:** knowledge/07 currently defines 양인격/건록격 as firing when the blade/건록 branch
@@ -179,36 +207,30 @@ well known for a 월령-centric 격국 theory) but unconfirmed here.
 the classical 양인격/건록격 (자평진전 convention), and relabel the existing year/day/hour case as a
 related-but-distinct pattern rather than dropping it.
 
-**Not yet implemented.** Requires: adding the month-branch check to `patterns.py`'s grid-detection
+**Implemented in `60d0f79`.** (Was: requires adding the month-branch check to `patterns.py`'s grid-detection
 logic, renaming/re-scoping the existing year/day/hour check to a distinct pattern name, rewriting
 knowledge/07 §3–4 to document both patterns with their own citations, and re-baselining any
-pattern-dependent validation fixtures.
+pattern-dependent validation fixtures.)
 
 ---
 
-## Not yet started (no investigation this pass beyond the summary table)
+## Still open
 
-- **N-3** (ephemeris-accurate 절기 table) — the single largest remaining item; needs an accurate
-  term table shipped as package data (DE440/Skyfield or KASI), replacing sajupy's CSV for term
-  lookups while keeping sajupy for day pillar and lunar data. `docs/audits/scripts/
-  check_solar_terms.py` (added alongside the audit) is the starting point for verification.
-- **N-12** (hidden-stem qi weights) — touches the element-balance percentages, strength verdict,
-  `dominant_element`, 종격 thresholds, and compat's element strength; would need a validation
-  fixture re-baseline same as N-5/N-6.
-- **N-13** (timezone/DST) — the intake-default-India-offset half is already fixed (F-10, prior
-  session); the IANA-timezone-as-primary-input redesign and DST-era historical-offset handling are
-  not.
-- **N-15** (remainder) — a 절기-proximity boundary disclosure, parallel to the 子-hour one already
-  added, using the term-candidate list `_independent_year_month_pillar` already builds.
-- **N-18** (range-edge crashes), **N-19** (dead `month_season_score`, Wood tie-break) — smaller P3
-  items, not yet investigated.
+- **N-6** — research done (`docs/research/2026-09-26-climate-gate-n6.md`); needs the user to pick an
+  option (recommended: A, the ordinal "remedy already dominant → fall back to 억부" rule).
+- **N-12** (hidden-stem qi weights) — needs a decision between normalising each branch's total qi to
+  1.0 and 월률분야 day-share weights. It touches element-balance percentages, strength, `dominant_element`,
+  종격 thresholds and compat, so it needs a fixture re-baseline like N-5.
 - **N-21** — not fixable from inside this repo; `apps/landing-page`'s own source tree (and
   `DEPLOY.md`'s described `src/proxy.ts`) is simply not present here to audit or fix.
 
 ## Client-report exposure
 
 Per the audit's own note: N-4 (already fixed) can change an existing report's "Current Major Luck"
-headline. N-5, N-6, N-12 (not yet fixed) can also change existing deliverables once implemented.
+headline. N-5 is now implemented: across the eight client charts in `tools/regen/`, only **Mahesh's**
+strength verdict changes (balanced → strong; 丑 is a resource month for 庚), and no headline 용신
+changes. N-3/N-9 change no client pillars or reported grid names. N-6 and N-12 would change
+deliverables once implemented.
 No candidate reports have been regenerated as part of this tracker — `tools/regen_client_reports.sh`
 should be run and the Quick Reference blocks diffed before re-sending anything, once the doctrinal
 items above are actually implemented.

@@ -15,6 +15,13 @@
 
 ## Current State (last updated 2026-09-26)
 
+- **Update (2026-09-26, later session): 19 of 22 N-findings now fixed** — N-3 (packaged ephemeris
+  절기 table `src/saju_engine/data/solar_terms.csv`, replacing sajupy's CSV for term instants), N-5
+  (월령 by element relation, `strength.month_relation()`), N-9 (month-branch 양인격/건록격 + distinct
+  non-month patterns), N-13 (`--timezone`, `saju_engine.timezones`), N-15 (절기 knife-edge note),
+  N-18, N-19. Still open: N-6 (research done, awaiting choice), N-12 (decision needed), N-21 (not in
+  repo). Suite **1132 passed / 9 xfailed**; validation `204 (PASS 200, INTERPRETATION 4, FAIL 0)`.
+  The paragraph below is the earlier state.
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"
   below and `docs/audits/2026-09-26-deep-engine-audit-verification.md` for the live tracker of the
   second pass. **Suite: 1094 passed / 9 xfailed / 0 failed.** Validation gate:
