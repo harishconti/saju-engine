@@ -966,13 +966,130 @@ def attachment_patterns(ctx) -> str:
     )
 
 
+def _marriage_year_signals(h, day_branch: str, gender: str) -> Tuple[int, List[str], List[str]]:
+    """Score one 세운 for commitment timing per knowledge/08-luck-pillars.md
+    Part 5b: spouse star in the annual stem, 육합/삼합 into the spouse palace,
+    minus 충/형/파 on the palace and the gendered obstruction (상관 for F,
+    겁재 for M). Returns (score, positives, negatives)."""
+    from . import lookup as L
+    spouse_class = "Wealth" if gender == "M" else "Authority"
+    obstruction = "겁재" if gender == "M" else "상관"
+    pos: List[str] = []
+    neg: List[str] = []
+    score = 0
+    if _TENGOD_FIVE_CLASS.get(h.stem_tengod) == spouse_class:
+        score += 2
+        pos.append(f"{h.stem_tengod} spouse-star year")
+    rels = {rel for _a, nb, rel in (h.activated_branches or []) if nb == day_branch}
+    if "combine" in rels:
+        score += 2
+        pos.append(f"{h.branch}{day_branch} 육합 into the spouse palace")
+    for hc in getattr(h, "harmony_completions", []) or []:
+        if hc.kind == "삼합" and day_branch in hc.matched_natal:
+            score += 1
+            pos.append(f"{''.join(hc.triad)} 삼합 through the spouse palace")
+            break
+    bad = rels & {"clash", "punish", "break", "self_punish"}
+    if bad:
+        score -= 2
+        neg.append(f"{h.branch}{day_branch} " + "/".join(
+            {"clash": "충", "punish": "형", "break": "파", "self_punish": "자형"}[r] for r in sorted(bad)
+        ) + " on the spouse palace")
+    if h.stem_tengod == obstruction:
+        score -= 1
+        neg.append(f"{obstruction} year")
+    return score, pos, neg
+
+
 def marriage_timing_windows(ctx) -> str:
-    """Deep-only: 2–3 strongest commitment years in current + next 대운."""
+    """Deep-only: commitment windows from the spouse star and spouse palace.
+
+    E-8 (2026-09-25 audit): this used to key marriage timing to 용신-element
+    decades/years only. It now follows knowledge/08-luck-pillars.md Part 5b:
+    the gendered spouse star (재성 for men, 관성 for women) in the 대운 opens
+    a window and in the 세운 selects the year; a 육합/삼합 into the day
+    branch (spouse palace) strengthens it; 충/형/파 on the palace and the
+    classical obstruction (상관 / 겁재) weaken it. Without a recorded gender
+    the spouse star is undefined, so it falls back to the 용신-decade reading.
+    """
     chart = _ctx_get(ctx, "chart")
     current = _ctx_get(ctx, "current_daeun")
     daeun = chart.daeun
     if not daeun:
         return "Major-luck data not available; defer to the annual timing tables."
+    gender = getattr(chart, "gender", None)
+    if gender not in ("M", "F"):
+        return _marriage_timing_fallback(ctx)
+
+    from . import sewoon as SE
+    from datetime import datetime
+    ref = chart.reference_date_obj() if hasattr(chart, "reference_date_obj") else None
+    start_year = (ref or datetime.now().date()).year
+    day_branch = chart.day.branch
+    spouse_class = "Wealth" if gender == "M" else "Authority"
+    star_label = "재성 (wife star)" if gender == "M" else "관성 (husband star)"
+
+    # Decade windows: current + next 대운 whose stem carries the spouse star
+    # or whose branch binds the spouse palace.
+    try:
+        cur_idx = next(i for i, p in enumerate(daeun) if current and p.combined == current.combined)
+    except StopIteration:
+        cur_idx = 0
+    decade_notes = []
+    for p in daeun[cur_idx:cur_idx + 2]:
+        why = []
+        if _TENGOD_FIVE_CLASS.get(p.stem_tengod) == spouse_class:
+            why.append(f"{p.stem_tengod} spouse-star stem")
+        if any(nb == day_branch and rel == "combine" for _a, nb, rel in (p.activated_branches or [])):
+            why.append(f"{p.branch}{day_branch} 육합 into the spouse palace")
+        if why:
+            decade_notes.append(f"**{p.combined}** (ages {p.start_age}-{p.end_age}: {', '.join(why)})")
+
+    hits = SE.build_sewoon_range(
+        chart.day_master, chart.branches, start_year, start_year + 9, natal_stems=chart.stems
+    )
+    scored = []
+    cautions = []
+    for h in hits:
+        score, pos, neg = _marriage_year_signals(h, day_branch, gender)
+        if score >= 2 and pos:
+            detail = ", ".join(pos) + (f"; offset by {', '.join(neg)}" if neg else "")
+            scored.append((score, h.year, f"**{h.year} {h.combined}** ({detail})"))
+        elif neg and not pos:
+            cautions.append(f"{h.year} ({', '.join(neg)})")
+    scored.sort(key=lambda t: (-t[0], t[1]))
+    top = [t[2] for t in scored[:3]]
+
+    parts = [
+        f"Commitment timing is read from your **{star_label}** and your spouse palace **{day_branch}** "
+        f"(the day branch) *(see knowledge/08-luck-pillars.md Part 5b)*."
+    ]
+    if decade_notes:
+        parts.append("Major-luck windows that open the theme: " + "; ".join(decade_notes) + ".")
+    else:
+        parts.append(
+            "Neither the current nor the next major-luck period carries the spouse star or binds the "
+            "spouse palace, so the annual years below carry more of the weight."
+        )
+    if top:
+        parts.append("The years where the most signals converge: " + "; ".join(top) + ".")
+    else:
+        parts.append("No year in the next decade combines the spouse star with a spouse-palace bond.")
+    if cautions:
+        parts.append(
+            "Years better suited to deepening privately than to formalising: " + "; ".join(cautions[:3]) + "."
+        )
+    parts.append(
+        "These are tendencies for when the theme is most active — not predictions of an event."
+    )
+    return " ".join(parts)
+
+
+def _marriage_timing_fallback(ctx) -> str:
+    """Pre-E-8 reading, kept for charts with no recorded gender: 용신 decades."""
+    chart = _ctx_get(ctx, "chart")
+    current = _ctx_get(ctx, "current_daeun")
+    daeun = chart.daeun
     try:
         cur_idx = next(i for i, p in enumerate(daeun) if current and p.combined == current.combined)
     except StopIteration:
@@ -996,7 +1113,8 @@ def marriage_timing_windows(ctx) -> str:
     return (
         f"The strongest windows for commitment decisions in the current and next major-luck periods: {body}. "
         f"Within those windows, the annual pillars whose stem element matches the favorable element are "
-        f"the cleanest moments to formalize; clash years are better for deepening privately."
+        f"the cleanest moments to formalize; clash years are better for deepening privately. (No gender "
+        f"is recorded for this chart, so the classical spouse-star reading cannot be applied.)"
     )
 
 

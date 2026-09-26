@@ -782,3 +782,27 @@ def test_business_and_health_seasons_agree(harish_ctx):
 def test_direct_officer_fit_does_not_claim_a_stem():
     import inspect
     assert "Direct Officer stem" not in inspect.getsource(PF)
+
+
+# ── E-8 residual (2026-09-26) — marriage timing from spouse star/palace ──
+
+
+def test_marriage_timing_uses_spouse_star_and_palace_for_harish(harish_ctx):
+    text = PF.marriage_timing_windows(harish_ctx)
+    assert "재성 (wife star)" in text and "spouse palace **亥**" in text
+    # The audit's worked example: 2034 甲寅 = 정재 year + 寅亥合 into the palace.
+    assert "**2034 甲寅** (정재 spouse-star year, 寅亥 육합 into the spouse palace" in text
+    assert "2030 (겁재 year)" in text
+
+
+def test_marriage_timing_female_uses_officer_star(ctx):
+    text = PF.marriage_timing_windows(ctx)
+    assert "관성 (husband star)" in text
+    assert "spouse-star stem" in text
+
+
+def test_marriage_timing_without_gender_falls_back():
+    chart = compute_chart(**{**SAMPLE_BIRTH, "gender": None})
+    c = _ReportContext(chart, tier="deep", generation_date="2026-09-26")
+    assert "No gender is recorded" in PF.marriage_timing_windows(c) or \
+        "Major-luck data not available" in PF.marriage_timing_windows(c)

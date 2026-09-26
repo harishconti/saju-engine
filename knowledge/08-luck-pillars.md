@@ -130,6 +130,28 @@ A rule of thumb: **a "trigger" is most powerful when all three layers point in t
 
 Conversely, if a natal pattern is only weakly present and the time-based luck is "out of phase" with it, the pattern may stay dormant or be neutralized.
 
+## Part 5b: Relationship & Marriage Timing (결혼 시기)
+
+*(Added 2026-09-26, E-8 of the 2026-09-25 engine audit.)* Commitment timing is read from the
+**spouse star** and the **spouse palace**, not from the 용신 alone:
+
+1. **Spouse star (배우자성).** Male querent → 재성 (정재/편재); female querent → 관성 (정관/편관)
+   *(same gender mapping as `11-gunghap.md` §G)*. A 대운 whose stem carries the spouse star **opens a
+   window**; a 세운 whose stem carries it **selects the year** within that window.
+2. **Spouse palace (배우자궁, the day branch).** A 세운/대운 branch that forms **육합 or 삼합** with the
+   day branch is read as the palace being "bound" — meetings and formal commitments cluster here.
+3. **Obstructions.** A year that **충/형/파** the day branch is read as unfavorable for formalising
+   (better for deepening privately), as is a year dominated by the spouse star's classical obstruction —
+   **상관** (which strikes 관성) for a female querent, **겁재** (which contests 재성) for a male.
+4. The more of (1)–(3) converge, the stronger the window. 용신/희신 years remain a supporting
+   (not primary) signal. Phrase every result as a tendency, never a prediction (Ground Rule 4).
+
+*Sources:* 사자사주 「결혼 시기 사주: 배우자 만나는 시기 보는법」 ("배우자를 상징하는 십성(여성: 관성, 남성:
+재성)이 대운이나 세운에 들어오는 타이밍으로 판단", "배우자궁인 일지의 상태가 그 바탕"; checklist: spouse star in
+대운, 세운 strengthening it, 일지 합 with the annual branch, absence of 충/파, weakened 상관/겁재) —
+<https://www.sazasaju.com/blog/marriage-timing-guide>; 정사주 「결혼운사주 보는 법」 —
+<https://jeongsaju.com/blog/marriage-fortune-saju-interpretation>.
+
 ## Part 6: Useful Tables for Speed
 
 ### 2026 Annual Pillar
