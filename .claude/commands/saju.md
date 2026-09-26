@@ -43,7 +43,7 @@ Call the local engine with the user's data to get a pre-filled skeleton.
 - `--date YYYY-MM-DD`
 - `--time HH:MM` (24-hour)
 - `--gender M|F` (for 대운 direction)
-- Either `--city "City Name"` or `--longitude D.DD --utc-offset H.H`
+- Either `--city "City Name"` or `--longitude D.DD`, plus `--timezone <IANA zone>` (preferred) or `--utc-offset H.H`
 - `--convention korean|chinese` (default `korean` — Korean 야자시)
 
 ### Optional inputs
@@ -89,9 +89,9 @@ PYTHONPATH=src python3 -m saju_engine \
 
 Then read `/tmp/skeleton.md` or `/tmp/premium-report.md` and use its pre-filled tables as the factual basis for the reading. For premium output, review and remove all `[ENGINE DRAFT — REVIEW REQUIRED]` markers before client delivery.
 
-> If you need an exact longitude, use `--longitude D.DD --utc-offset H.H` instead of `--city`.
+> If you need an exact longitude, use `--longitude D.DD` instead of `--city`.
 
-> For Indian births, the default `utc-offset 5.5` and `convention korean` are usually correct. The engine applies true solar-time correction from the longitude.
+> Prefer `--timezone <IANA zone>` (e.g. `America/New_York`, `Europe/London`, `Asia/Seoul`) over a bare `--utc-offset`: the zone resolves the offset actually in force at the birth moment, including daylight saving (New York in July is UTC-4, not -5) and Korea's historical offsets (+8:30 in 1954–61; DST in 1948–60 and 1987–88). A one-hour error moves the hour pillar for about half of births. The engine warns on stderr when a birth time falls in a DST fall-back (repeated) or spring-forward (skipped) hour. If you only have a numeric offset, it must include DST. The engine applies true solar-time correction from the longitude.
 
 ### What the engine skeleton gives you
 

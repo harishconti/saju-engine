@@ -13,7 +13,7 @@ If any of these are missing, ask for **all of them in a single message**:
 - **Full name** (as it should appear on the report)
 - **Date of birth** — `YYYY-MM-DD` (Gregorian)
 - **Birth time** — `HH:MM`, 24-hour clock (use the best estimate if exact minute is unknown)
-- **Birthplace** — city/country, **or** `longitude` + `UTC offset`
+- **Birthplace** — city/country, **and** its IANA timezone (e.g. `America/New_York`); or `longitude` + the UTC offset in force at birth (DST included)
 - **Gender** — `M` or `F` (needed for 대운 direction)
 - **Tier** — `sample` (free hook), `essential` ($9 intro → $19), or `deep` ($55); compat `basic` ($24) / `deep` ($45)
 
@@ -55,7 +55,7 @@ PYTHONPATH=src:. python3 -m saju_engine \
   --time HH:MM \
   --gender M \
   --city "Birth City" \
-  --utc-offset 5.5 \
+  --timezone America/New_York \
   --convention korean \
   --name "Client Name" \
   --format premium \
@@ -63,7 +63,7 @@ PYTHONPATH=src:. python3 -m saju_engine \
   --output-file candidates_horoscope/reports/{slug}/{slug}-essential.md
 ```
 
-Use `--longitude D.DD` instead of `--city` when only longitude is available. For Indian births the default `--utc-offset 5.5` and `--convention korean` are usually correct.
+Use `--longitude D.DD` instead of `--city` when only longitude is available. Prefer `--timezone <IANA zone>` (e.g. `America/New_York`, `Europe/London`, `Asia/Seoul`) over a bare `--utc-offset`: the zone resolves the offset actually in force at the birth moment, including daylight saving (New York in July is UTC-4, not -5) and Korea's historical offsets (+8:30 in 1954–61; DST in 1948–60 and 1987–88). A one-hour error moves the hour pillar for about half of births. The engine warns on stderr when a birth time falls in a DST fall-back (repeated) or spring-forward (skipped) hour. If you only have a numeric offset, it must include DST.
 
 The engine output already includes a `Report ID: CID-{slug}-{YYYYMMDD}-{TIER}` line, CosmicSaju branding, and the tier-specific sections. Read `{slug}-{tier}.md` and the relevant `knowledge/` files to refine it into the final client report.
 
@@ -139,6 +139,7 @@ Write a small JSON record to `candidates_horoscope/intake/`:
   "time": "02:45",
   "birthplace": "Pallipat, Tamil Nadu",
   "longitude": 79.32,
+  "timezone": "Asia/Kolkata",
   "utc_offset": 5.5,
   "gender": "F",
   "tier": "essential",

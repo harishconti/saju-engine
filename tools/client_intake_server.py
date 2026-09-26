@@ -81,6 +81,12 @@ class _Handler(BaseHTTPRequestHandler):
             self._send_json(400, {"ok": False, "error": f"Missing fields: {sorted(missing)}"})
             return
 
+        # N-13 (2026-09-26 audit): this form used to collect no timezone or
+        # offset at all, so the reader had to guess the birth's offset.
+        if not payload.get("timezone", "").strip() and not payload.get("utc_offset", "").strip():
+            self._send_json(400, {"ok": False, "error": "Timezone (e.g. America/New_York) or UTC offset is required."})
+            return
+
         if payload.get("tier") == "deep" and not payload.get("main_concern", "").strip():
             self._send_json(400, {"ok": False, "error": "Main concern is required for The Deep Destiny Report tier."})
             return

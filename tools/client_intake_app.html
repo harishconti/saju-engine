@@ -295,11 +295,11 @@
         <div class="row">
           <div>
             <label for="utc_offset">UTC offset <span class="hint">hours</span></label>
-            <input type="number" id="utc_offset" name="utc_offset" step="0.5" required placeholder="e.g., -5 for US Eastern, 9 for Korea">
+            <input type="number" id="utc_offset" name="utc_offset" step="0.25" min="-12" max="14" placeholder="Only if no timezone: e.g. -4 for New York in summer">
           </div>
           <div>
-            <label for="timezone">IANA timezone <span class="hint">optional — e.g. Asia/Seoul</span></label>
-            <input type="text" id="timezone" name="timezone" placeholder="Asia/Seoul (overrides numeric offset if valid)">
+            <label for="timezone">Timezone <span class="hint">recommended — e.g. America/New_York, Asia/Seoul</span></label>
+            <input type="text" id="timezone" name="timezone" placeholder="America/New_York (handles daylight saving automatically)">
           </div>
         </div>
         <div class="row">

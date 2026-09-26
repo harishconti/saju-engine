@@ -273,6 +273,17 @@
         <label for="location">Birth location</label>
         <input type="text" id="location" name="location" required placeholder="City, state/country (e.g., Mysore, Karnataka, India)">
 
+        <div class="row">
+          <div>
+            <label for="timezone">Timezone <span class="hint">recommended — e.g. America/New_York, Asia/Seoul</span></label>
+            <input type="text" id="timezone" name="timezone" placeholder="America/New_York (handles daylight saving automatically)">
+          </div>
+          <div>
+            <label for="utc_offset">UTC offset <span class="hint">hours, only if no timezone</span></label>
+            <input type="number" id="utc_offset" name="utc_offset" step="0.25" min="-12" max="14" placeholder="e.g. -4 for New York in summer">
+          </div>
+        </div>
+
         <label for="email">Email <span class="hint">for delivery of the PDF report</span></label>
         <input type="email" id="email" name="email" required>
       </div>

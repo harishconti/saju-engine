@@ -30,7 +30,6 @@ import re
 import sys
 from datetime import datetime
 from pathlib import Path
-from zoneinfo import ZoneInfo, available_timezones
 
 # Make the local src/ tree importable; user-space site-packages is already on
 # sys.path by default, with `$SAJU_SITE` as an explicit override for non-standard
@@ -49,6 +48,7 @@ from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 from starlette.concurrency import run_in_threadpool  # noqa: E402
 
 from saju_engine.engine import compute_chart  # noqa: E402
+from saju_engine.timezones import resolve_utc_offset  # noqa: E402
 from saju_engine.premium_report import normalize_tier  # noqa: E402
 from saju_engine.compat_report import generate_compat_report  # noqa: E402
 from saju_html.md_to_saju_pdf import build_pdf  # noqa: E402
@@ -116,27 +116,29 @@ def _derive_utc_offset(
     dob: str,
     birth_time: str,
     timezone_name: Optional[str],
-    fallback_offset: float,
+    fallback_offset: Optional[float],
 ) -> float:
     """Return the UTC offset to use for chart computation.
 
-    If ``timezone_name`` is a recognized IANA zone, compute the exact historical
-    UTC offset (including DST) for the given local date/time. Otherwise fall
-    back to the user-supplied numeric ``fallback_offset``.
+    A recognized IANA zone wins: the offset in force at the birth moment,
+    DST and historical offsets included (saju_engine.timezones). Otherwise
+    the numeric ``fallback_offset`` is used.
+
+    N-13 (2026-09-26 audit): an unrecognized zone name used to fall back
+    silently to the numeric field — which defaulted to India's +5.5 — so a
+    US client with a typo got an IST chart. Both an unknown zone and a
+    missing offset are now client errors (ValueError → HTTP 400).
     """
     tz = (timezone_name or "").strip()
-    if not tz:
-        return fallback_offset
-    if tz not in available_timezones():
-        # Not a known IANA key — keep the numeric fallback and let the caller
-        # decide whether to warn.
-        return fallback_offset
-    year, month, day, hour, minute = _parse_dob_time(dob, birth_time)
-    local_dt = datetime(year, month, day, hour, minute, tzinfo=ZoneInfo(tz))
-    offset = local_dt.utcoffset()
-    if offset is None:
-        return fallback_offset
-    return offset.total_seconds() / 3600.0
+    if tz:
+        year, month, day, hour, minute = _parse_dob_time(dob, birth_time)
+        return resolve_utc_offset(tz, year, month, day, hour, minute).utc_offset
+    if fallback_offset is None:
+        raise ValueError(
+            "Please give the birthplace's timezone (e.g. America/New_York) or its UTC offset "
+            "at the time of birth, including daylight saving."
+        )
+    return float(fallback_offset)
 
 
 def _generate_pdf(payload: dict, output_path: Path) -> Path:
@@ -147,10 +149,11 @@ def _generate_pdf(payload: dict, output_path: Path) -> Path:
         raise ValueError("PDF generation requires gender Female or Male so major-luck timing can be computed.")
 
     tier = normalize_tier(payload.get("tier", "essential"))
+    raw_offset = payload.get("utc_offset")
     utc_offset = _derive_utc_offset(
         payload["dob"], payload["birth_time"],
         payload.get("timezone"),
-        float(payload.get("utc_offset", 5.5)),
+        float(raw_offset) if raw_offset not in (None, "") else None,
     )
 
     chart = compute_chart(
@@ -190,7 +193,7 @@ async def generate(
     dob: str = Form(...),
     birth_time: str = Form(...),
     location: str = Form(...),
-    utc_offset: float = Form(5.5),
+    utc_offset: Optional[float] = Form(None),
     email: str = Form(...),
     gender: str = Form(...),
     marriage_status: str = Form(...),
@@ -203,7 +206,7 @@ async def generate(
         "dob": dob.strip(),
         "birth_time": birth_time.strip(),
         "location": location.strip(),
-        "utc_offset": str(utc_offset),
+        "utc_offset": "" if utc_offset is None else str(utc_offset),
         "email": email.strip(),
         "gender": gender,
         "marriage_status": marriage_status,
@@ -259,13 +262,13 @@ async def compat_generate(
     dob_a: str = Form(...),
     birth_time_a: str = Form(...),
     location_a: str = Form(...),
-    utc_offset_a: float = Form(5.5),
+    utc_offset_a: Optional[float] = Form(None),
     gender_a: str = Form(...),
     name_b: str = Form(...),
     dob_b: str = Form(...),
     birth_time_b: str = Form(...),
     location_b: str = Form(...),
-    utc_offset_b: float = Form(5.5),
+    utc_offset_b: Optional[float] = Form(None),
     gender_b: str = Form(...),
     email: str = Form(...),
     main_concern: str = Form(""),
@@ -281,13 +284,13 @@ async def compat_generate(
         "dob_a": dob_a.strip(),
         "birth_time_a": birth_time_a.strip(),
         "location_a": location_a.strip(),
-        "utc_offset_a": str(utc_offset_a),
+        "utc_offset_a": "" if utc_offset_a is None else str(utc_offset_a),
         "gender_a": gender_a,
         "name_b": name_b.strip(),
         "dob_b": dob_b.strip(),
         "birth_time_b": birth_time_b.strip(),
         "location_b": location_b.strip(),
-        "utc_offset_b": str(utc_offset_b),
+        "utc_offset_b": "" if utc_offset_b is None else str(utc_offset_b),
         "gender_b": gender_b,
         "email": email.strip(),
         "main_concern": main_concern.strip(),
@@ -319,6 +322,10 @@ async def compat_generate(
     try:
         ya, ma, da, ha, mia = _parse_dob_time(dob_a, birth_time_a)
         yb, mb, db, hb, mib = _parse_dob_time(dob_b, birth_time_b)
+        # N-13: resolve offsets here, so an unknown zone or a missing offset
+        # is a 400 for the client, not a generic 500 from the worker thread.
+        offset_a = _derive_utc_offset(dob_a, birth_time_a, payload.get("timezone_a"), utc_offset_a)
+        offset_b = _derive_utc_offset(dob_b, birth_time_b, payload.get("timezone_b"), utc_offset_b)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
@@ -345,8 +352,6 @@ async def compat_generate(
         # to run directly in this async handler, blocking the event loop
         # (and every other in-flight request) for as long as chart
         # computation took.
-        offset_a = _derive_utc_offset(dob_a, birth_time_a, payload.get("timezone_a"), utc_offset_a)
-        offset_b = _derive_utc_offset(dob_b, birth_time_b, payload.get("timezone_b"), utc_offset_b)
         chart_a = compute_chart(
             name=name_a or None, gender=gender_a,
             year=ya, month=ma, day=da, hour=ha, minute=mia,

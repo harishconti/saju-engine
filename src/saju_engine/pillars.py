@@ -381,7 +381,11 @@ def _warn_if_suspicious_longitude(
             f"more than 5° (~20 min solar time). Using --longitude value.\n"
         )
         return
-    if abs(geocoded - standard_lon) > 5.0:
+    # N-13 (2026-09-26 audit): offsets now routinely include daylight saving
+    # (resolved from an IANA zone), which moves the civil meridian 15° east of
+    # the standard one — accept that one-hour-DST meridian too.
+    dst_standard_lon = (utc_offset - 1.0) * 15.0
+    if abs(geocoded - standard_lon) > 5.0 and abs(geocoded - dst_standard_lon) > 5.0:
         sys.stderr.write(
             f"Warning: geocoded longitude for '{city}' is {geocoded}°, which is "
             f"more than 5° from the standard meridian {standard_lon}° for UTC offset "

@@ -85,8 +85,13 @@ def _build_parser() -> argparse.ArgumentParser:
                     help="Birth city for longitude geocoding (e.g., 'Pallipat').")
     ap.add_argument("--longitude", type=float, default=None,
                     help="Birth longitude in decimal degrees (east positive). Overrides city.")
+    ap.add_argument("--timezone", default=None,
+                    help="IANA timezone of the birthplace (preferred; e.g. America/New_York, Asia/Seoul). "
+                         "Resolves the offset in force at the birth moment, including daylight saving and "
+                         "historical offsets such as Korea's +8:30 in 1954-61.")
     ap.add_argument("--utc-offset", type=utc_offset_float, default=None,
-                    help="UTC offset in hours (required; e.g. 5.5 for India, 9 for Korea). Range [-12, 14].")
+                    help="UTC offset in hours, DST included (fallback when --timezone is not given; e.g. "
+                         "5.5 for India, 9 for Korea, -4 for New York in summer). Range [-12, 14].")
     ap.add_argument("--no-solar-time", dest="use_solar_time", action="store_false",
                     default=True, help="Disable true solar-time correction.")
     ap.add_argument("--convention", choices=["korean", "chinese"], default="korean",
@@ -162,11 +167,30 @@ def _table(chart) -> str:
 
 def _run(args, stdout, stderr, *, deprecated_alias_used: bool = False) -> int:
     """Execute the requested command; write output to the provided streams."""
-    if args.utc_offset is None:
-        raise SystemExit("--utc-offset is required (e.g. 5.5 for India, 9 for Korea)")
-
     year, month, day = args.date
     hour, minute = args.time
+
+    # N-13 (2026-09-26 audit): prefer an IANA zone, which knows DST and
+    # historical offsets; a bare numeric offset is the fallback.
+    if args.timezone:
+        from .timezones import resolve_utc_offset
+        try:
+            resolved = resolve_utc_offset(args.timezone, year, month, day, hour, minute)
+        except ValueError as exc:
+            raise SystemExit(str(exc))
+        if args.utc_offset is not None and abs(args.utc_offset - resolved.utc_offset) > 1e-9:
+            stderr.write(
+                f"Warning: --utc-offset {args.utc_offset:g} ignored; {resolved.timezone} was "
+                f"UTC{resolved.utc_offset:+g} at the birth moment.\n"
+            )
+        for note in resolved.notes:
+            stderr.write(f"Warning: {note}\n")
+        args.utc_offset = resolved.utc_offset
+    if args.utc_offset is None:
+        raise SystemExit(
+            "--timezone (preferred, e.g. America/New_York) or --utc-offset is required. "
+            "A numeric offset must include daylight saving (New York in July is -4, not -5)."
+        )
 
     if args.format in ("premium", "skeleton") and args.gender is None:
         raise SystemExit(

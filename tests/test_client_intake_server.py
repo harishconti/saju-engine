@@ -34,6 +34,7 @@ def test_submit_decodes_plus_as_space_in_form_body(tmp_path, monkeypatch):
         body = (
             "name=John+Doe&dob=1990-01-01&birth_time=10%3A00&location=Seoul"
             "&email=a%40b.com&gender=M&marriage_status=single&tier=essential"
+            "&timezone=Asia%2FSeoul"
         )
         conn = http.client.HTTPConnection(*httpd.server_address)
         conn.request(

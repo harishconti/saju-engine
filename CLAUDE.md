@@ -183,7 +183,7 @@ Two client-facing intake paths are available:
 1. **JSON-only intake form** — `tools/client_intake_form.html` + `tools/client_intake_server.py`. Collects the same fields and saves each submission as JSON in `candidates_horoscope/intake/`. No engine or PDF is produced; the reader processes the intake manually.
 2. **Self-service calculator** — `tools/client_intake_app.html` + `tools/client_intake_app.py` (FastAPI). Collects the same fields and immediately returns a tiered PDF. Requires the `web` optional dependencies (`pip install -e ".[web]"`).
 
-Both forms ask for: name, DOB, birth time, birth location, UTC offset, email, gender, marriage/relationship status, and tier selection. The "main concern" textarea is enabled only when **The Deep Destiny Report (`deep` tier)** is selected.
+Both forms ask for: name, DOB, birth time, birth location, timezone (IANA, preferred) or UTC offset, email, gender, marriage/relationship status, and tier selection. A timezone resolves daylight saving and historical offsets automatically; a numeric offset must include DST. There is no default offset. The "main concern" textarea is enabled only when **The Deep Destiny Report (`deep` tier)** is selected.
 
 ## OpenWiki Documentation
 
