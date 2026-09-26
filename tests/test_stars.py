@@ -1,6 +1,8 @@
 """Tests for classical star derivations."""
 from __future__ import annotations
 
+import pytest
+
 from saju_engine import stars as stars_module
 from saju_engine.stars import derive_stars
 
@@ -182,6 +184,37 @@ def test_heavenly_virtue_stem():
         month_branch="寅", stems=["甲", "丙", "丁", "戊"],
     )
     assert stars["heavenly_virtue"] == ["丁"]
+
+
+@pytest.mark.parametrize("month_branch,target_branch", [
+    ("卯", "申"),
+    ("午", "亥"),
+    ("酉", "寅"),
+    ("子", "巳"),
+])
+def test_heavenly_virtue_branch_target_months(month_branch, target_branch):
+    """F-2 (2026-09-26 audit): 4 of 12 months target a BRANCH, not a stem.
+
+    knowledge/07-special-formations.md's 천덕귀인 table maps 卯→申, 午→亥,
+    酉→寅, 子→巳 — all branch characters. These can never appear among natal
+    stems, so checking them against `stems` alone can never fire; they must
+    be checked against the natal branches instead.
+    """
+    stars = derive_stars(
+        day_stem="甲", day_branch=target_branch,
+        branches=[target_branch],
+        month_branch=month_branch, stems=["甲", "丙", "戊", "庚"],
+    )
+    assert stars["heavenly_virtue"] == [target_branch]
+
+
+def test_heavenly_virtue_branch_target_month_absent_when_branch_missing():
+    stars = derive_stars(
+        day_stem="甲", day_branch="子",
+        branches=["子"],
+        month_branch="卯", stems=["甲", "丙", "戊", "庚"],
+    )
+    assert stars["heavenly_virtue"] == []
 
 
 def test_monthly_virtue_stem():

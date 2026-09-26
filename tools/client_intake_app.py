@@ -72,6 +72,7 @@ app.add_middleware(
     expose_headers=["Content-Disposition"],
 )
 
+TOOLS_DIR = Path(__file__).resolve().parent
 INTAKE_DIR = PROJECT_ROOT / "candidates_horoscope" / "intake"
 FORM_PATH = TOOLS_DIR / "client_intake_app.html"
 COMPAT_FORM_PATH = TOOLS_DIR / "client_compat_intake_form.html"

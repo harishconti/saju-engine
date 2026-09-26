@@ -14,7 +14,7 @@ its relationship to the natal chart:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from functools import lru_cache
 
@@ -144,6 +144,18 @@ def _load_sajupy_calendar() -> Dict[Tuple[int, int, int], Tuple[str, str]]:
     }
 
 
+# Outside sajupy's 1900-2100 ephemeris there is no exact 절기 date to consult,
+# so the fallback approximates Lichun (立春) as Feb 4 — the exact date varies
+# ±1 day year to year, but this is the best available without ephemeris data.
+_APPROX_LICHUN_DAY = 4
+
+
+def _is_before_approx_lichun(month: int, day: int) -> bool:
+    """True for a Gregorian (month, day) that falls before the approximate
+    ~Feb-4 Lichun boundary (all of January, or early February)."""
+    return month == 1 or (month == 2 and day < _APPROX_LICHUN_DAY)
+
+
 def _annual_pillar_for_date(year: int, month: int, day: int) -> Tuple[str, str]:
     """Return the 60-cycle annual pillar for the given Gregorian date.
 
@@ -154,7 +166,12 @@ def _annual_pillar_for_date(year: int, month: int, day: int) -> Tuple[str, str]:
     if key in lookup:
         year_pillar = lookup[key][0]
         return year_pillar[0], year_pillar[1]
-    # Outside the ephemeris range, fall back to the raw Saju-year math.
+    # Outside the ephemeris range, fall back to the raw Saju-year math — F-8
+    # (2026-09-26 audit): this used to ignore month/day entirely, so a
+    # pre-입춘 January (or early February) date got the CURRENT year's cycle
+    # instead of the previous one.
+    if _is_before_approx_lichun(month, day):
+        return _annual_pillar(year - 1)
     return _annual_pillar(year)
 
 
@@ -166,7 +183,7 @@ def _monthly_pillar_for_date(year: int, month: int, day: int) -> Tuple[str, str]
         month_pillar = lookup[key][1]
         return month_pillar[0], month_pillar[1]
     # Outside the ephemeris range, fall back to the raw month math.
-    return _monthly_pillar(year, month)
+    return _monthly_pillar(year, month, day)
 
 
 def _detect_branch_relationship(a: str, b: str) -> List[str]:
@@ -398,40 +415,49 @@ def current_sewoon(
 _MONTH_BRANCHES: List[str] = ["寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥", "子", "丑"]
 
 
-def _saju_month_index(gregorian_month: int, lichun_month: int = 2) -> int:
-    """Map a Gregorian month to a Saju month index 1–12.
+def _saju_month_index(gregorian_month: int, gregorian_day: int = 15) -> int:
+    """Map a Gregorian (month, day) to a Saju month index 1–12.
 
-    The Saju year starts at 立春, roughly Gregorian Feb (month 2). So:
-      - Gregorian Feb → Saju month 1 (寅)
+    The Saju year starts at 立春, approximated as ~Feb 4 (see
+    `_APPROX_LICHUN_DAY`) when no ephemeris is available. So:
+      - Gregorian Jan, or early Feb before the approximate boundary → Saju
+        month 12 (丑, the previous Saju year's last month)
+      - Gregorian on/after the approximate boundary in Feb → Saju month 1 (寅)
       - Gregorian Mar → Saju month 2 (卯)
       - ...
-      - Gregorian Jan → Saju month 12 (丑)
 
-    `lichun_month` defaults to 2 (February). Adjust if a different convention is used.
+    `gregorian_day` defaults to 15 (safely past the ~Feb-4 boundary) so
+    callers that only care about the month keep their existing behaviour.
+    F-8 (2026-09-26 audit): this used to key off month alone (`lichun_month`
+    hardcoded to 2), so every day in February — including Feb 1-3, before
+    the real Lichun boundary — was treated as post-입춘.
     """
-    idx = (gregorian_month - lichun_month) % 12
+    effective_month = 1 if _is_before_approx_lichun(gregorian_month, gregorian_day) else gregorian_month
+    idx = (effective_month - 2) % 12
     return idx + 1  # 1-based
 
 
-def _monthly_pillar(year: int, month: int) -> Tuple[str, str]:
+def _monthly_pillar(year: int, month: int, day: int = 15) -> Tuple[str, str]:
     """Return the 60-cycle pillar for a Saju month.
 
-    The Saju year begins at 立春 (≈ Gregorian Feb). Therefore:
-      - Gregorian Jan belongs to the previous Saju year.
-      - Gregorian Feb is the first Saju month (寅月).
+    The Saju year begins at 立春 (≈ Gregorian Feb 4). Therefore:
+      - Gregorian Jan, or early Feb before the boundary, belongs to the
+        previous Saju year.
+      - Gregorian on/after the boundary in Feb is the first Saju month (寅月).
 
     The first-month stem is derived from the year stem via 五虎遁 (Oho-dun).
-    See `lookup._OHO_DUN`.
+    See `lookup._OHO_DUN`. `day` defaults to 15 (mid-month, safely past the
+    ~Feb-4 boundary) so existing (year, month)-only callers are unaffected.
     """
-    # Determine which Saju year this Gregorian month belongs to.
-    if month < 2:  # January only
+    # Determine which Saju year this Gregorian date belongs to.
+    if _is_before_approx_lichun(month, day):
         sajuyear = year - 1
     else:
         sajuyear = year
 
     year_stem, _ = _annual_pillar(sajuyear)
     first_month_stem = L._OHO_DUN[year_stem]
-    sm_index = _saju_month_index(month)
+    sm_index = _saju_month_index(month, day)
     branch = _MONTH_BRANCHES[sm_index - 1]
     # Step the stem from the first-month stem by (sm_index - 1).
     stem = L.STEM_ORDER[(L.STEM_INDEX[first_month_stem] + sm_index - 1) % 10]

@@ -253,6 +253,7 @@ _LOOKUPS_ALLOWED_INPUT = {
     "twelve_stage": {"lookup", "day_master"},
     "nayin": {"lookup", "nayin"},
     "xunkong": {"lookup", "xun_start"},
+    "hidden_stems": {"lookup"},
 }
 
 
@@ -266,6 +267,12 @@ def check_lookups(entry: dict) -> dict:
                      + expected.element (nayin_element_of)
       xunkong      → expected.absent: the 2 void branches of one 旬 block,
                      checked against ALL 10 day pillars of that block
+      hidden_stems → expected.stems: {branch: {"main": .., "middle": .. (opt),
+                     "residual": .. (opt)}} for ALL 12 branches in one entry
+                     (F-12, 2026-09-26 audit: no check kind existed for
+                     L.HIDDEN_STEMS at all, so a repeat of E-2's 중기/여기
+                     swap on the four storage/tomb branches would have been
+                     invisible to this gate)
 
     stars._xun_kong is a private module function; the validation harness is the
     one documented consumer (no public 공망 surface exists yet — W3 validates
@@ -307,6 +314,11 @@ def check_lookups(entry: dict) -> dict:
             got = stars._xun_kong(p[0], p[1])
             if got != absent:
                 mismatches[f"xun_kong({p[0]}{p[1]})"] = {"expected": absent, "got": got}
+    elif kind == "hidden_stems":
+        for branch, exp_roles in expected["stems"].items():
+            got_roles = L.HIDDEN_STEMS.get(branch, {})
+            if got_roles != exp_roles:
+                mismatches[f"hidden_stems({branch})"] = {"expected": exp_roles, "got": got_roles}
     else:
         raise ValueError(f"lookups/{entry['id']}: unknown lookup kind {kind!r}")
 

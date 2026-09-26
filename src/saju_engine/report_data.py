@@ -51,7 +51,7 @@ TIER_CONFIG: Dict[str, Dict[str, str]] = {
     },
     "essential": {
         "name": "Essential Report",
-        "price": "$19",
+        "price": "$9 intro → $19",
         "pages": "6–7",
         "tagline": "Your natal chart, career arc, decade cycles, and lucky-element guide",
     },

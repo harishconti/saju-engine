@@ -193,3 +193,14 @@ def test_compute_daeun_n_periods():
     assert len(periods) == 10
     assert periods[0].start_age == starting_age(1993, 12, 11, "backward")
 
+
+
+def test_module_level_type_hints_resolve():
+    """F-16 (2026-09-26 audit): `Dict` was used in module-level annotations
+    without being imported from `typing` — harmless only because
+    `from __future__ import annotations` defers evaluation; would NameError
+    under `typing.get_type_hints()`.
+    """
+    import typing
+    from saju_engine import daeun as daeun_module
+    typing.get_type_hints(daeun_module._parse_calendar)

@@ -393,6 +393,7 @@ def _classify_flag(flag: str) -> Optional[str]:
             "육해",
             "육파",
             "삼형",
+            "도화스쳐",
             "기신",
             "상해",
             "쌍도화",
@@ -465,13 +466,20 @@ def compat_daybranch(a: Chart, b: Chart) -> CompatSubResult:
             "amplifies inner-torment pattern"
         )
 
-    # Harm (해) and break (파) — softer flags.
-    if _branch_pair_lookup(b1, b2, L.SIX_HARMS):
-        primary_score -= 5
-        flags.append(f"일지 해 {b1}{b2}")
-    if _branch_pair_lookup(b1, b2, L.SIX_BREAKS):
-        primary_score -= 3
-        flags.append(f"일지 파 {b1}{b2}")
+    # Harm (해) and break (파) — softer flags. Gated behind the 육합/육충
+    # check above: F-5 (2026-09-26 audit) found 寅亥 and 巳申 are
+    # simultaneously a 육합 and a 육파 per the lookup tables, and checking
+    # both unconditionally double-dipped the score. Classical priority
+    # (knowledge/11-gunghap.md:181, 육합 → 육충 → 육해 → 육파 → 삼형 → 반합)
+    # says a higher-priority match wins outright, the same precedence
+    # `_cross_branch_score` above already applies for the secondary layer.
+    if not _branch_pair_lookup(b1, b2, L.SIX_COMBINATIONS) and not _branch_pair_lookup(b1, b2, L.SIX_CLASHES):
+        if _branch_pair_lookup(b1, b2, L.SIX_HARMS):
+            primary_score -= 5
+            flags.append(f"일지 해 {b1}{b2}")
+        elif _branch_pair_lookup(b1, b2, L.SIX_BREAKS):
+            primary_score -= 3
+            flags.append(f"일지 파 {b1}{b2}")
 
     # Cross-chart secondary (half weight per pair, capped at ±15 to avoid runaway).
     # Score A's day-branch against B's month/year/hour, and B's day-branch

@@ -352,7 +352,6 @@ class Chart:
             "zi_time_type": self.zi_time_type,
             "solar_correction": self.solar_correction,
             "year_month_correction": self.year_month_correction,
-            "reference_date": self.reference_date,
             "day_master": self.day_master,
             "day_master_info": self.day_master_info,
             "pillars": [_pillar_dict(p) for p in self.pillars],
@@ -369,29 +368,7 @@ class Chart:
                 {"position": pos, "branch": br, "stage": st}
                 for pos, br, st in self.twelve_stages
             ],
-            "daeun": [
-                {
-                    "start_age": p.start_age,
-                    "end_age": p.end_age,
-                    "stem": p.stem,
-                    "branch": p.branch,
-                    "combined": p.combined,
-                    "stem_tengod": p.stem_tengod,
-                    "stem_tengod_en": p.stem_tengod_en,
-                    "activated_branches": [
-                        {"daeun": a, "natal": n, "relationship": r}
-                        for a, n, r in p.activated_branches
-                    ],
-                    "relationship_types": p.relationship_types,
-                    "harmony_completions": self._harmony_completions_dicts(p.harmony_completions),
-                    "stem_combinations": p.stem_combinations,
-                    "stem_clashes": p.stem_clashes,
-                    "stem_element": p.stem_element,
-                    "branch_element": p.branch_element,
-                    "favorable_status": p.favorable_status,
-                }
-                for p in self.daeun
-            ],
+            "daeun": [self._daeun_period_dict(p) for p in self.daeun],
             "combinations_6": self.combinations_6,
             "clashes": self.clashes,
             "self_punishments": self.self_punishments,

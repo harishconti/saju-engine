@@ -184,6 +184,7 @@ def _validate_input(
     gender: Optional[str],
     longitude: Optional[float],
     convention: str,
+    star_anchor: str = "day",
 ) -> None:
     """Raise ValueError for inputs outside sane ranges."""
     if not (1900 <= year <= 2100):
@@ -202,6 +203,8 @@ def _validate_input(
         raise ValueError(f"longitude must be -180 to 180, got {longitude}")
     if convention.lower() not in ("korean", "chinese"):
         raise ValueError(f"convention must be 'korean' or 'chinese', got {convention!r}")
+    if star_anchor not in ("day", "year"):
+        raise ValueError(f"star_anchor must be 'day' or 'year', got {star_anchor!r}")
 
 
 def compute_chart(
@@ -244,7 +247,7 @@ def compute_chart(
     major-luck, annual-luck, monthly-luck, and daily-luck overlays. They default
     to the day `compute_chart` is called.
     """
-    _validate_input(year, month, day, hour, minute, gender, longitude, convention)
+    _validate_input(year, month, day, hour, minute, gender, longitude, convention, star_anchor)
     today = date.today()
     ref_year = reference_year or today.year
     ref_month = reference_month or today.month

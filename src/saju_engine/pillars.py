@@ -163,16 +163,6 @@ def _hour_boundary_info(
     return info
 
 
-def _day_stem_for_date(year: int, month: int, day: int) -> str:
-    """Return the day-stem for a calendar date using the 60-cycle anchor.
-
-    Anchor: 1900-01-01 = 甲戌 (index 10), verified against sajupy.
-    """
-    anchor = date(1900, 1, 1)
-    target = date(year, month, day)
-    delta = (target - anchor).days
-    idx = (10 + delta) % 60
-    return L.JIAZI_CYCLE[idx][0]
 
 
 def _parse_solar_time(raw: Dict[str, Any]) -> Optional[Tuple[int, int]]:
@@ -561,6 +551,12 @@ def compute_pillars(
     # Geocoding sanity checks.
     _warn_if_suspicious_longitude(raw, city, longitude, utc_offset, convention)
 
+    # Capture sajupy's own (pre-EoT) longitude-only correction so we can
+    # later isolate exactly how many EXTRA calendar days the equation of
+    # time contributes on top of it (see below).
+    _sc_before_eot = raw.get("solar_correction")
+    _own_correction_minutes = (_sc_before_eot or {}).get("correction_minutes", 0) or 0
+
     # Refine sajupy's longitude-only solar correction with the equation of
     # time (see _apply_equation_of_time docstring). No-op if sajupy applied
     # no correction at all.
@@ -575,6 +571,28 @@ def compute_pillars(
     )
     raw["adjusted_date"] = adjusted_date
     raw["date_adjustment"] = date_adjustment
+
+    # Recompute the day pillar for the EXTRA calendar-day crossing the
+    # equation of time contributes beyond sajupy's own longitude-only
+    # correction (F-1, 2026-09-26 audit: a dead helper existed for exactly
+    # this but was never wired in). sajupy's raw day_pillar already reflects
+    # its own correction plus any zi-hour day-advance convention (see
+    # _hour_stem_day_stem's docstring), so we shift that pillar by the delta
+    # rather than recomputing it outright from `adjusted_date` — recomputing
+    # from scratch would silently discard the zi-advance convention sajupy
+    # already applied (regression caught by test_chinese_zi_solar_rollback_hour_stem).
+    _own_date_adjustment = _compute_adjusted_date(
+        year, month, day, hour, minute, {"correction_minutes": _own_correction_minutes}
+    )[1]
+    _extra_day_delta = date_adjustment - _own_date_adjustment
+    if _extra_day_delta:
+        _current_pillar = (raw.get("day_stem"), raw.get("day_branch"))
+        if _current_pillar in L.JIAZI_CYCLE:
+            _idx = (L.JIAZI_CYCLE.index(_current_pillar) + _extra_day_delta) % 60
+            correct_day_stem, correct_day_branch = L.JIAZI_CYCLE[_idx]
+            raw["day_stem"] = correct_day_stem
+            raw["day_branch"] = correct_day_branch
+            raw["day_pillar"] = f"{correct_day_stem}{correct_day_branch}"
 
     # Determine the effective time and date that sajupy used.
     eff_hour, eff_minute = _effective_time(hour, minute, raw, use_solar_time)

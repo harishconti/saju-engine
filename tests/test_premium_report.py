@@ -330,7 +330,9 @@ def test_premium_report_essential_price_and_scope():
     chart = _sample_chart()
     report = generate_premium_report(chart, tier="essential")
     assert "Essential Report" in report
-    assert "$19" in report
+    # F-13 (2026-09-26 audit): TIER_CONFIG must match CLAUDE.md's documented
+    # launch price ("$9 intro → $19"), not the bare regular price alone.
+    assert "$9 intro → $19" in report
     assert "## Chart at a Glance" in report
     assert "## Table of Contents" in report
     assert "## Day Master Portrait" in report

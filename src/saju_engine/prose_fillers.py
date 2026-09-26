@@ -121,9 +121,17 @@ def period_favorable_status(period: Any, ctx: Any) -> str:
     # qualifying element, was labelled a "favorable-element year" by the
     # annual check — a direct, client-visible contradiction between two
     # tables describing the same period.
-    if favorable in hits or (supporting and supporting in hits):
+    fav_hit = (favorable is not None and favorable in hits) or (supporting and supporting in hits)
+    unfav_hit = bool(unfavorable) and unfavorable in hits
+    # F-7 (2026-09-26 audit): a period whose stem matches the favorable
+    # element but whose branch matches the unfavorable one (or vice versa)
+    # used to report flatly "favorable" (checked first, unconditionally),
+    # discarding the conflicting signal. Both hitting at once is a wash.
+    if fav_hit and unfav_hit:
+        return "neutral"
+    if fav_hit:
         return "favorable"
-    if unfavorable and unfavorable in hits:
+    if unfav_hit:
         return "unfavorable"
     return "neutral"
 

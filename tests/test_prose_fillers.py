@@ -431,6 +431,21 @@ class _FakePeriod:
         self.favorable_status = favorable_status  # deliberately unused by the fix
 
 
+def test_period_favorable_status_conflicting_stem_branch_is_neutral():
+    """F-7 (2026-09-26 audit), same root cause as daeun_overlay.py: a period
+    whose stem matches the resolved favorable element but whose branch
+    matches the unfavorable element (or vice versa) must not be reported as
+    flatly "favorable" — the conflicting signal must net to neutral.
+    """
+    import types
+    ctx = types.SimpleNamespace(favorable="Metal", supporting=None, unfavorable="Fire")
+    period = _FakePeriod(
+        stem_tengod="편재", stem_tengod_en="Indirect Wealth",
+        stem_element="Metal", branch_element="Fire",
+    )
+    assert PF.period_favorable_status(period, ctx) == "neutral"
+
+
 @pytest.mark.parametrize("ko,en,expected_career_substring", [
     ("편관", "Seven Killings (偏官)", "structured career moves"),  # Authority
     ("정관", "Direct Officer (正官)", "structured career moves"),  # Authority

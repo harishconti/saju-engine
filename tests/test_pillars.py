@@ -107,6 +107,26 @@ def test_korean_yazi_hour_stem_asymmetry():
     assert (jo.day.combined, jo.hour.combined) == ("辛亥", "戊子")
 
 
+def test_equation_of_time_alone_crossing_midnight_recomputes_day_pillar():
+    """F-1 (2026-09-26 audit): EoT-only midnight crossing must roll the day pillar.
+
+    Birth at 23:50 on 2000-11-03 at longitude 135°E (== utc_offset*15, so
+    sajupy's own longitude-only correction is ~0 and it reports day pillar
+    for 11-03, 乙丑). The equation of time on 11-03 is ~+16.3 min — added on
+    top by this engine, not by sajupy — which alone pushes the true solar
+    time to 00:06 on 2000-11-04. The day pillar must roll forward to that
+    date's 丙寅, not remain stuck on 乙丑.
+    """
+    c = compute_chart(
+        name="EoT-midnight", gender="M",
+        year=2000, month=11, day=3, hour=23, minute=50,
+        longitude=135.0, utc_offset=9.0, use_solar_time=True,
+    )
+    assert c.day.combined == "丙寅", (
+        f"expected day pillar 丙寅 (2000-11-04) after EoT rolls past midnight, got {c.day.combined}"
+    )
+
+
 def test_input_validation():
     with pytest.raises(ValueError):
         compute_chart(year=1899, month=1, day=1, hour=12)
@@ -118,6 +138,11 @@ def test_input_validation():
         compute_chart(year=2000, month=1, day=1, hour=12, gender="X")
     with pytest.raises(ValueError):
         compute_chart(year=2000, month=1, day=1, hour=12, convention="unknown")
+    with pytest.raises(ValueError):
+        # F-11 (2026-09-26 audit): star_anchor was validated by the CLI's
+        # argparse(choices=...) but not by compute_chart() itself — a direct
+        # caller passing e.g. "YEAR" silently fell back to day-anchor.
+        compute_chart(year=2000, month=1, day=1, hour=12, star_anchor="YEAR")
 
 
 @pytest.mark.parametrize(

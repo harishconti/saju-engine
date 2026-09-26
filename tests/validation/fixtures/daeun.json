@@ -487,5 +487,47 @@
     },
     "status": "expect_match",
     "notes": "庚午년 (양) + 여명 → 역행 (female-direction edge: 양년 여). 대운수 9 (band 7–9): 역행 uses days back to the PREVIOUS 절입 — 입추 1990-08-08 03:45 → ~28.35 days ÷ 3 ≈ 9.45, engine floors to 9; manseryeok label \"9\" (1999-10-15 start → Western 9) and fourpillars band 9-19 agree exactly with the engine floor. Evidence: evidence/kim-yeon-a-daeun-manseryeok.png, evidence/kim-yeon-a-daeun-fourpillars.png"
+  },
+  {
+    "id": "non-korean-longitude-trump-daeun",
+    "subsystem": "daeun",
+    "input": {
+      "year": 1946,
+      "month": 6,
+      "day": 14,
+      "hour": 10,
+      "minute": 54,
+      "longitude": -73.79,
+      "utc_offset": -4.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true,
+      "n_periods": 8
+    },
+    "source": [
+      {
+        "citation": "Independent hand derivation from this repo's own 절기 calendar CSV and the classical 3-days-per-year rule (knowledge/08-luck-pillars.md), computed WITHOUT calling daeun.py: the calendar's 1946 row for 小暑 (next 節 after birth) is raw term_time 194607080206 — per E-1 (2026-09-25 audit), this is KST (UTC+9), so converted to the birth's own UTC-4 by subtracting 13h gives 1946-07-07 13:06 local. Elapsed from birth (1946-06-14 10:54 local) is 23 complete days; 23 // 3 = 7 (starting_age's own floor rule). 丙戌 year (Yang) + male → 순행 (forward); the month pillar 甲午 (idx 30 in the 60-cycle, cross-checked against the non-korean-longitude-trump PILLARS fixture in pillars.json, itself sourced from 사주매니아/fourpillars.net) steps forward by 1..8 in the JIAZI_CYCLE table (lookup.py) to give the period sequence below."
+      },
+      {
+        "citation": "non-korean-longitude-trump (pillars.json) — same birth data, year/month/day pillars cross-checked against 사주매니아 and fourpillars.net (two independent calculators, both UTC-4 wartime Eastern War Time)",
+        "url": "https://fourpillars.net/online4p_V3.php?Lang=en&GEN=1&HR=10&DD=14&MM=6&YY=1946&Sta=r"
+      }
+    ],
+    "expected": {
+      "start_age": 7,
+      "start_age_accept": null,
+      "periods": [
+        "乙未",
+        "丙申",
+        "丁酉",
+        "戊戌",
+        "己亥",
+        "庚子",
+        "辛丑",
+        "壬寅"
+      ]
+    },
+    "status": "expect_match",
+    "notes": "F-12 (2026-09-26 audit): closes the validation gate's structural blind spot that EVERY daeun fixture used utc_offset 9.0 (KST), so a repeat of E-1's cross-timezone 절기-boundary bug in daeun.py's starting_age()/starting_age's term-boundary lookup would have been invisible to this gate. Reuses the already-externally-verified non-korean-longitude-trump birth (UTC-4, Queens NY) so the pillars are independently pinned elsewhere in this fixture set; the 대운 expectation itself is derived by hand (not sourced from a third-party 대운 table, since no cross-referenced non-Korean-birth 대운 publication was found), from the same calendar CSV + classical rule the engine itself is supposed to follow — so this fixture pins the ARITHMETIC, not merely the engine's current output."
   }
 ]

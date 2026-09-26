@@ -121,6 +121,30 @@ def test_monthly_pillar_respects_lichun():
     assert _monthly_pillar_for_date(2026, 1, 15) == ("己", "丑")
 
 
+def test_annual_pillar_for_date_out_of_range_fallback_respects_lichun():
+    """F-8 (2026-09-26 audit): outside sajupy's 1900-2100 ephemeris, the
+    fallback ignored month/day entirely, so a pre-입춘 January (or early
+    February) date got the CURRENT year's cycle instead of the previous
+    one — the exact bug _annual_pillar_for_date's in-range path already
+    guards against (test_annual_pillar_respects_lichun).
+    """
+    # 1899-01-15 is before Lichun, outside the 1900-2100 range → must fall
+    # back to 1898's pillar (戊戌), not 1899's (己亥).
+    assert _annual_pillar_for_date(1899, 1, 15) == _annual_pillar(1898)
+    # 2101-02-01 is before the ~Feb-4 Lichun approximation, outside range →
+    # must fall back to 2100's pillar (庚申), not 2101's (辛酉).
+    assert _annual_pillar_for_date(2101, 2, 1) == _annual_pillar(2100)
+
+
+def test_monthly_pillar_for_date_out_of_range_fallback_respects_lichun():
+    """F-8 (2026-09-26 audit): `_saju_month_index`'s hardcoded lichun_month=2
+    treated every February date as post-입춘 even before the real ~Feb-4
+    boundary, so an out-of-range early-February date got Saju month 1 (寅)
+    of the current year instead of month 12 (丑) of the previous year.
+    """
+    assert _monthly_pillar_for_date(2101, 2, 1) == _monthly_pillar(2101, 1)
+
+
 def test_sewoon_date_lichun_rollback():
     # 2026-01-15 should report the 乙巳 annual pillar, not 丙午.
     hit = derive_sewoon("丙", ["酉", "子", "寅", "丑"], 2026, 1, 15)
@@ -269,3 +293,11 @@ def test_without_natal_stems_only_day_master_checked():
     assert hit.stem_clashes == []
     assert derive_sewoon("辛", _H_BRANCHES, 2031).stem_clashes == []  # 辛 vs DM 辛: no clash
     assert derive_sewoon("甲", _H_BRANCHES, 2030).stem_clashes == [("庚", "甲")]
+
+
+def test_module_level_type_hints_resolve():
+    """F-16 (2026-09-26 audit): same as daeun.py — `Dict` was used in
+    module-level annotations without being imported from `typing`."""
+    import typing
+    from saju_engine import sewoon as sewoon_module
+    typing.get_type_hints(sewoon_module._load_sajupy_calendar)

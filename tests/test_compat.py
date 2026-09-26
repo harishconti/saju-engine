@@ -271,6 +271,17 @@ def test_compat_flag_classification_hae_token_not_overmatched():
     assert _classify_flag("해석은 reader가 진행") is None
 
 
+def test_compat_flag_classification_dohwa_seuchyeo_is_yellow():
+    """F-9 (2026-09-26 audit): '도화스쳐' (-5, spouse-palace 도화 hit / affair-
+    risk flag per knowledge/11-gunghap.md §I) was never bucketed into red or
+    yellow, so it silently never appeared in the client-facing flag lists
+    despite contributing to the composite score.
+    """
+    from saju_engine.compat import _classify_flag
+
+    assert _classify_flag("도화스쳐 — 도화 hits spouse palace") == "yellow"
+
+
 def test_compat_band_thresholds():
     # Sanity check the band assignment via _band_for directly
     assert _band_for(85) == "Excellent"
@@ -355,6 +366,31 @@ def test_compat_yongshin_scoring_uses_resolved_favorable_element():
         )
 
 
+def _day_branch_only_chart(branch: str):
+    """Minimal Chart with all four branches equal, isolating the PRIMARY
+    day-branch score (the secondary cross-chart loop skips a branch equal to
+    the day branch, so this contributes nothing but the primary term)."""
+    from saju_engine.chart import Chart, Pillar
+
+    p = Pillar(position="x", stem="甲", branch=branch)
+    return Chart(year=p, month=p, day=p, hour=p)
+
+
+@pytest.mark.parametrize("b1,b2", [("寅", "亥"), ("巳", "申")])
+def test_compat_daybranch_combination_not_double_dipped_by_break(b1, b2):
+    """F-5 (2026-09-26 audit): 寅亥 and 巳申 are simultaneously a 육합 (+20)
+    and a 육파 (-3) per the lookup tables. Classical priority (knowledge/
+    11-gunghap.md:181, 육합 → 육충 → 육해 → 육파 → 삼형 → 반합) says 육합 is
+    tested first and wins outright — the pair must net the full +20, not
+    +17 from an unconditional break penalty stacking on top.
+    """
+    a = _day_branch_only_chart(b1)
+    b = _day_branch_only_chart(b2)
+    sub = compat_daybranch(a, b)
+    assert sub.score == 20, f"{b1}{b2}: expected +20 (pure 육합), got {sub.score}"
+    assert not any("파" in f for f in sub.flags), f"break flag must not also fire: {sub.flags}"
+
+
 def test_compat_daybranch_asymmetric_scoring():
     """Reverse cross-chart branch scoring must detect B's day vs A's non-day branches."""
     # Build a chart pair where only the reverse direction has a combination.
@@ -425,6 +461,27 @@ def test_generate_compat_report_default_is_basic():
     # Score + band must appear on cover
     assert "/ 100" in md
     assert "Mixed" in md or "Strong" in md or "Excellent" in md or "Challenging" in md
+
+
+def test_basic_tier_does_not_leak_deep_tier_verdict_detail():
+    """F-6 (2026-09-26 audit): the $24 basic ("Compatibility Snapshot") tier
+    rendered the identical full 11-sub-system verdict table and red/yellow/
+    favorable flag lists that the $45 deep tier is supposed to reserve —
+    `_verdict_block()` took no tier parameter. Basic must show only the
+    composite score/band plus its four decisive sub-systems, never the full
+    breakdown table nor references to deep-only sub-systems like Ten-God
+    Cross (G) or Major Luck Synchrony (H).
+    """
+    from saju_engine.compat_report import generate_compat_report
+    md = generate_compat_report(MAHESH, VP, "Mahesh", "Vishnu Priya", tier="basic")
+    assert "| Sub-System | Korean | Score | Max | Verdict |" not in md, (
+        "basic tier must not render the full 11-row verdict table"
+    )
+    for leaked_label in ["Ten-god cross-relationship", "Major luck synchrony",
+                         "Nayin harmony", "Day-pillar pair classification",
+                         "Combined element balance", "Compatibility star overlays",
+                         "Year-branch zodiac pair"]:
+        assert leaked_label not in md, f"basic tier must not reference {leaked_label!r}"
 
 
 def test_annual_couple_timing_overlay_uses_chart_reference_date_not_wall_clock():

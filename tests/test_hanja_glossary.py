@@ -1,7 +1,21 @@
 """Tests for `saju_engine.hanja_glossary.inject_hanja`."""
 from __future__ import annotations
 
+import inspect
+
+from saju_engine import hanja_glossary
 from saju_engine.hanja_glossary import inject_hanja
+
+
+def test_glossary_source_has_no_duplicate_keys():
+    """F-15 (2026-09-26 audit): "육해", "일주", "월지" were each defined twice
+    in HANJA_GLOSSARY with identical values (harmless, redundant)."""
+    src = inspect.getsource(hanja_glossary)
+    dict_src = src[src.index("HANJA_GLOSSARY"):src.index("\n}\n") + 2]
+    import re
+    keys = re.findall(r'^\s*"([^"]+)":', dict_src, re.MULTILINE)
+    dupes = {k for k in keys if keys.count(k) > 1}
+    assert not dupes, f"duplicate glossary keys: {dupes}"
 
 
 def test_prefix_term_does_not_split_an_already_annotated_longer_term():
@@ -90,3 +104,16 @@ def test_single_char_term_still_annotated_when_standalone():
     stands alone (not embedded in a longer unlisted compound)."""
     result = inject_hanja("the 합 is important here.", set())
     assert "합 (合)" in result
+
+
+def test_term_already_inside_a_bare_parenthetical_is_not_double_parenthesized():
+    """F-4 (2026-09-26 audit): "(대운)" written in ordinary prose (the term
+    already sitting inside an open parenthetical, with no Hanja) became
+    "(대운 (大運))" in every generated report — `inject_hanja` only ever
+    checked for an existing annotation immediately AFTER the term, never
+    checked whether the term was already sitting inside an open paren.
+    """
+    text = "The current major luck period (대운) shapes this decade."
+    result = inject_hanja(text, set())
+    assert "(大運)" not in result, f"must not inject inside an existing paren: {result!r}"
+    assert "((" not in result and "))" not in result, f"no nested parens: {result!r}"

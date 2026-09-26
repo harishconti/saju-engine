@@ -44,9 +44,34 @@ def test_daeun_overlay_stem_combination_and_favorable():
     # 甲 + 己 is 천간합 → 甲己合土
     assert overlay["stem_combinations"]
     assert any(c["combined_element"] == "Earth" for c in overlay["stem_combinations"])
-    # 甲 (Wood) matches candidate_unfavorable, 戌 (Earth) matches candidate_favorable.
-    # Earth favorable wins → favorable.
-    assert overlay["favorable_status"] == "favorable"
+    # 甲 (Wood) matches candidate_unfavorable, 戌 (Earth) matches
+    # candidate_favorable — a genuine conflicting stem/branch signal.
+    # F-7 (2026-09-26 audit): this used to let "favorable" win
+    # unconditionally, discarding the conflicting branch signal. A
+    # conflicting signal nets to neutral, not a false "favorable".
+    assert overlay["favorable_status"] == "neutral"
+
+
+def test_daeun_overlay_conflicting_stem_branch_signal_is_neutral_not_favorable():
+    """F-7 (2026-09-26 audit): a decade whose stem is the 용신 but whose
+    branch is the 기신 (or vice versa) must not be silently reported as
+    flatly "favorable" — that discards the conflicting signal entirely.
+    """
+    # 庚 (Metal) = favorable, 午 (Fire) = unfavorable: opposite elements.
+    period = DaeunPeriod(start_age=30, end_age=39, stem="庚", branch="午")
+    overlay = derive_daeun_overlay(
+        day_master="丙",
+        natal_branches=["寅"],
+        natal_stems=["甲", "丙", "戊"],
+        strength_assessment={
+            "candidate_favorable": "Metal",
+            "candidate_unfavorable": "Fire",
+        },
+        period=period,
+    )
+    assert overlay["stem_element"] == "Metal"
+    assert overlay["branch_element"] == "Fire"
+    assert overlay["favorable_status"] == "neutral"
 
 
 def test_derive_daeun_overlay_uses_resolved_favorable_over_raw_candidate():

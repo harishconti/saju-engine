@@ -102,9 +102,18 @@ def derive_daeun_overlay(
             else strength_assessment.get("candidate_unfavorable")
         )
         hits = {stem_element, branch_element}
-        if fav in hits:
+        fav_hit = fav is not None and fav in hits
+        unfav_hit = unfav is not None and unfav in hits
+        # F-7 (2026-09-26 audit): a decade whose stem is the 용신 but whose
+        # branch is the 기신 (or vice versa) used to report flatly
+        # "favorable" (fav_hit checked first, unconditionally), discarding
+        # the conflicting signal. Both hitting at once is a genuine wash,
+        # not a favorable decade.
+        if fav_hit and unfav_hit:
+            favorable_status = "neutral"
+        elif fav_hit:
             favorable_status = "favorable"
-        elif unfav in hits:
+        elif unfav_hit:
             favorable_status = "unfavorable"
         else:
             favorable_status = "neutral"

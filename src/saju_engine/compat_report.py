@@ -316,36 +316,68 @@ def _glance_table(chart: Chart, name: str) -> List[str]:
     return lines
 
 
-def _verdict_block(report: CompatReport) -> List[str]:
-    """Composite breakdown table + top red flags + top favorable points."""
+# The four sub-systems the basic ("Compatibility Snapshot") tier is scoped to
+# (CLAUDE.md: "the four most decisive sub-systems — day-branch, day-stem,
+# 용신 cross-supply, yin-yang"). Keyed by each CompatSubResult's own `.label`
+# (the prefix `_verdict_block`'s red/yellow/favorable lines carry), not the
+# report-section heading, which differs.
+_BASIC_TIER_SUB_LABELS = {
+    "Day-stem combination",
+    "Day-branch interaction (spouse palaces)",
+    "Favorable element cross-supply",
+    "Yin-Yang polarity",
+}
+
+
+def _verdict_block(report: CompatReport, tier: str = "deep") -> List[str]:
+    """Composite score + (tier-scoped) breakdown table, flags, and favorable points.
+
+    F-6 (2026-09-26 audit): this used to render the full 11-sub-system table
+    and unfiltered flag lists — including cross-references to deep-only
+    sub-systems like Ten-God Cross (G) and Major Luck Synchrony (H) —
+    regardless of tier, so the $24 basic snapshot leaked the $45 deep tier's
+    detail. The basic tier now shows only the composite score/band, plus
+    flags scoped to its four decisive sub-systems.
+    """
     lines: List[str] = []
     lines.append("## The Verdict (심정)")
     lines.append("")
-    lines.append("| Sub-System | Korean | Score | Max | Verdict |")
-    lines.append("|---|---|---|---|---|")
-    for sub in report.sub_systems():
-        lines.append(
-            f"| {sub.label} | {sub.label_kr} | {sub.score:+d} | {sub.max} | {sub.band} |"
-        )
-    lines.append("")
+    if tier == "deep":
+        lines.append("| Sub-System | Korean | Score | Max | Verdict |")
+        lines.append("|---|---|---|---|---|")
+        for sub in report.sub_systems():
+            lines.append(
+                f"| {sub.label} | {sub.label_kr} | {sub.score:+d} | {sub.max} | {sub.band} |"
+            )
+        lines.append("")
     lines.append(f"**Composite Score (종합 점수):** {report.score}/100 → **{report.band}**")
     lines.append("")
-    if report.red_flags:
+
+    def _scoped(flags: List[str]) -> List[str]:
+        if tier == "deep":
+            return flags
+        return [f for f in flags if f.split(":", 1)[0] in _BASIC_TIER_SUB_LABELS]
+
+    red_flags = _scoped(report.red_flags)
+    yellow_flags = _scoped(report.yellow_flags)
+    favorable_points = _scoped(report.favorable_points)
+
+    if red_flags:
         lines.append("### Top Red Flags (주의 사항)")
         lines.append("")
-        for f in report.red_flags:
+        for f in red_flags:
             lines.append(f"- ⚠️ {f}")
         lines.append("")
-    if report.yellow_flags:
+    if yellow_flags:
         lines.append("### Yellow Flags (관찰 사항)")
         lines.append("")
-        for f in report.yellow_flags[:5]:
+        for f in yellow_flags[:5]:
             lines.append(f"- 🟡 {f}")
         lines.append("")
-    if report.favorable_points:
+    if favorable_points:
         lines.append("### Favorable Points (긍정적 요소)")
         lines.append("")
-        for f in report.favorable_points:
+        for f in favorable_points:
             lines.append(f"- ✅ {f}")
         lines.append("")
     return lines
@@ -357,7 +389,7 @@ def _sub_system_block(label_en: str, label_kr: str, sub: CompatSubResult,
     """Render one sub-system as a section."""
     lines: List[str] = []
     if compact:
-        lines.append(f"### {label_en}")
+        lines.append(f"### {label_en} — {label_kr}")
         lines.append(f"**{sub.score:+d} / {sub.max}** — {sub.band}  ")
         lines.append(sub.narrative)
         lines.append("")
@@ -806,7 +838,7 @@ def _basic_report_lines(
         lines.append(f"| {label} | {pa.combined} | {pb.combined} |")
     lines.append("")
 
-    lines.extend(_verdict_block(report))
+    lines.extend(_verdict_block(report, tier="basic"))
     lines.extend(_verdict_narrative(report))
     lines.extend(_couple_narrative(report, name_a, name_b))
     lines.append("")
@@ -816,8 +848,9 @@ def _basic_report_lines(
     lines.append("## Key Sub-Systems")
     lines.append("")
     lines.append(
-        "The verdict table above lists all eleven sub-systems. The four below "
-        "are the ones that most strongly shape day-to-day married life."
+        "The composite score above draws on all eleven classical sub-systems. "
+        "The four below are the ones that most strongly shape day-to-day "
+        "married life — the Deep Compatibility report includes the full breakdown."
     )
     lines.append("")
 
@@ -879,7 +912,7 @@ def _deep_report_lines(
     lines.extend(_glance_table(chart_a, name_a))
     lines.extend(_glance_table(chart_b, name_b))
 
-    lines.extend(_verdict_block(report))
+    lines.extend(_verdict_block(report, tier="deep"))
     lines.extend(_verdict_narrative(report))
     lines.extend(_couple_narrative(report, name_a, name_b))
     lines.append("")

@@ -1956,5 +1956,35 @@
       ]
     },
     "status": "expect_match"
+  },
+  {
+    "id": "hidden-stems-all-branches",
+    "subsystem": "lookups",
+    "input": {
+      "lookup": "hidden_stems"
+    },
+    "source": [
+      {
+        "citation": "knowledge/02-branches.md:24-45 — Hidden Stems (지장간, 地藏干) table, corrected 2026-09-25 (E-2: the four storage/tomb branches 辰戌丑未 had 중기/여기 swapped)"
+      }
+    ],
+    "expected": {
+      "stems": {
+        "子": {"main": "癸"},
+        "丑": {"main": "己", "middle": "辛", "residual": "癸"},
+        "寅": {"main": "甲", "middle": "丙", "residual": "戊"},
+        "卯": {"main": "乙"},
+        "辰": {"main": "戊", "middle": "癸", "residual": "乙"},
+        "巳": {"main": "丙", "middle": "庚", "residual": "戊"},
+        "午": {"main": "丁", "middle": "己"},
+        "未": {"main": "己", "middle": "乙", "residual": "丁"},
+        "申": {"main": "庚", "middle": "壬", "residual": "戊"},
+        "酉": {"main": "辛"},
+        "戌": {"main": "戊", "middle": "丁", "residual": "辛"},
+        "亥": {"main": "壬", "middle": "甲"}
+      }
+    },
+    "status": "expect_match",
+    "notes": "F-12 (2026-09-26 audit): closes the validation gate's structural blind spot that no hidden_stems check kind existed at all — a repeat of E-2's 중기/여기 swap on 辰戌丑未 would have been invisible to this gate. Pins all 12 branches in one entry against the corrected classical table."
   }
 ]

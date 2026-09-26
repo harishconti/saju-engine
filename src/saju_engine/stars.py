@@ -506,12 +506,20 @@ def derive_stars(
         stars["white_tiger"] = []
         stars["sky_hero"] = []
 
-    # Month-branch → stem virtue stars
-    if month_branch and stems:
+    # Month-branch → virtue stars. 천덕귀인's classical table targets a stem
+    # for 8 of the 12 months, but a BRANCH for 卯/午/酉/子 (knowledge/
+    # 07-special-formations.md) — those four can never appear among natal
+    # stems, so they must be checked against the natal branches instead.
+    if month_branch:
         hv = _HEAVENLY_VIRTUE_STEM.get(month_branch)
-        stars["heavenly_virtue"] = [s for s in stems if s == hv] if hv else []
+        if hv is None:
+            stars["heavenly_virtue"] = []
+        elif hv in L.STEM_INDEX:
+            stars["heavenly_virtue"] = [s for s in (stems or []) if s == hv]
+        else:
+            stars["heavenly_virtue"] = [hv] if hv in present else []
         mv = _MONTHLY_VIRTUE_STEM.get(month_branch)
-        stars["monthly_virtue"] = [s for s in stems if s == mv] if mv else []
+        stars["monthly_virtue"] = [s for s in (stems or []) if s == mv] if mv else []
     else:
         stars["heavenly_virtue"] = []
         stars["monthly_virtue"] = []

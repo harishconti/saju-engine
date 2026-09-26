@@ -71,7 +71,6 @@ HANJA_GLOSSARY: Dict[str, str] = {
     "망신살": "亡神殺",
     "장성": "將星",
     "반안": "攀鞍",
-    "육해": "六害",
     "원진": "怨嗔",
     "원진살": "怨嗔煞",
     "귀문관": "鬼門關",
@@ -84,8 +83,6 @@ HANJA_GLOSSARY: Dict[str, str] = {
     "월덕귀인": "月德貴人",
     "천덕": "天德",
     "월덕": "月德",
-    "일주": "日柱",
-    "월지": "月支",
     "본기": "本氣",
     "중기": "中氣",
     "여기": "餘氣",
@@ -141,6 +138,15 @@ def inject_hanja(text: str, already_used: set, glossary: Dict[str, str] = HANJA_
         # when the character immediately before `term` is itself Hangul,
         # since that means `term` is only a fragment of a larger compound.
         if idx > 0 and re.match(r"[가-힣]", text[idx - 1]):
+            continue
+        # F-4 (2026-09-26 audit): the checks above only ever looked for an
+        # existing annotation AFTER `term`. Prose that already parenthesizes
+        # the bare term itself, e.g. "(대운)", sits with a "(" opened but not
+        # yet closed at `idx` — injecting there produced the nested
+        # "(대운 (大運))". Skip when `term` is already inside an unclosed
+        # paren (more "(" than ")" in the text so far).
+        prefix = text[:idx]
+        if prefix.count("(") > prefix.count(")"):
             continue
         annotated = f"{term} ({hanja})"
         text = text[:idx] + annotated + text[idx + len(term):]
