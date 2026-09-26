@@ -333,22 +333,32 @@ divergence they guard still holds (Wood ≠ Water).
 `distance_seconds`; report shows seconds under 90 s. Harish: ~29 s (audit: 28 s — the 1 s gap is the
 longitude input, 79.4408 vs 79.42). RM: 17 s past 午/未.
 
-## Next set of implementation (as of 2026-09-26)
+## Session 2026-09-26 (continued) — "next set" closed
 
-In recommended order:
+All seven "next set" items from the first 2026-09-26 pass are done. Full suite: **1038 passed, 5
+skipped, 9 xfailed, 0 failed**.
 
-1. **Regenerate every client report** (`candidates_horoscope/reports/*`, compat pairs) — the audit's own
-   step 6. E-2 changed element percentages for any chart with 辰/戌/丑/未; E-1/E-3/E-6/E-12 changed prose
-   and timing tables. Hand-written reader sections must be re-checked, not just re-rendered.
-2. **Verify the 23-item interpretation-layer validation** (`candidates_horoscope/reports/harish/
-   validation-2026-09-25.md` on the audit branch) — still never checked claim-by-claim here.
-3. **E-3/E-5 single resolution pass** (audit step 2): resolve 용신/희신/기신/구신/한신 once in `yongsin.py`
-   with provenance, make compat scoring and every consumer read it, and replace the balanced-chart
-   least-element pick with an explicit "requires reader argument" state for temperate months.
-4. **E-8 residual:** marriage timing is still keyed to 용신-element years; key it to spouse-star
-   (재성/관성) years and spouse-palace (day-branch) activations — e.g. Harish 2034 甲寅: 정재 year + 寅亥合.
-5. **E-9 residual:** other 파격 signals the audit named — 월지충 on an officer grid, and a weak DM under
-   정관격 — need a knowledge-file source before they can be added (Ground Rule 1).
-6. **Report the 12신살 basis** in client prose (currently always day-branch, unlabelled), or add a
-   year-basis option to the CLI.
-7. **Test debt:** a replacement `dry × balanced × climate_agrees=false` climate fixture (from E-2).
+| # | Item | Status | Commit |
+|---|---|---|---|
+| 1 | Regenerate every client report | **DONE** — all engine-built base/tier/combined reports, two compat pairs, every PDF (incl. HTML backend and landing demos). Hand-written follow-ups reconciled with dated notes; Harish `career.md` timing re-derived. Not regenerable: `harish_vinothini` (no birth data — flagged in-file). Reproducible via `tools/regen_client_reports.sh`. | `2ee1bf9` |
+| 2 | Verify the 23-item Harish validation | **DONE** — every claim checked; the ones not already closed by E-1..E-13 fixed: 기신 partner row, boss profile keyed to the 구신, folk pick named in client text, 합화 season/clash check, half-harmony / 방합 / natal 천간충 rows, branch-aware annual lean, decade structural drivers (巳酉丑 삼합, 건록), 공망 years. Not changed: strength verdict (balanced vs weak is an [UNCERTAIN] reader call; E-4's reconciling clause covers the prose). | `bbf9ba0` |
+| 3 | Single 용신/희신/기신/구신/한신 resolution (E-3/E-5) | **DONE** — `FavorableElement` carries the full role set with provenance; compat, decade overlay, report_data, compat report, premium context and prose_scaffold all read it; balanced temperate charts marked provisional. Follow-up: a reader override that confirms the 억부 pick keeps the 억부 희신/기신. | `ae7cbc4`, `7f1bf26` |
+| 4 | E-8 marriage timing | **DONE** — spouse star + spouse palace rule sourced into `knowledge/08` Part 5b. | `477c938` |
+| 5 | E-9 other 파격 signals | **DONE** — 관살혼잡 and 정관 합거 break the grid; 월지 충·형 and weak DM are caveats (sourced into `knowledge/07`). | `8857b52` |
+| 6 | 12신살 basis in client prose | **DONE** — labelled in the report; `--star-anchor` / `compute_chart(star_anchor=)`. | `8f1c420` |
+| 7 | dry×balanced×disagree fixture | **DONE** — `dry-balanced-synth-v2`. | `6f0020a` |
+
+Also fixed while regenerating (`0f5bd72`): PDF translation gaps (empty "()" from dropped Hanja, "해
+(harm)" rendered as the branch 亥, "병신합수" rendered as "Illness Sin…", ~70 untranslated terms) and a
+Hanja-glossary look-ahead that split "**천간충**".
+
+### Still open (outside this audit's code scope)
+
+- **Vinothini's birth data** is needed to regenerate `harish_vinothini`.
+- **`cross-candidate-business-analysis.md`** idea rankings still rest on June 용신 values (Harish was
+  Earth, now Water); the element table and one wrong line are corrected and a banner warns readers, but
+  the business rankings need a fresh interpretive pass.
+- **Chart signature** sentences are keyed to the Day Master's element only, so 庚 and 辛 share the
+  "jewel kept in velvet" image (seen on Mahesh's 庚 report) — cosmetic, pre-existing.
+- **Birth-time confirmation for Harish** — the validation's own recommendation: the corrected time is
+  ~29 s from the 丑/寅 boundary, so the hour pillar should be confirmed to the minute with the client.
