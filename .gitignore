@@ -78,3 +78,6 @@ claude-context/sessions/
 /landing-hero.png
 /landing-viewport.png
 /time_click.png
+
+# Firecrawl research cache
+.firecrawl/
