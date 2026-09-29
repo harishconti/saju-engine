@@ -960,6 +960,43 @@
   "subsystem": "climate",
   "input": {
    "probe": "merge",
+   "year": 1965,
+   "month": 10,
+   "day": 13,
+   "hour": 1,
+   "minute": 0,
+   "longitude": 126.98,
+   "utc_offset": 9.0
+  },
+  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (戌 = 燥 → Water remedy, Metal 희신) + §How This Combines With 억부. Covers the 'climate overrides a DISAGREEING raw candidate' sub-case. Re-pointed 2026-09-26 (deep-audit N-6): the prior chart (1970-10-10 03:00) had Water as its most-abundant element, so the new remedy-dominance guard now (correctly) suppresses the override there — it was moved to the new dry-remedy-dominant fixture. This replacement (1965-10-13 01:00) is 戌 dry with Fire dominant and Water genuinely needed; probe-verified 2026-09-26 (pillars 乙巳/丙戌/庚子/丙子).",
+  "expected": {
+   "climate": {
+    "band": "dry",
+    "climate_favorable": "Water",
+    "climate_supporting": "Metal"
+   },
+   "strength": {
+    "verdict": "balanced",
+    "candidate": "Earth"
+   },
+   "fe": {
+    "element": "Water",
+    "method": "climate-balanced",
+    "supporting": "Metal",
+    "climate_band": "dry",
+    "climate_element": "Water",
+    "climate_agrees": false,
+    "confidence": "heuristic",
+    "remedy_dominant": false
+   }
+  },
+  "status": "expect_match"
+ },
+ {
+  "id": "dry-remedy-dominant",
+  "subsystem": "climate",
+  "input": {
+   "probe": "merge",
    "year": 1970,
    "month": 10,
    "day": 10,
@@ -968,7 +1005,7 @@
    "longitude": 126.98,
    "utc_offset": 9.0
   },
-  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (戌 = 燥 → Water remedy, Metal 희신) + §How This Combines With 억부. Replaces dry-balanced-synth's lost sub-case (climate overrides a DISAGREEING raw candidate) after the 2026-09-25 E-2 hidden-stem fix flipped that chart's climate_agrees to true. Synthetic chart, probe-verified against the current engine 2026-09-26 (pillars 庚戌/丙戌/癸亥/癸丑; raw balanced least-element candidate Wood, overridden by the dry-band Water remedy).",
+  "source": "N-6 (2026-09-26 deep audit): the remedy-dominance guard. 戌 dry month whose prescribed Water remedy is already the chart's MOST abundant element (2.7 Water vs 1.8 Earth), so adding Water cannot balance it — the 조후 override is withheld and 억부 governs. This is the audit's own chart example for the guard (docs/audit 2026-09-26 N-6; docs/research/2026-09-26-climate-extremeness-threshold.md). Probe-verified 2026-09-26 (pillars 庚戌/丙戌/癸亥/癸丑).",
   "expected": {
    "climate": {
     "band": "dry",
@@ -980,13 +1017,14 @@
     "candidate": "Wood"
    },
    "fe": {
-    "element": "Water",
-    "method": "climate-balanced",
-    "supporting": "Metal",
+    "element": "Wood",
+    "method": "balanced-heuristic",
+    "supporting": "Water",
     "climate_band": "dry",
     "climate_element": "Water",
     "climate_agrees": false,
-    "confidence": "heuristic"
+    "confidence": "heuristic",
+    "remedy_dominant": true
    }
   },
   "status": "expect_match"

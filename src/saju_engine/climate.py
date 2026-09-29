@@ -23,6 +23,20 @@ table (directly reviewed 2026-09-13) and corroborated by OpenFate's 사계절
 토와 월령 page. This was a deliberate, user-approved product decision (the
 divergence had been pinned by tests specifically so any expansion would be
 signalled, not silent) — it is not a bug fix.
+
+2026-09-26 (deep-audit N-6): the 조후 override is now gated by the
+**remedy-dominance guard** (`is_remedy_dominant`) — the guard the audit
+recommended, and the minimal one that needs no invented threshold. The
+classical doctrine (적천수 §29/§30 + 임철초 註) conditions the override on the
+*chart* being climate-extreme ("不可過/不可偏"), but states that qualitatively;
+the practitioner sources give numeric whole-chart tests that disagree with one
+another and would suppress readings 궁통보감 prescribes unconditionally (e.g.
+四月辛金, which wants 壬水 regardless of how hot the rest of the chart is —
+Harish's own canonical chart). The one condition that is both sourced and
+logically forced is the audit's: if the prescribed remedy is **already the
+chart's most abundant element**, adding it cannot balance the chart, so the
+override is withheld. This avoids inventing a threshold. See
+`docs/research/2026-09-26-climate-extremeness-threshold.md`.
 """
 from __future__ import annotations
 
@@ -43,6 +57,36 @@ _COLD_BRANCHES = {"亥", "子", "丑"}
 # resolves.
 _DAMP_BRANCHES = {"辰"}
 _DRY_BRANCHES = {"戌"}
+
+
+def is_remedy_dominant(
+    month_branch: str,
+    element_counts: Optional[Dict[str, float]],
+) -> bool:
+    """Return True if the 조후 remedy element is already the chart's most abundant.
+
+    N-6 (2026-09-26). The classical doctrine gates the 조후 override on the
+    whole chart being climate-extreme (적천수 §29/§30: "不可過/不可偏"), but
+    states that qualitatively — no classical source gives a numeric threshold.
+    The one condition that is both sourced and logically forced is this guard:
+    if the element 조후 prescribes is **already the chart's most abundant
+    element**, adding more of it cannot balance the chart, so the override is
+    withheld and 억부 (strength-balance) governs instead. This is the minimal
+    fix the deep audit recommended, and it needs no invented threshold.
+
+    The practitioner sources that DO give numeric whole-chart tests disagree
+    with one another and would suppress readings 궁통보감 prescribes
+    unconditionally (e.g. 四月辛金 → 壬水 regardless of chart-wide temperature),
+    so those tests are deliberately not adopted. See
+    `docs/research/2026-09-26-climate-extremeness-threshold.md`.
+
+    A temperate month (no remedy) returns False. An empty/None `element_counts`
+    returns False (nothing to compare — do not suppress on missing data).
+    """
+    remedy = assess_climate(month_branch)["climate_favorable"]
+    if not remedy or not element_counts:
+        return False
+    return remedy == max(element_counts, key=element_counts.get)
 
 
 def assess_climate(month_branch: str) -> Dict[str, Optional[str]]:

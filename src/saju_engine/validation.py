@@ -707,8 +707,8 @@ def check_yongsin(chart: Any, entry: dict) -> dict:
     """Check yongsin.favorable_element() against a yongsin fixture entry.
 
     Expected keys: "fe" (fields of FavorableElement: element, method,
-    supporting, climate_band, climate_element, climate_agrees, confidence —
-    None skips that field) and "strength" (chart.strength_assessment fields
+    supporting, climate_band, climate_element, climate_agrees, confidence,
+    remedy_dominant — None skips that field) and "strength" (chart.strength_assessment fields
     verdict / candidate_favorable, None skips). Status semantics identical
     to check_pillars: PASS / INTERPRETATION / FAIL.
     """
@@ -720,6 +720,7 @@ def check_yongsin(chart: Any, entry: dict) -> dict:
         "element": fe.element, "method": fe.method, "supporting": fe.supporting,
         "climate_band": fe.climate_band, "climate_element": fe.climate_element,
         "climate_agrees": fe.climate_agrees, "confidence": fe.confidence,
+        "remedy_dominant": fe.remedy_dominant,
     }
     for key, exp in (expected.get("fe") or {}).items():
         if exp is not None and got_fe[key] != exp:
@@ -806,7 +807,8 @@ def check_climate_merge(chart: Any, entry: dict) -> dict:
       the raw pre-merge candidate, so a resolved-element change is
       attributable to the climate merge rather than to a moved candidate.
     - "fe": the resolved FavorableElement fields (element, method,
-      supporting, climate_band, climate_element, climate_agrees, confidence).
+      supporting, climate_band, climate_element, climate_agrees, confidence,
+      remedy_dominant).
     Status semantics identical to check_pillars: PASS / INTERPRETATION / FAIL.
     """
     expected = entry.get("expected", {})
@@ -832,6 +834,7 @@ def check_climate_merge(chart: Any, entry: dict) -> dict:
         "element": fe.element, "method": fe.method, "supporting": fe.supporting,
         "climate_band": fe.climate_band, "climate_element": fe.climate_element,
         "climate_agrees": fe.climate_agrees, "confidence": fe.confidence,
+        "remedy_dominant": fe.remedy_dominant,
     }
     for key, exp in (expected.get("fe") or {}).items():
         if exp is not None and got_fe[key] != exp:

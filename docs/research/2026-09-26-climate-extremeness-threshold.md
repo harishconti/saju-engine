@@ -173,57 +173,60 @@ work — so this needs explicit approval, not a unilateral fix.
 
 ---
 
-## 5. Recommendation
+## 5. Decision — option C (remedy-dominance guard). IMPLEMENTED.
 
-The research request (from the N-6 decision) was: *"look for a secondary 궁통보감/적천수 commentary
-source that gives a concrete chart-extremeness criterion."* That is **sourced** here:
+The research produced four candidate fixes. The **branch-count gates (A/B) were ruled out by a
+further classical finding**, and **option C was adopted and implemented** 2026-09-26.
 
-- **Classical (primary):** 적천수 §29/§30 + 임철초 주 — confirms the *principle* (a chart must be
-  **extreme / one-sided**, not merely born in-season) but gives no number.
-- **Practitioner (operational):** two independent Korean sources give the same numeric shape —
-  season-month **and** a majority of the chart's branches in that temperature class (naver: ≥3 of
-  4 branches; sajuplus: ≥4 of 8 characters); naver adds a whole-chart fallback (≥5 of 8).
-- **Commercial engine (8-codes):** confirms the whole-chart-weighted-score method but publishes
-  no cutoff.
+### Why the branch-count gates (A/B) were rejected
 
-**Recommended gate (A + C together):** keep the existing band table for *which element* to
-prescribe, and add **two** guards before the override fires:
+A branch-count extremeness gate looks well-sourced in the abstract, but it **contradicts a
+transcribed classical per-stem rule.** 궁통보감’s entry for **四月辛金** (辛金 born in the 巳
+month — Harish’s exact chart) is *unconditional*:
 
-1. **Direction-consistent extremeness (A):** the month is in-season **and** ≥3 of the 4 branches
-   (month included) sit in that band's temperature class (naver's primary test; sajuplus's ≥4-of-8
-   is the looser variant). Suppresses 49% of current overrides.
-2. **Remedy-dominance guard (C):** if the prescribed remedy is already the chart's most-abundant
-   element, suppress the override (or set `requires_reader=True`). This is the only one of the two
-   that catches the 1963-10-24 example.
+> 四月辛金 … **忌丙火之燥烈，喜壬水之洗淘** … 四月辛金，不能无水，壬癸出干，主异途富贵 …
+> 如壬癸水俱无，但见烈烈火攻，金被火镕，贫贱残疾之命
+> — 窮通寶鑑 (四月辛金), transcribed via
+> <https://www.dajiazhao.com/sm/qtbj/6178.html>
 
-The two guards are complementary — the branch gate cannot catch a chart that is genuinely
-hot-dominated but already Water-rich (the 1963 case), and the dominance guard alone does not
-enforce the classical "chart must be extreme" condition. Both together drop the "remedy already
-dominant" rate from 14.7% to ~5% in the sample.
+The prescription is Water **regardless of how hot the rest of the chart is** — the remedy follows
+the stem-and-month, not the chart-wide temperature. A branch-count gate would suppress Harish’s
+Water-용신 (his 巳/亥/丑 branches fail a ≥3-of-4 hot test) and replace it with Wood, directly
+contradicting 궁통보감. (This is also why MEMORY records Harish’s Water as independently
+validated.) The two practitioner sources’ class lists are also mutually inconsistent (naver’s
+cold-branch set includes 申酉丑辰; its cold *stems* are only 壬癸, while sajuplus counts 庚辛己),
+so neither gives a stable, citable threshold.
 
-**Caveat / remaining [UNCERTAIN]:** the numeric threshold rests on modern practitioner sources,
-not a transcribed classical number (the classics state it qualitatively). That is acceptable for a
-*gate* — it operationalises "不可過" rather than inventing new doctrine — but the chosen cutoff
-should be labelled `[UNCERTAIN]` in `knowledge/17`, exactly as the 辰/戌 branch assignments
-already are.
+### Adopted: the remedy-dominance guard (option C)
 
-**Not implemented.** The gate changes the resolved 용신 for at least two published candidates
-(Harish: Water → Wood; Mahesh: Fire → Water), so it needs an explicit user decision before code
-changes — Ground Rule 1, and the same pattern as the 2026-09-19 gate-broadening decision, which
-was user-approved and impact-checked before landing.
+The one condition that is **both sourced and logically forced** is the audit’s own: if the
+element 조후 prescribes is **already the chart’s most-abundant element**, adding it cannot balance
+the chart. 算准網 states the same principle for when *not* to apply 조후 (it should not fire when
+the chart is "已经达到平衡" / already balanced). This needs **no invented threshold**, cannot
+contradict a per-stem prescription (it fires only when the chart is *already* saturated with the
+remedy), and — measured — corrects **both** audit examples (1963 and 2010 both have their
+prescribed remedy as the most-abundant element):
 
-### Options for the decision
+| Chart | Band | Remedy | Most-abundant | Guard |
+|---|---|---|---|---|
+| 1963-10-24 (36% Water) | dry | Water | Water | **suppress** ✓ |
+| 2010-12-06 (Fire = 기신) | cold | Fire | Fire | **suppress** ✓ |
 
-- **(A) Branch-weighted extremeness gate** (≥3 of 4 branches, direction-consistent, + optional
-  ≥5-of-8 fallback). Suppresses 49% of overrides; changes Harish + Mahesh resolved 용신 →
-  requires a client-report regeneration.
-- **(B) Looser sajuplus criterion** (≥4 of 8 characters, month included). Suppresses fewer
-  overrides; closer to the classical "不可過" reading of "majority of the chart".
-- **(C) Remedy-dominance guard only** — suppress the override when the prescribed remedy is
-  already the chart's most-abundant element. Smallest change; adopts no numeric threshold; catches
-  the 1963 example but not the 2010 one.
-- **(A + C) Both gates** — the recommendation above.
-- **(D) Leave as-is** and document the gap as a known scope limit.
+**Impact:** drops the "remedy already the chart’s most-abundant element" rate from 14.7% of
+climate-governed charts to **0 by construction**, and changes the resolved 용신 for **zero**
+published candidates (Harish, Mahesh, Vishnu Priya, Gurumoorthy, Sruthi, Pawan, Manvitha, RM all
+keep their element). Implemented in `climate.is_remedy_dominant()` +
+`yongsin.favorable_element()`; `FavorableElement.remedy_dominant` records the state.
+
+*(An earlier draft of this doc recommended A+C and claimed the guard alone would not catch the
+2010 example — that was an error in a prototype measurement; both audit examples are
+remedy-dominant, so the guard catches both.)*
+
+### Remaining [UNCERTAIN] / open
+
+A true chart-extremeness threshold (A/B) is **not adopted** — it would need either a source that
+does not contradict 궁통보감's per-stem rules, or an explicit product decision to override those
+rules. Option B (looser 4-of-8) remains available if a future source justifies it.
 
 ---
 

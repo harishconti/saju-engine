@@ -24,13 +24,15 @@
   the month branch by element relation / 득령, knowledge/09 Step 2 — not the 12운성 stage; extreme
   bands widened 4.0→5.0 to keep `extreme` rare and hold published verdicts stable) and **N-9**
   (양인격/건록격 now fire at the month/월령 position as the classical grid, with the year/day/hour
-  case relabelled a related-but-distinct pattern). **N-6's requested research is now done** (see
-  `docs/research/2026-09-26-climate-extremeness-threshold.md`): the classical 적천수 §29/§30
-  confirms the principle — a chart must be extreme, not merely born in-season — but gives no
-  number; two independent Korean sources give a concrete whole-chart criterion (≥3 of 4 branches,
-  or ≥4 of 8 chars). **Not implemented** — the gate would change Harish's / Vishnu Priya's /
-  Gurumoorthy's resolved 용신, so it needs an explicit user decision (options A–D in the research
-  doc). Client reports were regenerated for N-5/N-9 on 2026-09-26 (second pass).
+  case relabelled a related-but-distinct pattern). **N-6 is now FIXED (option C)** — the
+  **remedy-dominance guard**: if 조후's prescribed remedy is already the chart's most-abundant
+  element, the override is withheld and 억부 governs (`climate.is_remedy_dominant()` +
+  `yongsin.favorable_element()`, `FavorableElement.remedy_dominant`). Corrects both audit examples,
+  changes **zero** published deliverables, invents no threshold. Branch-count gates (options A/B)
+  were researched and rejected — they contradict 궁통보감's unconditional per-stem rule (四月辛金 →
+  壬水 regardless of chart-wide temperature; Harish's own chart). See
+  `docs/research/2026-09-26-climate-extremeness-threshold.md`. Client reports were regenerated for
+  N-5/N-9 on 2026-09-26 (second pass).
 
 - Engine is feature-complete for the current product scope, now including a 조후 (climate-balance)
   cross-check on top of the existing 억부 (strength-balance) 용신 heuristic — see the 2026-09-13
@@ -253,14 +255,17 @@ history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P
     /draft leaks). Also fixed the **N-22 regression test**, which asserted a clean `git status` and
     so failed on any legitimate regen of a tracked deliverable — it now compares the tracked PDF's
     bytes before/after instead.
-  - **N-6 research** — `docs/research/2026-09-26-climate-extremeness-threshold.md`. The 조후 gate
-    should key on whole-chart extremeness, not the month alone. The classical 적천수 (滴天髓) §29/§30
-    confirms the principle but gives no number; two independent Korean sources give a concrete
-    criterion (≥3 of 4 branches / ≥4 of 8 chars). Measured: a branch-weighted gate suppresses 49%
-    of current overrides and drops the "remedy already dominant" rate from 14.7% to 4.8%; it
-    corrects the 2010 audit example, while the 1963 case needs the separate option-C dominance
-    guard — but together they would change published 용신 for Harish (Water→Wood) and Mahesh
-    (Fire→Water). **Decision pending**, no code changed (options A–D in the research doc).
+  - **N-6 FIXED (option C — remedy-dominance guard)** — `docs/research/
+    2026-09-26-climate-extremeness-threshold.md`. The 조후 override now keys on whole-chart
+    extremeness: if the prescribed remedy is already the chart's most-abundant element, the
+    override is withheld and 억부 governs (`climate.is_remedy_dominant()` + `yongsin.
+    favorable_element()`; `FavorableElement.remedy_dominant` field; knowledge/17 + 09 updated).
+    Corrects both audit examples (1963 → Wood, 2010 → Earth) and changes **zero** published
+    deliverables. The classical 적천수 §29/§30 confirms the *principle* but gives no number; the
+    two Korean practitioner branch-count criteria (A/B) were researched and **rejected** — they
+    contradict 궁통보감's unconditional 四月辛金→壬水 rule (Harish's own chart). New fixtures
+    `dry-remedy-dominant` + re-pointed `dry-balanced-synth-v2`; regression tests; validation CLI
+    204→205. Suite 1096 → **1104**.
 
 - **2026-09-26 (N-5 + N-9 doctrinal decisions implemented, Suite 1094 → 1096)** — Two of the three
   [doctrinal] items from the second deep audit were implemented against their recorded user
