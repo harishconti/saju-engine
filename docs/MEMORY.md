@@ -24,10 +24,13 @@
   the month branch by element relation / 득령, knowledge/09 Step 2 — not the 12운성 stage; extreme
   bands widened 4.0→5.0 to keep `extreme` rare and hold published verdicts stable) and **N-9**
   (양인격/건록격 now fire at the month/월령 position as the classical grid, with the year/day/hour
-  case relabelled a related-but-distinct pattern). **N-6 is still open** (조후 gate needs more
-  research before a chart-extremeness threshold is picked — check the tracker doc before relying on
-  strength/조후 output for a hot/cold-month chart). Client reports have **not** been regenerated for
-  N-5/N-9 yet.
+  case relabelled a related-but-distinct pattern). **N-6's requested research is now done** (see
+  `docs/research/2026-09-26-climate-extremeness-threshold.md`): the classical 적천수 §29/§30
+  confirms the principle — a chart must be extreme, not merely born in-season — but gives no
+  number; two independent Korean sources give a concrete whole-chart criterion (≥3 of 4 branches,
+  or ≥4 of 8 chars). **Not implemented** — the gate would change Harish's / Vishnu Priya's /
+  Gurumoorthy's resolved 용신, so it needs an explicit user decision (options A–D in the research
+  doc). Client reports were regenerated for N-5/N-9 on 2026-09-26 (second pass).
 
 - Engine is feature-complete for the current product scope, now including a 조후 (climate-balance)
   cross-check on top of the existing 억부 (strength-balance) 용신 heuristic — see the 2026-09-13
@@ -239,6 +242,25 @@ history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P
   needs to be passed explicitly, though doing so is still fine.
 
 ## Recent Changes to Remember
+
+- **2026-09-26 (client-report regen + N-6 research)** — Two follow-ups after the N-5/N-9 work:
+  - **Full client-report regeneration** (`tools/regen_client_reports.sh`): all base reports, tier
+    files, combined reports, compat pairs, and PDFs regenerated. Verdicts, favorable elements, and
+    compat scores confirmed **unchanged** (Harish×Manvitha 64/Mixed, Pawan×Sruthi 50/Mixed);
+    four-pillar tables byte-identical. The visible delta is the N-5 strength/arrival lines plus
+    accumulated catch-up the prior regen predated (F-4 Hanja first-use, F-13 tier price, N-2 대운수
+    precision, F-6 basic-tier compat table, N-10 red-flag order). All PDFs audited clean (0 citation
+    /draft leaks). Also fixed the **N-22 regression test**, which asserted a clean `git status` and
+    so failed on any legitimate regen of a tracked deliverable — it now compares the tracked PDF's
+    bytes before/after instead.
+  - **N-6 research** — `docs/research/2026-09-26-climate-extremeness-threshold.md`. The 조후 gate
+    should key on whole-chart extremeness, not the month alone. The classical 적천수 (滴天髓) §29/§30
+    confirms the principle but gives no number; two independent Korean sources give a concrete
+    criterion (≥3 of 4 branches / ≥4 of 8 chars). Measured: a branch-weighted gate suppresses 49%
+    of current overrides and drops the "remedy already dominant" rate from 14.7% to 4.8%; it
+    corrects the 2010 audit example, while the 1963 case needs the separate option-C dominance
+    guard — but together they would change published 용신 for Harish (Water→Wood) and Mahesh
+    (Fire→Water). **Decision pending**, no code changed (options A–D in the research doc).
 
 - **2026-09-26 (N-5 + N-9 doctrinal decisions implemented, Suite 1094 → 1096)** — Two of the three
   [doctrinal] items from the second deep audit were implemented against their recorded user

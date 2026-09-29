@@ -12,11 +12,12 @@ user decision on how to handle a boundary this close (see the 2026-09-19 change 
 Day Master strength now reads season/element relation, not 12운성 stage — `strength.py`; extreme
 bands widened 4.0→5.0 to hold published verdicts stable) and N-9 (양인격/건록격 now fire at the
 month-branch/월령 position as the classical grid, with the year/day/hour case relabelled a related
-pattern — `patterns.py`). **N-6 remains open** (조후 gate needs more research before a
-chart-extremeness threshold is picked — no decision yet). See
-`docs/audits/2026-09-26-deep-engine-audit-verification.md`. Client reports have **not** been
-regenerated for N-5/N-9 yet — run `tools/regen_client_reports.sh` before re-sending (verdicts/
-elements unchanged; reasoning + pattern lines move).
+pattern — `patterns.py`). **N-6's requested research is done** (`docs/research/
+2026-09-26-climate-extremeness-threshold.md`: classical principle sourced, numeric criterion from
+two Korean practitioner sources, measured to suppress 49% of overrides) but **not implemented** —
+it would change published 용신 for Harish (Water→Wood) and Mahesh (Fire→Water), so it needs a user decision.
+Client reports were regenerated for N-5/N-9 on 2026-09-26 (second pass); verdicts/elements
+unchanged, reasoning + pattern lines moved.
 **Status:** The **engine** is complete and validated (four Korean 만세력 textbook cross-validation cases, parametrized lookup-table tests, 30×30 Nayin table on the 5-element fallback, special-formations tests). **As of 2026-09-07 the project pivoted the go-to-market from India / ₹ to English-speaking-global / USD** — see `improvements_issues.md` (master doc) and `docs/market-research-2026-09.md` (sourced research). The 3 client-facing engine defects that blocked a paid launch are **fixed** (G1 reviewer-note leak, G2 per-pillar template grammar, G3 용신 single source of truth), plus ₹→USD across the engine, docs, and landing page. **Open P0/P1 (see `improvements_issues.md` §12):** real testimonials, Merchant-of-Record checkout, self-service-app PII/queue hardening, deployment. **Package layout:** engine and PDF packages live under `src/` with direct-run shims and a ReportLab fallback.
 
 This file is the persistent to-do list for the saju project. Items here were either explicitly deferred or surfaced during research.
@@ -336,6 +337,19 @@ Sourced market research: **`docs/market-research-2026-09.md`**. Design spec:
 
 ---
 
+- **2026-09-26 (client-report regen + N-6 research)** — Regenerated every engine-generated client
+  deliverable after N-5/N-9 (`tools/regen_client_reports.sh`): verdicts, favorable elements, and
+  compat scores all confirmed unchanged; the delta is the N-5 strength/arrival lines plus
+  accumulated catch-up (F-4 Hanja first-use, F-13 tier price, N-2 대운수 precision, F-6 basic-tier
+  compat table, N-10 red-flag order); all PDFs clean. Fixed the N-22 regression test (asserted a
+  clean `git status`, so any legitimate regen broke it — now compares tracked-PDF bytes). Then did
+  the **N-6 research** the user requested (`docs/research/2026-09-26-climate-extremeness-threshold.md`):
+  the classical 적천수 §29/§30 confirms the whole-chart-extremeness principle but gives no number;
+  two independent Korean sources give a concrete criterion (≥3 of 4 branches, or ≥4 of 8 chars); a
+  branch-weighted gate measured to suppress 49% of current overrides — it corrects the 2010
+  audit example, while the 1963 case needs the separate option-C remedy-dominance guard — but it
+  changes published 용신 for Harish (Water→Wood) and Mahesh (Fire→Water) → **decision pending, no
+  code changed** (options A–D in the research doc).
 - **2026-09-26 (N-5 + N-9 doctrinal decisions implemented, Suite 1094 → 1096)** — Implemented two of
   the three [doctrinal] items from the second deep audit against their recorded user decisions.
   **N-5:** `strength.py::assess_strength` now scores the month term from the element-relation 득령

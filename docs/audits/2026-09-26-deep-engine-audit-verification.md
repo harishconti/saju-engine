@@ -32,7 +32,7 @@ NOT STARTED = not yet investigated or fixed this pass.
 | N-3 | P1 | NOT STARTED | — | sajupy's 절기 table is imprecise by up to 114 min; needs an ephemeris-sourced replacement table shipped as package data. |
 | N-4 | P1 | **FIXED** | `abfc6c1` | Current 대운 selected 1.3–2.4 years early (세수 vs. floored-elapsed-year convention mismatch). |
 | N-5 | P1 | **FIXED** *(2026-09-26, decision implemented)* | — | Yin Day Master strength inversion. Strength scoring switched from the 12운성 month-stage to the element-relation 득령 signal (knowledge/09 Step 2); extreme bands widened to 5.0 to keep "extreme" rare and held published verdicts stable. See "Doctrinal decisions" below. |
-| N-6 | P1 | NEEDS DECISION → **research requested, not yet implemented** | — | 조후 overrides 용신 from month branch alone, not chart-level extremeness. User asked for more research before deciding a threshold. |
+| N-6 | P1 | **RESEARCHED → decision pending** | — | 조후 overrides 용신 from month branch alone, not chart-level extremeness. **Research done 2026-09-26** (`docs/research/2026-09-26-climate-extremeness-threshold.md`): the classical 적천수 §29/§30 confirms the *principle* (chart must be extreme — "不可過/不可偏") but gives no number; two independent Korean sources give a concrete criterion (≥3 of 4 branches, or ≥4 of 8 chars). Not implemented — it changes ≥2 published candidates' resolved 용신, so it needs an explicit user decision. |
 | N-7 | P1 | **FIXED** | `23f92d2` | Web compat path forwarded a chart's raw pre-climate 억부 pick as a "reader-confirmed" override. |
 | N-8 | P1 | **FIXED** | `23f92d2` | HTML/Playwright backend rendered markdown with `html: True` — a client name containing `<script>`/`<iframe>` reached Chromium unescaped. |
 | N-9 | P2 | **FIXED** *(2026-09-26, decision implemented)* | `10c3706` + follow-up | 문창귀인 갑→해 typo fixed (→사); 천덕귀인 doc/table contradiction fixed (engine already fixed prior session, F-2). 양인격/건록격: the month-branch (월령) case is now the classical grid; the year/day/hour case is relabelled a related-but-distinct pattern. See "Doctrinal decisions" below. |
@@ -50,9 +50,11 @@ NOT STARTED = not yet investigated or fixed this pass.
 | N-21 | P3 | NOT ACTIONABLE HERE | — | `apps/landing-page`'s `src/`/`src/proxy.ts` is not in this repo at all — nothing to fix from inside `saju-engine`. |
 | N-22 | P3 | **FIXED** | `33fef13` | Test suite overwrote the tracked client PDF `sruthi-report.pdf` (and two Playwright tests with the same pattern) on every run. |
 
-**Tally:** 13 FIXED, 2 PARTIAL, 0 NEEDS DECISION (both decided items, N-5 and N-9, now
-implemented), 5 NOT STARTED, 1 not actionable in this repo. *(Updated 2026-09-26: N-5 and N-9
-moved from NEEDS DECISION/PARTIAL to FIXED once their recorded decisions were implemented.)*
+**Tally:** 13 FIXED, 2 PARTIAL, 0 NEEDS DECISION-but-unimplemented, 1 RESEARCHED/decision-pending
+(N-6), 4 NOT STARTED (N-3, N-12, N-13, N-15-remainder; N-18/N-19 remain P3), 1 not actionable in
+this repo. *(Updated 2026-09-26: N-5 and N-9 moved to FIXED once their recorded decisions were
+implemented; N-6's requested research is now done and awaits a user decision; N-19's dead
+`month_season_score` half was fixed by N-5.)*
 
 ---
 
@@ -165,16 +167,37 @@ actually climate-extreme — in 9% of sampled charts the prescribed remedy eleme
 chart's most abundant one.
 
 **Investigated:** knowledge/17's own cited source is explicit that the gate should be "사주가 너무
-차거나 너무 더우면" (**if the chart** is too cold or hot) — i.e., a whole-chart-extremeness
+차거나 너무 더우면" (**if the chart** is too cold or hot) — i.e. a whole-chart-extremeness
 condition — but no source in this repo (or found by the audit) gives a **numeric threshold** for
 what counts as "too cold/hot." Implementing the audit's suggested fix (weigh Fire/Water across
 stems and hidden stems, gate on that) would mean inventing that threshold, which is exactly what
 Ground Rule 1 says to decline and flag instead of doing unilaterally.
 
 **Decision (user, 2026-09-26): research it more first**, rather than approve a threshold or leave
-as-is. Not yet done — this is open, pending that research (candidate next step: look for a
-secondary 궁통보감/적천수 commentary source that gives a concrete chart-extremeness criterion,
-rather than deriving one from scratch).
+as-is.
+
+**Research done (2026-09-26)** — `docs/research/2026-09-26-climate-extremeness-threshold.md`.
+Findings:
+- The **primary classical source** (적천수 滴天髓 §29 寒暖 / §30 燥濕 + 임철초 註) confirms the
+  *principle* — a chart must be "過/偏" (extreme/one-sided), not merely born in-season — and even
+  says to **withhold** the remedy for absolute excess ("若原局全是极寒...反不宜调候"). It gives
+  **no number**.
+- Two **independent Korean practitioner sources** give a concrete criterion: month in the season
+  **and** a majority of the chart in that temperature class — 네이버/촌노: **≥3 of the 4 branches**
+  (month included), with a ≥5-of-8 whole-chart fallback; 사주플러스: **≥4 of the 8 characters**.
+- A commercial engine (정해 만세력 / 8-codes) documents the same whole-chart weighted-score method
+  but publishes no cutoff — method corroboration only.
+- **Measured impact** (4,000 random charts): the branch-weighted gate suppresses **49%** of current
+  climate overrides and drops the "remedy already the chart's most-abundant element" rate from
+  14.7% to 4.8% of fired. The branch gate corrects the 2010 example; the 1963 example needs the
+  separate remedy-dominance guard (option C). Together they would change the resolved 용신 for
+  **Harish** (Water→Wood) and **Mahesh** (Fire→Water) — a client-visible move that needs explicit
+  approval.
+
+**Decision pending.** Options A–D recorded in the research doc §5 (implement the branch-weighted
+gate / implement the looser 4-of-8 criterion / only suppress-when-remedy-already-dominant /
+leave as-is). **Not implemented** — no code changed. The numeric threshold, if adopted, should be
+labelled `[UNCERTAIN]` in knowledge/17 as the 辰/戌 branch assignments already are.
 
 ### N-9 — 양인격/건록격 month-branch position
 
@@ -216,6 +239,7 @@ non-month-is-related, for both 양인 and 건록).
   not.
 - **N-15** (remainder) — a 절기-proximity boundary disclosure, parallel to the 子-hour one already
   added, using the term-candidate list `_independent_year_month_pillar` already builds.
+- **N-6** — researched, decision pending (see above / `docs/research/2026-09-26-climate-extremeness-threshold.md`).
 - **N-18** (range-edge crashes), **N-19** (the dead `month_season_score` half is now fixed by N-5;
   the Wood tie-break half remains) — smaller P3
   items, not yet investigated.
