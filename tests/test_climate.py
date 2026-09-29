@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-from saju_engine.climate import assess_climate
+from saju_engine.climate import assess_climate, is_remedy_dominant
 
 
 @pytest.mark.parametrize("branch", ["巳", "午", "未"])
@@ -59,3 +59,31 @@ def test_unknown_branch_is_temperate():
     result = assess_climate("")
     assert result["band"] == "temperate"
     assert result["climate_favorable"] is None
+
+
+# ── N-6 remedy-dominance guard (2026-09-26) ──────────────────────────────────
+
+
+def test_remedy_dominant_true_when_remedy_is_most_abundant():
+    """戌 (dry → Water): a Water-dominant chart must be flagged, so the 조후
+    override can be withheld (adding Water cannot balance the chart)."""
+    counts = {"Water": 2.7, "Earth": 1.8, "Fire": 1.6, "Metal": 1.5, "Wood": 0.3}
+    assert is_remedy_dominant("戌", counts) is True
+
+
+def test_remedy_dominant_false_when_another_element_leads():
+    """A dry month whose chart is Fire-dominant still genuinely needs Water."""
+    counts = {"Fire": 2.9, "Metal": 1.4, "Water": 1.2, "Wood": 1.0, "Earth": 0.7}
+    assert is_remedy_dominant("戌", counts) is False
+
+
+def test_remedy_dominant_false_for_temperate_month():
+    """No remedy → nothing to gate, never dominant."""
+    counts = {"Water": 3.0, "Fire": 0.1}
+    assert is_remedy_dominant("酉", counts) is False
+
+
+def test_remedy_dominant_false_without_counts():
+    """Missing/empty counts must not suppress on absent data."""
+    assert is_remedy_dominant("戌", None) is False
+    assert is_remedy_dominant("戌", {}) is False

@@ -32,7 +32,7 @@ NOT STARTED = not yet investigated or fixed this pass.
 | N-3 | P1 | NOT STARTED | — | sajupy's 절기 table is imprecise by up to 114 min; needs an ephemeris-sourced replacement table shipped as package data. |
 | N-4 | P1 | **FIXED** | `abfc6c1` | Current 대운 selected 1.3–2.4 years early (세수 vs. floored-elapsed-year convention mismatch). |
 | N-5 | P1 | **FIXED** *(2026-09-26, decision implemented)* | — | Yin Day Master strength inversion. Strength scoring switched from the 12운성 month-stage to the element-relation 득령 signal (knowledge/09 Step 2); extreme bands widened to 5.0 to keep "extreme" rare and held published verdicts stable. See "Doctrinal decisions" below. |
-| N-6 | P1 | **RESEARCHED → decision pending** | — | 조후 overrides 용신 from month branch alone, not chart-level extremeness. **Research done 2026-09-26** (`docs/research/2026-09-26-climate-extremeness-threshold.md`): the classical 적천수 §29/§30 confirms the *principle* (chart must be extreme — "不可過/不可偏") but gives no number; two independent Korean sources give a concrete criterion (≥3 of 4 branches, or ≥4 of 8 chars). Not implemented — it changes ≥2 published candidates' resolved 용신, so it needs an explicit user decision. |
+| N-6 | P1 | **FIXED (option C)** | — | 조후 overrode 용신 from month branch alone, not chart extremeness. **Implemented 2026-09-26**: the **remedy-dominance guard** — if the prescribed remedy is already the chart's most-abundant element, the override is withheld (억부 governs). Corrects both audit examples, changes zero published deliverables, invents no threshold. Branch-count gates were ruled out (they contradict 궁통보감's unconditional per-stem rules, e.g. 四月辛金→壬水). See `docs/research/2026-09-26-climate-extremeness-threshold.md`. |
 | N-7 | P1 | **FIXED** | `23f92d2` | Web compat path forwarded a chart's raw pre-climate 억부 pick as a "reader-confirmed" override. |
 | N-8 | P1 | **FIXED** | `23f92d2` | HTML/Playwright backend rendered markdown with `html: True` — a client name containing `<script>`/`<iframe>` reached Chromium unescaped. |
 | N-9 | P2 | **FIXED** *(2026-09-26, decision implemented)* | `10c3706` + follow-up | 문창귀인 갑→해 typo fixed (→사); 천덕귀인 doc/table contradiction fixed (engine already fixed prior session, F-2). 양인격/건록격: the month-branch (월령) case is now the classical grid; the year/day/hour case is relabelled a related-but-distinct pattern. See "Doctrinal decisions" below. |
@@ -50,11 +50,10 @@ NOT STARTED = not yet investigated or fixed this pass.
 | N-21 | P3 | NOT ACTIONABLE HERE | — | `apps/landing-page`'s `src/`/`src/proxy.ts` is not in this repo at all — nothing to fix from inside `saju-engine`. |
 | N-22 | P3 | **FIXED** | `33fef13` | Test suite overwrote the tracked client PDF `sruthi-report.pdf` (and two Playwright tests with the same pattern) on every run. |
 
-**Tally:** 13 FIXED, 2 PARTIAL, 0 NEEDS DECISION-but-unimplemented, 1 RESEARCHED/decision-pending
-(N-6), 4 NOT STARTED (N-3, N-12, N-13, N-15-remainder; N-18/N-19 remain P3), 1 not actionable in
+**Tally:** 14 FIXED, 2 PARTIAL, 0 NEEDS DECISION-but-unimplemented, 0 research-pending, 4 NOT STARTED (N-3, N-12, N-13, N-15-remainder; N-18/N-19 remain P3), 1 not actionable in
 this repo. *(Updated 2026-09-26: N-5 and N-9 moved to FIXED once their recorded decisions were
-implemented; N-6's requested research is now done and awaits a user decision; N-19's dead
-`month_season_score` half was fixed by N-5.)*
+implemented; N-6's research finished and its recommended remedy-dominance guard is now
+implemented (option C); N-19's dead `month_season_score` half was fixed by N-5.)*
 
 ---
 
@@ -194,10 +193,20 @@ Findings:
   **Harish** (Water→Wood) and **Mahesh** (Fire→Water) — a client-visible move that needs explicit
   approval.
 
-**Decision pending.** Options A–D recorded in the research doc §5 (implement the branch-weighted
-gate / implement the looser 4-of-8 criterion / only suppress-when-remedy-already-dominant /
-leave as-is). **Not implemented** — no code changed. The numeric threshold, if adopted, should be
-labelled `[UNCERTAIN]` in knowledge/17 as the 辰/戌 branch assignments already are.
+**IMPLEMENTED (option C — the remedy-dominance guard), 2026-09-26.** `climate.is_remedy_dominant()`
++ `yongsin.favorable_element()` now withhold the 조후 override when the prescribed remedy is
+already the chart's most-abundant element; `FavorableElement.remedy_dominant` records it;
+knowledge/17 §"The Remedy-Dominance Guard" + knowledge/09 Step 3 document it. Verified: both audit
+examples suppressed; **zero** published deliverables changed (regen produced no markdown diff);
+new fixtures `dry-remedy-dominant` (guard fires) + re-pointed `dry-balanced-synth-v2`; regression
+tests in `test_climate.py` / `test_yongsin_consistency.py`. Validation CLI 204→205.
+
+**Why not the branch-count gates:** 궁통보감's 四月辛金 entry prescribes 壬水 **unconditionally**
+(regardless of chart-wide temperature), and Harish's canonical chart is exactly 四月辛金 — a
+branch-count gate would flip his Water→Wood, contradicting the classical per-stem rule. The
+practitioner sources' class lists are also mutually inconsistent. Option B remains available if a
+future non-contradicting source appears. Ground Rule 1 satisfied: the adopted guard is sourced and
+logically forced; no threshold was invented.
 
 ### N-9 — 양인격/건록격 month-branch position
 
@@ -239,7 +248,6 @@ non-month-is-related, for both 양인 and 건록).
   not.
 - **N-15** (remainder) — a 절기-proximity boundary disclosure, parallel to the 子-hour one already
   added, using the term-candidate list `_independent_year_month_pillar` already builds.
-- **N-6** — researched, decision pending (see above / `docs/research/2026-09-26-climate-extremeness-threshold.md`).
 - **N-18** (range-edge crashes), **N-19** (the dead `month_season_score` half is now fixed by N-5;
   the Wood tie-break half remains) — smaller P3
   items, not yet investigated.

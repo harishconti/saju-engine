@@ -87,6 +87,41 @@ but on the per-branch element assignments in the table above, which rest on a
 modern practitioner source (cantian.ai) rather than a transcribed classical
 text.
 
+## The Remedy-Dominance Guard (added 2026-09-26, deep-audit N-6)
+
+The classical doctrine conditions the 조후 override on the **whole chart**
+being climate-extreme, not merely on the birth month. 적천수 (滴天髓) §29 寒暖
+and §30 燥濕 say the chart must be "不可過 / 不可偏" (not excessive / not
+one-sided), and 임철초's (任鐵樵) commentary even withholds the remedy for
+absolute excess (*"若原局全是極寒、極濕、極暖、極燥之氣，反不宜調候"*). A chart
+born in a hot month but already full of Water does **not** need more Water.
+
+The primary text states this condition qualitatively — **no classical source
+gives a numeric threshold.** Two modern Korean practitioner sources do give
+whole-chart tests, but they disagree with one another and would suppress
+readings 궁통보감 prescribes unconditionally (e.g. 四月辛金 wants 壬水 *regardless*
+of how hot the rest of the chart is — see `docs/research/
+2026-09-26-climate-extremeness-threshold.md` §3). Adopting either would
+contradict a transcribed classical rule, so neither is used.
+
+What this project implements instead is the one condition that is both sourced
+and logically forced — the audit's **remedy-dominance guard**:
+
+> **If the element 조후 prescribes is already the chart's most abundant
+> element, the 조후 override is withheld; 억부 (strength-balance) governs.**
+
+Adding the most-abundant element cannot balance a chart, so this needs no
+invented threshold and cannot contradict a per-stem prescription (it only fires
+when the chart is *already* saturated with the remedy). In `src/saju_engine/`,
+`climate.is_remedy_dominant(month_branch, element_counts)` implements the test
+and `yongsin.favorable_element()` applies it after the band table. The resolved
+`FavorableElement.remedy_dominant` field records the state.
+
+This closes the audit's N-6 complaint (the prescribed remedy was already the
+chart's most-abundant element in ~15% of climate-governed random charts; the
+guard reduces that to 0 by construction, and corrects both of the audit's own
+example charts) without inventing doctrine.
+
 ## How This Combines With 억부 (Strength-Balance)
 
 Per `knowledge/09-interpretation-method.md` Step 3, **as of 2026-09-19**:

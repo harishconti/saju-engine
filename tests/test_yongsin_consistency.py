@@ -208,6 +208,54 @@ def test_harish_regression_climate_override_to_water():
     assert fe.supporting == "Metal"
     assert fe.method == "climate-balanced"
     assert fe.climate_agrees is False
+    # N-6: Harish's Water remedy is NOT already dominant, so the override is
+    # not suppressed — 궁통보감 prescribes 壬水 for 四月辛金 unconditionally.
+    assert fe.remedy_dominant is False
+
+
+# ── N-6 remedy-dominance guard (2026-09-26 deep audit) ───────────────────
+
+
+def test_n6_guard_suppresses_water_remedy_when_water_already_dominant():
+    """The audit's own N-6 example: 1963-10-24 11:00 is a 戌 (dry → Water)
+    month, but the chart is already 36% Water (壬, 癸, 子). Adding Water cannot
+    balance it, so the 조후 override must be withheld and 억부 governs."""
+    chart = compute_chart(
+        name="N6-dry-water-dominant", gender="M",
+        year=1963, month=10, day=24, hour=11, minute=0,
+        longitude=127.0, utc_offset=9.0, use_solar_time=True,
+    )
+    fe = favorable_element(chart)
+    assert fe.climate_band == "dry"
+    assert fe.climate_element == "Water"
+    assert fe.remedy_dominant is True
+    assert fe.method != "climate-balanced"      # override withheld
+    assert fe.element != "Water"
+
+
+def test_n6_guard_suppresses_fire_remedy_when_fire_already_dominant():
+    """The audit's second N-6 example: a 亥 (cold → Fire) month whose chart is
+    already Fire-dominant (35%) — Fire here is the chart's 기신, so it must not
+    be prescribed."""
+    chart = compute_chart(
+        name="N6-cold-fire-dominant", gender="M",
+        year=2010, month=12, day=6, hour=1, minute=0,
+        longitude=127.0, utc_offset=9.0, use_solar_time=True,
+    )
+    fe = favorable_element(chart)
+    assert fe.climate_band == "cold"
+    assert fe.climate_element == "Fire"
+    assert fe.remedy_dominant is True
+    assert fe.element != "Fire"
+
+
+def test_n6_guard_does_not_fire_for_published_candidates():
+    """The guard must leave every published reading's resolved 용신 unchanged
+    (none of them has its remedy element as the most abundant)."""
+    for chart in CANDIDATES:
+        fe = favorable_element(chart)
+        # remedy_dominant is None for a temperate month, else must be False.
+        assert fe.remedy_dominant in (None, False)
 
 
 # ── E-3/E-5 single resolution (2026-09-26) ───────────────────────────────
