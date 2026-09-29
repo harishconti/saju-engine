@@ -31,6 +31,15 @@ def test_build_pdf_from_markdown(tmp_path):
     # client deliverable (candidates_horoscope/reports/sruthi/sruthi-report.pdf)
     # and overwrite it on every test run. SAJU_OUT_DIR redirects the build to
     # a scratch directory instead.
+    #
+    # The check below compares the tracked PDF's bytes before and after the
+    # build (content hash), NOT `git status` cleanliness — the original N-22
+    # assertion required the tree to be clean, so any *legitimate* regeneration
+    # of that deliverable (e.g. a client-report regen) made this test fail even
+    # though the build under test never touched the file.
+    real_pdf_path = PROJECT_ROOT / "candidates_horoscope" / "reports" / "sruthi" / "sruthi-report.pdf"
+    before = real_pdf_path.read_bytes() if real_pdf_path.exists() else None
+
     result = subprocess.run(
         ["bash", str(PROJECT_ROOT / "tools" / "build-pdf.sh"), "sruthi"],
         cwd=PROJECT_ROOT,
@@ -42,9 +51,8 @@ def test_build_pdf_from_markdown(tmp_path):
     pdf_path = tmp_path / "sruthi-report.pdf"
     assert pdf_path.exists()
     assert pdf_path.stat().st_size > 1000
-    real_pdf_path = PROJECT_ROOT / "candidates_horoscope" / "reports" / "sruthi" / "sruthi-report.pdf"
-    assert subprocess.run(["git", "status", "--porcelain", "--", str(real_pdf_path)],
-                           cwd=PROJECT_ROOT, capture_output=True, text=True).stdout == ""
+    after = real_pdf_path.read_bytes() if real_pdf_path.exists() else None
+    assert after == before, "the scratch build must not overwrite the tracked client PDF"
 
 
 def test_build_pdf_from_premium_markdown(tmp_path):

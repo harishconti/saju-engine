@@ -229,5 +229,9 @@ headline. **N-5 is now implemented** (verdicts and favorable elements held stabl
 charts, but the `**Strength:**` reasoning line changed shape and now names the element-relation
 baseline instead of the 12운성 stage), and **N-9 is now implemented** (양인격/건록격 pattern lines
 can move position). N-6 and N-12 are still open and will change deliverables once implemented.
-**No candidate reports have been regenerated as part of this tracker** — run
-`tools/regen_client_reports.sh` and diff the Quick Reference blocks before re-sending anything.
+**All candidate deliverables were regenerated 2026-09-26 (second pass)** via
+`tools/regen_client_reports.sh` — verdicts, favorable elements, and compat scores were all
+confirmed unchanged; the diff is the N-5 strength/arrival lines plus accumulated F-1..F-16 /
+N-series catch-up (Hanja first-use, tier price, 대운수 precision). The regen also exposed and
+fixed a flaw in the N-22 regression test (it asserted a clean `git status`, so any legitimate
+regen of a tracked deliverable failed it) — the test now asserts unchanged bytes instead.

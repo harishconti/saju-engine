@@ -46,10 +46,10 @@
 ### Quick Reference
 
 - **Day Master:** Sin (Yin Metal, 辛金)
-- **Strength:** Balanced — the Day Master's stage in the month branch **巳** is **사** (a seasonally weak baseline, per knowledge/06-twelve-stages.md) — one cycle is completing as the querent enters the world, so early identity may feel transitional — and peer/resource support and the output/wealth/authority drain sit close to even.
+- **Strength:** Balanced — the month branch **巳** gives the Day Master a **mixed seasonal baseline** by element relation (per knowledge/09-interpretation-method.md Step 2); its 12운성 stage there is **사 (死)** — one cycle is completing as the querent enters the world, so early identity may feel transitional (knowledge/06-twelve-stages.md). Peer/resource support and the output/wealth/authority drain sit close to even.
 - **Favorable Element:** Water — The Day Master reads as balanced, so the classical 조후 (climate-balance) check applies: this chart peaks in hot summer conditions, and the classical remedy is Water. This takes priority over the chart's simple element count, which is a weaker signal than the classical climate check here.
 - **Supporting Element:** Metal
-- **Avoid / Watch:** Fire (기신 (忌神), watch) · Earth (구신, restrains Water) · Wood (한신 (閒神), drains Water)
+- **Avoid / Watch:** Fire (기신, watch) · Earth (구신, restrains Water) · Wood (한신, drains Water)
 - **Current Major Luck:** 己酉 (ages 30-39)
 - **Luck direction:** forward, advancing from the month pillar — derived from a yang year stem (壬) and male gender, per the classical rule (yang year + male, or yin year + female → forward; otherwise backward).
 - **Pattern / Formation:** 정관격 / Direct Officer Grid
@@ -91,7 +91,7 @@ This document is a structured, multi-section reading. It is meant to be returned
 2. **Should I move north or only wear water?** No. The favorable element is a tendency, not a rule. Wear the colors that feel right, work in the direction that suits you, but do not rearrange your life around a single element. The goal is balance, not obsession.
 3. **Can Saju tell me what illness I might get?** No. Classical Saju maps tendencies in the body's elemental systems (e.g. *excess Wood* may show up in the liver channel), but it does not diagnose. Always consult a licensed healthcare provider for any health concern.
 4. **How often should I get a reading?** Most readers find that a full re-reading every 2–3 years is enough, with a brief check-in at each major annual or lunar-new-year transition. Use the Annual Windows table in this report to track the larger currents yourself.
-5. **What is a major luck period?** A 10-year stretch of life shaped by a new stem and branch (대운 (大運)) that overlays your natal chart. The Major Luck Periods table summarises all of yours. Plan long-term decisions with the table in hand.
+5. **What is a major luck period?** A 10-year stretch of life shaped by a new stem and branch (대운) that overlays your natal chart. The Major Luck Periods table summarises all of yours. Plan long-term decisions with the table in hand.
 6. **How is Saju different from Western astrology?** Saju is solar-lunar calendar-based and built on the Five Elements and Yin-Yang, not the tropical zodiac. There is no equivalent of "rising sign" or "house system"; the four pillars and the timing overlays are the entire frame.
 7. **Should I read this report chronologically?** No. The Chart at a Glance, Quick Reference, and Closing Note are the entry points. Use the timing tables (Annual Windows, Monthly Lucky Dates) as a navigation layer, not as a linear story.
 
@@ -107,7 +107,7 @@ Born in a **Metal** chart with the engine reading as **balanced**, the way you m
 
 Your growth edge is to consciously cultivate **Water** energy — the favorable element — so that your Metal nature has the right container and outlet.
 
-Your Day Master **辛** meets the month branch **巳** at the **사 (phase-ending start)** twelve-stage — one cycle is completing as the querent enters the world, so early identity may feel transitional. This is read as a seasonally depleted arrival: a tendency in how the querent's core energy first enters the world, not a fixed early-life outcome.
+Your Day Master **辛** meets the month branch **巳** at the **사 (phase-ending start)** twelve-stage — one cycle is completing as the querent enters the world, so early identity may feel transitional. This is read as a mixed seasonal support arrival: a tendency in how the querent's core energy first enters the world, not a fixed early-life outcome.
 
 ### Four Pillars, One by One
 
@@ -153,7 +153,7 @@ When the annual or major luck touches the 丑 branch or the 己 stem, expect hou
 
 ### Ten-God Distribution Table
 
-A pillar-by-pillar view of the ten-god (십신 (十神)) picture — including the hidden stems inside each branch, which most of the time shape the chart's deeper themes more than the visible stems alone.
+A pillar-by-pillar view of the ten-god (십신) picture — including the hidden stems inside each branch, which most of the time shape the chart's deeper themes more than the visible stems alone.
 
 | Pillar | Stem | Ten-God (Stem) | Branch Hidden Stems | Hidden Ten-Gods | Reading |
 |---|---|---|---|---|---|
@@ -193,7 +193,7 @@ Use this table as a quick reference when you are unsure which ten-god a particul
 
 ### Wealth Pattern
 
-Wealth timing is read from where 재성 (Wealth) ten-gods appear and are supported. Your favorable element **Water** and supporting element **Metal** describe the broader climate that helps those wealth channels function; they are not the wealth channel itself. 재성 (Wealth) ten-gods are visible in the natal pillars, so earning capacity is rooted in the chart. Use the 대운 and 세운 (歲運) tables to see when income and value-creation themes surface most clearly. Periods dominated by **Fire** call for conservation rather than expansion.
+Wealth timing is read from where 재성 (Wealth) ten-gods appear and are supported. Your favorable element **Water** and supporting element **Metal** describe the broader climate that helps those wealth channels function; they are not the wealth channel itself. 재성 (Wealth) ten-gods are visible in the natal pillars, so earning capacity is rooted in the chart. Use the 대운 (大運) and 세운 (歲運) tables to see when income and value-creation themes surface most clearly. Periods dominated by **Fire** call for conservation rather than expansion.
 
 ### Employment vs. Entrepreneurship
 
@@ -264,7 +264,7 @@ With a **Eating God (食神)** ten-god over a **Earth** branch (stem element Wat
 
 ### Relationship Style
 
-The spouse palace is **亥** (12-stage: 목욕 (沐浴) — an unsettled, exposed phase — learning through mistakes *(see knowledge/06-twelve-stages.md)*), whose main hidden stem relates to your Day Master as **Hurting Officer (傷官)**. In practice, you express affection candidly, sometimes bluntly, and want a partner who can take direct feedback. No **도화 (桃花)** star is natally active, so relationship style is more shaped by the spouse palace and ten-god mix than by overt magnetism. By 자평진전's gendered spouse-star convention, your **처성 (재성, wife star)** appears at **乙** (month stem), **甲** (day branch middle) — including the spouse palace itself, a classically stronger placement *(see knowledge/11-gunghap.md §G)*.
+The spouse palace is **亥** (12-stage: 목욕), whose main hidden stem relates to your Day Master as **Hurting Officer (傷官)**. In practice, you express affection candidly, sometimes bluntly, and want a partner who can take direct feedback. No **도화 (桃花)** star is natally active, so relationship style is more shaped by the spouse palace and ten-god mix than by overt magnetism. By 자평진전's gendered spouse-star convention, your **처성 (재성, wife star)** appears at **乙** (month stem), **甲** (day branch middle) — including the spouse palace itself, a classically stronger placement *(see knowledge/11-gunghap.md §G)*.
 
 ### Spouse Palace Ten-God
 
@@ -277,7 +277,7 @@ The spouse palace **亥** (12-stage: 목욕) carries a main hidden stem that rel
 | Growth-oriented, idealistic, and principled | Wood | **Compatible** | Neutral energetic exchange. |
 | Radiant, expressive, and momentum-driven | Fire | **Watch** | Fire is your 기신 (challenging element) — it works against the balance your chart seeks. |
 | Grounded, nurturing, and reliability-focused | Earth | **Compatible** | Neutral energetic exchange. |
-| Disciplined, precise, and structure-oriented | Metal | **Good** | Metal supports your 용신 (Water) — secondary support (희신 (喜神)). |
+| Disciplined, precise, and structure-oriented | Metal | **Good** | Metal supports your 용신 (Water) — secondary support (희신). |
 | Adaptive, perceptive, and depth-seeking | Water | **Best** | Water is your 용신 (favorable element) — the core balance your chart seeks. |
 
 ### Three Things to Be Mindful Of
@@ -309,7 +309,7 @@ Friend and social energy is shaped by the chart's dominant classes — **Output 
 With the spouse palace **亥** sitting in the **목욕** 12-stage and carrying hidden-stem ten-gods of **상관, 정재**, the querent bonds through a mix of presence and discernment. The **목욕** stage is one of the supported (strong) stages, so the querent tends to bring energy and presence into the bond. The hidden-stem ten-gods colour the undercurrent — Resource leans into safety, Output into creative play, Wealth into stability. Read this as the emotional baseline; the 대운/세운 overlays show when the querent's bond patterns shift most.
 
 #### Marriage Timing Windows
-Commitment timing is read from your **재성 (wife star)** and your spouse palace **亥** (the day branch) *(see knowledge/08-luck-pillars.md Part 5b)*. Neither the current nor the next major-luck period carries the spouse star or binds the spouse palace, so the annual years below carry more of the weight. The years where the most signals converge: **2035 乙卯** (편재 spouse-star year, 亥卯未 삼합 (三合) through the spouse palace; offset by a void (empty) year, so gains may feel less solid); **2034 甲寅** (정재 spouse-star year, 寅亥 육합 (六合) into the spouse palace; offset by 寅亥 파 (破) on the spouse palace, a void (empty) year, so gains may feel less solid). Years better suited to deepening privately than to formalising: 2030 (겁재 year); 2031 (亥亥 자형 (自刑) on the spouse palace). These are tendencies for when the theme is most active — not predictions of an event.
+Commitment timing is read from your **재성 (wife star)** and your spouse palace **亥** (the day branch) *(see knowledge/08-luck-pillars.md Part 5b)*. Neither the current nor the next major-luck period carries the spouse star or binds the spouse palace, so the annual years below carry more of the weight. The years where the most signals converge: **2035 乙卯** (편재 spouse-star year, 亥卯未 삼합 through the spouse palace; offset by a void (empty) year, so gains may feel less solid); **2034 甲寅** (정재 spouse-star year, 寅亥 육합 into the spouse palace; offset by 寅亥 파 on the spouse palace, a void (empty) year, so gains may feel less solid). Years better suited to deepening privately than to formalising: 2030 (겁재 year); 2031 (亥亥 자형 on the spouse palace). These are tendencies for when the theme is most active — not predictions of an event.
 
 #### Family Dynamics
 The year pillar **申** carries ancestral and parental themes; its main hidden stem shapes how the querent absorbs (or pushes back on) family-of-origin patterns. The month pillar **巳** is the career and sibling palace — its dynamics surface in how the querent shows up among peers and early mentors. The hour pillar **丑** speaks to children and later life — its hidden stems indicate what the querent is likely to pass on, and what they will need to consciously teach.
@@ -360,9 +360,9 @@ This section gathers the visible structural signals in your natal chart — comb
 
 | Pattern | Branches | Classical Note |
 |---|---|---|
-| Six Combination | 巳+申 | binds the two branches without transforming (합 (合)이불화, 合而不化) — Water is not in season at the month branch or a member is struck by a clash, so read it as a tie, not a new Water force; links the year and month palaces |
+| Six Combination | 巳+申 | binds the two branches without transforming (합이불화, 合而不化) — Water is not in season at the month branch or a member is struck by a clash, so read it as a tie, not a new Water force; links the year and month palaces |
 | Half Harmony | 巳+丑 | two of the 巳酉丑 (Metal) frame without its central branch 酉 — latent; it activates when 酉 arrives in a luck period |
-| Stem Clash (천간충 (天干沖)) | 乙↔辛 | two same-polarity stems in direct control — tension in what those stems' ten-gods represent |
+| Stem Clash (천간충) | 乙↔辛 | two same-polarity stems in direct control — tension in what those stems' ten-gods represent |
 | Six Clash | 巳↔亥 | a tension or activation between two life palaces; often a call to adjust, release, or decide |
 | Three Punishment (partial) | 申-巳 | two branches of a punishment frame without the third; a lighter but recurring structural pressure that matures slowly |
 | Six Harm | 申-亥 | a quiet friction that can drain energy if ignored |
@@ -371,7 +371,7 @@ This section gathers the visible structural signals in your natal chart — comb
 
 ### Pattern Narratives
 
-The engine flags **정관격 (Direct Officer Grid)** as the regular grid, but with a caveat: 파격 (broken-grid) risk: 상관견관 is also present in this chart (knowledge/05-ten-gods.md, knowledge/07-special-formations.md), which classically complicates a 정관격 reading. Read this grid's usual meaning with that caveat rather than at full strength. The month branch is struck (申巳 형 (刑), 亥巳 충), which lowers the grid's purity without fully breaking it. When intact, this grid points toward a life theme shaped by conventional respectability and structure — credentials, large institutions, examinations, and public trust.
+The engine flags **정관격 (Direct Officer Grid)** as the regular grid, but with a caveat: 파격 (broken-grid) risk: 상관견관 is also present in this chart (knowledge/05-ten-gods.md, knowledge/07-special-formations.md), which classically complicates a 정관격 reading. Read this grid's usual meaning with that caveat rather than at full strength. The month branch is struck (申巳 형, 亥巳 충), which lowers the grid's purity without fully breaking it. When intact, this grid points toward a life theme shaped by conventional respectability and structure — credentials, large institutions, examinations, and public trust.
 
 The most prominent natal branch signal is a **partial 삼형 (Three Punishment)** between **申** and **巳** (삼형 申巳 (Wood-Metal-Fire punishment)), touching the ancestral and social-root energy — the wider world you were born into and career and immediate environment — how you show up at work and in daily life. Two branches of a punishment frame are present without the third — a lighter but recurring structural pressure; its themes mature slowly and tend to recur until they are consciously recognized.
 
@@ -387,7 +387,7 @@ The chart's dominant pattern candidate is **정관격 (Direct Officer Grid)**. A
 *Counted from your day branch **亥** (common modern practice; traditional Korean practice counts from the year branch, which can give a different set of stars).*
 
 - **겁살 (劫煞)** (at 申): sudden loss, theft, or unexpected competition — can also mark a capacity for decisive action.
-- **지살 (地煞)** (at 亥): a movement/departure marker — relocation, travel, job or residence changes; a milder, more passive sibling of the travel star (역마 (驛馬)).
+- **지살 (地煞)** (at 亥): a movement/departure marker — relocation, travel, job or residence changes; a milder, more passive sibling of the travel star (역마).
 - **월살 (月煞)** (at 丑): also called 고초살 — a drying-up/stagnation marker: slow development and effort that needs patience before it bears fruit.
 - **천덕귀인 (天德貴人)** (at 辛): virtue, protection, and honorable character — help arriving in times of need; often read as one of the most favorable stars.
 
@@ -536,7 +536,7 @@ A quick reading of each year's energy relative to your Day Master and favorable 
 
 ## Life Themes by Major Luck Period
 
-Each 10-year major-luck (대운) period brings a new stem and branch into prominence. The stem shows the outer theme through its 십신 relationship to your Day Master; the branch shows the stage of life and the underlying terrain. Read these as tendencies, not fixed events.
+Each 10-year major-luck (대운) period brings a new stem and branch into prominence. The stem shows the outer theme through its 십신 (十神) relationship to your Day Master; the branch shows the stage of life and the underlying terrain. Read these as tendencies, not fixed events.
 
 ### Ages 0–9: 丙午
 
@@ -581,7 +581,7 @@ With a **Robber (劫財)** ten-god over a **Earth** branch (stem element Metal),
 ### Ages 50–59: 辛亥
 
 - **Ten-God theme:** Companion (比肩)
-- **Branch element & 12-stage:** Water · 목욕
+- **Branch element & 12-stage:** Water · 목욕 (沐浴)
 - **Favorable lean:** favorable
 
 With a **Companion (比肩)** ten-god over a **Water** branch (stem element Metal), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Water** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Companion (比肩)** undertow — themes of peer dynamics, independence, and friendship-based bonds are likely. The favorable **Water** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
@@ -686,7 +686,7 @@ Across all periods, the **Water** element's daily practices (its season, foods, 
 
 The next **12 months** of favorable days, selected when the daily stem element matches your **Water** or **Metal** element and the day branch does not clash, harm, or break your natal day or hour branch.
 
-> _Methodology: each row filters the daily-luck (일운 (日運)) stems to those whose element matches your favorable or supporting element, then drops any day whose branch clashes, harms, or breaks against your natal day or hour branch._
+> _Methodology: each row filters the daily-luck (일운) stems to those whose element matches your favorable or supporting element, then drops any day whose branch clashes, harms, or breaks against your natal day or hour branch._
 
 > **Almanac caveat:** this is a chart-relative shortlist, not a finished 택일 — a full 택일 also weighs the day's own almanac assignment, the specific event type, and local custom *(see knowledge/16-date-selection.md)*.
 
@@ -772,7 +772,6 @@ Listen once in full, then return to the chapters that match the season you are i
 
 - **Indirect Resource (偏印):** unconventional learning — intuition, solitary study, restless over-thinking
 - **Day Master (日干):** you — the reference point the whole chart is read against
-- **Bath stage (沐浴):** an unsettled, exposed phase — learning through mistakes
 - **Resource class (印星):** the resource group — support, learning, and what sustains you
 - **Robber (劫財):** a rival for the same resources — competition in money or love
 - **Companion (比肩):** a peer or equal — support, solidarity, and rivalry in equal measure
