@@ -54,7 +54,7 @@ def test_regular_grid_no_tuochul_falls_back_to_bonki():
 
 
 def test_yangin_detection():
-    # 丙 day master in 午 branch
+    # 丙 day master in 午 branch (월령) — N-9: the month case IS the grid.
     result = detect_patterns(
         day_master="丙",
         month_stem="甲",
@@ -66,37 +66,65 @@ def test_yangin_detection():
     # Star-level 양인 appears anywhere the blade branch is found.
     assert result["yangin"]["present"] is True
     assert 0 in result["yangin"]["positions"]
-    # Grid-level 양인격 excludes the month pillar (positions 0,2,3 only).
+    # N-9: the month-branch blade is the classical 양인격...
     assert result["yangin_grid"]["present"] is True
-    assert 1 not in result["yangin_grid"]["positions"]
+    assert result["yangin_grid"]["positions"] == [1]
+    # ...and the year/day/hour blades are reported separately as related.
+    assert result["yangin_related"]["positions"] == [0, 2, 3]
 
 
-def test_yangin_star_vs_grid_distinction():
-    """B11: 양인 in the month pillar registers as a star but not as a grid."""
+def test_yangin_month_is_grid_other_positions_related():
+    """N-9 (2026-09-26): 양인격 is the 월령 (month) grid per 자평진전. A blade
+    in the year/day/hour pillar is a related, distinct pattern — the reverse of
+    the old rule, which excluded the month and called year/day/hour the grid."""
     result = detect_patterns(
         day_master="丙",
         month_stem="甲",
-        month_branch="午",
-        branches=["子", "午", "寅", "丑"],
+        month_branch="子",              # not the blade month
+        branches=["子", "子", "寅", "午"],  # blade (午) in the hour pillar only
         stems=["丙", "甲", "丙", "己"],
-        hidden_stems=[("main", "丁")],
+        hidden_stems=[("main", "壬")],
     )
     assert result["yangin"]["present"] is True
-    assert result["yangin"]["positions"] == [1]
+    assert result["yangin"]["positions"] == [3]
+    # Not the 월령 grid...
     assert result["yangin_grid"]["present"] is False
+    assert result["yangin_grid"]["positions"] == []
+    # ...but surfaced as the related blade pattern.
+    assert result["yangin_related"]["present"] is True
+    assert result["yangin_related"]["positions"] == [3]
 
 
 def test_jianlu_detection():
-    # 丙 day master, 巳 is 建祿 branch
+    # 丙 day master, 巳 is the 建祿 branch, in the month pillar (월령).
     result = detect_patterns(
         day_master="丙",
         month_stem="甲",
         month_branch="巳",
-        branches=["巳", "子", "寅", "丑"],
+        branches=["子", "巳", "寅", "丑"],
         stems=["丙", "甲", "丙", "己"],
         hidden_stems=[("main", "丙")],
     )
     assert result["jianlu"]["present"] is True
+    # N-9: the month-branch 건록 IS the classical 건록격.
+    assert result["jianlu_grid"]["present"] is True
+    assert result["jianlu_grid"]["positions"] == [1]
+
+
+def test_jianlu_non_month_is_related_not_grid():
+    """N-9: a 건록 branch outside the month is a related pattern, not 건록격."""
+    result = detect_patterns(
+        day_master="丙",
+        month_stem="甲",
+        month_branch="寅",              # not the 건록 month
+        branches=["巳", "寅", "寅", "丑"],  # 巳 (건록) in the year pillar
+        stems=["丙", "甲", "丙", "己"],
+        hidden_stems=[("main", "甲")],
+    )
+    assert result["jianlu"]["present"] is True
+    assert result["jianlu_grid"]["present"] is False
+    assert result["jianlu_related"]["present"] is True
+    assert result["jianlu_related"]["positions"] == [0]
 
 
 def test_element_balance():
@@ -682,6 +710,7 @@ def test_yangin_absent_for_yin_day_master():
     )
     assert result["yangin"]["present"] is False
     assert result["yangin_grid"]["present"] is False
+    assert result["yangin_related"]["present"] is False
 
 
 # ── 상관견관 (Output Meets Authority) — added 2026-09-19, external review ────

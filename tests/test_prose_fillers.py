@@ -679,7 +679,7 @@ def test_strength_reasoning_reconciles_skew_with_balanced_verdict():
     support = sa["self_score"] + sa["resource_score"]
     assert sa["drain_score"] > support * 1.3
     text = PF.strength_reasoning({"chart": chart})
-    assert "the output/wealth/authority drain outweighs the peer and resource support" in text
+    assert "the output/wealth/authority drain outweighs the peer and resource support" in text.lower()
     assert "pulls the total back into the balanced range despite that skew" in text
 
 

@@ -20,12 +20,14 @@
   second pass. **Suite: 1094 passed / 9 xfailed / 0 failed.** Validation gate:
   `python3 tools/run_validation.py` → `204 (PASS 200, INTERPRETATION 4, FAIL 0)`. `ruff check
   --select F src tools tests` is now clean and enforced in CI (was not run in CI before this pass).
-  **Three doctrinal items are decided but not yet implemented** — N-5 (yin DM strength should read
-  season/element relation, not 12운성 stage), N-9 (양인격/건록격 should also recognize a
-  month-branch/월령 case, kept distinct from the existing year/day/hour case), and N-6 (조후 gate
-  needs more research before a chart-extremeness threshold is picked). Do not assume these are done
-  — check the tracker doc before relying on strength/조후/grid output for a yin-DM or hot/cold-month
-  chart.
+  **Two of the three doctrinal items are now implemented:** **N-5** (yin-DM strength now scores
+  the month branch by element relation / 득령, knowledge/09 Step 2 — not the 12운성 stage; extreme
+  bands widened 4.0→5.0 to keep `extreme` rare and hold published verdicts stable) and **N-9**
+  (양인격/건록격 now fire at the month/월령 position as the classical grid, with the year/day/hour
+  case relabelled a related-but-distinct pattern). **N-6 is still open** (조후 gate needs more
+  research before a chart-extremeness threshold is picked — check the tracker doc before relying on
+  strength/조후 output for a hot/cold-month chart). Client reports have **not** been regenerated for
+  N-5/N-9 yet.
 
 - Engine is feature-complete for the current product scope, now including a 조후 (climate-balance)
   cross-check on top of the existing 억부 (strength-balance) 용신 heuristic — see the 2026-09-13
@@ -238,6 +240,37 @@ history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P
 
 ## Recent Changes to Remember
 
+- **2026-09-26 (N-5 + N-9 doctrinal decisions implemented, Suite 1094 → 1096)** — Two of the three
+  [doctrinal] items from the second deep audit were implemented against their recorded user
+  decisions:
+  - **N-5 — yin Day Master strength.** `strength.py::assess_strength` now scores the month term from
+    the **element-relation 득령** signal (`month_season_score`, `_MONTH_BRANCH_SEASON`) instead of the
+    12운성 `month_stage_score`, per knowledge/09 Step 2. The 12운성 stage is retained as descriptive
+    metadata (`month_stage`/`month_stage_score` still exported). Because the season term's ceiling
+    (2.0×1.5=3.0) exceeds the stage term's effective ceiling, the **extreme bands were widened
+    4.0→5.0** so `extreme` stays ~3% of charts and every published verdict is unchanged (verified:
+    rm/gurumoorthy strong, harish/vishnu/sruthi/pawan/mahesh balanced — all hold). The yin inversion
+    is gone: 乙 in 亥 is now resource-supported, 乙 in 午 is not, and 乙/甲 agree by season. Six
+    synthetic *climate-merge* fixtures were re-baselined (raw strength/candidate moved; their
+    climate-resolved `fe` is unchanged); `damp-strong-synth` was re-pointed to a genuinely strong
+    辰-month chart. `prose_fillers._season_signal` now consumes the element-relation score, and the
+    Quick-Reference `**Strength:**` reasoning line names the element-relation baseline (with the
+    12운성 stage still named descriptively). knowledge/06 + knowledge/09 record the scope.
+  - **N-9 — 양인격/건록격 position.** `patterns.py::detect_patterns` now flags the **월령 (month
+    branch)** case as the classical 양인격/건록격 grid (`yangin_grid`/`jianlu_grid.present`) and
+    surfaces the year/day/hour case as new `yangin_related` / `jianlu_related` blocks (the raw
+    `jianlu` block keeps an any-position presence flag).
+    knowledge/07 §3–4 rewritten with both patterns + citations (자평진전 월령 격국; 淵海子平/
+    명리정종/三命通會). `skeleton.py` renders both distinctly. Regression tests in `test_patterns.py`.
+  - Also fixed a **pre-existing ruff F841** in `pillars.py` (orphaned by the N-2 fix: dead
+    `eff_date` / `_effective_calendar_date`) that had left the CI `ruff check --select F` gate red.
+  - Gates: suite **1096 passed / 9 xfailed / 0 failed**; validation `204 (PASS 200, INTERPRETATION
+    4, FAIL 0)`; `ruff check --select F src tools tests` clean. Tracker updated:
+    `docs/audits/2026-09-26-deep-engine-audit-verification.md`. N-6 (조후 gate threshold) remains
+    open pending research. **Client reports were not regenerated** — run `tools/regen_client_reports.sh`
+    and diff Quick Reference blocks before re-sending (verdicts/elements are unchanged; the
+    reasoning line and pattern lines move).
+
 - **2026-09-26 (second deep engine audit, 11 of 22 fixed + 3 doctrinal decisions recorded, Suite →
   1094)** — A separate session ran a fresh from-scratch audit
   (`docs/audits/2026-09-26-deep-engine-audit.md`, N-1..N-22) against the same baseline the
@@ -268,7 +301,8 @@ history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P
   `docs/audits/2026-09-26-deep-engine-audit-verification.md`. **Still open, not started:** N-3
   (ephemeris-accurate 절기 table — the largest remaining item), N-12 (hidden-stem qi weights), N-13
   (IANA timezone/DST redesign), N-15's remainder (절기-proximity disclosure), N-18/N-19 (range-edge
-  crashes, dead `month_season_score`). N-21 (landing-page source) is not fixable from this repo —
+  crashes; N-19's dead `month_season_score` half is now fixed by N-5, its Wood tie-break half
+  remains). N-21 (landing-page source) is not fixable from this repo —
   the source simply is not here. Gates: suite **1094 passed / 9 xfailed / 0 failed**; validation
   `204 (PASS 200, INTERPRETATION 4, FAIL 0)`; `ruff check --select F src tools tests` clean and now
   in CI.

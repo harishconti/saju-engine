@@ -2,17 +2,21 @@
 
 **Date opened:** 2026-06-02  
 **Last updated:** 2026-09-26  
-**Test count:** 1094 pytest cases passing / 9 xfailed (`python3 -m pytest`); engine validation gate
+**Test count:** 1096 pytest cases passing / 9 xfailed (`python3 -m pytest`); engine validation gate
 `python3 tools/run_validation.py` → 204 checks (200 PASS / 4 INTERPRETATION / 0 FAIL); `ruff check
 --select F src tools tests` clean and now enforced in CI.
 **Open decision:** RM (Kim Nam-joon)'s hour pillar sits 17 seconds from the 午/未 boundary after the
 2026-09-19 equation-of-time fix — his public demo materials still use the old 午 reading pending a
 user decision on how to handle a boundary this close (see the 2026-09-19 change log entry).
-**Open doctrinal decisions (2026-09-26 audit, decided but not yet implemented):** N-5 (yin Day
-Master strength should read season/element relation, not 12운성 stage — see
-`docs/audits/2026-09-26-deep-engine-audit-verification.md`), N-9 (양인격/건록격 should also
-recognize a distinct month-branch/월령 case), and N-6 (조후 gate needs more research before a
-chart-extremeness threshold is picked — open, no decision yet).
+**Doctrinal decisions (2026-09-26 audit) — N-5 and N-9 now IMPLEMENTED** (2026-09-26): N-5 (yin
+Day Master strength now reads season/element relation, not 12운성 stage — `strength.py`; extreme
+bands widened 4.0→5.0 to hold published verdicts stable) and N-9 (양인격/건록격 now fire at the
+month-branch/월령 position as the classical grid, with the year/day/hour case relabelled a related
+pattern — `patterns.py`). **N-6 remains open** (조후 gate needs more research before a
+chart-extremeness threshold is picked — no decision yet). See
+`docs/audits/2026-09-26-deep-engine-audit-verification.md`. Client reports have **not** been
+regenerated for N-5/N-9 yet — run `tools/regen_client_reports.sh` before re-sending (verdicts/
+elements unchanged; reasoning + pattern lines move).
 **Status:** The **engine** is complete and validated (four Korean 만세력 textbook cross-validation cases, parametrized lookup-table tests, 30×30 Nayin table on the 5-element fallback, special-formations tests). **As of 2026-09-07 the project pivoted the go-to-market from India / ₹ to English-speaking-global / USD** — see `improvements_issues.md` (master doc) and `docs/market-research-2026-09.md` (sourced research). The 3 client-facing engine defects that blocked a paid launch are **fixed** (G1 reviewer-note leak, G2 per-pillar template grammar, G3 용신 single source of truth), plus ₹→USD across the engine, docs, and landing page. **Open P0/P1 (see `improvements_issues.md` §12):** real testimonials, Merchant-of-Record checkout, self-service-app PII/queue hardening, deployment. **Package layout:** engine and PDF packages live under `src/` with direct-run shims and a ReportLab fallback.
 
 This file is the persistent to-do list for the saju project. Items here were either explicitly deferred or surfaced during research.
@@ -332,6 +336,24 @@ Sourced market research: **`docs/market-research-2026-09.md`**. Design spec:
 
 ---
 
+- **2026-09-26 (N-5 + N-9 doctrinal decisions implemented, Suite 1094 → 1096)** — Implemented two of
+  the three [doctrinal] items from the second deep audit against their recorded user decisions.
+  **N-5:** `strength.py::assess_strength` now scores the month term from the element-relation 득령
+  signal (`month_season_score`, `_MONTH_BRANCH_SEASON`) instead of the 12운성 `month_stage_score`
+  (knowledge/09 Step 2); the stage is retained as descriptive metadata. Extreme bands widened
+  4.0→5.0 to keep `extreme` rare and hold every published verdict stable (rm/gurumoorthy strong,
+  harish/vishnu/sruthi/pawan/mahesh balanced — all verified unchanged); the yin inversion is gone
+  (乙/甲 agree by season). Six synthetic climate-merge fixtures re-baselined (their resolved `fe`
+  unchanged); `prose_fillers._season_signal` + the `**Strength:**` reasoning line now read the
+  element-relation baseline. `knowledge/06`+`09` record the scope. **N-9:**
+  `patterns.py::detect_patterns` now flags the 월령 (month-branch) case as the classical
+  양인격/건록격 grid (`yangin_grid`/`jianlu_grid.present`) and surfaces the year/day/hour case as a
+  new `yangin_related` block / relabelled `jianlu.note`; `knowledge/07` §3–4 rewritten with both
+  patterns + citations (자평진전 월령 격국; 淵海子平/명리정종/三命通會); `skeleton.py` renders both.
+  Also fixed a pre-existing `ruff` F841 in `pillars.py` (dead `eff_date`/`_effective_calendar_date`,
+  orphaned by the N-2 fix) that had left the CI `ruff check --select F` gate red. Gates: suite
+  **1096/9 xfailed**, validation `204 (200/4/0)`, ruff clean. N-6 (조후 gate threshold) remains
+  open. Client reports not regenerated — run `tools/regen_client_reports.sh` before re-sending.
 - **2026-09-26 (second deep engine audit — 11 of 22 fixed, 3 doctrinal decisions recorded, Suite
   1068 → 1094)** — A separate session's from-scratch audit (`docs/audits/
   2026-09-26-deep-engine-audit.md`, N-1..N-22, merged via PR #4) against the same pre-fix baseline

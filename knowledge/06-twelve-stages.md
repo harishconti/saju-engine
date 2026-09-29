@@ -140,13 +140,33 @@ The stages are interpreted as the **state of the Day Master (or any element bein
 
 ## Day Master Strength by Stage (Cheat Sheet)
 
+> **Strength-scoring scope note (2026-09-26, deep-audit N-5, user-approved).** The
+> stage cheat sheet below describes the **12운성 narrative** — the life-stage
+> colour of the Day Master in the month branch. It is **not** the criterion the
+> engine (or this method) uses to *score* 신강/신약. Strength scoring follows
+> `09-interpretation-method.md` Step 2, which reads the month branch's **element
+> relation to the Day Master** (own element / peak season / resource / drain).
+>
+> The reason is the yin cycle: yin stems run the 12운성 cycle **backward**
+> (음생양사), so reading strength off the stage inverts yin Day Masters — 乙 in 午
+> is its 장생 but the season is Fire, not Wood support, and 乙 in 亥 is its 사
+> but Water *generates* Wood. The 적천수 commentary (임철초) is explicitly
+> critical of using 음장생 for strength. Use this table for the stage's own
+> descriptive purpose (the DM's rhythm in a branch, 대운/세운 stage readings);
+> use Step 2 for the strong/weak verdict.
+
 For the **Day Master itself**, the stages that strengthen the chart:
 
 - **Strongest stages (Day Master is supported):** 장생, 목욕, 관대, 건록, 제왕.
 - **Weakest stages (Day Master is unsupported):** 쇠, 병, 사, 묘, 절.
 - **Transitional stages (mixed):** 태, 양.
 
-> A Day Master in **건록 or 제왕** in the month branch is at **seasonal peak** and is considered **신강 (身強, strong Day Master)**. A Day Master in **사, 묘, 절, 병, or 쇠** in the month branch is **seasonally weak** and considered **신약 (身弱, weak Day Master)** unless supported by other factors.
+> A Day Master in **건록 or 제왕** in the month branch is at **seasonal peak** and
+> is read as **신강 (身強, strong)** — for a *yang* stem this coincides with the
+> element-relation reading in Step 2. A Day Master in **사, 묘, 절, 병, or 쇠** in
+> the month branch is described as **seasonally weak** unless supported by other
+> factors — again, for yang stems only; for yin stems use Step 2's element
+> relation, per the scope note above.
 
 ## 12 Stages + Ten Gods
 

@@ -7,7 +7,24 @@ still be argued from the full chart context per `knowledge/09-interpretation-met
 
 Rules sourced from:
   - knowledge/03-five-elements.md (generating/overcoming cycles)
-  - knowledge/06-twelve-stages.md (seasonal strength signal)
+  - knowledge/09-interpretation-method.md §Step 2 (seasonal support: the month
+    branch's own element vs. the Day Master's element) — this is the 득령
+    signal that now drives the verdict.
+  - knowledge/06-twelve-stages.md (12운성 stage — retained as *descriptive*
+    metadata only; see the N-5 note below).
+
+N-5 (2026-09-26 doctrinal decision, user-approved, implemented here): the
+month-branch support term is scored from the **element relation** (season/
+element, knowledge/09 Step 2) rather than from the Day Master's 12운성 stage.
+The 12운성 cycle runs backward for yin stems (음생양사), so scoring strength off
+the stage inverted yin Day Masters — 乙 in 午 (its 장생) scored as strongly
+supported and 乙 in 亥 (its 사) as unsupported, whereas by season both are the
+opposite. The 2026-09-26 audit cites 임철초's 적천수 commentary as explicitly
+critical of using 음장생 for strength (not independently verified here), and
+knowledge/06's stage cheat sheet and knowledge/09 Step 2 genuinely disagreed
+for yin stems. The stage table stays authoritative for its own
+descriptive purpose (12운성 narrative, 대운/세운 stage readings); only the
+strength *scoring* input changed.
 """
 from __future__ import annotations
 
@@ -24,6 +41,11 @@ _GENERATED_BY: Dict[str, str] = {v: k for k, v in L.GENERATES.items()}
 # Seasonal strength of each element by month branch (solar-term month).
 # Simplified: each branch's season strongly favors its own element and the
 # element it generates. Values are relative weights.
+#
+# This table is the 득령 (in-season) signal used by the strength verdict
+# (knowledge/09 Step 2). It is keyed on the Day Master's element, so it is
+# yin/yang-neutral — a 乙 and an 甲 born in 亥 read the same seasonal support,
+# which is the whole point of the N-5 fix (see the module docstring).
 _MONTH_BRANCH_SEASON = {
     "寅": {"Wood": 2.0, "Fire": 1.0},
     "卯": {"Wood": 2.0, "Fire": 1.0},
@@ -41,6 +63,12 @@ _MONTH_BRANCH_SEASON = {
 
 # 12운성 strength signal for the Day Master in the month branch.
 # These are relative weights; 제왕/건록/관대/장생 are supportive, 사/묘/절 are depleted.
+#
+# N-5: DESCRIPTIVE ONLY — since the 2026-09-26 decision this table no longer
+# feeds the strength verdict (month_stage_score is still exported for the
+# 12운성 narrative prose, but the verdict uses month_season_score instead).
+# Kept because prose_fillers' stage narrative and the report's "stage in the
+# month branch" line are legitimate 12운성 readings, not strength claims.
 _STAGE_WEIGHT = {
     "장생": 1.5,
     "목욕": 0.8,
@@ -85,8 +113,10 @@ def assess_strength(
 
     The result contains:
       - element_counts: weighted stem counts by element
-      - month_season_score: seasonal support from the month branch
-      - month_stage_score: 12운성 support in the month branch
+      - month_season_score: seasonal (element-relation) support from the month
+        branch — the scored 월령 signal (N-5)
+      - month_stage_score: 12운성 support in the month branch (descriptive
+        only since N-5; still exported for the stage narrative)
       - total_score: combined numeric score
       - verdict: 'strong', 'weak', 'extreme_weak', 'balanced', or 'extreme'
       - candidate_favorable: candidate 용신 element
@@ -97,11 +127,13 @@ def assess_strength(
     dm_element = L.STEM_INFO[day_master]["element"]
     counts = _element_counts(stems, hidden_stems)
 
-    # Seasonal support from month branch
+    # 득령 (seasonal/in-season support) from the month branch — the element
+    # relation per knowledge/09 Step 2. This is the scored 월령 signal (N-5).
     season_weights = _MONTH_BRANCH_SEASON.get(month_branch, {})
     month_season_score = season_weights.get(dm_element, 0.0)
 
-    # 12운성 support in month branch
+    # 12운성 support in month branch — descriptive metadata only since N-5
+    # (see the module docstring); no longer contributes to total_score.
     month_stage = L.twelve_stage(day_master, month_branch)
     month_stage_score = _STAGE_WEIGHT.get(month_stage, 0.5)
 
@@ -135,19 +167,26 @@ def assess_strength(
     total_score = (
         self_score * 1.0
         + resource_score * 0.8
-        + month_stage_score * 1.5
+        + month_season_score * 1.5
         - drain_score * 0.7
     )
 
     # Verdict thresholds — tuned to be conservative; extreme scores are rare.
-    # D1 fix: month_season_score removed from total; month_stage_score alone
-    # carries the 월령 signal, so thresholds are lowered accordingly.
+    # N-5 (2026-09-26): month_season_score (element relation, knowledge/09
+    # Step 2) is the scored 월령 signal. The old D1 fix had removed the
+    # season term in favour of month_stage_score, which inverted yin DMs; the
+    # element-relation term is yin/yang-neutral and replaces it.
+    # Because the season term's maximum (2.0, weighted ×1.5 = 3.0) is larger
+    # than the stage term's (2.0 ×1.5 = 3.0 but stage rarely reaches 제왕;
+    # the effective old ceiling was ~2.25), the extreme bands are widened
+    # from 4.0 to 5.0 so "extreme" stays genuinely rare (≈3% of charts) and
+    # the published strong/weak verdicts are unchanged by this decision.
     # D3 fix: symmetric extreme bands for very weak Day Masters.
-    if total_score >= 4.0:
+    if total_score >= 5.0:
         verdict = "extreme"
     elif total_score >= 1.5:
         verdict = "strong"
-    elif total_score <= -4.0:
+    elif total_score <= -5.0:
         verdict = "extreme_weak"
     elif total_score <= -1.5:
         verdict = "weak"

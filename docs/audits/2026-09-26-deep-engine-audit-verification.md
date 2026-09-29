@@ -31,11 +31,11 @@ NOT STARTED = not yet investigated or fixed this pass.
 | N-2 | P1 | **FIXED** | `d57d1ee` | 절기 override compared solar-corrected birth time against civil-clock term instants — corrupted year/month pillars near a boundary. |
 | N-3 | P1 | NOT STARTED | — | sajupy's 절기 table is imprecise by up to 114 min; needs an ephemeris-sourced replacement table shipped as package data. |
 | N-4 | P1 | **FIXED** | `abfc6c1` | Current 대운 selected 1.3–2.4 years early (세수 vs. floored-elapsed-year convention mismatch). |
-| N-5 | P1 | NEEDS DECISION → **recorded, not yet implemented** | — | Yin Day Master strength inversion. Decision: switch to season/element relation (knowledge/09 Step 2), away from 12운성-stage reading (knowledge/06). See "Doctrinal decisions" below. |
+| N-5 | P1 | **FIXED** *(2026-09-26, decision implemented)* | — | Yin Day Master strength inversion. Strength scoring switched from the 12운성 month-stage to the element-relation 득령 signal (knowledge/09 Step 2); extreme bands widened to 5.0 to keep "extreme" rare and held published verdicts stable. See "Doctrinal decisions" below. |
 | N-6 | P1 | NEEDS DECISION → **research requested, not yet implemented** | — | 조후 overrides 용신 from month branch alone, not chart-level extremeness. User asked for more research before deciding a threshold. |
 | N-7 | P1 | **FIXED** | `23f92d2` | Web compat path forwarded a chart's raw pre-climate 억부 pick as a "reader-confirmed" override. |
 | N-8 | P1 | **FIXED** | `23f92d2` | HTML/Playwright backend rendered markdown with `html: True` — a client name containing `<script>`/`<iframe>` reached Chromium unescaped. |
-| N-9 | P2 | **PARTIAL** | `10c3706` | 문창귀인 갑→해 typo fixed (→사); 천덕귀인 doc/table contradiction fixed (engine already fixed prior session, F-2). 양인격/건록격 month-branch question: decision recorded (support both, labeled differently), not yet implemented. |
+| N-9 | P2 | **FIXED** *(2026-09-26, decision implemented)* | `10c3706` + follow-up | 문창귀인 갑→해 typo fixed (→사); 천덕귀인 doc/table contradiction fixed (engine already fixed prior session, F-2). 양인격/건록격: the month-branch (월령) case is now the classical grid; the year/day/hour case is relabelled a related-but-distinct pattern. See "Doctrinal decisions" below. |
 | N-10 | P2 | **FIXED** | `d95c10b` | Compat cover's "top 3 red flags" were picked alphabetically, not by severity. |
 | N-11 | P2 | **FIXED** | `6a106a2` | "This year" prose stated the Gregorian year instead of the 사주 year (사주 year is prior year before 입춀). |
 | N-12 | P2 | NOT STARTED | — | Hidden-stem qi weights give unequal branch totals (왕지 underweighted by 10–40%). |
@@ -45,12 +45,14 @@ NOT STARTED = not yet investigated or fixed this pass.
 | N-16 | P3 | **FIXED** | `33fef13` | Remaining F821/F601/F401/F541/F811/F841 lint debt; `ruff check --select F` added to CI. |
 | N-17 | P3 | **FIXED** | `c96be17` | `sajupy` was unpinned (`>=0.2.0`); pinned to `==0.2.0` + a test pinning the CSV's own SHA-256. |
 | N-18 | P3 | NOT STARTED | — | Range-edge crashes (1900 rollback, silent start-age-0 post-2100, 입춀-day-vs-instant comparison). |
-| N-19 | P3 | NOT STARTED | — | `month_season_score` computed but unused in the verdict; balanced-fallback ties always resolve to Wood. |
+| N-19 | P3 | **PARTIAL** *(N-5)* | — | `month_season_score` is now the live scored 월령 signal (it was dead; N-5 wired it into the verdict). The second half — balanced-fallback ties always resolving to Wood — remains open. |
 | N-20 | P3 | **FIXED** | `c96be17` | Duplicate pairwise 삼형 entries when a branch repeats across pillars. |
 | N-21 | P3 | NOT ACTIONABLE HERE | — | `apps/landing-page`'s `src/`/`src/proxy.ts` is not in this repo at all — nothing to fix from inside `saju-engine`. |
 | N-22 | P3 | **FIXED** | `33fef13` | Test suite overwrote the tracked client PDF `sruthi-report.pdf` (and two Playwright tests with the same pattern) on every run. |
 
-**Tally:** 11 FIXED, 3 PARTIAL, 2 NEEDS DECISION (recorded), 5 NOT STARTED, 1 not actionable in this repo.
+**Tally:** 13 FIXED, 2 PARTIAL, 0 NEEDS DECISION (both decided items, N-5 and N-9, now
+implemented), 5 NOT STARTED, 1 not actionable in this repo. *(Updated 2026-09-26: N-5 and N-9
+moved from NEEDS DECISION/PARTIAL to FIXED once their recorded decisions were implemented.)*
 
 ---
 
@@ -140,10 +142,20 @@ away from reading strength off the 12운성 stage table for yin stems. knowledge
 stays as-is for its own descriptive purpose (12운성 narrative, 대운/세운 stage readings) — only the
 strength *scoring* input changes.
 
-**Not yet implemented.** This requires: rewriting `strength.py`'s `month_stage_score` term to use
-an element-relation lookup instead of `twelve_stage()`, re-baselining the strength/climate
-validation fixtures, and reviewing existing client reports whose strength verdict may change
-(same review step the audit recommends for N-4/N-6/N-12).
+**IMPLEMENTED 2026-09-26.** `strength.py::assess_strength` now scores the month term from
+`month_season_score` (the element-relation 득령 table, `_MONTH_BRANCH_SEASON`) rather than
+`month_stage_score`; `month_stage_score` is retained and exported as descriptive metadata.
+Because the season term (max 2.0 × 1.5 = 3.0) exceeds the stage term's effective ceiling, the
+extreme bands were widened from 4.0 to 5.0 so "extreme" stays rare (≈3% of charts) — this keeps
+all published/named-fixture verdicts unchanged. Verified: the yin inversion is gone (乙 in 亥 is
+now strong=resource, 乙 in 午 not strong; 乙 and 甲 agree by season); all published fixtures
+(rm, gurumoorthy, harish, vishnu-priya, sruthi, pawan, mahesh) hold their existing strength
+metadata. Re-baselined six synthetic *climate merge* fixtures whose raw pre-merge strength/candidate
+moved (their climate-resolved `fe` — the client-facing doctrine — is unchanged); `damp-strong-synth`
+was re-pointed to a chart that is genuinely strong under the new scoring. Client-facing effect:
+existing `*-report.md` `**Strength:**` reasoning lines name the seasonal baseline by stage and are
+now stale; regenerate via `tools/regen_client_reports.sh` (verdicts/favorable elements are
+unchanged, so only the reasoning line + N-9 pattern lines move).
 
 ### N-6 — 조후 climate-override gate
 
@@ -179,10 +191,14 @@ well known for a 월령-centric 격국 theory) but unconfirmed here.
 the classical 양인격/건록격 (자평진전 convention), and relabel the existing year/day/hour case as a
 related-but-distinct pattern rather than dropping it.
 
-**Not yet implemented.** Requires: adding the month-branch check to `patterns.py`'s grid-detection
-logic, renaming/re-scoping the existing year/day/hour check to a distinct pattern name, rewriting
-knowledge/07 §3–4 to document both patterns with their own citations, and re-baselining any
-pattern-dependent validation fixtures.
+**IMPLEMENTED 2026-09-26.** `patterns.py::detect_patterns` now flags `yangin_grid.present` /
+`jianlu_grid.present` only when the blade/건록 branch is the **month** branch (월령), and surfaces a
+new `yangin_related` block plus a relabelled `jianlu.note` for the year/day/hour case.
+`yangin_grid` keeps its key name (backward-compatible) but now means the classical month grid.
+`skeleton.py` renders 양인격/건록격 (월령) and the related patterns distinctly. knowledge/07 §3–4
+rewritten with both patterns and citations (자평진전 월령 격국 theory; 淵海子平/명리정종/三命通會
+branch tables). Regression tests added in `tests/test_patterns.py` (month-is-grid,
+non-month-is-related, for both 양인 and 건록).
 
 ---
 
@@ -200,7 +216,8 @@ pattern-dependent validation fixtures.
   not.
 - **N-15** (remainder) — a 절기-proximity boundary disclosure, parallel to the 子-hour one already
   added, using the term-candidate list `_independent_year_month_pillar` already builds.
-- **N-18** (range-edge crashes), **N-19** (dead `month_season_score`, Wood tie-break) — smaller P3
+- **N-18** (range-edge crashes), **N-19** (the dead `month_season_score` half is now fixed by N-5;
+  the Wood tie-break half remains) — smaller P3
   items, not yet investigated.
 - **N-21** — not fixable from inside this repo; `apps/landing-page`'s own source tree (and
   `DEPLOY.md`'s described `src/proxy.ts`) is simply not present here to audit or fix.
@@ -208,7 +225,9 @@ pattern-dependent validation fixtures.
 ## Client-report exposure
 
 Per the audit's own note: N-4 (already fixed) can change an existing report's "Current Major Luck"
-headline. N-5, N-6, N-12 (not yet fixed) can also change existing deliverables once implemented.
-No candidate reports have been regenerated as part of this tracker — `tools/regen_client_reports.sh`
-should be run and the Quick Reference blocks diffed before re-sending anything, once the doctrinal
-items above are actually implemented.
+headline. **N-5 is now implemented** (verdicts and favorable elements held stable for all published
+charts, but the `**Strength:**` reasoning line changed shape and now names the element-relation
+baseline instead of the 12운성 stage), and **N-9 is now implemented** (양인격/건록격 pattern lines
+can move position). N-6 and N-12 are still open and will change deliverables once implemented.
+**No candidate reports have been regenerated as part of this tracker** — run
+`tools/regen_client_reports.sh` and diff the Quick Reference blocks before re-sending anything.
