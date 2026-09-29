@@ -111,6 +111,33 @@ def test_element_balance_helpers_match_strength_assessment():
     assert all(e in pct for e in ["Wood", "Fire", "Earth", "Metal", "Water"])
 
 
+def test_n5_yin_and_yang_day_master_agree_by_season():
+    """N-5 (2026-09-26 doctrinal decision): strength must read the month
+    branch's element relation (knowledge/09 Step 2), not the Day Master's
+    12운성 stage. The yin stage cycle runs backward (음생양사), so scoring off
+    the stage inverted yin DMs — 乙 in 午 (its 장생) read as supported and 乙
+    in 亥 (its 사) as unsupported, the reverse of the season. A bare yin and
+    yang stem of the same element must now get the same verdict from the same
+    month branch, which they cannot if the stage drives the score."""
+    for yin, yang, draining_month, resource_month in [
+        ("乙", "甲", "午", "亥"),   # Wood: 午 drains, 亥 is resource
+        ("丁", "丙", "子", "寅"),   # Fire: 子 drains, 寅 is resource
+        ("癸", "壬", "巳", "申"),   # Water: 巳 drains, 申 is resource
+    ]:
+        yin_res = assess_strength(yin, resource_month, [yin], [])
+        yang_res = assess_strength(yang, resource_month, [yang], [])
+        yin_drain = assess_strength(yin, draining_month, [yin], [])
+        # Resource month supports; draining month does not.
+        assert yin_res["month_season_score"] == yang_res["month_season_score"] == 1.0
+        assert yin_res["verdict"] == yang_res["verdict"] == "strong"
+        assert yin_drain["month_season_score"] == 0.0
+        assert yin_drain["verdict"] != "strong"
+    # The stage fields remain populated (descriptive), but no longer drive it.
+    r = assess_strength("乙", "午", ["乙"], [])
+    assert r["month_stage"] == "장생" and r["month_stage_score"] == 1.5
+    assert r["month_season_score"] == 0.0 and r["verdict"] != "strong"
+
+
 def test_e5_balanced_heuristic_skips_in_season_controller():
     """E-5 (2026-09-25 audit): Harish (壬申/乙巳/辛亥/己丑) is balanced with
     Fire least-represented, but Fire controls the 辛 Day Master and 巳 is

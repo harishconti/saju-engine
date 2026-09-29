@@ -228,22 +228,30 @@ _STAGE_TENDENCY: Dict[str, Tuple[str, str]] = {
 }
 
 
-def _season_signal(month_stage_score: float) -> str:
-    """Classify a 12운성 month-stage score as supported / depleted / mixed.
+def _season_signal(month_season_score: float) -> str:
+    """Classify the element-relation month score as supported / depleted / mixed.
 
-    Bug found 2026-09-20 (own find, while implementing R17's strength
-    reasoning): `strength.py::_STAGE_WEIGHT` scores range 0.0-2.0 and are
-    NEVER negative (see its own comment: "제왕/건록/관대/장생 are supportive,
-    사/묘/절 are depleted" — the depleted stages score exactly 0.0, not a
-    negative number). The threshold `<= -0.5` used here and in
-    `dm_arrival_narrative` could therefore never fire, so a Day Master at
-    사/절/병 (score 0.0-0.2) was always mis-bucketed as "mixed seasonal
-    support" instead of depleted — confirmed live: Harish's 辛 at 사 (0.0)
-    in 巳 read as "mixed" when knowledge/06 calls 사 an ending/depleted stage.
+    N-5 (2026-09-26): this now reads `strength.py::month_season_score` (the
+    득령 / element-relation signal, knowledge/09 Step 2), not the 12운성
+    month-stage score. The stage term no longer feeds the strength verdict, so
+    classifying the *stage* here would let the "seasonal baseline" sentence
+    contradict the verdict — e.g. 乙 in 亥 is 사 by stage (looks depleted) but
+    Water generates Wood, so the element relation reads it as supported.
+
+    Element-relation scores (see `strength.py::_MONTH_BRANCH_SEASON`):
+      2.0 own element / 1.5 Earth self-season → supported;
+      1.0 the season's element generates the DM (resource) → supported;
+      0.5 residual qi → mixed;
+      0.0 unsupported → depleted.
+
+    History: the original bug (found 2026-09-20) was a `<= -0.5` threshold on
+    a never-negative stage score, so depleted stages never fired. That is
+    moot now — this function consumes the element-relation score, whose
+    depleted value is exactly 0.0.
     """
-    if month_stage_score >= 1.2:
+    if month_season_score >= 1.0:
         return "supported"
-    if month_stage_score <= 0.3:
+    if month_season_score <= 0.0:
         return "depleted"
     return "mixed"
 
@@ -265,13 +273,14 @@ def dm_arrival_narrative(ctx) -> str:
     label, description = _STAGE_TENDENCY.get(stage, ("mixed arrival", "the month branch gives a mixed first impression"))
 
     sa = chart.strength_assessment or {}
-    sa.get("month_stage", stage)
-    # Use the engine's month-stage score as a second signal, if present.
-    month_stage_score = sa.get("month_stage_score", 0.0)
+    # N-5: the seasonal signal is the element-relation 득령 score, not the
+    # 12운성 stage (see _season_signal). The stage above is still the
+    # descriptive 12운성 lens.
+    month_season_score = sa.get("month_season_score", 0.0)
     season_signal = {
         "supported": "seasonally supported", "depleted": "seasonally depleted",
         "mixed": "mixed seasonal support",
-    }[_season_signal(month_stage_score)]
+    }[_season_signal(month_season_score)]
 
     return (
         f"Your Day Master **{chart.day_master}** meets the month branch **{chart.month.branch}** "
@@ -290,20 +299,25 @@ def strength_reasoning(ctx) -> str:
     Reference used to state only the verdict ("Balanced — a
     seasonal-strength reading") with no argument for it, even though
     `strength_assessment` already carries every input the argument needs —
-    confirmed live: Harish's 辛 sits at 사 (death/depleted, per
-    knowledge/06-twelve-stages.md) in the 巳 month, a seasonally weak
-    baseline, which the chart's Earth/Metal (resource + peer) support then
-    offsets back to balanced; the report never stated this mechanism.
+    confirmed live: Harish's 辛 sits in the 巳 month, and the chart's
+    Earth/Metal (resource + peer) support offsets the Fire drain back to
+    balanced; the report never stated this mechanism.
+
+    N-5 (2026-09-26): the seasonal baseline is argued from the element
+    relation (month_season_score, knowledge/09 Step 2), not from the 12운성
+    stage — using the stage would contradict the verdict for yin Day Masters.
+    The stage term is no longer part of total_score either, so the
+    "reconcile" clause points at the seasonal term instead of the stage.
     """
     chart = _ctx_get(ctx, "chart")
     sa = chart.strength_assessment or {}
     stage = sa.get("month_stage", "—")
     _, description = _STAGE_TENDENCY.get(stage, ("mixed", "the month branch gives a mixed signal"))
-    month_stage_score = sa.get("month_stage_score", 0.0)
+    month_season_score = sa.get("month_season_score", 0.0)
     season_note = {
-        "supported": "a seasonally supported baseline", "depleted": "a seasonally weak baseline",
-        "mixed": "a mixed seasonal baseline",
-    }[_season_signal(month_stage_score)]
+        "supported": "seasonally supported baseline", "depleted": "seasonally weak baseline",
+        "mixed": "mixed seasonal baseline",
+    }[_season_signal(month_season_score)]
     self_score = sa.get("self_score", 0.0)
     resource_score = sa.get("resource_score", 0.0)
     drain_score = sa.get("drain_score", 0.0)
@@ -320,23 +334,23 @@ def strength_reasoning(ctx) -> str:
     # Bug found 2026-09-25 (external report review, E-4): for a chart whose
     # overall verdict is "Balanced," a bare, unqualified skew statement here
     # ("the drain outweighs the support") reads as flatly contradicting the
-    # verdict label a few words earlier — confirmed live: Harish's support
-    # (2.8) and drain (4.1) are genuinely ~46% apart, but total_score also
-    # includes the month-stage term (weight 1.5), which is what actually
-    # pulls the total back into the balanced band despite that skew. Say so
-    # explicitly rather than leaving the reader to reconcile "Balanced" with
-    # a sentence that, read alone, sounds unbalanced. Strong/weak charts are
-    # unaffected — there, a skew in the verdict's own direction reinforces
-    # rather than contradicts the label, so no reconciling clause is needed.
+    # verdict label a few words earlier. Say so explicitly rather than leaving
+    # the reader to reconcile "Balanced" with a sentence that, read alone,
+    # sounds unbalanced. Strong/weak charts are unaffected — there, a skew in
+    # the verdict's own direction reinforces rather than contradicts the label,
+    # so no reconciling clause is needed. (N-5: the reconciling term is the
+    # element-relation season, not the 12운성 stage.)
     reconcile = ""
     if skewed and sa.get("verdict") == "balanced":
         reconcile = (
-            " — the month-branch stage above (weighted more heavily in the overall formula) "
+            " — the element-relation season above (weighted more heavily in the overall formula) "
             "is what pulls the total back into the balanced range despite that skew"
         )
+    offset_note = offset_note[0].upper() + offset_note[1:]
     return (
-        f"the Day Master's stage in the month branch **{chart.month.branch}** is **{stage}** "
-        f"({season_note}, per knowledge/06-twelve-stages.md) — {description} — and {offset_note}{reconcile}."
+        f"the month branch **{chart.month.branch}** gives the Day Master a **{season_note}** by "
+        f"element relation (per knowledge/09-interpretation-method.md Step 2); its 12운성 stage "
+        f"there is **{stage}** — {description} (knowledge/06-twelve-stages.md). {offset_note}{reconcile}."
     )
 
 

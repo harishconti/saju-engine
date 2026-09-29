@@ -928,9 +928,16 @@ def test_strength_line_states_a_reasoning_not_just_the_verdict():
     """knowledge/10-output-template requires verdict + reasoning (season,
     hidden stems, stem support). The Quick Reference used to say only
     "Balanced — a seasonal-strength reading" with no argument — confirmed
-    live: it never mentioned that Harish's 辛 sits at 사 (a seasonally weak
-    12운성 stage per knowledge/06) in the 巳 month, which the chart's
-    Earth/Metal support then offsets back to balanced."""
+    live: it never mentioned the mechanism by which Harish's 辛 chart, which
+    the Fire drain presses, is pulled back to balanced by its Earth/Metal
+    support.
+
+    N-5 (2026-09-26): the seasonal baseline is now argued from the
+    element-relation 득령 signal (knowledge/09 Step 2), not the 12운성 stage
+    — for Harish (辛 in 巳) the month element Fire controls Metal (a drain),
+    but 巳 also hides 庚 Metal and 戊 Earth, so the element-relation baseline
+    reads "mixed" (0.5), and the stage (사) is still named as the descriptive
+    12운성 lens."""
     chart = compute_chart(
         name="Harish-strength-reasoning-regression", gender="M",
         year=1992, month=6, day=4, hour=3, minute=10,
@@ -939,7 +946,10 @@ def test_strength_line_states_a_reasoning_not_just_the_verdict():
     report = generate_premium_report(chart, tier="deep")
     line = next(l for l in report.splitlines() if l.startswith("- **Strength:**"))
     assert "seasonal-strength reading; a full classical analysis" not in line
-    assert "사" in line and "seasonally weak baseline" in line
+    # 巳 is Fire (controls Metal) but also hides 庚 Metal (중기) and 戊 Earth
+    # (여기), so the element-relation baseline reads "mixed", not depleted.
+    assert "mixed seasonal baseline" in line
+    assert "사" in line  # the descriptive 12운성 stage is still named
     assert "peer" in line or "resource" in line or "drain" in line
 
 
@@ -1111,16 +1121,19 @@ def test_monthly_lucky_dates_not_capped_at_five_and_has_caveat():
     assert dates == ["5", "6", "14", "26"], f"unexpected dates: {oct_row!r}"
 
 
-def test_season_signal_correctly_buckets_depleted_month_stages():
-    """Own find while implementing R17: `_STAGE_WEIGHT` scores range 0.0-2.0
-    and are NEVER negative, so the old `<= -0.5` "depleted" threshold could
-    never fire — a Day Master at 사/절 (score 0.0) or 병 (0.2) was always
-    mis-bucketed as "mixed" instead of depleted."""
+def test_season_signal_correctly_buckets_element_relation_scores():
+    """N-5: `_season_signal` now consumes `strength.month_season_score`, the
+    element-relation 득령 score (`strength.py::_MONTH_BRANCH_SEASON`), whose
+    values are 2.0 (own element) / 1.5 (Earth self-season) / 1.0 (resource
+    generation) / 0.5 (residual qi) / 0.0 (unsupported). The historical bug
+    (a `<= -0.5` threshold on a never-negative stage score) is moot, but the
+    depleted bucket must still fire at 0.0."""
     from saju_engine.prose_fillers import _season_signal
-    assert _season_signal(0.0) == "depleted"  # 사, 절
-    assert _season_signal(0.2) == "depleted"  # 병
-    assert _season_signal(2.0) == "supported"  # 제왕
-    assert _season_signal(0.7) == "mixed"  # 양
+    assert _season_signal(0.0) == "depleted"  # unsupported season
+    assert _season_signal(2.0) == "supported"  # own element / peak season
+    assert _season_signal(1.5) == "supported"  # Earth in its own storage month
+    assert _season_signal(1.0) == "supported"  # resource generates the DM
+    assert _season_signal(0.5) == "mixed"  # residual qi only
 
 
 # ── E-12 (2026-09-25 audit) ──────────────────────────────────────────────

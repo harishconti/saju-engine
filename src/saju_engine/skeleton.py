@@ -102,12 +102,25 @@ def _patterns_str(chart: Chart) -> str:
         parts.append(f"**양인 (Blade Star)**: {p['yangin']['blade_branch']} at positions {p['yangin']['positions']} — {p['yangin']['note']}")
     if p.get("yangin_grid", {}).get("present"):
         parts.append(
-            f"**양인격 (Blade Grid)**: {p['yangin_grid']['blade_branch']} at positions "
+            f"**양인격 (Blade Grid, 월령)**: {p['yangin_grid']['blade_branch']} at positions "
             f"{p['yangin_grid']['positions']} — {p['yangin_grid']['note']}"
         )
+    if p.get("yangin_related", {}).get("present"):
+        parts.append(
+            f"**양인 (Blade, related)**: {p['yangin_related']['blade_branch']} at positions "
+            f"{p['yangin_related']['positions']} — {p['yangin_related']['note']}"
+        )
 
-    if p.get("jianlu", {}).get("present"):
-        parts.append(f"**건禄格 (Jianlu)**: {p['jianlu']['jianlu_branch']} at positions {p['jianlu']['positions']} — {p['jianlu']['note']}")
+    if p.get("jianlu_grid", {}).get("present"):
+        parts.append(
+            f"**건록격 (Jianlu Grid, 월령)**: {p['jianlu_grid']['jianlu_branch']} at positions "
+            f"{p['jianlu_grid']['positions']} — {p['jianlu_grid']['note']}"
+        )
+    if p.get("jianlu_related", {}).get("present"):
+        parts.append(
+            f"**건록 (Jianlu, related)**: {p['jianlu_related']['jianlu_branch']} at positions "
+            f"{p['jianlu_related']['positions']} — {p['jianlu_related']['note']}"
+        )
 
     combos = p.get("stem_combinations", [])
     if combos:

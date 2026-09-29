@@ -98,6 +98,32 @@ _JIANLU_BRANCH: Dict[str, str] = {
     "甲": "寅", "丙": "巳", "戊": "巳", "庚": "申", "壬": "亥",
 }
 
+# N-9 (2026-09-26 deep-audit doctrinal decision): 양인격/건록격 are **월령**
+# (month-command) grids in 자평진전 — the 격 is defined by the month branch,
+# and the same branch appearing in another pillar is a different, related
+# pattern (일인/귀록 etc.), not the grid itself. The engine previously
+# excluded the month branch from the grid (and flagged 건록 at any position),
+# which is backwards. These labels keep the two cases distinct, per the
+# decision: the month case is the classical 격; the year/day/hour case is
+# surfaced as a related-but-distinct pattern.
+_YANGIN_GRID_MONTH_NOTE = (
+    "양인격 (羊刃格) per 자평진전: the blade branch stands in the **month** "
+    "branch (월령). This is the classical grid position."
+)
+_YANGIN_RELATED_NOTE = (
+    "양인 (羊刃) in the year/day/hour pillar — a related blade pattern, kept "
+    "distinct from the 월령 양인격 (자평진전). Read as a strong-will overlay, "
+    "not the headline grid."
+)
+_JIANLU_GRID_MONTH_NOTE = (
+    "건록격 (建祿格) per 자평진전: the 건록 branch stands in the **month** "
+    "branch (월령). This is the classical grid position."
+)
+_JIANLU_RELATED_NOTE = (
+    "건록 (建祿) in the year/day/hour pillar — a related self-sufficiency "
+    "pattern, kept distinct from the 월령 건록격 (자평진전)."
+)
+
 
 # Breaking stems that can disturb a ten-stem combination.
 # Each entry maps a combination pair label to the list of stems that classical
@@ -613,19 +639,25 @@ def detect_patterns(
 
     blade = _BLADE_BRANCH.get(day_master)
     yangin_positions_star = []
-    yangin_positions_grid = []
+    yangin_grid_month = False
+    yangin_related_positions: List[int] = []
     if blade:
         yangin_positions_star = [p for p, b in enumerate(branches) if b == blade]
-        # B11: 양인격 (grid) is traditionally read when the blade branch appears
-        # in the year, day, or hour pillar; the star-level 양인 may appear anywhere.
-        yangin_positions_grid = [
+        # N-9: 양인격 is the 월령 (month-branch) grid per 자평진전. The same
+        # blade branch in the year/day/hour pillar is a related pattern.
+        yangin_grid_month = 1 in yangin_positions_star
+        yangin_related_positions = [
             p for p in yangin_positions_star if p in {0, 2, 3}
         ]
 
     jianlu = _JIANLU_BRANCH.get(day_master)
     jianlu_positions = []
+    jianlu_grid_month = False
+    jianlu_related_positions: List[int] = []
     if jianlu:
         jianlu_positions = [p for p, b in enumerate(branches) if b == jianlu]
+        jianlu_grid_month = 1 in jianlu_positions
+        jianlu_related_positions = [p for p in jianlu_positions if p in {0, 2, 3}]
 
     element_counts = _element_counts(stems, hidden_stems)
     dominant_element = element_counts.most_common(1)[0][0] if element_counts else None
@@ -683,19 +715,46 @@ def detect_patterns(
             "present": len(yangin_positions_star) > 0,
             "note": "양인 (blade star) appears wherever the blade branch is found; it is an energy overlay, not necessarily a grid.",
         },
+        # N-9: 양인격 is the 월령 (month) case; the year/day/hour blade is a
+        # related, distinct pattern. `yangin_grid` is kept for backward
+        # compatibility and now means the classical month-branch grid.
         "yangin_grid": {
             "day_master": day_master,
             "blade_branch": blade,
-            "positions": yangin_positions_grid,
-            "present": len(yangin_positions_grid) > 0,
-            "note": "양인격 (blade grid) is read when the blade branch sits in the year, day, or hour pillar per knowledge/07-special-formations.md.",
+            "positions": [1] if yangin_grid_month else [],
+            "present": yangin_grid_month,
+            "note": _YANGIN_GRID_MONTH_NOTE,
         },
+        "yangin_related": {
+            "day_master": day_master,
+            "blade_branch": blade,
+            "positions": yangin_related_positions,
+            "present": len(yangin_related_positions) > 0,
+            "note": _YANGIN_RELATED_NOTE,
+        },
+        # `jianlu` keeps its any-position presence flag (backward-compatible);
+        # N-9 scopes the grid vs. related cases into the two blocks below.
         "jianlu": {
             "day_master": day_master,
             "jianlu_branch": jianlu,
             "positions": jianlu_positions,
             "present": len(jianlu_positions) > 0,
-            "note": "건禄格 indicates natural self-sufficiency and earning capacity." if jianlu_positions else None,
+            "note": "건록 (建祿) branch appears in the chart; see jianlu_grid / jianlu_related for the scoped reading.",
+        },
+        # N-9: explicit month-branch (월령) grid flags, matching 자평진전.
+        "jianlu_grid": {
+            "day_master": day_master,
+            "jianlu_branch": jianlu,
+            "positions": [1] if jianlu_grid_month else [],
+            "present": jianlu_grid_month,
+            "note": _JIANLU_GRID_MONTH_NOTE,
+        },
+        "jianlu_related": {
+            "day_master": day_master,
+            "jianlu_branch": jianlu,
+            "positions": jianlu_related_positions,
+            "present": len(jianlu_related_positions) > 0,
+            "note": _JIANLU_RELATED_NOTE,
         },
         "stem_combinations": stem_combos,
         "transformation_grid": transformation,

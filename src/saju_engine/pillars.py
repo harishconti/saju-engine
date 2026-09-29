@@ -239,22 +239,6 @@ def _compute_adjusted_date(
     return (adjusted.year, adjusted.month, adjusted.day), adjustment_days
 
 
-def _effective_calendar_date(
-    year: int,
-    month: int,
-    day: int,
-    raw: Dict[str, Any],
-    use_solar_time: bool,
-) -> Tuple[int, int, int]:
-    """Return the calendar date that sajupy used after solar-time adjustment."""
-    info = raw.get("solar_correction")
-    if use_solar_time and info:
-        adjusted = raw.get("adjusted_date")
-        if adjusted:
-            return adjusted
-    return year, month, day
-
-
 def _hour_stem_day_stem(raw: Dict[str, Any], eff_hour: int, convention: str) -> str:
     """Return the day-stem that should drive the hour-stem 五鼠遁 calculation.
 
@@ -610,9 +594,10 @@ def compute_pillars(
             raw["day_branch"] = correct_day_branch
             raw["day_pillar"] = f"{correct_day_stem}{correct_day_branch}"
 
-    # Determine the effective time and date that sajupy used.
+    # Determine the effective time that sajupy used. (The effective *date* is
+    # no longer needed here: N-2 moved the year/month override to compare
+    # civil clock time against 절기 instants, so it reads the raw date.)
     eff_hour, eff_minute = _effective_time(hour, minute, raw, use_solar_time)
-    eff_date = _effective_calendar_date(year, month, day, raw, use_solar_time)
 
     # Recompute the hour branch from the effective time. sajupy already does this
     # when use_solar_time=True, but we repeat it here as an auditable check.

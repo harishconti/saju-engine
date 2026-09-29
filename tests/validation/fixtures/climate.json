@@ -716,7 +716,7 @@
    "longitude": 126.98,
    "utc_offset": 9.0
   },
-  "source": "knowledge/09-interpretation-method.md Step 3 + knowledge/17-climate-method.md §How This Combines With 억부 (cold 子 x strong DM: 억부 Water drain wins over 조후 Fire — climate_agrees False; the strong/weak branch takes priority over 조후); fills the cold x strong matrix cell; synthetic chart probe-verified 2026-09-13 2026-09-19: 조후-vs-억부 gate broadened from verdict-gated to band-extremeness-gated (docs/research/2026-09-validation-climate.md §5) — 조후 now wins the headline here regardless of the strength verdict; fixture updated to match, engine re-verified 2026-09-19.",
+  "source": "knowledge/09-interpretation-method.md Step 3 + knowledge/17-climate-method.md §How This Combines With 억부 (cold 子 month: 조후 wins the headline Fire regardless of the strength verdict — docs/research/2026-09-validation-climate.md §5). Re-baselined 2026-09-26 (deep-audit N-5): under the element-relation strength scoring this chart now reads **balanced** (was strong), so it fills the cold x balanced cell; the cold x strong cell is covered by cold-strong-scan. The climate-resolved fe (Fire, climate_agrees True) is unchanged by N-5 — it already read Fire after the 2026-09-19 gate broadening.",
   "expected": {
    "climate": {
     "band": "cold",
@@ -724,8 +724,8 @@
     "climate_supporting": "Wood"
    },
    "strength": {
-    "verdict": "strong",
-    "candidate": "Water"
+    "verdict": "balanced",
+    "candidate": "Fire"
    },
    "fe": {
     "element": "Fire",
@@ -733,7 +733,7 @@
     "supporting": "Wood",
     "climate_band": "cold",
     "climate_element": "Fire",
-    "climate_agrees": false,
+    "climate_agrees": true,
     "confidence": "heuristic"
    }
   },
@@ -788,7 +788,7 @@
    "longitude": 126.98,
    "utc_offset": 9.0
   },
-  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (辰 = 濕 → Fire remedy, Wood 희신) + §How This Combines With 억부 (broadened 2026-09-19: 조후 governs whenever the band is non-temperate, regardless of verdict — docs/research/2026-09-validation-climate.md §5); fills the damp x balanced matrix cell; synthetic chart probe-verified 2026-09-19",
+  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (辰 = 濕 → Fire remedy, Wood 희신) + §How This Combines With 억부 (broadened 2026-09-19: 조후 governs whenever the band is non-temperate, regardless of verdict — docs/research/2026-09-validation-climate.md §5); fills the damp x balanced matrix cell; synthetic chart probe-verified 2026-09-19 Re-baselined 2026-09-26 (deep-audit N-5): the strength scoring switched from the 12운성 month-stage to the element-relation 득령 signal (knowledge/09 Step 2, yin/yang-neutral), so this synthetic chart's raw pre-merge strength/candidate moved. The climate-resolved fe (the client-facing 용신 doctrine) is unchanged.",
   "expected": {
    "climate": {
     "band": "damp",
@@ -796,8 +796,8 @@
     "climate_supporting": "Wood"
    },
    "strength": {
-    "verdict": "balanced",
-    "candidate": "Water"
+    "verdict": "weak",
+    "candidate": "Wood"
    },
    "fe": {
     "element": "Fire",
@@ -818,13 +818,13 @@
    "probe": "merge",
    "year": 1975,
    "month": 4,
-   "day": 10,
-   "hour": 15,
+   "day": 8,
+   "hour": 1,
    "minute": 0,
    "longitude": 126.98,
    "utc_offset": 9.0
   },
-  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (辰 = 濕 → Fire remedy, Wood 희신) + §How This Combines With 억부 (broadened 2026-09-19: 조후 governs whenever the band is non-temperate, regardless of verdict — docs/research/2026-09-validation-climate.md §5); fills the damp x strong matrix cell; synthetic chart probe-verified 2026-09-19",
+  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (辰 = 濕 → Fire remedy, Wood 희신) + §How This Combines With 억부 (broadened 2026-09-19: 조후 governs whenever the band is non-temperate, regardless of verdict — docs/research/2026-09-validation-climate.md §5); fills the damp x strong matrix cell. Re-pointed + re-baselined 2026-09-26 (deep-audit N-5): the original chart (1975-04-10 15:00) no longer reads strong under the element-relation strength scoring, so this is now 1975-04-08 01:00 甲 (strong), chosen to keep the damp x strong cell filled. The climate-resolved fe (Fire, climate_agrees True) is unchanged.",
   "expected": {
    "climate": {
     "band": "damp",
@@ -833,7 +833,7 @@
    },
    "strength": {
     "verdict": "strong",
-    "candidate": "Earth"
+    "candidate": "Fire"
    },
    "fe": {
     "element": "Fire",
@@ -841,7 +841,7 @@
     "supporting": "Wood",
     "climate_band": "damp",
     "climate_element": "Fire",
-    "climate_agrees": false,
+    "climate_agrees": true,
     "confidence": "heuristic"
    }
   },
@@ -932,7 +932,7 @@
    "longitude": 126.98,
    "utc_offset": 9.0
   },
-  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (戌 = 燥 → Water remedy, Metal 희신) + §How This Combines With 억부 (broadened 2026-09-19: 조후 governs whenever the band is non-temperate, regardless of verdict — docs/research/2026-09-validation-climate.md §5); synthetic chart probe-verified 2026-09-19. CORRECTED 2026-09-25 (external report review, E-2): strength.candidate changed from 'Metal' to 'Water' and fe.climate_agrees from false to true after fixing lookup.py's swapped 戌 중기/여기 (this chart's month branch is 戌). The verdict itself (balanced) is unchanged, so this still fills the dry x balanced matrix cell — but it no longer demonstrates the climate-overrides-a-disagreeing-candidate scenario (climate_agrees is now true, not false). That sub-case is now covered by dry-balanced-synth-v2 (added 2026-09-26).",
+  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (戌 = 燥 → Water remedy, Metal 희신) + §How This Combines With 억부 (broadened 2026-09-19: 조후 governs whenever the band is non-temperate, regardless of verdict — docs/research/2026-09-validation-climate.md §5); synthetic chart probe-verified 2026-09-19. CORRECTED 2026-09-25 (external report review, E-2): strength.candidate changed from 'Metal' to 'Water' and fe.climate_agrees from false to true after fixing lookup.py's swapped 戌 중기/여기 (this chart's month branch is 戌). The verdict itself (balanced) is unchanged, so this still fills the dry x balanced matrix cell — but it no longer demonstrates the climate-overrides-a-disagreeing-candidate scenario (climate_agrees is now true, not false). That sub-case is now covered by dry-balanced-synth-v2 (added 2026-09-26). Re-baselined 2026-09-26 (deep-audit N-5): the strength scoring switched from the 12운성 month-stage to the element-relation 득령 signal (knowledge/09 Step 2, yin/yang-neutral), so this synthetic chart's raw pre-merge strength/candidate moved. The climate-resolved fe (the client-facing 용신 doctrine) is unchanged.",
   "expected": {
    "climate": {
     "band": "dry",
@@ -940,8 +940,8 @@
     "climate_supporting": "Metal"
    },
    "strength": {
-    "verdict": "balanced",
-    "candidate": "Water"
+    "verdict": "strong",
+    "candidate": "Metal"
    },
    "fe": {
     "element": "Water",
@@ -949,7 +949,7 @@
     "supporting": "Metal",
     "climate_band": "dry",
     "climate_element": "Water",
-    "climate_agrees": true,
+    "climate_agrees": false,
     "confidence": "heuristic"
    }
   },
@@ -1004,7 +1004,7 @@
    "longitude": 126.98,
    "utc_offset": 9.0
   },
-  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (戌 = 燥 → Water remedy, Metal 희신) + §How This Combines With 억부 (broadened 2026-09-19: 조후 governs whenever the band is non-temperate, regardless of verdict — docs/research/2026-09-validation-climate.md §5); fills the dry x strong matrix cell; synthetic chart probe-verified 2026-09-19",
+  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (戌 = 燥 → Water remedy, Metal 희신) + §How This Combines With 억부 (broadened 2026-09-19: 조후 governs whenever the band is non-temperate, regardless of verdict — docs/research/2026-09-validation-climate.md §5); fills the dry x strong matrix cell; synthetic chart probe-verified 2026-09-19 Re-baselined 2026-09-26 (deep-audit N-5): the strength scoring switched from the 12운성 month-stage to the element-relation 득령 signal (knowledge/09 Step 2, yin/yang-neutral), so this synthetic chart's raw pre-merge strength/candidate moved. The climate-resolved fe (the client-facing 용신 doctrine) is unchanged.",
   "expected": {
    "climate": {
     "band": "dry",
@@ -1012,7 +1012,7 @@
     "climate_supporting": "Metal"
    },
    "strength": {
-    "verdict": "strong",
+    "verdict": "extreme",
     "candidate": "Metal"
    },
    "fe": {
