@@ -48,8 +48,8 @@
 
 ### Top Red Flags (주의 사항)
 
-- ⚠️ Compatibility star overlays: 홍양교차 — classical caution pattern
 - ⚠️ Day-branch interaction (spouse palaces): A일지·B지지 육충 午子
+- ⚠️ Compatibility star overlays: 홍양교차 — classical caution pattern
 - ⚠️ Nayin harmony: 납음 天河水 vs 爐中火 → 상충 [element-grammar-fallback]
 
 ### Yellow Flags (관찰 사항)

@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Vishnu Priya — Essential Report · $19
+## Vishnu Priya — Essential Report · $9 intro → $19
 
 *Your natal chart, career arc, decade cycles, and lucky-element guide*
 
@@ -43,10 +43,10 @@
 ### Quick Reference
 
 - **Day Master:** Sin (Yin Metal, 辛金)
-- **Strength:** Balanced — the Day Master's stage in the month branch **午** is **병** (a seasonally weak baseline, per knowledge/06-twelve-stages.md) — early momentum is depleted; the querent often builds strength through recovery and patience — and peer/resource support and the output/wealth/authority drain sit close to even.
+- **Strength:** Balanced — the month branch **午** gives the Day Master a **seasonally weak baseline** by element relation (per knowledge/09-interpretation-method.md Step 2); its 12운성 stage there is **병 (病)** — early momentum is depleted; the querent often builds strength through recovery and patience (knowledge/06-twelve-stages.md). Peer/resource support and the output/wealth/authority drain sit close to even.
 - **Favorable Element:** Water — The Day Master reads as balanced, so the classical 조후 (climate-balance) check applies: this chart peaks in hot summer conditions, and the classical remedy is Water. This matches the chart's own least-represented element, reinforcing the pick.
 - **Supporting Element:** Metal
-- **Avoid / Watch:** Fire (기신 (忌神), watch) · Earth (구신, restrains Water) · Wood (한신 (閒神), drains Water)
+- **Avoid / Watch:** Fire (기신, watch) · Earth (구신, restrains Water) · Wood (한신, drains Water)
 - **Current Major Luck:** 丙申 (ages 19-28)
 - **Luck direction:** forward, advancing from the month pillar — derived from a yin year stem (辛) and female gender, per the classical rule (yang year + male, or yin year + female → forward; otherwise backward).
 - **Pattern / Formation:** 편관격 / Seven Killings Grid
@@ -144,8 +144,8 @@ For a **Metal** Day Master with a **Balanced** reading, wealth preservation star
 | Age | Pillar | Elements (Stem / Branch) | Ten-God | Career Theme | Relationship Theme |
 |---|---|---|---|---|---|
 | 9-18 | 乙未 | Wood / Earth | Indirect Wealth (偏財) | income, assets, or value-creation themes (mixed — protect, don't overcommit) | shared resources or lifestyle alignment |
-| 19-28 | 丙申 | Fire / Metal | Direct Officer (正官) | structured career moves; credentials matter | commitment or formalization themes |
-| 29-38 | 丁酉 | Fire / Metal | Seven Killings (偏官) | structured career moves; credentials matter | commitment or formalization themes |
+| 19-28 | 丙申 | Fire / Metal | Direct Officer (正官) | structured career moves; credentials matter (mixed — protect, don't overcommit) | commitment or formalization themes |
+| 29-38 | 丁酉 | Fire / Metal | Seven Killings (偏官) | structured career moves; credentials matter (mixed — protect, don't overcommit) | commitment or formalization themes |
 | 39-48 | 戊戌 | Earth / Earth | Direct Resource (正印) | study, mentorship, or skill-building (mixed — protect, don't overcommit) | nurturing, support, or healing connection |
 | 49-58 | 己亥 | Earth / Water | Indirect Resource (偏印) | study, mentorship, or skill-building | nurturing, support, or healing connection |
 | 59-68 | 庚子 | Metal / Water | Robber (劫財) | peer-driven or self-defined work | friendship-based or peer dynamic |
@@ -154,13 +154,13 @@ For a **Metal** Day Master with a **Balanced** reading, wealth preservation star
 
 ### Current Period Deep-Dive
 
-This decade carries a **Direct Officer (正官)** ten-god over a **Metal** branch — a clearly favorable window for visible wins. The stem ten-god is the *outer theme* — what the world sees and asks of the querent — while the branch element is the *underlying terrain* — the quieter emotional and circumstantial backdrop. Read them together rather than separately; mismatches between outer theme and inner terrain are where this decade is most likely to surprise.
+This decade carries a **Direct Officer (正官)** ten-god over a **Metal** branch — a mixed window that asks for measured moves rather than bold ones. The stem ten-god is the *outer theme* — what the world sees and asks of the querent — while the branch element is the *underlying terrain* — the quieter emotional and circumstantial backdrop. Read them together rather than separately; mismatches between outer theme and inner terrain are where this decade is most likely to surprise.
 
-Specifically: **do** push visible projects, plant seeds, and request what is owed; **avoid** starting too many things at once. Within this decade, years and months whose stem element matches the favorable **Water** energy are the cleanest moments for major commitments; the annual windows table below shows them. Years dominated by the unfavorable element are best used for rest, review, and quiet preparation.
+Specifically: **do** conserve, refine, and protect the foundation; **avoid** long commitments whose payoff is years away. Within this decade, years and months whose stem element matches the favorable **Water** energy are the cleanest moments for major commitments; the annual windows table below shows them. Years dominated by the unfavorable element are best used for rest, review, and quiet preparation.
 
-Structurally, your Day Master sits at **제왕 (帝旺)** on **申** — a strong root for the self; its **申** punishes (형 (刑)) your natal **巳**; its stem **丙** combines with your natal **辛** (병 (病)신합수), tying up what that stem represents; its stem **丙** combines with your natal **辛** (병신합수), tying up what that stem represents.
+Structurally, your Day Master sits at **제왕 (帝旺)** on **申** — a strong root for the self; its **申** punishes (형) your natal **巳**; its stem **丙** combines with your natal **辛** (병신합수), tying up what that stem represents; its stem **丙** combines with your natal **辛** (병신합수), tying up what that stem represents.
 
-> **In plain words:** You are currently in a tailwind decade — a good stretch to push on the things that matter. Zoom in with the year and month windows that carry Water.
+> **In plain words:** You are currently in a mixed decade — pick your moments using the year and month tables. Zoom in with the year and month windows that carry Water.
 
 
 ---

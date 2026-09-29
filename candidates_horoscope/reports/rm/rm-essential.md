@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## RM (Kim Nam-joon) — Essential Report · $19
+## RM (Kim Nam-joon) — Essential Report · $9 intro → $19
 
 *Your natal chart, career arc, decade cycles, and lucky-element guide*
 
@@ -44,7 +44,7 @@
 ### Quick Reference
 
 - **Day Master:** Sin (Yin Metal, 辛金)
-- **Strength:** Strong — the Day Master's stage in the month branch **酉** is **건록** (a seasonally supported baseline, per knowledge/06-twelve-stages.md) — the Day Master is already strong in the month branch, so competence arrives without much fanfare — and the output/wealth/authority drain outweighs the peer and resource support.
+- **Strength:** Strong — the month branch **酉** gives the Day Master a **seasonally supported baseline** by element relation (per knowledge/09-interpretation-method.md Step 2); its 12운성 stage there is **건록 (建祿)** — the Day Master is already strong in the month branch, so competence arrives without much fanfare (knowledge/06-twelve-stages.md). The output/wealth/authority drain outweighs the peer and resource support.
 - **Favorable Element:** Water — The Day Master reads as strong, so the favorable element is the one that channels and expresses its excess. This is an engine reading — a full classical analysis may refine it. Born in a climate-neutral month, so no 조후 override applies here.
 - **Supporting Element:** Wood
 - **Avoid / Watch:** Metal
@@ -138,7 +138,7 @@ For a **Metal** Day Master with a **Strong** reading, wealth preservation starts
 
 **Luck direction:** forward, advancing from the month pillar — derived from a yang year stem (甲) and male gender, per the classical rule (yang year + male, or yin year + female → forward; otherwise backward).
 
-**대운수 (starting age):** ~8.8 (~26.4 days to the qualifying 節氣 ÷ 3, per knowledge/08's "3 days = 1 year" rule) — the first major-luck period begins roughly 105 months after birth (≈ Jun 2003), inside the **8-17** decade label shown below, not precisely at its first birthday; each later period changes over at the same point in the year. Korean 만세력 apps round this to a whole **대운수 9** and list decades as 9, 19, 29… (often in Korean age), so their labels can differ from the table below by a year or so while describing the same periods.
+**대운수 (starting age):** ~8.8 (~26.3 days to the qualifying 節氣 ÷ 3, per knowledge/08's "3 days = 1 year" rule) — the first major-luck period begins roughly 105 months after birth (≈ Jun 2003), inside the **8-17** decade label shown below, not precisely at its first birthday; each later period changes over at the same point in the year. Korean 만세력 apps round this to a whole **대운수 9** and list decades as 9, 19, 29… (often in Korean age), so their labels can differ from the table below by a year or so while describing the same periods.
 
 ### Major Luck Periods
 
@@ -159,7 +159,7 @@ This decade carries a **Direct Officer (正官)** ten-god over a **Water** branc
 
 Specifically: **do** push visible projects, plant seeds, and request what is owed; **avoid** starting too many things at once. Within this decade, years and months whose stem element matches the favorable **Water** energy are the cleanest moments for major commitments; the annual windows table below shows them. Years dominated by the unfavorable element are best used for rest, review, and quiet preparation.
 
-Structurally, its stem **丙** combines with your natal **辛** (병 (病)신합수), tying up what that stem represents.
+Structurally, its stem **丙** combines with your natal **辛** (병신합수), tying up what that stem represents.
 
 > **In plain words:** You are currently in a tailwind decade — a good stretch to push on the things that matter. Zoom in with the year and month windows that carry Water.
 
