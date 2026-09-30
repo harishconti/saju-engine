@@ -133,6 +133,7 @@ Two-chart readings live under `candidates_horoscope/marriage_compatibility/` in 
 |---|---|---|---|---|
 | Pawan × Sruthi (demo) | [MD](marriage_compatibility/pawan_sruthi/pawan_sruthi_compatibility.md) · [PDF](marriage_compatibility/pawan_sruthi/pawan_sruthi_compatibility.pdf) | [MD](marriage_compatibility/pawan_sruthi/pawan_sruthi_compatibility_deep.md) · [PDF](marriage_compatibility/pawan_sruthi/pawan_sruthi_compatibility_deep.pdf) | 50/100 *(was 55; regenerated 2026-09-26)* | Mixed |
 | Harish × Manvitha | [MD](marriage_compatibility/harish_manvitha/harish_manvitha_compatibility.md) · [PDF](marriage_compatibility/harish_manvitha/harish_manvitha_compatibility.pdf) | [MD](marriage_compatibility/harish_manvitha/harish_manvitha_compatibility_deep.md) · [PDF](marriage_compatibility/harish_manvitha/harish_manvitha_compatibility_deep.pdf) | 64/100 *(was 68 Strong; regenerated 2026-09-26 — 기신 penalties now apply to balanced charts)* | Mixed |
+| Harish × Srinidhi | [MD](marriage_compatibility/harish_srinidhi/harish_srinidhi_compatibility.md) · [PDF](marriage_compatibility/harish_srinidhi/harish_srinidhi_compatibility.pdf) | [MD](marriage_compatibility/harish_srinidhi/harish_srinidhi_compatibility_deep.md) · [PDF](marriage_compatibility/harish_srinidhi/harish_srinidhi_compatibility_deep.pdf) | 61/100 | Mixed |
 
 The compat engine lives at `src/saju_engine/compat.py` (see `knowledge/11-gunghap.md` for the classical reference).
 
