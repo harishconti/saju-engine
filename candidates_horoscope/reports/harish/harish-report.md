@@ -35,18 +35,18 @@
 
 | Element | Presence | Percentage |
 |---|---|---|
-| 🔴 Fire | ██░░░░░░░░░░░░░░░░░░ | 7.6% |
-| 🟡 Earth | █████░░░░░░░░░░░░░░░ | 22.8% |
-| ⚪ Metal | ██████░░░░░░░░░░░░░░ | 27.8% |
-| 🔵 Water | █████░░░░░░░░░░░░░░░ | 25.3% |
-| 🟢 Wood | ███░░░░░░░░░░░░░░░░░ | 16.5% |
+| 🔴 Fire | █░░░░░░░░░░░░░░░░░░░ | 5.6% |
+| 🟡 Earth | █████░░░░░░░░░░░░░░░ | 23.1% |
+| ⚪ Metal | █████░░░░░░░░░░░░░░░ | 26.9% |
+| 🔵 Water | █████░░░░░░░░░░░░░░░ | 25.6% |
+| 🟢 Wood | ████░░░░░░░░░░░░░░░░ | 18.8% |
 
 > _Methodology: each element's share counts the 4 visible stems (year/month/day/hour) at weight 1.0, plus every branch's hidden stems (藏干) at reduced weights (main qi 0.6, middle 0.3, residual 0.1) — a branch's own elemental weight is carried entirely through its hidden stems (its main-qi hidden stem is usually the branch's nominal element), not counted a second time as a separate 1.0 entry, since that would double-count it; the counts are then normalized to 100%._
 
 ### Quick Reference
 
 - **Day Master:** Sin (Yin Metal, 辛金)
-- **Strength:** Balanced — the month branch **巳** gives the Day Master a **mixed seasonal baseline** by element relation (per knowledge/09-interpretation-method.md Step 2); its 12운성 stage there is **사 (死)** — one cycle is completing as the querent enters the world, so early identity may feel transitional (knowledge/06-twelve-stages.md). Peer/resource support and the output/wealth/authority drain sit close to even.
+- **Strength:** Balanced — the month branch **巳** gives the Day Master a **mixed seasonal baseline** by element relation (per knowledge/09-interpretation-method.md Step 2); its 12운성 stage there is **사 (死)** — one cycle is completing as the querent enters the world, so early identity may feel transitional (knowledge/06-twelve-stages.md). The output/wealth/authority drain outweighs the peer and resource support — the element-relation season above (weighted more heavily in the overall formula) is what pulls the total back into the balanced range despite that skew.
 - **Favorable Element:** Water — The Day Master reads as balanced, so the classical 조후 (climate-balance) check applies: this chart peaks in hot summer conditions, and the classical remedy is Water. This takes priority over the chart's simple element count, which is a weaker signal than the classical climate check here.
 - **Supporting Element:** Metal
 - **Avoid / Watch:** Fire (기신, watch) · Earth (구신, restrains Water) · Wood (한신, drains Water)
@@ -328,7 +328,7 @@ The year pillar **申** carries ancestral and parental themes; its main hidden s
 
 - **Element excess:** Metal — pay attention to the lung/large intestine and respiratory/immune boundaries system.
 - **Element deficiency:** Fire — the heart/small intestine and circulation system may need gentle support. Note that Fire is also this chart's challenging element (기신) under the climate/억부 reading used for its favorable element — so "support" here means protecting and resting this system, not deliberately adding more Fire-element activity.
-- The chart's lightest weighted element is **Fire (7.6%)**, which in classical Five-Element mapping is paired with the **heart/small intestine and circulation**. This is not a diagnosis; it is the least natally emphasized system, making it the natural place to begin gentle, preventive support through fire-aligned foods, seasons, and rhythms.
+- The chart's lightest weighted element is **Fire (5.6%)**, which in classical Five-Element mapping is paired with the **heart/small intestine and circulation**. This is not a diagnosis; it is the least natally emphasized system, making it the natural place to begin gentle, preventive support through fire-aligned foods, seasons, and rhythms.
 
 ### Grounding Practices
 
@@ -652,7 +652,7 @@ A single-glance view of all 8 major-luck periods in your life and the favorable 
 
 ### Element Story
 
-This chart's element balance shows **Metal (27.8%)** as the most present element and **Fire (7.6%)** as the least. Energy tends to **flow in cycles** in the Metal domain; a balanced day feels like quiet movement between input, processing, and release. The Fire system is the most likely leak point — under-supported and easy to neglect — and the easiest place to begin rebuilding through the favorable element's practices.
+This chart's element balance shows **Metal (26.9%)** as the most present element and **Fire (5.6%)** as the least. Energy tends to **flow in cycles** in the Metal domain; a balanced day feels like quiet movement between input, processing, and release. The Fire system is the most likely leak point — under-supported and easy to neglect — and the easiest place to begin rebuilding through the favorable element's practices.
 
 ### Body-System Map
 

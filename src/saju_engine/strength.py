@@ -28,6 +28,7 @@ strength *scoring* input changed.
 """
 from __future__ import annotations
 
+import math
 from collections import Counter
 from typing import Dict, List, Tuple
 
@@ -85,21 +86,55 @@ _STAGE_WEIGHT = {
 }
 
 
+# Relative qi of a branch's hidden stems (본기 > 중기 > 여기). These are
+# normalised **per branch** so every branch contributes the same total qi
+# (N-12, 2026-09-26), then scaled by `_HIDDEN_BRANCH_QI` so a branch still
+# weighs less than a visible stem (its qi is submerged).
+_HIDDEN_ROLE_RATIO = {"main": 0.6, "middle": 0.3, "residual": 0.1}
+# Total qi of one branch's hidden stems, relative to one visible stem (1.0).
+_HIDDEN_BRANCH_QI = 0.6
+
+
 def _element_counts(
     stems: List[str],
     hidden_stems: List[Tuple[str, str]],
 ) -> Counter:
     """Count element occurrences across visible stems and hidden stems.
 
-    Hidden stems are weighted lower than visible stems because they are
-    submerged qi.
+    Visible stems weigh 1.0 each. Each **branch's** hidden stems are normalised
+    so the branch contributes a fixed total qi (`_HIDDEN_BRANCH_QI`, < 1.0) split
+    among its 본기/중기/여기 by `_HIDDEN_ROLE_RATIO`.
+
+    N-12 (2026-09-26 audit): the old scheme gave each role a fixed absolute
+    weight (main 0.6, middle 0.3, residual 0.1), so a one-stem branch (子卯酉)
+    totalled 0.6 while a three-stem branch totalled 1.0 — the 王地 (pure
+    branches) were underweighted by 10–40%. Branch boundaries are detected by the
+    `main` role, which begins each branch's group in the (main → middle →
+    residual) order the hidden-stem table is built in. Because a branch totals
+    0.6 instead of the 1.0 a normalization-to-1.0 would give, the absolute score
+    scale is preserved (only the *relative* branch weights change) — this keeps
+    the strength thresholds stable while correcting the inequality.
     """
     counts: Counter = Counter()
     for s in stems:
         counts[L.STEM_INFO[s]["element"]] += 1.0
+
+    # Split the flat list into per-branch groups (each starts at a "main").
+    group: List[Tuple[str, str]] = []
+    groups: List[List[Tuple[str, str]]] = []
     for role, s in hidden_stems:
-        weight = {"main": 0.6, "middle": 0.3, "residual": 0.1}.get(role, 0.3)
-        counts[L.STEM_INFO[s]["element"]] += weight
+        if role == "main" and group:
+            groups.append(group)
+            group = []
+        group.append((role, s))
+    if group:
+        groups.append(group)
+
+    for branch_stems in groups:
+        total_ratio = sum(_HIDDEN_ROLE_RATIO.get(r, 0.3) for r, _ in branch_stems) or 1.0
+        for role, s in branch_stems:
+            share = _HIDDEN_ROLE_RATIO.get(role, 0.3) / total_ratio
+            counts[L.STEM_INFO[s]["element"]] += share * _HIDDEN_BRANCH_QI
     return counts
 
 
@@ -292,14 +327,24 @@ def element_balance_counts(chart) -> Counter:
     return _element_counts(stems, hidden)
 
 
+_ELEMENT_ORDER = ["Wood", "Fire", "Earth", "Metal", "Water"]
+
+
 def element_balance_pct(chart) -> Dict[str, float]:
     """Return element percentages (0–100) using ``element_balance_counts``.
 
-    Guarantees all five elements are present in the returned dict.
+    Guarantees all five elements are present and that the values sum to exactly
+    100.0 (largest-remainder rounding). N-12 (2026-09-26): the branch-qi
+    normalisation changed the raw counts enough that naive per-element rounding
+    could sum to 99.9; the display is anchored to 100.
     """
     counts = element_balance_counts(chart)
     total = sum(counts.values()) or 1
-    return {
-        e: round(counts.get(e, 0) / total * 100, 1)
-        for e in ["Wood", "Fire", "Earth", "Metal", "Water"]
-    }
+    raw = {e: counts.get(e, 0) / total * 100 for e in _ELEMENT_ORDER}
+    floored = {e: math.floor(raw[e] * 10) / 10 for e in _ELEMENT_ORDER}
+    # Distribute the remaining tenths to the largest fractional remainders.
+    remainder = round(1000 - sum(v * 10 for v in floored.values()))
+    order = sorted(_ELEMENT_ORDER, key=lambda e: (raw[e] - floored[e]), reverse=True)
+    for e in order[:max(0, remainder)]:
+        floored[e] = round(floored[e] + 0.1, 1)
+    return floored

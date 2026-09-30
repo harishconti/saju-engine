@@ -2,7 +2,7 @@
 
 **Date opened:** 2026-06-02  
 **Last updated:** 2026-09-26  
-**Test count:** 1124 pytest cases passing / 9 xfailed (`python3 -m pytest`); engine validation gate
+**Test count:** 1126 pytest cases passing / 9 xfailed (`python3 -m pytest`); engine validation gate
 `python3 tools/run_validation.py` → 206 checks (202 PASS / 4 INTERPRETATION / 0 FAIL); `ruff check
 --select F src tools tests` clean and now enforced in CI.
 **Open decision:** RM (Kim Nam-joon)'s hour pillar sits 17 seconds from the 午/未 boundary after the
@@ -341,7 +341,15 @@ Sourced market research: **`docs/market-research-2026-09.md`**. Design spec:
 
 ---
 
-- **2026-09-26 (N-3 ephemeris term table + N-15/N-18/N-19 P3 cleanups, Suite 1104 → 1124)** —
+- **2026-09-26 (N-12 branch-qi normalisation, Suite 1126)** — `strength._element_counts` now
+  normalises each branch's hidden stems to a fixed total qi (`_HIDDEN_BRANCH_QI = 0.6`), so every
+  branch contributes equally; the old fixed role weights (0.6/0.3/0.1) made 왕지 (子卯酉) total 0.6
+  vs 1.0 for three-stem branches. Absolute scale unchanged → resolved verdicts / favorable elements
+  / compat scores unchanged (verified); only Element Balance percentages shift. `element_balance_pct`
+  now sums to exactly 100 (largest-remainder rounding). Fixture raw-strength blocks re-baselined;
+  regression tests added. Open audit items now: N-13 (IANA timezone/DST), N-18's sajupy-internal
+  1900 crash, N-21 (not actionable here).
+- **2026-09-26 (N-3 ephemeris term table + N-15/N-18/N-19 P3 cleanups, Suite 1104 → 1126)** —
   Implemented N-3: `daeun._parse_calendar()` now reads an accurate ephemeris-generated
   `src/saju_engine/data/solar_terms.csv` (regenerate via `tools/generate_solar_terms.py`; PyEphem
   VSOP87, 1899–2101) instead of sajupy's `calendar_data.csv`, which was off by a median 22 min

@@ -34,11 +34,11 @@
 
 | Element | Presence | Percentage |
 |---|---|---|
-| 🔴 Fire | ██░░░░░░░░░░░░░░░░░░ | 8.8% |
-| 🟡 Earth | ██████████░░░░░░░░░░ | 48.8% |
-| ⚪ Metal | ███░░░░░░░░░░░░░░░░░ | 16.2% |
-| 🔵 Water | ██░░░░░░░░░░░░░░░░░░ | 7.5% |
-| 🟢 Wood | ████░░░░░░░░░░░░░░░░ | 18.8% |
+| 🔴 Fire | █░░░░░░░░░░░░░░░░░░░ | 6.6% |
+| 🟡 Earth | ██████████░░░░░░░░░░ | 49.1% |
+| ⚪ Metal | ████░░░░░░░░░░░░░░░░ | 18.4% |
+| 🔵 Water | █░░░░░░░░░░░░░░░░░░░ | 5.6% |
+| 🟢 Wood | ████░░░░░░░░░░░░░░░░ | 20.3% |
 
 > _Methodology: each element's share counts the 4 visible stems (year/month/day/hour) at weight 1.0, plus every branch's hidden stems (藏干) at reduced weights (main qi 0.6, middle 0.3, residual 0.1) — a branch's own elemental weight is carried entirely through its hidden stems (its main-qi hidden stem is usually the branch's nominal element), not counted a second time as a separate 1.0 entry, since that would double-count it; the counts are then normalized to 100%._
 
@@ -314,7 +314,7 @@ The year pillar **辰** carries ancestral and parental themes; its main hidden s
 
 - **Element excess:** Earth — pay attention to the spleen/stomach and digestive metabolism system.
 - **Element deficiency:** Water — the kidney/bladder and hormonal/endocrine reserves system may need gentle support.
-- The chart's lightest weighted element is **Water (7.5%)**, which in classical Five-Element mapping is paired with the **kidney/bladder and hormonal/endocrine reserves**. This is not a diagnosis; it is the least natally emphasized system, making it the natural place to begin gentle, preventive support through water-aligned foods, seasons, and rhythms.
+- The chart's lightest weighted element is **Water (5.6%)**, which in classical Five-Element mapping is paired with the **kidney/bladder and hormonal/endocrine reserves**. This is not a diagnosis; it is the least natally emphasized system, making it the natural place to begin gentle, preventive support through water-aligned foods, seasons, and rhythms.
 
 ### Grounding Practices
 
@@ -630,7 +630,7 @@ A single-glance view of all 8 major-luck periods in your life and the favorable 
 
 ### Element Story
 
-This chart's element balance shows **Earth (48.8%)** as the most present element and **Water (7.5%)** as the least. Energy tends to **accumulate and congest** in the Earth domain; a balanced day feels like quiet movement between input, processing, and release. The Water system is the most likely leak point — under-supported and easy to neglect — and the easiest place to begin rebuilding through the favorable element's practices.
+This chart's element balance shows **Earth (49.1%)** as the most present element and **Water (5.6%)** as the least. Energy tends to **accumulate and congest** in the Earth domain; a balanced day feels like quiet movement between input, processing, and release. The Water system is the most likely leak point — under-supported and easy to neglect — and the easiest place to begin rebuilding through the favorable element's practices.
 
 ### Body-System Map
 

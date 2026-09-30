@@ -298,22 +298,24 @@ def test_n6_harish_keeps_water_despite_neutral_temperature():
 # ── E-3/E-5 single resolution (2026-09-26) ───────────────────────────────
 
 
-def _c(y, m):
+def _c(y, m, day=15, hour=12):
     from saju_engine.engine import compute_chart
-    return compute_chart(name="x", gender="M", year=y, month=m, day=15, hour=12, minute=0,
+    return compute_chart(name="x", gender="M", year=y, month=m, day=day, hour=hour, minute=0,
                          longitude=127.0, utc_offset=9)
 
 
 def test_full_role_set_resolved_once_for_every_method():
     from saju_engine.yongsin import favorable_element
+    # N-12 (2026-09-26): branch-qi normalisation moved the old (1983, 3)
+    # weak-dm-support probe to balanced; (1980, 2, day 5) still resolves weak.
     cases = {
-        "balanced-heuristic": (1980, 3),
-        "climate-balanced": (1980, 4),
-        "strong-dm-drain": (1980, 9),
-        "weak-dm-support": (1983, 3),
+        "balanced-heuristic": (1980, 3, 15, 12),
+        "climate-balanced": (1980, 4, 15, 12),
+        "strong-dm-drain": (1980, 9, 15, 12),
+        "weak-dm-support": (1980, 2, 5, 6),
     }
-    for method, (y, m) in cases.items():
-        fe = favorable_element(_c(y, m))
+    for method, (y, m, day, hour) in cases.items():
+        fe = favorable_element(_c(y, m, day, hour))
         assert fe.method == method
         assert fe.unfavorable and fe.unfavorable not in (fe.element, fe.supporting)
         assert fe.requires_reader is (method == "balanced-heuristic")

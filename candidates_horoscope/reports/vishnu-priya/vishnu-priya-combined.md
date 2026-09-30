@@ -34,11 +34,11 @@
 
 | Element | Presence | Percentage |
 |---|---|---|
-| 🔴 Fire | ██████░░░░░░░░░░░░░░ | 27.8% |
-| 🟡 Earth | ███░░░░░░░░░░░░░░░░░ | 13.9% |
-| ⚪ Metal | ████████░░░░░░░░░░░░ | 40.5% |
-| 🔵 Water | █░░░░░░░░░░░░░░░░░░░ | 5.1% |
-| 🟢 Wood | ███░░░░░░░░░░░░░░░░░ | 12.7% |
+| 🔴 Fire | ██████░░░░░░░░░░░░░░ | 27.5% |
+| 🟡 Earth | ██░░░░░░░░░░░░░░░░░░ | 10.6% |
+| ⚪ Metal | ████████░░░░░░░░░░░░ | 42.5% |
+| 🔵 Water | █░░░░░░░░░░░░░░░░░░░ | 3.8% |
+| 🟢 Wood | ███░░░░░░░░░░░░░░░░░ | 15.6% |
 
 > _Methodology: each element's share counts the 4 visible stems (year/month/day/hour) at weight 1.0, plus every branch's hidden stems (藏干) at reduced weights (main qi 0.6, middle 0.3, residual 0.1) — a branch's own elemental weight is carried entirely through its hidden stems (its main-qi hidden stem is usually the branch's nominal element), not counted a second time as a separate 1.0 entry, since that would double-count it; the counts are then normalized to 100%._
 
@@ -314,7 +314,7 @@ The year pillar **巳** carries ancestral and parental themes; its main hidden s
 
 - **Element excess:** Metal — pay attention to the lung/large intestine and respiratory/immune boundaries system.
 - **Element deficiency:** Water — the kidney/bladder and hormonal/endocrine reserves system may need gentle support.
-- The chart's lightest weighted element is **Water (5.1%)**, which in classical Five-Element mapping is paired with the **kidney/bladder and hormonal/endocrine reserves**. This is not a diagnosis; it is the least natally emphasized system, making it the natural place to begin gentle, preventive support through water-aligned foods, seasons, and rhythms.
+- The chart's lightest weighted element is **Water (3.8%)**, which in classical Five-Element mapping is paired with the **kidney/bladder and hormonal/endocrine reserves**. This is not a diagnosis; it is the least natally emphasized system, making it the natural place to begin gentle, preventive support through water-aligned foods, seasons, and rhythms.
 
 ### Grounding Practices
 
@@ -640,7 +640,7 @@ A single-glance view of all 8 major-luck periods in your life and the favorable 
 
 ### Element Story
 
-This chart's element balance shows **Metal (40.5%)** as the most present element and **Water (5.1%)** as the least. Energy tends to **accumulate and congest** in the Metal domain; a balanced day feels like quiet movement between input, processing, and release. The Water system is the most likely leak point — under-supported and easy to neglect — and the easiest place to begin rebuilding through the favorable element's practices.
+This chart's element balance shows **Metal (42.5%)** as the most present element and **Water (3.8%)** as the least. Energy tends to **accumulate and congest** in the Metal domain; a balanced day feels like quiet movement between input, processing, and release. The Water system is the most likely leak point — under-supported and easy to neglect — and the easiest place to begin rebuilding through the favorable element's practices.
 
 ### Body-System Map
 

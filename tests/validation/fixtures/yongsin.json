@@ -42,7 +42,7 @@
   "status": "expect_match",
   "expected": {
    "strength": {
-    "verdict": "weak",
+    "verdict": "balanced",
     "candidate": "Metal"
    },
    "fe": {

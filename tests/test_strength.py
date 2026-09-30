@@ -179,3 +179,32 @@ def test_n19_balanced_tie_is_surfaced_not_hidden():
 def test_n19_non_balanced_has_no_tie_set():
     result = assess_strength("甲", "卯", ["甲", "乙"], [])
     assert result["balanced_tie_elements"] == []
+
+
+def test_n12_every_branch_contributes_equal_qi():
+    """N-12 (2026-09-26 audit): a branch is one unit of qi, but the old fixed
+    role weights (main 0.6 / middle 0.3 / residual 0.1) gave a 1-stem branch
+    0.6 total and a 3-stem branch 1.0 — underweighting 子卯酉 by up to 40%.
+    Each branch must now contribute the same total (`_HIDDEN_BRANCH_QI`)."""
+    from saju_engine import lookup as L
+    from saju_engine.strength import _HIDDEN_BRANCH_QI, _element_counts
+
+    def branch_qi(branch):
+        hidden = [(role, stem) for role, stem in L.HIDDEN_STEMS[branch].items()]
+        # The visible stem is neutralised by using a stem not in this branch;
+        # measure only the hidden contribution.
+        counts = _element_counts([], hidden)
+        return round(sum(counts.values()), 6)
+
+    totals = {b: branch_qi(b) for b in L.HIDDEN_STEMS}
+    assert all(abs(t - _HIDDEN_BRANCH_QI) < 1e-9 for t in totals.values()), totals
+
+
+def test_n12_pure_branch_qi_matches_multi_stem_branch():
+    """子 (single 癸) and 寅 (甲+丙+戊) must weigh the same in element balance."""
+    from saju_engine import lookup as L
+    from saju_engine.strength import _element_counts
+
+    zi = _element_counts([], [("main", "癸")])
+    yin = _element_counts([], [(r, s) for r, s in L.HIDDEN_STEMS["寅"].items()])
+    assert round(sum(zi.values()), 6) == round(sum(yin.values()), 6)

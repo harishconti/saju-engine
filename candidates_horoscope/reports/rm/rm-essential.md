@@ -33,11 +33,11 @@
 
 | Element | Presence | Percentage |
 |---|---|---|
-| 🔴 Fire | █░░░░░░░░░░░░░░░░░░░ | 5.3% |
-| 🟡 Earth | █████░░░░░░░░░░░░░░░ | 23.7% |
-| ⚪ Metal | █████░░░░░░░░░░░░░░░ | 26.3% |
-| 🔵 Water | ███░░░░░░░░░░░░░░░░░ | 14.5% |
-| 🟢 Wood | ██████░░░░░░░░░░░░░░ | 30.3% |
+| 🔴 Fire | █░░░░░░░░░░░░░░░░░░░ | 3.7% |
+| 🟡 Earth | ███░░░░░░░░░░░░░░░░░ | 16.9% |
+| ⚪ Metal | ██████░░░░░░░░░░░░░░ | 28.7% |
+| 🔵 Water | ███░░░░░░░░░░░░░░░░░ | 16.6% |
+| 🟢 Wood | ███████░░░░░░░░░░░░░ | 34.1% |
 
 > _Methodology: each element's share counts the 4 visible stems (year/month/day/hour) at weight 1.0, plus every branch's hidden stems (藏干) at reduced weights (main qi 0.6, middle 0.3, residual 0.1) — a branch's own elemental weight is carried entirely through its hidden stems (its main-qi hidden stem is usually the branch's nominal element), not counted a second time as a separate 1.0 entry, since that would double-count it; the counts are then normalized to 100%._
 

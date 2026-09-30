@@ -580,7 +580,7 @@
     "climate_supporting": "Wood"
    },
    "strength": {
-    "verdict": "weak",
+    "verdict": "balanced",
     "candidate": "Metal"
    },
    "fe": {
@@ -796,8 +796,8 @@
     "climate_supporting": "Wood"
    },
    "strength": {
-    "verdict": "weak",
-    "candidate": "Wood"
+    "verdict": "balanced",
+    "candidate": "Water"
    },
    "fe": {
     "element": "Fire",
@@ -1050,7 +1050,7 @@
     "climate_supporting": "Metal"
    },
    "strength": {
-    "verdict": "extreme",
+    "verdict": "strong",
     "candidate": "Metal"
    },
    "fe": {

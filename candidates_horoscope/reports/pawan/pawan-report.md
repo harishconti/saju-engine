@@ -34,11 +34,11 @@
 
 | Element | Presence | Percentage |
 |---|---|---|
-| 🔴 Fire | ████████░░░░░░░░░░░░ | 38.0% |
-| 🟡 Earth | ███░░░░░░░░░░░░░░░░░ | 12.7% |
-| ⚪ Metal | ███████░░░░░░░░░░░░░ | 36.6% |
-| 🔵 Water | ██░░░░░░░░░░░░░░░░░░ | 8.5% |
-| 🟢 Wood | █░░░░░░░░░░░░░░░░░░░ | 4.2% |
+| 🔴 Fire | ████████░░░░░░░░░░░░ | 38.4% |
+| 🟡 Earth | ██░░░░░░░░░░░░░░░░░░ | 8.8% |
+| ⚪ Metal | ████████░░░░░░░░░░░░ | 40.6% |
+| 🔵 Water | ██░░░░░░░░░░░░░░░░░░ | 9.4% |
+| 🟢 Wood | █░░░░░░░░░░░░░░░░░░░ | 2.8% |
 
 > _Methodology: each element's share counts the 4 visible stems (year/month/day/hour) at weight 1.0, plus every branch's hidden stems (藏干) at reduced weights (main qi 0.6, middle 0.3, residual 0.1) — a branch's own elemental weight is carried entirely through its hidden stems (its main-qi hidden stem is usually the branch's nominal element), not counted a second time as a separate 1.0 entry, since that would double-count it; the counts are then normalized to 100%._
 
@@ -325,9 +325,9 @@ The year pillar **未** carries ancestral and parental themes; its main hidden s
 
 ### Primary Watchpoints
 
-- **Element excess:** Fire — pay attention to the heart/small intestine and circulation system.
+- **Element excess:** Metal — pay attention to the lung/large intestine and respiratory/immune boundaries system.
 - **Element deficiency:** Wood — the liver/gall bladder and nervous system system may need gentle support.
-- The chart's lightest weighted element is **Wood (4.2%)**, which in classical Five-Element mapping is paired with the **liver/gall bladder and nervous system**. This is not a diagnosis; it is the least natally emphasized system, making it the natural place to begin gentle, preventive support through wood-aligned foods, seasons, and rhythms.
+- The chart's lightest weighted element is **Wood (2.8%)**, which in classical Five-Element mapping is paired with the **liver/gall bladder and nervous system**. This is not a diagnosis; it is the least natally emphasized system, making it the natural place to begin gentle, preventive support through wood-aligned foods, seasons, and rhythms.
 
 ### Grounding Practices
 
@@ -657,11 +657,11 @@ A single-glance view of all 8 major-luck periods in your life and the favorable 
 
 ### Element Story
 
-This chart's element balance shows **Fire (38.0%)** as the most present element and **Wood (4.2%)** as the least. Energy tends to **accumulate and congest** in the Fire domain; a balanced day feels like quiet movement between input, processing, and release. The Wood system is the most likely leak point — under-supported and easy to neglect — and the easiest place to begin rebuilding through the favorable element's practices.
+This chart's element balance shows **Metal (40.6%)** as the most present element and **Wood (2.8%)** as the least. Energy tends to **accumulate and congest** in the Metal domain; a balanced day feels like quiet movement between input, processing, and release. The Wood system is the most likely leak point — under-supported and easy to neglect — and the easiest place to begin rebuilding through the favorable element's practices.
 
 ### Body-System Map
 
-- **Excess system (Fire):** heart/small intestine and circulation — watch for signs of over-activity or congestion.
+- **Excess system (Metal):** lung/large intestine and respiratory/immune boundaries — watch for signs of over-activity or congestion.
 - **Deficient system (Wood):** liver/gall bladder and nervous system — gentle rebuilding over time is usually better than forceful stimulation.
 
 ### Stress Signature
@@ -767,7 +767,7 @@ Listen once in full, then return to the chapters that match the season you are i
 
 ## Closing Note
 
-**丙 (Bing (Yang Fire, 丙火))** sits at the centre of this chart, with the chart's element balance leaning toward **Fire** and a ten-god distribution dominated by **Companion (4), Wealth (3)**. The favorable **Water** element (with **Metal** as the quiet secondary) is the querent's main lever — not as a rule to follow, but as a rhythm to listen to. The spouse palace **午** and the chart's relationship dynamics reward the querent for showing up consistently rather than performing. The natal clash between **子** and **午** is a recurring pressure; the chart's gift is that the querent has already learned how to navigate it — and the favorable element makes the navigation gentler. The six-combination between **午** and **未** is a quiet asset — partnerships or projects that bring two palaces into harmony, with the querent's role often as the connector. Across a full lifetime, this chart rewards the querent who studies their own patterns and acts with the favorable element rather than against it. The work is not to fix the chart; it is to use what is already there well.
+**丙 (Bing (Yang Fire, 丙火))** sits at the centre of this chart, with the chart's element balance leaning toward **Metal** and a ten-god distribution dominated by **Companion (4), Wealth (3)**. The favorable **Water** element (with **Metal** as the quiet secondary) is the querent's main lever — not as a rule to follow, but as a rhythm to listen to. The spouse palace **午** and the chart's relationship dynamics reward the querent for showing up consistently rather than performing. The natal clash between **子** and **午** is a recurring pressure; the chart's gift is that the querent has already learned how to navigate it — and the favorable element makes the navigation gentler. The six-combination between **午** and **未** is a quiet asset — partnerships or projects that bring two palaces into harmony, with the querent's role often as the connector. Across a full lifetime, this chart rewards the querent who studies their own patterns and acts with the favorable element rather than against it. The work is not to fix the chart; it is to use what is already there well.
 
 ---
 
