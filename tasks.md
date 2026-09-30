@@ -2,7 +2,7 @@
 
 **Date opened:** 2026-06-02  
 **Last updated:** 2026-09-26  
-**Test count:** 1134 pytest cases passing / 9 xfailed (`python3 -m pytest`); engine validation gate
+**Test count:** 1136 pytest cases passing / 9 xfailed (`python3 -m pytest`); engine validation gate
 `python3 tools/run_validation.py` → 206 checks (202 PASS / 4 INTERPRETATION / 0 FAIL); `ruff check
 --select F src tools tests` clean and now enforced in CI.
 **Open decision:** RM (Kim Nam-joon)'s hour pillar sits 17 seconds from the 午/未 boundary after the
@@ -341,6 +341,10 @@ Sourced market research: **`docs/market-research-2026-09.md`**. Design spec:
 
 ---
 
+- **2026-09-26 (N-18 range edges + all audit findings closed, Suite 1136)** — `compute_pillars`
+  retries without solar correction when a 1900-01-01 birth's rollback leaves sajupy's table
+  (disclosed via `solar_correction["range_edge_fallback"]`), closing the last open deep-audit
+  finding. Every fixable N-1..N-22 item is now done (only N-21 — landing-page source not in repo).
 - **2026-09-26 (N-13 IANA timezone/DST, Suite 1134)** — Added `saju_engine.timezone.derive_utc_offset`
   (zoneinfo; historical + DST aware), a CLI `--timezone` flag, and the intake app now reuses it;
   removed the intake server's implicit `Form(5.5)` default (offset optional; timezone-or-offset

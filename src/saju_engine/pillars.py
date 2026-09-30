@@ -583,18 +583,51 @@ def compute_pillars(
     # captured text to stderr so JSON/table output stays clean.
     _captured = io.StringIO()
     with contextlib.redirect_stdout(_captured):
-        raw = calculate_saju(
-            year=year,
-            month=month,
-            day=day,
-            hour=hour,
-            minute=minute,
-            city=city,
-            longitude=longitude,
-            utc_offset=utc_offset,
-            use_solar_time=use_solar_time,
-            early_zi_time=sajupy_early_zi,
-        )
+        try:
+            raw = calculate_saju(
+                year=year,
+                month=month,
+                day=day,
+                hour=hour,
+                minute=minute,
+                city=city,
+                longitude=longitude,
+                utc_offset=utc_offset,
+                use_solar_time=use_solar_time,
+                early_zi_time=sajupy_early_zi,
+            )
+        except ValueError as exc:
+            # N-18 (2026-09-26 audit): sajupy's table starts 1900-01-01, so a
+            # solar-time correction that rolls a very early 1900 birth back to
+            # 1899-12-31 makes it raise "Could not find data for the given date:
+            # 1899-12-31". Retry without solar-time correction so the chart still
+            # computes, and treat the rest of this function as no-solar (reassign
+            # `use_solar_time`) so the equation-of-time refinement below does not
+            # re-introduce the same rollback. Any other ValueError is re-raised.
+            if not (use_solar_time and "Could not find data for the given date" in str(exc)):
+                raise
+            use_solar_time = False
+            raw = calculate_saju(
+                year=year,
+                month=month,
+                day=day,
+                hour=hour,
+                minute=minute,
+                city=city,
+                longitude=longitude,
+                utc_offset=utc_offset,
+                use_solar_time=False,
+                early_zi_time=sajupy_early_zi,
+            )
+            # Expose the fallback via `solar_correction` so the Chart and the
+            # report layer can disclose that the solar-time correction was
+            # skipped (matching the JSON/CLI consumers' existing contract).
+            raw["solar_correction"] = {
+                "range_edge_fallback": (
+                    "sajupy's ephemeris table begins 1900-01-01; solar-time "
+                    "correction was skipped to keep this chart computable."
+                )
+            }
     _captured_text = _captured.getvalue().strip()
     if _captured_text:
         sys.stderr.write(_captured_text + "\n")
