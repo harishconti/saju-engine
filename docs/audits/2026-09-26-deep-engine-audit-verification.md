@@ -44,18 +44,17 @@ NOT STARTED = not yet investigated or fixed this pass.
 | N-15 | P2 | **FIXED** | `8693ca3` + 2026-09-26 | 子-hour boundary disclosed; **절기-proximity disclosure added 2026-09-26** (`pillars._term_boundary_info` → `Chart.term_boundary` → report "⚠ Solar-term boundary note"). |
 | N-16 | P3 | **FIXED** | `33fef13` | Remaining F821/F601/F401/F541/F811/F841 lint debt; `ruff check --select F` added to CI. |
 | N-17 | P3 | **FIXED** | `c96be17` | `sajupy` was unpinned (`>=0.2.0`); pinned to `==0.2.0` + a test pinning the CSV's own SHA-256. |
-| N-18 | P3 | **PARTIAL** | 2026-09-26 | (2) late-2100 forward start-age silent-0 → **fixed** by the N-3 table extension (2100-12-31 now returns 1); (3) `saju_age` now compares the 입춘 **instant** when a birth time is supplied (`saju_age(..., birth_time_str=)`; `saju_year` accepts datetime) → **fixed**. (1) the 1900-01-01 solar-rollback crash originates **inside sajupy** (its table starts 1900-01-01) and needs a sajupy-side or pre-1900 guard — **open**. |
+| N-18 | P3 | **FIXED** | 2026-09-26 | All three: (1) the 1900-01-01 solar-rollback crash — `compute_pillars` now retries without solar correction at the range edge and discloses `solar_correction["range_edge_fallback"]`; (2) late-2100 forward start-age was silenced-0 → fixed by the N-3 table extension; (3) `saju_age` compares the 입춘 **instant** when a birth time is supplied. |
 | N-19 | P3 | **FIXED** | 2026-09-26 | `month_season_score` is the live scored 월령 signal (N-5). Balanced-fallback ties are now surfaced via `strength_assessment["balanced_tie_elements"]` instead of silently resolving to Wood. |
 | N-20 | P3 | **FIXED** | `c96be17` | Duplicate pairwise 삼형 entries when a branch repeats across pillars. |
 | N-21 | P3 | NOT ACTIONABLE HERE | — | `apps/landing-page`'s `src/`/`src/proxy.ts` is not in this repo at all — nothing to fix from inside `saju-engine`. |
 | N-22 | P3 | **FIXED** | `33fef13` | Test suite overwrote the tracked client PDF `sruthi-report.pdf` (and two Playwright tests with the same pattern) on every run. |
 
-**Tally:** 19 FIXED, 1 PARTIAL (N-18), 1 not actionable in this repo (N-21). *(Updated 2026-09-26:
-N-5/N-9 implemented; N-6 implemented with the industry-standard whole-chart gate; N-3 (ephemeris
-term table), N-12 (branch qi normalisation), N-13 (IANA timezone/DST), N-15 (절기-proximity), and
-N-19 (balanced-tie surfacing) fixed. **The only open item is N-18's sajupy-internal 1900-01-01
-solar-rollback crash**, which originates inside sajupy's own table and is not fixable from this
-repo without a pre-1900 guard.)*
+**Tally: 20 FIXED, 0 partial, 1 not actionable in this repo (N-21). All fixable findings from
+the 2026-09-26 deep audit are now closed.** *(Updated 2026-09-26: N-5/N-9 implemented; N-6 with the
+industry-standard whole-chart gate; N-3 (ephemeris term table), N-12 (branch qi), N-13 (IANA
+timezone/DST), N-15 (절기-proximity), N-18 (range edges), and N-19 (balanced-tie surfacing) fixed.
+N-21's `apps/landing-page` source is simply not in this repo.)*
 
 ---
 

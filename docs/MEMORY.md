@@ -17,7 +17,7 @@
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"
   below and `docs/audits/2026-09-26-deep-engine-audit-verification.md` for the live tracker of the
-  second pass. **Suite: 1134 passed / 9 xfailed / 0 failed.** Validation gate:
+  second pass. **Suite: 1136 passed / 9 xfailed / 0 failed.** Validation gate:
   `python3 tools/run_validation.py` → `206 (PASS 202, INTERPRETATION 4, FAIL 0)`. `ruff check
   --select F src tools tests` is now clean and enforced in CI (was not run in CI before this pass).
   **All three doctrinal items are now implemented:** **N-5** (yin-DM strength now scores
@@ -278,9 +278,12 @@ history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P
     DST aware), a CLI `--timezone` flag, and the intake app now reuses it; removed the intake
     server's implicit `Form(5.5)` default (offset optional; timezone-or-offset required) and set the
     numeric field's step to 0.25. knowledge/09 documents the DST/historical-offset rule.
-  - Gates: suite **1134 passed / 9 xfailed / 0 failed**; validation `206 (PASS 202, INTERPRETATION
-    4, FAIL 0)`; `ruff check --select F` clean. **Only open audit item:** N-18's sajupy-internal
-    1900-01-01 solar-rollback crash (N-21 is not actionable in this repo).
+  - **N-18 (P3).** `compute_pillars` now retries without solar correction when a very
+    early-1900 birth's rollback leaves sajupy's table (`solar_correction["range_edge_fallback"]`
+    discloses it), so the 1900-01-01 crash is gone.
+  - Gates: suite **1136 passed / 9 xfailed / 0 failed**; validation `206 (PASS 202, INTERPRETATION
+    4, FAIL 0)`; `ruff check --select F` clean. **All fixable 2026-09-26 audit findings are now
+    closed** (only N-21 — `apps/landing-page` source — is not actionable in this repo).
 
 - **2026-09-26 (client-report regen + N-6 research)** — Two follow-ups after the N-5/N-9 work:
   - **Full client-report regeneration** (`tools/regen_client_reports.sh`): all base reports, tier

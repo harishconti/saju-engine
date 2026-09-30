@@ -450,3 +450,29 @@ def test_term_boundary_absent_far_from_a_solar_term():
         longitude=79.4408, utc_offset=5.5,
     )
     assert c.term_boundary is None
+
+
+# ── N-18 (2026-09-26): 1900-01-01 solar-rollback range edge ─────────────────
+
+
+def test_1900_01_01_does_not_crash_on_solar_rollback():
+    """N-18: a 1900-01-01 birth with solar-time correction rolls back to
+    1899-12-31, outside sajupy's table. The engine must fall back to no solar
+    correction (disclosed) rather than raising."""
+    c = compute_chart(
+        name="RangeEdge", gender="M",
+        year=1900, month=1, day=1, hour=0, minute=0,
+        longitude=127.0, utc_offset=9.0, use_solar_time=True,
+    )
+    assert [p.combined for p in c.pillars] == ["己亥", "丙子", "甲戌", "甲子"]
+    assert c.solar_correction and c.solar_correction.get("range_edge_fallback")
+
+
+def test_1901_birth_uses_normal_solar_correction():
+    """The fallback must not trigger inside the supported range."""
+    c = compute_chart(
+        name="Normal", gender="M",
+        year=1901, month=1, day=1, hour=0, minute=0,
+        longitude=127.0, utc_offset=9.0, use_solar_time=True,
+    )
+    assert not (c.solar_correction or {}).get("range_edge_fallback")
