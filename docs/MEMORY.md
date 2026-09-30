@@ -249,6 +249,17 @@ history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P
 
 ## Recent Changes to Remember
 
+- **2026-09-30 (new compat pair: Harish × Srinidhi)** — Created `candidates_horoscope/
+  marriage_compatibility/harish_srinidhi/` (basic + deep, both `.md` and `.pdf`; added to the
+  Compatibility table in `candidates_horoscope/README.md`). **Srinidhi** — 9 April 1994, 20:47 IST,
+  Tiruchirappalli (78.70°E): pillars **甲戌/戊辰/乙丑/丙戌**, Day Master **乙** (Yin Wood), balanced,
+  용신 **Fire** (climate-balanced); hour 戌 stable, no boundary caveats. **Harish** — 壬申/乙巳/辛亥/
+  己丑, 辛, balanced, 용신 Water. **Composite 61/100 — Mixed.** Positive: the spouse palaces (亥·丑)
+  form a partial Metal 삼합 (반합 巳酉丑). Watch: favorable-element cross-supply — Harish's Metal runs
+  over for Srinidhi (her challenging element); her chart carries 정재격. No 辛乙 day-stem combination,
+  so the match leans on the day-branch tie + element balance. No 용신 overrides used (both resolved
+  natively). Engine drafts — review before client delivery. PDFs audit clean (0 citation/draft leaks).
+
 - **2026-09-26 (N-3 ephemeris term table + N-15/N-18/N-19 P3 cleanups, Suite 1104 → 1126)** —
   - **N-3 (P1).** The engine no longer reads sajupy's inaccurate `calendar_data.csv` for the
     month-opener 節氣 instants. `daeun._parse_calendar()` now reads our own
