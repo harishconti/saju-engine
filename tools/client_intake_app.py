@@ -30,7 +30,6 @@ import re
 import sys
 from datetime import datetime
 from pathlib import Path
-from zoneinfo import ZoneInfo, available_timezones
 
 # Make the local src/ tree importable; user-space site-packages is already on
 # sys.path by default, with `$SAJU_SITE` as an explicit override for non-standard
@@ -116,27 +115,24 @@ def _derive_utc_offset(
     dob: str,
     birth_time: str,
     timezone_name: Optional[str],
-    fallback_offset: float,
+    fallback_offset: Optional[float],
 ) -> float:
     """Return the UTC offset to use for chart computation.
 
-    If ``timezone_name`` is a recognized IANA zone, compute the exact historical
-    UTC offset (including DST) for the given local date/time. Otherwise fall
-    back to the user-supplied numeric ``fallback_offset``.
+    Delegates to `saju_engine.timezone.derive_utc_offset` (N-13, 2026-09-26) so
+    the CLI and web app share one historical/DST-aware implementation. If
+    ``timezone_name`` is a recognized IANA zone, the exact historical offset
+    (including DST) for the local date/time is used; otherwise the numeric
+    ``fallback_offset`` is used. Raises `UnknownTimezone` when neither is
+    available — callers should validate the form first.
     """
-    tz = (timezone_name or "").strip()
-    if not tz:
-        return fallback_offset
-    if tz not in available_timezones():
-        # Not a known IANA key — keep the numeric fallback and let the caller
-        # decide whether to warn.
-        return fallback_offset
+    from saju_engine.timezone import derive_utc_offset
+
     year, month, day, hour, minute = _parse_dob_time(dob, birth_time)
-    local_dt = datetime(year, month, day, hour, minute, tzinfo=ZoneInfo(tz))
-    offset = local_dt.utcoffset()
-    if offset is None:
-        return fallback_offset
-    return offset.total_seconds() / 3600.0
+    offset, _from_tz = derive_utc_offset(
+        year, month, day, hour, minute, timezone_name, fallback_offset
+    )
+    return offset
 
 
 def _generate_pdf(payload: dict, output_path: Path) -> Path:
@@ -147,10 +143,12 @@ def _generate_pdf(payload: dict, output_path: Path) -> Path:
         raise ValueError("PDF generation requires gender Female or Male so major-luck timing can be computed.")
 
     tier = normalize_tier(payload.get("tier", "essential"))
+    raw_offset = payload.get("utc_offset")
+    fallback = float(raw_offset) if raw_offset else None
     utc_offset = _derive_utc_offset(
         payload["dob"], payload["birth_time"],
         payload.get("timezone"),
-        float(payload.get("utc_offset", 5.5)),
+        fallback,
     )
 
     chart = compute_chart(
@@ -190,7 +188,9 @@ async def generate(
     dob: str = Form(...),
     birth_time: str = Form(...),
     location: str = Form(...),
-    utc_offset: float = Form(5.5),
+    # N-13: no default offset (the old 5.5 silently produced IST charts for a
+    # US-primary market). A blank offset is only valid when `timezone` is given.
+    utc_offset: str = Form(""),
     email: str = Form(...),
     gender: str = Form(...),
     marriage_status: str = Form(...),
@@ -203,7 +203,7 @@ async def generate(
         "dob": dob.strip(),
         "birth_time": birth_time.strip(),
         "location": location.strip(),
-        "utc_offset": str(utc_offset),
+        "utc_offset": utc_offset.strip(),
         "email": email.strip(),
         "gender": gender,
         "marriage_status": marriage_status,
@@ -215,6 +215,11 @@ async def generate(
     # Validation
     if not payload["name"]:
         raise HTTPException(status_code=400, detail="Name is required.")
+    if not payload["timezone"] and not payload["utc_offset"]:
+        raise HTTPException(
+            status_code=400,
+            detail="Provide an IANA timezone or a UTC offset (no default is assumed).",
+        )
     if tier not in ("sample", "essential", "deep", "spark", "reading", "fullmap"):
         raise HTTPException(status_code=400, detail="Invalid report tier selected.")
     if tier == "deep" and not payload["main_concern"]:

@@ -39,7 +39,7 @@ NOT STARTED = not yet investigated or fixed this pass.
 | N-10 | P2 | **FIXED** | `d95c10b` | Compat cover's "top 3 red flags" were picked alphabetically, not by severity. |
 | N-11 | P2 | **FIXED** | `6a106a2` | "This year" prose stated the Gregorian year instead of the 사주 year (사주 year is prior year before 입춀). |
 | N-12 | P2 | **FIXED** | 2026-09-26 | Hidden-stem qi weights gave unequal branch totals (왕지 子卯酉 0.6 vs 3-stem 1.0). `_element_counts` now normalises each branch to `_HIDDEN_BRANCH_QI` (0.6) — every branch contributes equal qi, absolute scale unchanged. Resolved verdicts/favorable elements/compat scores unchanged; only the displayed Element Balance percentages shift (e.g. Harish Fire 7.6%→5.6%). |
-| N-13 | P2 | NOT STARTED | — | No DST/historical-offset handling; intake default offset still 5.5 in one path per the audit (superseded by F-10 for the two HTML forms — verify `client_intake_form.html`/CLI still need it). |
+| N-13 | P2 | **FIXED** | 2026-09-26 | No DST/historical-offset handling. Added `saju_engine.timezone.derive_utc_offset` (zoneinfo, historical + DST aware), a CLI `--timezone` flag, and the web app now reuses it; the intake server's implicit `Form(5.5)` default is removed (offset optional, timezone-or-offset required) and the numeric field step is now 0.25 (Nepal +5.75 etc.). knowledge/09 documents the DST/historical-offset rule. New `tests/test_timezone.py`. |
 | N-14 | P2 | **FIXED** | `b63fbfd` | Web app overwrote curated client deliverables, blocked the event loop, and echoed raw exception text to clients. |
 | N-15 | P2 | **FIXED** | `8693ca3` + 2026-09-26 | 子-hour boundary disclosed; **절기-proximity disclosure added 2026-09-26** (`pillars._term_boundary_info` → `Chart.term_boundary` → report "⚠ Solar-term boundary note"). |
 | N-16 | P3 | **FIXED** | `33fef13` | Remaining F821/F601/F401/F541/F811/F841 lint debt; `ruff check --select F` added to CI. |
@@ -50,12 +50,12 @@ NOT STARTED = not yet investigated or fixed this pass.
 | N-21 | P3 | NOT ACTIONABLE HERE | — | `apps/landing-page`'s `src/`/`src/proxy.ts` is not in this repo at all — nothing to fix from inside `saju-engine`. |
 | N-22 | P3 | **FIXED** | `33fef13` | Test suite overwrote the tracked client PDF `sruthi-report.pdf` (and two Playwright tests with the same pattern) on every run. |
 
-**Tally:** 18 FIXED, 1 PARTIAL (N-18), 0 research-pending, 1 NOT STARTED (N-13), 1 not actionable
-in this repo (N-21). *(Updated 2026-09-26: N-5/N-9 implemented; N-6 implemented with the
-industry-standard whole-chart gate; N-3 (ephemeris term table), N-12 (branch qi normalisation),
-N-15 (절기-proximity), and N-19 (balanced-tie surfacing) fixed; N-18 partly fixed — the
-sajupy-internal 1900 crash remains open. Only N-13 (IANA timezone/DST) is left, plus that N-18
-remainder.)*
+**Tally:** 19 FIXED, 1 PARTIAL (N-18), 1 not actionable in this repo (N-21). *(Updated 2026-09-26:
+N-5/N-9 implemented; N-6 implemented with the industry-standard whole-chart gate; N-3 (ephemeris
+term table), N-12 (branch qi normalisation), N-13 (IANA timezone/DST), N-15 (절기-proximity), and
+N-19 (balanced-tie surfacing) fixed. **The only open item is N-18's sajupy-internal 1900-01-01
+solar-rollback crash**, which originates inside sajupy's own table and is not fixable from this
+repo without a pre-1900 guard.)*
 
 ---
 

@@ -17,7 +17,7 @@
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"
   below and `docs/audits/2026-09-26-deep-engine-audit-verification.md` for the live tracker of the
-  second pass. **Suite: 1126 passed / 9 xfailed / 0 failed.** Validation gate:
+  second pass. **Suite: 1134 passed / 9 xfailed / 0 failed.** Validation gate:
   `python3 tools/run_validation.py` → `206 (PASS 202, INTERPRETATION 4, FAIL 0)`. `ruff check
   --select F src tools tests` is now clean and enforced in CI (was not run in CI before this pass).
   **All three doctrinal items are now implemented:** **N-5** (yin-DM strength now scores
@@ -274,9 +274,13 @@ history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P
     unchanged**; only the displayed Element Balance percentages shift. `element_balance_pct` now
     uses largest-remainder rounding so the percentages sum to exactly 100. Fixture raw-strength
     blocks re-baselined (resolved `fe` unchanged); regression tests in `test_strength.py`.
-  - Gates: suite **1126 passed / 9 xfailed / 0 failed**; validation `206 (PASS 202, INTERPRETATION
-    4, FAIL 0)`; `ruff check --select F` clean. **Remaining open audit items:** N-13 (IANA
-    timezone/DST), N-18's sajupy-internal 1900 crash, N-21 (not actionable here).
+  - **N-13 (P2).** Added `saju_engine.timezone.derive_utc_offset` (stdlib `zoneinfo`, historical +
+    DST aware), a CLI `--timezone` flag, and the intake app now reuses it; removed the intake
+    server's implicit `Form(5.5)` default (offset optional; timezone-or-offset required) and set the
+    numeric field's step to 0.25. knowledge/09 documents the DST/historical-offset rule.
+  - Gates: suite **1134 passed / 9 xfailed / 0 failed**; validation `206 (PASS 202, INTERPRETATION
+    4, FAIL 0)`; `ruff check --select F` clean. **Only open audit item:** N-18's sajupy-internal
+    1900-01-01 solar-rollback crash (N-21 is not actionable in this repo).
 
 - **2026-09-26 (client-report regen + N-6 research)** — Two follow-ups after the N-5/N-9 work:
   - **Full client-report regeneration** (`tools/regen_client_reports.sh`): all base reports, tier

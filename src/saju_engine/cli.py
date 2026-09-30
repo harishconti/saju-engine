@@ -85,6 +85,10 @@ def _build_parser() -> argparse.ArgumentParser:
                     help="Birth city for longitude geocoding (e.g., 'Pallipat').")
     ap.add_argument("--longitude", type=float, default=None,
                     help="Birth longitude in decimal degrees (east positive). Overrides city.")
+    ap.add_argument("--timezone", default=None,
+                    help="IANA timezone name (e.g. America/New_York, Asia/Seoul). "
+                         "Resolves the historical UTC offset incl. DST for the birth "
+                         "date; preferred over --utc-offset. N-13.")
     ap.add_argument("--utc-offset", type=utc_offset_float, default=None,
                     help="UTC offset in hours (required; e.g. 5.5 for India, 9 for Korea). Range [-12, 14].")
     ap.add_argument("--no-solar-time", dest="use_solar_time", action="store_false",
@@ -162,11 +166,18 @@ def _table(chart) -> str:
 
 def _run(args, stdout, stderr, *, deprecated_alias_used: bool = False) -> int:
     """Execute the requested command; write output to the provided streams."""
-    if args.utc_offset is None:
-        raise SystemExit("--utc-offset is required (e.g. 5.5 for India, 9 for Korea)")
-
     year, month, day = args.date
     hour, minute = args.time
+
+    # N-13: resolve the UTC offset from an IANA --timezone (historical + DST
+    # aware) when given, else the numeric --utc-offset. Neither is defaulted.
+    from .timezone import UnknownTimezone, derive_utc_offset
+    try:
+        utc_offset, _from_tz = derive_utc_offset(
+            year, month, day, hour, minute, args.timezone, args.utc_offset
+        )
+    except UnknownTimezone as exc:
+        raise SystemExit(str(exc))
 
     if args.format in ("premium", "skeleton") and args.gender is None:
         raise SystemExit(
@@ -181,7 +192,7 @@ def _run(args, stdout, stderr, *, deprecated_alias_used: bool = False) -> int:
             hour=hour, minute=minute,
             city=args.city,
             longitude=args.longitude,
-            utc_offset=args.utc_offset,
+            utc_offset=utc_offset,
             use_solar_time=args.use_solar_time,
             convention=args.convention,
             n_periods=args.daeun_periods,

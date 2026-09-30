@@ -17,6 +17,17 @@ If the querent does not know the birth time, **proceed without the hour pillar**
 
 > **Boundary-chart policy (added 2026-09-20, external report review I7).** When the engine's corrected solar time falls within 10 minutes of a 2-hour branch-window edge, `compute_chart()` flags it in `solar_correction["hour_boundary"]` with both the primary and the neighboring alternate hour pillar (`src/saju_engine/pillars.py::_hour_boundary_info`) — never silently pick one side. If this field is present, disclose it in the report (see `premium_report.py`'s "⚠ Hour-boundary note") and treat hour-pillar-dependent claims (palace themes, hour ten-god) as lower-confidence rather than asserting the neighboring branch is ruled out. This flag is not emitted across the 子 (23:00/01:00) edge, because that edge also changes which calendar day's stem drives the hour stem under 야자시 — a compound decision the flag does not attempt to resolve; check that boundary manually if the corrected time lands near midnight.
 
+> **Timezone / DST note (added 2026-09-26, deep-audit N-13).** A birth time is
+> local *clock* time; the correct UTC offset must include **daylight saving** and
+> any **historical** offset change. US/UK/EU summer births use the DST offset
+> (New York in July is UTC−4, not −5), and Korea used UTC+8:30 in 1954–61 and
+> DST in 1948–60 and 1987–88. A one-hour error moves the hour pillar for about
+> half of all births. Prefer an **IANA timezone** (e.g. `America/New_York`,
+> `Asia/Seoul`) over a hand-typed numeric offset — the engine resolves the exact
+> historical offset from it (`saju_engine.timezone.derive_utc_offset`, via the
+> CLI's `--timezone` and the intake app's timezone field). There is **no default
+> offset**: omitting both timezone and offset is an error, not an implied region.
+
 > **Scope note (added 2026-09-20, external report review, 3rd pass).** "Do not auto-derive the pillars in this skill" governs an interactive reading conducted directly in this Claude-driven skill, where pillar math has not been independently checked in that conversation. It does not describe `src/saju_engine`'s packaged report-generation engine (`compute_chart()`), which *does* auto-derive the four pillars from a birth date/time/location — that is a separate, independently validated code path (see `docs/openwiki/architecture/engine.md` and the engine's own test suite) and is the intended way client-facing reports (`candidates_horoscope/`) are produced. A reader of this knowledge base alone, without that context, could otherwise read this file as contradicting the product it documents.
 
 ## Step 1 · Identify the Day Master (일간, 日干)

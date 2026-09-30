@@ -2,7 +2,7 @@
 
 **Date opened:** 2026-06-02  
 **Last updated:** 2026-09-26  
-**Test count:** 1126 pytest cases passing / 9 xfailed (`python3 -m pytest`); engine validation gate
+**Test count:** 1134 pytest cases passing / 9 xfailed (`python3 -m pytest`); engine validation gate
 `python3 tools/run_validation.py` → 206 checks (202 PASS / 4 INTERPRETATION / 0 FAIL); `ruff check
 --select F src tools tests` clean and now enforced in CI.
 **Open decision:** RM (Kim Nam-joon)'s hour pillar sits 17 seconds from the 午/未 boundary after the
@@ -341,6 +341,12 @@ Sourced market research: **`docs/market-research-2026-09.md`**. Design spec:
 
 ---
 
+- **2026-09-26 (N-13 IANA timezone/DST, Suite 1134)** — Added `saju_engine.timezone.derive_utc_offset`
+  (zoneinfo; historical + DST aware), a CLI `--timezone` flag, and the intake app now reuses it;
+  removed the intake server's implicit `Form(5.5)` default (offset optional; timezone-or-offset
+  required, no silent region) and set the numeric field step to 0.25 (Nepal +5.75 etc.);
+  knowledge/09 documents the rule. New `tests/test_timezone.py`. Only open audit item is now N-18's
+  sajupy-internal 1900 crash.
 - **2026-09-26 (N-12 branch-qi normalisation, Suite 1126)** — `strength._element_counts` now
   normalises each branch's hidden stems to a fixed total qi (`_HIDDEN_BRANCH_QI = 0.6`), so every
   branch contributes equally; the old fixed role weights (0.6/0.3/0.1) made 왕지 (子卯酉) total 0.6
