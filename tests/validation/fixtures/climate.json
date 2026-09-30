@@ -1100,5 +1100,43 @@
    }
   },
   "status": "expect_match"
+ },
+ {
+  "id": "hot-month-cool-chart",
+  "subsystem": "climate",
+  "input": {
+   "probe": "merge",
+   "year": 1981,
+   "month": 6,
+   "day": 5,
+   "hour": 1,
+   "minute": 0,
+   "longitude": 127.0,
+   "utc_offset": 9.0
+  },
+  "source": "N-6 (2026-09-26, industry-standard whole-chart gate): a 巳 (hot → Water) month whose whole chart leans clearly cool (temperature -5.5), so the chart is not 'too hot' — the 조후 override is withheld and 억부 governs. Exercises the direction gate (climate.is_climate_extreme) independently of the remedy-dominance guard (Water is not the most-abundant element here). Method: 정해 만세력/8-codes + 사주플러스 whole-chart 한난 score. Probe-verified 2026-09-26 (pillars 辛酉/癸巳/甲寅/甲子).",
+  "expected": {
+   "climate": {
+    "band": "hot",
+    "climate_favorable": "Water",
+    "climate_supporting": "Metal"
+   },
+   "strength": {
+    "verdict": "balanced",
+    "candidate": "Earth"
+   },
+   "fe": {
+    "element": "Earth",
+    "method": "balanced-heuristic",
+    "supporting": "Fire",
+    "climate_band": "hot",
+    "climate_element": "Water",
+    "climate_agrees": false,
+    "confidence": "heuristic",
+    "climate_extreme": false,
+    "remedy_dominant": false
+   }
+  },
+  "status": "expect_match"
  }
 ]

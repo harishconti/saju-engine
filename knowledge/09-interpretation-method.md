@@ -93,13 +93,16 @@ birth** (寅卯申酉, i.e. none of the eight non-temperate branches above — �
 have no opinion, and the 억부 logic below (Steps 1–3) becomes the primary
 signal.
 
-> **Remedy-dominance guard (added 2026-09-26, deep-audit N-6).** Because the
-> doctrine gates on the chart being climate-*extreme*, the 조후 override is
-> withheld when the element it prescribes is **already the chart's most
-> abundant element** — adding it cannot balance the chart. In that case the
-> 억부 logic below governs instead. See `knowledge/17-climate-method.md`
-> §"The Remedy-Dominance Guard" for the sourcing and the reason no numeric
-> chart-extremeness threshold is used.
+> **Whole-chart extremeness gate (added 2026-09-26, deep-audit N-6).** Because
+> the doctrine gates on the chart — not the month alone — being climate-*extreme*,
+> the 조후 override is withheld in two cases, and the 억부 logic below governs
+> instead: (1) the whole chart clearly leans **opposite** its month's temperature
+> (a hot month whose chart reads cool, or a cold month whose chart reads warm);
+> or (2) the element 조후 prescribes is **already the chart's most abundant
+> element**, so adding it cannot balance the chart. This is the industry-standard
+> reading (정해 만세력/8-codes and 사주플러스 both score 온도 from the whole
+> chart). The element itself stays month/stem-derived (궁통보감). See
+> `knowledge/17-climate-method.md` §"The Whole-Chart Extremeness Gate".
 
 1. **If 신강 (Day Master is strong) — and the month is temperate:** The chart has too much of the Day Master. The 용신 is one of the elements that **drains or controls** the Day Master:
    - **식상 (Output)** is the most common first choice for 신강 — it channels the Day Master's energy out.

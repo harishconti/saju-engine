@@ -173,60 +173,57 @@ work — so this needs explicit approval, not a unilateral fix.
 
 ---
 
-## 5. Decision — option C (remedy-dominance guard). IMPLEMENTED.
+## 5. Decision — the industry-standard whole-chart temperature gate. IMPLEMENTED.
 
-The research produced four candidate fixes. The **branch-count gates (A/B) were ruled out by a
-further classical finding**, and **option C was adopted and implemented** 2026-09-26.
+The user asked for the **industry standard**. Research into the major Korean engines settled it:
+both **정해 만세력 (8-codes)** and **사주플러스** judge 한난 (temperature) from the **whole chart**,
+not the month alone — 8-codes as a weighted per-character temperature score with month/hour
+weighted higher, 사주플러스 with a published per-character 한난 table and "월지 중심" reading. So
+the audit's N-6 recommendation (weigh Fire/Water across stems and hidden stems, gate on that) *is*
+the industry standard. It is implemented as two gates; the element stays month/stem-derived.
 
-### Why the branch-count gates (A/B) were rejected
+### What was implemented
 
-A branch-count extremeness gate looks well-sourced in the abstract, but it **contradicts a
-transcribed classical per-stem rule.** 궁통보감’s entry for **四月辛金** (辛金 born in the 巳
-month — Harish’s exact chart) is *unconditional*:
+`climate.climate_temperature(pillars)` — the weighted whole-chart 한난 score (positive = warm/木火,
+negative = cool/金水), using the 사주플러스 per-character assignment (stems 한 甲辛壬癸 / 난 乙丙丁庚,
+neutral 戊己; branches 한 寅酉戌亥子丑 / 난 卯辰巳午未申) and the 8-codes position weighting (month
+×2, hour ×1.5; hidden stems at a fraction). Two threshold-free gates then decide priority:
 
-> 四月辛金 … **忌丙火之燥烈，喜壬水之洗淘** … 四月辛金，不能无水，壬癸出干，主异途富贵 …
-> 如壬癸水俱无，但见烈烈火攻，金被火镕，贫贱残疾之命
-> — 窮通寶鑑 (四月辛金), transcribed via
-> <https://www.dajiazhao.com/sm/qtbj/6178.html>
+1. **Direction gate (寒暖 axis)** — `is_climate_extreme()`. For a hot (巳午未) or cold (亥子丑)
+   month, if the whole chart clearly leans *opposite* its month (a hot month whose chart reads
+   cool, or vice versa, beyond `_NEUTRAL_TEMPERATURE_MARGIN`), the "사주가 너무 차거나 너무
+   더우면" condition is not met and the override is withheld. (辰戌 are the 燥濕/humidity axis,
+   which this *temperature* score cannot judge, so they are not gated on it.)
+2. **Remedy-dominance guard** — `is_remedy_dominant()`. If the prescribed remedy is already the
+   chart's most-abundant element, adding more cannot balance the chart. Covers 辰戌 and any other
+   oversaturation.
 
-The prescription is Water **regardless of how hot the rest of the chart is** — the remedy follows
-the stem-and-month, not the chart-wide temperature. A branch-count gate would suppress Harish’s
-Water-용신 (his 巳/亥/丑 branches fail a ≥3-of-4 hot test) and replace it with Wood, directly
-contradicting 궁통보감. (This is also why MEMORY records Harish’s Water as independently
-validated.) The two practitioner sources’ class lists are also mutually inconsistent (naver’s
-cold-branch set includes 申酉丑辰; its cold *stems* are only 壬癸, while sajuplus counts 庚辛己),
-so neither gives a stable, citable threshold.
+**Why the element stays month-derived.** Both the branch-count gates (A/B) *and* a naive
+whole-chart-temperature element derivation would **contradict 궁통보감's unconditional per-stem
+rule** — 四月辛金 (Harish's exact chart) prescribes 壬水 regardless of the rest of the chart:
 
-### Adopted: the remedy-dominance guard (option C)
+> 四月辛金，必喜庚壬为用 … 忌丙火之燥烈，喜壬水之洗淘 … 如壬癸水俱无，但见烈烈火攻，金被火鎔
+> — 窮通寶鑑 (四月辛金), transcribed via <https://www.dajiazhao.com/sm/qtbj/6178.html>
 
-The one condition that is **both sourced and logically forced** is the audit’s own: if the
-element 조후 prescribes is **already the chart’s most-abundant element**, adding it cannot balance
-the chart. 算准網 states the same principle for when *not* to apply 조후 (it should not fire when
-the chart is "已经达到平衡" / already balanced). This needs **no invented threshold**, cannot
-contradict a per-stem prescription (it fires only when the chart is *already* saturated with the
-remedy), and — measured — corrects **both** audit examples (1963 and 2010 both have their
-prescribed remedy as the most-abundant element):
+Harish's chart scores ≈0.0 on the temperature scale (genuinely neutral), so an element-from-
+temperature rule would flip his validated Water → an unsourced element. Ground Rule 1 (classical
+wins) therefore forbids deriving the *element* from the chart-wide score; only the *priority* is
+gated. This also matches 사주플러스's "한난은 월지 중심" and the classical stem×month structure.
 
-| Chart | Band | Remedy | Most-abundant | Guard |
-|---|---|---|---|---|
-| 1963-10-24 (36% Water) | dry | Water | Water | **suppress** ✓ |
-| 2010-12-06 (Fire = 기신) | cold | Fire | Fire | **suppress** ✓ |
+**Measured impact** (4,000 random climate-governed charts): the direction gate withholds the
+clearly-contradicted ~9%, the dominance guard ~14%, together ~21% — and **every published
+deliverable is unchanged** (Harish Water, Mahesh Fire, Vishnu Priya Water, Manvitha Fire, RM
+Water; Gurumoorthy/Sruthi/Pawan are reader-overrides). Both audit examples are corrected:
+1963-10-24 (dry/Water, remedy already dominant) and 2010-12-06 (cold/Fire, remedy already
+dominant) now resolve via 억부.
 
-**Impact:** drops the "remedy already the chart’s most-abundant element" rate from 14.7% of
-climate-governed charts to **0 by construction**, and changes the resolved 용신 for **zero**
-published candidates (Harish, Mahesh, Vishnu Priya, Gurumoorthy, Sruthi, Pawan, Manvitha, RM all
-keep their element). Implemented in `climate.is_remedy_dominant()` +
-`yongsin.favorable_element()`; `FavorableElement.remedy_dominant` records the state.
+### Remaining [UNCERTAIN]
 
-*(An earlier draft of this doc recommended A+C and claimed the guard alone would not catch the
-2010 example — that was an error in a prototype measurement; both audit examples are
-remedy-dominant, so the guard catches both.)*
-
-### Remaining [UNCERTAIN] / open
-
-A true chart-extremeness threshold (A/B) is **not adopted** — it would need either a source that
-does not contradict 궁통보감's per-stem rules, or an explicit product decision to override those
-rules. Option B (looser 4-of-8) remains available if a future source justifies it.
+`_NEUTRAL_TEMPERATURE_MARGIN = 1.0` is an **operational choice** — the engines publish no cutoff —
+and is flagged `[UNCERTAIN]` in knowledge/17. It is deliberately conservative (withholds only the
+clearly-contradicted case), so a future source giving a precise extremeness threshold could widen
+it without changing any current output. An element-from-temperature derivation (the more literal
+8-codes reading) is **not adopted** because it contradicts 궁통보감.
 
 ---
 
@@ -253,6 +250,20 @@ Directly reviewed (scraped 2026-09-26):
 9. 太极书馆 — 《四柱预测学入门》 补偏之三·用神调候 —
    <https://www.8bei8.com/book/sizhuyucexuerumen_30.html>
 
+**Industry engines (the standard this implementation follows), directly reviewed 2026-09-26:**
+
+10. 정해 만세력 / 8-codes — 용신과 용신격 (조후용신 method: per-character 한난 score, month &
+    hour weighted higher; 조후 importance falls as the chart approaches neutral) —
+    <https://guide.8-codes.com/guide/origin/yongsin.html>
+11. 사주플러스 (플러스만세력) — 명리학 조견표 · 천간 지지의 한난조습 (published per-character
+    한난 table; "한난은 월지 중심으로 판단") —
+    <http://mase.sajuplus.net/?mnuid=1&idcnt=2&curjong=manse003006&cstyle=D&drlink=habchsch2&etcval=hanan1>
+12. 窮通寶鑑 — 四月辛金 條 (unconditional 壬水; the per-stem rule that fixes the *element* even
+    when the whole-chart temperature is neutral) —
+    <https://www.dajiazhao.com/sm/qtbj/6178.html>
+
 **Ground-rule note.** The *principle* (chart must be extreme) is classical and transcribed. The
-*numeric threshold* is practitioner-sourced, stated here with provenance and flagged `[UNCERTAIN]`;
-it is not presented as classical doctrine. No engine change is made by this document.
+industry *method* (whole-chart weighted temperature score) is documented by 정해 만세력 and
+사주플러스. The one numeric constant (`_NEUTRAL_TEMPERATURE_MARGIN`) is an operational choice, not
+published by any source, and is flagged `[UNCERTAIN]`. The *element* is taken from 궁통보감's
+stem×month rule, not derived from the temperature score, per Ground Rule 1.

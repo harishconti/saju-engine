@@ -720,7 +720,7 @@ def check_yongsin(chart: Any, entry: dict) -> dict:
         "element": fe.element, "method": fe.method, "supporting": fe.supporting,
         "climate_band": fe.climate_band, "climate_element": fe.climate_element,
         "climate_agrees": fe.climate_agrees, "confidence": fe.confidence,
-        "remedy_dominant": fe.remedy_dominant,
+        "remedy_dominant": fe.remedy_dominant, "climate_extreme": fe.climate_extreme,
     }
     for key, exp in (expected.get("fe") or {}).items():
         if exp is not None and got_fe[key] != exp:
@@ -834,7 +834,7 @@ def check_climate_merge(chart: Any, entry: dict) -> dict:
         "element": fe.element, "method": fe.method, "supporting": fe.supporting,
         "climate_band": fe.climate_band, "climate_element": fe.climate_element,
         "climate_agrees": fe.climate_agrees, "confidence": fe.confidence,
-        "remedy_dominant": fe.remedy_dominant,
+        "remedy_dominant": fe.remedy_dominant, "climate_extreme": fe.climate_extreme,
     }
     for key, exp in (expected.get("fe") or {}).items():
         if exp is not None and got_fe[key] != exp:

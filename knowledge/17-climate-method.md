@@ -87,52 +87,77 @@ but on the per-branch element assignments in the table above, which rest on a
 modern practitioner source (cantian.ai) rather than a transcribed classical
 text.
 
-## The Remedy-Dominance Guard (added 2026-09-26, deep-audit N-6)
+## The Whole-Chart Extremeness Gate (added 2026-09-26, deep-audit N-6)
 
 The classical doctrine conditions the 조후 override on the **whole chart**
 being climate-extreme, not merely on the birth month. 적천수 (滴天髓) §29 寒暖
 and §30 燥濕 say the chart must be "不可過 / 不可偏" (not excessive / not
 one-sided), and 임철초's (任鐵樵) commentary even withholds the remedy for
-absolute excess (*"若原局全是極寒、極濕、極暖、極燥之氣，反不宜調候"*). A chart
-born in a hot month but already full of Water does **not** need more Water.
+absolute excess (*"若原局全是極寒、極濕、極暖、極燥之氣，反不宜調候"*). The
+sourced condition is qualitative — no classical text gives a number.
 
-The primary text states this condition qualitatively — **no classical source
-gives a numeric threshold.** Two modern Korean practitioner sources do give
-whole-chart tests, but they disagree with one another and would suppress
-readings 궁통보감 prescribes unconditionally (e.g. 四月辛金 wants 壬水 *regardless*
-of how hot the rest of the chart is — see `docs/research/
-2026-09-26-climate-extremeness-threshold.md` §3). Adopting either would
-contradict a transcribed classical rule, so neither is used.
+**The industry standard operationalises it as a whole-chart temperature score.**
+Two leading Korean engines document this:
 
-What this project implements instead is the one condition that is both sourced
-and logically forced — the audit's **remedy-dominance guard**:
+- **정해 만세력 (8-codes)** — *"조후에 따른 용신을 구합니다. 천간, 지지의 각
+  글자마다 각각 한난, 조습에 해당하는 점수를 부여하고 이를 조합하여 사주의 온도와
+  습도를 구합니다. 이때, **월지와 시지에 더 큰 가산점**을 주어 구합니다. …
+  **조후가 중화되어 있을수록 조후 용신의 중요성은 떨어집니다.**"* — a weighted
+  per-character temperature score (month/hour weighted higher), where 조후's
+  importance falls as the chart approaches neutral.
+- **사주플러스** — *"한난은 **월지 중심으로** 판단하고, 조습은 일지 중심으로
+  판단합니다"* — temperature judged from the whole chart with the month central,
+  and it publishes a per-character 한난 (한/난) table.
 
-> **If the element 조후 prescribes is already the chart's most abundant
-> element, the 조후 override is withheld; 억부 (strength-balance) governs.**
+### What the engine implements
 
-Adding the most-abundant element cannot balance a chart, so this needs no
-invented threshold and cannot contradict a per-stem prescription (it only fires
-when the chart is *already* saturated with the remedy). In `src/saju_engine/`,
-`climate.is_remedy_dominant(month_branch, element_counts)` implements the test
-and `yongsin.favorable_element()` applies it after the band table. The resolved
-`FavorableElement.remedy_dominant` field records the state.
+`climate.climate_temperature(pillars)` computes the weighted whole-chart 한난
+score (positive = warm/木火, negative = cool/金水), using the 사주플러스
+per-character assignment (stems 한 甲辛壬癸 / 난 乙丙丁庚, neutral 戊己;
+branches 한 寅酉戌亥子丑 / 난 卯辰巳午未申) with the 8-codes position weighting
+(month ×2, hour ×1.5; hidden stems at a fraction). Two threshold-free gates
+then decide whether the override fires:
 
-This closes the audit's N-6 complaint (the prescribed remedy was already the
-chart's most-abundant element in ~15% of climate-governed random charts; the
-guard reduces that to 0 by construction, and corrects both of the audit's own
-example charts) without inventing doctrine.
+1. **Direction gate (寒暖 axis).** For a **hot** (巳午未) or **cold** (亥子丑)
+   month, if the whole chart clearly leans *opposite* its month — a hot month
+   whose chart reads cool, or a cold month whose chart reads warm, beyond
+   `_NEUTRAL_TEMPERATURE_MARGIN` — the "사주가 너무 차거나 너무 더우면" condition
+   is not met, so the override is withheld and 억부 governs. (The 燥濕/辰戌 bands
+   are a *humidity* axis this temperature score cannot judge, so they are not
+   gated on it.)
+2. **Remedy-dominance guard.** If the element 조후 prescribes is already the
+   chart's most abundant element, adding more cannot balance the chart, so the
+   override is withheld. This covers the 燥濕 bands and any other oversaturation.
+
+In both cases the **element itself stays month/stem-derived** — matching
+궁통보감's unconditional per-stem rules (e.g. 四月辛金 → 壬水 regardless of the
+rest of the chart, which is why a pure magnitude gate that would flip such a
+chart is *not* used). Only the *priority* is gated. `src/saju_engine/`:
+`climate.is_climate_extreme()` / `climate.is_remedy_dominant()` implement the
+gates; `yongsin.favorable_element()` applies them; the resolved
+`FavorableElement.climate_temperature` / `climate_extreme` / `remedy_dominant`
+fields record the state.
+
+The numeric `_NEUTRAL_TEMPERATURE_MARGIN` is an **operational choice, not a
+transcribed classical number** — the engines publish no cutoff — and is marked
+`[UNCERTAIN]` accordingly. Measured 2026-09-26: it withholds only the clearly
+contradicted ~9% of climate-governed charts (plus ~14% for the dominance guard),
+leaving every published reading unchanged while correcting the audit's two
+example charts. See `docs/research/2026-09-26-climate-extremeness-threshold.md`.
 
 ## How This Combines With 억부 (Strength-Balance)
 
 Per `knowledge/09-interpretation-method.md` Step 3, **as of 2026-09-19**:
 
-- **조후 governs the headline 용신 whenever the chart sits in a non-temperate
-  climate band** (hot, cold, damp, or dry) — **regardless of the 억부 strength
-  verdict.** This is the sourced doctrine: *"조후와 부억에는 명식을 떠난 고정
-  순서가 없습니다... 극단적 기후가 다른 기능을 막으면 조후가 전제가 됩니다"*
-  (OpenFate); *"사주가 너무 차거나 너무 더우면 조후를 우선하고, 그렇지 않으면
-  억부를 우선하는 견해가 많습니다"* (두루미사주) — priority is gated on
-  **climate extremeness**, not on the Day Master's strength. See
+- **조후 governs the headline 용신 when the chart sits in a non-temperate
+  climate band** (hot, cold, damp, or dry) **and passes the whole-chart
+  extremeness gate above** — **regardless of the 억부 strength verdict.** This
+  is the sourced doctrine: *"조후와 부억에는 명식을 떠난 고정 순서가 없습니다...
+  극단적 기후가 다른 기능을 막으면 조후가 전제가 됩니다"* (OpenFate); *"사주가
+  너무 차거나 너무 더우면 조후를 우선하고, 그렇지 않으면 억부를 우선하는 견해가
+  많습니다"* (두루미사주) — priority is gated on **climate extremeness**, not on
+  the Day Master's strength. The extremeness is now read from the whole chart
+  (see "The Whole-Chart Extremeness Gate"), not the month alone. See
   `docs/research/2026-09-validation-climate.md` §5.
 - **Temperate month:** 억부 stays authoritative for the headline 용신, since
   조후 has no opinion to offer in a mild season.

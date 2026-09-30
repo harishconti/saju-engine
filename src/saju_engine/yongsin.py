@@ -29,14 +29,18 @@ has no opinion to offer. A reader override always wins outright over both
 methods, unchanged. This module never invents a new derivation beyond that
 merge.
 
-2026-09-26 (deep-audit N-6): the 조후 override is additionally gated by the
-**remedy-dominance guard** (``climate.is_remedy_dominant``). The doctrine
-requires the *chart* to be climate-extreme, not merely the birth month; the one
-condition that is both sourced and logically forced is the audit's — if the
-element 조후 prescribes is already the chart's most abundant, adding it cannot
-balance the chart, so 억부 governs instead. (Numeric branch-count gates were
-researched and rejected: they contradict 궁통보감's unconditional per-stem rule,
-e.g. 四月辛金 → 壬水. See docs/research/2026-09-26-climate-extremeness-threshold.md.)
+2026-09-26 (deep-audit N-6): the 조후 override is additionally gated on the
+**whole chart**, following the industry standard. 정해 만세력 (8-codes) computes a
+weighted per-character 한난 temperature score (month/hour weighted higher) and
+states that 조후 matters less as the chart approaches neutral; 사주플러스 likewise
+judges 한난 from the whole chart. This module computes that score
+(``climate.climate_temperature``) and withholds the override when the chart does
+not lean in the month band's climate direction (``is_climate_extreme``); a
+second threshold-free guard withholds it when the prescribed remedy is already
+the chart's most abundant element (``is_remedy_dominant``). In both cases 억부
+governs. The *element* is still taken from the month table, matching the
+classical per-stem 궁통보감 rule. See
+docs/research/2026-09-26-climate-extremeness-threshold.md.
 """
 from __future__ import annotations
 
@@ -44,7 +48,12 @@ from dataclasses import dataclass, replace
 from typing import Optional
 
 from . import lookup as L
-from .climate import assess_climate, is_remedy_dominant
+from .climate import (
+    assess_climate,
+    climate_temperature,
+    is_climate_extreme,
+    is_remedy_dominant,
+)
 
 # Strength verdict → the method label we expose to the reader/client, when
 # climate does not override the headline (see favorable_element()).
@@ -123,6 +132,10 @@ class FavorableElement:
             a temperate-month chart.
         climate_agrees: whether the climate element matches the raw 억부
             candidate_favorable, or None when the month is temperate.
+        climate_temperature: the weighted whole-chart 한난 score (positive =
+            warm, negative = cool) — the industry-standard extremeness measure.
+        climate_extreme: whether the chart leaned in the month band's climate
+            direction (N-6 gate). None when the month is temperate.
         remedy_dominant: N-6 guard state. True when the 조후 remedy element was
             already the chart's most abundant element, so the override was
             withheld (억부 governs). None when the month is temperate (no
@@ -137,6 +150,8 @@ class FavorableElement:
     climate_band: str = "temperate"
     climate_element: Optional[str] = None
     climate_agrees: Optional[bool] = None
+    climate_temperature: Optional[float] = None
+    climate_extreme: Optional[bool] = None
     remedy_dominant: Optional[bool] = None
     # E-3/E-5 single resolution (2026-09-26): the rest of the five-role set,
     # resolved once here so every product reads the same values.
@@ -255,21 +270,27 @@ def favorable_element(chart, override: Optional[str] = None) -> FavorableElement
     climate_agrees = (climate_element == raw_favorable) if climate_element else None
     season_label = _SEASON_LABEL.get(climate["band"])
 
-    # N-6 (2026-09-26): if the prescribed remedy is already the chart's MOST
-    # abundant element, adding it cannot balance the chart — suppress the
-    # override and let 억부 govern. This is the audit's minimal, threshold-free
-    # fix; see climate.is_remedy_dominant and
-    # docs/research/2026-09-26-climate-extremeness-threshold.md.
+    # N-6 (2026-09-26): the 조후 override is gated on the *whole chart* being
+    # climate-extreme in the month band's direction (industry-standard weighted
+    # temperature score, 정해 만세력 / 8-codes), and additionally withheld if the
+    # prescribed remedy is already the chart's most abundant element. Either way
+    # 억부 governs instead. See climate.climate_temperature / is_climate_extreme
+    # / is_remedy_dominant and docs/research/2026-09-26-climate-extremeness-threshold.md.
     counts = sa.get("element_counts") or {}
+    temperature = climate_temperature(getattr(chart, "pillars", []) or [])
+    climate_extreme = bool(
+        climate_element
+        and is_climate_extreme(sa.get("month_branch", ""), temperature)
+    )
     remedy_dominant = bool(
         climate_element and is_remedy_dominant(sa.get("month_branch", ""), counts)
     )
 
-    if climate_element and not remedy_dominant:
-        # 조후 governs the headline whenever the climate band is non-temperate
-        # (hot/cold/damp/dry) and the remedy is not already dominant, regardless
-        # of the 억부 verdict. See the module docstring and
-        # docs/research/2026-09-validation-climate.md §5.
+    if climate_element and climate_extreme and not remedy_dominant:
+        # 조후 governs the headline when the chart is genuinely climate-extreme
+        # (hot/cold/damp/dry) in the month band's direction and the remedy is not
+        # already dominant, regardless of the 억부 verdict. See the module
+        # docstring and docs/research/2026-09-validation-climate.md §5.
         element = climate_element
         supporting = climate["climate_supporting"]
         method = "climate-balanced"
@@ -306,12 +327,14 @@ def favorable_element(chart, override: Optional[str] = None) -> FavorableElement
             element=element, method=method, confidence="heuristic", note=note,
             supporting=supporting, climate_band=climate["band"],
             climate_element=climate_element, climate_agrees=climate_agrees,
+            climate_temperature=temperature, climate_extreme=climate_extreme,
             remedy_dominant=(remedy_dominant if climate_element else None),
         ), sa)
 
-    # No 조후 override: either a temperate month (nothing to govern with) or a
-    # non-temperate month whose prescribed remedy is already the chart's most
-    # abundant element (the N-6 guard). 억부 stays authoritative.
+    # No 조후 override: a temperate month (nothing to govern with), a
+    # non-temperate month whose chart is not climate-extreme in the month band's
+    # direction (N-6 whole-chart gate), or one whose prescribed remedy is
+    # already the most abundant element (N-6 dominance guard). 억부 governs.
     element = raw_favorable
     supporting = raw_supporting
     method = _METHOD_BY_VERDICT.get(verdict, "balanced-heuristic")
@@ -321,6 +344,11 @@ def favorable_element(chart, override: Optional[str] = None) -> FavorableElement
             f" The {climate_element} that 조후 would add is already this chart's most abundant "
             "element, so it cannot balance the chart and the strength-balance (억부) reading governs."
         )
+    elif climate_element and not climate_extreme:
+        suppress_note = (
+            " Born in a non-temperate month, but the chart as a whole leans the other way, "
+            "so the classical 조후 check is set aside and the strength-balance (억부) reading governs."
+        )
     else:
         suppress_note = " Born in a climate-neutral month, so no 조후 override applies here."
     note = base_note + suppress_note
@@ -329,5 +357,6 @@ def favorable_element(chart, override: Optional[str] = None) -> FavorableElement
         element=element, method=method, confidence="heuristic", note=note,
         supporting=supporting, climate_band=climate["band"],
         climate_element=climate_element, climate_agrees=climate_agrees,
+        climate_temperature=temperature, climate_extreme=climate_extreme,
         remedy_dominant=(remedy_dominant if climate_element else None),
     ), sa)
