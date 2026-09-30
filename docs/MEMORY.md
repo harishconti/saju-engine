@@ -17,20 +17,21 @@
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"
   below and `docs/audits/2026-09-26-deep-engine-audit-verification.md` for the live tracker of the
-  second pass. **Suite: 1094 passed / 9 xfailed / 0 failed.** Validation gate:
-  `python3 tools/run_validation.py` → `204 (PASS 200, INTERPRETATION 4, FAIL 0)`. `ruff check
+  second pass. **Suite: 1113 passed / 9 xfailed / 0 failed.** Validation gate:
+  `python3 tools/run_validation.py` → `206 (PASS 202, INTERPRETATION 4, FAIL 0)`. `ruff check
   --select F src tools tests` is now clean and enforced in CI (was not run in CI before this pass).
-  **Two of the three doctrinal items are now implemented:** **N-5** (yin-DM strength now scores
+  **All three doctrinal items are now implemented:** **N-5** (yin-DM strength now scores
   the month branch by element relation / 득령, knowledge/09 Step 2 — not the 12운성 stage; extreme
   bands widened 4.0→5.0 to keep `extreme` rare and hold published verdicts stable) and **N-9**
   (양인격/건록격 now fire at the month/월령 position as the classical grid, with the year/day/hour
-  case relabelled a related-but-distinct pattern). **N-6 is now FIXED (option C)** — the
-  **remedy-dominance guard**: if 조후's prescribed remedy is already the chart's most-abundant
-  element, the override is withheld and 억부 governs (`climate.is_remedy_dominant()` +
-  `yongsin.favorable_element()`, `FavorableElement.remedy_dominant`). Corrects both audit examples,
-  changes **zero** published deliverables, invents no threshold. Branch-count gates (options A/B)
-  were researched and rejected — they contradict 궁통보감's unconditional per-stem rule (四月辛金 →
-  壬水 regardless of chart-wide temperature; Harish's own chart). See
+  case relabelled a related-but-distinct pattern). **N-6 is now FIXED (industry-standard whole-chart
+  gate)** — following 정해 만세력 (8-codes) and 사주플러스, `climate.climate_temperature()` computes a
+  weighted whole-chart 한난 score (month/hour weighted higher) and two threshold-free gates decide
+  priority: `is_climate_extreme()` withholds the override when a hot/cold month's whole chart clearly
+  leans the other way, and `is_remedy_dominant()` withholds it when the prescribed remedy is already
+  the most-abundant element. The **element** stays month/stem-derived (궁통보감 — deriving it from the
+  temperature score would flip Harish's validated Water). Corrects both audit examples, changes
+  **zero** published deliverables (verified: regen produced no markdown diff). See
   `docs/research/2026-09-26-climate-extremeness-threshold.md`. Client reports were regenerated for
   N-5/N-9 on 2026-09-26 (second pass).
 
@@ -255,17 +256,21 @@ history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P
     /draft leaks). Also fixed the **N-22 regression test**, which asserted a clean `git status` and
     so failed on any legitimate regen of a tracked deliverable — it now compares the tracked PDF's
     bytes before/after instead.
-  - **N-6 FIXED (option C — remedy-dominance guard)** — `docs/research/
-    2026-09-26-climate-extremeness-threshold.md`. The 조후 override now keys on whole-chart
-    extremeness: if the prescribed remedy is already the chart's most-abundant element, the
-    override is withheld and 억부 governs (`climate.is_remedy_dominant()` + `yongsin.
-    favorable_element()`; `FavorableElement.remedy_dominant` field; knowledge/17 + 09 updated).
-    Corrects both audit examples (1963 → Wood, 2010 → Earth) and changes **zero** published
-    deliverables. The classical 적천수 §29/§30 confirms the *principle* but gives no number; the
-    two Korean practitioner branch-count criteria (A/B) were researched and **rejected** — they
-    contradict 궁통보감's unconditional 四月辛金→壬水 rule (Harish's own chart). New fixtures
-    `dry-remedy-dominant` + re-pointed `dry-balanced-synth-v2`; regression tests; validation CLI
-    204→205. Suite 1096 → **1104**.
+  - **N-6 FIXED (industry-standard whole-chart extremeness gate)** — `docs/research/
+    2026-09-26-climate-extremeness-threshold.md`. Per the user's "industry standard" direction, the
+    조후 override is now gated on the **whole chart**: `climate.climate_temperature()` computes a
+    weighted 한난 score (month/hour weighted higher — 정해 만세력/8-codes; per-character table from
+    사주플러스), and two threshold-free tests decide priority — `is_climate_extreme()` (a hot/cold
+    month whose whole chart clearly leans the other way withdraws the override) and
+    `is_remedy_dominant()` (remedy already the most-abundant element). `FavorableElement` carries
+    `climate_temperature`/`climate_extreme`/`remedy_dominant`; knowledge/17 + 09 updated.
+    **The element stays month/stem-derived** (궁통보감 — a temperature-derived element would flip
+    Harish's validated Water, whose chart scores ≈0/neutral). Corrects both audit examples
+    (1963 → Wood, 2010 → Earth) and changes **zero** published deliverables (regen: no markdown
+    diff). New fixtures `hot-month-cool-chart` + `dry-remedy-dominant`; re-pointed
+    `dry-balanced-synth-v2`; regression tests in `test_climate.py`/`test_yongsin_consistency.py`;
+    validation CLI 204→206. Suite 1096 → **1113**. `_NEUTRAL_TEMPERATURE_MARGIN` is an operational
+    (not transcribed) constant, flagged `[UNCERTAIN]`.
 
 - **2026-09-26 (N-5 + N-9 doctrinal decisions implemented, Suite 1094 → 1096)** — Two of the three
   [doctrinal] items from the second deep audit were implemented against their recorded user

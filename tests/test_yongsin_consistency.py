@@ -258,6 +258,43 @@ def test_n6_guard_does_not_fire_for_published_candidates():
         assert fe.remedy_dominant in (None, False)
 
 
+def test_n6_direction_gate_suppresses_hot_month_on_cool_chart():
+    """Industry-standard whole-chart gate: a 巳 (hot → Water) month whose whole
+    chart leans clearly cool is not 'too hot', so 조후 is withheld and 억부
+    governs. Water is NOT the most-abundant element here, so this exercises the
+    direction gate independently of the dominance guard."""
+    chart = compute_chart(
+        name="N6-hot-month-cool-chart", gender="M",
+        year=1981, month=6, day=5, hour=1, minute=0,
+        longitude=127.0, utc_offset=9.0, use_solar_time=True,
+    )
+    fe = favorable_element(chart)
+    assert fe.climate_band == "hot"
+    assert fe.climate_element == "Water"
+    assert fe.climate_temperature is not None and fe.climate_temperature < 0
+    assert fe.climate_extreme is False
+    assert fe.remedy_dominant is False
+    assert fe.method != "climate-balanced"
+    assert fe.element != "Water"
+
+
+def test_n6_harish_keeps_water_despite_neutral_temperature():
+    """Regression lock: Harish's chart scores ~0 on the whole-chart temperature
+    (genuinely neutral), but 궁통보감's 四月辛金 rule prescribes 壬水
+    unconditionally, so the *element* must stay Water — the gate must never flip
+    a validated reading by deriving the element from the temperature score."""
+    chart = compute_chart(
+        name="Harish", gender="M", year=1992, month=6, day=4, hour=3, minute=10,
+        city="Pallipattu, Tamil Nadu", utc_offset=5.5, use_solar_time=True,
+        convention="korean",
+    )
+    fe = favorable_element(chart)
+    assert fe.element == "Water"
+    assert fe.method == "climate-balanced"
+    assert abs(fe.climate_temperature) < 1.0        # neutral temperature
+    assert fe.climate_extreme is True               # but not opposing its month
+
+
 # ── E-3/E-5 single resolution (2026-09-26) ───────────────────────────────
 
 

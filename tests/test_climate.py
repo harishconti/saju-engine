@@ -3,7 +3,20 @@ from __future__ import annotations
 
 import pytest
 
-from saju_engine.climate import assess_climate, is_remedy_dominant
+from saju_engine.climate import (
+    assess_climate,
+    climate_temperature,
+    is_climate_extreme,
+    is_remedy_dominant,
+)
+
+
+class _P:
+    """Minimal pillar stand-in for climate_temperature()."""
+    def __init__(self, stem, branch, hidden=()):
+        self.stem = stem
+        self.branch = branch
+        self.hidden_stems = list(hidden)
 
 
 @pytest.mark.parametrize("branch", ["巳", "午", "未"])
@@ -87,3 +100,52 @@ def test_remedy_dominant_false_without_counts():
     """Missing/empty counts must not suppress on absent data."""
     assert is_remedy_dominant("戌", None) is False
     assert is_remedy_dominant("戌", {}) is False
+
+
+# ── N-6 whole-chart temperature gate (industry standard, 2026-09-26) ─────────
+
+
+def test_climate_temperature_warm_vs_cool_sign():
+    """A warm-dominant chart scores positive; a cool-dominant chart negative.
+
+    Uses the 사주플러스 per-character assignment (stems 한 甲辛壬癸 / 난 乙丙丁庚;
+    branches 한 寅酉戌亥子丑 / 난 卯辰巳午未申)."""
+    warm = [_P("丙", "午"), _P("乙", "巳"), _P("丙", "未"), _P("乙", "卯")]
+    cool = [_P("壬", "子"), _P("癸", "亥"), _P("辛", "酉"), _P("癸", "丑")]
+    assert climate_temperature(warm) > 0
+    assert climate_temperature(cool) < 0
+
+
+def test_climate_temperature_weights_month_and_hour_branches_more():
+    """Per 8-codes, the month/hour branches carry more weight than year/day.
+
+    Start from a cool chart (all 丑 branches) and warm one branch at a time;
+    warming the month (weight 2.0) must move the score more than warming the
+    day (weight 1.0)."""
+    base = [_P("戊", "丑"), _P("戊", "丑"), _P("戊", "丑"), _P("戊", "丑")]
+    month_hot = [_P("戊", "丑"), _P("戊", "午"), _P("戊", "丑"), _P("戊", "丑")]
+    day_hot = [_P("戊", "丑"), _P("戊", "丑"), _P("戊", "午"), _P("戊", "丑")]
+    month_delta = climate_temperature(month_hot) - climate_temperature(base)
+    day_delta = climate_temperature(day_hot) - climate_temperature(base)
+    assert month_delta > day_delta > 0
+
+
+def test_direction_gate_suppresses_hot_month_on_cool_chart():
+    """A hot month whose whole chart leans cool is not 'too hot' — override off."""
+    assert is_climate_extreme("巳", -5.5) is False
+
+
+def test_direction_gate_allows_hot_month_on_warm_chart():
+    assert is_climate_extreme("午", 5.0) is True
+    assert is_climate_extreme("子", -4.0) is True
+
+
+def test_direction_gate_false_for_temperate_month():
+    assert is_climate_extreme("酉", 9.0) is False
+
+
+def test_direction_gate_has_no_temperature_opinion_for_damp_dry():
+    """辰/戌 are the 燥濕 (humidity) axis — a temperature score cannot judge them,
+    so the direction gate passes them through for the dominance guard to handle."""
+    assert is_climate_extreme("辰", 9.0) is True
+    assert is_climate_extreme("戌", -9.0) is True
