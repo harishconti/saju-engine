@@ -452,7 +452,7 @@ With **Metal** as the favorable element, the most aligned launch window is **aut
 
 **Luck direction:** forward, advancing from the month pillar — derived from a yang year stem (甲) and male gender, per the classical rule (yang year + male, or yin year + female → forward; otherwise backward).
 
-**대운수 (starting age):** ~6.5 (~19.4 days to the qualifying 節氣 ÷ 3, per knowledge/08's "3 days = 1 year" rule) — the first major-luck period begins roughly 77 months after birth (≈ Dec 1970), inside the **6-15** decade label shown below, not precisely at its first birthday; each later period changes over at the same point in the year. Korean 만세력 apps round this to a whole **대운수 6** and list decades as 6, 16, 26… (often in Korean age), so their labels can differ from the table below by a year or so while describing the same periods.
+**대운수 (starting age):** ~6.5 (~19.4 days to the qualifying 節氣 ÷ 3, per knowledge/08's "3 days = 1 year" rule) — the first major-luck period begins roughly 78 months after birth (≈ Jan 1971), inside the **6-15** decade label shown below, not precisely at its first birthday; each later period changes over at the same point in the year. Korean 만세력 apps round this to a whole **대운수 6** and list decades as 6, 16, 26… (often in Korean age), so their labels can differ from the table below by a year or so while describing the same periods.
 
 ### Major Luck Periods
 

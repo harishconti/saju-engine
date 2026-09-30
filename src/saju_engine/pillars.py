@@ -432,6 +432,57 @@ _FIVE_TIGERS: Dict[str, str] = {
 _YEAR_CYCLE_ANCHOR = 1984
 
 
+# N-15 remainder (2026-09-26 audit): births within this many minutes of a
+# month-opener 節氣 can flip the month pillar (and, at 입춘, the year pillar and
+# the entire 대운 sequence) on a small clock/term-precision error. Emit a
+# disclosure so reports can warn the reader.
+TERM_BOUNDARY_MARGIN_MIN = 30
+
+
+def _term_boundary_info(
+    year: int, month: int, day: int, hour: int, minute: int, utc_offset: float,
+) -> Optional[Dict[str, Any]]:
+    """Return proximity metadata when the birth is near a month-opener 節氣.
+
+    The term instants are absolute; this compares the **civil** birth moment
+    (as ``_independent_year_month_pillar`` does, after the N-2 fix) against the
+    term times converted to the birth's own timezone. Returns None when the
+    birth is further than ``TERM_BOUNDARY_MARGIN_MIN`` from every term.
+    """
+    from .daeun import KST_OFFSET_HOURS, _parse_calendar, _parse_term_time
+
+    by_year = _parse_calendar()
+    tz_shift = timedelta(hours=utc_offset - KST_OFFSET_HOURS)
+    birth_dt = datetime(year, month, day, hour, minute)
+    best: Optional[Tuple[datetime, str, float]] = None
+    nearest: Optional[Tuple[datetime, str, float]] = None
+    for y in (year - 1, year, year + 1):
+        for dt, hanja, term_time in by_year.get(str(y), []):
+            term_dt = _parse_term_time(term_time, dt) + tz_shift
+            delta_min = (birth_dt - term_dt).total_seconds() / 60.0
+            if nearest is None or abs(delta_min) < abs(nearest[2]):
+                nearest = (term_dt, hanja, delta_min)
+            if abs(delta_min) <= TERM_BOUNDARY_MARGIN_MIN:
+                if best is None or abs(delta_min) < abs(best[2]):
+                    best = (term_dt, hanja, delta_min)
+    if best is None:
+        return None
+    term_dt, hanja, delta_min = best
+    side = "after" if delta_min >= 0 else "before"
+    return {
+        "term": hanja,
+        "term_datetime_local": term_dt.isoformat(sep=" "),
+        "distance_minutes": int(round(abs(delta_min))),
+        "side": side,
+        "note": (
+            f"The birth moment is within {TERM_BOUNDARY_MARGIN_MIN} minutes "
+            f"{side} the 節氣 {hanja}, so a small clock or term-time error could "
+            "change the month pillar (and, at 立春, the year pillar and the whole "
+            "대운 sequence). Treat the year/month pillars as lower-confidence."
+        ),
+    }
+
+
 def _independent_year_month_pillar(
     year: int, month: int, day: int, hour: int, minute: int, utc_offset: float,
 ) -> Optional[Dict[str, str]]:
@@ -626,6 +677,15 @@ def compute_pillars(
     )
     if boundary_info is not None and raw.get("solar_correction"):
         raw["solar_correction"]["hour_boundary"] = boundary_info
+
+    # N-15 remainder (2026-09-26 audit): disclose 절기-proximity (month/year
+    # pillar knife-edge), parallel to the hour-boundary note. This is
+    # independent of solar-time correction, so it is stored on `raw` directly
+    # rather than nested under `solar_correction` (which is None when
+    # use_solar_time=False); the Chart exposes it as `term_boundary`.
+    term_boundary = _term_boundary_info(year, month, day, hour, minute, utc_offset)
+    if term_boundary is not None:
+        raw["term_boundary"] = term_boundary
 
     raw["zi_time_type"] = _derive_zi_time_type(eff_hour, convention)
     raw["convention"] = convention

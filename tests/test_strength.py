@@ -153,3 +153,29 @@ def test_e5_balanced_heuristic_skips_in_season_controller():
     assert min(counts, key=counts.get) == "Fire"      # the raw minimum is still Fire
     assert sa["candidate_favorable"] != "Fire"        # ...but it is not offered
     assert sa["candidate_favorable"] == "Wood"
+
+
+def test_n19_balanced_tie_is_surfaced_not_hidden():
+    """N-19 (2026-09-26 audit): the balanced fallback resolved ties to the
+    first element in a fixed order (always Wood) silently. `balanced_tie_elements`
+    must now record the tied minima so a reader can see it was not unique."""
+    # 甲 in 申 with 甲/戊/壬/丙 visible: balanced, and four elements tie at the
+    # minimum (Wood, Fire, Earth, Water all 0 — Earth counts only via the DM
+    # exclusion). The tie must be surfaced, not silently collapsed to Wood.
+    result = assess_strength("甲", "申", ["甲", "戊", "壬", "丙"], [])
+    assert result["verdict"] == "balanced"
+    ties = result["balanced_tie_elements"]
+    assert len(ties) >= 2, ties
+    counts = result["element_counts"]
+    # Every element in the tie set shares the same (minimal) count.
+    least = min(counts.get(e, 0.0) for e in ties)
+    assert all(abs(counts.get(e, 0.0) - least) < 1e-9 for e in ties)
+    assert result["candidate_favorable"] in ties
+    # E-5: the controller Metal is excluded from the tie set here (申 is Metal's
+    # own season), so Metal is not among the tied minima even though it's 0.
+    assert "Metal" not in ties
+
+
+def test_n19_non_balanced_has_no_tie_set():
+    result = assess_strength("甲", "卯", ["甲", "乙"], [])
+    assert result["balanced_tie_elements"] == []

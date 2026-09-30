@@ -189,16 +189,17 @@ def test_solar_term_boundary_far_from_kst_still_correct():
 @pytest.mark.parametrize(
     "hour,minute,expected_year,expected_month",
     [
-        # N-2 (2026-09-26 audit): the CSV's 立春 term_time for 2024 is
-        # 17:00 KST. Seoul (longitude 127, utc_offset 9) has a real solar
-        # correction (~-32 min, since Korea's civil clock runs on the 135°E
-        # meridian, not 127°E) — the bug compared this SOLAR time against the
-        # civil-converted term instant, so civil births up to ~17:47 KST were
-        # wrongly pushed into the previous year/month (癸卯/乙丑) instead of
-        # 甲辰/丙寅. Reproduces the audit's own table exactly.
-        (17, 20, "甲辰", "丙寅"),
-        (17, 40, "甲辰", "丙寅"),
+        # N-2 (2026-09-26 audit): the accurate 立春 term_time for 2024 is
+        # 17:27 KST (N-3's ephemeris table; the old sajupy CSV said 17:00).
+        # Seoul (longitude 127, utc_offset 9) has a real solar correction
+        # (~-46 min, since Korea's civil clock runs on the 135°E meridian, not
+        # 127°E) — the bug compared this SOLAR time against the civil-converted
+        # term instant, so civil births up to ~18:12 KST were wrongly pushed
+        # into the previous year/month (癸卯/乙丑) instead of 甲辰/丙寅.
+        (17, 27, "甲辰", "丙寅"),  # exactly at the term (civil) → new year
+        (17, 40, "甲辰", "丙寅"),  # after the term civilly; solar time still isn't
         (17, 55, "甲辰", "丙寅"),
+        (18, 5, "甲辰", "丙寅"),
     ],
 )
 def test_year_month_override_compares_civil_not_solar_time_seoul(
@@ -216,14 +217,14 @@ def test_year_month_override_compares_civil_not_solar_time_seoul(
 @pytest.mark.parametrize(
     "hour,minute,expected_year,expected_month",
     [
-        # Same 2024 立春 (17:00 KST), converted to IST (utc_offset 5.5):
-        # 13:30 IST. Mumbai's real longitude (72.9) sits ~38 min west of the
-        # +5.5 standard meridian (82.5), so a civil birth at 13:35-14:10 IST
-        # (after the term) has a SOLAR time of 12:42-13:17 (before the term),
+        # Same 2024 立春 (17:27 KST), converted to IST (utc_offset 5.5):
+        # 13:57 IST. Mumbai's real longitude (72.9) sits ~39 min west of the
+        # +5.5 standard meridian (82.5), so a civil birth at 14:11-14:49 IST
+        # (after the term) has a SOLAR time of ~13:19-13:57 (before the term),
         # which the bug used to compare instead of the civil clock.
-        (13, 20, "癸卯", "乙丑"),  # before the term either way
-        (13, 35, "甲辰", "丙寅"),  # after the term civilly; solar time still isn't
-        (14, 10, "甲辰", "丙寅"),
+        (13, 35, "癸卯", "乙丑"),  # before the term either way
+        (14, 10, "甲辰", "丙寅"),  # after the term civilly; solar time still isn't
+        (14, 35, "甲辰", "丙寅"),
     ],
 )
 def test_year_month_override_compares_civil_not_solar_time_mumbai(
@@ -419,3 +420,33 @@ def test_hour_boundary_distance_seconds_math():
     assert info["distance_seconds"] == 30
     # Without precise_minutes the key is absent (backward compatible).
     assert "distance_seconds" not in _hour_boundary_info(2, 59, "丑", "己", "辛")
+
+
+# ── N-15 remainder (2026-09-26): 절기-proximity disclosure ────────────────────
+
+
+def test_term_boundary_disclosed_near_a_solar_term():
+    """A birth within the margin of a month-opener 節氣 must set
+    `chart.term_boundary` (so reports can warn the month/year pillar is
+    lower-confidence). 1992 芒種 is 19:23 KST."""
+    c = compute_chart(
+        name="NearTerm", gender="M",
+        year=1992, month=6, day=5, hour=19, minute=10,
+        longitude=127.0, utc_offset=9.0, use_solar_time=False,
+    )
+    tb = c.term_boundary
+    assert tb is not None
+    assert tb["term"] == "芒種"
+    assert tb["distance_minutes"] <= 30
+    assert tb["side"] == "before"
+    assert c.to_dict()["term_boundary"]["term"] == "芒種"
+
+
+def test_term_boundary_absent_far_from_a_solar_term():
+    """Harish's birth is ~1 day from 芒種 — no disclosure."""
+    c = compute_chart(
+        name="FarFromTerm", gender="M",
+        year=1992, month=6, day=4, hour=3, minute=10,
+        longitude=79.4408, utc_offset=5.5,
+    )
+    assert c.term_boundary is None

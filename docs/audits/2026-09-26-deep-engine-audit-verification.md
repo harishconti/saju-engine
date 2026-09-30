@@ -29,7 +29,7 @@ NOT STARTED = not yet investigated or fixed this pass.
 |---|---|---|---|---|
 | N-1 | P0 | **FIXED** *(prior session)* | `3fc4d1f` (F-3) | `client_intake_app.py` crashed on import — undefined `TOOLS_DIR`. |
 | N-2 | P1 | **FIXED** | `d57d1ee` | 절기 override compared solar-corrected birth time against civil-clock term instants — corrupted year/month pillars near a boundary. |
-| N-3 | P1 | NOT STARTED | — | sajupy's 절기 table is imprecise by up to 114 min; needs an ephemeris-sourced replacement table shipped as package data. |
+| N-3 | P1 | **FIXED** | — | sajupy's 절기 table is imprecise by up to 114 min. **Fixed 2026-09-26**: `_parse_calendar` now reads our own `src/saju_engine/data/solar_terms.csv`, regenerated from an ephemeris (PyEphem VSOP87; calibrated to published KASI/HKO 2024 within ~30 s at minute resolution) by `tools/generate_solar_terms.py`, covering 1899–2101. Month/year pillars and 대운 starting age now use accurate term instants. |
 | N-4 | P1 | **FIXED** | `abfc6c1` | Current 대운 selected 1.3–2.4 years early (세수 vs. floored-elapsed-year convention mismatch). |
 | N-5 | P1 | **FIXED** *(2026-09-26, decision implemented)* | — | Yin Day Master strength inversion. Strength scoring switched from the 12운성 month-stage to the element-relation 득령 signal (knowledge/09 Step 2); extreme bands widened to 5.0 to keep "extreme" rare and held published verdicts stable. See "Doctrinal decisions" below. |
 | N-6 | P1 | **FIXED (industry-standard whole-chart gate)** | — | 조후 overrode 용신 from month branch alone, not chart extremeness. **Implemented 2026-09-26** per the industry standard (정해 만세력/8-codes + 사주플러스 both judge 한난 from the whole chart): a weighted whole-chart temperature score (`climate.climate_temperature`) gates the override via two threshold-free tests — a direction gate for the 寒暖 axis (chart must not clearly oppose its month) and the remedy-dominance guard. Corrects both audit examples, changes zero published deliverables. The *element* stays month/stem-derived (궁통보감; a temperature-derived element would flip Harish's validated Water). See `docs/research/2026-09-26-climate-extremeness-threshold.md`. |
@@ -41,19 +41,20 @@ NOT STARTED = not yet investigated or fixed this pass.
 | N-12 | P2 | NOT STARTED | — | Hidden-stem qi weights give unequal branch totals (왕지 underweighted by 10–40%). |
 | N-13 | P2 | NOT STARTED | — | No DST/historical-offset handling; intake default offset still 5.5 in one path per the audit (superseded by F-10 for the two HTML forms — verify `client_intake_form.html`/CLI still need it). |
 | N-14 | P2 | **FIXED** | `b63fbfd` | Web app overwrote curated client deliverables, blocked the event loop, and echoed raw exception text to clients. |
-| N-15 | P2 | **PARTIAL** | `8693ca3` | 子-hour boundary now disclosed (compound-edge flag, no false alternate pillar claimed). 절기-proximity disclosure not yet added. |
+| N-15 | P2 | **FIXED** | `8693ca3` + 2026-09-26 | 子-hour boundary disclosed; **절기-proximity disclosure added 2026-09-26** (`pillars._term_boundary_info` → `Chart.term_boundary` → report "⚠ Solar-term boundary note"). |
 | N-16 | P3 | **FIXED** | `33fef13` | Remaining F821/F601/F401/F541/F811/F841 lint debt; `ruff check --select F` added to CI. |
 | N-17 | P3 | **FIXED** | `c96be17` | `sajupy` was unpinned (`>=0.2.0`); pinned to `==0.2.0` + a test pinning the CSV's own SHA-256. |
-| N-18 | P3 | NOT STARTED | — | Range-edge crashes (1900 rollback, silent start-age-0 post-2100, 입춀-day-vs-instant comparison). |
-| N-19 | P3 | **PARTIAL** *(N-5)* | — | `month_season_score` is now the live scored 월령 signal (it was dead; N-5 wired it into the verdict). The second half — balanced-fallback ties always resolving to Wood — remains open. |
+| N-18 | P3 | **PARTIAL** | 2026-09-26 | (2) late-2100 forward start-age silent-0 → **fixed** by the N-3 table extension (2100-12-31 now returns 1); (3) `saju_age` now compares the 입춘 **instant** when a birth time is supplied (`saju_age(..., birth_time_str=)`; `saju_year` accepts datetime) → **fixed**. (1) the 1900-01-01 solar-rollback crash originates **inside sajupy** (its table starts 1900-01-01) and needs a sajupy-side or pre-1900 guard — **open**. |
+| N-19 | P3 | **FIXED** | 2026-09-26 | `month_season_score` is the live scored 월령 signal (N-5). Balanced-fallback ties are now surfaced via `strength_assessment["balanced_tie_elements"]` instead of silently resolving to Wood. |
 | N-20 | P3 | **FIXED** | `c96be17` | Duplicate pairwise 삼형 entries when a branch repeats across pillars. |
 | N-21 | P3 | NOT ACTIONABLE HERE | — | `apps/landing-page`'s `src/`/`src/proxy.ts` is not in this repo at all — nothing to fix from inside `saju-engine`. |
 | N-22 | P3 | **FIXED** | `33fef13` | Test suite overwrote the tracked client PDF `sruthi-report.pdf` (and two Playwright tests with the same pattern) on every run. |
 
-**Tally:** 14 FIXED, 2 PARTIAL, 0 NEEDS DECISION-but-unimplemented, 0 research-pending, 4 NOT STARTED (N-3, N-12, N-13, N-15-remainder; N-18/N-19 remain P3), 1 not actionable in
-this repo. *(Updated 2026-09-26: N-5 and N-9 moved to FIXED once their recorded decisions were
-implemented; N-6's research finished and its recommended remedy-dominance guard is now
-implemented (option C); N-19's dead `month_season_score` half was fixed by N-5.)*
+**Tally:** 17 FIXED, 2 PARTIAL (N-18, N-9-note), 0 research-pending, 2 NOT STARTED (N-12, N-13),
+1 not actionable in this repo (N-21). *(Updated 2026-09-26: N-5/N-9 implemented; N-6 implemented
+with the industry-standard whole-chart gate; N-3 (ephemeris term table), N-15 (절기-proximity),
+and N-19 (balanced-tie surfacing) fixed; N-18 partly fixed — the sajupy-internal 1900 crash
+remains open.)*
 
 ---
 

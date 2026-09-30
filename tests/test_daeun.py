@@ -67,31 +67,32 @@ def test_starting_age(name, year, month, day, gender, expected):
 
 
 def test_starting_age_on_solar_term_zero_only_at_or_after_moment():
-    # 2024 立春 falls on 2024-02-04 at 17:00 (per the calendar CSV).
-    # A3 fix: the boundary is the 절기 MOMENT, not the calendar date.
-    # Birth at 00:00 (before the 17:00 moment):
-    #   forward  → next 절기 at-or-after birth = 입춘 17:00 same day → 0 days → 0
+    # 2024 立春 falls on 2024-02-04 at 17:27 KST (N-3's accurate ephemeris
+    # table; the old sajupy CSV said 17:00). A3 fix: the boundary is the 절기
+    # MOMENT, not the calendar date.
+    # Birth at 00:00 (before the 17:27 moment):
+    #   forward  → next 절기 at-or-after birth = 입춘 17:27 same day → 0 days → 0
     #   backward → prev 절기 at-or-before birth = 소한 2024-01-06 → ~29 days → 9
     assert starting_age(2024, 2, 4, "forward", 0, 0) == 0
     assert starting_age(2024, 2, 4, "backward", 0, 0) == 9
-    # Birth at 23:59 (after the 17:00 moment):
+    # Birth at 23:59 (after the 17:27 moment):
     #   forward  → next 절기 = 경칩 2024-03-05 → ~29 days → 9
-    #   backward → prev 절기 at-or-before birth = 입춘 17:00 same day → 0 days → 0
+    #   backward → prev 절기 at-or-before birth = 입춘 17:27 same day → 0 days → 0
     assert starting_age(2024, 2, 4, "forward", 23, 59) == 9
     assert starting_age(2024, 2, 4, "backward", 23, 59) == 0
 
 
 def test_starting_age_at_exact_term_moment_is_zero():
-    # Birth exactly at the 절기 moment (2024-02-04 17:00) → 0 in both directions.
-    assert starting_age(2024, 2, 4, "forward", 17, 0) == 0
-    assert starting_age(2024, 2, 4, "backward", 17, 0) == 0
+    # Birth exactly at the 절기 moment (2024-02-04 17:27 KST) → 0 in both directions.
+    assert starting_age(2024, 2, 4, "forward", 17, 27) == 0
+    assert starting_age(2024, 2, 4, "backward", 17, 27) == 0
 
 
 def test_starting_age_backward_fractional_day_floors_correctly():
     """Backward elapsed time must be truncated, not rounded toward -inf.
 
     Birth at 2024-02-06 20:00 is 2 days 3 hours after the previous term
-    (입춘 2024-02-04 17:00). The old code did `int(negative // 86400)` and
+    (입춘 2024-02-04 17:27). The old code did `int(negative // 86400)` and
     produced 3 days → age 1; the fix uses `abs(seconds) // 86400` and yields
     2 days → age 0.
     """
@@ -220,3 +221,30 @@ def test_module_level_type_hints_resolve():
     import typing
     from saju_engine import daeun as daeun_module
     typing.get_type_hints(daeun_module._parse_calendar)
+
+
+# ── N-18 (2026-09-26): saju_age must use the 입춘 INSTANT, not the date ──────
+
+
+def test_saju_age_counts_pre_ipchun_birth_in_prior_year():
+    """N-18: a birth on 입춘 day but BEFORE the term instant (2024 입춘 is
+    17:27 KST) belongs to the prior saju year, so its 세수 is one higher than a
+    post-instant birth on the same day. Previously a bare date comparison put
+    both in the new year."""
+    from saju_engine.daeun import saju_age
+
+    today = date(2024, 12, 1)
+    assert saju_age("2024-02-04", today, "10:00") == 2   # before 17:27 → 2023
+    assert saju_age("2024-02-04", today, "18:00") == 1   # after 17:27 → 2024
+    # A bare date (no time) can only compare at day resolution, so 입춘 day
+    # counts as the new year (the previous, coarser behaviour).
+    assert saju_age("2024-02-04", today) == 1
+
+
+def test_saju_year_accepts_datetime_and_uses_instant():
+    from datetime import datetime
+
+    from saju_engine.daeun import saju_year
+
+    assert saju_year(datetime(2024, 2, 4, 10, 0)) == 2023
+    assert saju_year(datetime(2024, 2, 4, 18, 0)) == 2024
