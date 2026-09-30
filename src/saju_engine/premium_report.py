@@ -330,7 +330,24 @@ def _solar_time_note(chart) -> List[str]:
                 f"**{boundary['primary_hour_pillar']}** used above) is a plausible alternative — treat the hour "
                 "pillar (and its palace themes) as lower-confidence in this reading."
             )
+
     return lines
+
+
+def _term_boundary_note(chart) -> List[str]:
+    """Disclose 절기-proximity (N-15 remainder, 2026-09-26) — independent of
+    solar-time correction, so it is a separate note rather than part of the
+    time-method block above."""
+    term = getattr(chart, "term_boundary", None)
+    if not term:
+        return []
+    return [
+        f"> **⚠ Solar-term boundary note:** the birth moment is only "
+        f"~{term['distance_minutes']} minutes {term['side']} the 節氣 **{term['term']}**. "
+        "A small clock or term-time error could change the month pillar (and, at 立春, the "
+        "year pillar and the whole 대운 sequence), so treat the year/month pillars as "
+        "lower-confidence and consult a reader for a manual recheck."
+    ]
 
 
 def _year_month_correction_note(chart) -> List[str]:
@@ -465,6 +482,7 @@ def _section_cover(ctx: _ReportContext, compact: bool = False) -> List[str]:
         f"**Born:** {ctx.chart.birth_date} · {ctx.chart.birth_time} · {ctx.chart.city or '—'}",
         "",
         *_solar_time_note(ctx.chart),
+        *_term_boundary_note(ctx.chart),
         *_year_month_correction_note(ctx.chart),
         "",
         f"**Day Master:** {ctx.dm_en}",

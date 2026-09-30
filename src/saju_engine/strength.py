@@ -203,6 +203,7 @@ def assess_strength(
     #     generates the under-represented 용신 element (unambiguous in this case).
     # All outputs are heuristic candidates only; the final 용신/희신 must be
     # argued from the full chart per knowledge/09-interpretation-method.md.
+    least_present_elements: List[str] = []
     if verdict in ("strong", "extreme"):
         # Strong Day Master needs outlets, not more support.
         candidate_favorable = output_element      # 食傷 / output channel (drains)
@@ -228,7 +229,15 @@ def assess_strength(
         # yongsin.py's balanced-heuristic note).
         if L.BRANCH_ELEMENT.get(month_branch) == authority_element:
             all_elements = [e for e in all_elements if e != authority_element]
-        least_present = min(all_elements, key=lambda e: counts.get(e, 0.0))
+        # N-19 (2026-09-26 audit): `min()` over the fixed element order resolved
+        # ties to its first entry — always Wood — silently. Collect the tied
+        # minima and pick deterministically *for display*, but record the tie so
+        # the reading can flag it rather than present one element as the clear
+        # least-represented. The pick stays a folk heuristic either way.
+        least_value = min(counts.get(e, 0.0) for e in all_elements)
+        least_present_elements = [e for e in all_elements
+                                  if abs(counts.get(e, 0.0) - least_value) < 1e-9]
+        least_present = least_present_elements[0]
         candidate_favorable = least_present
         # Supporting element is the one that generates (nourishes) the least-present element.
         candidate_supporting = _GENERATED_BY.get(least_present, least_present)
@@ -250,6 +259,11 @@ def assess_strength(
         "candidate_supporting": candidate_supporting,
         "candidate_unfavorable": candidate_unfavorable,
         "candidate_draining": candidate_draining,
+        # N-19: the balanced-fallback least-present tie set (empty unless the
+        # verdict is balanced AND ≥2 elements share the minimum). When non-empty,
+        # `candidate_favorable` is just the deterministic first pick, not a
+        # unique answer.
+        "balanced_tie_elements": least_present_elements if verdict == "balanced" else [],
         "note": "Heuristic only; final 용신 must be argued from the full chart context.",
     }
 

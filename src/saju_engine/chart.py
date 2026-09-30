@@ -182,6 +182,11 @@ class Chart:
     # (E-1, 2026-09-25) — None when no correction was needed.
     year_month_correction: Optional[dict] = None
 
+    # Set when the birth moment is within the boundary margin of a month-opener
+    # 節氣, so the month/year pillar is lower-confidence (N-15 remainder,
+    # 2026-09-26) — None otherwise.
+    term_boundary: Optional[dict] = None
+
     # 조자시 / 야자시 handling
     zi_time_type: Optional[str] = None  # "夜子時 (Korean 야자시)" | "早子時 (Chinese 조자시)" | None
     convention: str = "korean"          # convention used to derive the hour pillar
@@ -352,6 +357,7 @@ class Chart:
             "zi_time_type": self.zi_time_type,
             "solar_correction": self.solar_correction,
             "year_month_correction": self.year_month_correction,
+            "term_boundary": self.term_boundary,
             "day_master": self.day_master,
             "day_master_info": self.day_master_info,
             "pillars": [_pillar_dict(p) for p in self.pillars],

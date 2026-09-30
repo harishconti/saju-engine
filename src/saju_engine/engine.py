@@ -287,6 +287,7 @@ def compute_chart(
         utc_offset=utc_offset,
         solar_correction=raw.get("solar_correction"),
         year_month_correction=raw.get("year_month_correction"),
+        term_boundary=raw.get("term_boundary"),
         zi_time_type=raw.get("zi_time_type"),
         convention=raw.get("convention", convention),
         reference_date=f"{ref_year:04d}-{ref_month:02d}-{ref_day:02d}",
@@ -297,7 +298,9 @@ def compute_chart(
     chart.day_master_info = L.STEM_INFO[chart.day_master]
 
     # 사주 세수 on the querier's reference date; used by all report layers.
-    chart.current_age = D.saju_age(chart.effective_date, ref_date)
+    # N-18: pass the birth time so a birth on 입춘 day but before the term
+    # instant counts in the prior saju year.
+    chart.current_age = D.saju_age(chart.effective_date, ref_date, chart.birth_time)
 
     chart.ten_gods = _derive_ten_gods(chart)
     chart.twelve_stages = _derive_twelve_stages(chart)

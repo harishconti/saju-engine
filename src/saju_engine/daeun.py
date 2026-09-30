@@ -15,8 +15,9 @@ This module:
 """
 from __future__ import annotations
 
+import os
 from datetime import date, datetime, time, timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 from . import lookup as L
 from .chart import DaeunPeriod
@@ -35,9 +36,16 @@ def _ipchun_date(year: int) -> Optional[datetime]:
     return None
 
 
-def saju_year(d: date) -> int:
-    """Return the 사주 year (연도) of a Gregorian date: on/after that year's
-    입춀 belongs to that year; before it belongs to the prior year.
+def saju_year(d: Union[date, datetime]) -> int:
+    """Return the 사주 year (연도) of a Gregorian date/datetime: on/after that
+    year's 입춀 belongs to that year; before it belongs to the prior year.
+
+    N-18 (2026-09-26 audit): this used to compare `d < ipchun.date()`, so a birth
+    (or reference moment) **on 입춘 day but before the term instant** was counted
+    in the new saju year — putting 세수, and therefore the selected 대운, off by
+    one for those few hours a year. When `d` carries a time (a `datetime`), the
+    comparison is now made against the 입춘 **instant**; a bare `date` is treated
+    as midnight (still before a typical ~17:00 KST 입춘).
 
     N-11 (2026-09-26 audit): client-facing "What This Year Means"/annual-luck
     prose used `reference_date.year` (the raw Gregorian year) as the CURRENT
@@ -51,12 +59,18 @@ def saju_year(d: date) -> int:
     the birth year and "today".
     """
     ipchun = _ipchun_date(d.year)
-    if ipchun is not None and d < ipchun.date():
-        return d.year - 1
-    return d.year
+    if ipchun is None:
+        return d.year
+    if isinstance(d, datetime):
+        return d.year - 1 if d < ipchun else d.year
+    return d.year - 1 if d < ipchun.date() else d.year
 
 
-def saju_age(birth_date_str: str, today: Optional[date] = None) -> Optional[int]:
+def saju_age(
+    birth_date_str: str,
+    today: Optional[date] = None,
+    birth_time_str: Optional[str] = None,
+) -> Optional[int]:
     """Return the 사주 세수 (Korean counting age, 입춀-based) on `today`.
 
     The 대운 ``start_age`` is computed by the 3-day=1-year rule and is expressed
@@ -66,9 +80,10 @@ def saju_age(birth_date_str: str, today: Optional[date] = None) -> Optional[int]
     10-year period by 1–2 years (A5 fix; see knowledge/08-luck-pillars.md).
 
     세수 = (saju_year_today - saju_year_of_birth) + 1, where the saju year is
-    reckoned from 입춀: a date on/after 입춀 belongs to that solar year; a date
-    before 입춀 belongs to the prior year. Returns None if the birth string or
-    입춀 data is unavailable.
+    reckoned from 입춀: a moment on/after 입춀 belongs to that solar year; before
+    it belongs to the prior year. `birth_time_str` ("HH:MM") lets a birth on
+    입춘 day *before* the term instant count in the prior year (N-18). Returns
+    None if the birth string or 입춀 data is unavailable.
     """
     try:
         by, bm, bd = (int(x) for x in birth_date_str.split("-"))
@@ -78,7 +93,13 @@ def saju_age(birth_date_str: str, today: Optional[date] = None) -> Optional[int]
     if isinstance(today, datetime):
         today = today.date()
 
-    birth = date(by, bm, bd)
+    birth: Union[date, datetime] = date(by, bm, bd)
+    if birth_time_str:
+        try:
+            bh, bmi = (int(x) for x in birth_time_str.split(":"))
+            birth = datetime(by, bm, bd, bh, bmi)
+        except (ValueError, AttributeError):
+            pass
     return saju_year(today) - saju_year(birth) + 1
 
 
@@ -120,57 +141,56 @@ _MONTH_OPENER_TERMS = frozenset({
     "立秋", "白露", "寒露", "立冬", "大雪", "小寒",
 })
 
-# Cache the parsed calendar CSV (re-read if file changes between calls)
-# Value is {year: [(date, hanja, term_time), ...]} where term_time is the raw
-# sajupy string YYYYMMDDHHMM (may be empty for non-term rows, but those are
-# filtered out here).
+# Cache the parsed term table (read once).
+# Value is {year: [(date, hanja, term_time), ...]} where term_time is
+# YYYYMMDDHHMM in KST wall-clock (the engine's established convention — see
+# KST_OFFSET_HOURS below).
 _CALENDAR_CACHE: Optional[Dict[str, List[Tuple[date, str, str]]]] = None
+
+# Accurate solar-term table shipped as package data (deep-audit N-3).
+#
+# N-3: the engine previously read sajupy's bundled calendar_data.csv for the
+# month-opener 節氣 instants. Those instants are wrong by a median of ~22 min
+# and up to ~114 min (see docs/audits/2026-09-26-deep-engine-audit.md N-3 and
+# docs/audits/scripts/check_solar_terms.py), which flips the month pillar for
+# births within that window of a term — roughly 1 birth in 1,100–2,700, and
+# 2–4× more for pre-1960 / post-2030 charts. This module now reads our own
+# `data/solar_terms.csv`, generated from an ephemeris (PyEphem/libastro VSOP87,
+# nutation + aberration; calibrated to published KASI/HKO 2024 values within
+# ~3 s) and covering 1899–2101. sajupy is still used for the day pillar and
+# lunar data. Regenerate with `tools/generate_solar_terms.py`.
+_SOLAR_TERMS_CSV = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "solar_terms.csv")
 
 
 def _parse_calendar() -> Dict[str, List[Tuple[date, str, str]]]:
-    """Read sajupy/calendar_data.csv and return {year: [(date, hanja, term_time), ...]}.
+    """Return {year: [(date, hanja, term_time), ...]} from the accurate term table.
 
-    Only month-opener 節氣 rows are kept, sorted by date.
+    Only month-opener 節氣 rows are kept, sorted by date. `term_time` is
+    KST wall-clock ``YYYYMMDDHHMM``, matching the historical sajupy-CSV
+    convention this replaced.
     """
     global _CALENDAR_CACHE
     if _CALENDAR_CACHE is not None:
         return _CALENDAR_CACHE
     import csv
-    import os
-    # Locate the sajupy package via importlib — robust to install location.
-    import importlib.util
-    spec = importlib.util.find_spec("sajupy")
-    if spec is None or spec.origin is None:
-        raise ImportError("sajupy is not importable; cannot locate calendar_data.csv")
-    sajupy_dir = os.path.dirname(spec.origin)
-    csv_path = os.path.join(sajupy_dir, "calendar_data.csv")
-    if not os.path.isfile(csv_path):
-        # Bug found 2026-09-20 (external code-quality review): this file
-        # lives inside sajupy's own install directory (a third-party
-        # dependency's internal data file, not this package's own data —
-        # sajupy exposes no public API for it), so a raw `open()` failure
-        # here surfaces as an unhelpful bare `FileNotFoundError` with no
-        # hint about the actual cause (a stripped/incomplete sajupy
-        # install). Fail loudly with a diagnostic instead.
+    if not os.path.isfile(_SOLAR_TERMS_CSV):
         raise FileNotFoundError(
-            f"sajupy is importable but its calendar_data.csv is missing at "
-            f"{csv_path!r}. This usually means an incomplete or corrupted "
-            f"sajupy install — reinstall with "
-            f"`pip install --user --break-system-packages --force-reinstall sajupy`."
+            f"solar-term table missing at {_SOLAR_TERMS_CSV!r}. Regenerate it with "
+            f"`python3 tools/generate_solar_terms.py` (needs `ephem`)."
         )
     by_year: Dict[str, List[Tuple[date, str, str]]] = {}
-    with open(csv_path, "r", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            hanja = (row.get("solar_term_hanja") or "").strip()
+    with open(_SOLAR_TERMS_CSV, "r", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            hanja = (row.get("term") or "").strip()
             if hanja not in _MONTH_OPENER_TERMS:
                 continue
+            term_time = (row.get("kst") or "").strip()
             try:
-                y = int(row["year"]); m = int(row["month"]); d = int(row["day"])
-                dt = date(y, m, d)
-            except (KeyError, ValueError):
+                y = int(row["year"])
+                dt = date(y, int(term_time[4:6]), int(term_time[6:8]))
+            except (KeyError, ValueError, IndexError):
                 continue
-            by_year.setdefault(str(y), []).append((dt, hanja, row.get("term_time", "")))
+            by_year.setdefault(str(y), []).append((dt, hanja, term_time))
     for lst in by_year.values():
         lst.sort()
     _CALENDAR_CACHE = by_year

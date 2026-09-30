@@ -2,8 +2,8 @@
 
 **Date opened:** 2026-06-02  
 **Last updated:** 2026-09-26  
-**Test count:** 1096 pytest cases passing / 9 xfailed (`python3 -m pytest`); engine validation gate
-`python3 tools/run_validation.py` → 204 checks (200 PASS / 4 INTERPRETATION / 0 FAIL); `ruff check
+**Test count:** 1124 pytest cases passing / 9 xfailed (`python3 -m pytest`); engine validation gate
+`python3 tools/run_validation.py` → 206 checks (202 PASS / 4 INTERPRETATION / 0 FAIL); `ruff check
 --select F src tools tests` clean and now enforced in CI.
 **Open decision:** RM (Kim Nam-joon)'s hour pillar sits 17 seconds from the 午/未 boundary after the
 2026-09-19 equation-of-time fix — his public demo materials still use the old 午 reading pending a
@@ -341,6 +341,16 @@ Sourced market research: **`docs/market-research-2026-09.md`**. Design spec:
 
 ---
 
+- **2026-09-26 (N-3 ephemeris term table + N-15/N-18/N-19 P3 cleanups, Suite 1104 → 1124)** —
+  Implemented N-3: `daeun._parse_calendar()` now reads an accurate ephemeris-generated
+  `src/saju_engine/data/solar_terms.csv` (regenerate via `tools/generate_solar_terms.py`; PyEphem
+  VSOP87, 1899–2101) instead of sajupy's `calendar_data.csv`, which was off by a median 22 min
+  (up to 114 min) and flipped month pillars near a 節氣. Also: **N-15 remainder** — `Chart.term_boundary`
+  + report "⚠ Solar-term boundary note" for births within 30 min of a 節氣; **N-18 partial** —
+  `saju_age` compares the 입춘 instant (accepts birth time) and late-2100 forward start-age is no
+  longer 0; **N-19** — balanced-fallback ties surfaced via `balanced_tie_elements`. Only
+  Gurumoorthy's 대운수 note changed (one-month precision gain). Gates: suite 1104→**1124**,
+  validation 206, ruff clean. New: `tests/test_solar_terms_table.py`, `tools/generate_solar_terms.py`.
 - **2026-09-26 (client-report regen + N-6 research)** — Regenerated every engine-generated client
   deliverable after N-5/N-9 (`tools/regen_client_reports.sh`): verdicts, favorable elements, and
   compat scores all confirmed unchanged; the delta is the N-5 strength/arrival lines plus
