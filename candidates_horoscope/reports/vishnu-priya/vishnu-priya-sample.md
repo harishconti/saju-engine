@@ -26,11 +26,11 @@
 
 ### Element Balance
 
-- 🔴 **Fire:** 27.8%
-- 🟡 **Earth:** 13.9%
-- ⚪ **Metal:** 40.5%
-- 🔵 **Water:** 5.1%
-- 🟢 **Wood:** 12.7%
+- 🔴 **Fire:** 27.5%
+- 🟡 **Earth:** 10.6%
+- ⚪ **Metal:** 42.5%
+- 🔵 **Water:** 3.8%
+- 🟢 **Wood:** 15.6%
 
 ### Quick Read
 

@@ -34,11 +34,11 @@
 
 | Element | Presence | Percentage |
 |---|---|---|
-| 🔴 Fire | ████░░░░░░░░░░░░░░░░ | 18.1% |
-| 🟡 Earth | █████░░░░░░░░░░░░░░░ | 23.6% |
-| ⚪ Metal | ██░░░░░░░░░░░░░░░░░░ | 12.5% |
-| 🔵 Water | █████░░░░░░░░░░░░░░░ | 23.6% |
-| 🟢 Wood | ████░░░░░░░░░░░░░░░░ | 22.2% |
+| 🔴 Fire | ████░░░░░░░░░░░░░░░░ | 18.4% |
+| 🟡 Earth | ████░░░░░░░░░░░░░░░░ | 22.2% |
+| ⚪ Metal | ██░░░░░░░░░░░░░░░░░░ | 12.2% |
+| 🔵 Water | █████░░░░░░░░░░░░░░░ | 25.9% |
+| 🟢 Wood | ████░░░░░░░░░░░░░░░░ | 21.3% |
 
 > _Methodology: each element's share counts the 4 visible stems (year/month/day/hour) at weight 1.0, plus every branch's hidden stems (藏干) at reduced weights (main qi 0.6, middle 0.3, residual 0.1) — a branch's own elemental weight is carried entirely through its hidden stems (its main-qi hidden stem is usually the branch's nominal element), not counted a second time as a separate 1.0 entry, since that would double-count it; the counts are then normalized to 100%._
 
@@ -325,9 +325,9 @@ The year pillar **酉** carries ancestral and parental themes; its main hidden s
 
 ### Primary Watchpoints
 
-- **Element excess:** Earth — pay attention to the spleen/stomach and digestive metabolism system. This is also your favorable element (용신) — classical 조후/억부 resolution reads a chart's own 용신 as the element it structurally needs, not a harmful surplus, even when it is also the most numerically prominent one. The caution here is about extreme, further concentration (e.g. through diet, environment, or timing choices layered on top of an already-abundant element), not about the element itself — which the Grounding Practices below still recommend leaning into.
+- **Element excess:** Water — pay attention to the kidney/bladder and hormonal/endocrine reserves system.
 - **Element deficiency:** Metal — the lung/large intestine and respiratory/immune boundaries system may need gentle support.
-- The chart's lightest weighted element is **Metal (12.5%)**, which in classical Five-Element mapping is paired with the **lung/large intestine and respiratory/immune boundaries**. This is not a diagnosis; it is the least natally emphasized system, making it the natural place to begin gentle, preventive support through metal-aligned foods, seasons, and rhythms.
+- The chart's lightest weighted element is **Metal (12.2%)**, which in classical Five-Element mapping is paired with the **lung/large intestine and respiratory/immune boundaries**. This is not a diagnosis; it is the least natally emphasized system, making it the natural place to begin gentle, preventive support through metal-aligned foods, seasons, and rhythms.
 
 ### Grounding Practices
 
@@ -649,11 +649,11 @@ A single-glance view of all 8 major-luck periods in your life and the favorable 
 
 ### Element Story
 
-This chart's element balance shows **Earth (23.6%)** as the most present element and **Metal (12.5%)** as the least. Energy tends to **flow in cycles** in the Earth domain; a balanced day feels like quiet movement between input, processing, and release. The Metal system is the most likely leak point — under-supported and easy to neglect — and the easiest place to begin rebuilding through the favorable element's practices.
+This chart's element balance shows **Water (25.9%)** as the most present element and **Metal (12.2%)** as the least. Energy tends to **flow in cycles** in the Water domain; a balanced day feels like quiet movement between input, processing, and release. The Metal system is the most likely leak point — under-supported and easy to neglect — and the easiest place to begin rebuilding through the favorable element's practices.
 
 ### Body-System Map
 
-- **Excess system (Earth):** spleen/stomach and digestive metabolism — watch for signs of over-activity or congestion.
+- **Excess system (Water):** kidney/bladder and hormonal/endocrine reserves — watch for signs of over-activity or congestion.
 - **Deficient system (Metal):** lung/large intestine and respiratory/immune boundaries — gentle rebuilding over time is usually better than forceful stimulation.
 
 ### Stress Signature
