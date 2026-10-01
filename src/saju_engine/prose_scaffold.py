@@ -69,8 +69,11 @@ def _strength_draft(chart: Chart) -> str:
     month = chart.month
     sa = chart.strength_assessment or {}
     verdict = sa.get("verdict", "balanced")
-    candidate_fav = sa.get("candidate_favorable", "—")
     month_stage = sa.get("month_stage", "—")
+    # 2026-09-14 audit §5 item 1: read the RESOLVED 용신 (climate + reader
+    # aware) so the draft never names an element the report contradicts.
+    from .yongsin import favorable_element
+    candidate_fav = favorable_element(chart).element
 
     season_map = {
         "寅": "early Wood", "卯": "peak Wood", "辰": "late Wood/Earth",
@@ -103,7 +106,8 @@ def _strength_draft(chart: Chart) -> str:
         parts.append(f"The month branch is outside the Day Master's season of peak ({dm_season}), so seasonal support is muted.")
 
     parts.append(
-        f"The engine's heuristic places the chart toward **{verdict}**, with a candidate 용신 of **{candidate_fav}**. "
+        f"The engine's heuristic places the chart toward **{verdict}**, with a working 용신 of **{candidate_fav}** "
+        "(resolved after the climate and any reader ruling). "
         "The final ruling must still consider hidden-stem support, 합/충, and any special-grid candidate."
     )
     return " ".join(parts)
@@ -112,10 +116,16 @@ def _strength_draft(chart: Chart) -> str:
 def _yongsin_draft(chart: Chart) -> str:
     """Draft paragraph for 용신/희신 reasoning."""
     sa = chart.strength_assessment or {}
-    fav = sa.get("candidate_favorable", "—")
-    sup = sa.get("candidate_supporting", "—")
-    unfav = sa.get("candidate_unfavorable") or "—"
     verdict = sa.get("verdict", "balanced")
+
+    # 2026-09-14 audit §5 item 1: read the RESOLVED role set (climate +
+    # reader aware), not the raw 억부 candidate — the two diverge on ~19%
+    # of charts and the draft must not contradict the report.
+    from .yongsin import favorable_element
+    fe = favorable_element(chart)
+    fav = fe.element
+    sup = fe.supporting
+    unfav = fe.unfavorable or "—"
 
     if verdict in ("strong", "extreme"):
         logic = (
@@ -132,19 +142,8 @@ def _yongsin_draft(chart: Chart) -> str:
     else:
         logic = (
             f"The heuristic reads the chart as {verdict}. "
-            f"The engine suggests cultivating **{fav}** (용신) because it is the most under-represented element, "
-            f"with **{sup}** as 희신; this should be argued from the full chart context rather than accepted blindly."
-        )
-    # E-3/E-5 (2026-09-26): the paragraph above narrates the raw 억부
-    # heuristic. When the single resolution (climate/reader-aware) lands on a
-    # different set, say so, so the draft never contradicts the report.
-    from .yongsin import favorable_element
-    fe = favorable_element(chart)
-    if (fe.element, fe.supporting, fe.unfavorable) != (fav, sup, sa.get("candidate_unfavorable")):
-        logic += (
-            f" After the climate (조후) and reader-override resolution the chart's working set is "
-            f"용신 **{fe.element}**, 희신 **{fe.supporting}**, 기신 **{fe.unfavorable or '—'}** — "
-            f"use these in the reading."
+            f"The engine's working set is 용신 **{fav}**, 희신 **{sup}**, 기신 **{unfav}** — "
+            "argue this from the full chart context (temperature, blockage, season) rather than accepting it blindly."
         )
     return logic
 

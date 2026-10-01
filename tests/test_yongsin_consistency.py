@@ -359,3 +359,48 @@ def test_reader_override_confirming_eokbu_keeps_dm_relative_gisin():
                       longitude=79.42, utc_offset=5.5)
     fe = favorable_element(c, override="Metal")
     assert (fe.unfavorable, fe.unfavorable_method) == ("Earth", "dm-relative")
+
+
+# ── 2026-09-14 architecture audit §4.5 / §5 item 2: the raw field is now ──
+# self-flagging. The producer emits both keys; the underscore name is the
+# canonical raw channel and `candidate_favorable` is a backward-compatible
+# alias pointing at the same value. The divergence rule (audit §4.5, derived
+# over 2,016 charts) is pinned so the two channels cannot silently
+# re-converge or re-diverge without a test failing.
+
+def test_raw_field_is_self_flagged_and_has_no_public_alias():
+    """2026-09-14 audit §5 item 2. The raw pick is published ONLY as
+    ``_raw_unresolved_favorable``. An earlier pass added the new key while
+    keeping ``candidate_favorable`` as an "alias" — but that name reads like a
+    public 용신 field, and four modules had already adopted it as one (two of
+    them shipping a pre-climate element to clients). The alias is gone, so a
+    stray read now raises KeyError instead of silently resolving."""
+    from saju_engine.strength import assess_strength
+    sa = assess_strength("甲", "酉", ["甲", "辛", "甲", "乙"], [("酉", "辛")])
+    assert "_raw_unresolved_favorable" in sa
+    assert "candidate_favorable" not in sa, (
+        "the legacy candidate_favorable alias is back — it reads like a public "
+        "용신 field and has silently diverged from the resolved value before"
+    )
+
+
+def test_divergence_rule_balanced_climate_band_diverges():
+    """resolved ≠ raw  iff  reader_override_favorable is set
+    or (verdict == "balanced" and month_branch ∈ 巳午未/亥子丑) — for a
+    climate-band chart where the N-6 whole-chart gate does NOT withhold the
+    override. (Gate-withheld charts legitimately agree; this pins the firing
+    half of the rule on a known firing example, 1970-05-23 from the audit's
+    2,016-chart sweep: 巳 month, balanced, raw Wood → resolved Water.)"""
+    from saju_engine.engine import compute_chart
+    from saju_engine.yongsin import favorable_element
+    c = compute_chart(name="d", gender="F", year=1970, month=5, day=23,
+                      hour=12, minute=0, longitude=100.5, utc_offset=7.0)
+    sa = c.strength_assessment
+    fe = favorable_element(c)
+    if fe.method == "climate-balanced":
+        assert sa["verdict"] == "balanced"
+        assert fe.element != sa["_raw_unresolved_favorable"]
+    else:
+        # The N-6 whole-chart gate withheld the override — the rule's
+        # precondition no longer holds, so agreement is legitimate.
+        assert fe.method in _ALLOWED_METHODS

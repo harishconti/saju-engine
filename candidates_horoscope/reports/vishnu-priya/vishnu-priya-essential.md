@@ -165,6 +165,21 @@ Structurally, your Day Master sits at **제왕 (帝旺)** on **申** — a stron
 
 ---
 
+## 30-Day Action Plan
+
+A short, focused cycle designed to bring more **Water** energy into your daily rhythm. These steps are tendencies and invitations, not prescriptions — adapt them to your schedule and comfort.
+
+| Week | Focus | Suggested Action |
+|---|---|---|
+| Week 1 | Tune the environment | Add black accents, face north when working, and clear one space that feels stagnant.
+| Week 2 | Feed the element | Bring black beans, seaweed, salty foods in moderation, soups and broths into two meals a day and notice which foods leave you feeling steady.
+| Week 3 | Move with the energy | Take one daily walk or practice session at the time of day that carries water qi for you.
+| Week 4 | Make one aligned decision | Choose one small career, relationship, or health choice that leans into your favorable element and notice the result.
+
+> *Carry the chart’s strength into action gradually. Big changes built on small, consistent moves tend to outlast dramatic swings.*
+
+---
+
 ## Practical Guidance Summary
 
 ### Lucky Attributes — Your Favorable Element Reference Card
@@ -188,3 +203,10 @@ This chart's gift is a strong companion presence that gives the querent real fol
 
 - **Direct Officer (正官):** conventional authority — career structure, rules, status, institutions
 - **Day Master (日干):** you — the reference point the whole chart is read against
+
+## Sources & Limits
+
+- Classical framework: 적천수 (滴天髓), 연해자평 (淵海子平), 궁통보감 (窮通寶鑑), 명리정종, 자평진전 — as compiled in `knowledge/`.
+- Method: `knowledge/09-interpretation-method.md` (9-step procedure).
+- This reading describes tendencies, not fixed outcomes; it is for reflection and entertainment — not medical, legal, or financial advice.
+- The engine's heuristic verdicts (strength, 용신) are marked provisional where the classical sources disagree; a qualified reader confirms the final reading.

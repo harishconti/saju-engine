@@ -276,3 +276,63 @@ def test_year_anchor_twelve_stars_harish():
     assert day["robbery_star"] == ["申"]
     assert day["earth_bane"] == ["亥"]
     assert day["monthly_bane"] == ["丑"]
+
+
+# ── §5 item 10 (2026-09-14 architecture audit §2.7): a census over the ───────
+# ── 24 EMITTED star keys, not the 10 module-level functions. ────────────────
+
+def test_every_emitted_star_key_is_labelled_and_grounded_in_knowledge():
+    """The audit's point: a function-level review reaches ~1/4 of the output;
+    the census must run over the keys `derive_stars` actually emits.
+
+    For every key in a real computed chart's `stars` dict (the emitted set,
+    all 24), assert:
+      1. `STAR_LABELS` carries a display label (so no star can render as a
+         bare key in a report), and
+      2. the label's Korean head-word appears somewhere under knowledge/ (the
+         star is documented — the repo's "no table without a knowledge
+         citation" convention, applied to stars).
+
+    Grounding scans the whole knowledge/ tree, not just 07: the first run of
+    this census proved the scope matters. 공망 and 홍염 are documented in
+    knowledge/00-glossary.md and knowledge/11-gunghap.md respectively, NOT in
+    07-special-formations.md, so a 07-only check reported two false
+    "ungrounded" stars. Knowledge is spread across the tree by design; the
+    doctrine rule is "somewhere in knowledge/", so that is what is asserted.
+    """
+    from pathlib import Path
+
+    from saju_engine.engine import compute_chart
+
+    kb_dir = Path(__file__).parent.parent / "knowledge"
+    kb_files = sorted(kb_dir.glob("*.md"))
+    assert len(kb_files) >= 5, (
+        f"expected the knowledge/ tree, found {len(kb_files)} files — the "
+        "grounding census must not pass vacuously on an empty read"
+    )
+    kb = "\n".join(p.read_text(encoding="utf-8") for p in kb_files)
+
+    chart = compute_chart(
+        name="census", gender="M",
+        year=1990, month=6, day=15, hour=10, minute=0,
+        longitude=127.0, utc_offset=9.0,
+    )
+    emitted = sorted(chart.stars.keys())
+    assert len(emitted) == 24, (
+        f"the census expects the documented 24 emitted keys; got {len(emitted)}: {emitted}. "
+        "If a key was added/removed, update this census AND the audit status note"
+    )
+    unlabelled = [k for k in emitted if k not in stars_module.STAR_LABELS]
+    assert not unlabelled, f"emitted star keys without a display label: {unlabelled}"
+
+    ungrounded = []
+    for key in emitted:
+        label = stars_module.STAR_LABELS[key]
+        # The Korean head-word before the parenthesised Hanja, e.g. "공망".
+        head = label.split("(")[0].strip()
+        if head not in kb:
+            ungrounded.append((key, head))
+    assert not ungrounded, (
+        f"star labels whose Korean head-word appears in NO knowledge/ file: {ungrounded}. "
+        "Either document the star in knowledge/ or drop it from derive_stars."
+    )

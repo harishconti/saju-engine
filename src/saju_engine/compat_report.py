@@ -343,12 +343,25 @@ def _verdict_block(report: CompatReport, tier: str = "deep") -> List[str]:
     lines.append("## The Verdict (심정)")
     lines.append("")
     if tier == "deep":
+        # V8 (2026-09-14 audit §9.9): the `Max` column summed to 112 against
+        # a stated /100 composite. The scoring was already correct —
+        # `combined_elements` is deliberately descriptive (excluded from the
+        # composite so 용신 is not double-counted; knowledge/11 folds it into
+        # the 용신 row). The row is now labelled so the table is
+        # self-consistent: the descriptive row shows its weight but is
+        # marked as not counted toward the composite.
         lines.append("| Sub-System | Korean | Score | Max | Verdict |")
         lines.append("|---|---|---|---|---|")
         for sub in report.sub_systems():
-            lines.append(
-                f"| {sub.label} | {sub.label_kr} | {sub.score:+d} | {sub.max} | {sub.band} |"
-            )
+            if sub is report.combined_elements:
+                lines.append(
+                    f"| {sub.label} *(descriptive — not counted toward the composite)* "
+                    f"| {sub.label_kr} | {sub.score:+d} | — | {sub.band} |"
+                )
+            else:
+                lines.append(
+                    f"| {sub.label} | {sub.label_kr} | {sub.score:+d} | {sub.max} | {sub.band} |"
+                )
         lines.append("")
     lines.append(f"**Composite Score (종합 점수):** {report.score}/100 → **{report.band}**")
     lines.append("")

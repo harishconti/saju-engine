@@ -8,12 +8,12 @@ fixed (2026-09-14) and this file now pins the fixed behaviour instead.
 THE DEFECT (spec §Known Open Bug 1, second live instance)
 ---------------------------------------------------------
 ``premium_report.py`` was the first instance: it reads the RAW
-``strength_assessment["candidate_favorable"]`` instead of the element that
+``strength_assessment["_raw_unresolved_favorable"]`` instead of the element that
 ``yongsin.favorable_element()`` actually resolves for the chart.
 ``report_data.py`` repeats the same read at two call sites::
 
-    _career_why:    favorable = (chart.strength_assessment or {}).get("candidate_favorable")
-    _career_tiers:  favorable   = (chart.strength_assessment or {}).get("candidate_favorable")
+    _career_why:    favorable = (chart.strength_assessment or {}).get("_raw_unresolved_favorable")
+    _career_tiers:  favorable   = (chart.strength_assessment or {}).get("_raw_unresolved_favorable")
                     unfavorable = (chart.strength_assessment or {}).get("candidate_unfavorable")
 
 Both values are used for *display* — the "why this fits" line on every career
@@ -115,7 +115,7 @@ def test_career_why_uses_resolved_favorable_element():
     # harish diverges with NO override: candidate=Wood, resolved=Water (climate-balanced).
     # (Raw candidate was Fire until E-5, 2026-09-26: Fire controls the 辛 DM
     # and is in season in 巳, so the balanced heuristic now skips it.)
-    assert (HARISH.strength_assessment or {}).get("candidate_favorable") == "Wood"
+    assert (HARISH.strength_assessment or {}).get("_raw_unresolved_favorable") == "Wood"
     assert favorable_element(HARISH).element == "Water"
     phrase = _career_why(HARISH, "Strategy & Consulting")   # _domain_element -> Water
     assert "favorable element Water" in phrase
@@ -158,4 +158,4 @@ def test_stale_branch_is_reachable_for_a_domain_the_resolver_maps_to_water():
 
     assert _domain_element("Strategy & Consulting") == "Water"
     # ...while the raw (stale) field is a different element — the divergence.
-    assert (HARISH.strength_assessment or {}).get("candidate_favorable") == "Wood"
+    assert (HARISH.strength_assessment or {}).get("_raw_unresolved_favorable") == "Wood"

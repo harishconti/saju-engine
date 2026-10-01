@@ -248,3 +248,39 @@ def test_saju_year_accepts_datetime_and_uses_instant():
 
     assert saju_year(datetime(2024, 2, 4, 10, 0)) == 2023
     assert saju_year(datetime(2024, 2, 4, 18, 0)) == 2024
+
+
+# ── §5 item 4 (2026-09-14 architecture audit): the `return 0` sentinel  ────
+# ── collided with a legitimate 0 (birth on a 절기) and was untestable. ──────
+
+
+def test_starting_age_range_edge_returns_none_not_zero():
+    """The term table (solar_terms.csv) covers 1899–2101. A birth after the
+    last covered 절기 has no qualifying boundary in the table, so
+    `starting_age` must return None — NOT 0, which a legitimate on-term birth
+    also produces. The pre-fix code made this branch unfalsifiable."""
+    # 2024-02-04 (입춘 17:27 KST): a birth at 00:00 is before the moment and
+    # forward-counts 0 days — a LEGITIMATE 0.
+    assert starting_age(2024, 2, 4, "forward", 0, 0) == 0
+    # 2101-12-20: after the table's last entry → the sentinel.
+    assert starting_age(2101, 12, 20, "forward", utc_offset=9.0) is None
+
+
+def test_compute_daeun_flags_approximate_start_age_at_range_edge():
+    """When the term table misses, the periods keep a 0-based label (so the
+    report still renders) but carry `start_age_approx=True` so callers can
+    disclose the approximation; a covered birth is NOT flagged."""
+    from saju_engine.daeun import compute_daeun
+
+    edge = compute_daeun(
+        year_stem="甲", month_stem="丙", month_branch="寅",
+        year=2101, month=12, day=20, gender="M", utc_offset=9.0,
+    )
+    assert all(p.start_age_approx for p in edge)
+    assert edge[0].start_age == 0
+
+    covered = compute_daeun(
+        year_stem="甲", month_stem="丙", month_branch="寅",
+        year=2024, month=2, day=4, gender="M", utc_offset=9.0,
+    )
+    assert all(not p.start_age_approx for p in covered)

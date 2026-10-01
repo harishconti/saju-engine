@@ -374,7 +374,7 @@ def test_compat_yongshin_scoring_uses_resolved_favorable_element():
     from saju_engine.compat import compat_yongshin
 
     assert favorable_element(MAHESH).element == "Fire"
-    assert MAHESH.strength_assessment.get("candidate_favorable") == "Water"
+    assert MAHESH.strength_assessment.get("_raw_unresolved_favorable") == "Water"
 
     sub = compat_yongshin(MAHESH, VP)
     # The sub-system's flags/narrative reference the resolved element (Fire),
@@ -666,11 +666,11 @@ def test_compat_score_override_is_non_mutating():
     """compat_score with favorable-element overrides must not mutate the caller's
     Chart objects (engine-audit D21 — thread-safety regression).
     """
-    original_a = MAHESH.strength_assessment.get("candidate_favorable")
-    original_b = VP.strength_assessment.get("candidate_favorable")
+    original_a = MAHESH.strength_assessment.get("_raw_unresolved_favorable")
+    original_b = VP.strength_assessment.get("_raw_unresolved_favorable")
     compat_score(MAHESH, VP, favorable_element_a="Metal", favorable_element_b="Wood")
-    assert MAHESH.strength_assessment.get("candidate_favorable") == original_a
-    assert VP.strength_assessment.get("candidate_favorable") == original_b
+    assert MAHESH.strength_assessment.get("_raw_unresolved_favorable") == original_a
+    assert VP.strength_assessment.get("_raw_unresolved_favorable") == original_b
 
 
 # ── Plan 6 T1 bug-lock: C9 삼형 shadowing ────────────────────────────────────
@@ -817,3 +817,25 @@ def test_compat_order_independence_band_stable_all_subsystems_identical():
     differing = [k for k in compat.WEIGHT
                  if getattr(fwd, k).score != getattr(rev, k).score]
     assert differing == []
+
+
+# ── V8 (2026-09-14 audit §9.9): the breakdown table's Max column must not ───
+# ── sum to 112 against a stated /100 composite. ─────────────────────────────
+
+def test_v8_deep_breakdown_max_column_is_self_consistent_with_composite():
+    """The combined-elements row is descriptive (excluded from the composite
+    so 용신 is not double-counted — knowledge/11 folds it into D/F). Its Max
+    must render as "—" with a descriptive label, so the visible Max column
+    sums to exactly 100 — the same number the composite is out of."""
+    from saju_engine.compat_report import generate_compat_report
+    report = generate_compat_report(MAHESH, VP, "Mahesh", "Vishnu Priya", tier="deep")
+    # Only the verdict-table rows (Sub-System | Korean | Score | Max | Verdict)
+    table_rows = [l for l in report.splitlines()
+                  if l.startswith("| ") and l.count("|") == 6 and "Sub-System" not in l]
+    numeric_max = [int(r.split("|")[4]) for r in table_rows if r.split("|")[4].strip().lstrip("+-").isdigit()]
+    assert sum(numeric_max) == 100, (
+        f"visible Max column sums to {sum(numeric_max)}, not the composite's 100"
+    )
+    descriptive = [r for r in table_rows if "descriptive — not counted" in r]
+    assert len(descriptive) == 1
+    assert "| — |" in descriptive[0]

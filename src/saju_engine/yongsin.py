@@ -197,7 +197,7 @@ def _with_unfavorable(fe: "FavorableElement", sa: dict) -> "FavorableElement":
     confirms_eokbu = (
         fe.method == "reader-confirmed"
         and sa.get("verdict") in ("strong", "extreme", "weak", "extreme_weak")
-        and fe.element == sa.get("candidate_favorable")
+        and fe.element == sa.get("_raw_unresolved_favorable")
     )
     if confirms_eokbu and sa.get("candidate_supporting"):
         # Same pick as 억부, so the 억부 희신 convention applies too: the
@@ -262,7 +262,12 @@ def favorable_element(chart, override: Optional[str] = None) -> FavorableElement
         return _with_unfavorable(_reader_confirmed(reader_override), sa)
 
     verdict = sa.get("verdict", "balanced")
-    raw_favorable = sa.get("candidate_favorable") or "—"
+    # 2026-09-14 audit §5 item 2: read the self-flagging raw key (the alias
+    # ``candidate_favorable`` points at the same value in engine-produced
+    # assessments; the fallback covers hand-built dicts in tests).
+    raw_favorable = (
+        sa.get("_raw_unresolved_favorable") or sa.get("candidate_favorable") or "—"
+    )
     raw_supporting = sa.get("candidate_supporting") or "—"
 
     climate = assess_climate(sa.get("month_branch", ""))

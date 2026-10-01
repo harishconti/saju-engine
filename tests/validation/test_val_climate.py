@@ -178,7 +178,7 @@ def test_climate_agrees_covered_both_polarities():
 # Regression lock for the formerly-known bug (Plan 5 T4 / spec §Known Open
 # Bugs Tracked #1) — FIXED 2026-09-14. premium_report.py's
 # `_right_now_callout` (~L181) and `ctx_favorable_phrase` (~L1399) used to
-# read the raw `strength_assessment["candidate_favorable"]` instead of the
+# read the raw `strength_assessment["_raw_unresolved_favorable"]` instead of the
 # resolved `yongsin.favorable_element()`; both now take an `override` param
 # threaded from `_ReportContext.favorable_override` and read the resolved
 # channel. The two `xfail(strict=False)` markers that pinned the wrong
@@ -221,7 +221,7 @@ def test_resolved_fe_differs_from_raw_candidate():
     from saju_engine import yongsin
 
     chart = _regression_chart()
-    raw = chart.strength_assessment["candidate_favorable"]
+    raw = chart.strength_assessment["_raw_unresolved_favorable"]
     resolved = yongsin.favorable_element(chart)
     assert resolved.method == "climate-balanced", resolved.method
     assert raw != resolved.element, (
@@ -237,7 +237,7 @@ def test_right_now_callout_uses_resolved_element():
 
     chart = _regression_chart()
     resolved = yongsin.favorable_element(chart).element
-    raw = chart.strength_assessment["candidate_favorable"]
+    raw = chart.strength_assessment["_raw_unresolved_favorable"]
     callout = _right_now_callout(chart)
     assert f"**{resolved}**" in callout, (
         f"callout names the raw candidate, not the resolved element — "

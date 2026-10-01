@@ -40,6 +40,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 from . import lookup as L
 from .chart import Chart
+from .fallback_log import log_fallback
 from .nayin import NAYIN_ORDER, nayin_of, nayin_relation_detail
 from .yongsin import favorable_element
 
@@ -225,7 +226,10 @@ def compat_daystem_combo(a: Chart, b: Chart) -> CompatSubResult:
     if in_season_a or in_season_b:
         flags.append(f"합화 원소 {combined_elem} 월령 양호")
     else:
-        flags.append(f"합화 원소 {combined_elem} 월령 불분명 [UNCERTAIN]")
+        # V3 (2026-09-14 audit §9.7): client-voice phrasing (was a bare
+        # "[UNCERTAIN]" tag that leaked into client PDFs — the strip regex
+        # only matched the colon form).
+        flags.append(f"합화 원소 {combined_elem} 월령 불분명 (학파마다 판단이 갈립니다)")
 
     # Breaking-stem check across all 8 visible stems, then by position.
     breakers = _BREAKING_STEMS.get(frozenset([s_a, s_b]), [])
@@ -834,6 +838,7 @@ def _spouse_palace_virtue(chart: Chart) -> Tuple[int, List[str]]:
     try:
         elem = L.STEM_INFO[main_hidden]["element"]
     except Exception:
+        log_fallback("compat.day_branch_elem", f"STEM_INFO[{main_hidden}] lookup failed")
         return (0, [])
     tg = L.ten_god(chart.day.stem, main_hidden)
     flags = [f"일지 본기 {main_hidden} → {tg} ({elem})"]
@@ -1072,10 +1077,12 @@ def compat_tengod_cross(a: Chart, b: Chart) -> CompatSubResult:
     try:
         a_to_b = L.ten_god(s_b, s_a)
     except Exception:
+        log_fallback("compat.tengod_cross.a_to_b", f"ten_god({s_a}→{s_b}) failed")
         a_to_b = "—"
     try:
         b_to_a = L.ten_god(s_a, s_b)
     except Exception:
+        log_fallback("compat.tengod_cross.b_to_a", f"ten_god({s_b}→{s_a}) failed")
         b_to_a = "—"
 
     flags: List[str] = []

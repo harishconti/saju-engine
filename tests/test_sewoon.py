@@ -153,6 +153,46 @@ def test_sewoon_date_lichun_rollback():
     assert hit.stem_tengod == "정인"
 
 
+# ── §5 item 11 (2026-09-14 architecture audit §2.3): the sub-1900 / ──────────
+# ── post-2100 fallback paths were genuinely untested end-to-end. ────────────
+
+def test_derive_sewoon_end_to_end_below_1899_fallback():
+    """A pre-1900 date (outside sajupy's ephemeris) must still produce a
+    complete SeWoonHit through the approximate-Lichun fallback — the annual
+    pillar rolls back to the prior Saju year before ~Feb 4, and the overlay
+    (branch relationships, harmony completions) is fully computed, not an
+    error or a silent partial."""
+    # 1899-01-15: pre-Lichun → 1898's cycle pillar 戊戌.
+    hit = derive_sewoon("甲", ["子", "申", "辰", "午"], 1899, 1, 15)
+    assert hit.combined == "戊戌"
+    # 甲's ten-god to 戊 (Yang Earth): 편재.
+    assert hit.stem_tengod == "편재"
+    # The overlay must fire: 戌 pairs with natal 午 in 寅午戌 (Fire 삼합 —
+    # a half completion with one of 午/寅 present) and is detected.
+    assert hit.harmony_completions, "out-of-range path must still compute the overlay"
+
+
+def test_derive_sewoon_end_to_end_above_2100_fallback():
+    """A post-2100 date must produce a complete SeWoonHit via the same
+    fallback, with the pre-Lichun rollback applied (2101-02-01 → 2100's
+    庚申 pillar)."""
+    hit = derive_sewoon("甲", ["子", "申", "辰", "午"], 2101, 2, 1)
+    assert hit.combined == "庚申"
+    # 甲's ten-god to 庚 (Yang Metal): 편관.
+    assert hit.stem_tengod == "편관"
+    # 申 completes the natal 申子辰 Water 삼합 fully (子+辰 present).
+    assert any(hc.kind == "삼합" and hc.status == "full" for hc in hit.harmony_completions)
+
+
+def test_derive_ilwoon_end_to_end_out_of_range_uses_day_pillar_math():
+    """The daily pillar is pure 60-cycle math anchored at 1900-01-01 = 甲戌
+    (no ephemeris involved), so out-of-range dates must still derive a
+    correct day pillar — 1899-12-31 is one day before the anchor, so its
+    index is 10 − 1 = 9 = 癸酉."""
+    hit = derive_ilwoon("甲", ["子"], 1899, 12, 31)
+    assert (hit.stem, hit.branch) == ("癸", "酉")
+
+
 # ── R12 — annual stem-vs-Day-Master 천간합 was never computed ─────────────
 # ── (found 2026-09-20, external report review, 3rd pass) ─────────────────
 

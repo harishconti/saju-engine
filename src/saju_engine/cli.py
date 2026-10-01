@@ -160,7 +160,11 @@ def _table(chart) -> str:
     lines.append("Strength heuristic:")
     if chart.strength_assessment:
         lines.append(f"  Verdict: {chart.strength_assessment['verdict']}")
-        lines.append(f"  Favorable candidate: {chart.strength_assessment['candidate_favorable']}")
+        # 2026-09-14 audit §5 item 1: the CLI's own short summary should show
+        # the RESOLVED 용신 (climate + reader aware), labelled as such.
+        from .yongsin import favorable_element
+        fe = favorable_element(chart)
+        lines.append(f"  Favorable element (resolved): {fe.element} ({fe.method})")
     return "\n".join(lines)
 
 

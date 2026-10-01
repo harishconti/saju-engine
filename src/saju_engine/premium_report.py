@@ -57,6 +57,7 @@ from . import sewoon as SE
 from .chart import Chart, DaeunPeriod
 from .daeun import saju_year
 from . import prose_fillers as PF
+from .fallback_log import log_fallback
 from .hanja_glossary import inject_hanja
 from .plain_glossary import collect_used_terms, gloss_first_use, render_terms_section
 from .yongsin import favorable_element
@@ -429,6 +430,7 @@ def _daeun_starting_age_note(chart) -> str:
             utc_offset=getattr(chart, "utc_offset", 9.0),
         )
     except Exception:
+        log_fallback("premium_report.daeun_starting_age", "days_to_term computation failed")
         return ""
     if days is None:
         return ""
@@ -496,7 +498,8 @@ def _section_cover(ctx: _ReportContext, compact: bool = False) -> List[str]:
         lines.append(f"**Chart signature:** *{_chart_signature(ctx.chart)}*")
         lines.append("")
     # Deep Destiny cover: confirm the MP3 audio is included by default.
-    if ctx.tier == "deep":
+    # V7: fullmap renders as deep — same cover line.
+    if ctx.tier in ("deep", "fullmap"):
         lines += [
             "**(Audio summary included)** Your MP3 audio summary is included — delivered with this report.",
             "",
@@ -604,9 +607,31 @@ def _section_chart_at_a_glance(ctx: _ReportContext) -> List[str]:
     lines += [
         f"- **Day Master:** {ctx.dm_en}",
         f"- **Strength:** {ctx.strength_label} — {PF.strength_reasoning(ctx)}",
+    ]
+    fav_line = (
         f"- **Favorable Element:** {ctx.favorable}"
         f"{' *(provisional — requires reader confirmation)*' if ctx.fe.requires_reader else ''}"
-        f" — {ctx.favorable_note}",
+        f" — {ctx.favorable_note}"
+    )
+    # V11 (2026-09-14 audit §9.13): disclose the provenance — whether a
+    # human reader confirmed the 용신 or the engine's heuristic stands — so
+    # the "read by a human" positioning is visible in the artifact itself.
+    if ctx.fe.confidence == "reader-confirmed":
+        fav_line += " *Confirmed by a human reader from the full classical analysis.*"
+    lines.append(fav_line)
+    # V2 (2026-09-14 audit §9.12a): when the 조후 (climate) and 억부
+    # (strength-balance) channels disagree, state the tension rather than
+    # silently reporting one — the resolution is already computed
+    # (fe.climate_agrees / fe.climate_element); this is one field of wiring.
+    if ctx.fe.climate_element and ctx.fe.climate_agrees is False:
+        lines.append(
+            f"- **Why this element:** two classical checks apply here — the strength-balance "
+            f"(억부) reading points one way, while the climate-balance (조후) reading points to "
+            f"**{ctx.fe.climate_element}** for a {ctx.fe.climate_band}-season chart. In this chart "
+            f"the {'climate reading takes priority because the chart leans clearly seasonal' if ctx.fe.method == 'climate-balanced' else 'strength reading takes priority because the chart is not extreme enough for the climate override'}; "
+            "the reader has weighed both."
+        )
+    lines += [
         f"- **Supporting Element:** {ctx.supporting}",
         f"- **Avoid / Watch:** {_avoid_watch_text(ctx)}",
     ]
@@ -660,7 +685,7 @@ def _section_day_master_portrait(ctx: _ReportContext, short: bool = False) -> Li
     # 4–5 sentences per pillar in Deep). Tier-gated below.
     if ctx.tier == "essential":
         lines += _four_pillars_one_by_one(ctx, sentences=2)
-    elif ctx.tier == "deep":
+    elif ctx.tier in ("deep", "fullmap"):  # V7: fullmap renders as deep
         lines += _four_pillars_one_by_one(ctx, sentences=4)
         # Deep tier adds the full Ten-God distribution table right after the
         # per-pillar walk so the reader has a single pillar-by-pillar reference.
@@ -772,6 +797,7 @@ def _section_ten_god_distribution_table(ctx: _ReportContext) -> List[str]:
             try:
                 tg = L.ten_god(ctx.chart.day_master, stem)
             except Exception:
+                log_fallback("premium_report.pillar_hidden_tg", f"ten_god({stem}) failed")
                 tg = "—"
             hidden_strs.append(f"{stem} ({label})")
             hidden_tg_strs.append(tg)
@@ -946,6 +972,7 @@ def _section_relationships(ctx: _ReportContext, mode: str = "standard") -> List[
                 natal_stems=ctx.chart.stems,
             )
         except Exception:
+            log_fallback("premium_report.relationship_annual_hits", "build_sewoon_range failed")
             annual_hits = []
         for h in annual_hits:
             tg = h.stem_tengod_en or h.stem_tengod or "—"
@@ -1718,6 +1745,7 @@ def _section_auspicious_dates(ctx: _ReportContext, window_days: int = 90) -> Lis
         try:
             hit = SE.derive_ilwoon(ctx.chart.day_master, natal_branches, d.year, d.month, d.day)
         except Exception:
+            log_fallback("premium_report.ilwoon_window", f"derive_ilwoon({d}) failed")
             continue
         stem_elem = L.STEM_INFO.get(hit.stem, {}).get("element", "")
         if stem_elem not in fav_elems:
@@ -2177,6 +2205,7 @@ def _section_monthly_lucky_dates(ctx: _ReportContext, months_ahead: int = 3, max
             try:
                 hit = SE.derive_ilwoon(ctx.chart.day_master, natal_branches, year, month, day)
             except Exception:
+                log_fallback("premium_report.monthly_lucky_ilwoon", f"derive_ilwoon({year}-{month}-{day}) failed")
                 continue
             stem_elem = L.STEM_INFO.get(hit.stem, {}).get("element", "")
             if stem_elem not in fav_elems:
@@ -2219,6 +2248,38 @@ def _section_audio_summary_note(ctx: _ReportContext) -> List[str]:
         "",
         "---",
         "",
+    ]
+
+
+# ── Deep / Full-map section list (V7 — single source of truth) ──────────────
+# `fullmap` is a legacy alias of `deep`: normalize_tier keeps the name alive
+# for TIER_CONFIG metadata, but the rendered body is identical. The audit's
+# finding (§9.8) was that the two branches carried two hand-maintained COPIES
+# of this list, so any deep-section change silently missed the fullmap copy.
+# It is now one function, called by one branch, so the copies cannot diverge
+# again — a structural fix, not a synchronisation discipline.
+def _deep_tier_sections(ctx: _ReportContext) -> List[str]:
+    """The deep (and fullmap) body, in order."""
+    return [
+        _section_toc(ctx),
+        _section_how_to_use(ctx),
+        _section_day_master_portrait(ctx, short=False),
+        _section_career_wealth(ctx, mode="deep"),
+        _section_relationships(ctx, mode="deep"),
+        _section_health_vitality(ctx),
+        _section_natal_patterns(ctx),
+        _section_wealth_timing(ctx),
+        _section_relocation_directions(ctx),
+        _section_business_launch(ctx),
+        _section_timing(ctx, full_forecast=True),
+        _section_major_luck_narrative(ctx),
+        _section_lifetime_decade_roadmap(ctx),
+        _section_auspicious_dates(ctx),
+        _health_deep_dive(ctx),
+        _section_monthly_lucky_dates(ctx, months_ahead=12),
+        _section_practical_guidance(ctx, full=True),
+        _section_audio_summary_note(ctx),
+        _section_closing_note(ctx, short=False),
     ]
 
 
@@ -2268,28 +2329,20 @@ def generate_premium_report(
         sections.append(_section_day_master_portrait(ctx, short=True))
         sections.append(_section_career_wealth(ctx, mode="essential"))
         sections.append(_section_timing(ctx, include_annual=False))
+        # V6 (2026-09-14 audit §9.8): the 30-day plan was defined but never
+        # called ("dead" per the audit) — it is exactly the tier-differentiator
+        # the Essential product needs (a concrete, favorable-element action
+        # cycle), and its content is grounded in the same
+        # `_ELEMENT_ASSOCIATIONS` table the Lucky Attributes card cites
+        # (knowledge/14-directions-and-relocation.md, knowledge/15-health-and-body.md).
+        sections.append(_section_30_day_plan(ctx))
         sections.append(_section_practical_guidance(ctx, full=False))
         sections.append(_section_closing_note(ctx, short=True))
-    elif tier == "deep":
-        sections.append(_section_toc(ctx))
-        sections.append(_section_how_to_use(ctx))
-        sections.append(_section_day_master_portrait(ctx, short=False))
-        sections.append(_section_career_wealth(ctx, mode="deep"))
-        sections.append(_section_relationships(ctx, mode="deep"))
-        sections.append(_section_health_vitality(ctx))
-        sections.append(_section_natal_patterns(ctx))
-        sections.append(_section_wealth_timing(ctx))
-        sections.append(_section_relocation_directions(ctx))
-        sections.append(_section_business_launch(ctx))
-        sections.append(_section_timing(ctx, full_forecast=True))
-        sections.append(_section_major_luck_narrative(ctx))
-        sections.append(_section_lifetime_decade_roadmap(ctx))
-        sections.append(_section_auspicious_dates(ctx))
-        sections.append(_health_deep_dive(ctx))
-        sections.append(_section_monthly_lucky_dates(ctx, months_ahead=12))
-        sections.append(_section_practical_guidance(ctx, full=True))
-        sections.append(_section_audio_summary_note(ctx))
-        sections.append(_section_closing_note(ctx, short=False))
+    elif tier in ("deep", "fullmap"):
+        # V7 (2026-09-14 audit §9.8): `fullmap` is a legacy alias of `deep`.
+        # One branch, one section list (`_deep_tier_sections`) — the audit's
+        # finding was two hand-maintained copies that could silently diverge.
+        sections.extend(_deep_tier_sections(ctx))
     elif tier == "companion":
         # Focused monthly/annual timing read: chart snapshot + major-luck
         # snapshot + next 12-month window + practical guidance + short closing.
@@ -2297,38 +2350,31 @@ def generate_premium_report(
         sections.append(_section_timing(ctx, annual_range=(current_year, current_year + 1)))
         sections.append(_section_practical_guidance(ctx, full=True))
         sections.append(_section_closing_note(ctx, short=True))
-    elif tier == "spark":
-        sections.append(_section_day_master_portrait(ctx, short=True))
-        sections.append(_section_practical_guidance(ctx, full=False))
-        sections.append(_section_closing_note(ctx, short=True))
-    elif tier == "reading":
-        sections.append(_section_day_master_portrait(ctx, short=False))
-        sections.append(_section_career_wealth(ctx, mode="standard"))
-        sections.append(_section_relationships(ctx, mode="standard"))
-        sections.append(_section_health_vitality(ctx))
-        sections.append(_section_timing(ctx, full_forecast=False))
-        sections.append(_section_practical_guidance(ctx, full=True))
-        sections.append(_section_closing_note(ctx, short=False))
-    else:  # fullmap
-        sections.append(_section_toc(ctx))
-        sections.append(_section_how_to_use(ctx))
-        sections.append(_section_day_master_portrait(ctx, short=False))
-        sections.append(_section_career_wealth(ctx, mode="deep"))
-        sections.append(_section_relationships(ctx, mode="deep"))
-        sections.append(_section_health_vitality(ctx))
-        sections.append(_section_natal_patterns(ctx))
-        sections.append(_section_wealth_timing(ctx))
-        sections.append(_section_relocation_directions(ctx))
-        sections.append(_section_business_launch(ctx))
-        sections.append(_section_timing(ctx, full_forecast=True))
-        sections.append(_section_major_luck_narrative(ctx))
-        sections.append(_section_lifetime_decade_roadmap(ctx))
-        sections.append(_section_auspicious_dates(ctx))
-        sections.append(_health_deep_dive(ctx))
-        sections.append(_section_monthly_lucky_dates(ctx, months_ahead=12))
-        sections.append(_section_practical_guidance(ctx, full=True))
-        sections.append(_section_audio_summary_note(ctx))
-        sections.append(_section_closing_note(ctx, short=False))
+    elif tier in ("reading", "spark"):
+        # V7 (2026-09-14 audit §9.8): the legacy tier branches are now
+        # EXPLICIT aliases with a recorded decision — `reading` and `spark`
+        # keep their distinct (smaller) section lists for backward
+        # compatibility with already-generated legacy deliverables; they
+        # must not be sold to new clients (see CLAUDE.md). `fullmap` is
+        # identical to `deep` and now delegates to it (below) instead of
+        # duplicating the list — the duplication was the audit's finding:
+        # any future deep-section change silently missed the fullmap copy.
+        if tier == "spark":
+            sections.append(_section_day_master_portrait(ctx, short=True))
+            sections.append(_section_practical_guidance(ctx, full=False))
+            sections.append(_section_closing_note(ctx, short=True))
+        else:  # reading
+            sections.append(_section_day_master_portrait(ctx, short=False))
+            sections.append(_section_career_wealth(ctx, mode="standard"))
+            sections.append(_section_relationships(ctx, mode="standard"))
+            sections.append(_section_health_vitality(ctx))
+            sections.append(_section_timing(ctx, full_forecast=False))
+            sections.append(_section_practical_guidance(ctx, full=True))
+            sections.append(_section_closing_note(ctx, short=False))
+    else:
+        # Reachable only for an unrecognised tier — normalize_tier routes
+        # every known name (deep, fullmap, reading, spark) to its branch above.
+        raise ValueError(f"unreachable tier branch: {tier!r}")
 
     sections.append([
         "*Engine-generated premium report draft. Interpretive prose must be reviewed and finalized by a qualified reader before client delivery.*",
@@ -2345,4 +2391,20 @@ def generate_premium_report(
     terms = render_terms_section(collect_used_terms(doc), tier)
     if terms:
         doc = doc.rstrip() + "\n\n" + terms
+
+    # V10 (2026-09-14 audit §9.5): knowledge/10-output-template.md mandates a
+    # "Sources & Limits" section, but the premium report never emitted one
+    # (only the skeleton did) — an unresolved contradiction. Decision: emit
+    # it in the .md (auditable source, per the repo's citations-stay-in-md
+    # convention); `strip_source_citations` removes it from client PDFs, so
+    # the PDF pipeline is unchanged.
+    if tier != "sample":
+        doc = doc.rstrip() + "\n\n" + "\n".join([
+            "## Sources & Limits",
+            "",
+            "- Classical framework: 적천수 (滴天髓), 연해자평 (淵海子平), 궁통보감 (窮通寶鑑), 명리정종, 자평진전 — as compiled in `knowledge/`.",
+            "- Method: `knowledge/09-interpretation-method.md` (9-step procedure).",
+            "- This reading describes tendencies, not fixed outcomes; it is for reflection and entertainment — not medical, legal, or financial advice.",
+            "- The engine's heuristic verdicts (strength, 용신) are marked provisional where the classical sources disagree; a qualified reader confirms the final reading.",
+        ])
     return doc

@@ -47,6 +47,10 @@ class DaeunPeriod:
     stem: str
     branch: str
     combined: str = ""
+    # §5 item 4 (2026-09-14 architecture audit): True when the term table did
+    # not cover the birth date, so `start_age` fell back to 0 as an
+    # approximation — a legitimate 0 (birth on a 절기) is NOT flagged.
+    start_age_approx: bool = False
 
     # Activation overlay (populated by daeun_overlay.build_daeun_overlays)
     stem_tengod: str = ""

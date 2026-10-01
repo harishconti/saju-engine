@@ -414,7 +414,7 @@ def detect_special_forms(
         if notes:
             note = (
                 f"Candidate {ko} ({en}) downgraded: " + " | ".join(notes)
-                + " Mark as [UNCERTAIN] until verified."
+                + " Reader verification required before relying on this candidate."
             )
         else:
             note = (

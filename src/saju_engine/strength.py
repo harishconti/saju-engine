@@ -154,7 +154,9 @@ def assess_strength(
         only since N-5; still exported for the stage narrative)
       - total_score: combined numeric score
       - verdict: 'strong', 'weak', 'extreme_weak', 'balanced', or 'extreme'
-      - candidate_favorable: candidate 용신 element
+      - _raw_unresolved_favorable: RAW candidate 용신 element (pre-climate,
+        pre-override) — internal; client-facing code must call
+        yongsin.favorable_element()
       - candidate_supporting: candidate 희신 element
       - candidate_unfavorable: candidate 기신 element
       - candidate_draining: candidate 한신 element
@@ -217,6 +219,15 @@ def assess_strength(
     # from 4.0 to 5.0 so "extreme" stays genuinely rare (≈3% of charts) and
     # the published strong/weak verdicts are unchanged by this decision.
     # D3 fix: symmetric extreme bands for very weak Day Masters.
+    #
+    # §5 item 9 sensitivity sweep (2026-10-01, ±10% per threshold/weight over
+    # the 7 canonical charts — tests/threshold_sweep.py): no canonical
+    # strong/weak verdict moves, BUT Sruthi's total (−1.43) sits 0.07 inside
+    # the −1.5 balanced/weak edge — a ±10% nudge of the band OR of the
+    # resource/drain weight flips her to "weak". This is a KNOWN knife-edge,
+    # recorded here per the audit's recommendation; her published verdict
+    # ("balanced") is the reader-facing anchor and the favorable element is
+    # unaffected (her 용신 comes from the 조후 climate channel, not the verdict).
     if total_score >= 5.0:
         verdict = "extreme"
     elif total_score >= 1.5:
@@ -279,6 +290,16 @@ def assess_strength(
         candidate_unfavorable = None
         candidate_draining = None
 
+    # The raw, UNRESOLVED pick is published ONLY as
+    # ``_raw_unresolved_favorable`` (2026-09-14 audit §5 item 2). There is no
+    # ``candidate_favorable`` alias any more: the old name read like a public
+    # 용신 field, and four modules had quietly adopted it as one — daeun_overlay
+    # and two validation sites shipped a pre-climate element to clients while
+    # the reports showed a different resolved one. The underscore prefix
+    # self-flags "raw, do not render". Anything client-facing must read
+    # ``yongsin.favorable_element(chart)``. Reads outside the producer
+    # (strength.py), the resolver (yongsin.py) and the validation harness
+    # (validation.py — which compares raw vs resolved by design) are bugs;
     return {
         "element_counts": dict(counts),
         "month_branch": month_branch,
@@ -290,13 +311,13 @@ def assess_strength(
         "drain_score": drain_score,
         "total_score": round(total_score, 2),
         "verdict": verdict,
-        "candidate_favorable": candidate_favorable,
+        "_raw_unresolved_favorable": candidate_favorable,
         "candidate_supporting": candidate_supporting,
         "candidate_unfavorable": candidate_unfavorable,
         "candidate_draining": candidate_draining,
         # N-19: the balanced-fallback least-present tie set (empty unless the
         # verdict is balanced AND ≥2 elements share the minimum). When non-empty,
-        # `candidate_favorable` is just the deterministic first pick, not a
+        # the raw favorable pick is just the deterministic first pick, not a
         # unique answer.
         "balanced_tie_elements": least_present_elements if verdict == "balanced" else [],
         "note": "Heuristic only; final 용신 must be argued from the full chart context.",
