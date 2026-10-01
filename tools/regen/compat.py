@@ -11,10 +11,13 @@ pawan = compute_chart(name="Pawan", gender="M", year=1991, month=10, day=3, hour
                       longitude=79.19, utc_offset=5.5, **REF)
 sruthi = compute_chart(name="Sruthi", gender="F", year=1993, month=12, day=11, hour=2, minute=45,
                        longitude=79.45, utc_offset=5.5, **REF)
+bindu = compute_chart(name="Bindu", gender="F", year=1995, month=3, day=24, hour=10, minute=10,
+                      longitude=78.2669, utc_offset=5.5, **REF)
 jobs = [
     ("harish_manvitha", harish, manvitha, "Harish", "Manvitha", {}),
     ("pawan_sruthi", pawan, sruthi, "Pawan", "Sruthi",
      dict(favorable_element_a="Water", favorable_element_b="Earth")),
+    ("harish_bindu", harish, bindu, "Harish", "Bindu", {}),
 ]
 for slug, a, b, na, nb, ov in jobs:
     for tier, suffix in (("basic", ""), ("deep", "_deep")):
