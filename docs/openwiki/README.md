@@ -17,7 +17,7 @@ Structured documentation for the Korean Saju (사주, 四柱) project.
 - **For readings and interpretations:** start with `CLAUDE.md`, then `knowledge/00-glossary.md` and `knowledge/09-interpretation-method.md`.
 - **For engine and tooling:** start with [Architecture — Engine](architecture/engine.md) and [Operations — Toolchain and Testing](operations/toolchain-and-testing.md).
 - **For product and delivery questions:** start with [Products — Reports](products/reports.md).
-- **For project state and current priorities:** see `docs/MEMORY.md` and `tasks.md`.
+- **For project state and current priorities:** see `docs/MEMORY.md` and `README.md`.
 
 ## Maintenance
 

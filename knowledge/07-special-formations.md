@@ -260,7 +260,7 @@ Derived from the **day branch's three-harmony triplet**. The table below gives t
 > differ completely between the two bases. This engine defaults to the day branch (consistent with its
 > 도화/역마/화개 default) and supports year-branch anchoring via `anchor="year"`. Readers should state
 > which basis they are using. Sources: 두루미사주 12신살 사전 ("년지를 기준으로 삼합 그룹에 따라"),
-> 류동학, 대구신문 「12신살의 이론과 적용」; see `docs/audits/2026-09-25-engine-audit-verification.md`.
+> 류동학, 대구신문 「12신살의 이론과 적용」; see `the 2026-09-25 engine audit`.
 
 | Day-branch triplet | 겁살 (劫煞) | 재살 (災煞) | 천살 (天煞) | 지살 (地煞) | 연살 (年煞) | 월살 (月煞) | 망신 (亡神) | 장성 (將星) | 반안 (攀鞍) | 역마 (驛馬) | 육해 (六害) | 화개 (華蓋) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|

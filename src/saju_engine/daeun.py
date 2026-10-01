@@ -151,8 +151,8 @@ _CALENDAR_CACHE: Optional[Dict[str, List[Tuple[date, str, str]]]] = None
 #
 # N-3: the engine previously read sajupy's bundled calendar_data.csv for the
 # month-opener 節氣 instants. Those instants are wrong by a median of ~22 min
-# and up to ~114 min (see docs/audits/2026-09-26-deep-engine-audit.md N-3 and
-# docs/audits/scripts/check_solar_terms.py), which flips the month pillar for
+# and up to ~114 min (see the 2026-09-26 deep-engine audit N-3 and
+# the removed solar-terms check script), which flips the month pillar for
 # births within that window of a term — roughly 1 birth in 1,100–2,700, and
 # 2–4× more for pre-1960 / post-2030 charts. This module now reads our own
 # `data/solar_terms.csv`, generated from an ephemeris (PyEphem/libastro VSOP87,

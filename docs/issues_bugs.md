@@ -4,7 +4,7 @@
 > client-launch blockers G1–G6 added and fixed 2026-09-07.
 > Current test status: **590 passing** (`python3 -m pytest` from the repo root).
 > This file is the engine issue tracker with fix history. For go-to-market / product / landing-page
-> issues and the prioritised backlog, see `../improvements_issues.md`.
+> issues, see `MEMORY.md`.
 >
 > **Path note:** the engine moved `tools/ → src/` in the 2026-08 modularization. `Files:` fields
 > below now say `src/saju_engine/…` but the **line numbers are historical** — verify against the code.
@@ -38,7 +38,7 @@
 
 Surfaced by the deep-dive research report's report-quality audit
 (`research-engine/output/2026-09-07/report-saju.html` §3.8). Full context and the wider
-go-to-market backlog are in **`improvements_issues.md`**.
+go-to-market backlog are in **`../docs/market-research-2026-09.md`**.
 
 ### G1. Internal reviewer notes leak into client-facing PDFs
 
@@ -816,4 +816,4 @@ The following issues were raised by an external reviewer after the 2026-07-01 bu
 | 2026-07-01 | Added reviewer deep-dive findings H11–H13, M15–M17, L19–L20, D1 to backlog; fixed H11, H12, M16, M17; full suite 383/383 passing. |
 | 2026-07-01 | Fixed H13 (종격 rooting check), L19 (reportlab element emoji → colored bullets), L20 (exact demo-pair compat assertions), and M15 (documented demo-deployment privacy limits); full suite 386/386 passing. |
 | 2026-07-01 | Fixed D1: added `tests/test_textbook_cases.py` with external Korean Saju validation case for Park Chung-hee (four pillars + 대운 table); full suite 388/388 passing. |
-| 2026-09-07 | Added and fixed G1 (reviewer-note leak into client PDFs), G2 (per-pillar template grammar), G3 (용신 single source of truth + provenance — new `src/saju_engine/yongsin.py`), G6 (₹→USD in engine text) as part of the go-to-market pivot; regression tests added; full suite 568 → 590 passing. See `improvements_issues.md`. |
+| 2026-09-07 | Added and fixed G1 (reviewer-note leak into client PDFs), G2 (per-pillar template grammar), G3 (용신 single source of truth + provenance — new `src/saju_engine/yongsin.py`), G6 (₹→USD in engine text) as part of the go-to-market pivot; regression tests added; full suite 568 → 590 passing. |

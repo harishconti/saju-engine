@@ -1,10 +1,8 @@
 # Saju — Four Pillars of Destiny Reading
 
-This project is a **Claude Code skill + knowledge base + calculation engine** for performing Korean Saju (사주) readings grounded in classical principles (오행, 음양, 십신, 격국, 12운성, 대운/세운), plus a client-report pipeline and landing page. The client-facing product targets an **English-speaking global** audience (K-culture fans, diaspora) priced in USD — see `improvements_issues.md` for the go-to-market and `docs/market-research-2026-09.md` for the research.
+This project is a **calculation engine + knowledge base + Claude Code skill** for performing Korean Saju (사주) readings grounded in classical principles (오행, 음양, 십신, 격국, 12운성, 대운/세운), plus a client-report pipeline and landing page. The client-facing product targets an **English-speaking global** audience (K-culture fans, diaspora) priced in USD — see `docs/market-research-2026-09.md` for the research.
 
-For the **current state of work** (what's built, what's deferred, the change log) see `tasks.md`. For persistent project memory (conventions, decisions, quick commands) see `docs/MEMORY.md`. For the engine issue tracker, see `docs/issues_bugs.md`. For the **go-to-market strategy, product/landing issues, and the prioritised backlog**, see `improvements_issues.md` (with sourced research in `docs/market-research-2026-09.md`).
-
-> **Project health (2026-09-07):** The engine suite is green (**590 passed**); the three client-launch blockers (G1–G3) and the ₹→USD / English-global pivot are done. Remaining P0/P1 work (real testimonials, checkout, deployment) is tracked in `improvements_issues.md` §12. The engine, PDF toolchain, and HTML/Playwright backend live under `src/`.
+For persistent project memory (conventions, decisions, quick commands, current state) see `docs/MEMORY.md`. For the engine issue tracker, see `docs/issues_bugs.md`. For the go-to-market strategy and research, see `docs/market-research-2026-09.md`.
 
 ## What this gives you
 
@@ -24,16 +22,12 @@ The knowledge is **encyclopedic** — stems, branches, ten gods, 12 stages, spec
 saju/
 ├── CLAUDE.md                          # Persona + ground rules
 ├── README.md                          # This file
-├── tasks.md                           # Prioritized project to-do list
-├── improvements_issues.md             # Master go-to-market + issues doc (see also docs/market-research-2026-09.md)
 ├── docs/
 │   ├── MEMORY.md                      # Persistent project memory (state, conventions, quick commands)
 │   ├── issues_bugs.md                 # Engine issue tracker / decision log (with fix history)
 │   ├── market-research-2026-09.md     # Sourced market research (confidence-flagged)
-│   ├── audits/                        # Historical engine/architecture audit reports + index
-│   ├── openwiki/                      # Reference docs: quickstart, architecture, domain, products, operations
-│   ├── superpowers/                   # Design specs + implementation plans
-│   └── codex/instructions.md          # Codex project-level instructions
+│   ├── research/                      # Validation research notes
+│   └── openwiki/                      # Reference docs: quickstart, architecture, domain, products, operations
 ├── pyproject.toml                     # Packaging + dependencies
 ├── requirements.txt                   # Runtime dependencies
 ├── requirements-dev.txt               # Development dependencies (pytest, ruff)
@@ -97,10 +91,9 @@ saju/
 │   ├── client_intake_app.html         # Self-service form variant with PDF download
 │   ├── client_intake_app.py           # FastAPI self-service app that returns tiered PDFs
 │   ├── client_compat_intake_form.html # Two-chart compat intake form (Partner A × Partner B)
-│   ├── client_compat_intake_server.py # Stdlib HTTP server for compat intake
-│   └── build_market_research_html.py  # Renders misc/market_research/*.md → misc/market_research_html/
+│   └── client_compat_intake_server.py # Stdlib HTTP server for compat intake
 ├── apps/landing-page/                 # Next.js marketing site (own git repo; USD/English-global positioning)
-├── tests/                             # pytest suite (590 tests)
+├── tests/                             # pytest suite (1200+ tests)
 ├── misc/market_research/              # ⚠️ SUPERSEDED June-2026 India research — see docs/market-research-2026-09.md
 └── candidates_horoscope/
     ├── README.md                      # Per-candidate folder conventions + index
@@ -210,8 +203,8 @@ saju-engine --date 1993-12-11 --time 02:45 --city "Pallipat" --gender F --format
 ## Client products
 
 Report tiers implemented in the engine and exposed to clients via the intake forms. Prices are USD
-launch prices; the target market is **English-speaking global** (see `improvements_issues.md` for the
-strategy and `docs/market-research-2026-09.md` for the research behind it).
+launch prices; the target market is **English-speaking global** (see `docs/market-research-2026-09.md`
+for the strategy and research behind it).
 
 | Tier | Name | Price | Length | Core Contents |
 |---|---|---|---|---|

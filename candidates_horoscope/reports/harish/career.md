@@ -115,7 +115,7 @@ Combining the ten-god weight (관성 thinnest, 인성/식상 strongest) with the
 
 ## 2026-09-26 — Corrections after the engine audit
 
-The base report was regenerated after the 2026-09-25 engine audit (`docs/audits/2026-09-25-engine-audit-verification.md`) and the independent validation of this chart. Changes carried into this file:
+The base report was regenerated after the 2026-09-25 engine audit (`the 2026-09-25 engine audit`) and the independent validation of this chart. Changes carried into this file:
 
 - **Element balance:** the 丑 hidden-stem order was swapped in the engine (己/辛/癸 is correct); Metal (27.8%) now leads Water (25.3%).
 - **Annual timing:** Fire (기신) years 2026–27 now read as caution years, and 2029 — where the 巳酉丑 삼합 completes — as the strongest year of the decade. The earlier "2030–2033 cleanest window" rested on stem-only leans and missed the 삼합, 乙庚合, 丑戌형 and 공망 signals.

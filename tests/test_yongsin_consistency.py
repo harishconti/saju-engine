@@ -1,6 +1,6 @@
 """용신 (favorable element) single-source-of-truth + cross-product consistency.
 
-Regression guard for issue G3 / A1 (see improvements_issues.md): the favorable
+Regression guard for issue G3 / A1 (see the previously-tracked product backlog (removed 2026-10-01)): the favorable
 element shown in a person's natal report must equal the one shown in any
 compatibility report they appear in, and both must equal the resolver value.
 """

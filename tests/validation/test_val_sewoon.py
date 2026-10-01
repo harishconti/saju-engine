@@ -1,6 +1,6 @@
 """W2 세운/월운 harness — fixture-driven cross-validation.
 
-See docs/superpowers/specs/2026-09-13-engine-validation-campaign-design.md.
+See the 2026-09 validation campaign design (removed 2026-10-01).
 Seed expectations cross-validate sewoon's 1984=甲子 annual anchor and the
 五虎遁 monthly anchor against the W1-certified pillar layer (non-circular).
 Appending fixture entries auto-extends the suite.

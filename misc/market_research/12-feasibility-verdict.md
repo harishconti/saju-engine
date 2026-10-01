@@ -187,7 +187,7 @@ If the founder chooses to GO, the most important next step is **to start writing
 ## 12. Sources
 
 - All 11 prior docs in this folder.
-- Project state: [CLAUDE.md](../../CLAUDE.md), [README.md](../../README.md), [tasks.md](../../tasks.md).
+- Project state: [CLAUDE.md](../../CLAUDE.md), [README.md](../../README.md).
 - Engine + tests: [tools/saju_engine/](../../tools/saju_engine/), [tests/](../../tests/).
 - 6 paid pilots: [candidates_horoscope/reports/](../../candidates_horoscope/reports/).
 - Self-service calculator: [tools/client_intake_app.py](../../tools/client_intake_app.py).

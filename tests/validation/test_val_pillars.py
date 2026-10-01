@@ -1,6 +1,6 @@
 """W1 pillar harness — fixture-driven cross-validation.
 
-See docs/superpowers/specs/2026-09-13-engine-validation-campaign-design.md.
+See the 2026-09 validation campaign design (removed 2026-10-01).
 Every fixture entry is checked by run_fixture; documented_interpretation
 entries that mismatch are reported as xfail (visible, non-failing) so school
 disagreements never mask engine bugs.

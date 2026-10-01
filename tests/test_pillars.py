@@ -370,7 +370,7 @@ def test_rm_boundary_case_pinned():
     # reports/rm/). Longitude pinned explicitly (126.9783°E, Nominatim's
     # answer for "Seoul" as of 2026-09-20) rather than re-geocoding, because
     # sajupy's city geocoder is a live network call and is not guaranteed
-    # stable run-to-run (see docs/audits/2026-09-20-i4-i7-followup.md) — the
+    # stable run-to-run (see the 2026-09-20 i4/i7 follow-up) — the
     # committed rm-report.md was in fact generated against a different
     # geocoded longitude than this test observes today. This fixture pins
     # the CURRENT engine's reading so a future geocoder/formula change can't

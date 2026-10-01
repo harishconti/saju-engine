@@ -1,5 +1,5 @@
 # Claude Context — Korean Saju (Four Pillars of Destiny)
-> For project state, conventions, and quick commands, see `docs/MEMORY.md`. For the prioritized task list, see `tasks.md`. For the go-to-market strategy, product/landing issues, and the prioritised backlog, see `improvements_issues.md` (with sourced research in `docs/market-research-2026-09.md`).
+> For project state, conventions, and quick commands, see `docs/MEMORY.md`. For the go-to-market strategy and sourced research, see `docs/market-research-2026-09.md`.
 
 ## Persona
 
@@ -130,7 +130,7 @@ For deliverables that combine a base natal reading with topic deep-dives, follow
 
 ## Market & Positioning
 
-> **Full strategy:** `improvements_issues.md` (root) · **Sourced research:** `docs/market-research-2026-09.md`.
+> **Sourced research:** `docs/market-research-2026-09.md`.
 > The 2026-09-07 pivot moved this product from an India / ₹ / Vedic-adjacent framing to an
 > English-speaking-global / USD one. When writing client-facing copy, follow the new framing.
 
@@ -151,7 +151,7 @@ For deliverables that combine a base natal reading with topic deep-dives, follow
 
 The engine maps each product to a `--tier` value. Use the slash command
 `.claude/commands/saju-client.md` (`/saju-client`) for the manual order-fulfillment workflow.
-Prices are USD launch prices — see `improvements_issues.md` §4 for the ranges and the pricing risk.
+Prices are USD launch prices — see `docs/market-research-2026-09.md` for the ranges and the pricing risk.
 
 | Tier | Engine `--tier` | Landing-page name | Price | Length | Core Contents |
 |---|---|---|---|---|---|
@@ -197,7 +197,7 @@ For a structured project reference beyond this file, see `docs/openwiki/`:
 
 ## Deferred Work
 
-For the **prioritized project to-do list** (Priorities 1–6, completion status, and remaining items) see **`tasks.md`** at the project root. The current state at a glance:
+Current state at a glance:
 
 - ✅ **Priority 1 — Calculation Engine.** Built at `src/saju_engine/`. 520 pytest tests pass. Wraps `sajupy` (installed at `/home/harish/.local/lib/python3.12/site-packages/`) + our own 십신/12운성/대운 lookups, plus overlays for stars, strength, patterns, annual/monthly/daily luck, and a 30×30 Nayin pair table.
 - ✅ **Priority 2 — PDF toolchain.** `src/saju_html/md_to_saju_pdf.py` + `src/saju_html/md_to_saju_html_pdf.py` + `tools/build-pdf.sh` produce presentable PDFs from markdown or directly from a `Chart` (`--from-chart`).
@@ -206,5 +206,5 @@ For the **prioritized project to-do list** (Priorities 1–6, completion status,
 - ✅ **Priority 5 — Self-service calculator.** Implemented as FastAPI app (`tools/client_intake_app.py`) with a self-service form that returns a tiered PDF.
 - ✅ **Priority 6 — Anthropic community skills.** Six skills (pdf, theme-factory, canvas-design, docx, pptx, xlsx) symlinked into `~/.claude/skills/`.
 - ✅ **Priority E — Compatibility (궁합) Reading.** Standalone product with Snapshot ($24) and Deep ($45) tiers, two-chart intake form, JSON intake server, FastAPI `/compat` route, standalone PDF renderer, and an 11-sub-system engine grounded in 적천수, 연해자평, 궁통보감, 명리정종, 자평진전, 서전구미록 + 권인성·곽임성·정봉재·송기영 Korean schools. See `knowledge/11-gunghap.md`.
-- ✅ **Priority B — Go-to-market pivot (2026-09-07).** English-global / USD positioning; 3 client-launch blockers (G1–G3) fixed. See `improvements_issues.md`.
-- ⏳ **Priority 7+ — Future polish.** Real testimonials + Merchant-of-Record checkout + deployment (P1), the quiz funnel and embedded calculator (P2), richer engine-drafted prose (G4), and additional Korean textbook cases remain open — tracked in `improvements_issues.md` §12.
+- ✅ **Priority B — Go-to-market pivot (2026-09-07).** English-global / USD positioning; 3 client-launch blockers (G1–G3) fixed.
+- ⏳ **Priority 7+ — Future polish.** Real testimonials + Merchant-of-Record checkout + deployment (P1), the quiz funnel and embedded calculator (P2), richer engine-drafted prose (G4), and additional Korean textbook cases remain open. See `docs/MEMORY.md` for the live state.

@@ -523,7 +523,7 @@ and states the mechanism in `notes`, so it legally PASSes while rendering INTERP
 > appended rather than substituted because the survey is the provenance record for every
 > `source["external"]` citation on the W6 fixtures — the finding it documents is what the
 > fix was derived from, so both the pre-fix reading and its resolution belong in the file.
-> Detail: `.superpowers/sdd/progress.md` (carried defect #6 entry).
+> Detail: `the removed session progress log (2026-10-01)` (carried defect #6 entry).
 
 ### 5.3 The domain router's five mis-maps
 

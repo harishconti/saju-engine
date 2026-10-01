@@ -1,6 +1,6 @@
 # Cosmic Saju — Market Research (September 2026)
 
-> **Purpose:** an auditable fact base for the go-to-market decisions in `../improvements_issues.md`.
+> **Purpose:** an auditable fact base for the go-to-market decisions and positioning.
 > **Method:** 15 web searches / direct fetches on 2026-09-07, cross-checked against the deep-dive
 > research report at `research-engine/output/2026-09-07/report-saju.html`. Every claim below carries
 > a confidence flag and a source.
@@ -250,7 +250,7 @@ MCP, so even that entry point is contested.
   (80% minus compute, pay-per-event).
 
 **Verdict:** revisit only when B2C has proven the narrative asset has weekly active users. Trigger
-condition in `../improvements_issues.md` §10.
+condition noted in this file's positioning section.
 
 > Query: `MCP server monetization 2026 paid revenue how many servers`
 > Sources: https://mcp-marketplace.io/blog/state-of-mcp-monetization-2026 ·

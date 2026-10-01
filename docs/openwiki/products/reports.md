@@ -2,13 +2,12 @@
 
 > **Positioning (2026-09-07 pivot):** target market is English-speaking global (K-culture fans,
 > diaspora), priced in USD. India is a Phase-2 experiment only. Canonical line: *"an accurate engine
-> and an honest interpreter — not a Korean master."* See `improvements_issues.md` and
-> `docs/market-research-2026-09.md`.
+> and an honest interpreter — not a Korean master."* See `docs/market-research-2026-09.md`.
 
 ## Single-chart products
 
 Legacy internal names are still accepted by the engine but should not be advertised to new clients.
-Prices are USD launch prices — see `improvements_issues.md` §4 for ranges and the pricing risk.
+Prices are USD launch prices — see `docs/market-research-2026-09.md` for ranges and the pricing risk.
 
 | Client-facing name | Engine tier | Price | Pages | Contents |
 |---|---:|---:|---:|---|

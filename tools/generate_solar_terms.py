@@ -9,7 +9,7 @@ from an ephemeris and writes ``src/saju_engine/data/solar_terms.csv``.
 
 Method: apparent geocentric solar longitude from PyEphem (libastro VSOP87),
 corrected for nutation (four largest terms) and aberration (-20.496"), matching
-``docs/audits/scripts/check_solar_terms.py``. Calibrated to published 2024 KASI/
+the removed audit script (deleted in the 2026-10-01 cleanup). Calibrated to published 2024 KASI/
 HKO values within ~3 s (立春 08:26:53 UTC, 芒種 04:09:56, 立冬 22:19:46).
 
 Usage::

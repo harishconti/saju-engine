@@ -1,7 +1,6 @@
 # Saju Project Memory
 
 > **Context file:** `CLAUDE.md` (primary agent persona + ground rules)  
-> **Task tracker:** `tasks.md`  
 > **Project overview:** `README.md`  
 > This file tracks persistent facts, decisions, and conventions that should be remembered across sessions when working on the saju repo.
 
@@ -16,8 +15,7 @@
 ## Current State (last updated 2026-09-26)
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"
-  below and `docs/audits/2026-09-26-deep-engine-audit-verification.md` for the live tracker of the
-  second pass. **Suite: 1136 passed / 9 xfailed / 0 failed.** Validation gate:
+  below. The 2026-09 audit reports that tracked this work were removed in the 2026-10-01 cleanup. **Suite: 1136 passed / 9 xfailed / 0 failed.** Validation gate:
   `python3 tools/run_validation.py` → `206 (PASS 202, INTERPRETATION 4, FAIL 0)`. `ruff check
   --select F src tools tests` is now clean and enforced in CI (was not run in CI before this pass).
   **All three doctrinal items are now implemented:** **N-5** (yin-DM strength now scores
@@ -51,7 +49,7 @@
   W4 용신 13, W5 조후 30, W6 compat+career 59). Gate commands and expected output:
   `python3 tools/run_validation.py` → `194 (PASS 189, INTERPRETATION 5, FAIL 0)`, exit 0, stdout md5
   `9626959ad9b18f658fa49adb1b3ebeee`. The rendered report
-  `docs/audits/2026-09-engine-validation-report.md` is **produced by that tool — never hand-edit it**;
+  `tmp/engine-validation-report.md` is **produced by that tool — never hand-edit it**;
   current render md5 `c697db8f529cb992f07de623598869b4`.
 - **Post-campaign fix wave landed (2026-09-14) — tree is CLEAN, not dirty.** The user directed work on
   the 13 loose ends the campaign pinned but didn't fix (see `memory/saju-open-defects-triage.md` in
@@ -76,7 +74,7 @@
   follow-ups) is still in progress, not complete — see "Active Wishes / Open Items" below. Two
   **product decisions** (not defects) remain surfaced but undecided: #10 (조후-vs-억부 gate width)
   and whether `climate.py` should expand to the full 寒暖燥濕 four-way 궁통보감 reading.
-- **Products implemented** (USD, after the 2026-09-07 pivot — see `improvements_issues.md`):
+- **Products implemented** (USD, after the 2026-09-07 pivot — see `docs/market-research-2026-09.md`):
   - **The Hook** (`sample`) — free 1-page report.
   - **The Essential Report** (`essential`) — $9 intro → $19, 6–7 pages.
   - **The Deep Destiny Report** (`deep`) — $55, 10–12 pages.
@@ -95,9 +93,7 @@ honest interpreter — not a Korean master."* Lowest-CAC channel is organic shor
 compatibility (궁합) product is the marketing hero. Realistic revenue ceiling with manual
 fulfilment: ~$1–3K/month; most likely 12-month outcome is a kill/skip.
 
-- **Master execution doc:** `improvements_issues.md` (root) — issues, backlog (P0–P3), pricing, plan.
 - **Sourced research:** `docs/market-research-2026-09.md` — every market number with a confidence flag.
-- **Design spec:** `docs/superpowers/specs/2026-09-07-saju-business-refinement-design.md`.
 - **P0 blockers fixed 2026-09-07:** G1 (reviewer-note leak into client PDFs), G2 (per-pillar template
   grammar), G3 (용신 single source of truth via `src/saju_engine/yongsin.py` + provenance), G6 (₹→USD
   in engine text). Suite 568 → 590.
@@ -120,13 +116,9 @@ fulfilment: ~$1–3K/month; most likely 12-month outcome is a kill/skip.
 |---|---|
 | Agent persona / ground rules | `CLAUDE.md` |
 | Project overview & quickstart | `README.md` |
-| Prioritized task list & changelog | `tasks.md` |
 | This memory file | `docs/MEMORY.md` |
 | Engine issue tracker + fix history | `docs/issues_bugs.md` |
-| Go-to-market strategy, product/landing issues, backlog | `improvements_issues.md` (root) |
 | Sourced market research | `docs/market-research-2026-09.md` |
-| Historical engine/architecture audits | `docs/audits/` |
-| Design specs + implementation plans | `docs/superpowers/` |
 | Reference doc site | `docs/openwiki/` |
 | Knowledge base (interpretive reference) | `knowledge/00-glossary.md` through `knowledge/17-climate-method.md` |
 | Calculation engine | `src/saju_engine/` |
@@ -137,8 +129,6 @@ fulfilment: ~$1–3K/month; most likely 12-month outcome is a kill/skip.
 | Per-candidate readings | `candidates_horoscope/reports/{slug}/` |
 | Client intake records (gitignored — may hold PII) | `candidates_horoscope/intake/` |
 | Slash commands | `.claude/commands/saju.md`, `.claude/commands/saju-client.md` |
-| Codex project instructions | `docs/codex/instructions.md` |
-| Codex skills (user-level) | `~/.codex/skills/saju-reading/`, `~/.codex/skills/saju-client-order/` |
 
 ## Conventions
 
@@ -203,8 +193,7 @@ python3 src/saju_html/md_to_saju_compat_pdf.py <compat.md> --name-a ... --name-b
 
 ## Active Wishes / Open Items
 
-See `improvements_issues.md` §12 for the prioritised P0–P3 backlog and `tasks.md` for the engine
-history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P1 items:
+As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P1 items:
 - **Merchant-of-Record checkout** (Lemon Squeezy / Paddle) for paid tiers and the Companion subscription — nothing is charged today.
 - **Real testimonials** on the landing page — the current ones are flagged illustrative and must be replaced or removed before launch (FTC risk).
 - Self-service app hardening: encrypt PII, background queue, auth (`tools/client_intake_app.py`).
@@ -348,14 +337,14 @@ history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P
     `eff_date` / `_effective_calendar_date`) that had left the CI `ruff check --select F` gate red.
   - Gates: suite **1096 passed / 9 xfailed / 0 failed**; validation `204 (PASS 200, INTERPRETATION
     4, FAIL 0)`; `ruff check --select F src tools tests` clean. Tracker updated:
-    `docs/audits/2026-09-26-deep-engine-audit-verification.md`. N-6 (조후 gate threshold) remains
+    the second-pass audit verification. N-6 (조후 gate threshold) remains
     open pending research. **Client reports were not regenerated** — run `tools/regen_client_reports.sh`
     and diff Quick Reference blocks before re-sending (verdicts/elements are unchanged; the
     reasoning line and pattern lines move).
 
 - **2026-09-26 (second deep engine audit, 11 of 22 fixed + 3 doctrinal decisions recorded, Suite →
   1094)** — A separate session ran a fresh from-scratch audit
-  (`docs/audits/2026-09-26-deep-engine-audit.md`, N-1..N-22) against the same baseline the
+  (N-1..N-22) against the same baseline the
   F-1..F-16 pass below started from (so it did not know about those fixes), merged via PR #4.
   Cross-referenced against F-1..F-16 first (N-1/N-9-partial/N-16-partial were already fixed),
   then fixed the rest of the audit's recommended order: **N-2** (절기 override compared solar time
@@ -380,7 +369,7 @@ history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P
   **N-9's 양인격/건록격** month-branch question (자평진전's 월령-based grids vs. the current
   year/day/hour-only rule, uncitable independently) → decided: support both, labeled differently,
   not yet implemented. Full tracker with fix-log commit hashes:
-  `docs/audits/2026-09-26-deep-engine-audit-verification.md`. **Still open, not started:** N-3
+  the verification. **Still open, not started:** N-3
   (ephemeris-accurate 절기 table — the largest remaining item), N-12 (hidden-stem qi weights), N-13
   (IANA timezone/DST redesign), N-15's remainder (절기-proximity disclosure), N-18/N-19 (range-edge
   crashes; N-19's dead `month_season_score` half is now fixed by N-5, its Wood tie-break half
@@ -405,7 +394,7 @@ history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P
   judged disproportionate for a P3 item). Suite 1034 → 1068 passed / 9 xfailed. Committed and
   pushed as `3fc4d1f`.
 - **2026-09-14 (full-engine architecture audit, documentation-only)** — Wrote
-  `docs/audits/2026-09-14-full-architecture-audit.md`: a design/robustness review of every
+  a design/robustness review of every
   calculation subsystem (distinct from the validation campaign's classical-source-correctness
   check). Full reads of `engine.py`, `daeun.py`, `pillars.py`, `sewoon.py`, `lookup.py`,
   `strength.py`, `chart.py`; targeted reads of `patterns.py`/`stars.py`; compared against two
@@ -435,12 +424,11 @@ history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P
   failed**; validation CLI unchanged `194 (PASS 189, INTERPRETATION 5, FAIL 0)`.
 - **2026-09-13 → 2026-09-14 (Engine Validation Campaign — COMPLETE, Suite 649 → 883)** — Independent
   validation of the whole engine against classical sources, run as spec + Plans 1–6
-  (`docs/superpowers/specs/2026-09-13-engine-validation-campaign-design.md`,
-  `docs/superpowers/plans/2026-09-13-engine-validation-plan-{1-foundation-pillars,2-daeun-sewoon,
+  (design spec + plan,
   3-lookups,4-yongsin,5-climate,6-compat-career}.md` — all six now **deleted**, superseded by this
   entry + `docs/research/2026-09-validation-*.md` + the rendered report). Built a permanent
   validation harness: `src/saju_engine/validation.py` + `tools/run_validation.py` (`python3
-  tools/run_validation.py` → renders `docs/audits/2026-09-engine-validation-report.md`, **never
+  tools/run_validation.py` → renders `tmp/engine-validation-report.md`, **never
   hand-edit it**) + `tests/validation/` fixtures. **Certified 194 checks / 189 PASS / 5
   INTERPRETATION / 0 FAIL across 8 subsystems**: W1 pillars 17, W2 대운·세운 19, W3
   십신/12운성/납음/공망 56, W4 용신 13, W5 조후 30, W6 compat+career 59. Each workstream is backed by
@@ -489,10 +477,9 @@ history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P
   published charts); the real gap was that 용신 determination only implemented 抑扶
   (strength-balance) — missing 조후 (climate-balance, 궁통보감/적천수), both cited in CLAUDE.md's
   persona but never wired into `knowledge/09-interpretation-method.md` Step 3 or the code. Full
-  design in `docs/superpowers/specs/2026-09-13-climate-favorable-element-design.md`, plan in
-  `docs/superpowers/plans/2026-09-13-climate-favorable-element.md`, executed via
+  design + plan, executed via
   subagent-driven-development (adapted for no-git: no commits/worktrees, reviewers read files
-  directly — ledger `.superpowers/sdd/progress.md`). **What shipped:**
+  directly). **What shipped:**
   - New `src/saju_engine/climate.py` (`assess_climate(month_branch)`): a conservative, general
     season-based model — 巳午未 (hot) → Water, 亥子丑 (cold) → Fire, everything else → no override.
     Deliberately NOT a fabricated per-stem-per-month 궁통보감 table (no source text was available).
@@ -562,7 +549,7 @@ history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P
   landed too: `premium_report` practical-guidance lists now emit `-` bullets (were rendering
   `1. 1. 1.`), and the reportlab inline renderer now handles `_underscore italic_`. Suite **627**.
 - **2026-09-08 (Better Reports — plan complete)** — Executed
-  `docs/superpowers/plans/2026-09-07-better-reports.md` Tasks 1–16 inline. **Track B:**
+  Tasks 1–16 of the better-reports plan inline. **Track B:**
   `knowledge/12`–`16` (career / wealth / directions / health / date-selection) now exist,
   are Hanja-compliant, wired into the method / glossary / `CLAUDE.md` / `.claude/commands/saju.md`
   / openwiki, and back the engine's interpretive tables (`report_data.py` `# source:` comments +
@@ -573,20 +560,19 @@ history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P
   after the Closing Note — wired into `premium_report.py`, `skeleton.py`, `compat_report.py`.
   `strip_source_citations` eats the leading space; `combine_candidate_report.py` keeps the
   glossary last. RM demo set regenerated leak-free. Suite 594 → **625**; PDF backends + compat
-  renderer + landing `npm run build` green. Resume ledger: `.superpowers/sdd/progress.md`.
+  renderer + landing `npm run build` green.
 - **2026-09-07 (landing redesign — shipped)** — Full `apps/landing-page` restructure:
   ~15 sections → ~9, proof-first arc, new Saju visual system (`src/components/viz/`), premium-editorial
   aesthetic, elemental palette tokens, `四柱` watermark. Deletes `WhatIsSaju` / `WhatYouReceive` /
-  `TrustClarity` / `ImportantDetails` / `ComparisonTable`. Spec + plan in `docs/superpowers/`;
-  tracker `improvements_issues.md` §5a (LP13).
+  `TrustClarity` / `ImportantDetails` / `ComparisonTable`.
 - **2026-09-07 (repo housekeeping)** — Deleted cruft (`!`, `.coverage`, `.pytest_cache/`,
   `.playwright-mcp/`, stray root PNGs, `rm-deep.md` dup, 12 intake test files). Archived the 3
-  audit reports → `docs/audits/` (+ index README). Deleted 4 completed plan docs (`docs/PLAN.md`,
+  audit reports. Deleted 4 completed plan docs (`docs/PLAN.md`,
   `docs/plans/*`, `.claude/plan.md`). `misc/market_research/` kept with a SUPERSEDED banner.
   `.gitignore` extended (node_modules, .next, intake/, .remember/, settings.local.json).
   `.claude/settings.local.json` trimmed from ~250 stale allowlist entries to a compact set.
   `docs/issues_bugs.md` paths `tools/ → src/`. New file map in README + `docs/MEMORY.md`.
-- **2026-09-07** — Go-to-market pivot to English-speaking-global / USD (see `improvements_issues.md`,
+- **2026-09-07** — Go-to-market pivot to English-speaking-global / USD (see
   `docs/market-research-2026-09.md`). Fixed 3 client-facing engine defects: G1 reviewer-note leak
   (`premium_report._reviewer_note`, `strip_source_citations`), G2 per-pillar template grammar, G3
   용신 single source of truth (`src/saju_engine/yongsin.py` — `favorable_element()` +
@@ -595,9 +581,9 @@ history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P
   candidate/landing prices ₹→USD. Landing page (`apps/landing-page`) repositioned; testimonials
   flagged illustrative. Suite 568 → 590; landing build + 107 vitest green. RM + pawan_sruthi demo
   reports/PDFs regenerated leak-free.
-- **2026-06-28** — Added Codex support: `docs/codex/instructions.md` plus `saju-reading` and `saju-client-order` skills in `~/.codex/skills/`.
+- **2026-06-28** — Added Codex support (`saju-reading` and `saju-client-order` skills in `~/.codex/skills/`); the in-repo Codex instructions were removed in the 2026-10-01 cleanup.
 - **2026-06-28** — Marriage-compatibility engine (`compat.py`), 16-section report generator (`compat_report.py`), Nayin lookup (`nayin.py`), two-chart intake form + server, standalone compat PDF renderer, and `knowledge/11-gunghap.md` reference completed.
-- **2026-06-28** — Repo cleanup: deleted old `docs/`, `ENGINE_SPEC.md`, `ENGINE_RESEARCH.md`. Documentation surface then lived in `README.md`, `CLAUDE.md`, `tasks.md`, `candidates_horoscope/README.md`, and this `MEMORY.md`.
+- **2026-06-28** — Repo cleanup: deleted old `docs/`, `ENGINE_SPEC.md`, `ENGINE_RESEARCH.md`. Documentation surface then lived in `README.md`, `CLAUDE.md`, `candidates_horoscope/README.md`, and this `MEMORY.md`.
 - **2026-07-06** — Repo-root reorganization: created `docs/` and consolidated project memory, issue tracker, engine audit, plan artifacts, OpenWiki stubs, and Codex instructions there. Deleted stray files/dirs (`:`, `=0.2.0`, `=4.1`, `EOF`, `.coverage`, `.pytest_cache/`) and added coverage/cache artifacts to `.gitignore`.
 - **2026-06-27** — Added landing-page tiers (`sample`/`essential`/`deep`) and `/saju-client` slash command.
 - **2026-06-22** — Self-service FastAPI calculator, tiered intake form, combined-report combiner, colored Element Balance rendering, citation stripping in PDFs.
@@ -605,7 +591,7 @@ history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P
 
 ## Codex-Specific Notes
 
-- Project-level Codex instructions live in `docs/codex/instructions.md`.
+- Project-level Codex instructions were removed in the 2026-10-01 cleanup.
 - Two user-level skills are installed in `~/.codex/skills/` for auto-discovery:
   - `saju-reading` — single-chart reading workflow.
   - `saju-client-order` — client order fulfillment workflow.
@@ -616,4 +602,4 @@ history. As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P
 At the start of a new session working on this repo, read:
 1. `MEMORY.md` (this file) for state, conventions, and quick commands.
 2. `CLAUDE.md` for persona, ground rules, and interpretive workflow.
-3. `tasks.md` for the prioritized work list and change log.
+3. `docs/issues_bugs.md` for the engine issue tracker and change log.

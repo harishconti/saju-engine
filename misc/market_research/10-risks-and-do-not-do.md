@@ -245,5 +245,5 @@ In rough order of likelihood:
 - [DPDP Act 2023 (India)](https://www.meity.gov.in/data-protection-framework)
 - [Indian Penal Code § 508 (criminal intimidation by threat of divine displeasure)](https://indiankanoon.org/doc/615953/)
 - Existing project: [CLAUDE.md](../../CLAUDE.md)
-- Existing project: [tasks.md](../../tasks.md)
+- Existing project: [README.md](../../README.md)
 - Existing project: [ISSUES_FOUND.md](../../ISSUES_FOUND.md)

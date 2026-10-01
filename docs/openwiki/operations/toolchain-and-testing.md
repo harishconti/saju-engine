@@ -64,7 +64,7 @@ pytest tests/test_pdf.py
    ```
 3. Run `pytest tests/test_textbook_cases.py -v` and confirm the engine matches.
 4. If there is any discrepancy, leave the case as `pytest.mark.xfail` and document the divergence in the test docstring.
-5. Update `docs/MEMORY.md`, `MEMORY.md`, and `tasks.md` with the new case and test count.
+5. Update `docs/MEMORY.md` with the new case and test count.
 
 ## Adding a new classical star
 
@@ -153,4 +153,3 @@ pytest tests/test_textbook_cases.py::test_park_chung_hee -v
 - `tests/test_textbook_cases.py`
 - `tests/test_nayin.py`
 - `tests/test_pdf.py`
-- `tasks.md`
