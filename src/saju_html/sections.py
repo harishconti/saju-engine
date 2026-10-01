@@ -12,7 +12,12 @@ from __future__ import annotations
 
 import re
 
-from saju_html.svg_charts import _build_decade_roadmap_svg
+from saju_html.svg_charts import (
+    _build_decade_roadmap_svg,
+    build_luck_bars_svg,
+    build_luck_classes_svg,
+    build_luck_timeline_svg,
+)
 
 
 def _section_bounds(html: str, heading_re: str) -> tuple[int, int] | None:
@@ -160,6 +165,97 @@ def _wrap_decade_roadmap(html: str) -> str:
         f"<!-- decade-roadmap:start -->\n{svg}\n<!-- decade-roadmap:end -->"
     )
     return html[: start_match.start()] + replacement + html[end_match.end():]
+
+
+# ── Luck-cycle report charts ────────────────────────────────────────────────
+
+def _marker_bounds(html: str, name: str):
+    """Return (start, end, inner) for a `<!-- name:start -->…<!-- name:end -->`
+    marker pair, tolerating the HTML-escaped form the parser emits when
+    `html: False` is set (see `_wrap_decade_roadmap`)."""
+    start = re.search(
+        rf"(?:<p>)?(?:<!--|&lt;!--)\s*{name}:start\s*(?:-->|--&gt;)(?:</p>)?", html, re.I)
+    end = re.search(
+        rf"(?:<p>)?(?:<!--|&lt;!--)\s*{name}:end\s*(?:-->|--&gt;)(?:</p>)?", html, re.I)
+    if not start or not end or end.start() < start.end():
+        return None
+    return start.start(), end.end(), html[start.end():end.start()]
+
+
+def _table_rows(inner: str) -> list[list[str]]:
+    rows: list[list[str]] = []
+    table = re.search(r"<table\b.*?</table>", inner, re.DOTALL)
+    if not table:
+        return rows
+    for tr in re.findall(r"<tr[^>]*>(.*?)</tr>", table.group(0), re.DOTALL):
+        cells = [
+            re.sub(r"<[^>]+>", "", td).strip()
+            for td in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", tr, re.DOTALL)
+        ]
+        rows.append(cells)
+    return rows
+
+
+def _replace_marker(html: str, name: str, svg: str) -> str:
+    bounds = _marker_bounds(html, name)
+    if not bounds or not svg:
+        return html
+    start, end, _inner = bounds
+    return html[:start] + svg + html[end:]
+
+
+def _wrap_luck_timeline(html: str) -> str:
+    """Replace the luck-cycle timeline table with an SVG."""
+    bounds = _marker_bounds(html, "luck-timeline")
+    if not bounds:
+        return html
+    rows = _table_rows(bounds[2])
+    data = []
+    for r in rows:
+        if len(r) < 6 or not r[0] or r[0].lower().startswith("years"):
+            continue
+        data.append((r[0], r[5].replace("⟵ you are here", "").strip()))
+    svg = build_luck_timeline_svg(data)
+    return _replace_marker(html, "luck-timeline", svg)
+
+
+def _wrap_luck_favorable(html: str) -> str:
+    bounds = _marker_bounds(html, "luck-favorable")
+    if not bounds:
+        return html
+    rows = _table_rows(bounds[2])
+    data = []
+    for r in rows:
+        if len(r) < 4 or not r[0] or r[0].lower().startswith("years"):
+            continue
+        try:
+            data.append((r[0], float(r[1]), float(r[3])))
+        except ValueError:
+            continue
+    svg = build_luck_bars_svg(data, "Favorable vs. unfavorable years per block",
+                              "Favorable-Cycle Chart", maxv=5.0)
+    return _replace_marker(html, "luck-favorable", svg)
+
+
+def _wrap_luck_classes(html: str) -> str:
+    bounds = _marker_bounds(html, "luck-classes")
+    if not bounds:
+        return html
+    rows = _table_rows(bounds[2])
+    order = ["Companion", "Output", "Wealth", "Authority", "Resource"]
+    data = []
+    for r in rows:
+        if len(r) < 6 or not r[0] or r[0].lower().startswith("years"):
+            continue
+        counts = {}
+        for j, cls in enumerate(order):
+            try:
+                counts[cls] = int(r[1 + j])
+            except ValueError:
+                counts[cls] = 0
+        data.append((r[0], counts))
+    svg = build_luck_classes_svg(data, "Ten-god class rhythm per five-year block")
+    return _replace_marker(html, "luck-classes", svg)
 
 
 def _wrap_chart_signature(html: str) -> str:
