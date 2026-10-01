@@ -61,7 +61,7 @@ The project itself is evidence of demand:
 
 1. **6 paid pilots already executed** at the Full Map tier (₹3,499), each with a bespoke Markdown + PDF deliverable: Sruthi, Pawan, Harish, Gurumoorthy, Mahesh, Vishnu Priya. All on the same South-Indian client network, mostly via referral.
 2. **Existing intake submissions** in `candidates_horoscope/intake/` from the self-service calculator (4 test files as of 2026-06-22).
-3. **Cross-candidate joint analysis** (`reports/cross-candidate-business-analysis.md`) was the highest-value deliverable to the trio — a clear signal that **business / venture analysis is the most demanded use case**, not generic "what does my chart say."
+3. **Cross-candidate joint analysis** (`cross-candidate-reports/cross-candidate-business-analysis.md`) was the highest-value deliverable to the trio — a clear signal that **business / venture analysis is the most demanded use case**, not generic "what does my chart say."
 
 ## 6. Demand by use case
 
