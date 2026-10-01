@@ -268,9 +268,20 @@ def generate_skeleton(
     if chart.strength_assessment:
         sa = chart.strength_assessment
         rounded_counts = {k: round(v, 1) for k, v in sa["element_counts"].items()}
+        # 2026-09-14 audit §5 item 1: render the RESOLVED 용신 set (climate +
+        # reader aware) as the headline; keep the raw 억부 candidate visible
+        # (clearly labelled) so the reader can still see the pre-resolution pick.
+        from .yongsin import favorable_element
+        fe = favorable_element(chart)
         lines += [
             f"- **Verdict**: {sa['verdict']}",
-            f"- **Candidate 용신**: {sa['candidate_favorable']}",
+            f"- **Resolved 용신**: {fe.element} ({fe.method})",
+            f"- **Resolved 희신**: {fe.supporting}",
+            f"- **Resolved 기신**: {fe.unfavorable or '—'}",
+            # The raw pick is diagnostic output here (explicitly labelled
+            # pre-climate/unresolved), not a 용신 to render — the resolved
+            # element above it comes from yongsin.favorable_element().
+            f"- **Raw 억부 candidate (pre-climate, unresolved)**: {sa.get('_raw_unresolved_favorable')}",
             f"- **Candidate 희신**: {sa['candidate_supporting']}",
             f"- **Candidate 기신**: {sa.get('candidate_unfavorable') or '—'}",
             f"- **Total score**: {round(sa['total_score'], 2)}",
@@ -379,7 +390,7 @@ def generate_skeleton(
     lines += [
         "## Sources & Limits",
         "",
-        "- Engine output from `tools/saju_engine/`.",
+        "- Engine output from `src/saju_engine/`.",
         "- Interpretive framework from `knowledge/09-interpretation-method.md`.",
         "- This reading describes tendencies, not fixed outcomes.",
     ]

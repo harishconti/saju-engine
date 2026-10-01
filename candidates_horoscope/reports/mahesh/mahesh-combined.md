@@ -47,6 +47,7 @@
 - **Day Master:** Gyeong (Yang Metal, 庚金)
 - **Strength:** Balanced — the month branch **丑** gives the Day Master a **mixed seasonal baseline** by element relation (per knowledge/09-interpretation-method.md Step 2); its 12운성 stage there is **묘 (墓)** — energy is stored in the month branch; the chart ripens slowly and reveals depth over time (knowledge/06-twelve-stages.md). Peer/resource support and the output/wealth/authority drain sit close to even.
 - **Favorable Element:** Fire — The Day Master reads as balanced, so the classical 조후 (climate-balance) check applies: this chart peaks in cold winter conditions, and the classical remedy is Fire. This takes priority over the chart's simple element count, which is a weaker signal than the classical climate check here.
+- **Why this element:** two classical checks apply here — the strength-balance (억부) reading points one way, while the climate-balance (조후) reading points to **Fire** for a cold-season chart. In this chart the climate reading takes priority because the chart leans clearly seasonal; the reader has weighed both.
 - **Supporting Element:** Wood
 - **Avoid / Watch:** Metal (기신, watch) · Water (구신, restrains Fire) · Earth (한신, drains Fire)
 - **Current Major Luck:** 庚辰 (ages 25-34)

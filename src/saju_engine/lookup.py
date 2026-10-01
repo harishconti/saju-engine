@@ -82,15 +82,34 @@ JIAZI_CYCLE: List[Tuple[str, str]] = [
 
 
 def cycle_index(stem: str, branch: str) -> int:
-    """Return the position (0–59) of (stem, branch) in the 60-cycle."""
-    s_idx = STEM_INDEX[stem]
-    b_idx = BRANCH_INDEX[branch]
-    if s_idx % 2 != b_idx % 2:
-        raise ValueError(f"{stem}{branch} is not a valid 60-cycle pair (yin/yang mismatch)")
-    for i in range(60):
-        if i % 10 == s_idx and i % 12 == b_idx:
-            return i
-    raise ValueError(f"no cycle index for {stem}{branch}")
+    """Return the position (0–59) of (stem, branch) in the 60-cycle.
+
+    O(1) (2026-09-14 architecture audit §4.4): a precomputed dict keyed by
+    the combined two-character string, built once at import from the same
+    parity-checked derivation the old linear scan used. The scan sat in hot
+    loops (per-period 대운 stepping, per-day 월운/일운 pillars) and was the
+    stated performance ceiling for any future batch/API surface; the map
+    removes it at negligible cost. Behaviour is identical, including the
+    ValueError on a yin/yang-mismatched pair.
+    """
+    idx = _CYCLE_INDEX_BY_PAIR.get(f"{stem}{branch}")
+    if idx is None:
+        s_idx = STEM_INDEX[stem]
+        b_idx = BRANCH_INDEX[branch]
+        if s_idx % 2 != b_idx % 2:
+            raise ValueError(f"{stem}{branch} is not a valid 60-cycle pair (yin/yang mismatch)")
+        raise ValueError(f"no cycle index for {stem}{branch}")
+    return idx
+
+
+# Precomputed (stem+branch) → 0–59 map, built once at import. Only the 60
+# parity-valid pairs of the 10×12 grid exist in the cycle; the builder below
+# enforces the same invariant the scan did.
+_CYCLE_INDEX_BY_PAIR: Dict[str, int] = {}
+for _i in range(60):
+    _s, _b = JIAZI_CYCLE[_i]
+    _CYCLE_INDEX_BY_PAIR[f"{_s}{_b}"] = _i
+del _i, _s, _b
 
 
 def step_cycle(stem: str, branch: str, n: int) -> Tuple[str, str]:

@@ -46,7 +46,7 @@
 
 - **Day Master:** Gi (Yin Earth, 己土)
 - **Strength:** Strong — the month branch **未** gives the Day Master a **seasonally supported baseline** by element relation (per knowledge/09-interpretation-method.md Step 2); its 12운성 stage there is **관대 (冠帶)** — the querent grows into form gradually; adolescence and early adulthood often bring ambition (knowledge/06-twelve-stages.md). Peer/resource support and the output/wealth/authority drain sit close to even.
-- **Favorable Element:** Metal — Favorable element confirmed by the reader from the full classical analysis.
+- **Favorable Element:** Metal — Favorable element confirmed by the reader from the full classical analysis. *Confirmed by a human reader from the full classical analysis.*
 - **Supporting Element:** Water
 - **Avoid / Watch:** Earth
 - **Current Major Luck:** 丁丑 (ages 56-65)

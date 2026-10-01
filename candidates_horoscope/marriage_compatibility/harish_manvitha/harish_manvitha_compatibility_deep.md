@@ -37,7 +37,7 @@
 | Nayin harmony | 납음오행 (納音五行) | -3 | 5 | Yellow Flag |
 | Favorable element cross-supply | 용신 궁합 (用神 宮合) | +5 | 12 | Moderate |
 | Day-pillar pair classification | 일주 궁합 (日柱 宮合) | +3 | 15 | Soft |
-| Combined element balance | 결합 오행 (結合 五行) | +9 | 12 | Strong |
+| Combined element balance *(descriptive — not counted toward the composite)* | 결합 오행 (結合 五行) | +9 | — | Strong |
 | Ten-god cross-relationship | 십신 교차 (十神 交叉) | +10 | 10 | Strong |
 | Major luck synchrony | 대운·세운 동기 (大運·歲運 同期) | +1 | 5 | Soft |
 | Compatibility star overlays | 신살 궁합 (神殺 宮合) | +0 | 5 | Soft |

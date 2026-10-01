@@ -46,7 +46,7 @@
 
 - **Day Master:** Bing (Yang Fire, 丙火)
 - **Strength:** Balanced — the month branch **子** gives the Day Master a **seasonally weak baseline** by element relation (per knowledge/09-interpretation-method.md Step 2); its 12운성 stage there is **태 (胎)** — new potential is forming; early life may feel preparatory rather than openly productive (knowledge/06-twelve-stages.md). The output/wealth/authority drain outweighs the peer and resource support — the element-relation season above (weighted more heavily in the overall formula) is what pulls the total back into the balanced range despite that skew.
-- **Favorable Element:** Earth — Favorable element confirmed by the reader from the full classical analysis.
+- **Favorable Element:** Earth — Favorable element confirmed by the reader from the full classical analysis. *Confirmed by a human reader from the full classical analysis.*
 - **Supporting Element:** Fire
 - **Avoid / Watch:** Water (기신, watch) · Wood (구신, restrains Earth) · Metal (한신, drains Earth)
 - **Current Major Luck:** 丁卯 (ages 28-37)
@@ -773,3 +773,10 @@ Listen once in full, then return to the chapters that match the season you are i
 - **Companion (比肩):** a peer or equal — support, solidarity, and rivalry in equal measure
 - **Eating God (食神):** gentle output — talent, making, teaching, slow enjoyable accumulation
 - **Hurting Officer (傷官):** sharp output — bold expression, creativity, friction with rules and authority
+
+## Sources & Limits
+
+- Classical framework: 적천수 (滴天髓), 연해자평 (淵海子平), 궁통보감 (窮通寶鑑), 명리정종, 자평진전 — as compiled in `knowledge/`.
+- Method: `knowledge/09-interpretation-method.md` (9-step procedure).
+- This reading describes tendencies, not fixed outcomes; it is for reflection and entertainment — not medical, legal, or financial advice.
+- The engine's heuristic verdicts (strength, 용신) are marked provisional where the classical sources disagree; a qualified reader confirms the final reading.

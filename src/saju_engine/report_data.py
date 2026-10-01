@@ -73,6 +73,18 @@ TIER_CONFIG: Dict[str, Dict[str, str]] = {
         "tagline": "Your complete Saju reading — personality, career, relationships, health, and the next 3 years",
     },
     "fullmap": {
+        # V7 (2026-09-14 audit §9.8): the RENDERED BODY of `fullmap` is
+        # byte-identical to `deep` (premium_report._deep_tier_sections serves
+        # both), so the "$129 / 18–22 pages" metadata below is NOT a claim the
+        # engine can back. It is kept unchanged deliberately, as the legacy
+        # commercial terms for already-sold legacy deliverables — `fullmap` is
+        # a retired tier that must not be sold to new clients (see CLAUDE.md),
+        # so no new buyer can be misled by it, and rewriting the price would
+        # silently restate terms on documents already paid for.
+        #
+        # Consequence to keep in mind: a regenerated legacy fullmap cover says
+        # "The Full Map · $129" above a deep-tier body. `pages` is not printed
+        # by `_section_cover`, so only the price/name appear client-facing.
         "name": "The Full Map",
         "price": "$129",
         "pages": "18–22",

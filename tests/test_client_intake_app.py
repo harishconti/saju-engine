@@ -44,6 +44,69 @@ def test_compat_generate_does_not_forward_raw_candidate_favorable_as_override():
     source = APP_PATH.read_text()
     assert '.get("candidate_favorable")' not in source
     assert "strength_assessment[\"candidate_favorable\"]" not in source
+    assert "strength_assessment[\"_raw_unresolved_favorable\"]" not in source
+
+
+def test_no_module_reads_the_raw_favorable_field_outside_the_permitted_set():
+    """2026-09-14 audit §5 item 2, closed form: the raw pick is published
+    ONLY as ``_raw_unresolved_favorable`` (no ``candidate_favorable`` alias).
+    Four modules had adopted the old name as if it were a public 용신 field, and
+    two of them shipped a pre-climate element to clients.
+
+    Permit reads only in the producer (strength.py), the resolver
+    (yongsin.py) and the validation harness (validation.py, which compares raw
+    vs resolved by design). daeun_overlay.py is the one intentional
+    exception: its overlay displays the strength-heuristic pick explicitly and
+    is covered by its own note.
+    """
+    import ast
+    import pathlib
+
+    import saju_engine
+
+    RAW = "_raw_unresolved_favorable"
+    LEGACY = "candidate_favorable"
+    src_root = pathlib.Path(saju_engine.__file__).parent
+    # Reads of the raw key are permitted only where the value is used AS the
+    # raw diagnostic (or compared against the resolved value on purpose).
+    # skeleton.py is included because its snapshot line is explicitly labelled
+    # "Raw 억부 candidate (pre-climate, unresolved)" and sits beside the
+    # resolved element — the self-flag the underscore prefix exists for.
+    permitted = {
+        "strength.py", "yongsin.py", "validation.py",
+        "daeun_overlay.py", "skeleton.py",
+    }
+
+    def _string_accesses(text):
+        """Return the string literals used as a subscript key or a .get()/.pop()
+        argument — i.e. real field reads, ignoring comments and docstrings."""
+        found = []
+        for node in ast.walk(ast.parse(text)):
+            if isinstance(node, ast.Subscript) and isinstance(node.slice, ast.Constant):
+                if isinstance(node.slice.value, str):
+                    found.append(node.slice.value)
+            elif (
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)
+                and node.func.attr in ("get", "pop", "setdefault")
+                and node.args
+                and isinstance(node.args[0], ast.Constant)
+                and isinstance(node.args[0].value, str)
+            ):
+                found.append(node.args[0].value)
+        return found
+
+    offenders = []
+    for path in sorted(src_root.glob("*.py")):
+        if path.name in permitted:
+            continue
+        for key in _string_accesses(path.read_text(encoding="utf-8")):
+            if key in (RAW, LEGACY):
+                offenders.append(f"{path.name}:{key}")
+    assert not offenders, (
+        f"modules outside {sorted(permitted)} read the raw favorable field: {offenders}. "
+        "Client-facing 용신 must come from yongsin.favorable_element(chart)."
+    )
 
 
 def test_compat_generate_never_writes_into_the_curated_deliverable_folder(monkeypatch, tmp_path):

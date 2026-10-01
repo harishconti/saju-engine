@@ -18,7 +18,7 @@ def test_strong_earth_day_master():
     ]
     result = assess_strength("己", "未", stems, hidden)
     assert result["verdict"] in ("strong", "extreme")
-    assert result["candidate_favorable"] in ("Metal", "Earth")
+    assert result["_raw_unresolved_favorable"] in ("Metal", "Earth")
 
 
 def test_weak_metal_day_master():
@@ -34,7 +34,7 @@ def test_weak_metal_day_master():
     # Earth and Metal hidden stems give meaningful support, so the heuristic
     # calls this "balanced" rather than strictly weak.
     assert result["verdict"] in ("balanced", "weak")
-    assert result["candidate_favorable"] in {"Wood", "Fire", "Earth", "Metal", "Water"}
+    assert result["_raw_unresolved_favorable"] in {"Wood", "Fire", "Earth", "Metal", "Water"}
     assert result["candidate_supporting"] in {"Wood", "Fire", "Earth", "Metal", "Water"}
 
 
@@ -70,7 +70,7 @@ def test_balanced_supporting_is_generating_element():
         [("main", "丙"), ("middle", "戊"), ("residual", "甲")],  # no Water hidden
     )
     assert result["verdict"] == "balanced"
-    assert result["candidate_favorable"] == "Water"
+    assert result["_raw_unresolved_favorable"] == "Water"
     assert result["candidate_supporting"] == "Metal"
 
 
@@ -91,7 +91,7 @@ def test_strong_candidate_elements_consistent():
         ],
     )
     assert result["verdict"] in ("strong", "extreme")
-    assert result["candidate_favorable"] == "Metal"
+    assert result["_raw_unresolved_favorable"] == "Metal"
     assert result["candidate_supporting"] == "Water"
     assert result["candidate_unfavorable"] == "Earth"
     assert result["candidate_draining"] == "Wood"
@@ -151,8 +151,8 @@ def test_e5_balanced_heuristic_skips_in_season_controller():
     assert sa["verdict"] == "balanced"
     counts = sa["element_counts"]
     assert min(counts, key=counts.get) == "Fire"      # the raw minimum is still Fire
-    assert sa["candidate_favorable"] != "Fire"        # ...but it is not offered
-    assert sa["candidate_favorable"] == "Wood"
+    assert sa["_raw_unresolved_favorable"] != "Fire"        # ...but it is not offered
+    assert sa["_raw_unresolved_favorable"] == "Wood"
 
 
 def test_n19_balanced_tie_is_surfaced_not_hidden():
@@ -170,7 +170,7 @@ def test_n19_balanced_tie_is_surfaced_not_hidden():
     # Every element in the tie set shares the same (minimal) count.
     least = min(counts.get(e, 0.0) for e in ties)
     assert all(abs(counts.get(e, 0.0) - least) < 1e-9 for e in ties)
-    assert result["candidate_favorable"] in ties
+    assert result["_raw_unresolved_favorable"] in ties
     # E-5: the controller Metal is excluded from the tie set here (申 is Metal's
     # own season), so Metal is not among the tied minima even though it's 0.
     assert "Metal" not in ties

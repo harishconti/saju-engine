@@ -14,7 +14,7 @@ def test_daeun_overlay_ten_god_and_branch_relationship():
         natal_branches=["午", "寅", "亥"],
         natal_stems=["壬", "甲", "丙", "戊"],
         strength_assessment={
-            "candidate_favorable": "Earth",
+            "_raw_unresolved_favorable": "Earth",
             "candidate_unfavorable": "Water",
         },
         period=period,
@@ -36,7 +36,7 @@ def test_daeun_overlay_stem_combination_and_favorable():
         natal_branches=["子", "丑"],
         natal_stems=["己", "丙", "丁", "戊"],
         strength_assessment={
-            "candidate_favorable": "Earth",
+            "_raw_unresolved_favorable": "Earth",
             "candidate_unfavorable": "Wood",
         },
         period=period,
@@ -64,7 +64,7 @@ def test_daeun_overlay_conflicting_stem_branch_signal_is_neutral_not_favorable()
         natal_branches=["寅"],
         natal_stems=["甲", "丙", "戊"],
         strength_assessment={
-            "candidate_favorable": "Metal",
+            "_raw_unresolved_favorable": "Metal",
             "candidate_unfavorable": "Fire",
         },
         period=period,
@@ -93,7 +93,7 @@ def test_derive_daeun_overlay_uses_resolved_favorable_over_raw_candidate():
         natal_stems=["壬", "乙", "辛", "己"],
         strength_assessment={
             # Raw candidate (pre-climate) says Fire; the branch 亥 is Water.
-            "candidate_favorable": "Fire",
+            "_raw_unresolved_favorable": "Fire",
             "candidate_unfavorable": None,
         },
         period=period,

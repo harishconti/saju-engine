@@ -191,6 +191,64 @@ def test_premium_report_fullmap_has_10_year_forecast():
     assert str(current_year + 9) in report
 
 
+def test_fullmap_body_is_identical_to_deep_modulo_cover_metadata():
+    """V7 (2026-09-14 audit §9.8): `fullmap` is a legacy alias of `deep`. The
+    audit's finding was that the two tier branches carried two hand-maintained
+    COPIES of the section list, so any deep-section change silently missed the
+    fullmap copy. The fix is structural (`_deep_tier_sections` serves both).
+
+    This test pins that property: the two reports must be identical once the
+    tier name/price/tagline differ. If someone reintroduces a second copy of
+    the list, the bodies diverge here and the test fails.
+    """
+    chart = _sample_chart()
+    deep = generate_premium_report(chart, tier="deep")
+    fullmap = generate_premium_report(chart, tier="fullmap")
+
+    # The only intended differences are cover-level tier identity: the tier
+    # name/price, the tagline, and the Report ID's tier suffix.
+    def _normalize(text: str, name: str, price: str, tagline: str) -> str:
+        for token in (name, price, tagline):
+            text = text.replace(token, "T")
+        return re.sub(r"CID-[a-z]+-\d{8}-[A-Z]+", "CID-X", text)
+
+    deep_n = _normalize(
+        deep, "Deep Destiny Report", "$55",
+        "Full natal reading + ten-year year-by-year timing + relationship and business-launch guidance",
+    )
+    fullmap_n = _normalize(
+        fullmap, "The Full Map", "$129",
+        "Your life's complete map — natal reading + deep-dive modules + 10-year forecast",
+    )
+    assert deep_n == fullmap_n, (
+        "deep and fullmap bodies have diverged — they must both be rendered "
+        "from premium_report._deep_tier_sections (V7)"
+    )
+
+
+def test_fullmap_and_deep_share_one_section_list_function():
+    """Structural guard for V7: the tier dispatch must not carry a second,
+    hand-copied deep section list. Guards the fix at the source rather than
+    only by output comparison."""
+    import inspect
+
+    from saju_engine import premium_report as pr
+
+    src = inspect.getsource(pr.generate_premium_report)
+    # `deep` and `fullmap` must be handled by exactly one branch, and that
+    # branch must delegate to the shared helper.
+    assert src.count('elif tier in ("deep", "fullmap")') == 1, (
+        "deep/fullmap must be handled by a single branch in "
+        "generate_premium_report — a second branch reintroduces the "
+        "duplication the audit found"
+    )
+    assert "sections.extend(_deep_tier_sections(ctx))" in src, (
+        "the deep/fullmap branch must delegate to _deep_tier_sections"
+    )
+    # And the helper must exist as a module-level function.
+    assert callable(pr._deep_tier_sections)
+
+
 def test_premium_report_element_balance_uses_colored_emoji():
     chart = _sample_chart()
     report = generate_premium_report(chart)
@@ -278,10 +336,12 @@ def test_premium_report_essential_matches_contract():
     assert "## Timing: Major Luck" in report
     assert "## Practical Guidance Summary" in report
     assert "## Closing Note" in report
-    # Essential excludes the Deep-only modules.
+    # Essential excludes the Deep-only modules. The 30-Day Action Plan IS
+    # part of Essential since V6 (2026-09-14 audit §9.8 — it was dead code
+    # before; now it is the tier's concrete-action differentiator).
     assert "## Relationships" not in report
     assert "## Health & Vitality" not in report
-    assert "## 30-Day" not in report
+    assert "## 30-Day Action Plan" in report
     assert "### Lucky Attributes" in report
     # Abbreviated Lucky Attributes (Spark-style) has only 4 fields.
     assert "**Season:**" not in report
@@ -344,10 +404,11 @@ def test_premium_report_essential_price_and_scope():
     # major-luck table + abbreviated Lucky Attributes + short closing.
     assert "### Four Pillars, One by One" in report
     assert "### Wealth Preservation Note" in report
-    # Deep-only sections should not appear.
+    # Deep-only sections should not appear in the essential contract test
+    # (the 30-Day Action Plan lives in Essential — see V6 above).
     assert "## Relationships" not in report
     assert "## Health & Vitality" not in report
-    assert "## 30-Day Action Plan" not in report
+    assert "## 30-Day Action Plan" in report
     assert "### Ready to Go Deeper?" not in report
     assert "## Business & Launch Timing" not in report
     assert "## Monthly Lucky Dates" not in report
@@ -1188,3 +1249,42 @@ def test_validation_harish_partner_table_and_natal_rows():
     assert "| Half Harmony | 巳+丑 |" in report
     assert "乙↔辛" in report
     assert "numeric least-represented-element pick" not in report
+
+
+# ── V2 + V11 (2026-09-14 architecture audit §9.13): provenance and the ──────
+# ── 조후-vs-억부 tension are now client-visible in the Quick Reference. ─────
+
+def test_v2_climate_tension_stated_when_channels_disagree():
+    """Harish: climate-balanced (조후 Water wins over the raw 억부 Wood pick).
+    The Quick Reference must STATE the two-channel tension (fe.climate_agrees
+    is False) rather than silently reporting one resolution."""
+    report = _harish_deep_report()
+    assert "Why this element" in report
+    assert "climate-balance (조후) reading points to **Water**" in report
+
+
+def test_v2_no_tension_line_when_channels_agree():
+    """Vishnu Priya: climate agrees with the raw pick — no tension line."""
+    from saju_engine.engine import compute_chart
+    from saju_engine.premium_report import generate_premium_report
+    c = compute_chart(name="vp", gender="F", year=2001, month=6, day=7,
+                      hour=16, minute=45, longitude=76.65, utc_offset=5.5)
+    md = generate_premium_report(c, tier="deep")
+    assert "Why this element" not in md
+
+
+def test_v11_reader_confirmed_provenance_is_disclosed():
+    """A reader override must be VISIBLE in the artifact, not just applied —
+    the 'read by a human' positioning claim depends on it (audit §9.12b)."""
+    from saju_engine.engine import compute_chart
+    from saju_engine.premium_report import generate_premium_report
+    c = compute_chart(name="guro", gender="M", year=1964, month=7, day=19,
+                      hour=8, minute=30, longitude=79.42, utc_offset=5.5)
+    md = generate_premium_report(c, tier="deep", favorable_override="Metal")
+    assert "Confirmed by a human reader from the full classical analysis." in md
+
+
+def test_v11_heuristic_charts_do_not_claim_reader_confirmation():
+    """Without an override, the report must NOT claim reader confirmation."""
+    report = _harish_deep_report()
+    assert "Confirmed by a human reader" not in report

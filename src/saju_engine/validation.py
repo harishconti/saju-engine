@@ -729,7 +729,7 @@ def check_yongsin(chart: Any, entry: dict) -> dict:
     if exp_strength:
         sa = chart.strength_assessment
         got_strength = {"verdict": sa["verdict"],
-                        "candidate": sa["candidate_favorable"]}
+                        "candidate": sa["_raw_unresolved_favorable"]}
         for key, exp in exp_strength.items():
             if exp is not None and got_strength[key] != exp:
                 mismatches[f"strength.{key}"] = {
@@ -823,7 +823,7 @@ def check_climate_merge(chart: Any, entry: dict) -> dict:
     if exp_strength:
         sa = chart.strength_assessment
         got_strength = {"verdict": sa["verdict"],
-                        "candidate": sa["candidate_favorable"]}
+                        "candidate": sa["_raw_unresolved_favorable"]}
         for key, exp in exp_strength.items():
             if exp is not None and got_strength[key] != exp:
                 mismatches[f"strength.{key}"] = {

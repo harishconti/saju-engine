@@ -7,7 +7,10 @@ R=candidates_horoscope/reports
 REF=(--year 2026 --month 9 --day 26)
 gen() { # out tier args...
   local out=$1 tier=$2; shift 2
-  python -m saju_engine --format premium --tier "$tier" "${REF[@]}" --output-file "$out" "$@" >/dev/null
+  # PYTHON defaults to python3 — a bare `python` does not exist on this box
+  # (2026-10-01), which silently broke the whole regen script at its first
+  # gen() call. Override with PYTHON=/path/to/python if needed.
+  "${PYTHON:-python3}" -m saju_engine --format premium --tier "$tier" "${REF[@]}" --output-file "$out" "$@" >/dev/null
   echo "wrote $out"
 }
 H=(--date 1992-06-04 --time 03:10 --longitude 79.4408 --city "Pallipattu, Tamil Nadu" --utc-offset 5.5 --gender M --name Harish)

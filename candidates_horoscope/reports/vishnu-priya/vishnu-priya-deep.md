@@ -780,3 +780,10 @@ Listen once in full, then return to the chapters that match the season you are i
 - **Robber (劫財):** a rival for the same resources — competition in money or love
 - **Companion (比肩):** a peer or equal — support, solidarity, and rivalry in equal measure
 - **Hurting Officer (傷官):** sharp output — bold expression, creativity, friction with rules and authority
+
+## Sources & Limits
+
+- Classical framework: 적천수 (滴天髓), 연해자평 (淵海子平), 궁통보감 (窮通寶鑑), 명리정종, 자평진전 — as compiled in `knowledge/`.
+- Method: `knowledge/09-interpretation-method.md` (9-step procedure).
+- This reading describes tendencies, not fixed outcomes; it is for reflection and entertainment — not medical, legal, or financial advice.
+- The engine's heuristic verdicts (strength, 용신) are marked provisional where the classical sources disagree; a qualified reader confirms the final reading.

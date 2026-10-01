@@ -19,6 +19,7 @@ from __future__ import annotations
 from collections import Counter
 from typing import Any, Dict, List, Optional, Tuple
 
+from .fallback_log import log_fallback
 from .report_data import _PILLAR_AREAS
 
 
@@ -269,6 +270,7 @@ def dm_arrival_narrative(ctx) -> str:
     try:
         stage = L.twelve_stage(chart.day_master, chart.month.branch)
     except Exception:
+        log_fallback("prose_fillers.month_stage", "twelve_stage lookup failed")
         pass
     label, description = _STAGE_TENDENCY.get(stage, ("mixed arrival", "the month branch gives a mixed first impression"))
 
@@ -460,6 +462,7 @@ def income_rhythm(ctx) -> str:
                 try:
                     tg = L.ten_god(chart.day_master, stem)
                 except Exception:
+                    log_fallback("prose_fillers.hidden_ten_god", f"ten_god({stem}) failed")
                     continue
                 # NOT a substring check: "재" also occurs inside 겁재 (Robber,
                 # a 비겁-class ten-god, not Wealth) — a substring match here
@@ -698,6 +701,7 @@ def relationship_style(ctx) -> str:
     try:
         stage = L.twelve_stage(chart.day_master, spouse_branch)
     except Exception:
+        log_fallback("prose_fillers.spouse_stage", "twelve_stage lookup failed")
         stage = "—"
     # Look up by the simplified class key derived from the KOREAN ten-god
     # code (via _TENGOD_CLASS), not by `spouse_tg` (the full English gloss,
@@ -787,6 +791,7 @@ def spouse_palace_tengod(ctx) -> str:
     try:
         stage = L.twelve_stage(chart.day_master, spouse_branch)
     except Exception:
+        log_fallback("prose_fillers.spouse_domain_stage", "twelve_stage lookup failed")
         stage = "—"
     domain = {
         "Companion": "a peer-like partnership where independence and togetherness stay in balance",
@@ -974,12 +979,14 @@ def attachment_patterns(ctx) -> str:
     try:
         stage = L.twelve_stage(chart.day_master, spouse_branch)
     except Exception:
+        log_fallback("prose_fillers.spouse_hidden_stage", "twelve_stage lookup failed")
         stage = "—"
     hidden_tgs = []
     for role, stem in chart.day.hidden_stems:
         try:
             hidden_tgs.append(L.ten_god(chart.day_master, stem))
         except Exception:
+            log_fallback("prose_fillers.spouse_hidden_tg", f"ten_god({stem}) failed")
             hidden_tgs.append("—")
     hidden_summary = ", ".join(hidden_tgs) if hidden_tgs else "—"
     return (
@@ -1490,6 +1497,7 @@ def decade_structure_note(p, chart) -> str:
     try:
         stage = L.twelve_stage(chart.day_master, p.branch)
     except Exception:
+        log_fallback("prose_fillers.decade_stage", "twelve_stage lookup failed")
         stage = ""
     if stage in ("건록", "제왕"):
         notes.append(f"your Day Master sits at **{stage}** on **{p.branch}** — a strong root for the self")
@@ -1515,6 +1523,7 @@ def _void_branches(chart) -> List[str]:
         from .stars import _xun_kong
         return list(_xun_kong(chart.day_master, chart.day.branch))
     except Exception:
+        log_fallback("prose_fillers.void_years", "_xun_kong lookup failed")
         return []
 
 
@@ -1927,8 +1936,9 @@ def special_grid_note(ctx) -> str:
         return ""
     body = "; ".join(candidates)
     return (
-        f"[UNCERTAIN] The engine flags a special-grid candidate: {body}. "
-        "Special-grid rulings are strict; the final verdict requires a reader to verify that all classical preconditions "
+        "The engine flags a special-grid candidate: "
+        f"{body}. This reading carries an asterisk: special-grid rulings are strict, and the final "
+        "verdict requires a reader to verify that all classical preconditions "
         "(Day Master isolation, 득령/in-season support, and absence of breaking stems) are truly met. "
         "If confirmed, the Day Master may behave more like the transformed or followed element, and the favorable element could shift accordingly."
     )

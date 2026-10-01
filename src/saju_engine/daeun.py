@@ -281,8 +281,9 @@ def starting_age(
     hour: int = 0,
     minute: int = 0,
     utc_offset: float = 9.0,
-) -> int:
-    """Return the integer starting age of the first major-luck period.
+) -> Optional[int]:
+    """Return the integer starting age of the first major-luck period, or
+    ``None`` when the term table does not cover the birth date (range edges).
 
     Direction: 'forward' (순행) means we count to the *next* 節氣;
     'backward' (역행) means we count to the *previous* 節氣.
@@ -297,6 +298,10 @@ def starting_age(
     ``utc_offset`` defaults to 9.0 (Korea) for convenience, but production
     callers (``compute_daeun``) always pass the chart's real value — see
     ``_term_boundary_datetimes``'s KST-conversion note (E-1, 2026-09-25).
+
+    Returns ``None`` (not 0) when no term boundary exists for the date
+    (2026-09-14 audit §5 item 4) — 0 is a legitimate value for births on a
+    절기, so it cannot double as the failure sentinel.
     """
     prev, nxt = _term_boundary_datetimes(year, month, day, hour, minute, utc_offset)
     birth_dt = datetime(year, month, day, hour, minute)
@@ -305,9 +310,14 @@ def starting_age(
     else:
         target = prev  # last 절기 at or before the birth moment
     if target is None:
-        # Fall back: use sajupy's lunar→solar to at least get a sensible
-        # approximation, or just return 0 and let the caller flag it.
-        return 0
+        # 2026-09-14 architecture audit §2.2 / §5 item 4: this used to
+        # `return 0`, which is indistinguishable from the *legitimate* 0 a
+        # birth on a 절기 date produces — an unfalsifiable branch. The
+        # sentinel is now None; `compute_daeun` catches it, falls back to 0
+        # for the period labels, and flags the approximation on the periods
+        # (`DaeunPeriod.start_age_approx = True`) so a caller/report can
+        # disclose it. A range regression test pins both behaviours.
+        return None
     # Birth exactly on a 節氣 date is handled by _term_boundary_datetimes,
     # which returns (birth_dt, birth_dt) and yields 0 days.
     # Use absolute seconds before floor division to avoid rounding toward -inf
@@ -431,6 +441,17 @@ def compute_daeun(
     """
     direction = L.daeun_direction(year_stem, gender)
     start_age = starting_age(year, month, day, direction, hour=hour, minute=minute, utc_offset=utc_offset)
+    # §5 item 4: flag a term-table miss instead of silently labelling the
+    # decades with an approximation indistinguishable from a real 0.
+    start_age_approx = start_age is None
+    if start_age is None:
+        from .fallback_log import log_fallback
+        log_fallback(
+            "daeun.compute_daeun",
+            f"term table does not cover birth {year}-{month:02d}-{day:02d}; "
+            "decade start-age labels fall back to 0 (approximation)",
+        )
+        start_age = 0
     periods: List[DaeunPeriod] = []
     stem, branch = month_stem, month_branch
     for k in range(1, n_periods + 1):
@@ -439,5 +460,6 @@ def compute_daeun(
         else:
             stem, branch = step_cycle(month_stem, month_branch, -k)
         periods.append(DaeunPeriod(start_age=start_age + (k - 1) * 10, end_age=0,
-                                   stem=stem, branch=branch))
+                                   stem=stem, branch=branch,
+                                   start_age_approx=start_age_approx))
     return periods

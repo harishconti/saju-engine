@@ -46,7 +46,7 @@
 
 - **Day Master:** Gi (Yin Earth, 己土)
 - **Strength:** Strong — the month branch **未** gives the Day Master a **seasonally supported baseline** by element relation (per knowledge/09-interpretation-method.md Step 2); its 12운성 stage there is **관대 (冠帶)** — the querent grows into form gradually; adolescence and early adulthood often bring ambition (knowledge/06-twelve-stages.md). Peer/resource support and the output/wealth/authority drain sit close to even.
-- **Favorable Element:** Metal — Favorable element confirmed by the reader from the full classical analysis.
+- **Favorable Element:** Metal — Favorable element confirmed by the reader from the full classical analysis. *Confirmed by a human reader from the full classical analysis.*
 - **Supporting Element:** Water
 - **Avoid / Watch:** Earth
 - **Current Major Luck:** 丁丑 (ages 56-65)
@@ -769,3 +769,10 @@ Listen once in full, then return to the chapters that match the season you are i
 - **Direct Wealth (正財):** steady, earned income and everyday resources — salary and savings
 - **Wealth class (財星):** the wealth group — how money and resources come and are held
 - **Indirect Wealth (偏財):** variable money — deals, commissions, windfalls, higher risk and reward
+
+## Sources & Limits
+
+- Classical framework: 적천수 (滴天髓), 연해자평 (淵海子平), 궁통보감 (窮通寶鑑), 명리정종, 자평진전 — as compiled in `knowledge/`.
+- Method: `knowledge/09-interpretation-method.md` (9-step procedure).
+- This reading describes tendencies, not fixed outcomes; it is for reflection and entertainment — not medical, legal, or financial advice.
+- The engine's heuristic verdicts (strength, 용신) are marked provisional where the classical sources disagree; a qualified reader confirms the final reading.

@@ -48,6 +48,7 @@
 - **Day Master:** Sin (Yin Metal, 辛金)
 - **Strength:** Balanced — the month branch **巳** gives the Day Master a **mixed seasonal baseline** by element relation (per knowledge/09-interpretation-method.md Step 2); its 12운성 stage there is **사 (死)** — one cycle is completing as the querent enters the world, so early identity may feel transitional (knowledge/06-twelve-stages.md). The output/wealth/authority drain outweighs the peer and resource support — the element-relation season above (weighted more heavily in the overall formula) is what pulls the total back into the balanced range despite that skew.
 - **Favorable Element:** Water — The Day Master reads as balanced, so the classical 조후 (climate-balance) check applies: this chart peaks in hot summer conditions, and the classical remedy is Water. This takes priority over the chart's simple element count, which is a weaker signal than the classical climate check here.
+- **Why this element:** two classical checks apply here — the strength-balance (억부) reading points one way, while the climate-balance (조후) reading points to **Water** for a hot-season chart. In this chart the climate reading takes priority because the chart leans clearly seasonal; the reader has weighed both.
 - **Supporting Element:** Metal
 - **Avoid / Watch:** Fire (기신, watch) · Earth (구신, restrains Water) · Wood (한신, drains Water)
 - **Current Major Luck:** 己酉 (ages 30-39)

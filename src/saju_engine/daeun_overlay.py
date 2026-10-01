@@ -96,7 +96,10 @@ def derive_daeun_overlay(
     # Watch" field in premium_report.py), so it is kept as-is here too.
     favorable_status: Optional[str] = None
     if strength_assessment:
-        fav = resolved_favorable if resolved_favorable is not None else strength_assessment.get("candidate_favorable")
+        # RAW, unresolved pick (2026-09-14 audit §5 item 2): kept for the
+        # overlay's own strength-heuristic display, never for a client-facing
+        # 용신 — the resolver is yongsin.favorable_element().
+        fav = resolved_favorable if resolved_favorable is not None else strength_assessment.get("_raw_unresolved_favorable")
         unfav = (
             resolved_unfavorable if resolved_unfavorable is not None
             else strength_assessment.get("candidate_unfavorable")

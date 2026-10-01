@@ -544,8 +544,12 @@ def strip_source_citations(text: str) -> str:
     # after a Sources heading (e.g. a follow-up "## Focus Requested...") is
     # preserved. Matches the behavior of combine_candidate_report.py.
     out = _strip_sources_section(out)
-    # 4. Drop bracketed [UNCERTAIN: ...] markers so they do not leak into client PDFs.
-    out = re.sub(r"\s*\[UNCERTAIN:[^\]]*\]", "", out, flags=re.IGNORECASE)
+    # 4. Drop bracketed [UNCERTAIN: ...] markers (and the bare [UNCERTAIN]
+    #    form — V3, 2026-09-14 audit §9.7: the old regex required the colon,
+    #    so bare tags in compat/patterns prose leaked into client PDFs; the
+    #    emitters are now client-voiced, and this catches any residual) so
+    #    they do not leak into client PDFs.
+    out = re.sub(r"\s*\[UNCERTAIN:?[^\]]*\]", "", out, flags=re.IGNORECASE)
     # 5. Drop engine reviewer notes so they never reach a client PDF even if a
     # hand-written .md still carries them (the engine no longer emits these for
     # client tiers — see premium_report._reviewer_note):
