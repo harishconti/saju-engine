@@ -16,7 +16,8 @@ NAME[sruthi]="Sruthi"; DOB[sruthi]="11 December 1993, 02:45 AM IST (Pallipattu, 
 NAME[gurumoorthy]="Gurumoorthy"; DOB[gurumoorthy]="19 July 1964, 08:30 AM IST (Tirupati, Andhra Pradesh)"; DM[gurumoorthy]="Gi (Yin Earth)"
 NAME[vishnu-priya]="Vishnu Priya"; DOB[vishnu-priya]="7 June 2001, 04:45 PM IST (Mysore)"; DM[vishnu-priya]="Sin (Yin Metal)"
 NAME[rm]="RM (Kim Nam-joon)"; DOB[rm]="12 September 1994, 01:28 PM KST (Seoul)"; DM[rm]="Sin (Yin Metal)"
-for n in harish mahesh pawan sruthi gurumoorthy vishnu-priya rm; do
+NAME[bindu]="Bindu"; DOB[bindu]="24 March 1995, 10:10 AM IST (Kolar, Karnataka)"; DM[bindu]="Gap (Yang Wood)"
+for n in harish mahesh pawan sruthi gurumoorthy vishnu-priya rm bindu; do
   pdf $RL $R/$n/$n-report.md $R/$n/$n-report.pdf "${NAME[$n]} — Deep Destiny Report" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}" deep
 done
 for n in harish mahesh gurumoorthy vishnu-priya; do
@@ -25,7 +26,7 @@ done
 for n in mahesh vishnu-priya; do
   pdf $HT $R/$n/$n-combined.md $R/$n/$n-combined-html.pdf "${NAME[$n]} — Deep Destiny Report" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}" deep
 done
-for n in harish pawan sruthi gurumoorthy; do
+for n in harish pawan sruthi gurumoorthy bindu; do
   pdf $RL $R/$n/career.md $R/$n/career.pdf "${NAME[$n]} — Career & Wealth Deep-Dive" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}"
 done
 n=vishnu-priya
@@ -38,7 +39,7 @@ for t in sample essential; do
 done
 C=candidates_horoscope/marriage_compatibility
 # Luck-cycle reports: HTML/Playwright backend so the SVG charts render.
-for n in harish sruthi pawan; do
+for n in harish sruthi pawan bindu; do
   python3 "$HT" --input "$R/$n/$n-luck-cycle.md" --output "$R/$n/$n-luck-cycle.pdf" \
     --title "${NAME[$n]} — Luck Cycle & Lifetime Decade Roadmap" --client "${NAME[$n]}" \
     --dob "${DOB[$n]}" --day-master "${DM[$n]}" --tier deep >/dev/null \
