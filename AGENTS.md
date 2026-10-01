@@ -6,10 +6,8 @@ This file gives Claude Code agents quick orientation before they act on the Kore
 
 1. `CLAUDE.md` — persona, ground rules, language conventions, quality checklist.
 2. `docs/MEMORY.md` — current project state, test count, active wishes.
-3. `tasks.md` — prioritized task list and completion status.
-4. `improvements_issues.md` — go-to-market strategy, product/landing issues, prioritised P0–P3 backlog
-   (sourced research: `docs/market-research-2026-09.md`).
-5. `docs/openwiki/` — deeper docs: architecture, domain concepts, products, toolchain.
+3. `docs/openwiki/` — deeper docs: architecture, domain concepts, products, toolchain.
+4. `docs/market-research-2026-09.md` — sourced go-to-market research.
 
 ## Agent defaults
 

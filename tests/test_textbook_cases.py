@@ -96,7 +96,7 @@ from saju_engine.engine import compute_chart
 # The four-pillars published-chart cases have moved to the cited fixture set:
 #   fixtures: tests/validation/fixtures/pillars.json
 #   harness:  tests/validation/test_val_pillars.py
-# (Campaign spec: docs/superpowers/specs/2026-09-13-engine-validation-campaign-design.md)
+# (Campaign spec: the 2026-09 validation campaign design (removed 2026-10-01))
 
 
 # ---------------------------------------------------------------------------

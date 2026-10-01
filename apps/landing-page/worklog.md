@@ -40,7 +40,7 @@ Task: Strategy pivot — USD / English-speaking-global positioning
 
 Work Log:
 - Repositioned from India / ₹ / Vedic-adjacent NRI framing to English-speaking-global / USD.
-  Rationale + research: ../../improvements_issues.md and ../../docs/market-research-2026-09.md.
+  Rationale + research: ../../the previously-tracked product backlog (removed 2026-10-01) and ../../docs/market-research-2026-09.md.
 - `src/data/landing-data.ts`: PERSONAL_REPORTS + COMPAT_REPORTS prices ₹→USD
   (Essential $9→$19, Deep $55, Companion $9/mo, Compat Snapshot $24, Deep Compat $45);
   renamed "Marriage Compatibility" → "Compatibility (궁합)"; rewrote ABOUT_READER bio to the
@@ -55,7 +55,7 @@ Work Log:
   now free of the internal reviewer-note leak (G1).
 - LP3 (do-not-ship): the TESTIMONIALS array is fabricated. Added a prominent warning comment;
   it MUST be replaced with real permissioned reviews or removed before launch (FTC risk).
-- Not done here (tracked in improvements_issues.md §12): real checkout, quiz funnel, embedded
+- Not done here (tracked in the previously-tracked product backlog (removed 2026-10-01) §12): real checkout, quiz funnel, embedded
   calculator, real WhatsApp number, deployment.
 
 Stage Summary:
@@ -68,9 +68,9 @@ Task ID: (2026-09-07)
 Agent: main
 Task: Full landing-page redesign — restructure + Saju visual system
 
-Plan: ../../docs/superpowers/plans/2026-09-07-landing-page-redesign.md
-Spec: ../../docs/superpowers/specs/2026-09-07-landing-page-redesign-design.md
-Tracker: ../../improvements_issues.md §5a (LP13)
+Plan: ../../the 2026-09-07 landing-page redesign plan (removed 2026-10-01)
+Spec: ../../the 2026-09-07 landing-page redesign spec (removed 2026-10-01)
+Tracker: ../../the previously-tracked product backlog (removed 2026-10-01) §5a (LP13)
 
 Direction (user-approved 2026-09-07):
 - Full restructure: ~15 sections → ~9, proof-first narrative arc. Demo report moves to

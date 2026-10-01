@@ -1,6 +1,6 @@
 """W2 대운 harness — fixture-driven cross-validation.
 
-See docs/superpowers/specs/2026-09-13-engine-validation-campaign-design.md.
+See the 2026-09 validation campaign design (removed 2026-10-01).
 Migrated 1:1 from the seven textbook daeun regression tests in
 tests/test_textbook_cases.py (Plan 1 kept them until this plan).
 Appending fixture entries auto-extends the suite.

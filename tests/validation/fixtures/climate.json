@@ -860,7 +860,7 @@
    "longitude": 126.98,
    "utc_offset": 9.0
   },
-  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (辰 = 濕 → Fire remedy, Wood 희신) + §How This Combines With 억부 (broadened 2026-09-19: 조후 governs whenever the band is non-temperate, regardless of verdict — docs/research/2026-09-validation-climate.md §5); synthetic chart probe-verified 2026-09-19. CORRECTED 2026-09-25 (external report review, E-2): strength.verdict changed from 'weak' to 'balanced' after fixing lookup.py's swapped 辰 중기/여기 (this chart is four 辰 branches, maximally sensitive to that bug). The verdict change means this fixture no longer fills the intended damp x weak matrix cell — it now fills damp x balanced instead. A replacement synthetic chart for damp x weak is a follow-up (docs/audits/2026-09-25-engine-audit-verification.md).",
+  "source": "knowledge/17-climate-method.md §The Fuller 寒暖燥濕 Reading (辰 = 濕 → Fire remedy, Wood 희신) + §How This Combines With 억부 (broadened 2026-09-19: 조후 governs whenever the band is non-temperate, regardless of verdict — docs/research/2026-09-validation-climate.md §5); synthetic chart probe-verified 2026-09-19. CORRECTED 2026-09-25 (external report review, E-2): strength.verdict changed from 'weak' to 'balanced' after fixing lookup.py's swapped 辰 중기/여기 (this chart is four 辰 branches, maximally sensitive to that bug). The verdict change means this fixture no longer fills the intended damp x weak matrix cell — it now fills damp x balanced instead. A replacement synthetic chart for damp x weak is a follow-up (the 2026-09-25 engine audit).",
   "expected": {
    "climate": {
     "band": "damp",

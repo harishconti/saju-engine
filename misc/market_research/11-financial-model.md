@@ -362,5 +362,4 @@ This is the right starting point for a founder who is testing the waters.
 
 Internal references:
 - [CLAUDE.md — Tiered Client Products](../../CLAUDE.md)
-- [tasks.md — project status](../../tasks.md)
 - [candidates_horoscope/reports/](../../candidates_horoscope/reports/)

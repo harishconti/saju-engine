@@ -187,7 +187,7 @@ Vercel is for the **web app only** (Next.js frontend). Railway runs the Python.
 ### 5.1 Stack
 
 - **Framework:** Next.js 14+ App Router (server-rendered for SEO)
-- **Styling:** Tailwind + the same brand CSS variables from `market_research_html/combined.html` (warm cream, dark navy headings, brass accent)
+- **Styling:** Tailwind + the same brand CSS variables from the landing-page theme (warm cream, dark navy headings, brass accent)
 - **Auth:** Clerk
 - **DB:** Neon Postgres (or Supabase) — same schema as backend
 - **Payments:** Razorpay + Stripe Checkout

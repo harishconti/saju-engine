@@ -15,7 +15,9 @@ from saju_engine.validation import collect_results, render_report  # noqa: E402
 def main() -> int:
     results = collect_results()
     report = render_report(results)
-    out = REPO / "docs" / "audits" / "2026-09-engine-validation-report.md"
+    # The report is a generated artifact of this tool (never hand-edited), so it
+    # lives under tmp/ (gitignored), not in the tracked docs/ tree.
+    out = REPO / "tmp" / "engine-validation-report.md"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(report, encoding="utf-8")
     fails = sum(1 for rows in results.values() for r in rows if r["status"] == "FAIL")

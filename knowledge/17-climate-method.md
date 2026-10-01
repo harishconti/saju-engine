@@ -74,7 +74,7 @@ axis alone would band temperate, need the 燥濕 axis to get a remedy at all.
 
 **Historical note (resolved 2026-09-19):** until this date, `climate.py`
 implemented the 寒暖 axis only, banding 辰 and 戌 temperate — a deliberate,
-tested scope limit (see `docs/audits/2026-09-engine-validation-report.md` and
+tested scope limit (see `tmp/engine-validation-report.md` and
 `docs/research/2026-09-validation-climate.md` §3 for the validation campaign
 that surfaced and fully sourced this gap). Expanding to the full two-axis model
 was a **user-approved product decision** (2026-09-19), not a bug fix — it moves

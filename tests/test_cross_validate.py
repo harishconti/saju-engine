@@ -15,7 +15,7 @@ CANDIDATES = [
     ("Pawan", 1991, 10, 3, 23, 45, 79.19, 5.5, "M", "Vellore", ("辛未", "丁酉", "丙午", "庚子")),
     # 79.42 (Pallipattu, Tiruvallur) — not 76.33, which is the known-wrong
     # `--city Pallipat` geocoder output (src/saju_engine/pillars.py:218,
-    # docs/audits/2026-07-05-engine-audit.md C4). Both land in the 丑 hour, so
+    # the 2026-07-05 engine audit C4). Both land in the 丑 hour, so
     # the expected pillars and the anchor value are unchanged.
     ("Harish", 1992, 6, 4, 3, 10, 79.42, 5.5, "M", "Pallipat", ("壬申", "乙巳", "辛亥", "己丑")),
     ("Gurumoorthy", 1964, 7, 19, 8, 30, 79.422, 5.5, "M", "Tirupati", ("甲辰", "辛未", "己巳", "戊辰")),

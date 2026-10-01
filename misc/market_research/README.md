@@ -9,7 +9,6 @@
 > **Do not use this folder for current decisions.** The canonical research and
 > strategy now live at:
 > - `../../docs/market-research-2026-09.md` — sourced facts, confidence-flagged
-> - `../../improvements_issues.md` — strategy, pricing, backlog
 >
 > Kept only as history: the competitor detail, financial-model scaffolding, and
 > feature-demand analysis here may still be useful reference, but every
@@ -17,7 +16,7 @@
 
 **Date opened:** 2026-06-26
 **Last updated:** 2026-06-26 (frozen — see the SUPERSEDED notice above)
-**Project:** Korean Saju (사주) reading engine + tiered client report products + self-service calculator. See `README.md`, `CLAUDE.md`, `tasks.md` for project state.
+**Project:** Korean Saju (사주) reading engine + tiered client report products + self-service calculator. See `README.md` and `CLAUDE.md` for project state.
 
 This directory collects the market, competitor, audience, monetization, and feasibility research for turning the existing toolchain (engine + PDF toolchain + intake + self-service app) into a profitable consumer product.
 

@@ -1,6 +1,6 @@
 """W3 lookups harness — fixture-driven cross-validation.
 
-See docs/superpowers/specs/2026-09-13-engine-validation-campaign-design.md.
+See the 2026-09 validation campaign design (removed 2026-10-01).
 Ground truth: the classical lookup tables in knowledge/ (연해자평 ten-god
 framework, 12운성 stage tables, 납음오행 30-nayin table, 공망 旬 rule),
 cross-checked against independent Korean references (Plan 3 Task 4).

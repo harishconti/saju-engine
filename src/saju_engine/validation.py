@@ -5,7 +5,7 @@ Three check statuses per the validation spec:
 PASS (engine matches ground truth), INTERPRETATION (engine follows the cited
 classical rule; external source differs by school/method — documented, not a
 failure), FAIL (engine bug or unsupported rule — logged for later fixing).
-See docs/superpowers/specs/2026-09-13-engine-validation-campaign-design.md.
+See the 2026-09 validation campaign design (removed 2026-10-01).
 """
 from __future__ import annotations
 
@@ -997,7 +997,7 @@ def render_report(results: dict[str, list[dict]]) -> str:
         "# Engine Validation Report — 2026-09 campaign",
         "",
         "Ground truth: cited fixtures in `tests/validation/fixtures/` "
-        "(spec: docs/superpowers/specs/2026-09-13-engine-validation-campaign-design.md).",
+        "(spec: the 2026-09 validation campaign design (removed 2026-10-01)).",
         "",
         "## Scorecard",
         "",
