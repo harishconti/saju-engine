@@ -125,7 +125,22 @@ __all__ = [
 # reviewer notes ("verify against the knowledge files", "engine heuristic only")
 # must never appear in these — see _reviewer_note. Non-client callers (e.g. an
 # internal draft) get the notes.
-_CLIENT_TIERS = {"sample", "essential", "deep", "spark", "reading", "fullmap", "companion"}
+_CLIENT_TIERS = {"sample", "essential", "deep", "spark", "reading", "fullmap", "companion",
+                 "career", "luck-cycle"}
+
+
+def _strip_leading_title_block(md: str) -> List[str]:
+    """Drop a standalone report's own h1 title + Born/… header + first `---`.
+
+    career_report / luck_cycle_report each open with `# Name — Title`, a
+    metadata block, and a `---` rule. When they are routed through the premium
+    tier cover, that block would duplicate the cover's own title, so it is
+    removed here (everything before the first `## ` heading)."""
+    lines = md.splitlines()
+    for i, line in enumerate(lines):
+        if line.startswith("## "):
+            return lines[i:]
+    return lines
 
 
 def _reviewer_note(ctx: "_ReportContext", text: str) -> List[str]:
@@ -2310,6 +2325,34 @@ def generate_premium_report(
         `[ENGINE DRAFT — REVIEW REQUIRED]` markers before client delivery.
     """
     tier = normalize_tier(tier)
+
+    # Career / luck-cycle are standalone deep-dive add-ons whose full bodies are
+    # owned by career_report / luck_cycle_report. Routing them through the tier
+    # system (here) gives them a cover, the --tier surface, and the client-draft
+    # banner, without duplicating the document builders. Their own modules carry
+    # the Sources & Limits footer that PDF output strips.
+    if tier in ("career", "luck-cycle"):
+        if generation_date is None:
+            generation_date = (chart.reference_date_obj() or datetime.now().date()).strftime("%Y-%m-%d")
+        from .career_report import generate_career_report
+        from .luck_cycle_report import generate_luck_cycle_report
+
+        generated = (
+            generate_career_report(chart, favorable_override=favorable_override)
+            if tier == "career"
+            else generate_luck_cycle_report(chart, favorable_override=favorable_override)
+        )
+        # Strip the module's own document title block (h1 + Born/… header +
+        # leading rule); the tier cover below replaces it.
+        body = _strip_leading_title_block(generated)
+        ctx = _ReportContext(chart, tier, generation_date, favorable_override=favorable_override)
+        cover = _section_cover(ctx)
+        draft = [
+            "*Engine-generated premium report draft. Interpretive prose must be "
+            "reviewed and finalized by a qualified reader before client delivery.*",
+        ]
+        return "\n".join(cover + body + [""] + draft).rstrip() + "\n"
+
     if generation_date is None:
         generation_date = (chart.reference_date_obj() or datetime.now().date()).strftime("%Y-%m-%d")
 

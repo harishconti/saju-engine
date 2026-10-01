@@ -26,7 +26,7 @@ done
 for n in mahesh vishnu-priya; do
   pdf $HT $R/$n/$n-combined.md $R/$n/$n-combined-html.pdf "${NAME[$n]} — Deep Destiny Report" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}" deep
 done
-for n in harish pawan sruthi gurumoorthy bindu; do
+for n in harish pawan sruthi gurumoorthy bindu rm; do
   pdf $RL $R/$n/career.md $R/$n/career.pdf "${NAME[$n]} — Career & Wealth Deep-Dive" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}"
 done
 n=vishnu-priya
@@ -39,7 +39,7 @@ for t in sample essential; do
 done
 C=candidates_horoscope/marriage_compatibility
 # Luck-cycle reports: HTML/Playwright backend so the SVG charts render.
-for n in harish sruthi pawan bindu; do
+for n in harish sruthi pawan bindu mahesh gurumoorthy vishnu-priya rm; do
   python3 "$HT" --input "$R/$n/$n-luck-cycle.md" --output "$R/$n/$n-luck-cycle.pdf" \
     --title "${NAME[$n]} — Luck Cycle & Lifetime Decade Roadmap" --client "${NAME[$n]}" \
     --dob "${DOB[$n]}" --day-master "${DM[$n]}" --tier deep >/dev/null \
