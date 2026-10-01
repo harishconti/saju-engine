@@ -23,6 +23,7 @@ S=(--date 1993-12-11 --time 02:45 --longitude 79.45 --city "Pallipattu, Tamil Na
 G=(--date 1964-07-19 --time 08:30 --longitude 79.42 --city "Tirupati, Andhra Pradesh" --utc-offset 5.5 --gender M --name Gurumoorthy --favorable-override Metal)
 V=(--date 2001-06-07 --time 16:45 --longitude 80.27 --city "Mysore" --utc-offset 5.5 --gender F --name "Vishnu Priya")
 RM=(--date 1994-09-12 --time 13:28 --longitude 126.9783 --city "Seoul" --utc-offset 9 --gender M --name "RM (Kim Nam-joon)" --convention korean)
+B=(--date 1995-03-24 --time 10:10 --longitude 78.2669 --city "Kolar, Karnataka" --utc-offset 5.5 --gender F --name Bindu)
 # Standalone engine formats: career (career/business/wealth deep-dive) and
 # luck-cycle (5-year-block lifetime roadmap). Luck-cycle PDFs use the HTML
 # backend so their SVG charts render (see pdfs.sh).
@@ -47,3 +48,6 @@ gen $R/vishnu-priya/vishnu-priya-deep.md deep "${V[@]}"
 gen $R/rm/rm-report.md deep "${RM[@]}"
 gen $R/rm/rm-sample.md sample "${RM[@]}"
 gen $R/rm/rm-essential.md essential "${RM[@]}"
+gen $R/bindu/bindu-report.md deep "${B[@]}"
+genfmt career $R/bindu/career.md "${B[@]}"
+genfmt luck-cycle $R/bindu/bindu-luck-cycle.md "${B[@]}"
