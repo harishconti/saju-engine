@@ -21,6 +21,12 @@ G=(--date 1964-07-19 --time 08:30 --longitude 79.42 --city "Tirupati, Andhra Pra
 V=(--date 2001-06-07 --time 16:45 --longitude 80.27 --city "Mysore" --utc-offset 5.5 --gender F --name "Vishnu Priya")
 RM=(--date 1994-09-12 --time 13:28 --longitude 126.9783 --city "Seoul" --utc-offset 9 --gender M --name "RM (Kim Nam-joon)" --convention korean)
 gen $R/harish/harish-report.md deep "${H[@]}"
+# Standalone luck-cycle / lifetime-roadmap report (5-year blocks). Not a
+# premium tier — its own --format. Rendered to PDF with the HTML backend so
+# its SVG charts appear (see pdfs.sh).
+"${PYTHON:-python3}" -m saju_engine --format luck-cycle "${REF[@]}" \
+  --output-file "$R/harish/harish-luck-cycle.md" "${H[@]}" >/dev/null
+echo "wrote $R/harish/harish-luck-cycle.md"
 gen $R/mahesh/mahesh-report.md deep "${M[@]}"
 gen $R/pawan/pawan-report.md deep "${P[@]}"
 gen $R/sruthi/sruthi-report.md deep "${S[@]}"

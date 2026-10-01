@@ -127,6 +127,159 @@ def inject_element_balance_chart(html: str, style_fn) -> str:
     return re.sub(r"<table\b.*?</table>", _is_balance_table, html, flags=re.DOTALL)
 
 
+# ── Luck-cycle report charts (5-year blocks) ────────────────────────────────
+# The luck-cycle report emits marker-wrapped tables; the HTML renderer swaps
+# them for these SVGs. The marker carries the pre-parsed rows as TSV in a
+# `<code>` block? No — parser-safe approach: the table rows themselves are the
+# data source, exactly like the decade roadmap. Each builder takes already-
+# parsed (label, values...) tuples.
+
+_LEAN_COLORS = {
+    "favorable": "#27ae60",
+    "mixed": "#f39c12",
+    "challenging": "#c0392b",
+}
+
+_CLASS_COLORS = {
+    "Companion": "#8e44ad",
+    "Output": "#2980b9",
+    "Wealth": "#27ae60",
+    "Authority": "#c0392b",
+    "Resource": "#e67e22",
+}
+
+
+def _svg_wrap(inner: str, width: int, height: int, aria: str) -> str:
+    return (
+        f'<svg viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg" '
+        f'role="img" aria-label="{html.escape(aria)}">\n{inner}\n</svg>'
+    )
+
+
+def build_luck_timeline_svg(rows: list[tuple[str, str, str]]) -> str:
+    """rows: (year_range, lean) tuples for the 5-year-block timeline.
+
+    Laid out as a 2-row × 8-column grid so every year label reads horizontally
+    (a single 16-wide row forces rotated, overlapping labels).
+    """
+    if len(rows) < 2:
+        return ""
+    width = 760
+    margin_x = 16
+    cols = 8
+    cell_h = 40
+    gap_x, gap_y = 6, 8
+    cell_w = (width - 2 * margin_x - gap_x * (cols - 1)) / cols
+    legend_y = 20
+    top = 34
+    segs: list[str] = []
+    for i, (label, lean) in enumerate(rows):
+        r, c = divmod(i, cols)
+        x = margin_x + c * (cell_w + gap_x)
+        y = top + r * (cell_h + gap_y)
+        color = _LEAN_COLORS.get(lean, _LEAN_COLORS["mixed"])
+        segs.append(
+            f'<rect x="{x:.1f}" y="{y}" width="{cell_w:.1f}" height="{cell_h}" '
+            f'fill="{color}" rx="3"><title>{html.escape(label)} · {html.escape(lean)}'
+            "</title></rect>"
+        )
+        cx = x + cell_w / 2
+        segs.append(
+            f'<text x="{cx:.1f}" y="{y + cell_h / 2 - 1:.1f}" text-anchor="middle" '
+            f'font-size="11" font-weight="bold" fill="#ffffff" '
+            f'font-family="Helvetica,Arial,sans-serif">{html.escape(label)}</text>'
+        )
+        segs.append(
+            f'<text x="{cx:.1f}" y="{y + cell_h / 2 + 12:.1f}" text-anchor="middle" '
+            f'font-size="9" fill="#ffffff" opacity="0.9" '
+            f'font-family="Helvetica,Arial,sans-serif">{html.escape(lean)}</text>'
+        )
+    # Legend along the top.
+    lx = margin_x
+    for text, color in (("favorable", _LEAN_COLORS["favorable"]),
+                        ("mixed", _LEAN_COLORS["mixed"]),
+                        ("challenging", _LEAN_COLORS["challenging"])):
+        segs.append(f'<rect x="{lx}" y="{legend_y - 9}" width="11" height="11" fill="{color}" rx="2"/>')
+        segs.append(f'<text x="{lx + 15}" y="{legend_y}" font-size="10" fill="#444" '
+                    f'font-family="Helvetica,Arial,sans-serif">{text}</text>')
+        lx += 15 + 7 * len(text) + 14
+    height = top + 2 * cell_h + gap_y + 8
+    return f'<div class="luck-timeline no-break">\n{_svg_wrap(chr(10).join(segs), width, height, "Five-year luck timeline")}\n</div>'
+
+
+def build_luck_bars_svg(rows: list[tuple[str, float, float]], aria: str,
+                        title: str, maxv: float) -> str:
+    """Stacked horizontal bars: (label, favorable_count, unfavorable_count)."""
+    if not rows:
+        return ""
+    width = 760
+    margin_x, label_w = 16, 92
+    row_h, gap = 22, 6
+    bar_max = width - margin_x * 2 - label_w
+    height = 40 + len(rows) * (row_h + gap)
+    segs: list[str] = [
+        f'<text x="{margin_x}" y="20" font-size="13" font-weight="bold" '
+        f'fill="#2a4d6e" font-family="Helvetica,Arial,sans-serif">{html.escape(title)}</text>'
+    ]
+    for i, (label, fav, unfav) in enumerate(rows):
+        y = 34 + i * (row_h + gap)
+        segs.append(
+            f'<text x="{margin_x}" y="{y + row_h * 0.7:.1f}" font-size="10" '
+            f'fill="#555" font-family="Helvetica,Arial,sans-serif">{html.escape(label)}</text>'
+        )
+        x0 = margin_x + label_w
+        fw = bar_max * (fav / maxv) if maxv else 0
+        uw = bar_max * (unfav / maxv) if maxv else 0
+        segs.append(f'<rect x="{x0:.1f}" y="{y}" width="{fw:.1f}" height="{row_h}" '
+                    f'fill="{_LEAN_COLORS["favorable"]}" rx="2"><title>{int(fav)} favorable</title></rect>')
+        if unfav:
+            segs.append(f'<rect x="{x0 + fw:.1f}" y="{y}" width="{uw:.1f}" height="{row_h}" '
+                        f'fill="{_LEAN_COLORS["challenging"]}" rx="2"><title>{int(unfav)} unfavorable</title></rect>')
+    return f'<div class="luck-bars no-break">\n{_svg_wrap(chr(10).join(segs), width, height, aria)}\n</div>'
+
+
+def build_luck_classes_svg(rows: list[tuple[str, dict]], aria: str) -> str:
+    """Stacked 100% bars per block: (label, {class: count})."""
+    if not rows:
+        return ""
+    width = 760
+    margin_x, label_w = 16, 92
+    row_h, gap = 22, 6
+    bar_w = width - margin_x * 2 - label_w
+    height = 46 + len(rows) * (row_h + gap) + 20
+    order = ["Companion", "Output", "Wealth", "Authority", "Resource"]
+    segs: list[str] = [
+        f'<text x="{margin_x}" y="20" font-size="13" font-weight="bold" '
+        f'fill="#2a4d6e" font-family="Helvetica,Arial,sans-serif">Ten-God Class Rhythm</text>'
+    ]
+    for i, (label, counts) in enumerate(rows):
+        y = 34 + i * (row_h + gap)
+        segs.append(
+            f'<text x="{margin_x}" y="{y + row_h * 0.7:.1f}" font-size="10" '
+            f'fill="#555" font-family="Helvetica,Arial,sans-serif">{html.escape(label)}</text>'
+        )
+        total = sum(counts.values()) or 1
+        x = margin_x + label_w
+        for cls in order:
+            n = counts.get(cls, 0)
+            if not n:
+                continue
+            w = bar_w * (n / total)
+            segs.append(
+                f'<rect x="{x:.1f}" y="{y}" width="{w:.1f}" height="{row_h}" '
+                f'fill="{_CLASS_COLORS[cls]}" rx="1"><title>{cls}: {n}</title></rect>'
+            )
+            x += w
+    # Legend.
+    lx, ly = margin_x, height - 8
+    for cls in order:
+        segs.append(f'<rect x="{lx}" y="{ly - 9}" width="11" height="11" fill="{_CLASS_COLORS[cls]}" rx="2"/>')
+        segs.append(f'<text x="{lx + 15}" y="{ly}" font-size="10" fill="#444" '
+                    f'font-family="Helvetica,Arial,sans-serif">{cls}</text>')
+        lx += 15 + 7 * len(cls) + 14
+    return f'<div class="luck-classes no-break">\n{_svg_wrap(chr(10).join(segs), width, height, aria)}\n</div>'
+
+
 def _build_decade_roadmap_svg(rows: list[tuple[str, str, str]]) -> str:
     """Render an SVG horizontal timeline of all 8 major-luck periods.
 

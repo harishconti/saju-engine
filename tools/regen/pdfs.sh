@@ -37,6 +37,12 @@ for t in sample essential; do
   pdf $RL $R/$n/rm-$t.md $R/$n/rm-$t-report.pdf "${NAME[$n]} — ${LABEL[$t]}" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}" $t
 done
 C=candidates_horoscope/marriage_compatibility
+# Luck-cycle report: HTML/Playwright backend so the SVG charts render.
+python3 "$HT" --input "$R/harish/harish-luck-cycle.md" --output "$R/harish/harish-luck-cycle.pdf" \
+  --title "Harish — Luck Cycle & Lifetime Decade Roadmap" --client "Harish" \
+  --dob "4 June 1992, 03:10 AM IST (Pallipattu, Tamil Nadu)" --day-master "Sin (Yin Metal)" \
+  --tier deep >/dev/null && echo "built $R/harish/harish-luck-cycle.pdf"
+C=candidates_horoscope/marriage_compatibility
 for t in basic deep; do
   sfx=""; [ $t = deep ] && sfx=_deep
   python3 src/saju_html/md_to_saju_compat_pdf.py $C/harish_manvitha/harish_manvitha_compatibility$sfx.md --name-a Harish --name-b Manvitha \

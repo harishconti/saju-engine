@@ -24,6 +24,9 @@ from saju_html.sections import (
     _wrap_audio_included,
     _wrap_chart_signature,
     _wrap_decade_roadmap,
+    _wrap_luck_classes,
+    _wrap_luck_favorable,
+    _wrap_luck_timeline,
     _wrap_lucky_attributes,
     _wrap_partner_upsell,
     _wrap_quick_ref,
@@ -217,6 +220,9 @@ def _render_markdown(md_text: str, tier: str | None = None) -> str:
     html_doc = _wrap_right_now(html_doc)
     html_doc = _wrap_lucky_attributes(html_doc)
     html_doc = _wrap_decade_roadmap(html_doc)
+    html_doc = _wrap_luck_timeline(html_doc)
+    html_doc = _wrap_luck_favorable(html_doc)
+    html_doc = _wrap_luck_classes(html_doc)
     html_doc = _wrap_chart_signature(html_doc)
     html_doc = _wrap_audio_included(html_doc)
     html_doc = _wrap_partner_upsell(html_doc)
@@ -496,4 +502,7 @@ __all__ = [
     "markdown_to_html",
     "html_to_pdf",
     "_wrap_decade_roadmap",       # re-exported for tests
+    "_wrap_luck_timeline",        # re-exported for tests
+    "_wrap_luck_favorable",
+    "_wrap_luck_classes",
 ]
