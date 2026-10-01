@@ -53,6 +53,9 @@ for t in basic deep; do
   python3 src/saju_html/md_to_saju_compat_pdf.py $C/pawan_sruthi/pawan_sruthi_compatibility$sfx.md --name-a Pawan --name-b Sruthi \
     --dob-a "3 October 1991, 23:45 IST" --dob-b "11 December 1993, 02:45 IST" --day-master-a 丙 --day-master-b 丙 --tier $t \
     --output $C/pawan_sruthi/pawan_sruthi_compatibility$sfx.pdf >/dev/null && echo "built pawan_sruthi $t"
+  python3 src/saju_html/md_to_saju_compat_pdf.py $C/harish_bindu/harish_bindu_compatibility$sfx.md --name-a Harish --name-b Bindu \
+    --dob-a "4 June 1992, 03:10 IST" --dob-b "24 March 1995, 10:10 IST" --day-master-a 辛 --day-master-b 甲 --tier $t \
+    --output $C/harish_bindu/harish_bindu_compatibility$sfx.pdf >/dev/null && echo "built harish_bindu $t"
 done
 cp $R/rm/rm-sample-report.pdf apps/landing-page/public/demo-rm-sample.pdf
 cp $R/rm/rm-essential-report.pdf apps/landing-page/public/demo-rm-essential.pdf
