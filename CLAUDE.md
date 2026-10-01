@@ -161,6 +161,8 @@ Prices are USD launch prices — see `docs/market-research-2026-09.md` for the r
 | Compat basic | `compat_report(..., tier="basic")` | *Compatibility Snapshot (두 분 궁합)* | $24 | ~4 pages | Two-chart snapshot: composite 0–100 score + 4-band verdict on cover, four-pillar glance, the four most decisive sub-systems (day-branch, day-stem, 용신 cross-supply, yin-yang), condensed Practical Guidance, Closing Note. |
 | Compat deep | `compat_report(..., tier="deep")` | *Deep Compatibility (두 분 궁합)* — **hero** | $45 | 9–10 pages | Basic + all 11 sub-system cards (A 일간합 → K 띠), individual element balance / Day Master snapshots, major-luck timelines for both partners, year-by-year couple timing overlay, full Practical Guidance, Closing Note. |
 | Companion | `companion` | *Cosmic Companion* (subscription) | $9/mo or $79/yr | 3–4 pages | Monthly timing read; manual billing. Off the primary pricing grid. |
+| Career add-on | `career` | *Career & Wealth Deep-Dive* | Add-on | 8–12 pages | Full career/business/wealth deep-dive: ranked domains + role ladders, working mode, income style & carrying capacity, investment behaviour, wealth preservation, decade-by-decade transition timing. Standalone module `src/saju_engine/career_report.py`. |
+| Luck-cycle add-on | `luck-cycle` | *Luck Cycle & Lifetime Decade Roadmap* | Add-on | 12–16 pages | The whole life in five-year blocks from the concrete 세운 in each 대운, each with wealth / business / family / investment notes, plus SVG charts. Standalone module `src/saju_engine/luck_cycle_report.py`. |
 
 `generate_compat_report(...)` accepts `favorable_element_a` / `favorable_element_b` overrides — pass
 the reader-argued 용신 (from the hand-crafted natal reading) so the natal and compat products agree.
@@ -169,7 +171,7 @@ The legacy internal tiers (`spark` $9, `reading` $55, `fullmap` $129) remain eng
 backward compatibility, but new client orders should use the single-chart tiers `sample`,
 `essential`, `deep` or the compatibility (`compat`) tiers `basic`/`deep`.
 
-**Engine usage:** `python -m saju_engine --format premium --tier {sample,essential,deep} ...` passes `tier` to `src/saju_engine/premium_report.py`. `generate_premium_report(chart, tier=...)` gates sections accordingly. For Compat, use `generate_compat_report(chart_a, chart_b, name_a, name_b, tier="basic"|"deep")` from `src/saju_engine/compat_report.py` directly.
+**Engine usage:** `python -m saju_engine --format premium --tier {sample,essential,deep,career,luck-cycle} ...` passes `tier` to `src/saju_engine/premium_report.py`. `generate_premium_report(chart, tier=...)` gates sections accordingly (the `career`/`luck-cycle` tiers dispatch to their standalone modules and get a cover). For Compat, use `generate_compat_report(chart_a, chart_b, name_a, name_b, tier="basic"|"deep")` from `src/saju_engine/compat_report.py` directly.
 
 **Deliverable pattern:**
 - Direct engine reports → polish the engine draft prose, then run `./tools/build-pdf.sh --from-chart ... --tier <tier>`.

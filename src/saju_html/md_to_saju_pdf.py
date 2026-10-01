@@ -930,8 +930,8 @@ def main():
     ap.add_argument("--no-korean-yazi", dest="korean_yazi", action="store_false")
     ap.add_argument("--overwrite-report", action="store_true",
                     help="When using --from-chart, write the markdown to {name}-report.md instead of {name}-engine.md.")
-    ap.add_argument("--tier", choices=["sample", "essential", "deep", "spark", "reading", "fullmap"], default=None,
-                    help="Premium report tier. With --from-chart it selects generated sections; "
+    ap.add_argument("--tier", choices=["sample", "essential", "deep", "spark", "reading", "fullmap", "career", "luck-cycle"], default=None,
+                    help="Report tier. With --from-chart it selects generated sections; "
                          "with an existing .md it only affects cover-page styling and translation.")
     ap.add_argument("--report-id", default="",
                     help="Unique report ID for cover/footer branding (auto-derived if omitted).")

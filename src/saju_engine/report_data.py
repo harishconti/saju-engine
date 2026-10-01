@@ -96,6 +96,23 @@ TIER_CONFIG: Dict[str, Dict[str, str]] = {
         "pages": "3–4",
         "tagline": "Ongoing monthly timing guidance, annual outlook refresh, and priority email support",
     },
+    # Standalone deep-dive add-ons (2026-10-01). These render the full
+    # career_report / luck_cycle_report documents through the tier pipeline, so
+    # they have their own --tier values and covers. Price is shown as "Add-on"
+    # because no launch price is set in docs/market-research-2026-09.md — set a
+    # real number here when the product is priced.
+    "career": {
+        "name": "Career & Wealth Deep-Dive",
+        "price": "Add-on",
+        "pages": "8–12",
+        "tagline": "Ranked career domains, role ladders, business/investment behaviour, and decade-by-decade transition timing",
+    },
+    "luck-cycle": {
+        "name": "Luck Cycle & Lifetime Decade Roadmap",
+        "price": "Add-on",
+        "pages": "12–16",
+        "tagline": "Every five-year block of your life, with wealth, business, family and investment notes, and charts",
+    },
 }
 
 
@@ -350,11 +367,16 @@ def normalize_tier(tier: str) -> str:
         "fullmap": "fullmap", "thefullmap": "fullmap", "full": "fullmap",
         # Subscription tier
         "companion": "companion", "cosmiccompanion": "companion",
+        # Standalone deep-dive add-ons
+        "career": "career", "careerdeepdive": "career", "careerwealth": "career",
+        "luckcycle": "luck-cycle", "luck": "luck-cycle",
+        "lifetimeroadmap": "luck-cycle", "roadmap": "luck-cycle",
     }
     key = tier.lower().replace(" ", "").replace("-", "").replace("_", "").replace("₹", "").replace("/month", "")
     if key not in mapping:
         raise ValueError(
-            f"Unknown tier {tier!r}. Choose one of: sample, essential, deep, spark, reading, fullmap, companion."
+            f"Unknown tier {tier!r}. Choose one of: sample, essential, deep, spark, "
+            "reading, fullmap, companion, career, luck-cycle."
         )
     return mapping[key]
 

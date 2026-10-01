@@ -311,6 +311,34 @@ def test_premium_report_unknown_tier_raises():
         generate_premium_report(chart, tier="platinum")
 
 
+def test_career_and_luck_cycle_are_premium_tiers():
+    """career / luck-cycle are standalone add-ons routed through the tier
+    system: they get a cover (name + Add-on price), the full module body, and
+    the client-draft banner."""
+    from saju_engine.report_data import TIER_CONFIG, normalize_tier
+
+    assert "career" in TIER_CONFIG and "luck-cycle" in TIER_CONFIG
+    assert normalize_tier("career") == "career"
+    assert normalize_tier("luck-cycle") == "luck-cycle"
+    assert normalize_tier("Luck Cycle") == "luck-cycle"
+
+    chart = _sample_chart()
+    career = generate_premium_report(chart, tier="career")
+    assert "Career & Wealth Deep-Dive" in career
+    assert "Add-on" in career
+    assert "## Suitable Career Domains — Ranked" in career
+    assert "## Career Transition Timing — Decade by Decade" in career
+    assert "Sources & Limits" in career
+    # The module's own h1 title block is replaced by the tier cover (one h1).
+    assert sum(1 for l in career.splitlines() if l.startswith("# ")) == 1
+
+    luck = generate_premium_report(chart, tier="luck-cycle")
+    assert "Luck Cycle & Lifetime Decade Roadmap" in luck
+    assert "## The Five-Year Blocks" in luck
+    assert "<!-- luck-timeline:start -->" in luck
+    assert "Sources & Limits" in luck
+
+
 def test_premium_report_sample_hook_is_compact():
     chart = _sample_chart()
     report = generate_premium_report(chart, tier="sample")

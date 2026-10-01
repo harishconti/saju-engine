@@ -101,8 +101,10 @@ def _build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--name", default=None, help="Candidate name (optional).")
     ap.add_argument("--format", choices=["json", "table", "skeleton", "premium", "luck-cycle", "career"], default="table",
                     help="Output format (default table; skeleton/premium/luck-cycle/career = engine-driven markdown).")
-    ap.add_argument("--tier", choices=["sample", "essential", "deep", "companion", "spark", "reading", "fullmap"], default="essential",
-                    help="Premium report tier (default essential; used only with --format premium). Compat tier is API-only — use generate_compat_report.")
+    ap.add_argument("--tier", choices=["sample", "essential", "deep", "companion", "spark", "reading", "fullmap", "career", "luck-cycle"], default="essential",
+                    help="Report tier (default essential; used only with --format premium). "
+                         "'career' and 'luck-cycle' are standalone deep-dive add-ons. "
+                         "Compat tier is API-only — use generate_compat_report.")
     ap.add_argument("--favorable-override", default=None,
                     choices=["Wood", "Fire", "Earth", "Metal", "Water"],
                     help="Override the engine's heuristic 용신 with a reader-argued favorable element "

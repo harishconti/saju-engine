@@ -125,6 +125,15 @@ The generated PDF and engine markdown are saved alongside the intake JSON in `ca
 | RM (Kim Nam-joon) | 1994-09-12, 13:28 KST, Seoul | 辛 신 (Yin Metal) | Water (水) | Demo reports for landing page. Tiered: [sample.md](reports/rm/rm-sample.md) / [essential.md](reports/rm/rm-essential.md) / [deep.md](reports/rm/rm-report.md) — PDFs: [sample](reports/rm/rm-sample-report.pdf) · [essential](reports/rm/rm-essential-report.pdf) · [deep](reports/rm/rm-report.pdf) · Landing-page demos: [sample](../../apps/landing-page/public/demo-rm-sample.pdf) / [essential](../../apps/landing-page/public/demo-rm-essential.pdf) / [deep](../../apps/landing-page/public/demo-rm-deep.pdf) |
 | Bindu | 1995-03-24, 10:10 AM IST, Kolar, Karnataka — lon 78.2669 | 甲 갑 (Yang Wood) | Fire (火) *(engine; strong-DM drain, temperate month)* | [base](reports/bindu/bindu-report.md) · [base PDF](reports/bindu/bindu-report.pdf) · [career](reports/bindu/career.md) · [career PDF](reports/bindu/career.pdf) · [luck-cycle](reports/bindu/bindu-luck-cycle.md) · [luck-cycle PDF](reports/bindu/bindu-luck-cycle.pdf). **2026-10-01:** added. Pillars 乙亥/己卯/甲寅/己巳, Day Master 甲 strong (제왕 at 卯), 용신 Fire / 희신 Earth / 기신 Wood. Also has a [Harish × Bindu compatibility](marriage_compatibility/harish_bindu/harish_bindu_compatibility.md) (85/100 Excellent). |
 
+## Add-on deep-dives (career · luck-cycle)
+
+Two standalone engine reports, also exposed as **premium tiers** (`--tier career` / `--tier luck-cycle`), each with its own cover (`Add-on` price — no launch price is set yet):
+
+- **Career & Wealth Deep-Dive** — `reports/{slug}/career.md` · `.pdf`: ranked career domains + role ladders, working mode, income style & carrying capacity, investment behaviour, wealth preservation, and decade-by-decade transition timing (`knowledge/12` + `13`).
+- **Luck Cycle & Lifetime Decade Roadmap** — `reports/{slug}/{slug}-luck-cycle.md` · `.pdf`: the whole life in five-year blocks (read from the concrete 세운 inside each 대운), each with wealth / business / family / investment notes, plus SVG timeline / favorable-cycle / ten-god-class charts (`knowledge/08`). Rendered via the HTML/Playwright backend so the charts appear.
+
+Both now exist for **every candidate**: luck-cycle for harish, sruthi, pawan, bindu, gurumoorthy, mahesh, vishnu-priya, rm. Career is **engine-generated** for pawan, sruthi, bindu and rm; for harish, gurumoorthy, mahesh and vishnu-priya the `career.md` is **hand-authored** (richer deep-dive) and is deliberately excluded from the engine regen — see `tools/regen/markdown.sh`.
+
 ## Compatibility (궁합) readings
 
 Two-chart readings live under `candidates_horoscope/marriage_compatibility/` in **one subfolder per pair**, named with the partners' actual slugified names: `{name_a_slug}_{name_b_slug}/`. Inside that subfolder, the files use the same slug as the folder name. (Partner A first, Partner B second; for heterosexual pairs Partner A is the male). Each pair has two tiers:
