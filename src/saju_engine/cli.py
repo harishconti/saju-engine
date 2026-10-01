@@ -99,8 +99,8 @@ def _build_parser() -> argparse.ArgumentParser:
                     help="Branch the 12신살 (and 도화/역마/화개) are counted from: day (default, common "
                          "modern practice) or year (traditional Korean basis).")
     ap.add_argument("--name", default=None, help="Candidate name (optional).")
-    ap.add_argument("--format", choices=["json", "table", "skeleton", "premium", "luck-cycle"], default="table",
-                    help="Output format (default table; skeleton/premium/luck-cycle = engine-driven markdown).")
+    ap.add_argument("--format", choices=["json", "table", "skeleton", "premium", "luck-cycle", "career"], default="table",
+                    help="Output format (default table; skeleton/premium/luck-cycle/career = engine-driven markdown).")
     ap.add_argument("--tier", choices=["sample", "essential", "deep", "companion", "spark", "reading", "fullmap"], default="essential",
                     help="Premium report tier (default essential; used only with --format premium). Compat tier is API-only — use generate_compat_report.")
     ap.add_argument("--favorable-override", default=None,
@@ -183,7 +183,7 @@ def _run(args, stdout, stderr, *, deprecated_alias_used: bool = False) -> int:
     except UnknownTimezone as exc:
         raise SystemExit(str(exc))
 
-    if args.format in ("premium", "skeleton", "luck-cycle") and args.gender is None:
+    if args.format in ("premium", "skeleton", "luck-cycle", "career") and args.gender is None:
         raise SystemExit(
             f"--gender is required for --format {args.format} (대운 direction depends on gender)"
         )
@@ -252,6 +252,17 @@ def _run(args, stdout, stderr, *, deprecated_alias_used: bool = False) -> int:
             stdout.write(f"Luck-cycle report written to {args.output_file}\n")
         else:
             stdout.write(luck + "\n")
+    elif args.format == "career":
+        from .career_report import generate_career_report
+        career = generate_career_report(
+            chart, favorable_override=args.favorable_override
+        )
+        if args.output_file:
+            with open(args.output_file, "w", encoding="utf-8") as f:
+                f.write(career)
+            stdout.write(f"Career report written to {args.output_file}\n")
+        else:
+            stdout.write(career + "\n")
     else:
         stdout.write(_table(chart) + "\n")
     return 0

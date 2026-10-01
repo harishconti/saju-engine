@@ -37,11 +37,13 @@ for t in sample essential; do
   pdf $RL $R/$n/rm-$t.md $R/$n/rm-$t-report.pdf "${NAME[$n]} — ${LABEL[$t]}" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}" $t
 done
 C=candidates_horoscope/marriage_compatibility
-# Luck-cycle report: HTML/Playwright backend so the SVG charts render.
-python3 "$HT" --input "$R/harish/harish-luck-cycle.md" --output "$R/harish/harish-luck-cycle.pdf" \
-  --title "Harish — Luck Cycle & Lifetime Decade Roadmap" --client "Harish" \
-  --dob "4 June 1992, 03:10 AM IST (Pallipattu, Tamil Nadu)" --day-master "Sin (Yin Metal)" \
-  --tier deep >/dev/null && echo "built $R/harish/harish-luck-cycle.pdf"
+# Luck-cycle reports: HTML/Playwright backend so the SVG charts render.
+for n in harish sruthi pawan; do
+  python3 "$HT" --input "$R/$n/$n-luck-cycle.md" --output "$R/$n/$n-luck-cycle.pdf" \
+    --title "${NAME[$n]} — Luck Cycle & Lifetime Decade Roadmap" --client "${NAME[$n]}" \
+    --dob "${DOB[$n]}" --day-master "${DM[$n]}" --tier deep >/dev/null \
+    && echo "built $R/$n/$n-luck-cycle.pdf"
+done
 C=candidates_horoscope/marriage_compatibility
 for t in basic deep; do
   sfx=""; [ $t = deep ] && sfx=_deep

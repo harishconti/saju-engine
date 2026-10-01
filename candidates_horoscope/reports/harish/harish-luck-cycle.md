@@ -21,7 +21,7 @@ This report walks your whole life in **five-year blocks**. Each 10-year major-lu
 
 ## Lifetime Timeline
 
-Every five-year block, colour-coded by favorable lean. Green phases run your favorable element; red lean toward the unfavorable; amber are mixed.
+Every five-year block, colour-coded by **net** favorable lean (favorable years minus unfavorable years): green where the favorable element leads by 2+ years, red where the unfavorable leads by 2+, amber otherwise. A block showing fewer favorable years can still read green if it has no unfavorable years — the net, not the raw count, sets the colour.
 
 <!-- luck-timeline:start -->
 
