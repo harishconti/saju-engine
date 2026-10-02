@@ -159,3 +159,14 @@ def test_intake_forms_do_not_default_utc_offset_to_india():
             assert 'value="5.5"' not in tag, (
                 f"{html_path.name}#{field_id} must not default to India's UTC offset: {tag!r}"
             )
+
+
+def test_client_forms_show_usd_not_rupee_prices():
+    """S7 (2026-10-01 audit): forms still showed ₹799/₹1,499 after the
+    2026-09-07 USD pivot."""
+    for html_path in sorted((PROJECT_ROOT / "tools").glob("*.html")):
+        assert "₹" not in html_path.read_text(encoding="utf-8"), html_path.name
+    app_html = (PROJECT_ROOT / "tools" / "client_intake_app.html").read_text()
+    assert "$19" in app_html and "$55" in app_html
+    compat_html = (PROJECT_ROOT / "tools" / "client_compat_intake_form.html").read_text()
+    assert "$24" in compat_html and "$45" in compat_html
