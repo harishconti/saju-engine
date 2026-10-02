@@ -25,7 +25,7 @@ def _report(override="Water"):
 def test_has_all_sections():
     md = _report()
     for section in (
-        "## Suitable Career Domains — Ranked",
+        "## Career Archetypes — Ranked Domains",
         "## Concrete Role Ladders",
         "## Ten-God → Career Mode",
         "## Employment vs. Entrepreneurship",
@@ -36,6 +36,34 @@ def test_has_all_sections():
         "## Sources & Limits",
     ):
         assert section in md, f"missing section: {section}"
+
+
+def test_archetype_deep_dive_present_and_override_aware():
+    """The premium archetype deep-dive (Wealth Pattern, Income Rhythm,
+    Skill-Levers, Company-Type Fit, Boss/Team, Red-Flags) must be carried into
+    the standalone career report, and it must resolve the SAME favorable element
+    as the header even under a reader override (the E-3 channel-split bug)."""
+    md = _report(override="Water")
+    assert "## Archetype Deep-Dive" in md
+    for heading in ("### Wealth Pattern", "### Income Rhythm", "### Skill-Levers to Develop",
+                    "### Company-Type Fit", "### Boss / Team Dynamics",
+                    "### Red-Flag Environments"):
+        assert heading in md, f"missing deep-dive section: {heading}"
+    dive = md.split("## Archetype Deep-Dive", 1)[1]
+    # Under override Water, the prose must name Water — not the engine's raw pick.
+    assert "**Water**" in dive
+    assert "**Wood** leader" not in dive
+
+
+def test_domain_detail_tone_matches_ranked_tier():
+    """The per-domain detail must not call a 'Good Fit' a 'Best Fit' (the tier
+    is score-based; element equality alone does not set it)."""
+    md = _report(override="Water")
+    # For Pawan under Water, 'Logistics & Shipping' is Good Fit (5th row).
+    assert "### Logistics & Shipping (**Good Fit**)" in md
+    block = md.split("### Logistics & Shipping (**Good Fit**)", 1)[1].split("### ", 1)[0]
+    assert "A **Good Fit**" in block
+    assert "This is a **Best Fit**" not in block
 
 
 def test_all_ranked_domains_have_a_role_ladder():
@@ -62,9 +90,10 @@ def test_respects_reader_override():
     not the engine's own pick)."""
     md = _report(override="Water")
     assert "**Favorable (용신):** Water" in md
-    # The Best-Fit block must be Water-family domains.
-    best = md.split("## Suitable Career Domains", 1)[1].split("## Concrete", 1)[0]
-    best_fit = [l for l in best.splitlines() if "**Best Fit**" in l]
+    # The Best-Fit table rows must be Water-family domains.
+    best = md.split("## Career Archetypes", 1)[1].split("## Concrete", 1)[0]
+    best_fit = [l for l in best.splitlines()
+                if l.startswith("| **Best Fit**")]
     assert best_fit, "expected Best Fit rows"
     for line in best_fit:
         assert any(d in line for d in ("Strategy & Consulting", "Diplomacy & International Business",

@@ -151,14 +151,17 @@ def _top_classes(chart) -> List[str]:
 def _tiers_section(chart, override) -> List[str]:
     rows = _career_tiers(chart, override)
     lines = [
-        "## Suitable Career Domains — Ranked",
+        "## Career Archetypes — Ranked Domains",
         "",
-        "Domains are ranked by the chart's *need* (용신 / 희신), not by the Day "
-        "Master's own element — the classical priority in "
+        "Your career archetypes are the fields the chart can carry, ranked by "
+        "what it *needs* (용신 / 희신) rather than by the Day Master's own "
+        "element — the classical priority in "
         "`knowledge/12-career-and-vocation.md` §용신 vs. Day Master for Career "
         "Choice is to \"align work with what the chart needs\", because work that "
         "reinforces an already-dominant element pushes the chart further out of "
-        "balance.",
+        "balance. **Best Fit** = directly aligned; **Good Fit** = supportive "
+        "breadth; **Possible** = workable but not strongly resourced by the "
+        "chart.",
         "",
         "| Tier | Domain | Why It Fits | Example Roles |",
         "|---|---|---|---|",
@@ -183,10 +186,106 @@ def _tiers_section(chart, override) -> List[str]:
         seen.add(domain)
         lines.append(f"| {domain} | {_ROLES.get(domain, '—')} |")
     lines.append("")
+    lines += _domain_detail_section(chart, override, rows)
     return lines
 
 
-def _mode_section(chart, fav: str, sup: str, unfav: Optional[str], verdict: str) -> List[str]:
+# Element → the character of work it produces (knowledge/12 §Element → Industry
+# Families; knowledge/03-five-elements.md for the nature).
+_DOMAIN_ELEMENT_NOTE = {
+    "Wood": ("grows something over time — it develops people, ideas or structures and keeps extending",
+             "nourished into being and then feeding the next stage"),
+    "Fire": ("is public-facing and expressive — it makes things seen and energises an audience",
+             "maximum outward radiance that cannot act in private"),
+    "Earth": ("holds, stores and mediates — it stabilises assets and provides the base others rely on",
+             "the element that contains and stands between"),
+    "Metal": ("demands precision, standards and clean boundaries — it refines raw material into a finished thing",
+             "the element that cuts, separates and finishes"),
+    "Water": ("moves information, goods or people — it connects separated things and runs below the surface",
+             "the element that flows around obstacles and connects"),
+}
+
+
+def _domain_detail_section(chart, override, rows) -> List[str]:
+    """A paragraph per ranked domain: what it is, why it fits THIS chart, how to
+    use it, and how it relates to the chart's favorable/structural roles."""
+    from .report_data import _domain_element
+
+    fe = favorable_element(chart, override)
+    fav, sup, unfav = fe.element, fe.supporting, fe.unfavorable
+    dm_elem = chart.day_master_info.get("element", "")
+    lines = [
+        "## Domain Deep-Dive — Why Each Archetype Fits",
+        "",
+        "Each ranked archetype below is read for *this* chart: what the element "
+        "family is, why the chart fits it, the practical way to use it, and the "
+        "honest caveat where the fit is weaker "
+        "*(see knowledge/12-career-and-vocation.md §Element → Industry Families; "
+        "knowledge/03-five-elements.md)*.",
+        "",
+    ]
+    # de-dupe domains, keeping the best (first-seen) tier label
+    seen: Dict[str, str] = {}
+    for tier, domain, _why, _ex in rows:
+        seen.setdefault(domain, tier)
+    for domain, tier in seen.items():
+        elem = _domain_element(domain)
+        nature, image = _DOMAIN_ELEMENT_NOTE.get(elem, ("has its own character", "its elemental nature"))
+        role = _ROLES.get(domain, "—")
+        # Why the chart fits — the element relation (the engine's actual reason).
+        if elem == fav:
+            why_elem = (f"the family runs on **{fav}**, your favorable element, so the "
+                        "work moves *with* the chart's grain instead of against it")
+        elif elem == sup:
+            why_elem = (f"the family runs on **{sup}**, your 희신, which strengthens the "
+                        "chart's balance rather than draining or feeding the Day Master")
+        elif elem == dm_elem:
+            why_elem = (f"the family shares your Day Master's element (**{dm_elem}**), so "
+                        "it lets your native energy express directly")
+        elif elem and elem == unfav:
+            why_elem = (f"the family runs on **{unfav}**, your unfavorable element, which the "
+                        "chart reads as pressure rather than nourishment")
+        else:
+            why_elem = (f"the family runs on **{elem}**, a neutral element for this chart — "
+                        "neither favorable nor unfavorable on its own")
+
+        # The practical tone is keyed on the ACTUAL ranked tier, so the prose can
+        # never contradict the table above (the tier is score-based; element
+        # equality alone does not determine it).
+        if "Best" in tier:
+            fit = f"This is a **Best Fit**: {why_elem}."
+            use = ("Lean into it deliberately — this is where effort compounds fastest "
+                   "and friction is lowest.")
+            caveat = ("Even a favorable element can be overrun if pursued to excess; keep "
+                      "other tracks alive so the chart stays balanced.")
+        elif "Good" in tier:
+            fit = (f"A **Good Fit**: {why_elem}. It is well resourced by the chart, just "
+                   "not at the very top of the ranking.")
+            use = "Treat it as a lead second track, or a strong complement to your Best-Fit work."
+            caveat = ("Strong but not primary — pick it deliberately rather than by default, "
+                      "and keep the favorable element in play alongside it.")
+        else:
+            fit = f"A **Possible** fit: {why_elem}."
+            use = ("Use it only inside a supporting structure, with the favorable element "
+                   "present to offset it; do not make it the core identity of the work.")
+            caveat = ("The chart is not strongly resourced for this family — do not "
+                      "over-invest career capital here without a reader's check.")
+        lines += [
+            f"### {domain} ({tier})",
+            "",
+            f"- **Element family:** {elem} — this family {nature} "
+            f"(*{elem} {image}*, knowledge/12 §Element → Industry Families).",
+            f"- **Why it fits your chart:** {fit}",
+            f"- **How to use it:** {use}",
+            f"- **Caveat:** {caveat}",
+            f"- **Roles:** {role}",
+            "",
+        ]
+    return lines
+
+
+def _mode_section(chart, fav: str, sup: str, unfav: Optional[str], verdict: str,
+                  favorable_override=None) -> List[str]:
     tops = _top_classes(chart)
     top_ko = " · ".join(_CLASS_KO.get(c, c) for c in tops) if tops else "—"
     mode_blurb = {
@@ -225,6 +324,61 @@ def _mode_section(chart, fav: str, sup: str, unfav: Optional[str], verdict: str)
         "",
         "**Company / entity fit:** " + entity + " — " + env + " "
         "*(see knowledge/12-career-and-vocation.md §Element → Industry Families)*.",
+        "",
+        *_archetype_deep_dive(chart, favorable_override),
+    ]
+
+
+def _archetype_deep_dive(chart, override) -> List[str]:
+    """The premium report's archetype deep-dive prose, reuse-assembled.
+
+    These helpers live on a `_ReportContext`; we pass a minimal dict with the
+    same keys (`chart`, `favorable`, `supporting`, `unfavorable`, `dm_element`)
+    so the standalone career report carries the SAME grounded archetype detail
+    the Deep tier's Career & Wealth section shows — one source of truth.
+
+    ``override`` MUST be threaded through: without it `favorable_element()`
+    resolves the engine's raw pick and the deep-dive would name a different
+    element than this report's own header (the E-3 channel-split bug).
+    """
+    from . import prose_fillers as PF
+    from .yongsin import favorable_element
+
+    fe = favorable_element(chart, override)
+    ctx = {
+        "chart": chart,
+        "favorable": fe.element,
+        "supporting": fe.supporting,
+        "unfavorable": fe.unfavorable or "the challenging element",
+        "dm_element": chart.day_master_info.get("element", ""),
+        "tier": "deep",
+    }
+    return [
+        "## Archetype Deep-Dive",
+        "",
+        "### Wealth Pattern",
+        "",
+        PF.wealth_pattern(ctx),
+        "",
+        "### Income Rhythm",
+        "",
+        PF.income_rhythm(ctx),
+        "",
+        "### Skill-Levers to Develop",
+        "",
+        PF.skill_levers(ctx),
+        "",
+        "### Company-Type Fit",
+        "",
+        PF.company_type_fit(ctx),
+        "",
+        "### Boss / Team Dynamics",
+        "",
+        PF.boss_team_dynamics(ctx),
+        "",
+        "### Red-Flag Environments",
+        "",
+        PF.red_flag_environments(ctx),
         "",
     ]
 
@@ -423,7 +577,7 @@ def generate_career_report(chart, *, favorable_override: Optional[str] = None) -
         "---",
         "",
     ]
-    lines += _mode_section(chart, fav, sup, unfav, verdict)
+    lines += _mode_section(chart, fav, sup, unfav, verdict, favorable_override)
     lines += [
         "---",
         "",

@@ -326,7 +326,7 @@ def test_career_and_luck_cycle_are_premium_tiers():
     career = generate_premium_report(chart, tier="career")
     assert "Career & Wealth Deep-Dive" in career
     assert "Add-on" in career
-    assert "## Suitable Career Domains — Ranked" in career
+    assert "## Career Archetypes — Ranked Domains" in career
     assert "## Career Transition Timing — Decade by Decade" in career
     assert "Sources & Limits" in career
     # The module's own h1 title block is replaced by the tier cover (one h1).

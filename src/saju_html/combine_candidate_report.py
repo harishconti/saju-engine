@@ -192,11 +192,16 @@ def combine_report(name: str, topic_files: list[str] | None = None) -> Path:
         }
         # Exclude engine-generated tier files to avoid duplicate Closing Notes
         # and duplicated tiered content in the default combined output.
+        # `-luck-cycle` is excluded too: it is rendered via the HTML backend for
+        # its SVG chart markers, which the ReportLab backend used for the
+        # combined PDF does not strip — including it would leak literal
+        # `<!-- luck-timeline:start -->` markers into the client PDF.
         excluded_tier_substrings = (
             "-engine",
             "-sample",
             "-essential",
             "-deep",
+            "-luck-cycle",
         )
         topic_paths = sorted(
             p
