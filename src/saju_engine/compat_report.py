@@ -19,6 +19,7 @@ from __future__ import annotations
 
 from typing import List, Optional
 
+from . import report_primitives as RP
 from .chart import Chart
 from .compat import WEIGHT, CompatReport, CompatSubResult, compat_score
 from .strength import element_balance_pct
@@ -30,16 +31,6 @@ from datetime import date
 
 # ── Element-color emoji table (matches saju_html / engine convention) ───────
 
-_ELEMENT_EMOJI = {
-    "Wood": "🟢", "Fire": "🔴", "Earth": "🟡", "Metal": "⚪", "Water": "🔵",
-}
-
-
-def _plain(text: str) -> str:
-    """Wrap a lay restatement as a single-line 'In plain words' blockquote."""
-    return f"> **In plain words:** {text}"
-
-
 def _plain_words_verdict(report: CompatReport) -> str:
     picture = {
         "Excellent": "a strongly supportive match — the fundamentals line up",
@@ -47,7 +38,7 @@ def _plain_words_verdict(report: CompatReport) -> str:
         "Mixed": "a workable match with real friction points to manage deliberately",
         "Challenging": "a match that asks for steady, conscious effort to hold together",
     }.get(report.band, "a match to read section by section")
-    return _plain(
+    return RP.plain(
         f"Overall this reads as {picture} ({report.score}/100). "
         f"Treat the number as a weather report, not a verdict."
     )
@@ -63,7 +54,7 @@ def _plain_words_daymaster_cross(report: CompatReport) -> str:
                 "is a strength")
     else:
         core = "your day-to-day rhythms are neutral — neither a lift nor a drag on their own"
-    return _plain(f"At the centre of the match, {core}.")
+    return RP.plain(f"At the centre of the match, {core}.")
 
 
 def _plain_words_timing(report: CompatReport) -> str:
@@ -76,19 +67,14 @@ def _plain_words_timing(report: CompatReport) -> str:
     else:
         t = ("your life-chapters turn on different clocks — plan for stretches where one of you is "
              "rising while the other is steadying")
-    return _plain(f"On timing, {t}.")
+    return RP.plain(f"On timing, {t}.")
 
 
 def _emoji(elem: str) -> str:
-    return _ELEMENT_EMOJI.get(elem, "·")
+    return RP.ELEMENT_EMOJI.get(elem, "·")
 
 
 # ── Deep-tier helpers (added for the deep compatibility product) ────────────
-
-
-def _bar(pct: float) -> str:
-    filled = int(round(pct / 10))
-    return "█" * filled + "░" * (10 - filled)
 
 
 def _element_balance_lines(chart: Chart, name: str) -> List[str]:
@@ -102,7 +88,7 @@ def _element_balance_lines(chart: Chart, name: str) -> List[str]:
     lines.append("|---|---|---|")
     for elem in ["Fire", "Wood", "Earth", "Metal", "Water"]:
         pct = dist.get(elem, 0.0)
-        lines.append(f"| {_emoji(elem)} {elem} | {_bar(pct)} | {pct:.1f}% |")
+        lines.append(f"| {_emoji(elem)} {elem} | {RP.bar(pct, 10)} | {pct:.1f}% |")
     lines.append("")
     return lines
 
@@ -286,8 +272,8 @@ def _cover(report: CompatReport, name_a: str, name_b: str) -> List[str]:
     """Cover: both names, DOBs, Day Masters, score, band."""
     lines: List[str] = []
     a, b = report.chart_a, report.chart_b
-    a_dm_elem = _ELEMENT_EMOJI.get(a.day_master_info.get("element", "·"), "·") if a.day_master_info else "·"
-    b_dm_elem = _ELEMENT_EMOJI.get(b.day_master_info.get("element", "·"), "·") if b.day_master_info else "·"
+    a_dm_elem = RP.ELEMENT_EMOJI.get(a.day_master_info.get("element", "·"), "·") if a.day_master_info else "·"
+    b_dm_elem = RP.ELEMENT_EMOJI.get(b.day_master_info.get("element", "·"), "·") if b.day_master_info else "·"
     lines.append(f"# {name_a} × {name_b} — 궁합 (合婚 / Compatibility Reading)")
     lines.append("")
     lines.append(f"**Composite Score (종합 점수):** **{report.score} / 100**  ")

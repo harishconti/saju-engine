@@ -19,6 +19,7 @@ from typing import Dict, List, Optional, Tuple
 from functools import lru_cache
 
 from . import lookup as L
+from . import report_primitives as RP
 
 
 @dataclass
@@ -321,12 +322,7 @@ def derive_sewoon(
     """
     stem, branch = _annual_pillar_for_date(year, month, day)
     tengod = L.ten_god(day_master, stem)
-    tengod_en = {
-        "비견": "Companion", "겁재": "Robber", "식신": "Eating God",
-        "상관": "Hurting Officer", "편재": "Indirect Wealth",
-        "정재": "Direct Wealth", "편관": "Seven Killings",
-        "정관": "Direct Officer", "편인": "Indirect Resource", "정인": "Direct Resource",
-    }.get(tengod, tengod)
+    tengod_en = RP.TENGOD_SHORT_EN.get(tengod, tengod)
 
     activated: List[Tuple[str, str, str]] = []
     types: set[str] = set()
@@ -482,12 +478,7 @@ def derive_woon(
     """
     stem, branch = _monthly_pillar_for_date(year, month, day)
     tengod = L.ten_god(day_master, stem)
-    tengod_en = {
-        "비견": "Companion", "겁재": "Robber", "식신": "Eating God",
-        "상관": "Hurting Officer", "편재": "Indirect Wealth",
-        "정재": "Direct Wealth", "편관": "Seven Killings",
-        "정관": "Direct Officer", "편인": "Indirect Resource", "정인": "Direct Resource",
-    }.get(tengod, tengod)
+    tengod_en = RP.TENGOD_SHORT_EN.get(tengod, tengod)
 
     activated: List[Tuple[str, str, str]] = []
     types: set[str] = set()
@@ -550,12 +541,7 @@ def derive_ilwoon(
     """Compute the daily-luck overlay for a Gregorian calendar date."""
     stem, branch = _daily_pillar(year, month, day)
     tengod = L.ten_god(day_master, stem)
-    tengod_en = {
-        "비견": "Companion", "겁재": "Robber", "식신": "Eating God",
-        "상관": "Hurting Officer", "편재": "Indirect Wealth",
-        "정재": "Direct Wealth", "편관": "Seven Killings",
-        "정관": "Direct Officer", "편인": "Indirect Resource", "정인": "Direct Resource",
-    }.get(tengod, tengod)
+    tengod_en = RP.TENGOD_SHORT_EN.get(tengod, tengod)
 
     activated: List[Tuple[str, str, str]] = []
     types: set[str] = set()

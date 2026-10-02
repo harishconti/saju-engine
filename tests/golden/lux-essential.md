@@ -127,7 +127,7 @@ Wealth timing is read from where 재성 (Wealth) ten-gods appear and are support
 
 ### Wealth Preservation Note
 
-For a **Metal** Day Master with a **Extreme** reading, wealth preservation starts with diversification — never concentrate more than your chart can comfortably hold. Liquidity buffers aligned with the **Water** element (its colors, foods, and rhythms) help the querent stay flexible across unfavorable 대운 periods. Lean on **Water**-aligned custodians and instruments rather than chasing growth alone.
+For a **Metal** Day Master with a **Very Strong** reading, wealth preservation starts with diversification — never concentrate more than your chart can comfortably hold. Liquidity buffers aligned with the **Water** element (its colors, foods, and rhythms) help the querent stay flexible across unfavorable 대운 periods. Lean on **Water**-aligned custodians and instruments rather than chasing growth alone.
 
 > **In plain words:** Your chart leans toward earning alongside peers — teams, partnerships, independent practice. Fields and decades that carry Water give the cleanest results; the timing tables show when.
 

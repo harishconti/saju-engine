@@ -18,26 +18,14 @@ from __future__ import annotations
 from collections import Counter
 from typing import Dict, List, Optional, Tuple
 
+from . import report_primitives as RP
 from .chart import Chart, Pillar
 from .yongsin import favorable_element
 
 
 # ── Five-element presentation helpers (engine-neutral, used by both backends) ─
-ELEMENT_COLORS = {
-    "Wood": "#27ae60",
-    "Fire": "#e74c3c",
-    "Earth": "#f39c12",
-    "Metal": "#7f8c8d",
-    "Water": "#3498db",
-}
-
-ELEMENT_EMOJI = {
-    "Wood": "🟢",
-    "Fire": "🔴",
-    "Earth": "🟡",
-    "Metal": "⚪",
-    "Water": "🔵",
-}
+# B4 (2026-10-01 audit): defined in report_primitives; re-exported (saju_html imports them).
+from .report_primitives import ELEMENT_COLORS, ELEMENT_EMOJI  # noqa: E402,F401
 
 
 # ── Tier metadata ──────────────────────────────────────────────────────────
@@ -414,10 +402,7 @@ def _element_balance(chart: Chart) -> Tuple[Dict[str, float], Counter]:
     return pct, counts
 
 
-def _bar(pct: float, width: int = 20) -> str:
-    """Return an ASCII bar for the element balance display."""
-    filled = round(pct / 100 * width)
-    return "█" * filled + "░" * (width - filled)
+_bar = RP.bar
 
 
 def _element_balance_table(chart: Chart) -> List[str]:
@@ -436,16 +421,7 @@ def _element_balance_table(chart: Chart) -> List[str]:
 
 def _strength_label(chart: Chart) -> str:
     sa = chart.strength_assessment or {}
-    verdict = sa.get("verdict", "balanced")
-    if verdict == "extreme":
-        return "Very Strong"
-    if verdict == "strong":
-        return "Strong"
-    if verdict == "extreme_weak":
-        return "Very Weak"
-    if verdict == "weak":
-        return "Weak"
-    return "Balanced"
+    return RP.verdict_label(sa.get("verdict", "balanced"))
 
 
 def _domain_element(domain: str) -> Optional[str]:

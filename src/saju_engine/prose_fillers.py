@@ -19,6 +19,7 @@ from __future__ import annotations
 from collections import Counter
 from typing import Any, Dict, List, Optional, Tuple
 
+from . import report_primitives as RP
 from .fallback_log import log_fallback
 from .report_data import _PILLAR_AREAS
 
@@ -35,13 +36,7 @@ from .report_data import _PILLAR_AREAS
 # tengod string sourced from those modules, e.g. `stem_tengod_en` in a 세운
 # table, never matched a dict entry keyed "Output"). Split them to match the
 # existing convention and the other four classes' split-by-variant shape.
-_TENGOD_CLASS: Dict[str, str] = {
-    "비견": "Companion", "겁재": "Robber",
-    "식신": "Eating God", "상관": "Hurting Officer",
-    "편재": "Indirect Wealth", "정재": "Direct Wealth",
-    "편관": "Seven Killings", "정관": "Direct Officer",
-    "편인": "Indirect Resource", "정인": "Direct Resource",
-}
+# B4 (2026-10-01 audit): the table now lives in report_primitives.TENGOD_SHORT_EN.
 
 # The five broad 십신 classes (비겁/식상/재성/관성/인성), keyed by the KOREAN
 # ten-god code — not the English gloss. Use this, never a substring check on
@@ -60,13 +55,7 @@ _TENGOD_CLASS: Dict[str, str] = {
 # authority-pressure text; 2032 (壬子, Hurting Officer) and the 60-69 decade
 # both showed "structured career moves" (Authority text) instead of
 # Output-class text.
-_TENGOD_FIVE_CLASS: Dict[str, str] = {
-    "비견": "Companion", "겁재": "Companion",
-    "식신": "Output", "상관": "Output",
-    "편재": "Wealth", "정재": "Wealth",
-    "편관": "Authority", "정관": "Authority",
-    "편인": "Resource", "정인": "Resource",
-}
+# B4 (2026-10-01 audit): the table now lives in report_primitives.TENGOD_CLASS.
 
 # Element → organ mapping (used by health fillers)
 # source: knowledge/15-health-and-body.md § 오행 → Organ Systems
@@ -86,11 +75,6 @@ def _ctx_get(ctx: Any, key: str, default: Any = None) -> Any:
     return getattr(ctx, key, default)
 
 
-def _plain(text: str) -> str:
-    """Wrap a lay restatement as a single-line 'In plain words' blockquote."""
-    return f"> **In plain words:** {text}"
-
-
 def period_favorable_status(period: Any, ctx: Any) -> str:
     """Return a 대운 period's favorable/neutral/unfavorable lean vs. THIS
     report's final resolved favorable element (``ctx.favorable`` — which
@@ -108,7 +92,6 @@ def period_favorable_status(period: Any, ctx: Any) -> str:
     narrates 대운/timing favorability should call this instead of reading
     ``period.favorable_status`` directly.
     """
-    hits = {getattr(period, "stem_element", None), getattr(period, "branch_element", None)}
     favorable = _ctx_get(ctx, "favorable")
     supporting = _ctx_get(ctx, "supporting")
     unfavorable = _ctx_get(ctx, "unfavorable")
@@ -122,14 +105,11 @@ def period_favorable_status(period: Any, ctx: Any) -> str:
     # qualifying element, was labelled a "favorable-element year" by the
     # annual check — a direct, client-visible contradiction between two
     # tables describing the same period.
-    fav_hit = (favorable is not None and favorable in hits) or (supporting and supporting in hits)
-    unfav_hit = bool(unfavorable) and unfavorable in hits
-    # F-7 (2026-09-26 audit): a period whose stem matches the favorable
-    # element but whose branch matches the unfavorable one (or vice versa)
-    # used to report flatly "favorable" (checked first, unconditionally),
-    # discarding the conflicting signal. Both hitting at once is a wash.
-    if fav_hit and unfav_hit:
-        return "neutral"
+    return RP.favorability(
+        getattr(period, "stem_element", None),
+        getattr(period, "branch_element", None),
+        favorable, supporting, unfavorable,
+    )
     if fav_hit:
         return "favorable"
     if unfav_hit:
@@ -137,18 +117,11 @@ def period_favorable_status(period: Any, ctx: Any) -> str:
     return "neutral"
 
 
-def _display_verdict(verdict: str) -> str:
-    """Return a client-facing label for the strength verdict."""
-    if verdict == "extreme_weak":
-        return "Very Weak"
-    return verdict.title()
-
-
 def _class_counts(chart) -> Counter:
     """Count ten-god classes across all visible and hidden stems."""
     counts: Counter = Counter()
     for hit in chart.ten_gods:
-        cls = _TENGOD_CLASS.get(hit.tengod)
+        cls = RP.TENGOD_SHORT_EN.get(hit.tengod)
         if cls:
             counts[cls] += 1
     return counts
@@ -389,7 +362,7 @@ def wealth_preservation_short(ctx) -> str:
     dm_elem = _ctx_get(ctx, "dm_element", "")
     sa = chart.strength_assessment or {}
     verdict = sa.get("verdict", "balanced")
-    verdict_label = _display_verdict(verdict)
+    verdict_label = RP.verdict_label(verdict)
     return (
         f"For a **{dm_elem}** Day Master with a **{verdict_label}** reading, wealth preservation starts with "
         f"diversification — never concentrate more than your chart can comfortably hold. "
@@ -552,7 +525,7 @@ def wealth_preservation_long(ctx) -> str:
     dm_elem = _ctx_get(ctx, "dm_element", "")
     sa = chart.strength_assessment or {}
     verdict = sa.get("verdict", "balanced")
-    verdict_label = _display_verdict(verdict)
+    verdict_label = RP.verdict_label(verdict)
     return (
         f"For a **{dm_elem}** Day Master with a **{verdict_label}** reading, wealth preservation starts with "
         f"diversification — never concentrate more than your chart can comfortably hold. "
@@ -704,7 +677,7 @@ def relationship_style(ctx) -> str:
         log_fallback("prose_fillers.spouse_stage", "twelve_stage lookup failed")
         stage = "—"
     # Look up by the simplified class key derived from the KOREAN ten-god
-    # code (via _TENGOD_CLASS), not by `spouse_tg` (the full English gloss,
+    # code (via RP.TENGOD_SHORT_EN), not by `spouse_tg` (the full English gloss,
     # e.g. "Hurting Officer (傷官)") — the dict below is keyed by the class
     # name ("Output", "Companion", etc.), which the full gloss never matches.
     # Bug found 2026-09-19 (external report review): this lookup always
@@ -725,7 +698,7 @@ def relationship_style(ctx) -> str:
         "Seven Killings": "you want a partner who is strong and direct; passivity is more uncomfortable than conflict.",
         "Direct Resource": "you are drawn to partners who feel grounding, patient, and protective of your inner life.",
         "Indirect Resource": "you are drawn to partners who spark your curiosity and bring unexpected insights.",
-    }.get(_TENGOD_CLASS.get(spouse_tg_ko, ""), "you bring your full nature into the partnership.")
+    }.get(RP.TENGOD_SHORT_EN.get(spouse_tg_ko, ""), "you bring your full nature into the partnership.")
     base = (
         f"The spouse palace is **{spouse_branch}** (12-stage: {stage}), whose main hidden stem relates to "
         f"your Day Master as **{spouse_tg}**. In practice, {implication}"
@@ -785,7 +758,7 @@ def spouse_palace_tengod(ctx) -> str:
     for hit in chart.ten_gods:
         if hit.position == "day_branch_main":
             spouse_tg_ko = hit.tengod
-            spouse_tg_en = _TENGOD_CLASS.get(hit.tengod, hit.tengod_en or hit.tengod)
+            spouse_tg_en = RP.TENGOD_SHORT_EN.get(hit.tengod, hit.tengod_en or hit.tengod)
             break
     from . import lookup as L
     try:
@@ -1011,7 +984,7 @@ def _marriage_year_signals(
     pos: List[str] = []
     neg: List[str] = []
     score = 0
-    if _TENGOD_FIVE_CLASS.get(h.stem_tengod) == spouse_class:
+    if RP.TENGOD_CLASS.get(h.stem_tengod) == spouse_class:
         score += 2
         pos.append(f"{h.stem_tengod} spouse-star year")
     rels = {rel for _a, nb, rel in (h.activated_branches or []) if nb == day_branch}
@@ -1076,7 +1049,7 @@ def marriage_timing_windows(ctx) -> str:
     decade_notes = []
     for p in daeun[cur_idx:cur_idx + 2]:
         why = []
-        if _TENGOD_FIVE_CLASS.get(p.stem_tengod) == spouse_class:
+        if RP.TENGOD_CLASS.get(p.stem_tengod) == spouse_class:
             why.append(f"{p.stem_tengod} spouse-star stem")
         if any(nb == day_branch and rel == "combine" for _a, nb, rel in (p.activated_branches or [])):
             why.append(f"{p.branch}{day_branch} 육합 into the spouse palace")
@@ -1324,7 +1297,7 @@ def stress_signature(ctx) -> str:
             f"the crash, not after."
         )
     else:
-        verdict_label = _display_verdict(verdict)
+        verdict_label = RP.verdict_label(verdict)
         base += (
             f"With a {verdict_label} reading, the early signs are more emotional than physical — irritability, "
             f"detachment, or perfectionism show up before the body signals."
@@ -1399,7 +1372,7 @@ def major_luck_theme_row(p, ctx) -> Tuple[str, str]:
     status = period_favorable_status(p, ctx)
     # Exact match — see decade_career_strategy's E-3 follow-up note.
     favorable = status == "favorable"
-    cls = _TENGOD_FIVE_CLASS.get(p.stem_tengod, "")
+    cls = RP.TENGOD_CLASS.get(p.stem_tengod, "")
     if cls == "Authority":
         career = "structured career moves; credentials matter"
         relationship = "commitment or formalization themes"
@@ -1425,7 +1398,7 @@ def major_luck_narrative(p, ctx) -> str:
     tg = p.stem_tengod_en or p.stem_tengod or "—"
     period_favorable_status(p, ctx)
     fav = _ctx_get(ctx, "favorable", "—")
-    cls = _TENGOD_FIVE_CLASS.get(p.stem_tengod, "")
+    cls = RP.TENGOD_CLASS.get(p.stem_tengod, "")
     # E-12 (2026-09-25 audit): every non-Authority/Wealth/Output decade used
     # to fall through to "support and study" — including 비견/겁재 decades.
     # Keyed to the same five classes as major_luck_theme_row's relationship
@@ -1579,7 +1552,7 @@ def annual_window_row(h, ctx) -> Tuple[str, str, str]:
         "challenging": "challenging-element", "neutral": "mixed",
     }[lean]
     theme = f"{elem_label} energy + {tg} — a {lean_label} year."
-    cls = _TENGOD_FIVE_CLASS.get(h.stem_tengod, "")
+    cls = RP.TENGOD_CLASS.get(h.stem_tengod, "")
     if cls == "Authority":
         best = "career moves, credentials, formal commitments"
         watch = "stubborn authority clashes; avoid ego fights"
@@ -1624,7 +1597,7 @@ def year_by_year_note(h, ctx) -> str:
     the favorability label separates 용신, 희신 and 기신 years instead of
     calling every 희신 year a "favorable-element year".
     """
-    cls = _TENGOD_FIVE_CLASS.get(h.stem_tengod, "")
+    cls = RP.TENGOD_CLASS.get(h.stem_tengod, "")
     focus = {
         "Companion": "independent initiative, peers, and collaboration on equal terms",
         "Output": "expression, creative work, and putting your skills on show",
@@ -2409,7 +2382,7 @@ _SPOUSE_PLAIN: Dict[str, str] = {
 def _spouse_driver(chart) -> str:
     for hit in chart.ten_gods:
         if hit.position == "day_branch_main":
-            return _TENGOD_CLASS.get(hit.tengod, "")
+            return RP.TENGOD_SHORT_EN.get(hit.tengod, "")
     return ""
 
 
@@ -2426,7 +2399,7 @@ def plain_words_day_master(ctx) -> str:
     }.get(dm_el)
     if not image:
         return ""
-    return _plain(
+    return RP.plain(
         f"At your core you are {image}. Your chart reads as {strength or 'balanced'}, so the rest of "
         f"this report is about where that helps and where leaning toward "
         f"{fav or 'your favourable element'} keeps you in balance."
@@ -2443,7 +2416,7 @@ def plain_words_career(ctx) -> str:
             if drv:
                 drivers[drv] += n
     top = max(_CAREER_DRIVERS, key=lambda k: drivers.get(k, 0)) if drivers else "Output"
-    return _plain(
+    return RP.plain(
         f"Your chart leans toward {_CAREER_DRIVERS[top]}. Fields and decades that carry "
         f"{fav or 'your favourable element'} give the cleanest results; the timing tables show when."
     )
@@ -2457,7 +2430,7 @@ def plain_words_relationships(ctx) -> str:
     picture = _SPOUSE_PLAIN.get(driver)
     if not picture:
         return ""
-    return _plain(
+    return RP.plain(
         f"Your partnership area points toward {picture}. Treat this as the weather it tends to "
         f"create, not a description of one person."
     )
@@ -2472,7 +2445,7 @@ def plain_words_health(ctx) -> str:
         return ""
     lightest = min(pct.items(), key=lambda kv: kv[1])[0]
     organs = _ELEMENT_ORGANS.get(lightest, f"the {lightest.lower()}-associated systems")
-    return _plain(
+    return RP.plain(
         f"Your lightest element is {lightest}, so the {organs} are the natural place to start gentle, "
         f"preventive care — through {lightest.lower()}-aligned food, rest, and seasons. This is a "
         f"balance cue, not a diagnosis."
@@ -2483,7 +2456,7 @@ def plain_words_timing(ctx) -> str:
     current = _ctx_get(ctx, "current_daeun")
     fav = _ctx_get(ctx, "favorable", "your favourable element")
     if current is None:
-        return _plain(
+        return RP.plain(
             f"Timing works in layers — a roughly ten-year chapter, then the year, then the month. "
             f"Windows that carry {fav} are the ones to act in."
         )
@@ -2494,7 +2467,7 @@ def plain_words_timing(ctx) -> str:
         weather = "a tailwind decade — a good stretch to push on the things that matter"
     else:
         weather = "a mixed decade — pick your moments using the year and month tables"
-    return _plain(
+    return RP.plain(
         f"You are currently in {weather}. Zoom in with the year and month windows that carry {fav}."
     )
 
@@ -2504,12 +2477,12 @@ def plain_words_pattern(ctx) -> str:
     if not name or name == "Standard chart":
         return ""
     if name.startswith("종격"):
-        return _plain(
+        return RP.plain(
             "Your chart may be a 'follower' type — it works best by going fully with its strongest "
             "element rather than fighting it. This is a candidate reading, not a settled one."
         )
     if name.startswith("화격"):
-        return _plain(
+        return RP.plain(
             "Your chart may be a 'transformation' type — two parts combine and shift its centre of "
             "gravity. This is a candidate reading, not a settled one."
         )
@@ -2517,7 +2490,7 @@ def plain_words_pattern(ctx) -> str:
     theme = _REGULAR_GRID_THEME.get(ko)
     if not theme:
         return ""
-    return _plain(f"The chart's organising theme is {theme}.")
+    return RP.plain(f"The chart's organising theme is {theme}.")
 
 
 def plain_words_ten_gods(ctx) -> str:
@@ -2537,7 +2510,7 @@ def plain_words_ten_gods(ctx) -> str:
     tail = ""
     if thin:
         tail = f" Light on {_TEN_GOD_PLAIN[thin[0]]} — that area asks for more deliberate attention."
-    return _plain(
+    return RP.plain(
         f"Where your chart puts its weight: most of all on {_TEN_GOD_PLAIN[top]}.{tail}"
     )
 

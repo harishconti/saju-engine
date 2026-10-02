@@ -208,7 +208,7 @@ Income arrives in **project-based bursts** — commissions, deals, or ventures t
 
 ### Wealth Preservation Note
 
-For a **Metal** Day Master with a **Extreme** reading, wealth preservation starts with diversification — never concentrate more than your chart can comfortably hold. Liquidity buffers aligned with the **Water** element (its colors, foods, and rhythms) help the querent stay flexible across unfavorable 대운 periods. Partnerships and joint ventures work well when the partner's element supports Water; avoid partners whose chart emphasizes the unfavorable element, since their decisions tend to amplify the chart's existing pressure. Across a full lifetime, the disciplined saver with Water-aligned custodians outperforms the aggressive investor whose chart cannot hold the volatility.
+For a **Metal** Day Master with a **Very Strong** reading, wealth preservation starts with diversification — never concentrate more than your chart can comfortably hold. Liquidity buffers aligned with the **Water** element (its colors, foods, and rhythms) help the querent stay flexible across unfavorable 대운 periods. Partnerships and joint ventures work well when the partner's element supports Water; avoid partners whose chart emphasizes the unfavorable element, since their decisions tend to amplify the chart's existing pressure. Across a full lifetime, the disciplined saver with Water-aligned custodians outperforms the aggressive investor whose chart cannot hold the volatility.
 
 ### Career Deep-Dive
 
@@ -658,7 +658,7 @@ This chart's element balance shows **Metal (46.2%)** as the most present element
 
 ### Stress Signature
 
-When this chart goes out of balance, the most common early signals are: grief that surfaces unbidden, skin or respiratory sensitivity, and rigid perfectionism. With a Extreme reading, the early signs are more emotional than physical — irritability, detachment, or perfectionism show up before the body signals.
+When this chart goes out of balance, the most common early signals are: grief that surfaces unbidden, skin or respiratory sensitivity, and rigid perfectionism. With a Very Strong reading, the early signs are more emotional than physical — irritability, detachment, or perfectionism show up before the body signals.
 
 ### Recovery Toolkit
 

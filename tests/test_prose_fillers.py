@@ -16,6 +16,7 @@ import pytest
 from saju_engine.engine import compute_chart
 from saju_engine.premium_report import _ReportContext
 from saju_engine import prose_fillers as PF
+from saju_engine import report_primitives as RP
 
 
 SAMPLE_BIRTH = dict(
@@ -407,7 +408,7 @@ def test_spouse_palace_tengod_mentions_day_branch(ctx):
         if hit.position == "day_branch_main":
             spouse_tg_ko = hit.tengod
             break
-    spouse_tg_en = PF._TENGOD_CLASS.get(spouse_tg_ko, spouse_tg_ko)
+    spouse_tg_en = RP.TENGOD_SHORT_EN.get(spouse_tg_ko, spouse_tg_ko)
     assert spouse_tg_en in out, (
         f"spouse_palace_tengod should reference the spouse-palace ten-god {spouse_tg_en}: {out!r}"
     )

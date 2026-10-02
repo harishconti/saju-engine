@@ -20,22 +20,10 @@ from collections import Counter
 from typing import Dict, List, Optional, Tuple
 
 from . import lookup as L
-from .daeun import first_period_start_date
+from . import report_primitives as RP
 from .report_data import _career_tiers
 from .sewoon import derive_sewoon
 from .yongsin import favorable_element
-
-_CLASS_OF: Dict[str, str] = {
-    "비견": "Companion", "겁재": "Companion",
-    "식신": "Output", "상관": "Output",
-    "편재": "Wealth", "정재": "Wealth",
-    "편관": "Authority", "정관": "Authority",
-    "편인": "Resource", "정인": "Resource",
-}
-_CLASS_KO = {
-    "Companion": "비겁 (比劫)", "Output": "식상 (食傷)", "Wealth": "재성 (財星)",
-    "Authority": "관성 (官星)", "Resource": "인성 (印星)",
-}
 
 # Concrete role ladders per domain (modern 명리 convention, knowledge/12).
 _ROLES: Dict[str, str] = {
@@ -88,25 +76,8 @@ _ENTITY_BY_ELEMENT = {
 
 # ── helpers ─────────────────────────────────────────────────────────────────
 
-def _first_start(chart) -> Optional[object]:
-    try:
-        by, bm, bd = (int(x) for x in chart.birth_date.split("-"))
-    except (ValueError, AttributeError):
-        return None
-    bh, bmi = 0, 0
-    try:
-        bh, bmi = (int(x) for x in (chart.birth_time or "00:00").split(":"))
-    except (ValueError, AttributeError):
-        pass
-    direction = L.daeun_direction(chart.year.stem, chart.gender)
-    return first_period_start_date(
-        by, bm, bd, direction, hour=bh, minute=bmi,
-        utc_offset=getattr(chart, "utc_offset", 9.0) or 9.0,
-    )
-
-
 def _decade_year_range(chart, idx: int) -> Tuple[int, int]:
-    first = _first_start(chart)
+    first = RP.first_period_start(chart)
     if first is None:
         return (0, 0)
     s = first.replace(year=first.year + 10 * idx)
@@ -114,24 +85,10 @@ def _decade_year_range(chart, idx: int) -> Tuple[int, int]:
     return s.year + 1, e.year
 
 
-def _year_status(stem_e: str, branch_e: str, fav: str, sup: str,
-                 unfav: Optional[str]) -> str:
-    favsup = {e for e in (fav, sup) if e and e != "—"}
-    fav_hit = (stem_e in favsup) or (branch_e in favsup)
-    unfav_hit = bool(unfav) and unfav != "—" and (stem_e == unfav or branch_e == unfav)
-    if fav_hit and unfav_hit:
-        return "neutral"
-    if fav_hit:
-        return "favorable"
-    if unfav_hit:
-        return "unfavorable"
-    return "neutral"
-
-
 def _class_counts(chart) -> Counter:
     c: Counter = Counter()
     for h in chart.ten_gods:
-        cls = _CLASS_OF.get(h.tengod)
+        cls = RP.TENGOD_CLASS.get(h.tengod)
         if cls:
             c[cls] += 1
     return c
@@ -287,7 +244,7 @@ def _domain_detail_section(chart, override, rows) -> List[str]:
 def _mode_section(chart, fav: str, sup: str, unfav: Optional[str], verdict: str,
                   favorable_override=None) -> List[str]:
     tops = _top_classes(chart)
-    top_ko = " · ".join(_CLASS_KO.get(c, c) for c in tops) if tops else "—"
+    top_ko = " · ".join(RP.CLASS_KO.get(c, c) for c in tops) if tops else "—"
     mode_blurb = {
         "Wealth": "Business, sales, owning and growing resources — turning effort into held assets.",
         "Authority": "Institutions, licensed authority, management — operating inside accountable rank.",
@@ -499,7 +456,7 @@ def _timing_section(chart, fav: str, sup: str, unfav: Optional[str],
                                 natal_stems=chart.stems)
             se = L.STEM_INFO.get(hit.stem, {}).get("element", "")
             be = L.BRANCH_ELEMENT.get(hit.branch, "")
-            st = _year_status(se, be, fav, sup, unfav)
+            st = RP.favorability(se, be, fav, sup, unfav)
             fav_n += st == "favorable"
             unfav_n += st == "unfavorable"
         # Ten years per decade, so a real majority (not a 2-vs-0 margin)
@@ -519,7 +476,7 @@ def _timing_section(chart, fav: str, sup: str, unfav: Optional[str],
 
     lines += ["", "### Period Notes", ""]
     for p, ys, ye, tg, fav_n, unfav_n, read in rows:
-        cls = _CLASS_OF.get(p.stem_tengod, "")
+        cls = RP.TENGOD_CLASS.get(p.stem_tengod, "")
         if cls == "Resource":
             note = ("a learning, credential or advisory decade — build depth and "
                     "authority before converting it into output.")
@@ -559,7 +516,7 @@ def generate_career_report(chart, *, favorable_override: Optional[str] = None) -
         "",
         f"**Born:** {chart.birth_date} · {chart.birth_time} · {chart.city or '—'}  ",
         f"**Day Master:** {chart.day_master}  ",
-        f"**Strength:** {_verdict_label(verdict)}  ",
+        f"**Strength:** {RP.verdict_label(verdict)}  ",
         f"**Favorable (용신):** {fav} · **Supporting (희신):** {sup}"
         + (f" · **Unfavorable (기신):** {unfav}" if unfav else ""),
         "",
@@ -604,7 +561,3 @@ def generate_career_report(chart, *, favorable_override: Optional[str] = None) -
         "families, illustrative rather than exhaustive.",
     ]
     return "\n".join(lines) + "\n"
-
-
-def _verdict_label(verdict: str) -> str:
-    return {"extreme_weak": "Very Weak"}.get(verdict, verdict.title())

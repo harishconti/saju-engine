@@ -53,6 +53,7 @@ from datetime import date, datetime, timedelta
 from typing import List, Optional, Tuple
 
 from . import lookup as L
+from . import report_primitives as RP
 from . import sewoon as SE
 from .chart import Chart, DaeunPeriod
 from .daeun import saju_year
@@ -1451,7 +1452,7 @@ def _section_wealth_timing(ctx: _ReportContext) -> List[str]:
         lines.append("")
         for p in wealth_periods[:4]:
             tg_label = p.stem_tengod_en or p.stem_tengod
-            cls = PF._TENGOD_FIVE_CLASS.get(p.stem_tengod, "")
+            cls = RP.TENGOD_CLASS.get(p.stem_tengod, "")
             if cls == "Wealth":
                 note = "a window where income, asset, or value-creation themes are more likely to surface."
             elif cls == "Companion":
