@@ -39,3 +39,35 @@ def test_compat_element_table_matches_natal_element_balance():
         for elem, pct in element_balance_pct(chart).items():
             assert f"{elem} |" in section
             assert f"| {pct:.1f}% |" in section, (name, elem, pct)
+
+
+# ── S2 follow-up: compat labels must not print mismatched percentages ──────
+import re
+
+import pytest
+
+from saju_engine.compat import compat_combined_elements, compat_yongshin
+
+_PAIRS = [
+    ((1990, 6, 15, 10, "M"), (1992, 3, 20, 14, "F")),
+    ((1985, 11, 2, 6, "M"), (1988, 8, 8, 20, "F")),
+    ((1978, 1, 25, 23, "M"), (1981, 9, 30, 3, "F")),
+    ((2000, 2, 29, 12, "F"), (1996, 12, 1, 18, "M")),
+    ((1969, 7, 7, 8, "M"), (1974, 4, 14, 16, "F")),
+]
+
+
+def _chart(t):
+    y, m, d, h, g = t
+    return compute_chart(year=y, month=m, day=d, hour=h, minute=0,
+                         gender=g, utc_offset=9.0, longitude=127.0)
+
+
+@pytest.mark.parametrize("pa,pb", _PAIRS)
+def test_compat_d_and_f_labels_print_no_percentages(pa, pb):
+    a, b = _chart(pa), _chart(pb)
+    d = compat_yongshin(a, b)
+    f = compat_combined_elements(a, b)
+    for flag in d.flags + f.flags:
+        assert "%" not in flag, flag
+    assert not re.search(r"=\s*\d+(\.\d+)?%", f.narrative), f.narrative

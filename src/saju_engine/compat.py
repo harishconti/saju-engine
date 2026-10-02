@@ -42,7 +42,6 @@ from . import lookup as L
 from .chart import Chart
 from .fallback_log import log_fallback
 from .nayin import NAYIN_ORDER, nayin_of, nayin_relation_detail
-from .strength import element_balance_pct
 from .yongsin import favorable_element
 
 
@@ -719,22 +718,21 @@ def compat_yongshin(a: Chart, b: Chart) -> CompatSubResult:
         a_dist = _weighted_presence_pct(a)
         a_need = b_dist.get(fav_a, 0)
         b_need = a_dist.get(fav_b, 0)
-        # S2 (2026-10-01 audit): displayed % is the canonical natal number;
-        # thresholds above/below stay on the weighted-presence values.
-        a_need_disp = element_balance_pct(b).get(fav_a, 0)
-        b_need_disp = element_balance_pct(a).get(fav_b, 0)
+        # S2 (2026-10-01 audit): numbers are deliberately NOT printed here.
+        # Labels come from the §F weighted measure; the canonical
+        # element-balance table is the only client-visible percentage.
         if a_need >= 15:
             score += 6
-            flags.append(f"B → A 용신 {fav_a} 공급 양호 ({a_need_disp:.0f}%)")
+            flags.append(f"B → A 용신 {fav_a} 공급 양호")
         elif a_need >= 5:
             score += 3
-            flags.append(f"B → A 용신 {fav_a} 일부 공급 ({a_need_disp:.0f}%)")
+            flags.append(f"B → A 용신 {fav_a} 일부 공급")
         if b_need >= 15:
             score += 6
-            flags.append(f"A → B 용신 {fav_b} 공급 양호 ({b_need_disp:.0f}%)")
+            flags.append(f"A → B 용신 {fav_b} 공급 양호")
         elif b_need >= 5:
             score += 3
-            flags.append(f"A → B 용신 {fav_b} 일부 공급 ({b_need_disp:.0f}%)")
+            flags.append(f"A → B 용신 {fav_b} 일부 공급")
 
     # Mutual-gishin penalty.
     if gish_a and gish_b:
@@ -744,15 +742,13 @@ def compat_yongshin(a: Chart, b: Chart) -> CompatSubResult:
         # gish_in_b = amount of B's gishin element present in A's chart.
         gish_in_a = b_dist.get(gish_a, 0)
         gish_in_b = a_dist.get(gish_b, 0)
-        # S2 (2026-10-01 audit): display canonical natal %; thresholds unchanged.
-        gish_in_a_disp = element_balance_pct(b).get(gish_a, 0)
-        gish_in_b_disp = element_balance_pct(a).get(gish_b, 0)
+        # S2: no percentages printed (see above); thresholds unchanged.
         if gish_in_a >= 20:
             score -= 4
-            flags.append(f"B에 A의 기신 {gish_a} 과다 ({gish_in_a_disp:.0f}%)")
+            flags.append(f"B에 A의 기신 {gish_a} 과다")
         if gish_in_b >= 20:
             score -= 4
-            flags.append(f"A에 B의 기신 {gish_b} 과다 ({gish_in_b_disp:.0f}%)")
+            flags.append(f"A에 B의 기신 {gish_b} 과다")
 
     narr = (
         "용신 cross-supply is the **궁통보감 deciding factor**: does each "
@@ -940,9 +936,6 @@ def compat_combined_elements(a: Chart, b: Chart) -> CompatSubResult:
     dist_b = _weighted_presence_pct(b)
     union = {e: (dist_a.get(e, 0) + dist_b.get(e, 0)) / 2 for e in dist_a}
 
-    bal_a, bal_b = element_balance_pct(a), element_balance_pct(b)
-    disp_union = {e: (bal_a.get(e, 0) + bal_b.get(e, 0)) / 2 for e in dist_a}
-
     flags: List[str] = []
     score = 0
 
@@ -984,10 +977,10 @@ def compat_combined_elements(a: Chart, b: Chart) -> CompatSubResult:
     score = max(-WEIGHT["combined_elements"], min(WEIGHT["combined_elements"], score))
 
     narr = (
-        "Combined element distribution (avg of both charts): "
-        # S2 (2026-10-01 audit): display the canonical natal numbers.
-        + ", ".join(f"{e}={v:.0f}%" for e, v in disp_union.items())
-        + ". "
+        # S2 (2026-10-01 audit): per-element percentages deliberately not
+        # printed; the verdict derives from the §F weighted union, and the
+        # canonical element-balance table is the only client-visible %.
+        "Combined element distribution (average of both charts). "
     )
     if deviation < 8:
         narr += "The union is well-balanced across all five elements."
