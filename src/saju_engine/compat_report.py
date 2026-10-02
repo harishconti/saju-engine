@@ -21,6 +21,7 @@ from typing import List, Optional
 
 from .chart import Chart
 from .compat import WEIGHT, CompatReport, CompatSubResult, _element_strength, compat_score
+from .prose_fillers import period_favorable_status
 from .yongsin import favorable_element
 
 from datetime import date
@@ -129,14 +130,18 @@ def _day_master_snapshot(chart: Chart, name: str) -> List[str]:
 
 def _period_status(period, fe) -> str:
     """Favorable/neutral/unfavorable lean vs. the FINAL resolved element
-    ``fe`` (which already reflects a reader override, if one was applied via
-    ``compat_score``'s ``favorable_element_a``/``_b`` — see the docstring on
-    ``_daeun_lines`` for why this must not read ``period.favorable_status``
-    directly)."""
-    hits = {period.stem_element, period.branch_element}
-    if fe.element in hits:
-        return "favorable"
-    return "neutral"
+    set ``fe`` (already reflecting any reader override from ``compat_score``).
+
+    S3 (2026-10-01 audit): this used to check ``fe.element`` only, dropping
+    the 희신 and 기신 checks every other product applies — a 희신 decade read
+    "favorable" in the natal report but "neutral" here. It now delegates to
+    the single shared rule in ``prose_fillers.period_favorable_status``.
+    """
+    return period_favorable_status(period, {
+        "favorable": fe.element if fe.element and fe.element != "—" else None,
+        "supporting": fe.supporting if fe.supporting and fe.supporting != "—" else None,
+        "unfavorable": fe.unfavorable,
+    })
 
 
 def _daeun_lines(chart: Chart, name: str) -> List[str]:
