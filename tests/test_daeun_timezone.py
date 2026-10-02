@@ -38,3 +38,21 @@ def test_chart_age_agrees_with_year_pillar_for_new_york_birth():
     before = compute_chart(hour=3, **kw)
     assert before.year.stem + before.year.branch == "癸卯"
     assert before.current_age == 4
+
+
+def test_annual_label_follows_kst_keyed_sewoon_for_new_york_chart():
+    """S1 follow-up (2026-10-02 final review): the annual-year LABEL must
+    follow chart.sewoon, which is still KST-keyed until S8a. Before 立春 2026
+    the pillar is 乙巳 = 2025's, so it must never be labelled 2026."""
+    from saju_engine.premium_report import _year_one_liner
+    from saju_engine.prose_scaffold import _current_time_draft
+
+    chart = compute_chart(year=1990, month=6, day=15, hour=10, minute=0,
+                          gender="F", utc_offset=-5.0, longitude=-74.0,
+                          reference_year=2026, reference_month=2, reference_day=3)
+    line = _year_one_liner(chart)
+    assert "2025 is a **乙巳" in line
+    assert "2026 is a **乙巳" not in line
+    draft = _current_time_draft(chart)
+    assert "As of 2025, the annual pillar is **乙巳" in draft
+    assert "As of 2026, the annual pillar is **乙巳" not in draft
