@@ -298,7 +298,6 @@ def _build_decade_roadmap_svg(rows: list[tuple[str, str, str]]) -> str:
     seg_gap = 4
     total_bar_y = margin_y + 18
     seg_width = (width - 2 * margin_x - seg_gap * (len(rows) - 1)) / len(rows)
-    seg_width * len(rows) + seg_gap * (len(rows) - 1)
 
     segments: list[str] = []
     for i, (_label, pillar, lean) in enumerate(rows):

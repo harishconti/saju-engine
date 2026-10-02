@@ -68,11 +68,8 @@ STEM_INDEX: Dict[str, int] = {s: i for i, s in enumerate(STEM_ORDER)}
 #            辛未(7), 壬申(8), 癸酉(9), 甲戌(10). ✓
 
 JIAZI_CYCLE: List[Tuple[str, str]] = [
-    (s, b)
-    for i in range(60)
-    for s, b in [(STEM_ORDER[i % 10], BRANCH_ORDER[i % 12])]
-    if True
-][:60]
+    (STEM_ORDER[i % 10], BRANCH_ORDER[i % 12]) for i in range(60)
+]
 
 # Sanity checks for JIAZI_CYCLE live in tests/test_lookup.py, not here as
 # module-level asserts (moved 2026-09-20, external code-quality review: a

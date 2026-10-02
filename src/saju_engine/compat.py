@@ -1206,8 +1206,7 @@ def compat_tengod_cross(a: Chart, b: Chart) -> CompatSubResult:
 def compat_daeun_sync(a: Chart, b: Chart) -> CompatSubResult:
     """Sub-system H: Direction similarity + starting-element similarity.
 
-    Static, time-invariant. For time-bound queries use the separate
-    `compat_daeun_sync_at_year()` API (planned for v2).
+    Static, time-invariant.
     """
     label = "Major luck synchrony"
     label_kr = "대운·세운 동기 (大運·歲運 同期)"
@@ -1237,8 +1236,8 @@ def compat_daeun_sync(a: Chart, b: Chart) -> CompatSubResult:
         flags.append(f"대운 방향 상이 ({dir_a} vs {dir_b})")
 
     # Starting-element similarity.
-    start_a = a.daeun[0].stem if hasattr(a.daeun[0], "stem") else None
-    start_b = b.daeun[0].stem if hasattr(b.daeun[0], "stem") else None
+    start_a = a.daeun[0].stem
+    start_b = b.daeun[0].stem
     if start_a and start_b:
         ea = L.STEM_INFO[start_a]["element"]
         eb = L.STEM_INFO[start_b]["element"]

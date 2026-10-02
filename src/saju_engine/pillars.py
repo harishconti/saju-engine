@@ -751,15 +751,3 @@ def compute_pillars(
             raw["year_month_correction"] = disagreement
 
     return raw
-
-
-# Light validation: print the result in a fixed order for use in tests / debugging.
-def pretty(result: Dict[str, Any]) -> str:
-    keys = [
-        "year_pillar", "month_pillar", "day_pillar", "hour_pillar",
-        "year_stem", "year_branch", "month_stem", "month_branch",
-        "day_stem", "day_branch", "hour_stem", "hour_branch",
-        "birth_date", "birth_time", "zi_time_type", "convention",
-    ]
-    lines = [f"  {k}: {result.get(k)}" for k in keys if k in result]
-    return "\n".join(lines)
