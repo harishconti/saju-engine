@@ -180,10 +180,7 @@ backward compatibility, but new client orders should use the single-chart tiers 
 
 ## Client Intake
 
-Two client-facing intake paths are available:
-
-1. **JSON-only intake form** — `tools/client_intake_form.html` + `tools/client_intake_server.py`. Collects the same fields and saves each submission as JSON in `candidates_horoscope/intake/`. No engine or PDF is produced; the reader processes the intake manually.
-2. **Self-service calculator** — `tools/client_intake_app.html` + `tools/client_intake_app.py` (FastAPI). Collects the same fields and immediately returns a tiered PDF. Requires the `web` optional dependencies (`pip install -e ".[web]"`).
+**Self-service app** — `tools/client_intake_app.html` + `tools/client_compat_intake_form.html`, served by `tools/client_intake_app.py` (FastAPI; `/` single-chart, `/compat` two-chart). Every validated submission is saved as JSON in `candidates_horoscope/intake/` and a tiered PDF is returned. Requires the `web` optional dependencies (`pip install -e ".[web]"`). (The stdlib JSON-only servers were removed 2026-10-02 — audit S5.)
 
 Both forms ask for: name, DOB, birth time, birth location, UTC offset, email, gender, marriage/relationship status, and tier selection. The "main concern" textarea is enabled only when **The Deep Destiny Report (`deep` tier)** is selected.
 

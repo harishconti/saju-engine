@@ -80,7 +80,7 @@
   - **The Deep Destiny Report** (`deep`) — $55, 10–12 pages.
   - **Cosmic Companion** (`companion`) — $9/month or $79/year, 3–4 pages; manual-billing subscription (off the primary pricing grid).
   - **두 분 궁합 / Compatibility** (`compat`) — Snapshot ($24) and Deep ($45) tiers, 11 sub-systems, composite 0–100 score. Deep is the hero product.
-- **Intake paths:** JSON-only form (`tools/client_intake_form.html` + server), self-service FastAPI calculator (`tools/client_intake_app.py`), two-chart compat intake form + server, and landing-page Next.js app (`apps/landing-page`) wired to the calculator for the free sample tier.
+- **Intake paths:** self-service FastAPI app (`tools/client_intake_app.py`; `/` single-chart, `/compat` two-chart, saves JSON intake and returns tiered PDFs), and landing-page Next.js app (`apps/landing-page`) wired to the calculator for the free sample tier.
 - **PDF backends:** reportlab (default) and HTML/Playwright (`--html`).
 - **Major recent additions (2026-06-21 through 2026-07-12):** daily-luck (일운) overlay, engine-driven prose scaffold, premium report generator, landing-page tiered products, major-luck activation overlay, marriage-compatibility engine + report + PDF renderer, 30×30 Nayin pair table, Korean textbook 만세력 validation cases, repo-root documentation consolidation into `docs/`, Cosmic Companion subscription tier, deeper special-formations validation tests, richer engine-drafted prose fillers, landing-page/free-sample integration, complete `docs/openwiki/` reference site (README + quickstart + architecture + domain + products + operations), and landing-page demo reports generated from RM (Kim Nam-joon, BTS) birth data for all three single-chart tiers.
 
