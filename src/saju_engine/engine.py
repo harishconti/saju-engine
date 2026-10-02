@@ -300,7 +300,9 @@ def compute_chart(
     # 사주 세수 on the querier's reference date; used by all report layers.
     # N-18: pass the birth time so a birth on 입춘 day but before the term
     # instant counts in the prior saju year.
-    chart.current_age = D.saju_age(chart.effective_date, ref_date, chart.birth_time)
+    # S1 (2026-10-01 audit): pass the birth offset so the 입춘 boundary is
+    # compared in the querent's local clock, matching the year pillar.
+    chart.current_age = D.saju_age(chart.effective_date, ref_date, chart.birth_time, chart.utc_offset)
 
     chart.ten_gods = _derive_ten_gods(chart)
     chart.twelve_stages = _derive_twelve_stages(chart)

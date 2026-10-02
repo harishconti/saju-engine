@@ -1894,7 +1894,7 @@ def _year_one_liner(chart: Chart, override: Optional[str] = None) -> str:
     # same Gregorian number as the label here was wrong for a reference date
     # before 입춀 (e.g. "2026 is a 乙巳 year" when 乙巳 is 2025's pillar).
     return (
-        f"{saju_year(ref)} is a **{sewoon.combined} ({tengod})** year — "
+        f"{saju_year(ref, chart.utc_offset)} is a **{sewoon.combined} ({tengod})** year — "
         f"an invitation to lean into {ctx_favorable_phrase(chart, override)}."
     )
 
