@@ -42,6 +42,7 @@ from . import lookup as L
 from .chart import Chart
 from .fallback_log import log_fallback
 from .nayin import NAYIN_ORDER, nayin_of, nayin_relation_detail
+from .strength import element_balance_pct
 from .yongsin import favorable_element
 
 
@@ -672,11 +673,16 @@ def compat_nayin(a: Chart, b: Chart) -> CompatSubResult:
 
 # ── Sub-system D · Yongshin (용신) cross-supply ──────────────────────────────
 
-def _element_strength(chart: Chart) -> Dict[str, float]:
-    """Return a percent distribution of elements (0–100 each) for `chart`.
+def _weighted_presence_pct(chart: Chart) -> Dict[str, float]:
+    """Compat SCORING input only — knowledge/11-gunghap.md §F weighted
+    presence (visible stems = 1; hidden main=1, middle=0.5, residual=0.3).
 
-    Weights follow knowledge/11-gunghap.md §F: visible stems = 1; hidden stems
-    main=1, middle=0.5, residual=0.3.
+    S2 (2026-10-01 audit): this was also used to DISPLAY each partner's
+    element balance, which then disagreed with the natal report's
+    `strength.element_balance_pct` for the same person (measured: Water
+    14.4% vs 43.4%). Display now uses the canonical function; this stays
+    for the 용신 cross-supply / combined-element thresholds so published
+    composite scores do not move. Never render these numbers to a client.
     """
     counts: Dict[str, float] = {"Wood": 0, "Fire": 0, "Earth": 0, "Metal": 0, "Water": 0}
     for s in chart.stems:
@@ -709,37 +715,44 @@ def compat_yongshin(a: Chart, b: Chart) -> CompatSubResult:
 
     if fav_a and fav_b:
         # Cross-need: does B's chart supply A's 용신, and vice versa?
-        b_dist = _element_strength(b)
-        a_dist = _element_strength(a)
+        b_dist = _weighted_presence_pct(b)
+        a_dist = _weighted_presence_pct(a)
         a_need = b_dist.get(fav_a, 0)
         b_need = a_dist.get(fav_b, 0)
+        # S2 (2026-10-01 audit): displayed % is the canonical natal number;
+        # thresholds above/below stay on the weighted-presence values.
+        a_need_disp = element_balance_pct(b).get(fav_a, 0)
+        b_need_disp = element_balance_pct(a).get(fav_b, 0)
         if a_need >= 15:
             score += 6
-            flags.append(f"B → A 용신 {fav_a} 공급 양호 ({a_need:.0f}%)")
+            flags.append(f"B → A 용신 {fav_a} 공급 양호 ({a_need_disp:.0f}%)")
         elif a_need >= 5:
             score += 3
-            flags.append(f"B → A 용신 {fav_a} 일부 공급 ({a_need:.0f}%)")
+            flags.append(f"B → A 용신 {fav_a} 일부 공급 ({a_need_disp:.0f}%)")
         if b_need >= 15:
             score += 6
-            flags.append(f"A → B 용신 {fav_b} 공급 양호 ({b_need:.0f}%)")
+            flags.append(f"A → B 용신 {fav_b} 공급 양호 ({b_need_disp:.0f}%)")
         elif b_need >= 5:
             score += 3
-            flags.append(f"A → B 용신 {fav_b} 일부 공급 ({b_need:.0f}%)")
+            flags.append(f"A → B 용신 {fav_b} 일부 공급 ({b_need_disp:.0f}%)")
 
     # Mutual-gishin penalty.
     if gish_a and gish_b:
-        a_dist = _element_strength(a)
-        b_dist = _element_strength(b)
+        a_dist = _weighted_presence_pct(a)
+        b_dist = _weighted_presence_pct(b)
         # gish_in_a = amount of A's gishin element present in B's chart.
         # gish_in_b = amount of B's gishin element present in A's chart.
         gish_in_a = b_dist.get(gish_a, 0)
         gish_in_b = a_dist.get(gish_b, 0)
+        # S2 (2026-10-01 audit): display canonical natal %; thresholds unchanged.
+        gish_in_a_disp = element_balance_pct(b).get(gish_a, 0)
+        gish_in_b_disp = element_balance_pct(a).get(gish_b, 0)
         if gish_in_a >= 20:
             score -= 4
-            flags.append(f"B에 A의 기신 {gish_a} 과다 ({gish_in_a:.0f}%)")
+            flags.append(f"B에 A의 기신 {gish_a} 과다 ({gish_in_a_disp:.0f}%)")
         if gish_in_b >= 20:
             score -= 4
-            flags.append(f"A에 B의 기신 {gish_b} 과다 ({gish_in_b:.0f}%)")
+            flags.append(f"A에 B의 기신 {gish_b} 과다 ({gish_in_b_disp:.0f}%)")
 
     narr = (
         "용신 cross-supply is the **궁통보감 deciding factor**: does each "
@@ -923,9 +936,12 @@ def compat_combined_elements(a: Chart, b: Chart) -> CompatSubResult:
     """Sub-system F: Sum of two charts' element distributions → union balance."""
     label = "Combined element balance"
     label_kr = "결합 오행 (結合 五行)"
-    dist_a = _element_strength(a)
-    dist_b = _element_strength(b)
+    dist_a = _weighted_presence_pct(a)
+    dist_b = _weighted_presence_pct(b)
     union = {e: (dist_a.get(e, 0) + dist_b.get(e, 0)) / 2 for e in dist_a}
+
+    bal_a, bal_b = element_balance_pct(a), element_balance_pct(b)
+    disp_union = {e: (bal_a.get(e, 0) + bal_b.get(e, 0)) / 2 for e in dist_a}
 
     flags: List[str] = []
     score = 0
@@ -969,7 +985,8 @@ def compat_combined_elements(a: Chart, b: Chart) -> CompatSubResult:
 
     narr = (
         "Combined element distribution (avg of both charts): "
-        + ", ".join(f"{e}={v:.0f}%" for e, v in union.items())
+        # S2 (2026-10-01 audit): display the canonical natal numbers.
+        + ", ".join(f"{e}={v:.0f}%" for e, v in disp_union.items())
         + ". "
     )
     if deviation < 8:

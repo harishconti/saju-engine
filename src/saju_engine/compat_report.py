@@ -20,7 +20,8 @@ from __future__ import annotations
 from typing import List, Optional
 
 from .chart import Chart
-from .compat import WEIGHT, CompatReport, CompatSubResult, _element_strength, compat_score
+from .compat import WEIGHT, CompatReport, CompatSubResult, compat_score
+from .strength import element_balance_pct
 from .prose_fillers import period_favorable_status
 from .yongsin import favorable_element
 
@@ -91,8 +92,9 @@ def _bar(pct: float) -> str:
 
 
 def _element_balance_lines(chart: Chart, name: str) -> List[str]:
-    """Colored-emoji element balance table for one partner."""
-    dist = _element_strength(chart)
+    """Colored-emoji element balance table for one partner — the SAME
+    numbers as the natal report (S2, 2026-10-01 audit)."""
+    dist = element_balance_pct(chart)
     lines: List[str] = []
     lines.append(f"#### Element Balance — {name}")
     lines.append("")
