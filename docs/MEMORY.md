@@ -80,7 +80,7 @@
   - **The Deep Destiny Report** (`deep`) — $55, 10–12 pages.
   - **Cosmic Companion** (`companion`) — $9/month or $79/year, 3–4 pages; manual-billing subscription (off the primary pricing grid).
   - **두 분 궁합 / Compatibility** (`compat`) — Snapshot ($24) and Deep ($45) tiers, 11 sub-systems, composite 0–100 score. Deep is the hero product.
-- **Intake paths:** JSON-only form (`tools/client_intake_form.html` + server), self-service FastAPI calculator (`tools/client_intake_app.py`), two-chart compat intake form + server, and landing-page Next.js app (`apps/landing-page`) wired to the calculator for the free sample tier.
+- **Intake paths:** self-service FastAPI app (`tools/client_intake_app.py`; `/` single-chart, `/compat` two-chart, saves JSON intake and returns tiered PDFs), and landing-page Next.js app (`apps/landing-page`) wired to the calculator for the free sample tier.
 - **PDF backends:** reportlab (default) and HTML/Playwright (`--html`).
 - **Major recent additions (2026-06-21 through 2026-07-12):** daily-luck (일운) overlay, engine-driven prose scaffold, premium report generator, landing-page tiered products, major-luck activation overlay, marriage-compatibility engine + report + PDF renderer, 30×30 Nayin pair table, Korean textbook 만세력 validation cases, repo-root documentation consolidation into `docs/`, Cosmic Companion subscription tier, deeper special-formations validation tests, richer engine-drafted prose fillers, landing-page/free-sample integration, complete `docs/openwiki/` reference site (README + quickstart + architecture + domain + products + operations), and landing-page demo reports generated from RM (Kim Nam-joon, BTS) birth data for all three single-chart tiers.
 
@@ -198,6 +198,7 @@ As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P1 items:
 - **Real testimonials** on the landing page — the current ones are flagged illustrative and must be replaced or removed before launch (FTC risk).
 - Self-service app hardening: encrypt PII, background queue, auth (`tools/client_intake_app.py`).
 - Deployment hardening for the landing-page Next.js app and FastAPI calculator.
+- **A1:** recover `apps/landing-page/src/` from the machine that built it (not in this repo).
 - Populate the 30×30 Nayin pair table from a published source (currently on the 5-element fallback).
 - Optional additional Korean textbook 만세력 cases if more independent sources are found.
 - **`premium_report.py` "What This Year Means for You" bug — FIXED 2026-09-14.**
@@ -237,6 +238,16 @@ As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P1 items:
   needs to be passed explicitly, though doing so is still fine.
 
 ## Recent Changes to Remember
+
+- **2026-10-02 (audit 2026-10-01 Wave A/B fixes, branch `fix/audit-2026-10-01-wave-ab`)** — S1: 세수/current
+  대운 compare 입춘 in the birth's local time. S2: compat element-balance table uses canonical
+  `strength.element_balance_pct`; compat 용신/기신 flags and combined-elements narrative no longer print
+  percentages (user decision; the table is the only client-visible %); scoring helper is now
+  `compat._weighted_presence_pct`, WEIGHT unchanged. S3: compat Major Luck favorability uses the shared
+  `prose_fillers.period_favorable_status`. S5: stdlib intake servers and `client_intake_form.html` removed;
+  FastAPI serves both flows. S7: USD prices in intake forms. S8b/S8c: `/compat/generate` requires
+  `utc_offset_a/b` and validates before saving intake JSON. A5/A6/A7: test PYTHONPATH cleanup, CLAUDE.md
+  path fixes, dead code removed. Tracker: `docs/issues_bugs.md` "Audit 2026-10-01".
 
 - **2026-09-30 (new compat pair: Harish × Srinidhi)** — Created `candidates_horoscope/
   marriage_compatibility/harish_srinidhi/` (basic + deep, both `.md` and `.pdf`; added to the

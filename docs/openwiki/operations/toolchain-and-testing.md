@@ -20,8 +20,7 @@ Key scripts:
 | `src/saju_html/md_to_saju_compat_pdf.py` | Compat-specific PDF renderer with Korean CID font. |
 | `tools/build-pdf.sh` | Wrapper that sets `PYTHONPATH`, site-packages, and dispatches to the chosen backend. |
 | `src/saju_html/combine_candidate_report.py` | Merges base report + topic follow-ups into a single client deliverable. |
-| `tools/client_intake_form.html` + `client_intake_server.py` | JSON-only intake form. |
-| `tools/client_intake_app.html` + `tools/client_intake_app.py` | Self-service FastAPI tiered calculator. |
+| `tools/client_intake_app.html` + `tools/client_intake_app.py` | Self-service FastAPI app: `/` single-chart, `/compat` two-chart; saves JSON intake and returns tiered PDFs. |
 
 ## Running the test suite
 

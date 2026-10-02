@@ -36,9 +36,9 @@ def _ipchun_date(year: int) -> Optional[datetime]:
     return None
 
 
-def saju_year(d: Union[date, datetime]) -> int:
+def saju_year(d: Union[date, datetime], utc_offset: float = 9.0) -> int:
     """Return the 사주 year (연도) of a Gregorian date/datetime: on/after that
-    year's 입춀 belongs to that year; before it belongs to the prior year.
+    year's 입춘 belongs to that year; before it belongs to the prior year.
 
     N-18 (2026-09-26 audit): this used to compare `d < ipchun.date()`, so a birth
     (or reference moment) **on 입춘 day but before the term instant** was counted
@@ -57,10 +57,19 @@ def saju_year(d: Union[date, datetime]) -> int:
     the chart's own 입춀-based `current_age`/대운 timing. Factored out of
     `saju_age()`, which already computed this same thing internally for both
     the birth year and "today".
+
+    S1 (2026-10-01 audit): the 입춘 instant is stored in KST wall clock, but
+    `d` is the querent's LOCAL wall clock. The pillar path already shifts
+    terms by (utc_offset - 9) (pillars.py `_independent_year_month_pillar`);
+    this path compared them naively, so for any non-KST chart the 세수 /
+    current-대운 boundary sat up to ~14 h away from the year-pillar boundary.
+    `utc_offset` defaults to KST (9.0 == KST_OFFSET_HOURS) so existing
+    callers are unchanged.
     """
     ipchun = _ipchun_date(d.year)
     if ipchun is None:
         return d.year
+    ipchun = ipchun + timedelta(hours=utc_offset - 9.0)
     if isinstance(d, datetime):
         return d.year - 1 if d < ipchun else d.year
     return d.year - 1 if d < ipchun.date() else d.year
@@ -70,6 +79,7 @@ def saju_age(
     birth_date_str: str,
     today: Optional[date] = None,
     birth_time_str: Optional[str] = None,
+    utc_offset: float = 9.0,
 ) -> Optional[int]:
     """Return the 사주 세수 (Korean counting age, 입춀-based) on `today`.
 
@@ -100,7 +110,7 @@ def saju_age(
             birth = datetime(by, bm, bd, bh, bmi)
         except (ValueError, AttributeError):
             pass
-    return saju_year(today) - saju_year(birth) + 1
+    return saju_year(today, utc_offset) - saju_year(birth, utc_offset) + 1
 
 
 # ── 60-cycle (육십갑자) math ─────────────────────────────────────────────────

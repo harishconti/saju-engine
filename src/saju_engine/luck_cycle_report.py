@@ -127,7 +127,8 @@ def _saju_year_of_birth(chart) -> int:
     except (ValueError, AttributeError):
         pass
     from datetime import datetime
-    return saju_year(datetime(by, bm, bd, bh, bmi))
+    # S1 (2026-10-01 audit): compare 입춘 in the birth's local clock.
+    return saju_year(datetime(by, bm, bd, bh, bmi), chart.utc_offset)
 
 
 def _first_start_date(chart) -> Optional[date]:

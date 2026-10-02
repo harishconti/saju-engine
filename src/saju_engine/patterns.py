@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from . import lookup as L
 from .strength import _element_counts
@@ -517,7 +517,6 @@ def detect_structural_notes(
                     "note": f"A strong {elem} bias in the earthly foundation; the chart leans heavily in that direction.",
                 })
 
-    set(branches)
     for a, b, c, elem in L.THREE_HARMONIES:
         frame = {a, b, c}
         if all(br in frame for br in branches):
@@ -600,7 +599,7 @@ def detect_patterns(
     stems: List[str],
     hidden_stems: List[Tuple[str, str]],
     strength_verdict: str = "",
-) -> Dict[str, any]:
+) -> Dict[str, Any]:
     """Return a structured dictionary of pattern candidates and structural notes.
 
     Keys:
@@ -616,7 +615,6 @@ def detect_patterns(
       - dominant_element: element with highest weighted count.
       - element_balance: weighted element counts.
     """
-    L.STEM_INFO[day_master]["element"]
     # Visible month-stem ten-god (retained in the return dict for reference;
     # NOT used to name the regular grid — see the 투출 method below).
     month_tengod = L.ten_god(day_master, month_stem)

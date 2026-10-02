@@ -148,13 +148,6 @@ _CJK_RE = re.compile(
 )
 
 
-def _wrap_cjk_in_cid_font(text: str) -> str:
-    """Wrap each CJK run in an inline <font> tag pointing at the Korean CID font."""
-    return _CJK_RE.sub(
-        lambda m: f"<font face='{_CJK_FONT}'>{m.group(0)}</font>", text
-    )
-
-
 # If DejaVu registration failed for any face, fall back to the built-in names.
 def _font(name: str) -> str:
     """Return the registered font name, or a built-in fallback if unavailable."""
@@ -162,7 +155,7 @@ def _font(name: str) -> str:
         pdfmetrics.getFont(name)
         return name
     except Exception:
-        return name.replace("DejaVuSans", "Helvetica").replace("-Bold", "-Bold").replace("-Oblique", "-Oblique")
+        return name.replace("DejaVuSans", "Helvetica")
 
 from saju_engine.premium_report import generate_premium_report  # noqa: E402
 
@@ -318,24 +311,7 @@ _ELEMENT_EMOJI_TO_ELEMENT = {v: k for k, v in ELEMENT_EMOJI.items()}
 _ELEMENT_EMOJI_SET = set(ELEMENT_EMOJI.values())
 
 
-def _replace_element_emoji_with_bullet(text: str) -> str:
-    """Replace element-circle emoji with a colored bullet glyph.
-
-    DejaVu/Helvetica do not contain color-emoji glyphs, and Noto Color Emoji
-    uses the CBDT/CBLC bitmap format that reportlab's TTFont cannot load
-    (`missing location table`). Instead of silently stripping the emoji, we
-    map each one to a solid bullet (`●`) tinted with the element's color so
-    the visual cue is preserved.
-    """
-    for emoji in _ELEMENT_EMOJI_SET:
-        if emoji in text:
-            element = _ELEMENT_EMOJI_TO_ELEMENT[emoji]
-            color = ELEMENT_COLORS.get(element, "#333333")
-            text = text.replace(emoji, f'<font color="{color}">●</font>')
-    return text.strip()
-
-
-# Kept for backward compatibility; new code should use the bullet replacement.
+# Element emoji are stripped before reportlab layout (no colour-emoji font support).
 def _strip_element_emoji(text: str) -> str:
     """Remove element-circle emoji from table cells before reportlab layout."""
     for emoji in _ELEMENT_EMOJI_SET:

@@ -264,13 +264,13 @@ async def compat_generate(
     dob_a: str = Form(...),
     birth_time_a: str = Form(...),
     location_a: str = Form(...),
-    utc_offset_a: float = Form(5.5),
+    utc_offset_a: float = Form(...),
     gender_a: str = Form(...),
     name_b: str = Form(...),
     dob_b: str = Form(...),
     birth_time_b: str = Form(...),
     location_b: str = Form(...),
-    utc_offset_b: float = Form(5.5),
+    utc_offset_b: float = Form(...),
     gender_b: str = Form(...),
     email: str = Form(...),
     main_concern: str = Form(""),
@@ -302,6 +302,20 @@ async def compat_generate(
         "timezone_a": timezone_a.strip(),
         "timezone_b": timezone_b.strip(),
     }
+    # S8c (2026-10-01 audit): validate BEFORE persisting — rejected payloads
+    # must never be written to INTAKE_DIR as PII.
+    # Validate genders so 대운 (major luck) can be computed.
+    for prefix, gender in (("a", gender_a), ("b", gender_b)):
+        if gender not in ("M", "F"):
+            raise HTTPException(status_code=400,
+                                detail=f"Gender {prefix.upper()} must be M or F (got {gender!r}).")
+
+    try:
+        ya, ma, da, ha, mia = _parse_dob_time(dob_a, birth_time_a)
+        yb, mb, db, hb, mib = _parse_dob_time(dob_b, birth_time_b)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     # Save raw intake.
     INTAKE_DIR.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
@@ -314,18 +328,6 @@ async def compat_generate(
                     "payload": payload}, indent=2, ensure_ascii=False),
         encoding="utf-8",
     )
-
-    # Validate genders so 대운 (major luck) can be computed.
-    for prefix, gender in (("a", gender_a), ("b", gender_b)):
-        if gender not in ("M", "F"):
-            raise HTTPException(status_code=400,
-                                detail=f"Gender {prefix.upper()} must be M or F (got {gender!r}).")
-
-    try:
-        ya, ma, da, ha, mia = _parse_dob_time(dob_a, birth_time_a)
-        yb, mb, db, hb, mib = _parse_dob_time(dob_b, birth_time_b)
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     # N-14 (2026-09-26 audit): this used to write straight into
     # candidates_horoscope/marriage_compatibility/{slug_a}_{slug_b}/ — the

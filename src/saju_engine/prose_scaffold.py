@@ -248,6 +248,7 @@ def _current_time_draft(chart: Chart) -> str:
         # so this already finds the doctrinally-correct pillar) — only the
         # human-facing label needs the 사주 year: for a reference date before
         # 입춀, the active 세운 is still the prior year's.
+        # S1 follow-up (2026-10-02 final review): this LABEL must follow chart.sewoon, which is still KST-keyed until S8a; do not pass chart.utc_offset here.
         parts.append(
             f"As of {saju_year(ref)}, the annual pillar is **{current_sewoon.combined if current_sewoon else '—'}** "
             f"({current_sewoon.stem_tengod if current_sewoon else '—'} ten-god)."

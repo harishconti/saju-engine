@@ -329,13 +329,6 @@ class Chart:
         except (ValueError, TypeError):
             return None
 
-    def pillar_table_rows(self) -> List[Tuple[str, str, str, str]]:
-        """Return [(label, stem, branch, combined)] for the four pillars."""
-        return [
-            (p.position.capitalize(), p.stem, p.branch, p.combined)
-            for p in self.pillars
-        ]
-
     def to_dict(self) -> Dict[str, Any]:
         """Serialize the chart to a plain dictionary (JSON-ready)."""
         def _pillar_dict(p: Pillar) -> Dict[str, Any]:

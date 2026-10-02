@@ -86,12 +86,9 @@ saju/
 │       └── theme.css                  # Default premium theme
 ├── tools/
 │   ├── build-pdf.sh                   # Wrapper script (sets up PYTHONPATH, forwards flags)
-│   ├── client_intake_form.html        # JSON-only client intake + tier selection form
-│   ├── client_intake_server.py        # Tiny server that saves intake submissions as JSON
-│   ├── client_intake_app.html         # Self-service form variant with PDF download
+│   ├── client_intake_app.html         # Self-service form with PDF download
 │   ├── client_intake_app.py           # FastAPI self-service app that returns tiered PDFs
-│   ├── client_compat_intake_form.html # Two-chart compat intake form (Partner A × Partner B)
-│   └── client_compat_intake_server.py # Stdlib HTTP server for compat intake
+│   └── client_compat_intake_form.html # Two-chart compat intake form (Partner A × Partner B), served at /compat
 ├── apps/landing-page/                 # Next.js marketing site (own git repo; USD/English-global positioning)
 ├── tests/                             # pytest suite (1200+ tests)
 ├── misc/market_research/              # ⚠️ SUPERSEDED June-2026 India research — see docs/market-research-2026-09.md
@@ -143,13 +140,8 @@ Beyond the knowledge base, the project ships two execution paths:
 - **CLI formats:** `table` (default), `json`, `skeleton`, and `premium`. Premium supports `--tier {sample,essential,deep,spark,reading,fullmap}` — the first three are the landing-page products (Hook / Essential Report / Deep Destiny Report), the last three are legacy internal aliases kept for backward compatibility. Skeleton supports `--year`, `--month`, `--day`, `--focus`, and `--no-prose-scaffold`. `--convention` and `--overwrite-report` are available on the PDF wrapper.
 - **Dependencies:** declared in `pyproject.toml`. For a fresh machine: `pip install --user --break-system-packages sajupy reportlab pytest`.
 
-### Client intake form — `tools/client_intake_form.html`
-- A self-contained, mobile-friendly intake form that asks for name, DOB, birth time, location, email, gender, marriage status, and tier selection.
-- The "main concern" textarea is enabled only when **The Deep Destiny Report ($55)** is selected, matching the Mahesh combined-report deep-dive format.
-- Run `python3 tools/client_intake_server.py 8080` and open `http://localhost:8080`. Submissions are saved as JSON in `candidates_horoscope/intake/`.
-
 ### Self-service calculator — `tools/client_intake_app.py`
-- FastAPI web app that extends the intake form: the client fills the same form and receives a tiered PDF immediately.
+- FastAPI web app: the client fills the intake form (name, DOB, birth time, location, email, gender, marriage status, tier; "main concern" enabled only for the Deep tier) and receives a tiered PDF immediately. Each submission is saved as JSON in `candidates_horoscope/intake/` (the compat route validates before saving).
 - Computes the chart with `src/saju_engine/`, generates the premium markdown for the chosen tier, and renders it to PDF via the reportlab backend.
 - Saves the intake JSON and the generated PDF (plus its engine markdown) in `candidates_horoscope/intake/`.
 - Run `python3 tools/client_intake_app.py 8080` and open `http://localhost:8080`. Requires the `web` optional dependencies: `pip install --user --break-system-packages -e ".[web]"`.
@@ -174,7 +166,7 @@ Beyond the knowledge base, the project ships two execution paths:
 ### Two-chart compatibility pipeline — `src/saju_engine/compat.py` + `src/saju_html/md_to_saju_compat_pdf.py`
 - **Engine:** `compat_score(chart_a, chart_b)` in `src/saju_engine/compat.py` runs all 11 sub-systems (일간합 → 띠 궁합), weights them per `knowledge/11-gunghap.md`, and returns a `CompatReport` with composite 0–100 score + 4-band verdict.
 - **Standalone report:** `generate_compat_report(chart_a, chart_b, name_a, name_b, tier="basic"|"deep")` in `src/saju_engine/compat_report.py` produces a tiered markdown report. `basic` is the ~4-page compact snapshot; `deep` is the full 11-sub-system report plus individual chart snapshots + timing overlay.
-- **Intake form:** `tools/client_compat_intake_form.html` is a two-chart variant — symmetric Partner A | Partner B layout, single email + main-concern field. Stdlib server at `tools/client_compat_intake_server.py` saves submissions as JSON to `candidates_horoscope/intake/`.
+- **Intake form:** `tools/client_compat_intake_form.html` is a two-chart variant — symmetric Partner A | Partner B layout, single email + main-concern field. Served by `tools/client_intake_app.py` at `/compat`; submissions are saved as JSON to `candidates_horoscope/intake/`.
 - **Self-service route:** `python3 tools/client_intake_app.py 8080` then visit `/compat` for an immediate basic-tier PDF; the FastAPI app computes both charts, runs `compat_score`, and renders the compat PDF on the fly.
 - **Standalone renderer:** `python3 src/saju_html/md_to_saju_compat_pdf.py <compat.md> --name-a ... --name-b ... --tier basic|deep` produces a premium-styled PDF with both partners on the cover, composite score as a header block, and the sub-system cards selected by tier.
 - **Demo pair:** Pawan × Sruthi in `candidates_horoscope/marriage_compatibility/pawan_sruthi/pawan_sruthi_compatibility.{md,pdf}` (basic) and `pawan_sruthi/pawan_sruthi_compatibility_deep.{md,pdf}` (deep).

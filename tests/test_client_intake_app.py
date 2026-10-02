@@ -159,3 +159,47 @@ def test_intake_forms_do_not_default_utc_offset_to_india():
             assert 'value="5.5"' not in tag, (
                 f"{html_path.name}#{field_id} must not default to India's UTC offset: {tag!r}"
             )
+
+
+def test_client_forms_show_usd_not_rupee_prices():
+    """S7 (2026-10-01 audit): forms still showed ₹799/₹1,499 after the
+    2026-09-07 USD pivot."""
+    for html_path in sorted((PROJECT_ROOT / "tools").glob("*.html")):
+        assert "₹" not in html_path.read_text(encoding="utf-8"), html_path.name
+    app_html = (PROJECT_ROOT / "tools" / "client_intake_app.html").read_text()
+    assert "$19" in app_html and "$55" in app_html
+    compat_html = (PROJECT_ROOT / "tools" / "client_compat_intake_form.html").read_text()
+    assert "$24" in compat_html and "$45" in compat_html
+
+
+def test_compat_generate_requires_explicit_utc_offsets():
+    """S8b (2026-10-01 audit): /compat/generate still defaulted both offsets
+    to Form(5.5) (India) after N-13 removed it from /generate."""
+    import inspect
+
+    params = inspect.signature(_load_app_module().compat_generate).parameters
+    for name in ("utc_offset_a", "utc_offset_b"):
+        assert params[name].default.is_required(), name
+
+
+def test_compat_generate_validates_before_writing_intake(monkeypatch, tmp_path):
+    """S8c (2026-10-01 audit): the intake JSON was written BEFORE gender/date
+    validation, so rejected (possibly hostile) payloads accumulated as PII."""
+    import asyncio
+
+    import pytest
+    from fastapi import HTTPException
+
+    module = _load_app_module()
+    monkeypatch.setattr(module, "INTAKE_DIR", tmp_path)
+    with pytest.raises(HTTPException) as exc:
+        asyncio.run(module.compat_generate(
+            name_a="A", dob_a="1990-06-15", birth_time_a="10:00",
+            location_a="Seoul", utc_offset_a=9.0, gender_a="X",
+            name_b="B", dob_b="1992-03-20", birth_time_b="14:00",
+            location_b="Seoul", utc_offset_b=9.0, gender_b="F",
+            email="t@example.com", main_concern="", favorable_element_a="",
+            favorable_element_b="", timezone_a="", timezone_b="", tier="basic",
+        ))
+    assert exc.value.status_code == 400
+    assert not list(tmp_path.rglob("*.json"))

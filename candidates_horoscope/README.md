@@ -59,20 +59,20 @@ candidates_horoscope/
 
 ## Client Intake Form
 
-A self-contained HTML intake form lives at `tools/client_intake_form.html`. It collects name, DOB, birth time, birth location, email, gender, marriage/relationship status, and tier selection. The "main concern" textarea is enabled only when **The Deep Destiny Report** is selected.
+The intake forms (`tools/client_intake_app.html` single-chart, `tools/client_compat_intake_form.html` two-chart) are served by the FastAPI app `tools/client_intake_app.py`. The single-chart form collects name, DOB, birth time, birth location, email, gender, marriage/relationship status, and tier selection. The "main concern" textarea is enabled only when **The Deep Destiny Report** is selected.
 
-Run the tiny server to collect submissions as JSON:
+Run the app (requires `pip install -e ".[web]"`):
 
 ```bash
-python3 tools/client_intake_server.py 8080
-# open http://localhost:8080
+python3 tools/client_intake_app.py 8080
+# open http://localhost:8080  (compat form at /compat)
 ```
 
-Submissions are saved to `candidates_horoscope/intake/YYYYMMDD-HHMMSS-{name-slug}.json`.
+Each submission is saved as JSON in `candidates_horoscope/intake/` as `YYYYMMDD-HHMMSS-{name-slug}.json` (the compat route validates before saving).
 
 ## Self-Service Calculator
 
-`tools/client_intake_app.py` is a FastAPI app that serves the same form and immediately returns a tiered PDF. It computes the chart with `src/saju_engine/`, generates the premium markdown for the selected tier, and renders it via the reportlab backend.
+`tools/client_intake_app.py` is a FastAPI app that serves the single-chart form `tools/client_intake_app.html` at `/` (and the two-chart compat form at `/compat`) and immediately returns a tiered PDF. It computes the chart with `src/saju_engine/`, generates the premium markdown for the selected tier, and renders it via the reportlab backend.
 
 ```bash
 pip install --user --break-system-packages -e ".[web]"

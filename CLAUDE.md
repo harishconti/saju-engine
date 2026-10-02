@@ -91,9 +91,9 @@ When the user asks for a "PDF", "shareable", "presentable" version of a candidat
    - Default for Sruthi: `./tools/build-pdf.sh sruthi`
    - For a new candidate: `./tools/build-pdf.sh {name} "{title}" "{client}" "{dob}" "{day-master}"`
 2. **Output path:** `candidates_horoscope/reports/{name}/{name}-report.pdf` (sits next to the `.md` base reading).
-3. **Style:** English-primary, Korean/Hanja translated inline (translation maps live in `src/saju_html/md_to_saju_pdf.py`). Cover page with title, candidate info, Day Master, generation date. Body has clean headings, alternating-row tables, footer with page numbers.
-4. **Dependencies:** `reportlab` and `sajupy` are both pre-installed at `/home/harish/.local/lib/python3.12/site-packages/` (added to `PYTHONPATH` automatically by `build-pdf.sh` and the hardcoded `_SITE` in the engine). If a fresh machine is used, install with `pip install --user --break-system-packages sajupy reportlab`.
-5. **Adding new translation terms:** if a Korean or Hanja term appears in the PDF that isn't translated, add it to the appropriate map (`STEM_MAP`, `BRANCH_MAP`, `TENGOD_MAP`, `KOR_REPL`, or `HANJA_MAP`) in `src/saju_html/md_to_saju_pdf.py` and rebuild.
+3. **Style:** English-primary, Korean/Hanja translated inline (translation maps live in `src/saju_html/__init__.py`). Cover page with title, candidate info, Day Master, generation date. Body has clean headings, alternating-row tables, footer with page numbers.
+4. **Dependencies:** `reportlab` and `sajupy` are both pre-installed at `/home/harish/.local/lib/python3.12/site-packages/` (added to `PYTHONPATH` automatically by `build-pdf.sh`; the engine honours `$SAJU_SITE` as an override, `src/saju_engine/pillars.py`). If a fresh machine is used, install with `pip install --user --break-system-packages sajupy reportlab`.
+5. **Adding new translation terms:** if a Korean or Hanja term appears in the PDF that isn't translated, add it to the appropriate map (`STEM_MAP`, `BRANCH_MAP`, `TENGOD_MAP`, `KOR_REPL`, or `HANJA_MAP`) in `src/saju_html/__init__.py` and rebuild.
 
 ## Premium Client Report Pipeline (Preferred Pattern)
 
@@ -180,10 +180,7 @@ backward compatibility, but new client orders should use the single-chart tiers 
 
 ## Client Intake
 
-Two client-facing intake paths are available:
-
-1. **JSON-only intake form** — `tools/client_intake_form.html` + `tools/client_intake_server.py`. Collects the same fields and saves each submission as JSON in `candidates_horoscope/intake/`. No engine or PDF is produced; the reader processes the intake manually.
-2. **Self-service calculator** — `tools/client_intake_app.html` + `tools/client_intake_app.py` (FastAPI). Collects the same fields and immediately returns a tiered PDF. Requires the `web` optional dependencies (`pip install -e ".[web]"`).
+**Self-service app** — `tools/client_intake_app.html` + `tools/client_compat_intake_form.html`, served by `tools/client_intake_app.py` (FastAPI; `/` single-chart, `/compat` two-chart). Each submission is saved as JSON in `candidates_horoscope/intake/` (the compat route validates before saving) and a tiered PDF is returned. Requires the `web` optional dependencies (`pip install -e ".[web]"`). (The stdlib JSON-only servers were removed 2026-10-02 — audit S5.)
 
 Both forms ask for: name, DOB, birth time, birth location, UTC offset, email, gender, marriage/relationship status, and tier selection. The "main concern" textarea is enabled only when **The Deep Destiny Report (`deep` tier)** is selected.
 

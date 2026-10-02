@@ -1893,6 +1893,7 @@ def _year_one_liner(chart: Chart, override: Optional[str] = None) -> str:
     # so it already finds the doctrinally-correct pillar) — but stating that
     # same Gregorian number as the label here was wrong for a reference date
     # before 입춀 (e.g. "2026 is a 乙巳 year" when 乙巳 is 2025's pillar).
+    # S1 follow-up (2026-10-02 final review): this LABEL must follow chart.sewoon, which is still KST-keyed until S8a; do not pass chart.utc_offset here.
     return (
         f"{saju_year(ref)} is a **{sewoon.combined} ({tengod})** year — "
         f"an invitation to lean into {ctx_favorable_phrase(chart, override)}."

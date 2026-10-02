@@ -17,10 +17,17 @@ import shutil
 import subprocess
 from pathlib import Path
 
+import pytest
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+# A5 (2026-10-01 audit): this hard-coded /home/harish/.local/... and so only
+# ran on one machine. Inherit the caller's PYTHONPATH (CI installs deps
+# normally; locally build-pdf.sh / $SAJU_SITE provide it) and prepend src/.
 ENV = {
     **os.environ,
-    "PYTHONPATH": f"{PROJECT_ROOT / 'src'}:/home/harish/.local/lib/python3.12/site-packages",
+    "PYTHONPATH": os.pathsep.join(
+        p for p in (str(PROJECT_ROOT / "src"), os.environ.get("PYTHONPATH", "")) if p
+    ),
 }
 
 MINIMAL_COMPAT_MD = """\
@@ -41,6 +48,7 @@ Placeholder closing note for the regression fixture.
 
 
 def test_compat_pdf_default_output_lands_under_repo_root_not_src(tmp_path):
+    pytest.importorskip("reportlab")
     input_md = tmp_path / "test-pair-a_test-pair-b_compatibility.md"
     input_md.write_text(MINIMAL_COMPAT_MD, encoding="utf-8")
 
