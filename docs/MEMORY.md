@@ -198,6 +198,7 @@ As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P1 items:
 - **Real testimonials** on the landing page — the current ones are flagged illustrative and must be replaced or removed before launch (FTC risk).
 - Self-service app hardening: encrypt PII, background queue, auth (`tools/client_intake_app.py`).
 - Deployment hardening for the landing-page Next.js app and FastAPI calculator.
+- **A1:** recover `apps/landing-page/src/` from the machine that built it (not in this repo).
 - Populate the 30×30 Nayin pair table from a published source (currently on the 5-element fallback).
 - Optional additional Korean textbook 만세력 cases if more independent sources are found.
 - **`premium_report.py` "What This Year Means for You" bug — FIXED 2026-09-14.**
@@ -237,6 +238,16 @@ As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P1 items:
   needs to be passed explicitly, though doing so is still fine.
 
 ## Recent Changes to Remember
+
+- **2026-10-02 (audit 2026-10-01 Wave A/B fixes, branch `fix/audit-2026-10-01-wave-ab`)** — S1: 세수/current
+  대운 compare 입춘 in the birth's local time. S2: compat element-balance table uses canonical
+  `strength.element_balance_pct`; compat 용신/기신 flags and combined-elements narrative no longer print
+  percentages (user decision; the table is the only client-visible %); scoring helper is now
+  `compat._weighted_presence_pct`, WEIGHT unchanged. S3: compat Major Luck favorability uses the shared
+  `prose_fillers.period_favorable_status`. S5: stdlib intake servers and `client_intake_form.html` removed;
+  FastAPI serves both flows. S7: USD prices in intake forms. S8b/S8c: `/compat/generate` requires
+  `utc_offset_a/b` and validates before saving intake JSON. A5/A6/A7: test PYTHONPATH cleanup, CLAUDE.md
+  path fixes, dead code removed. Tracker: `docs/issues_bugs.md` "Audit 2026-10-01".
 
 - **2026-09-30 (new compat pair: Harish × Srinidhi)** — Created `candidates_horoscope/
   marriage_compatibility/harish_srinidhi/` (basic + deep, both `.md` and `.pdf`; added to the

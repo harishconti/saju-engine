@@ -91,9 +91,9 @@ When the user asks for a "PDF", "shareable", "presentable" version of a candidat
    - Default for Sruthi: `./tools/build-pdf.sh sruthi`
    - For a new candidate: `./tools/build-pdf.sh {name} "{title}" "{client}" "{dob}" "{day-master}"`
 2. **Output path:** `candidates_horoscope/reports/{name}/{name}-report.pdf` (sits next to the `.md` base reading).
-3. **Style:** English-primary, Korean/Hanja translated inline (translation maps live in `src/saju_html/md_to_saju_pdf.py`). Cover page with title, candidate info, Day Master, generation date. Body has clean headings, alternating-row tables, footer with page numbers.
-4. **Dependencies:** `reportlab` and `sajupy` are both pre-installed at `/home/harish/.local/lib/python3.12/site-packages/` (added to `PYTHONPATH` automatically by `build-pdf.sh` and the hardcoded `_SITE` in the engine). If a fresh machine is used, install with `pip install --user --break-system-packages sajupy reportlab`.
-5. **Adding new translation terms:** if a Korean or Hanja term appears in the PDF that isn't translated, add it to the appropriate map (`STEM_MAP`, `BRANCH_MAP`, `TENGOD_MAP`, `KOR_REPL`, or `HANJA_MAP`) in `src/saju_html/md_to_saju_pdf.py` and rebuild.
+3. **Style:** English-primary, Korean/Hanja translated inline (translation maps live in `src/saju_html/__init__.py`). Cover page with title, candidate info, Day Master, generation date. Body has clean headings, alternating-row tables, footer with page numbers.
+4. **Dependencies:** `reportlab` and `sajupy` are both pre-installed at `/home/harish/.local/lib/python3.12/site-packages/` (added to `PYTHONPATH` automatically by `build-pdf.sh`; the engine honours `$SAJU_SITE` as an override, `src/saju_engine/pillars.py`). If a fresh machine is used, install with `pip install --user --break-system-packages sajupy reportlab`.
+5. **Adding new translation terms:** if a Korean or Hanja term appears in the PDF that isn't translated, add it to the appropriate map (`STEM_MAP`, `BRANCH_MAP`, `TENGOD_MAP`, `KOR_REPL`, or `HANJA_MAP`) in `src/saju_html/__init__.py` and rebuild.
 
 ## Premium Client Report Pipeline (Preferred Pattern)
 

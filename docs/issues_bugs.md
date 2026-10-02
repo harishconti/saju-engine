@@ -364,10 +364,11 @@ go-to-market backlog are in **`../docs/market-research-2026-09.md`**.
 
 - **Status:** FIXED (2026-07-01)
 - **Area:** PDF generation (HTML/Playwright backend)
-- **Files:** `src/saju_html/renderer.py:197-206`
+- **Files:** `src/saju_html/renderer.py:197-206` (superseded: see note below)
 - **Issue:** The HTML backend always called `translate_inline()`, even when `tier="compat"`, which would partially mangle Korean/Hanja if compat were routed through HTML.
 - **Fix:** `_render_markdown()` now receives `tier` and skips CJK translation entirely when `tier == "compat"`, matching the reportlab backend behavior.
 - **Tests added:** Existing HTML PDF tests exercise `_render_markdown`; compat-specific rendering is covered by the reportlab compat PDF pipeline.
+- **Update (2026-10-02):** The compat skip-translation branch was superseded by `src/saju_html/renderer.py:214-217`: all client-facing PDFs, compat included, are now English-primary and run through `_translate_html`.
 
 ---
 
@@ -805,6 +806,32 @@ The following issues were raised by an external reviewer after the 2026-07-01 bu
 
 ---
 
+## Audit 2026-10-01 (Wave A/B)
+
+Source: `research-engine/output/2026-10-01/saju-engine-audit-2026-10-01.md`. Fixed on branch `fix/audit-2026-10-01-wave-ab`.
+
+| ID | Status | Notes |
+|----|--------|-------|
+| S1 | FIXED (2026-10-02, c4a0712) | 세수/current 대운 compare 입춘 in the birth's local time (`saju_year`/`saju_age` take `utc_offset`). |
+| S2 | FIXED (2026-10-02, 45cc7d9 + 62f8941) | Compat element-balance table uses canonical `strength.element_balance_pct`; scoring helper renamed `compat._weighted_presence_pct` (scoring only). User decision 2026-10-02: compat 용신/기신 flags and the combined-elements narrative print no percentages; the canonical table is the only client-visible %. |
+| S3 | FIXED (2026-10-02, 23c86b6) | Compat Major Luck favorability uses the shared 용신/희신/기신 rule (`prose_fillers.period_favorable_status`). |
+| S5 | FIXED (2026-10-02, 42b259b) | Stdlib intake servers and `tools/client_intake_form.html` removed; the FastAPI app serves both flows. |
+| S7 | FIXED (2026-10-02, 621a567) | USD tier prices in intake forms ($19/$55, compat $24/$45). |
+| S8b | FIXED (2026-10-02, 70930f6) | `/compat/generate` requires `utc_offset_a`/`utc_offset_b`. |
+| S8c | FIXED (2026-10-02, 70930f6) | Intake input validated before the intake JSON is saved. |
+| A5 | FIXED (2026-10-02, 518cf51) | `test_compat_pdf_cli.py` no longer hard-codes a machine-specific PYTHONPATH. |
+| A6 | FIXED (2026-10-02, this docs commit) | CLAUDE.md paths corrected (`src/saju_html/__init__.py`, `$SAJU_SITE`). |
+| A7 | FIXED (2026-10-02, f1012ea) | Dead code removed; `nayin_relation` kept (public API). |
+| B5 | ALREADY DONE | `tests/validation/test_val_compat.py:169` pins WEIGHT total 112 / scored 100 (the audit's "88" figure was wrong). |
+| S4/A1 | OPEN | Landing page source not in repo; see follow-up plan P6. |
+| S6 | OPEN | Typed compat flags; follow-up plan P2. |
+| S8a, S8d, S8e, S8f | OPEN | Web hardening (sewoon ephemeris, background PDF jobs, CORS, review gate); follow-up plan P4. |
+| B4, B8 | OPEN | `report_primitives` extraction; follow-up plan P2. |
+| B6 | OPEN | Not yet scheduled. |
+| B7 | OPEN | Stars + patterns validation fixtures; follow-up plan P3. |
+
+---
+
 ## Change Log
 
 | Date | Change |
@@ -817,3 +844,4 @@ The following issues were raised by an external reviewer after the 2026-07-01 bu
 | 2026-07-01 | Fixed H13 (종격 rooting check), L19 (reportlab element emoji → colored bullets), L20 (exact demo-pair compat assertions), and M15 (documented demo-deployment privacy limits); full suite 386/386 passing. |
 | 2026-07-01 | Fixed D1: added `tests/test_textbook_cases.py` with external Korean Saju validation case for Park Chung-hee (four pillars + 대운 table); full suite 388/388 passing. |
 | 2026-09-07 | Added and fixed G1 (reviewer-note leak into client PDFs), G2 (per-pillar template grammar), G3 (용신 single source of truth + provenance — new `src/saju_engine/yongsin.py`), G6 (₹→USD in engine text) as part of the go-to-market pivot; regression tests added; full suite 568 → 590 passing. |
+| 2026-10-02 | Audit 2026-10-01 Wave A/B: fixed S1, S2, S3, S5, S7, S8b, S8c, A5, A6, A7 (see "Audit 2026-10-01" section); M8 note corrected. |
