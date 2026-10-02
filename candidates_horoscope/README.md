@@ -68,11 +68,11 @@ python3 tools/client_intake_app.py 8080
 # open http://localhost:8080  (compat form at /compat)
 ```
 
-Every validated submission is saved as `candidates_horoscope/intake/YYYYMMDD-HHMMSS-{name-slug}.json`.
+Each submission is saved as JSON in `candidates_horoscope/intake/` as `YYYYMMDD-HHMMSS-{name-slug}.json` (the compat route validates before saving).
 
 ## Self-Service Calculator
 
-`tools/client_intake_app.py` is a FastAPI app that serves the same form and immediately returns a tiered PDF. It computes the chart with `src/saju_engine/`, generates the premium markdown for the selected tier, and renders it via the reportlab backend.
+`tools/client_intake_app.py` is a FastAPI app that serves the single-chart form `tools/client_intake_app.html` at `/` (and the two-chart compat form at `/compat`) and immediately returns a tiered PDF. It computes the chart with `src/saju_engine/`, generates the premium markdown for the selected tier, and renders it via the reportlab backend.
 
 ```bash
 pip install --user --break-system-packages -e ".[web]"

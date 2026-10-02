@@ -812,7 +812,7 @@ Source: `research-engine/output/2026-10-01/saju-engine-audit-2026-10-01.md`. Fix
 
 | ID | Status | Notes |
 |----|--------|-------|
-| S1 | FIXED (2026-10-02, c4a0712) | 세수/current 대운 compare 입춘 in the birth's local time (`saju_year`/`saju_age` take `utc_offset`). |
+| S1 | FIXED (2026-10-02, c4a0712) | 세수/current 대운 compare 입춘 in the birth's local time (`saju_year`/`saju_age` take `utc_offset`). Annual-label sites (premium_report, prose_scaffold) intentionally stay KST-keyed until S8a moves 세운 to the engine ephemeris (fix commit fa5e7de). |
 | S2 | FIXED (2026-10-02, 45cc7d9 + 62f8941) | Compat element-balance table uses canonical `strength.element_balance_pct`; scoring helper renamed `compat._weighted_presence_pct` (scoring only). User decision 2026-10-02: compat 용신/기신 flags and the combined-elements narrative print no percentages; the canonical table is the only client-visible %. |
 | S3 | FIXED (2026-10-02, 23c86b6) | Compat Major Luck favorability uses the shared 용신/희신/기신 rule (`prose_fillers.period_favorable_status`). |
 | S5 | FIXED (2026-10-02, 42b259b) | Stdlib intake servers and `tools/client_intake_form.html` removed; the FastAPI app serves both flows. |
@@ -820,14 +820,14 @@ Source: `research-engine/output/2026-10-01/saju-engine-audit-2026-10-01.md`. Fix
 | S8b | FIXED (2026-10-02, 70930f6) | `/compat/generate` requires `utc_offset_a`/`utc_offset_b`. |
 | S8c | FIXED (2026-10-02, 70930f6) | Intake input validated before the intake JSON is saved. |
 | A5 | FIXED (2026-10-02, 518cf51) | `test_compat_pdf_cli.py` no longer hard-codes a machine-specific PYTHONPATH. |
-| A6 | FIXED (2026-10-02, this docs commit) | CLAUDE.md paths corrected (`src/saju_html/__init__.py`, `$SAJU_SITE`). |
+| A6 | FIXED (2026-10-02, 1efdd25) | CLAUDE.md paths corrected (`src/saju_html/__init__.py`, `$SAJU_SITE`). |
 | A7 | FIXED (2026-10-02, f1012ea) | Dead code removed; `nayin_relation` kept (public API). |
 | B5 | ALREADY DONE | `tests/validation/test_val_compat.py:169` pins WEIGHT total 112 / scored 100 (the audit's "88" figure was wrong). |
 | S4/A1 | OPEN | Landing page source not in repo; see follow-up plan P6. |
 | S6 | OPEN | Typed compat flags; follow-up plan P2. |
 | S8a, S8d, S8e, S8f | OPEN | Web hardening (sewoon ephemeris, background PDF jobs, CORS, review gate); follow-up plan P4. |
 | B4, B8 | OPEN | `report_primitives` extraction; follow-up plan P2. |
-| B6 | OPEN | Not yet scheduled. |
+| B6 | OPEN | OPEN — typed compat flags (= S6); follow-up plan P2. Also track: compat F verdicts (결합 과다/결핍) still derive from the §F weighted union, so their wording can differ from the canonical element table. |
 | B7 | OPEN | Stars + patterns validation fixtures; follow-up plan P3. |
 
 ---

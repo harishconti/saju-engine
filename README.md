@@ -141,7 +141,7 @@ Beyond the knowledge base, the project ships two execution paths:
 - **Dependencies:** declared in `pyproject.toml`. For a fresh machine: `pip install --user --break-system-packages sajupy reportlab pytest`.
 
 ### Self-service calculator — `tools/client_intake_app.py`
-- FastAPI web app: the client fills the intake form (name, DOB, birth time, location, email, gender, marriage status, tier; "main concern" enabled only for the Deep tier) and receives a tiered PDF immediately. Each validated submission is also saved as JSON in `candidates_horoscope/intake/`.
+- FastAPI web app: the client fills the intake form (name, DOB, birth time, location, email, gender, marriage status, tier; "main concern" enabled only for the Deep tier) and receives a tiered PDF immediately. Each submission is saved as JSON in `candidates_horoscope/intake/` (the compat route validates before saving).
 - Computes the chart with `src/saju_engine/`, generates the premium markdown for the chosen tier, and renders it to PDF via the reportlab backend.
 - Saves the intake JSON and the generated PDF (plus its engine markdown) in `candidates_horoscope/intake/`.
 - Run `python3 tools/client_intake_app.py 8080` and open `http://localhost:8080`. Requires the `web` optional dependencies: `pip install --user --break-system-packages -e ".[web]"`.
