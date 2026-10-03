@@ -99,7 +99,7 @@ def _top_classes(chart) -> List[str]:
     if not counts:
         return []
     top = max(counts.values())
-    return [c for c in ("Companion", "Output", "Wealth", "Authority", "Resource")
+    return [c for c in RP.CLASS_ORDER
             if counts.get(c, 0) == top]
 
 

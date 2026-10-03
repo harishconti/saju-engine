@@ -36,3 +36,25 @@ def test_every_flag_is_typed_and_matches_legacy_classification(i, j):
         assert flag.kind == compat._legacy_classify_flag(str(flag)), flag
         assert flag.severity == compat._legacy_flag_severity(str(flag)), flag
         assert flag.code
+
+
+def _report(i=0, j=2):
+    return compat.compat_score(CHARTS[i], CHARTS[j])
+
+
+def test_flag_survives_pickle_copy_asdict():
+    import copy
+    import dataclasses
+    import pickle
+    report = _report()
+    flags = list(_all_flags(report))
+    assert flags
+    for f in flags:
+        g = pickle.loads(pickle.dumps(f))
+        assert isinstance(g, compat.Flag)
+        assert (str(g), g.kind, g.code, g.severity) == (str(f), f.kind, f.code, f.severity)
+    clone = copy.deepcopy(report)
+    assert [(str(f), f.kind, f.code, f.severity) for f in _all_flags(clone)] == \
+        [(str(f), f.kind, f.code, f.severity) for f in flags]
+    assert all(isinstance(f, compat.Flag) for f in _all_flags(clone))
+    assert dataclasses.asdict(report.daybranch)["flags"] is not None

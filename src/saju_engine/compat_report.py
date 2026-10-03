@@ -31,7 +31,7 @@ from datetime import date
 
 def _has(flags, *codes: str) -> bool:
     """True if any typed compat Flag carries one of ``codes`` (S6: no prose matching)."""
-    return any(getattr(f, "code", None) in codes for f in flags)
+    return any(f.code in codes for f in flags)
 
 
 # ── Element-color emoji table (matches saju_html / engine convention) ───────
@@ -536,7 +536,7 @@ def _practical_guidance(report: CompatReport, name_a: str, name_b: str) -> List[
         )
 
     # Compatibility stars.
-    if _has(report.compat_stars.flags, "stars.double_canopy"):
+    if _has(report.compat_stars.flags, "compat_stars.double_canopy"):
         bullets.append(
             "**쌍화개 (both have 화개):** both partners carry a Canopy overlay — "
             "spiritual / aesthetic affinity is high, but emotional distance can "
