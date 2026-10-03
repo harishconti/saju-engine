@@ -247,13 +247,13 @@ def test_compat_composite_returns_compat_report():
 
 def test_compat_flag_classification_avoids_chungbun_substring():
     """A flag containing '충분' (sufficient) must not be misclassified as a red flag."""
-    from saju_engine.compat import _classify_flag
+    from saju_engine.compat import _legacy_classify_flag
 
-    assert _classify_flag("용신 Metal 결합에서 충분") != "red"
-    assert _classify_flag("일지 육충 자축 (RED FLAG)") == "red"
-    assert _classify_flag("띠 반합 인묘진 (Wood)") == "favorable"
-    assert _classify_flag("A → B 용신 Metal 공급 양호 (24%)") == "favorable"
-    assert _classify_flag("일지 자형 오오") == "red"
+    assert _legacy_classify_flag("용신 Metal 결합에서 충분") != "red"
+    assert _legacy_classify_flag("일지 육충 자축 (RED FLAG)") == "red"
+    assert _legacy_classify_flag("띠 반합 인묘진 (Wood)") == "favorable"
+    assert _legacy_classify_flag("A → B 용신 Metal 공급 양호 (24%)") == "favorable"
+    assert _legacy_classify_flag("일지 자형 오오") == "red"
 
 
 def test_compat_flag_classification_hae_token_not_overmatched():
@@ -262,13 +262,13 @@ def test_compat_flag_classification_hae_token_not_overmatched():
     Regression for engine-audit D22: the yellow bucket previously used a
     single-character '해' check, misclassifying unrelated flags.
     """
-    from saju_engine.compat import _classify_flag
+    from saju_engine.compat import _legacy_classify_flag
 
-    assert _classify_flag("일지 육해 축자") == "yellow"
+    assert _legacy_classify_flag("일지 육해 축자") == "yellow"
     # Unrelated words containing '해' must stay unclassified.
-    assert _classify_flag("결합에서 해결 방안") is None
-    assert _classify_flag("해당 사항 없음") is None
-    assert _classify_flag("해석은 reader가 진행") is None
+    assert _legacy_classify_flag("결합에서 해결 방안") is None
+    assert _legacy_classify_flag("해당 사항 없음") is None
+    assert _legacy_classify_flag("해석은 reader가 진행") is None
 
 
 def test_compat_top_red_flags_ranked_by_severity_not_alphabetically():
@@ -276,7 +276,7 @@ def test_compat_top_red_flags_ranked_by_severity_not_alphabetically():
     the top 3 alphabetically by sub-system label, so a -25 day-branch 육충
     could lose its cover slot to weaker folk flags whose label happens to
     sort earlier ("Combined..." before "Day-branch...")."""
-    from saju_engine.compat import _flag_severity
+    from saju_engine.compat import _legacy_flag_severity
 
     flags = [
         "Combined element cross-supply: A → B 용신 木 일부 공급 (40%)",
@@ -284,7 +284,7 @@ def test_compat_top_red_flags_ranked_by_severity_not_alphabetically():
         "Day-branch interaction (spouse palaces): 일지 육충 子午 (RED FLAG)",
         "Nayin pair (30x30): 납음 A vs B → 상충",
     ]
-    ranked = sorted(flags, key=lambda f: (-_flag_severity(f), f))[:3]
+    ranked = sorted(flags, key=lambda f: (-_legacy_flag_severity(f), f))[:3]
     assert any("육충" in f for f in ranked), (
         f"the -25 day-branch clash must survive the top-3 cut: {ranked}"
     )
@@ -297,9 +297,9 @@ def test_compat_flag_classification_dohwa_seuchyeo_is_yellow():
     yellow, so it silently never appeared in the client-facing flag lists
     despite contributing to the composite score.
     """
-    from saju_engine.compat import _classify_flag
+    from saju_engine.compat import _legacy_classify_flag
 
-    assert _classify_flag("도화스쳐 — 도화 hits spouse palace") == "yellow"
+    assert _legacy_classify_flag("도화스쳐 — 도화 hits spouse palace") == "yellow"
 
 
 def test_compat_band_thresholds():

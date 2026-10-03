@@ -29,6 +29,11 @@ from .yongsin import favorable_element
 from datetime import date
 
 
+def _has(flags, *codes: str) -> bool:
+    """True if any typed compat Flag carries one of ``codes`` (S6: no prose matching)."""
+    return any(getattr(f, "code", None) in codes for f in flags)
+
+
 # ── Element-color emoji table (matches saju_html / engine convention) ───────
 
 def _plain_words_verdict(report: CompatReport) -> str:
@@ -488,22 +493,21 @@ def _practical_guidance(report: CompatReport, name_a: str, name_b: str) -> List[
 
     # Day-branch (spouse palace) — mutually exclusive: clash / 육합 / 반합 / neutral.
     db = report.daybranch
-    db_flags = " ".join(db.flags)
-    if "RED FLAG" in db_flags or any("육충" in f for f in db.flags):
+    if _has(db.flags, "daybranch.clash", "daybranch.cross_clash"):
         bullets.append(
             "**Day-branch clash (일지 육충) is present** — a classical hard "
             "indicator. Workable, but the relationship benefits from explicit "
             "communication rhythms: a weekly 'check-in' beats ad-hoc resolution. "
             "*(see knowledge/11-gunghap.md §B4)*"
         )
-    elif any("육합" in f for f in db.flags):
+    elif _has(db.flags, "daybranch.combine", "daybranch.cross_combine"):
         bullets.append(
             "**Day-branch combination (일지 육합) is present** — the strongest "
             "classical favorable. Maintain shared rituals (meals, weekly date, "
             "annual trip) that reinforce this anchor. *(see "
             "knowledge/11-gunghap.md §B1)*"
         )
-    elif any("반합" in f for f in db.flags):
+    elif _has(db.flags, "daybranch.half_harmony", "daybranch.cross_half_harmony"):
         bullets.append(
             "**Day-branch partial harmony (일지 반합) is present** — two-of-three "
             "in a 삼합 frame. A real but incomplete anchor: nurture the shared "
@@ -514,7 +518,7 @@ def _practical_guidance(report: CompatReport, name_a: str, name_b: str) -> List[
         )
 
     # Nayin clash — practical caution for the 납음 상충 case.
-    if report.nayin.score < 0 or any("상충" in f for f in report.nayin.flags):
+    if report.nayin.score < 0 or _has(report.nayin.flags, "nayin.clash"):
         bullets.append(
             "**Nayin (납음) clash is present** — a soft, disputed indicator. "
             "Don't overweight it on its own; treat it as a reminder to align "
@@ -532,7 +536,7 @@ def _practical_guidance(report: CompatReport, name_a: str, name_b: str) -> List[
         )
 
     # Compatibility stars.
-    if any("쌍화개" in f for f in report.compat_stars.flags):
+    if _has(report.compat_stars.flags, "stars.double_canopy"):
         bullets.append(
             "**쌍화개 (both have 화개):** both partners carry a Canopy overlay — "
             "spiritual / aesthetic affinity is high, but emotional distance can "
@@ -549,7 +553,7 @@ def _practical_guidance(report: CompatReport, name_a: str, name_b: str) -> List[
             "rather than trying to smooth them out. *(see "
             "knowledge/11-gunghap.md §J)*"
         )
-    elif any("음양 동일" in f for f in yy.flags) or yy.score < 0:
+    elif _has(yy.flags, "yin_yang.dm_same") or yy.score < 0:
         bullets.append(
             "**Identical Yin-Yang polarity (same wavelength).** Easy resonance, "
             "but the 권인성 school warns it can go 편의-stale — protect "
@@ -569,7 +573,7 @@ def _practical_guidance(report: CompatReport, name_a: str, name_b: str) -> List[
 
     # Daeun direction divergence + 'when to be more deliberate' timing note.
     ds = report.daeun_sync
-    if any("방향 상이" in f for f in ds.flags):
+    if _has(ds.flags, "daeun_sync.direction_differs"):
         bullets.append(
             "**Your major-luck (대운) directions diverge** — life's large phases "
             "arrive on different timing tracks for the two of you. Be more "
@@ -643,11 +647,11 @@ def _couple_narrative(report: CompatReport, name_a: str, name_b: str) -> List[st
 
     # Day-branch (spouse palace) layer.
     db = report.daybranch
-    if any("육합" in f for f in db.flags):
+    if _has(db.flags, "daybranch.combine", "daybranch.cross_combine"):
         parts.append("your spouse palaces (일지) combine")
-    elif any("반합" in f for f in db.flags):
+    elif _has(db.flags, "daybranch.half_harmony", "daybranch.cross_half_harmony"):
         parts.append("your spouse palaces (일지) sit in a partial harmony (반합)")
-    elif "RED FLAG" in " ".join(db.flags) or any("육충" in f for f in db.flags):
+    elif _has(db.flags, "daybranch.clash", "daybranch.cross_clash"):
         parts.append("your spouse palaces (일지) carry a classical clash")
     else:
         parts.append("your spouse palaces (일지) hold a neutral, uncombined relation")
@@ -687,7 +691,7 @@ def _couple_narrative(report: CompatReport, name_a: str, name_b: str) -> List[st
 
 def _daeun_callout(report: CompatReport) -> List[str]:
     """Top-line 'Watch out for' callout when 대운 directions diverge. Empty if no divergence."""
-    if not any("방향 상이" in f for f in report.daeun_sync.flags):
+    if not _has(report.daeun_sync.flags, "daeun_sync.direction_differs"):
         return []
     return [
         "> **⚠️ Watch out for — 대운 방향 상이 (diverging major-luck directions):** "
@@ -1012,18 +1016,17 @@ def _compact_guidance_bullets(report: CompatReport, name_a: str, name_b: str) ->
             "**Peer dynamic.** You share the same Day Master — easy and familiar, "
             "but guard against sibling-style competition. Take turns leading."
         )
-    db_flags = " ".join(report.daybranch.flags)
-    if "RED FLAG" in db_flags or any("육충" in f for f in report.daybranch.flags):
+    if _has(report.daybranch.flags, "daybranch.clash", "daybranch.cross_clash"):
         bullets.append(
             "**Day-branch clash is present.** Use explicit communication rhythms — "
             "a regular check-in works better than ad-hoc conflict resolution."
         )
-    elif any("육합" in f for f in report.daybranch.flags):
+    elif _has(report.daybranch.flags, "daybranch.combine", "daybranch.cross_combine"):
         bullets.append(
             "**Day-branch combination is present.** Reinforce it with shared rituals "
             "(meals, weekly time together, annual traditions)."
         )
-    if any("방향 상이" in f for f in report.daeun_sync.flags):
+    if _has(report.daeun_sync.flags, "daeun_sync.direction_differs"):
         bullets.append(
             "**Timing divergence.** Your major-luck phases run on different tracks — "
             "overlay both annual-luck charts before big joint decisions."

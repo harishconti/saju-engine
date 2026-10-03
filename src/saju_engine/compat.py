@@ -218,18 +218,21 @@ def compat_daystem_combo(a: Chart, b: Chart) -> CompatSubResult:
     combined_elem, korean_name, pair_label = combo
     base = WEIGHT["daystem_combo"]
     score = base
-    flags = [f"일간합 {korean_name} → {combined_elem}", f"결합 원소: {combined_elem}"]
+    flags: List[str] = [
+        Flag(f"일간합 {korean_name} → {combined_elem}", kind=None, code="daystem_combo.combo"),
+        Flag(f"결합 원소: {combined_elem}", kind=None, code="daystem_combo.combined_element"),
+    ]
 
     # 합화 in-season check at either partner's month branch.
     in_season_a = _element_in_season(combined_elem, a.month.branch)
     in_season_b = _element_in_season(combined_elem, b.month.branch)
     if in_season_a or in_season_b:
-        flags.append(f"합화 원소 {combined_elem} 월령 양호")
+        flags.append(Flag(f"합화 원소 {combined_elem} 월령 양호", kind="favorable", code="daystem_combo.in_season"))
     else:
         # V3 (2026-09-14 audit §9.7): client-voice phrasing (was a bare
         # "[UNCERTAIN]" tag that leaked into client PDFs — the strip regex
         # only matched the colon form).
-        flags.append(f"합화 원소 {combined_elem} 월령 불분명 (학파마다 판단이 갈립니다)")
+        flags.append(Flag(f"합화 원소 {combined_elem} 월령 불분명 (학파마다 판단이 갈립니다)", kind=None, code="daystem_combo.season_unclear"))
 
     # Breaking-stem check across all 8 visible stems, then by position.
     breakers = _BREAKING_STEMS.get(frozenset([s_a, s_b]), [])
@@ -244,7 +247,7 @@ def compat_daystem_combo(a: Chart, b: Chart) -> CompatSubResult:
         ) or any(_breaker_in_month_branch(s, b) for s in broken_in_b)
         if broken_month:
             score = int(base * 0.2)
-            flags.append(f"간섭 월지: {broken_in_a + broken_in_b} (broken)")
+            flags.append(Flag(f"간섭 월지: {broken_in_a + broken_in_b} (broken)", kind="red", code="daystem_combo.breaker_month", severity=4))
             narrative = (
                 f"The two Day Masters form {korean_name}, but a breaking stem "
                 f"({'/'.join(broken_in_a + broken_in_b)}) sits in a month position, "
@@ -253,7 +256,7 @@ def compat_daystem_combo(a: Chart, b: Chart) -> CompatSubResult:
             )
         else:
             score = int(base * 0.5)
-            flags.append(f"간섭 존재: {broken_in_a + broken_in_b} (half-binding)")
+            flags.append(Flag(f"간섭 존재: {broken_in_a + broken_in_b} (half-binding)", kind="red", code="daystem_combo.breaker_present", severity=4))
             narrative = (
                 f"The two Day Masters form {korean_name} (combined element {combined_elem}) — "
                 f"a natural attraction layer — but a breaking stem "
@@ -328,27 +331,55 @@ def _pairwise_three_punishment(b1: str, b2: str) -> Optional[str]:
     return None
 
 
-def _cross_branch_score(b1: str, b2: str) -> Tuple[int, Optional[str]]:
+def _cross_branch_score(b1: str, b2: str) -> Tuple[int, Optional[Flag]]:
     """Score a single cross-chart branch pair (day vs non-day).
 
     Returns (delta, flag_label) or (0, None). Implements 합/충/해/파/형/반합
     at half the primary day-to-day weights per knowledge/11-gunghap.md §B7.
     """
     if _branch_pair_lookup(b1, b2, L.SIX_COMBINATIONS):
-        return 4, f"육합 {b1}{b2}"
+        return 4, Flag(f"육합 {b1}{b2}", kind="favorable", code="daybranch.cross_combine")
     if _branch_pair_lookup(b1, b2, L.SIX_CLASHES):
-        return -5, f"육충 {b1}{b2}"
+        return -5, Flag(f"육충 {b1}{b2}", kind="red", code="daybranch.cross_clash", severity=25)
     if _branch_pair_lookup(b1, b2, L.SIX_HARMS):
-        return -1, f"육해 {b1}{b2}"
+        return -1, Flag(f"육해 {b1}{b2}", kind="yellow", code="daybranch.cross_harm")
     if _branch_pair_lookup(b1, b2, L.SIX_BREAKS):
-        return -1, f"육파 {b1}{b2}"
+        return -1, Flag(f"육파 {b1}{b2}", kind="yellow", code="daybranch.cross_break")
     pun = _pairwise_three_punishment(b1, b2)
     if pun:
-        return -2, pun
+        # The two texts _pairwise_three_punishment can emit differ by the very
+        # condition it branches on (b1 == b2 → 자형, else 삼형).
+        if b1 == b2:
+            return -2, Flag(pun, kind="red", code="daybranch.cross_self_punish", severity=8)
+        return -2, Flag(pun, kind="yellow", code="daybranch.cross_punish")
     th = _three_harmony_match(b1, b2)
     if th:
-        return 2, f"반합 {th[0]} ({th[1]})"
+        return 2, Flag(f"반합 {th[0]} ({th[1]})", kind="favorable", code="daybranch.cross_half_harmony")
     return 0, None
+
+
+def _prefixed(prefix: str, flag: Flag) -> Flag:
+    """Re-label a Flag with a text prefix, keeping its classification (str ops drop the type)."""
+    return Flag(prefix + flag, kind=flag.kind, code=flag.code, severity=flag.severity)
+
+
+class Flag(str):
+    """A compat tag with its classification attached (S6, 2026-10-01 audit).
+
+    Subclasses str so every renderer keeps working; consumers must read
+    ``kind``/``severity``/``code`` instead of substring-matching the text."""
+
+    kind: Optional[str]
+    severity: int
+    code: str
+
+    def __new__(cls, text: str, *, kind: Optional[str], code: str,
+                severity: int = 0) -> "Flag":
+        obj = super().__new__(cls, text)
+        obj.kind = kind
+        obj.code = code
+        obj.severity = severity
+        return obj
 
 
 # N-10 (2026-09-26 audit): the cover's "top 3 red flags" were picked by
@@ -370,16 +401,22 @@ _RED_FLAG_SEVERITY: List[Tuple[str, int]] = [
 ]
 
 
-def _flag_severity(flag: str) -> int:
-    """Approximate ranking weight for sorting the cover's top-N flag lists."""
+def _legacy_flag_severity(flag: str) -> int:
+    """Approximate ranking weight for sorting the cover's top-N flag lists.
+
+    Kept only as the oracle for tests/test_compat_flags.py — production code
+    reads Flag.kind/severity."""
     for token, severity in _RED_FLAG_SEVERITY:
         if token in flag:
             return severity
     return 0
 
 
-def _classify_flag(flag: str) -> Optional[str]:
+def _legacy_classify_flag(flag: str) -> Optional[str]:
     """Classify a single sub-system flag as 'red', 'yellow', 'favorable', or None.
+
+    Kept only as the oracle for tests/test_compat_flags.py — production code
+    reads Flag.kind/severity.
 
     Uses multi-character/classical tokens to avoid naive single-char substring
     misclassification (e.g. "충" inside "충분" must not be treated as a clash).
@@ -461,14 +498,14 @@ def compat_daybranch(a: Chart, b: Chart) -> CompatSubResult:
 
     if _branch_pair_lookup(b1, b2, L.SIX_COMBINATIONS):
         primary_score += 20
-        flags.append(f"일지 육합 {b1}{b2}")
+        flags.append(Flag(f"일지 육합 {b1}{b2}", kind="favorable", code="daybranch.combine"))
         primary_narrative_parts.append(
             f"the two spouse palaces form 육합 ({b1}{b2}) — the strongest "
             "favorable indicator in classical 궁합"
         )
     elif _branch_pair_lookup(b1, b2, L.SIX_CLASHES):
         primary_score -= 25
-        flags.append(f"일지 육충 {b1}{b2} (RED FLAG)")
+        flags.append(Flag(f"일지 육충 {b1}{b2} (RED FLAG)", kind="red", code="daybranch.clash", severity=25))
         primary_narrative_parts.append(
             f"the two spouse palaces are in direct 충 ({b1}{b2}) — a hard red flag "
             "in classical 적천수 commentary; KCI 2018 divorce study confirms high correlation"
@@ -482,7 +519,7 @@ def compat_daybranch(a: Chart, b: Chart) -> CompatSubResult:
     th = _three_harmony_match(b1, b2)
     if th and not _branch_pair_lookup(b1, b2, L.SIX_COMBINATIONS):
         primary_score += 8
-        flags.append(f"일지 반합 {th[0]} ({th[1]})")
+        flags.append(Flag(f"일지 반합 {th[0]} ({th[1]})", kind="favorable", code="daybranch.half_harmony"))
         primary_narrative_parts.append(
             f"the two spouse palaces are two-of-three in the {th[0]} 삼합 frame "
             f"({th[1]}) — partial harmony"
@@ -491,7 +528,7 @@ def compat_daybranch(a: Chart, b: Chart) -> CompatSubResult:
     # Self-punishment (자형) — both branches in {辰,午,酉,亥}.
     if b1 == b2 and b1 in L.SELF_PUNISHMENTS:
         primary_score -= 8
-        flags.append(f"일지 자형 {b1}{b1}")
+        flags.append(Flag(f"일지 자형 {b1}{b1}", kind="red", code="daybranch.self_punish", severity=8))
         primary_narrative_parts.append(
             f"both spouse palaces are {b1} (자형 self-punishment) — 'double-down' "
             "amplifies inner-torment pattern"
@@ -507,10 +544,10 @@ def compat_daybranch(a: Chart, b: Chart) -> CompatSubResult:
     if not _branch_pair_lookup(b1, b2, L.SIX_COMBINATIONS) and not _branch_pair_lookup(b1, b2, L.SIX_CLASHES):
         if _branch_pair_lookup(b1, b2, L.SIX_HARMS):
             primary_score -= 5
-            flags.append(f"일지 해 {b1}{b2}")
+            flags.append(Flag(f"일지 해 {b1}{b2}", kind=None, code="daybranch.harm"))
         elif _branch_pair_lookup(b1, b2, L.SIX_BREAKS):
             primary_score -= 3
-            flags.append(f"일지 파 {b1}{b2}")
+            flags.append(Flag(f"일지 파 {b1}{b2}", kind=None, code="daybranch.break"))
 
     # Cross-chart secondary (half weight per pair, capped at ±15 to avoid runaway).
     # Score A's day-branch against B's month/year/hour, and B's day-branch
@@ -527,7 +564,7 @@ def compat_daybranch(a: Chart, b: Chart) -> CompatSubResult:
         delta, flag = _cross_branch_score(b1, branch_b)
         if flag:
             secondary_score += delta
-            flags.append(f"A일지·B지지 {flag}")
+            flags.append(_prefixed("A일지·B지지 ", flag))
 
     # Reverse direction: B's day branch vs A's non-day branches.
     day_a = a.day.branch
@@ -538,7 +575,7 @@ def compat_daybranch(a: Chart, b: Chart) -> CompatSubResult:
         delta, flag = _cross_branch_score(b2, branch_a)
         if flag:
             secondary_score += delta
-            flags.append(f"B일지·A지지 {flag}")
+            flags.append(_prefixed("B일지·A지지 ", flag))
 
     secondary_score = max(-15, min(15, secondary_score))
 
@@ -588,6 +625,10 @@ def compat_daybranch(a: Chart, b: Chart) -> CompatSubResult:
 # gender is unknown. It is a NO-OP for every already-canonical (male-first) call,
 # so no published deliverable moves. See knowledge/11-gunghap.md §C — "Canonical
 # subject order".
+_NAYIN_CODE: Dict[str, str] = {
+    "상합": "harmony", "상구": "seeking", "상대": "opposed_mild",
+    "neutral": "neutral", "상해": "harm", "상충": "clash",
+}
 _NAYIN_INDEX: Dict[str, int] = {_n: _i for _i, _n in enumerate(NAYIN_ORDER)}
 
 
@@ -644,10 +685,15 @@ def compat_nayin(a: Chart, b: Chart) -> CompatSubResult:
     }
     score = _score_map.get(rel, 0)
 
-    flag = f"납음 {na} vs {nb} → {rel}"
+    flag_text = f"납음 {na} vs {nb} → {rel}"
     if source_tag == "element-grammar-fallback":
-        flag += " [element-grammar-fallback]"
-    flags.append(flag)
+        flag_text += " [element-grammar-fallback]"
+    # S6: the kind/severity follow the six-relationship label (the condition
+    # that chooses the text), never the text itself.
+    _nayin_kind = {"상합": ("favorable", 0), "상구": ("favorable", 0),
+                   "상해": ("yellow", 0), "상충": ("red", 5)}
+    _kind, _sev = _nayin_kind.get(rel, (None, 0))
+    flags.append(Flag(flag_text, kind=_kind, code=f"nayin.{_NAYIN_CODE.get(rel, 'neutral')}", severity=_sev))
 
     fallback_note = ""
     if source_tag == "element-grammar-fallback":
@@ -723,16 +769,16 @@ def compat_yongshin(a: Chart, b: Chart) -> CompatSubResult:
         # element-balance table is the only client-visible percentage.
         if a_need >= 15:
             score += 6
-            flags.append(f"B → A 용신 {fav_a} 공급 양호")
+            flags.append(Flag(f"B → A 용신 {fav_a} 공급 양호", kind="favorable", code="yongsin_cross.supply_good"))
         elif a_need >= 5:
             score += 3
-            flags.append(f"B → A 용신 {fav_a} 일부 공급")
+            flags.append(Flag(f"B → A 용신 {fav_a} 일부 공급", kind="favorable", code="yongsin_cross.supply_partial"))
         if b_need >= 15:
             score += 6
-            flags.append(f"A → B 용신 {fav_b} 공급 양호")
+            flags.append(Flag(f"A → B 용신 {fav_b} 공급 양호", kind="favorable", code="yongsin_cross.supply_good"))
         elif b_need >= 5:
             score += 3
-            flags.append(f"A → B 용신 {fav_b} 일부 공급")
+            flags.append(Flag(f"A → B 용신 {fav_b} 일부 공급", kind="favorable", code="yongsin_cross.supply_partial"))
 
     # Mutual-gishin penalty.
     if gish_a and gish_b:
@@ -745,10 +791,10 @@ def compat_yongshin(a: Chart, b: Chart) -> CompatSubResult:
         # S2: no percentages printed (see above); thresholds unchanged.
         if gish_in_a >= 20:
             score -= 4
-            flags.append(f"B에 A의 기신 {gish_a} 과다")
+            flags.append(Flag(f"B에 A의 기신 {gish_a} 과다", kind="yellow", code="yongsin_cross.gishin_excess"))
         if gish_in_b >= 20:
             score -= 4
-            flags.append(f"A에 B의 기신 {gish_b} 과다")
+            flags.append(Flag(f"A에 B의 기신 {gish_b} 과다", kind="yellow", code="yongsin_cross.gishin_excess"))
 
     narr = (
         "용신 cross-supply is the **궁통보감 deciding factor**: does each "
@@ -850,13 +896,13 @@ def _spouse_palace_virtue(chart: Chart) -> Tuple[int, List[str]]:
         log_fallback("compat.day_branch_elem", f"STEM_INFO[{main_hidden}] lookup failed")
         return (0, [])
     tg = L.ten_god(chart.day.stem, main_hidden)
-    flags = [f"일지 본기 {main_hidden} → {tg} ({elem})"]
+    flags: List[str] = [Flag(f"일지 본기 {main_hidden} → {tg} ({elem})", kind=None, code="ilju_pair.palace_main_stem")]
     if elem == fav:
-        return (3, flags + ["배우자 복덕 (용신 일치)"])
+        return (3, flags + [Flag("배우자 복덕 (용신 일치)", kind="favorable", code="ilju_pair.virtue_yongsin")])
     if elem == hee:
-        return (2, flags + ["배우자 복덕 (희신 일치)"])
+        return (2, flags + [Flag("배우자 복덕 (희신 일치)", kind="favorable", code="ilju_pair.virtue_heesin")])
     if elem == gish:
-        return (-3, flags + ["배우자 복덕 (기신 일치)"])
+        return (-3, flags + [Flag("배우자 복덕 (기신 일치)", kind="yellow", code="ilju_pair.virtue_gishin")])
     return (0, flags)
 
 
@@ -872,24 +918,24 @@ def compat_ilju_pair(a: Chart, b: Chart) -> CompatSubResult:
 
     if pair_key in _GOOD_PAIRS:
         score += 8
-        flags.append(f"{pair_a} + {pair_b} → {_GOOD_PAIRS[pair_key]}")
+        flags.append(Flag(f"{pair_a} + {pair_b} → {_GOOD_PAIRS[pair_key]}", kind=None, code="ilju_pair.good_pair"))
     if pair_key in _CHALLENGING_PAIRS:
         score -= 12
-        flags.append(f"{pair_a} + {pair_b} → {_CHALLENGING_PAIRS[pair_key]}")
+        flags.append(Flag(f"{pair_a} + {pair_b} → {_CHALLENGING_PAIRS[pair_key]}", kind="red", code="ilju_pair.challenging_pair", severity=12))
 
     # Spouse-palace strength checks (각 chart 독립).
     if pair_a in _STRONG_SPOUSE_PALACE:
         score += 3
-        flags.append(f"{pair_a} 배우자궁 강함")
+        flags.append(Flag(f"{pair_a} 배우자궁 강함", kind=None, code="ilju_pair.palace_strong"))
     elif pair_a in _WEAK_SPOUSE_PALACE:
         score -= 2
-        flags.append(f"{pair_a} 배우자궁 약함")
+        flags.append(Flag(f"{pair_a} 배우자궁 약함", kind=None, code="ilju_pair.palace_weak"))
     if pair_b in _STRONG_SPOUSE_PALACE:
         score += 3
-        flags.append(f"{pair_b} 배우자궁 강함")
+        flags.append(Flag(f"{pair_b} 배우자궁 강함", kind=None, code="ilju_pair.palace_strong"))
     elif pair_b in _WEAK_SPOUSE_PALACE:
         score -= 2
-        flags.append(f"{pair_b} 배우자궁 약함")
+        flags.append(Flag(f"{pair_b} 배우자궁 약함", kind=None, code="ilju_pair.palace_weak"))
 
     # Spouse virtue per partner (적천수 원칙).
     va, fla = _spouse_palace_virtue(a)
@@ -942,36 +988,36 @@ def compat_combined_elements(a: Chart, b: Chart) -> CompatSubResult:
     # Missing-element flag.
     missing = [e for e, v in union.items() if v == 0]
     if missing:
-        flags.append(f"결합에서 결핍: {missing}")
+        flags.append(Flag(f"결합에서 결핍: {missing}", kind="yellow", code="combined_elements.missing"))
 
     # Over-dominant element.
     over = [e for e, v in union.items() if v > 30]
     if over:
-        flags.append(f"결합 과다: {over}")
+        flags.append(Flag(f"결합 과다: {over}", kind="yellow", code="combined_elements.excess"))
 
     # Deviation from ideal 20% per element (lower is better).
     ideal = 20.0
     deviation = sum(abs(v - ideal) for v in union.values()) / 2  # normalize
     if deviation < 8:
         score = 12  # very balanced
-        flags.append("결합 오행 균형 양호")
+        flags.append(Flag("결합 오행 균형 양호", kind="favorable", code="combined_elements.balanced"))
     elif deviation < 15:
         score = 7
     elif deviation < 25:
         score = 2
     else:
         score = -4
-        flags.append("결합 오행 불균형 심함")
+        flags.append(Flag("결합 오행 불균형 심함", kind="yellow", code="combined_elements.imbalanced"))
 
     # Yongshin-union check: does each partner's 용신 appear in the union?
     fav_a = _resolved_favorable(a)
     fav_b = _resolved_favorable(b)
     if fav_a and union.get(fav_a, 0) >= 15:
         score += 2
-        flags.append(f"A 용신 {fav_a} 결합에서 충분")
+        flags.append(Flag(f"A 용신 {fav_a} 결합에서 충분", kind="favorable", code="combined_elements.yongsin_present"))
     if fav_b and union.get(fav_b, 0) >= 15:
         score += 2
-        flags.append(f"B 용신 {fav_b} 결합에서 충분")
+        flags.append(Flag(f"B 용신 {fav_b} 결합에서 충분", kind="favorable", code="combined_elements.yongsin_present"))
 
     # Cap at the stated sub-system max so the verdict table never shows >100%.
     score = max(-WEIGHT["combined_elements"], min(WEIGHT["combined_elements"], score))
@@ -1055,19 +1101,19 @@ def _gendered_spouse_star_note(a: Chart, b: Chart, a_to_b: str, b_to_a: str) -> 
     if ga == "M":
         if b_to_a in _WIFE_STARS:
             score += 2
-            flags.append(f"A(남)의 배우자 지표 재성 일치: B는 A의 {b_to_a}")
+            flags.append(Flag(f"A(남)의 배우자 지표 재성 일치: B는 A의 {b_to_a}", kind="favorable", code="tengod_cross.spouse_star"))
     if gb == "M":
         if a_to_b in _WIFE_STARS:
             score += 2
-            flags.append(f"B(남)의 배우자 지표 재성 일치: A는 B의 {a_to_b}")
+            flags.append(Flag(f"B(남)의 배우자 지표 재성 일치: A는 B의 {a_to_b}", kind="favorable", code="tengod_cross.spouse_star"))
     if ga == "F":
         if b_to_a in _HUSBAND_STARS:
             score += 2
-            flags.append(f"A(여)의 배우자 지표 관성 일치: B는 A의 {b_to_a}")
+            flags.append(Flag(f"A(여)의 배우자 지표 관성 일치: B는 A의 {b_to_a}", kind="favorable", code="tengod_cross.spouse_star"))
     if gb == "F":
         if a_to_b in _HUSBAND_STARS:
             score += 2
-            flags.append(f"B(여)의 배우자 지표 관성 일치: A는 B의 {a_to_b}")
+            flags.append(Flag(f"B(여)의 배우자 지표 관성 일치: A는 B의 {a_to_b}", kind="favorable", code="tengod_cross.spouse_star"))
 
     if score:
         narr.append(
@@ -1099,8 +1145,8 @@ def compat_tengod_cross(a: Chart, b: Chart) -> CompatSubResult:
     score = 0
     narr_parts: List[str] = []
 
-    flags.append(f"A ({s_a})는 B ({s_b})의 {a_to_b}")
-    flags.append(f"B ({s_b})는 A ({s_a})의 {b_to_a}")
+    flags.append(Flag(f"A ({s_a})는 B ({s_b})의 {a_to_b}", kind=None, code="tengod_cross.relation"))
+    flags.append(Flag(f"B ({s_b})는 A ({s_a})의 {b_to_a}", kind=None, code="tengod_cross.relation"))
 
     pair = (a_to_b, b_to_a)
     rev_pair = (b_to_a, a_to_b)
@@ -1156,16 +1202,16 @@ def compat_tengod_cross(a: Chart, b: Chart) -> CompatSubResult:
     modifier = 0
     if fav_a and elem_b == fav_a:
         modifier += 3
-        flags.append(f"B의 일간 원소 {elem_b} = A의 용신")
+        flags.append(Flag(f"B의 일간 원소 {elem_b} = A의 용신", kind="favorable", code="tengod_cross.yongsin_element"))
     if fav_b and elem_a == fav_b:
         modifier += 3
-        flags.append(f"A의 일간 원소 {elem_a} = B의 용신")
+        flags.append(Flag(f"A의 일간 원소 {elem_a} = B의 용신", kind="favorable", code="tengod_cross.yongsin_element"))
     if gish_a and elem_b == gish_a:
         modifier -= 2
-        flags.append(f"B의 일간 원소 {elem_b} = A의 기신 [주의]")
+        flags.append(Flag(f"B의 일간 원소 {elem_b} = A의 기신 [주의]", kind="yellow", code="tengod_cross.gishin_element"))
     if gish_b and elem_a == gish_b:
         modifier -= 2
-        flags.append(f"A의 일간 원소 {elem_a} = B의 기신 [주의]")
+        flags.append(Flag(f"A의 일간 원소 {elem_a} = B의 기신 [주의]", kind="yellow", code="tengod_cross.gishin_element"))
     score += modifier
 
     if a_to_b == "비견" and b_to_a == "비견" and modifier:
@@ -1224,16 +1270,16 @@ def compat_daeun_sync(a: Chart, b: Chart) -> CompatSubResult:
             label=label, label_kr=label_kr,
             score=0, max=WEIGHT["daeun_sync"],
             narrative="Gender unknown for one or both charts; Daeun direction comparison skipped.",
-            flags=["gender unknown — Daeun direction skipped"],
+            flags=[Flag("gender unknown — Daeun direction skipped", kind=None, code="daeun_sync.gender_unknown")],
         )
 
     dir_a = L.daeun_direction(a.year.stem, a.gender)
     dir_b = L.daeun_direction(b.year.stem, b.gender)
     if dir_a == dir_b:
         score += 3
-        flags.append(f"대운 방향 동일 ({dir_a})")
+        flags.append(Flag(f"대운 방향 동일 ({dir_a})", kind="favorable", code="daeun_sync.direction_same"))
     else:
-        flags.append(f"대운 방향 상이 ({dir_a} vs {dir_b})")
+        flags.append(Flag(f"대운 방향 상이 ({dir_a} vs {dir_b})", kind="favorable", code="daeun_sync.direction_differs"))
 
     # Starting-element similarity.
     start_a = a.daeun[0].stem
@@ -1243,10 +1289,10 @@ def compat_daeun_sync(a: Chart, b: Chart) -> CompatSubResult:
         eb = L.STEM_INFO[start_b]["element"]
         if ea == eb:
             score += 2
-            flags.append(f"시작 대운 원소 동일 ({ea})")
+            flags.append(Flag(f"시작 대운 원소 동일 ({ea})", kind=None, code="daeun_sync.start_same"))
         elif L.GENERATES.get(ea) == eb or L.GENERATES.get(eb) == ea:
             score += 1
-            flags.append(f"시작 대운 상생 ({ea}↔{eb})")
+            flags.append(Flag(f"시작 대운 상생 ({ea}↔{eb})", kind=None, code="daeun_sync.start_generates"))
 
     narr = (
         f"Daeun directions: A = {dir_a}, B = {dir_b}. "
@@ -1290,34 +1336,34 @@ def compat_stars(a: Chart, b: Chart) -> CompatSubResult:
     # Cross patterns.
     if peach_a and peach_b:
         score -= 3
-        flags.append("쌍도화 — both have 도화 present")
+        flags.append(Flag("쌍도화 — both have 도화 present", kind="yellow", code="stars.double_peach"))
     if a.day.branch in peach_b or b.day.branch in peach_a:
         score -= 5
-        flags.append("도화스쳐 — 도화 hits spouse palace")
+        flags.append(Flag("도화스쳐 — 도화 hits spouse palace", kind="yellow", code="stars.peach_hits_palace"))
     # 쌍역마: +2 when both have 역마 in the spouse palace (day branch) and the
     # yang partner's career benefits from movement; -2 otherwise (parallel but
     # peripatetic lives). Per knowledge/11-gunghap.md §I table.
     if a.day.branch in horse_a and b.day.branch in horse_b:
         score += 2
-        flags.append("쌍역마 — both have 역마 in spouse palace; yang partner's career benefits")
+        flags.append(Flag("쌍역마 — both have 역마 in spouse palace; yang partner's career benefits", kind="favorable", code="stars.double_horse_anchored"))
     elif horse_a and horse_b:
         score -= 2
-        flags.append("쌍역마 — both have 역마 but not anchored in spouse palace; parallel travel lives")
+        flags.append(Flag("쌍역마 — both have 역마 but not anchored in spouse palace; parallel travel lives", kind="yellow", code="stars.double_horse_loose"))
     if a.day.branch in noble_b or b.day.branch in noble_a:
         score += 5
-        flags.append("귀인배우 — partner is my 천을")
+        flags.append(Flag("귀인배우 — partner is my 천을", kind="favorable", code="stars.noble_partner"))
     if canopy_a and canopy_b:
         score -= 2
-        flags.append("쌍화개 — both have 화개")
+        flags.append(Flag("쌍화개 — both have 화개", kind="yellow", code="stars.double_canopy"))
     if ya_a and ya_b:
         score -= 3
-        flags.append("쌍양인 — both have 양인")
+        flags.append(Flag("쌍양인 — both have 양인", kind="yellow", code="stars.double_yangin"))
     if hy_a and hy_b:
         score -= 3
-        flags.append("쌍홍염 — both have 홍염")
+        flags.append(Flag("쌍홍염 — both have 홍염", kind="yellow", code="stars.double_hongyeom"))
     if (hy_a and ya_b) or (ya_a and hy_b):
         score -= 5
-        flags.append("홍양교차 — classical caution pattern")
+        flags.append(Flag("홍양교차 — classical caution pattern", kind="red", code="stars.hongyeom_yangin_cross", severity=5))
 
     narr = (
         "Cross-star overlays are **descriptive**, not primary factors. "
@@ -1356,10 +1402,10 @@ def compat_yin_yang(a: Chart, b: Chart) -> CompatSubResult:
     score = 0
     if pa != pb:
         score += 3
-        flags.append(f"일간 음양 상보 ({pa} ↔ {pb})")
+        flags.append(Flag(f"일간 음양 상보 ({pa} ↔ {pb})", kind=None, code="yin_yang.dm_complementary"))
     else:
         score -= 1
-        flags.append(f"일간 음양 동일 ({pa}/{pb})")
+        flags.append(Flag(f"일간 음양 동일 ({pa}/{pb})", kind=None, code="yin_yang.dm_same"))
 
     # Union polarity balance (count all stems + branches).
     union_yang = 0
@@ -1377,10 +1423,10 @@ def compat_yin_yang(a: Chart, b: Chart) -> CompatSubResult:
     total = union_yang + union_yin or 1
     yg_pct = union_yang / total * 100
     if 40 <= yg_pct <= 60:
-        flags.append(f"결합 음양 균형 양호 ({yg_pct:.0f}% 양)")
+        flags.append(Flag(f"결합 음양 균형 양호 ({yg_pct:.0f}% 양)", kind="favorable", code="yin_yang.union_balanced"))
         # no score change beyond Day-Master polarity
     else:
-        flags.append(f"결합 음양 불균형 ({yg_pct:.0f}% 양)")
+        flags.append(Flag(f"결합 음양 불균형 ({yg_pct:.0f}% 양)", kind="yellow", code="yin_yang.union_imbalanced"))
         score -= 1
 
     narr = (
@@ -1409,14 +1455,14 @@ def compat_year_branch(a: Chart, b: Chart) -> CompatSubResult:
     flags: List[str] = []
     if _branch_pair_lookup(b1, b2, L.SIX_COMBINATIONS):
         score = 3
-        flags.append(f"띠 육합 {b1}{b2}")
+        flags.append(Flag(f"띠 육합 {b1}{b2}", kind="favorable", code="year_branch.combine"))
     elif _branch_pair_lookup(b1, b2, L.SIX_CLASHES):
         score = -3
-        flags.append(f"띠 육충 {b1}{b2}")
+        flags.append(Flag(f"띠 육충 {b1}{b2}", kind="red", code="year_branch.clash", severity=25))
     elif _three_harmony_match(b1, b2):
         th = _three_harmony_match(b1, b2)
         score = 2
-        flags.append(f"띠 반합 {th[0]}")
+        flags.append(Flag(f"띠 반합 {th[0]}", kind="favorable", code="year_branch.half_harmony"))
     else:
         score = 0
     narr = (
@@ -1499,17 +1545,20 @@ def compat_score(
     favorable: List[str] = []
     for sub in subs.values():
         for flag in sub.flags:
-            bucket = _classify_flag(flag)
+            bucket = flag.kind
+            if bucket is None:
+                continue
+            labelled = _prefixed(f"{sub.label}: ", flag)
             if bucket == "red":
-                red_flags.append(f"{sub.label}: {flag}")
+                red_flags.append(labelled)
             elif bucket == "yellow":
-                yellow_flags.append(f"{sub.label}: {flag}")
+                yellow_flags.append(labelled)
             elif bucket == "favorable":
-                favorable.append(f"{sub.label}: {flag}")
+                favorable.append(labelled)
 
     # Top 3 of each. Red flags are ranked by severity, not alphabetically
     # (N-10, 2026-09-26 audit) — ties broken alphabetically for determinism.
-    red_flags = sorted(set(red_flags), key=lambda f: (-_flag_severity(f), f))[:3]
+    red_flags = sorted(set(red_flags), key=lambda f: (-f.severity, str(f)))[:3]
     yellow_flags = sorted(set(yellow_flags))[:5]
     favorable = sorted(set(favorable))[:3]
 
