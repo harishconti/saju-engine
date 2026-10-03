@@ -61,7 +61,6 @@ _METHOD_BY_VERDICT = {
     "strong": "strong-dm-drain",
     "extreme": "strong-dm-drain",
     "weak": "weak-dm-support",
-    "extreme_weak": "weak-dm-support",
     "balanced": "balanced-heuristic",
 }
 
@@ -101,7 +100,6 @@ _STRENGTH_LABEL = {
     "strong": "strong",
     "extreme": "strong",
     "weak": "weak",
-    "extreme_weak": "weak",
 }
 
 # B4 (2026-10-01 audit): _GENERATED_BY now lives in lookup.py; keep as alias for tests.
@@ -196,7 +194,7 @@ def _with_unfavorable(fe: "FavorableElement", sa: dict) -> "FavorableElement":
     # strong 己, reader-confirmed Metal = the raw pick → 기신 Earth).
     confirms_eokbu = (
         fe.method == "reader-confirmed"
-        and sa.get("verdict") in ("strong", "extreme", "weak", "extreme_weak")
+        and sa.get("verdict") in ("strong", "extreme", "weak")
         and fe.element == sa.get("_raw_unresolved_favorable")
     )
     if confirms_eokbu and sa.get("candidate_supporting"):

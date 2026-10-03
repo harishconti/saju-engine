@@ -289,7 +289,6 @@ _VERDICT_PLAIN_LABEL = {
     "strong": "strong",
     "extreme": "very strong",
     "weak": "on the weaker side",
-    "extreme_weak": "quite weak",
     "balanced": "balanced",
 }
 

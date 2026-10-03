@@ -163,7 +163,9 @@ def test_transformation_grid_candidate():
         month_stem="己",
         month_branch="辰",
         branches=["辰", "卯", "寅", "丑"],
-        stems=["甲", "己", "丙", "丁"],
+        # Pillar order year/month/day/hour: DM 甲 must sit at index 2 (the new
+        # detect_special_forms guard); year stem stays 甲 so the 甲己 anchor is unchanged.
+        stems=["甲", "己", "甲", "丁"],
         hidden_stems=[("main", "戊")],
     )
     trans = result["transformation_grid"]
@@ -286,7 +288,7 @@ def test_transformation_grid_strong_dm_is_none():
         month_stem="己",
         month_branch="辰",
         branches=["辰", "卯", "寅", "丑"],
-        stems=["甲", "己", "丙", "丁"],
+        stems=["丙", "己", "甲", "丁"],
         hidden_stems=[("main", "戊")],
         strength_verdict="strong",
     )
@@ -299,7 +301,7 @@ def test_transformation_grid_weak_dm_allowed():
         month_stem="己",
         month_branch="辰",
         branches=["辰", "卯", "寅", "丑"],
-        stems=["甲", "己", "丙", "丁"],
+        stems=["丙", "己", "甲", "丁"],
         hidden_stems=[("main", "戊")],
         strength_verdict="weak",
     )
@@ -342,7 +344,7 @@ def test_structural_note_samhapguk():
         month_stem="丙",
         month_branch="寅",
         branches=["寅", "午", "戌", "午"],
-        stems=["甲", "丙", "戊", "庚"],
+        stems=["戊", "丙", "甲", "庚"],
         hidden_stems=[("main", "甲")],
     )
     notes = result["structural_notes"]
@@ -378,7 +380,7 @@ def test_regular_grid_bonki_priority_over_middle_tuochul():
         month_stem="丙",
         month_branch="寅",
         branches=["寅", "寅", "寅", "寅"],
-        stems=["甲", "丙", "戊", "庚"],
+        stems=["甲", "戊", "丙", "庚"],
         hidden_stems=[("main", "甲"), ("middle", "丙"), ("residual", "戊")],
     )
     grid = result["regular_grid"]
@@ -394,7 +396,7 @@ def test_regular_grid_middle_used_when_bonki_absent():
         month_stem="戊",
         month_branch="寅",
         branches=["寅", "寅", "寅", "寅"],
-        stems=["丙", "戊", "庚", "壬"],
+        stems=["庚", "戊", "丙", "壬"],
         hidden_stems=[("main", "甲"), ("middle", "丙"), ("residual", "戊")],
     )
     assert any(g.name_ko == "비견격" for g in result["regular_grid"])
@@ -402,16 +404,18 @@ def test_regular_grid_middle_used_when_bonki_absent():
 
 def test_regular_grid_residual_used_when_main_middle_absent():
     # 寅 month branch, visible stems contain only 여기 戊 (no 甲, no 丙).
-    # For 丙 DM, 戊 is 식신 → 식신격.
+    # The Day Master must sit at stems[2] (pillar order) and counts as a visible
+    # stem, so a 丙 DM would 투출 the 중기 丙; use 丁 DM instead, for which 戊 is
+    # 상관 → 상관격 (same residual-fallback path as the original 丙/식신 case).
     result = detect_patterns(
-        day_master="丙",
+        day_master="丁",
         month_stem="庚",
         month_branch="寅",
         branches=["寅", "寅", "寅", "寅"],
-        stems=["戊", "己", "庚", "壬"],
+        stems=["戊", "己", "丁", "壬"],
         hidden_stems=[("main", "甲"), ("middle", "丙"), ("residual", "戊")],
     )
-    assert any(g.name_ko == "식신격" for g in result["regular_grid"])
+    assert any(g.name_ko == "상관격" for g in result["regular_grid"])
 
 
 # ── Deeper transformation-grid (화격) tests ───────────────────────────────────
@@ -578,7 +582,7 @@ def test_special_form_below_threshold_no_trigger():
         month_stem="戊",
         month_branch="辰",
         branches=["辰", "戌", "丑", "未"],
-        stems=["丙", "戊", "庚", "壬"],
+        stems=["庚", "戊", "丙", "壬"],
         hidden_stems=[],
         strength_verdict="weak",
     )
@@ -663,7 +667,7 @@ def test_structural_note_no_jeonguk_pyeonguk_when_balanced():
         month_stem="丙",
         month_branch="寅",
         branches=["寅", "卯", "巳", "午"],
-        stems=["甲", "丙", "戊", "庚"],
+        stems=["戊", "丙", "甲", "庚"],
         hidden_stems=[
             ("main", "甲"),
             ("main", "乙"),
@@ -682,7 +686,7 @@ def test_structural_note_samhapguk_hai_mao_wei():
         month_stem="乙",
         month_branch="卯",
         branches=["亥", "卯", "未", "卯"],
-        stems=["甲", "乙", "丙", "丁"],
+        stems=["丙", "乙", "甲", "丁"],
         hidden_stems=[
             ("main", "壬"),
             ("main", "乙"),

@@ -259,7 +259,7 @@ def _mode_section(chart, fav: str, sup: str, unfav: Optional[str], verdict: str,
         ent = ("Your chart leans toward the **independent / founder track**: a strong "
                "Day Master with visible Output/Wealth energy has the surplus self-energy "
                "and the produce→earn path the classics read as independent-work fit.")
-    elif verdict in ("weak", "extreme_weak") or (tops and tops[0] == "Authority"):
+    elif verdict == "weak" or (tops and tops[0] == "Authority"):
         ent = ("Your chart leans toward **institutional employment first**: a weak or "
                "관성-led chart benefits from the structure and rank it does not generate "
                "internally. Independence can become viable later if a 대운 strengthens the self.")
@@ -360,7 +360,7 @@ def _wealth_section(chart, fav: str, sup: str, unfav: Optional[str], override) -
 
     # Carrying capacity (knowledge/13 §Can the Day Master Hold Wealth).
     verdict = (chart.strength_assessment or {}).get("verdict", "balanced")
-    if verdict in ("weak", "extreme_weak"):
+    if verdict == "weak":
         carry = ("Weak Day Master — the classics read heavy 재성 as a burden "
                  "(재다신약): money flows in but is hard to retain. **Strengthen the "
                  "self first** (인성/비겁: study, credentials, trusted peers) before "
@@ -425,7 +425,7 @@ def _investment_behaviour(fav: str, sup: str, unfav: Optional[str], carry: str) 
 
 
 def _preservation(verdict: str, fav: str) -> str:
-    if verdict in ("weak", "extreme_weak"):
+    if verdict == "weak":
         return ("Prioritise **retention over acquisition** — fewer, simpler holdings; "
                 "strengthen the self (study, credentials, trusted peers) before taking "
                 "on more *(see knowledge/13-wealth-and-business.md §Wealth Preservation)*.")

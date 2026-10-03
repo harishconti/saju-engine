@@ -257,7 +257,7 @@ def assess_strength(
         candidate_supporting = wealth_element     # 財星 / wealth channel (also drains)
         candidate_unfavorable = dm_element        # 比劫 / self echo strengthens the strong
         candidate_draining = authority_element  # 官殺 / authority pressure on strong self
-    elif verdict in ("weak", "extreme_weak"):
+    elif verdict == "weak":
         candidate_favorable = resource_element    # 印綬 / resource support
         candidate_supporting = dm_element         # 比劫 / peer support
         candidate_unfavorable = authority_element # authority controls weak self

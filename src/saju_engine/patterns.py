@@ -233,7 +233,7 @@ def detect_transformation_grid(
     """
     # B7: 화격 requires DM isolation. If a strength verdict is supplied, only
     # a weak or extremely weak Day Master can form a true 화격.
-    if strength_verdict and strength_verdict not in {"weak", "extreme_weak"}:
+    if strength_verdict and strength_verdict != "weak":
         return None
 
     # Candidate anchors: Day Master and year stem (first stem in the list).
@@ -333,6 +333,11 @@ def detect_special_forms(
 
     All candidates are flags for the reader; the engine does not rule.
     """
+    if len(stems) < 3 or stems[2] != day_master:
+        raise ValueError(
+            "detect_special_forms expects stems in pillar order year/month/day/hour "
+            f"so the Day Master is stems[2]; got day_master={day_master!r}, stems={list(stems)!r}"
+        )
     forms: List[Dict[str, str]] = []
     # Option C: only a weak DM can follow; confidence comes from the
     # conditions below (rooting incl. visible stems, 득령), not the verdict.
@@ -592,7 +597,7 @@ def _officer_grid_caveats(
             f"The month branch is struck ({', '.join(dict.fromkeys(hits))}), which lowers the "
             "grid's purity without fully breaking it."
         )
-    if strength_verdict in ("weak", "extreme_weak"):
+    if strength_verdict == "weak":
         all_stems = list(stems) + [s for _, s in hidden_stems]
         has_resource = any(L.ten_god(day_master, s) in ("정인", "편인") for s in all_stems)
         out.append(
