@@ -225,6 +225,17 @@ OVERCOMES: Dict[str, str] = {
     "Fire": "Metal", "Metal": "Wood",
 }
 
+# B4 (2026-10-01 audit): single home for the inverse generating cycle
+# (was re-derived in strength.py, yongsin.py and climate.py).
+GENERATED_BY: Dict[str, str] = {v: k for k, v in GENERATES.items()}
+
+# 五虎遁 (오호둔): year stem → 寅-month stem. Public name for _OHO_DUN
+# (pillars.py kept a second hand-typed copy, _FIVE_TIGERS).
+FIVE_TIGERS: Dict[str, str] = _OHO_DUN
+
+# 甲子 anchor year for the 60-year cycle (pillars.py and sewoon.py each kept one).
+JIAZI_ANCHOR_YEAR = 1984
+
 
 # ── Ten-god derivation ──────────────────────────────────────────────────────
 # From knowledge/05-ten-gods.md

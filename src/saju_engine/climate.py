@@ -53,8 +53,8 @@ from typing import Dict, Optional
 
 from . import lookup as L
 
-# Inverse of the generating cycle: for each element, the element that generates it.
-_GENERATED_BY: Dict[str, str] = {v: k for k, v in L.GENERATES.items()}
+# B4 (2026-10-01 audit): _GENERATED_BY now lives in lookup.py; keep as alias for tests.
+_GENERATED_BY: Dict[str, str] = L.GENERATED_BY
 
 _HOT_BRANCHES = {"巳", "午", "未"}
 _COLD_BRANCHES = {"亥", "子", "丑"}

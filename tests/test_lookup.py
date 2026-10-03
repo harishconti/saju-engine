@@ -454,3 +454,17 @@ def test_jiazi_cycle_sanity_points():
     assert L.JIAZI_CYCLE[10] == ("甲", "戌")
     assert L.JIAZI_CYCLE[-1] == ("癸", "亥")
     assert len(L.JIAZI_CYCLE) == 60
+
+
+def test_core_tables_have_single_home():
+    """B4 (2026-10-01 audit): inverse-cycle ×3, 五虎遁 ×2, 1984 anchor ×2 and
+    branch order ×2 now live only in lookup.py."""
+    from saju_engine import climate, lookup as L, pillars, sewoon, strength, yongsin
+
+    assert L.GENERATED_BY == {v: k for k, v in L.GENERATES.items()}
+    assert strength._GENERATED_BY is L.GENERATED_BY
+    assert yongsin._GENERATED_BY is L.GENERATED_BY
+    assert climate._GENERATED_BY is L.GENERATED_BY
+    assert pillars._FIVE_TIGERS is L.FIVE_TIGERS
+    assert pillars._BRANCH_ORDER is L.BRANCH_ORDER
+    assert pillars._YEAR_CYCLE_ANCHOR == sewoon._ANCHOR_YEAR == L.JIAZI_ANCHOR_YEAR == 1984

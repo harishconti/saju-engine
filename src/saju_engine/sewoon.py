@@ -87,11 +87,12 @@ class SeWoonHit:
 
 
 # Cached 60-cycle index for year-pillar lookup (approximate).
+# B4 (2026-10-01 audit): _ANCHOR_YEAR now lives in lookup.py; keep as alias for tests.
 # 1984 is 甲子 (Jia-Zi) per classical tables.
 # We use the simple mapping: (year + 56) % 60 for the 60-cycle index,
 # because 1984 is index 0, and 1984 + 56 = 2040 gives index 56, etc.
 # More robustly, we derive from a known anchor.
-_ANCHOR_YEAR = 1984
+_ANCHOR_YEAR = L.JIAZI_ANCHOR_YEAR
 _ANCHOR_INDEX = 0
 
 
@@ -452,7 +453,7 @@ def _monthly_pillar(year: int, month: int, day: int = 15) -> Tuple[str, str]:
         sajuyear = year
 
     year_stem, _ = _annual_pillar(sajuyear)
-    first_month_stem = L._OHO_DUN[year_stem]
+    first_month_stem = L.FIVE_TIGERS[year_stem]
     sm_index = _saju_month_index(month, day)
     branch = _MONTH_BRANCHES[sm_index - 1]
     # Step the stem from the first-month stem by (sm_index - 1).
