@@ -2,7 +2,8 @@
 
 ``generate_draft`` renders the engine draft PDF for a stored intake and records
 the outcome in the store. Failures store only the exception class name in the
-plaintext ``error`` column; the traceback goes to the log (no PII is logged).
+plaintext ``error`` column; the traceback frames (never the exception message)
+go to the log. Logs must not contain PII.
 """
 from __future__ import annotations
 
@@ -132,7 +133,9 @@ def generate_draft(store: IntakeStore, intake_id: int, files_dir: Path) -> None:
             pdf = render_single(row["pii"], row["birth"], row["tier"],
                                 out_dir / "report.pdf")
     except Exception as exc:
-        log.exception("draft generation failed for intake %s", intake_id)
+        # Exception messages may embed birth data/PII: log class + frames only.
+        log.error("draft generation failed for intake %s: %s", intake_id,
+                  type(exc).__name__, exc_info=(type(exc), None, exc.__traceback__))
         store.set_status(intake_id, "failed", error=type(exc).__name__)
         return
     store.set_status(intake_id, "draft_ready", pdf_path=str(pdf))

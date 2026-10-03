@@ -130,3 +130,103 @@ def test_cors_hardened(app_mod):
     assert cors.kwargs["allow_credentials"] is False
     assert cors.kwargs["allow_headers"] == ["Content-Type"]
     assert cors.kwargs["allow_methods"] == ["GET", "POST"]
+
+
+# ---- review fix round 1 ------------------------------------------------------
+
+BAD_OFFSETS = ["nan", "inf", "-inf", "99", "-30", "1e308"]
+
+
+@pytest.mark.parametrize("off", BAD_OFFSETS)
+def test_single_rejects_bad_offset(app_mod, off):
+    with pytest.raises(HTTPException) as exc:
+        run(app_mod, **single(utc_offset=off))
+    assert exc.value.status_code == 400
+    assert app_mod.STORE.list_intakes() == []
+
+
+def _compat(mod, **over):
+    kw = dict(name_a="A", dob_a="1990-06-15", birth_time_a="10:00", location_a="Seoul",
+              utc_offset_a=9.0, gender_a="M", name_b="B", dob_b="1992-03-20",
+              birth_time_b="14:00", location_b="Seoul", utc_offset_b=9.0, gender_b="F",
+              email="t@example.com", main_concern="", favorable_element_a="",
+              favorable_element_b="", timezone_a="", timezone_b="", tier="basic")
+    kw.update(over)
+    return asyncio.run(mod.compat_generate(BackgroundTasks(), **kw))
+
+
+@pytest.mark.parametrize("off", [float("nan"), float("inf"), 99.0, -30.0, 1e308])
+@pytest.mark.parametrize("who", ["a", "b"])
+def test_compat_rejects_bad_offset(app_mod, off, who):
+    with pytest.raises(HTTPException) as exc:
+        _compat(app_mod, **{f"utc_offset_{who}": off})
+    assert exc.value.status_code == 400
+    assert app_mod.STORE.list_intakes() == []
+
+
+def test_offset_boundaries_accepted(app_mod):
+    assert run(app_mod, **single(utc_offset="-12")).status_code == 202
+    assert run(app_mod, **single(utc_offset="14")).status_code == 202
+
+
+@pytest.mark.parametrize("over", [
+    {"name": "x" * 121}, {"location": "x" * 121}, {"email": "x" * 255},
+    {"main_concern": "x" * 2001},
+])
+def test_single_field_length_limits(app_mod, over):
+    with pytest.raises(HTTPException) as exc:
+        run(app_mod, **single(**over))
+    assert exc.value.status_code == 400
+    assert app_mod.STORE.list_intakes() == []
+
+
+@pytest.mark.parametrize("over", [
+    {"name_a": "x" * 121}, {"name_b": "x" * 121}, {"location_a": "x" * 121},
+    {"email": "x" * 255}, {"main_concern": "x" * 2001},
+])
+def test_compat_field_length_limits(app_mod, over):
+    with pytest.raises(HTTPException) as exc:
+        _compat(app_mod, **over)
+    assert exc.value.status_code == 400
+    assert app_mod.STORE.list_intakes() == []
+
+
+def test_limits_at_boundary_accepted(app_mod):
+    resp = run(app_mod, **single(name="x" * 120, main_concern="y" * 2000))
+    assert resp.status_code == 202
+
+
+def test_unknown_paid_style_tier_is_queued_not_sync(app_mod, monkeypatch):
+    # Fail-safe: anything but "sample" is queued for review, never rendered inline.
+    monkeypatch.setattr(app_mod, "SINGLE_TIERS", app_mod.SINGLE_TIERS + ("future",))
+    resp = run(app_mod, **single(tier="future"))
+    assert resp.status_code == 202
+    assert app_mod.STORE.list_intakes()[0]["status"] == "received"
+
+
+def test_report_refuses_pdf_outside_files_root(app_mod, tmp_path_factory):
+    outside = tmp_path_factory.mktemp("outside") / "secret.pdf"
+    outside.write_bytes(b"%PDF-1.4 secret")
+    import json
+    iid = json.loads(run(app_mod, **single()).body)["intake_id"]
+    app_mod.STORE.set_status(iid, "draft_ready", pdf_path=str(outside))
+    token = app_mod.STORE.issue_token(iid)
+    with pytest.raises(HTTPException) as exc:
+        app_mod.report(token)
+    assert exc.value.status_code == 404
+
+
+def test_failure_log_has_no_exception_message(app_mod, monkeypatch, caplog):
+    import logging
+    import saju_web.jobs as jobs
+
+    def boom(*a, **k):
+        raise ValueError("PII-" + "SECRET-1990-06-15")  # built at runtime
+    monkeypatch.setattr(jobs, "render_single", boom)
+    bg = BackgroundTasks()
+    run(app_mod, bg, **single())
+    with caplog.at_level(logging.ERROR, logger="saju.jobs"):
+        asyncio.run(bg())
+    text = caplog.text
+    assert "ValueError" in text and "boom" in text  # class + frames
+    assert "PII-SECRET" not in text

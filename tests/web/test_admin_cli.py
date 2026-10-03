@@ -83,3 +83,20 @@ def test_missing_key_is_clear_error(cli, monkeypatch, capsys):
     monkeypatch.delenv("SAJU_INTAKE_KEY")
     assert cli.main(["list"]) == 2
     assert "SAJU_INTAKE_KEY" in capsys.readouterr().err
+
+
+def test_list_flags_stale_generating(cli, capsys):
+    import sqlite3
+    store, iid = _add(cli)
+    fresh = _add(cli)[1]
+    store.set_status(iid, "generating")
+    store.set_status(fresh, "generating")
+    old = (datetime.now(timezone.utc) - timedelta(minutes=16)).isoformat()
+    conn = sqlite3.connect(store.db_path)
+    conn.execute("UPDATE intake SET updated_at=? WHERE id=?", (old, iid))
+    conn.commit()
+    conn.close()
+    assert cli.main(["list"]) == 0
+    lines = {l.split("\t")[0]: l for l in capsys.readouterr().out.splitlines()}
+    assert "STALE" in lines[str(iid)]
+    assert "STALE" not in lines[str(fresh)]

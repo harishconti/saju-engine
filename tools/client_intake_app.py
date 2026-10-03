@@ -16,11 +16,12 @@ Usage:
     SAJU_INTAKE_KEY=$(python3 tools/intake_admin.py genkey) python3 tools/client_intake_app.py [port]
     # SAJU_HOST (default 127.0.0.1) sets the bind address; SAJU_INTAKE_DIR overrides storage.
 
-Never log decrypted PII; only intake ids are logged. Deploy with `umask 077`.
+Logs must not contain PII: only intake ids and exception class names are logged. Deploy with `umask 077`.
 """
 from __future__ import annotations
 
 import logging
+import math
 import os
 import re
 import sys
@@ -40,7 +41,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse  # noqa: 
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 from starlette.concurrency import run_in_threadpool  # noqa: E402
 
-from saju_web.jobs import PAID_TIERS, derive_offset, generate_draft  # noqa: E402
+from saju_web.jobs import derive_offset, generate_draft  # noqa: E402
 from saju_web.store import IntakeStore  # noqa: E402
 
 app = FastAPI(title="Saju Self-Service Intake")
@@ -82,12 +83,26 @@ def _bad_request(detail: str) -> HTTPException:
     return HTTPException(status_code=400, detail=detail)
 
 
+MAX_NAME = 120
+MAX_LOCATION = 120
+MAX_EMAIL = 254
+MAX_CONCERN = 2000
+OFFSET_MIN, OFFSET_MAX = -12.0, 14.0
+
+
+def _check_len(value: str, limit: int, field: str) -> None:
+    if len(value) > limit:
+        raise _bad_request(f"{field} is too long (max {limit} characters).")
+
+
 def _check_birth(dob: str, birth_time: str, tz: str, offset: str, label: str = "") -> None:
     """Validate date/time parse and timezone/offset resolution (no PII in errors)."""
     try:
         fallback = float(offset) if offset else None
     except ValueError:
         raise _bad_request(f"{label}UTC offset must be a number.")
+    if fallback is not None and not (math.isfinite(fallback) and OFFSET_MIN <= fallback <= OFFSET_MAX):
+        raise _bad_request(f"{label}UTC offset must be between {OFFSET_MIN:g} and {OFFSET_MAX:g}.")
     try:
         derive_offset(dob, birth_time, tz or None, fallback)
     except ValueError as exc:  # includes UnknownTimezone
@@ -133,6 +148,10 @@ async def generate(
         raise _bad_request("Name is required.")
     if not email.strip():
         raise _bad_request("Email is required.")
+    _check_len(name, MAX_NAME, "Name")
+    _check_len(location, MAX_LOCATION, "Location")
+    _check_len(email.strip(), MAX_EMAIL, "Email")
+    _check_len(main_concern, MAX_CONCERN, "Main concern")
     if not timezone and not utc_offset:
         raise _bad_request("Provide an IANA timezone or a UTC offset (no default is assumed).")
     if tier not in SINGLE_TIERS:
@@ -151,7 +170,7 @@ async def generate(
                "marriage_status": marriage_status},
     )
 
-    if tier in PAID_TIERS:
+    if tier != "sample":  # fail-safe: any non-sample tier goes to human review
         background_tasks.add_task(generate_draft, STORE, intake_id, FILES_DIR)
         return _accepted(intake_id)
 
@@ -171,12 +190,11 @@ async def generate(
 @app.get("/report/{token}")
 def report(token: str):
     row = STORE.resolve_token(token)
-    if row is None or not row["pdf_path"] or not Path(row["pdf_path"]).is_file():
+    pdf = Path(row["pdf_path"]) if row and row["pdf_path"] else None
+    # Defence in depth: only ever serve files under the store's files root.
+    if pdf is None or not pdf.resolve().is_relative_to(STORE.files_root.resolve()) or not pdf.is_file():
         raise HTTPException(status_code=404, detail="Not found")
-    return FileResponse(
-        path=row["pdf_path"], media_type="application/pdf",
-        filename=Path(row["pdf_path"]).name,
-    )
+    return FileResponse(path=pdf, media_type="application/pdf", filename=pdf.name)
 
 
 @app.get("/compat", response_class=HTMLResponse)
@@ -218,6 +236,11 @@ async def compat_generate(
         raise _bad_request("Both names are required.")
     if not email.strip():
         raise _bad_request("Email is required.")
+    for field, val, limit in (("Name A", name_a, MAX_NAME), ("Name B", name_b, MAX_NAME),
+                              ("Location A", location_a, MAX_LOCATION),
+                              ("Location B", location_b, MAX_LOCATION),
+                              ("Email", email, MAX_EMAIL), ("Main concern", main_concern, MAX_CONCERN)):
+        _check_len(val.strip(), limit, field)
     _check_birth(dob_a.strip(), birth_time_a.strip(), timezone_a.strip(), str(utc_offset_a), "Partner A: ")
     _check_birth(dob_b.strip(), birth_time_b.strip(), timezone_b.strip(), str(utc_offset_b), "Partner B: ")
 

@@ -17,6 +17,7 @@ import argparse
 import json
 import os
 import sys
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -27,6 +28,19 @@ for p in (str(PROJECT_ROOT / "src"), os.environ.get("SAJU_SITE")):
 from saju_web.store import IntakeStore, generate_key  # noqa: E402
 
 INTAKE_DIR = Path(os.environ.get("SAJU_INTAKE_DIR") or PROJECT_ROOT / "candidates_horoscope" / "intake")
+
+
+STALE_AFTER = timedelta(minutes=15)
+
+
+def _is_stale(updated_at: str | None, now: datetime) -> bool:
+    try:
+        ts = datetime.fromisoformat(updated_at)
+    except (TypeError, ValueError):
+        return False
+    if ts.tzinfo is None:
+        ts = ts.replace(tzinfo=timezone.utc)
+    return now - ts > STALE_AFTER
 
 
 def _store() -> IntakeStore:
@@ -60,8 +74,12 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     if args.cmd == "list":
+        now = datetime.now(timezone.utc)
         for r in store.list_intakes(args.status):
-            print(f"{r['id']}\t{r['status']}\t{r['kind']}/{r['tier']}\t{r['created_at']}\t{r['name']}")
+            line = f"{r['id']}\t{r['status']}\t{r['kind']}/{r['tier']}\t{r['created_at']}\t{r['name']}"
+            if r["status"] == "generating" and _is_stale(r["updated_at"], now):
+                line += "\tSTALE - run regenerate"
+            print(line)
         return 0
     if args.cmd == "purge":
         n = store.purge_older_than(args.days)

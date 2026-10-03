@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS intake(
     id INTEGER PRIMARY KEY,
     created_at TEXT, kind TEXT, tier TEXT, status TEXT,
     pii_enc BLOB, birth_json TEXT, pdf_path TEXT, error TEXT,
-    token_sha256 TEXT UNIQUE, approved_at TEXT
+    token_sha256 TEXT UNIQUE, approved_at TEXT, updated_at TEXT
 )
 """
 
@@ -70,6 +70,9 @@ class IntakeStore:
         try:
             conn.execute("PRAGMA journal_mode=WAL")
             conn.execute(_SCHEMA)
+            cols = {r["name"] for r in conn.execute("PRAGMA table_info(intake)")}
+            if "updated_at" not in cols:  # migrate pre-existing stores
+                conn.execute("ALTER TABLE intake ADD COLUMN updated_at TEXT")
             conn.commit()
         finally:
             conn.close()
@@ -117,9 +120,10 @@ class IntakeStore:
         conn = self._conn()
         try:
             cur = conn.execute(
-                "INSERT INTO intake(created_at, kind, tier, status, pii_enc, birth_json) "
-                "VALUES (?,?,?,?,?,?)",
-                (_now().isoformat(), kind, tier, "received", self._enc(pii), json.dumps(birth)),
+                "INSERT INTO intake(created_at, updated_at, kind, tier, status, pii_enc, birth_json) "
+                "VALUES (?,?,?,?,?,?,?)",
+                (_now().isoformat(), _now().isoformat(), kind, tier, "received",
+                 self._enc(pii), json.dumps(birth)),
             )
             conn.commit()
             return int(cur.lastrowid)
@@ -149,7 +153,7 @@ class IntakeStore:
             raise ValueError("approval only via issue_token (or mark_approved_without_token)")
         if error is _UNSET and status in ("generating", "draft_ready"):
             error = None
-        sets, params = ["status=?"], [status]
+        sets, params = ["status=?", "updated_at=?"], [status, _now().isoformat()]
         if pdf_path is not _UNSET:
             sets.append("pdf_path=?")
             params.append(pdf_path)
@@ -198,7 +202,8 @@ class IntakeStore:
                 _log.warning("intake %s: PII decryption failed", r["id"])
                 name = None
             out.append({"id": r["id"], "kind": r["kind"], "tier": r["tier"],
-                        "status": r["status"], "created_at": r["created_at"], "name": name})
+                        "status": r["status"], "created_at": r["created_at"],
+                        "updated_at": r["updated_at"] or r["created_at"], "name": name})
         return out
 
     def issue_token(self, intake_id: int) -> str:
