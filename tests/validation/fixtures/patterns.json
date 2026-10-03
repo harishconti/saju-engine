@@ -1184,11 +1184,14 @@
       "patterns": {
         "special_forms_names": [
           "종재"
-        ]
+        ],
+        "special_forms_confidence": {
+          "종재": "possible"
+        }
       }
     },
     "status": "expect_match",
-    "notes": "Pillars 丁卯 丁未 壬午 丁未. Day Master 壬 has no 비겁/인성 on any visible stem or hidden stem, and one element dominates → 종재. Engine emits these as 'possible' candidates (reader-verification flag) — only the names are asserted."
+    "notes": "Pillars 丁卯 丁未 壬午 丁未. Day Master 壬 has no 비겁/인성 on any visible stem or hidden stem, and one element dominates (Fire) → 종재. Confidence is 'possible' under P2-W Option C: the dominant Fire is not 득령 in a 未 (Earth) month, so the in-season condition of knowledge/07:63 fails (month BRANCH used for 월령 by user decision 2026-10-03); the name and the 'possible' confidence are both asserted."
   },
   {
     "id": "jong-종관-1973",
@@ -1216,11 +1219,14 @@
       "patterns": {
         "special_forms_names": [
           "종관"
-        ]
+        ],
+        "special_forms_confidence": {
+          "종관": "likely"
+        }
       }
     },
     "status": "expect_match",
-    "notes": "Pillars 壬子 壬子 丁酉 己酉. Day Master 丁 has no 비겁/인성 on any visible stem or hidden stem, and one element dominates → 종관. Engine emits these as 'possible' candidates (reader-verification flag) — only the names are asserted."
+    "notes": "Pillars 壬子 壬子 丁酉 己酉. Day Master 丁 has no 비겁/인성 on any visible stem or hidden stem, and Water dominates → 종관. Confidence is 'likely' under P2-W Option C: no 비겁/인성 anywhere (07:62) and the dominant Water is 득령 at the 子 month branch (07:63; month BRANCH used for 월령 by user decision 2026-10-03). Reader verification is still required."
   },
   {
     "id": "jong-종식상-1998",
@@ -1249,11 +1255,15 @@
         "special_forms_names": [
           "종식상",
           "종자"
-        ]
+        ],
+        "special_forms_confidence": {
+          "종식상": "likely",
+          "종자": "likely"
+        }
       }
     },
     "status": "expect_match",
-    "notes": "Pillars 戊寅 甲寅 癸未 甲寅. Day Master 癸 has no 비겁/인성 on any visible stem or hidden stem, and one element dominates → 종식상 (+ the 종자 alias the engine surfaces for the output subtype per knowledge/07:64-65). Engine emits these as 'possible' candidates (reader-verification flag) — only the names are asserted."
+    "notes": "Pillars 戊寅 甲寅 癸未 甲寅. Day Master 癸 has no 비겁/인성 on any visible stem or hidden stem, and Wood dominates → 종식상 (+ the 종자 alias the engine surfaces for the output subtype per knowledge/07:64-65). Both are 'likely' under P2-W Option C: no 비겁/인성 anywhere (07:62) and the dominant Wood is 득령 at the 寅 month branch (07:63; month BRANCH used for 월령 by user decision 2026-10-03)."
   },
   {
     "id": "jong-none-rooted-strong-1997",
@@ -1541,7 +1551,7 @@
       }
     },
     "status": "expect_match",
-    "notes": "Pillars 癸亥 甲子 戊子 癸亥. Day Master 戊 (Earth); resource Fire. No Earth/Fire on any visible stem (癸 甲 癸), branch (亥子子亥) or hidden stem (壬甲/癸) per knowledge/02-branches.md:34,45 → no 비겁/인성. Water dominates and month branch 子 is Water → 득령. Water is controlled by Earth → 종재, 'likely' (P2-W Option C)."
+    "notes": "Pillars 癸亥 甲子 戊子 癸亥. Day Master 戊 (Earth); resource Fire. No Earth/Fire on any visible stem (癸 甲 癸), branch (亥子子亥) or hidden stem (壬甲/癸) per knowledge/02-branches.md:34,45 → no 비겁/인성. Water dominates and month branch 子 is Water → 득령. Water is controlled by Earth → 종재, 'likely' (P2-W Option C). Caveat: the month STEM is 甲 (Wood) while Water dominates, so this qualifies only under the month-BRANCH (월령) reading chosen by the user (2026-10-03), not the literal knowledge/07:63 'month stem' wording."
   },
   {
     "id": "jong-visible-bigyeop-possible-종관-1938",

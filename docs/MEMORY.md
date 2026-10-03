@@ -45,7 +45,7 @@
   means *still defective*; the marker turning XPASS is the delete-the-marker signal. Cross-validation
   cases are in `tests/test_cross_validate.py` (the standalone harness was folded in and deleted).
 - **Validation gate grew to 10 subsystems (P3, 2026-10-03):** W7 stars (신살, 57 fixtures,
-  c8ef120) and W8 patterns (격국, 48 fixtures, 2e78fc8 + 1648979 + 04cf1d5) added; gate is now
+  c8ef120) and W8 patterns (격국, 51 fixtures, 2e78fc8 + 1648979 + 04cf1d5) added; gate is now
   `python3 tools/run_validation.py` → `314 (PASS 305, INTERPRETATION 9, FAIL 0)`. Per-gate narrative
   lives in `docs/validation/gate-history.md`. **Adding a fixture:** append an entry to
   `tests/validation/fixtures/stars.json` or `patterns.json` (`id`, `subsystem`, `input`, `source`

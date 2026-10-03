@@ -195,6 +195,8 @@ Gate date 2026-10-03. Checks at gate: 57/57 PASS (54 PASS + 3 documented_interpr
 
 Gate date 2026-10-03. Checks at gate: 48/48 PASS (46 PASS + 2 documented_interpretation; 0 FAIL).
 
++3 fixtures post-gate (d292746, Option C).
+
 ## Campaign status line (verbatim, formerly the report epilogue)
 
 - Gate: Campaign COMPLETE — all six workstreams (W1-W6) certified; no successor gate.
