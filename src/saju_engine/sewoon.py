@@ -13,6 +13,7 @@ its relationship to the natal chart:
 """
 from __future__ import annotations
 
+import calendar
 from dataclasses import dataclass, field
 from typing import List, Optional, Tuple
 
@@ -134,6 +135,8 @@ def _term_pillars_for_date(year: int, month: int, day: int):
     """Engine term-table year/month pillars for a date at 12:00 KST, or None
     outside the table's range."""
     from .pillars import _independent_year_month_pillar
+    # P4 review (2026-10-03): clamp to month length — the reused reference day may not exist in a shorter month.
+    day = min(day, calendar.monthrange(year, month)[1])
     return _independent_year_month_pillar(year, month, day, 12, 0, 9.0)
 
 
@@ -509,7 +512,9 @@ def current_woon_window(
     results: List[SeWoonHit] = []
     for delta in range(-window, window + 1):
         y, m = _add_months(reference_year, reference_month, delta)
-        results.append(derive_woon(day_master, natal_branches, y, m, reference_day))
+        # P4 review (2026-10-03): clamp to month length — the reused reference day may not exist in a shorter month.
+        d = min(reference_day, calendar.monthrange(y, m)[1])
+        results.append(derive_woon(day_master, natal_branches, y, m, d))
     return results
 
 

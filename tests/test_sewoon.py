@@ -340,4 +340,7 @@ def test_module_level_type_hints_resolve():
     module-level annotations without being imported from `typing`."""
     import typing
     from saju_engine import sewoon as sewoon_module
-    typing.get_type_hints(sewoon_module._annual_pillar_for_date)
+    import inspect
+    for name, fn in inspect.getmembers(sewoon_module, inspect.isfunction):
+        if fn.__module__ == sewoon_module.__name__:
+            typing.get_type_hints(fn)
