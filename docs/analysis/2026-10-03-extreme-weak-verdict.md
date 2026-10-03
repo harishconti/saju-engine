@@ -148,10 +148,13 @@ to −3.78. Neither audit comment cites a knowledge/ file for the −5.0 value.
 **A key consequence.** knowledge/07's 종격 conditions say no 인성 and no 비겁 anywhere,
 and no seasonal support. Those conditions force self = resource = 0, and every
 non-Day-Master qi then counts as drain (5.4). So **every chart that meets the
-knowledge/07 description scores exactly −3.78.** The −5.0 cut-off sits below every
+knowledge/07 description, read strictly, scores exactly −3.78.** (Strict reading:
+07:62 "no 인성, no 비겁" is taken to exclude support in any stem, branch or hidden
+stem. The floor is necessary, not sufficient: 267 charts sit at −3.78, and only 47
+of them also have a dominant share ≥ 50 % and are in season, i.e. reach "likely".) The −5.0 cut-off sits below every
 chart the doctrine has in mind. (Seasonal support without a hidden root is also
-impossible in the engine. Every non-zero entry in `_MONTH_BRANCH_SEASON` matches a
-hidden stem of that branch.)
+impossible in the engine. Every non-zero entry in `_MONTH_BRANCH_SEASON` corresponds
+to a hidden stem of the DM or resource element in that branch.)
 
 ## What `extreme_weak` actually controls today
 
@@ -233,7 +236,7 @@ Let the knowledge/07 structural conditions, not a score band, decide whether a
   does not look at the **visible** stems. If Option C were done naively (let every
   `weak` chart reach "likely"), 84 charts would reach "likely" instead of 47. The
   extra 37 score −2.08 or −2.28 because they have a visible 비겁 or 인성 stem.
-  knowledge/07-special-formations.md:61 excludes those explicitly ("no 인성, no 비겁"). So Option C needs a
+  knowledge/07-special-formations.md:62 excludes those explicitly ("no 인성, no 비겁"). So Option C needs a
   visible-stem 비겁/인성 test alongside the rooting test. With that test, Option C
   produces exactly the same 47 "likely" charts as Option B, chosen for the doctrinal
   reason rather than by a number.
@@ -266,6 +269,12 @@ Let the knowledge/07 structural conditions, not a score band, decide whether a
 3. **It cannot drift.** A structural test does not depend on the score weights, so
    the next calibration change cannot make it unreachable again.
 
+**On knowledge/09-interpretation-method.md:84** ("a special grid may apply if the
+strength is extreme in either direction"): under Option C "extreme" on the weak side
+is not a score band. It is the 07:62 condition set itself (no 인성/비겁 anywhere, not
+in season), which is what the engine now tests. The strong-side `extreme` verdict
+remains as a separate gateway for the strong-side special grids.
+
 **Honest limits:**
 
 - knowledge/07 lists a second condition: "the month stem is powerful in the dominant
@@ -273,7 +282,7 @@ Let the knowledge/07 structural conditions, not a score band, decide whether a
   the month stem. Whether Option C should also enforce the month-stem condition is
   a doctrinal question for the owner.
 - knowledge/ does not say whether a visible-only 비겁/인성 stem, with no root,
-  disqualifies 종격, or only weakens it. Line 61 reads as disqualifying ("no 인성, no
+  disqualifies 종격, or only weakens it. Line 62 reads as disqualifying ("no 인성, no
   비겁"), and that reading is used above. Some schools may treat an unrooted visible
   stem more leniently. That is not in knowledge/, so it is not assumed here.
 - Until the owner decides, **Option A is the status quo.** It is safe because no
@@ -286,3 +295,12 @@ Let the knowledge/07 structural conditions, not a score band, decide whether a
 `prose_scaffold.py:288-294` keys its plain-words label on `"extreme_strong"`. The
 engine's actual verdict is `"extreme"`, so "Very Strong" charts (≈2.3 %) get an empty
 `strength_label` in the plain-words callouts. This should be filed separately.
+
+## Decision (2026-10-03)
+
+The owner chose **Option C**. The `extreme_weak` verdict is removed. 종격 is read only
+from `weak` charts and reaches "likely" when the dominant element is >= 50 %, no
+비겁/인성 appears in any branch, hidden stem or non-Day-Master visible stem, and the
+dominant element is in season. The in-season test **keeps the month branch (월령)**,
+a documented difference from the "month stem" wording of knowledge/07-special-formations.md:63.
+The same change fixed the `_VERDICT_PLAIN_LABEL` key (`extreme_strong` -> `extreme`).

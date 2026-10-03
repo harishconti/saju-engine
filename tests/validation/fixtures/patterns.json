@@ -1472,5 +1472,110 @@
     },
     "status": "expect_match",
     "notes": "Pillars 丁未 丙午 己酉 丁卯. Not both 상관 and 정관 present (stems + hidden stems)."
+  },
+  {
+    "id": "jong-likely-종재-1948",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1948,
+      "month": 9,
+      "day": 9,
+      "hour": 1,
+      "minute": 47,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:57-65 — 종격 conditions (line 62: no 인성, no 비겁, no seasonal support; 63: dominant force)"
+      },
+      {
+        "citation": "8-codes 15강 용신 — 종격: 인성과 비겁이 없고 사주가 한 오행 세력으로 이루어진 경우 가장 강한 세력을 따른다 (external cross-check 2026-10-03)",
+        "url": "https://guide.8-codes.com/lecture/elementary/15.html"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "special_forms_names": [
+          "종재"
+        ],
+        "special_forms_confidence": {
+          "종재": "likely"
+        }
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 戊子 辛酉 丁酉 辛丑. Day Master 丁 (Fire); resource Wood. No Fire/Wood on any visible stem (戊 辛 辛), branch (子酉酉丑) or hidden stem (壬癸/辛/己辛癸) → no 비겁/인성. Metal dominates (>50%) and the month branch 酉 is Metal → 득령. Metal is controlled by Fire → 종재, confidence 'likely' under P2-W Option C (month BRANCH used for 월령 by user decision; knowledge/07:63 says 'month stem')."
+  },
+  {
+    "id": "jong-likely-종재-1983",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1983,
+      "month": 12,
+      "day": 26,
+      "hour": 22,
+      "minute": 3,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:57-65 — 종격 conditions (line 62: no 인성, no 비겁, no seasonal support; 63: dominant force)"
+      },
+      {
+        "citation": "8-codes 15강 용신 — 종격: 인성과 비겁이 없고 사주가 한 오행 세력으로 이루어진 경우 가장 강한 세력을 따른다 (external cross-check 2026-10-03)",
+        "url": "https://guide.8-codes.com/lecture/elementary/15.html"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "special_forms_names": [
+          "종재"
+        ],
+        "special_forms_confidence": {
+          "종재": "likely"
+        }
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 癸亥 甲子 戊子 癸亥. Day Master 戊 (Earth); resource Fire. No Earth/Fire on any visible stem (癸 甲 癸), branch (亥子子亥) or hidden stem (壬甲/癸) per knowledge/02-branches.md:34,45 → no 비겁/인성. Water dominates and month branch 子 is Water → 득령. Water is controlled by Earth → 종재, 'likely' (P2-W Option C)."
+  },
+  {
+    "id": "jong-visible-bigyeop-possible-종관-1938",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1938,
+      "month": 1,
+      "day": 5,
+      "hour": 23,
+      "minute": 56,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:57-65 — 종격 conditions (line 62: no 인성, no 비겁, no seasonal support; 63: dominant force); strict reading of 'no 비겁' includes a visible stem"
+      },
+      {
+        "citation": "8-codes 15강 용신 — 종격: 인성과 비겁이 없고 사주가 한 오행 세력으로 이루어진 경우 가장 강한 세력을 따른다 (external cross-check 2026-10-03)",
+        "url": "https://guide.8-codes.com/lecture/elementary/15.html"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "special_forms_names": [
+          "종관"
+        ],
+        "special_forms_confidence": {
+          "종관": "possible"
+        }
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丁丑 壬子 丁酉 壬子. Water dominates and is 득령 (month 子), no 비겁/인성 in any branch or hidden stem — but the year stem 丁 is a visible 비견 of the 丁 Day Master. Per the strict reading of 07:62 ('no 비겁') the candidate is downgraded to 'possible' (without the visible-stem test it would be 'likely'). knowledge/ does not say whether a visible-only 비겁 disqualifies or merely weakens 종격 (analysis doc, Honest limits)."
   }
 ]

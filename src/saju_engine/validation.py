@@ -938,6 +938,7 @@ def _patterns_extract(pat: dict) -> dict:
         "jianlu_grid": bool(pat["jianlu_grid"]["present"]),
         "transformation_grid": tg["name_ko"] if tg else None,
         "special_forms_names": sorted(f["name_ko"] for f in pat.get("special_forms") or []),
+        "special_forms_confidence": {f["name_ko"]: f["confidence"] for f in pat.get("special_forms") or []},
         "structural_notes_kinds": sorted(n["name_ko"] for n in pat.get("structural_notes") or []),
         "tengod_conflicts_names": sorted(c["name_ko"] for c in pat.get("tengod_conflicts") or []),
     }
@@ -949,8 +950,8 @@ def check_patterns(chart: Any, entry: dict) -> dict:
     expected.patterns keys (each optional): regular_grid_name, yangin (blade
     present at any position), yangin_grid (month-branch 양인격), jianlu,
     jianlu_grid (month-branch 건록격), transformation_grid (name or null),
-    special_forms_names, structural_notes_kinds, tengod_conflicts_names
-    (sorted lists). Unknown keys raise.
+    special_forms_names, special_forms_confidence (dict name_ko -> confidence),
+    structural_notes_kinds, tengod_conflicts_names (sorted lists). Unknown keys raise.
     """
     exp = entry.get("expected", {}).get("patterns") or {}
     got = _patterns_extract(chart._patterns_dict(chart.patterns))

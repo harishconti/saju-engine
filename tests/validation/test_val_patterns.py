@@ -37,10 +37,6 @@ def test_unknown_pattern_key_raises():
 # Patterns the engine can emit but that no compute_chart birth can reach, or
 # that the engine does not implement. Each needs a comment + report mention.
 UNREACHABLE = {
-    # 종격 at confidence "likely" needs strength verdict extreme_weak, which
-    # compute_chart never produces (same as strength `extreme_weak`); only the
-    # "possible" 종격 candidates are reachable, and those are fixtured.
-    "special_forms_likely",
     # 방합국 (cardinal-direction frame): knowledge/02 documents 방합 but
     # patterns.detect_structural_notes has no 방합국 detector.
     "방합국",
@@ -55,6 +51,11 @@ def test_coverage_every_documented_pattern():
     assert any(x.get("jianlu_grid") for x in exps), "건록격"
     assert any(x.get("transformation_grid") for x in exps), "화격"
     assert any(x.get("special_forms_names") for x in exps), "종격"
+    # P2-W Option C: 종격 "likely" is reachable (conditions, not a score band)
+    assert any("likely" in (x.get("special_forms_confidence") or {}).values()
+               for x in exps), "종격 likely"
+    assert any("possible" in (x.get("special_forms_confidence") or {}).values()
+               for x in exps), "종격 possible (visible-stem downgrade)"
     assert any("삼합국" in x.get("structural_notes_kinds", []) for x in exps), "삼합국"
     assert any("상관견관" in x.get("tengod_conflicts_names", []) for x in exps), "상관견관"
     # every one of the ten regular grids is exercised

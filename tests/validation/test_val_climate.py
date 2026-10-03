@@ -105,12 +105,12 @@ def test_climate_probe_input_guarded():
     )
 
 
-# The strength verdict enum has FIVE values (strength.py::assess_strength
-# docstring L91) — the corpus exercises three of them, so the mapping folds
-# the extreme forms into their class. Keeping the full enum here means a
+# The strength verdict enum has FOUR values (strength.py::assess_strength
+# docstring; `extreme_weak` was dropped by P2-W Option C, 2026-10-03) — the
+# corpus exercises three of them, so the mapping folds `extreme` into strong. Keeping the full enum here means a
 # future chart that lands on `extreme` still classifies instead of erroring.
 _VERDICT_CLASS = {"strong": "strong", "extreme": "strong",
-                  "weak": "weak", "extreme_weak": "weak",
+                  "weak": "weak",
                   "balanced": "balanced"}
 _BANDS = {"hot", "cold", "damp", "dry", "temperate"}
 _VERDICT_CLASSES = {"strong", "weak", "balanced"}

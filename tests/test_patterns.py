@@ -205,7 +205,7 @@ def test_special_form_candidate():
 
 
 def test_special_form_unrooted_is_likely():
-    # Same unrooted extremely weak chart: no Day Master or resource element in branches/hidden stems.
+    # Same unrooted weak chart: no Day Master or resource element in branches/hidden stems.
     result = detect_patterns(
         day_master="甲",
         month_stem="戊",
@@ -213,7 +213,7 @@ def test_special_form_unrooted_is_likely():
         branches=["辰", "戌", "丑", "未"],
         stems=["戊", "己", "甲", "戊"],
         hidden_stems=[("main", "戊"), ("main", "己"), ("main", "戊"), ("main", "己")],
-        strength_verdict="extreme_weak",
+        strength_verdict="weak",
     )
     special = result["special_forms"]
     match = next(s for s in special if s["name_ko"] == "종재")
@@ -554,15 +554,15 @@ def test_regular_grid_downgrade_confined_to_the_targeted_god():
 
 def test_special_form_exact_fifty_percent_triggers():
     # Dominant Earth is exactly 50% of the weighted element count with no hidden
-    # stems. The >= 0.5 threshold should trigger for an extreme_weak DM.
+    # stems. The >= 0.5 threshold should trigger for a weak DM.
     result = detect_patterns(
         day_master="丙",
         month_stem="戊",
         month_branch="辰",
         branches=["辰", "戌", "丑", "未"],
-        stems=["丙", "戊", "己", "庚"],
+        stems=["庚", "戊", "丙", "己"],  # 丙 Day Master at index 2
         hidden_stems=[],
-        strength_verdict="extreme_weak",
+        strength_verdict="weak",
     )
     special = result["special_forms"]
     assert any(s["name_ko"] == "종식상" for s in special)
@@ -580,7 +580,7 @@ def test_special_form_below_threshold_no_trigger():
         branches=["辰", "戌", "丑", "未"],
         stems=["丙", "戊", "庚", "壬"],
         hidden_stems=[],
-        strength_verdict="extreme_weak",
+        strength_verdict="weak",
     )
     assert result["special_forms"] == []
 
@@ -612,14 +612,14 @@ def test_special_form_jonggwan_metal_authority():
         month_stem="庚",
         month_branch="申",
         branches=["酉", "酉", "酉", "酉"],
-        stems=["甲", "庚", "辛", "壬"],
+        stems=["庚", "庚", "甲", "辛"],  # 甲 Day Master at index 2
         hidden_stems=[
             ("main", "辛"),
             ("main", "辛"),
             ("main", "辛"),
             ("main", "辛"),
         ],
-        strength_verdict="extreme_weak",
+        strength_verdict="weak",
     )
     special = result["special_forms"]
     assert any(s["name_ko"] == "종관" for s in special)
@@ -644,7 +644,7 @@ def test_special_form_jongin_resource_downgraded_by_rooting():
             ("main", "甲"),
             ("main", "乙"),
         ],
-        strength_verdict="extreme_weak",
+        strength_verdict="weak",
     )
     special = result["special_forms"]
     assert any(s["name_ko"] == "종인" for s in special)

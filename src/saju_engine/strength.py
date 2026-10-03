@@ -153,7 +153,7 @@ def assess_strength(
       - month_stage_score: 12운성 support in the month branch (descriptive
         only since N-5; still exported for the stage narrative)
       - total_score: combined numeric score
-      - verdict: 'strong', 'weak', 'extreme_weak', 'balanced', or 'extreme'
+      - verdict: 'strong', 'weak', 'balanced', or 'extreme'
       - _raw_unresolved_favorable: RAW candidate 용신 element (pre-climate,
         pre-override) — internal; client-facing code must call
         yongsin.favorable_element()
@@ -218,7 +218,10 @@ def assess_strength(
     # the effective old ceiling was ~2.25), the extreme bands are widened
     # from 4.0 to 5.0 so "extreme" stays genuinely rare (≈3% of charts) and
     # the published strong/weak verdicts are unchanged by this decision.
-    # D3 fix: symmetric extreme bands for very weak Day Masters.
+    # P2-W (2026-10-03, user decision — docs/analysis/2026-10-03-extreme-weak-verdict.md
+    # Option C): the −5.0 extreme_weak cut was unreachable (formula floor −3.78);
+    # knowledge/ has no "very weak" class, so 종격 is decided from its
+    # conditions in patterns.detect_special_forms instead.
     #
     # §5 item 9 sensitivity sweep (2026-10-01, ±10% per threshold/weight over
     # the 7 canonical charts — tests/threshold_sweep.py): no canonical
@@ -232,8 +235,6 @@ def assess_strength(
         verdict = "extreme"
     elif total_score >= 1.5:
         verdict = "strong"
-    elif total_score <= -5.0:
-        verdict = "extreme_weak"
     elif total_score <= -1.5:
         verdict = "weak"
     else:
