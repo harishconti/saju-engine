@@ -380,19 +380,19 @@
         <p class="concern-note" id="concern-note">Please select The Deep Destiny Report to share your primary focus. It helps the reader tailor the deep-dive sections.</p>
       </div>
 
-      <button type="submit" id="submit-btn">Generate &amp; Download My Saju Report</button>
+      <button type="submit" id="submit-btn">Get My Saju Report</button>
       <p class="disclaimer">
         Saju describes tendencies and influences, not fixed destinies. This is not a medical, legal, or financial diagnosis.
-        Your birth data is used only to prepare the reading. For Essential and Deep Destiny reports, the PDF is an engine-generated draft that may be reviewed before final delivery.
+        Your birth data is used only to prepare the reading. For Essential and Deep Destiny reports, your report is prepared as an engine draft, reviewed by a human reader, and then emailed to you as a private download link. The Sample report downloads instantly.
       </p>
 
-      <div class="error" id="error"></div>
-      <div class="spinner" id="spinner">Preparing your chart and PDF… this takes about 10–20 seconds.</div>
+      <div class="error" id="error" role="status" aria-live="polite"></div>
+      <div class="spinner" id="spinner" role="status" aria-live="polite">Preparing your chart and PDF… this takes about 10–20 seconds.</div>
     </form>
 
-    <div class="card success" id="success">
-      <h2>Your report is ready.</h2>
-      <p>If the download did not start automatically, check your browser's download bar.</p>
+    <div class="card success" id="success" role="status" aria-live="polite">
+      <h2 id="success-title">Your report is ready.</h2>
+      <p id="success-msg">If the download did not start automatically, check your browser's download bar.</p>
     </div>
   </div>
 
@@ -403,6 +403,8 @@
     const submitBtn = document.getElementById('submit-btn');
     const errorBox = document.getElementById('error');
     const spinner = document.getElementById('spinner');
+    const successMsg = document.getElementById('success-msg');
+    const successTitle = document.getElementById('success-title');
 
     function updateConcern() {
       const tier = document.querySelector('input[name="tier"]:checked');
@@ -439,16 +441,25 @@
           const body = await res.json().catch(() => ({}));
           throw new Error(body.detail || body.error || `Server error (${res.status})`);
         }
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        const name = (formData.get('name') || 'saju-reading').replace(/\s+/g, '-').toLowerCase();
-        a.href = url;
-        a.download = `${name}-saju-report.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
+        const ctype = res.headers.get('content-type') || '';
+        if (ctype.includes('application/pdf')) {
+          // Free sample: instant download.
+          const blob = await res.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          const name = (formData.get('name') || 'saju-reading').replace(/\s+/g, '-').toLowerCase();
+          a.href = url;
+          a.download = `${name}-saju-report.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+        } else if (res.status === 202) {
+          // Paid tier: queued for human review.
+          const body = await res.json().catch(() => ({}));
+          successMsg.textContent = body.message || 'Received. A reviewed report will be emailed to you.';
+          successTitle.textContent = 'Your order is received.';
+        }
 
         form.style.display = 'none';
         document.getElementById('success').style.display = 'block';
