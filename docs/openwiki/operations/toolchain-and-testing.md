@@ -20,7 +20,8 @@ Key scripts:
 | `src/saju_html/md_to_saju_compat_pdf.py` | Compat-specific PDF renderer with Korean CID font. |
 | `tools/build-pdf.sh` | Wrapper that sets `PYTHONPATH`, site-packages, and dispatches to the chosen backend. |
 | `src/saju_html/combine_candidate_report.py` | Merges base report + topic follow-ups into a single client deliverable. |
-| `tools/client_intake_app.html` + `tools/client_intake_app.py` | Self-service FastAPI app: `/` single-chart, `/compat` two-chart; saves JSON intake and returns tiered PDFs. |
+| `tools/client_intake_app.html` + `tools/client_intake_app.py` | Self-service FastAPI app: `/` single-chart, `/compat` two-chart; sample tier returns a PDF instantly; paid tiers are stored in an encrypted SQLite queue (`src/saju_web/store.py`, `SAJU_INTAKE_KEY`), drafted in the background and approved by the owner. |
+| `tools/intake_admin.py` | Owner CLI: `genkey`, `list [--status]`, `show <id>`, `approve <id> --base-url`, `regenerate <id>`, `purge --days 180`. `approve` prints the private `/report/{token}` link to email. |
 
 ## Running the test suite
 

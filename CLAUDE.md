@@ -180,7 +180,11 @@ backward compatibility, but new client orders should use the single-chart tiers 
 
 ## Client Intake
 
-**Self-service app** — `tools/client_intake_app.html` + `tools/client_compat_intake_form.html`, served by `tools/client_intake_app.py` (FastAPI; `/` single-chart, `/compat` two-chart). Each submission is saved as JSON in `candidates_horoscope/intake/` (the compat route validates before saving) and a tiered PDF is returned. Requires the `web` optional dependencies (`pip install -e ".[web]"`). (The stdlib JSON-only servers were removed 2026-10-02 — audit S5.)
+**Self-service app** — `tools/client_intake_app.html` + `tools/client_compat_intake_form.html`, served by `tools/client_intake_app.py` (FastAPI; `/` single-chart, `/compat` two-chart). Input is validated before anything is stored. Requires the `web` optional dependencies (`pip install -e ".[web]"`). (The stdlib JSON-only servers were removed 2026-10-02 — audit S5.)
+
+**Review queue (P4, 2026-10-04).** The free `sample` tier still returns its PDF instantly. Every paid tier (essential, deep, legacy spark/reading/fullmap, compat basic/deep) is saved and answered `202 received`; an engine draft PDF is built in a background task and the owner reviews it before delivery. Storage is one SQLite file (`src/saju_web/store.py`) under `candidates_horoscope/intake/` (override `SAJU_INTAKE_DIR`): name, email and main concern are Fernet-encrypted with `SAJU_INTAKE_KEY`; birth data stays plain so charts can be recomputed. The app refuses to start without the key. Bind address is `SAJU_HOST` (default `127.0.0.1`); CORS allows `SAJU_ALLOWED_ORIGINS`, no credentials, `Content-Type` only. Run the server with `umask 077`.
+
+Owner workflow (`tools/intake_admin.py`): `genkey` (once; keep the key in the environment) -> `list [--status draft_ready]` -> `show <id>` (prints the draft PDF path; review it) -> `approve <id> --base-url https://<host>` (prints the private `GET /report/{token}` link to email by hand; there is no email sending yet) -> `regenerate <id>` if the draft needs a rebuild -> `purge --days 180` (retention default 180 days; deletes intakes and their files).
 
 Both forms ask for: name, DOB, birth time, birth location, UTC offset, email, gender, marriage/relationship status, and tier selection. The "main concern" textarea is enabled only when **The Deep Destiny Report (`deep` tier)** is selected.
 

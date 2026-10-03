@@ -128,7 +128,7 @@ Use `tools/md_to_saju_pdf.py` (reportlab backend) instead if the Playwright back
 
 Add a one-line entry to the index table at the bottom of `candidates_horoscope/README.md`.
 
-## 8. Save the intake record (recommended for paid orders)
+## 8. Save the intake record (recommended for paid orders handled manually)
 
 Write a small JSON record to `candidates_horoscope/intake/`:
 
@@ -150,6 +150,10 @@ Write a small JSON record to `candidates_horoscope/intake/`:
 ```
 
 Save it as `candidates_horoscope/intake/YYYYMMDD-HHMMSS-{slug}.json`.
+
+### Orders from the self-service app
+
+Paid orders submitted through the app are already stored (encrypted SQLite; no JSON record needed). Review the engine draft instead: `python3 tools/intake_admin.py list --status draft_ready`, `show <id>` (shows the draft PDF path), polish or `regenerate <id>`, then `approve <id> --base-url https://<host>` and email the printed private link to the client. Needs `SAJU_INTAKE_KEY` in the environment.
 
 ## 9. Return a concise summary to the user
 
