@@ -824,10 +824,9 @@ Source: `research-engine/output/2026-10-01/saju-engine-audit-2026-10-01.md`. Fix
 | A7 | FIXED (2026-10-02, f1012ea) | Dead code removed; `nayin_relation` kept (public API). |
 | B5 | ALREADY DONE | `tests/validation/test_val_compat.py:169` pins WEIGHT total 112 / scored 100 (the audit's "88" figure was wrong). |
 | S4/A1 | OPEN | Landing page source not in repo; see follow-up plan P6. |
-| S6 | OPEN | Typed compat flags; follow-up plan P2. |
+| S6, B6 | FIXED (2026-10-03, 5d2501e) | Typed compat flags: `compat.Flag(str)` with `kind`/`severity`/`code` fields; legacy substring classifiers kept only as test oracle. See P2 task 6. |
 | S8a, S8d, S8e, S8f | OPEN | Web hardening (sewoon ephemeris, background PDF jobs, CORS, review gate); follow-up plan P4. |
-| B4, B8 | OPEN | `report_primitives` extraction; follow-up plan P2. |
-| B6 | OPEN | OPEN — typed compat flags (= S6); follow-up plan P2. Also track: compat F verdicts (결합 과다/결핍) still derive from the §F weighted union, so their wording can differ from the canonical element table. |
+| B4, B8 | FIXED (2026-10-03, 52bdf78 + f3b3812 + db9779c + 720b1c6 + d8369b1 + cf3e339) | `report_primitives` extraction + golden-snapshot harness. See P2 task 6. |
 | B7 | OPEN | Stars + patterns validation fixtures; follow-up plan P3. |
 
 ---
@@ -845,3 +844,4 @@ Source: `research-engine/output/2026-10-01/saju-engine-audit-2026-10-01.md`. Fix
 | 2026-07-01 | Fixed D1: added `tests/test_textbook_cases.py` with external Korean Saju validation case for Park Chung-hee (four pillars + 대운 table); full suite 388/388 passing. |
 | 2026-09-07 | Added and fixed G1 (reviewer-note leak into client PDFs), G2 (per-pillar template grammar), G3 (용신 single source of truth + provenance — new `src/saju_engine/yongsin.py`), G6 (₹→USD in engine text) as part of the go-to-market pivot; regression tests added; full suite 568 → 590 passing. |
 | 2026-10-02 | Audit 2026-10-01 Wave A/B: fixed S1, S2, S3, S5, S7, S8b, S8c, A5, A6, A7 (see "Audit 2026-10-01" section); M8 note corrected. |
+| 2026-10-03 | P2 refactor (task 6 — docs + tracker): golden-snapshot harness (52bdf78 + f3b3812), B4/B8 `report_primitives` extraction + core lookup tables (db9779c + 720b1c6 + d8369b1 + cf3e339), S6/B6 typed compat flags (5d2501e). One client-visible change: strength label `Extreme` → `Very Strong` in prose/career/luck-cycle. Open items: `extreme_weak` unreachable (threshold ≈−3.78 vs −5.0; doctrine review needed); compat flag legacy quirks explicit (cross/year-branch 육충 severity 25 vs ±5/±3; primary 육해/육파 kind=None). |

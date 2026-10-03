@@ -132,6 +132,10 @@ fulfilment: ~$1–3K/month; most likely 12-month outcome is a kill/skip.
 
 ## Conventions
 
+### Report tables and golden snapshots
+- **Report primitives:** All shared report helper tables, enums, and formatting functions live in a single `src/saju_engine/report_primitives.py` module. Never re-declare a copy in another module (e.g., `prose_fillers`, `compat_report`, etc.). If you need a table or function, import it from `report_primitives`.
+- **Golden snapshots:** Regression test baselines live in `tests/golden/` (currently 7 charts covering strong/extreme/weak/climate-override cases). Regenerate them with `tools/regen_golden.py` **only** when a reviewed output change is approved. Running the tool without review risks masking bugs.
+
 ### Candidate folders
 - One subfolder per candidate: `candidates_horoscope/reports/{name-slug}/`
 - Slug style: lowercase, hyphenated.
