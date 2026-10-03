@@ -354,6 +354,20 @@ class Flag(str):
         return (str(self),), {"kind": self.kind, "code": self.code, "severity": self.severity}
 
 
+def _top_red(flags) -> List[Flag]:
+    """Cover red flags: top 3 by severity, ties alphabetical (N-10)."""
+    return sorted(set(flags), key=lambda f: (-f.severity, str(f)))[:3]
+
+
+def _top_yellow(flags) -> List[Flag]:
+    """Cover yellow flags: top 5, primary 일지 해/파 first."""
+    # P2 Task 7 follow-up (2026-10-03): primary 일지 해/파 must not be truncated off the cover (user decision).
+    return sorted(
+        set(flags),
+        key=lambda f: (f.code not in {"daybranch.harm", "daybranch.break"}, str(f)),
+    )[:5]
+
+
 def _cross_branch_score(b1: str, b2: str) -> Tuple[int, Optional[Flag]]:
     """Score a single cross-chart branch pair (day vs non-day).
 
@@ -393,10 +407,10 @@ def _prefixed(prefix: str, flag: Flag) -> Flag:
 # point of origin in this file (day-branch 육충 -25, ilju_pair RED FLAG -12,
 # day-branch 자형 -8, nayin 상충 and cross-star 홍양교차 both -5); 간섭 is a
 # dampener on an otherwise-favorable 합 rather than a pure penalty, so it
-# ranks below the hard clashes/punishments. (2026-10-03: Flag.severity now
-# follows the same doctrine per flag — cross-branch 육충 5, 띠 육충 3, cross
-# 자형 2 — this table is only the legacy test oracle.) Order matters: more specific/
+# ranks below the hard clashes/punishments. Order matters: more specific/
 # severe tokens are checked first.
+# (2026-10-03: Flag.severity now follows the same doctrine per flag — cross-branch
+# 육충 5, 띠 육충 3, cross 자형 2 — so this table is only the legacy test oracle.)
 _RED_FLAG_SEVERITY: List[Tuple[str, int]] = [
     ("육충", 25),
     ("RED FLAG", 12),
@@ -1564,8 +1578,8 @@ def compat_score(
 
     # Top 3 of each. Red flags are ranked by severity, not alphabetically
     # (N-10, 2026-09-26 audit) — ties broken alphabetically for determinism.
-    red_flags = sorted(set(red_flags), key=lambda f: (-f.severity, str(f)))[:3]
-    yellow_flags = sorted(set(yellow_flags))[:5]
+    red_flags = _top_red(red_flags)
+    yellow_flags = _top_yellow(yellow_flags)
     favorable = sorted(set(favorable))[:3]
 
     return CompatReport(

@@ -93,11 +93,30 @@ def test_clash_severity_pairs_exist_in_scan():
     assert {"daybranch.cross_clash", "year_branch.clash", "daybranch.clash"} <= codes
 
 
-def test_cover_ranks_primary_clash_above_cross_clash():
-    # (0,2) carries two cross 육충 and a primary 육해; ranking is by actual delta.
-    sev = [f.severity for f in _rep(0, 1).red_flags]
-    assert sev == sorted(sev, reverse=True)
-    assert sev[0] == 25
+def _F(text, code, kind, sev=0):
+    return compat.Flag(text, kind=kind, code=code, severity=sev)
+
+
+def test_cover_ranks_cross_clash_below_primary_and_ilju_red_flags():
+    flags = [
+        _F("a: cross 육충", "daybranch.cross_clash", "red", 5),
+        _F("b: 일지 자형", "daybranch.self_punish", "red", 8),
+        _F("c: ilju RED FLAG", "ilju_pair.red", "red", 12),
+    ]
+    top = compat._top_red(flags)
+    assert [f.severity for f in top] == [12, 8, 5]
+    assert top[-1].code == "daybranch.cross_clash"
+
+
+def test_top_yellow_keeps_primary_harm_break_despite_cap():
+    # Hangul "일" sorts after "육"/"가": without the key, 일지 해 is truncated off.
+    others = [_F(f"가{n}: caution", f"x.{n}", "yellow") for n in range(7)]
+    harm = _F("일지 해 (육해)", "daybranch.harm", "yellow")
+    brk = _F("일지 파 (육파)", "daybranch.break", "yellow")
+    top = compat._top_yellow(others + [harm, brk])
+    assert len(top) == 5
+    assert top[:2] == sorted([harm, brk], key=str)
+    assert harm in top and brk in top
 
 
 @pytest.mark.parametrize("pair,code", [((0, 2), "daybranch.harm"), ((5, 6), "daybranch.break")])

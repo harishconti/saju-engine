@@ -111,7 +111,8 @@ def _day_master_snapshot(chart: Chart, name: str) -> List[str]:
         f"{dm.get('element', '')} ({dm.get('polarity', '')})"
     )
     fe = favorable_element(chart)
-    lines.append(f"- **Seasonal strength verdict:** {RP.verdict_label(sa.get('verdict', 'balanced')) if sa.get('verdict') else '—'}")
+    v = sa.get("verdict")
+    lines.append(f"- **Seasonal strength verdict:** {RP.verdict_label(v) if v else '—'}")
     lines.append(f"- **Favorable element (용신):** {fe.element}")
     lines.append(f"- **Supporting element (희신):** {fe.supporting}")
     lines.append(f"- **Unfavorable / watch element:** {fe.unfavorable or '—'}")
