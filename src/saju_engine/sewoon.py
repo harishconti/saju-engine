@@ -87,11 +87,12 @@ class SeWoonHit:
 
 
 # Cached 60-cycle index for year-pillar lookup (approximate).
-# B4 (2026-10-01 audit): _ANCHOR_YEAR now lives in lookup.py; keep as alias for tests.
 # 1984 is 甲子 (Jia-Zi) per classical tables.
 # We use the simple mapping: (year + 56) % 60 for the 60-cycle index,
 # because 1984 is index 0, and 1984 + 56 = 2040 gives index 56, etc.
 # More robustly, we derive from a known anchor.
+# B4 (2026-10-01 audit): the anchor year now lives in lookup.py; _ANCHOR_YEAR
+# is kept as an alias for tests.
 _ANCHOR_YEAR = L.JIAZI_ANCHOR_YEAR
 _ANCHOR_INDEX = 0
 
@@ -443,7 +444,7 @@ def _monthly_pillar(year: int, month: int, day: int = 15) -> Tuple[str, str]:
       - Gregorian on/after the boundary in Feb is the first Saju month (寅月).
 
     The first-month stem is derived from the year stem via 五虎遁 (Oho-dun).
-    See `lookup._OHO_DUN`. `day` defaults to 15 (mid-month, safely past the
+    See `lookup.FIVE_TIGERS`. `day` defaults to 15 (mid-month, safely past the
     ~Feb-4 boundary) so existing (year, month)-only callers are unaffected.
     """
     # Determine which Saju year this Gregorian date belongs to.
