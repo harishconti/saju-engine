@@ -421,7 +421,7 @@
       }
     },
     "status": "expect_match",
-    "notes": "Textbook chart 丁巳 辛亥 庚申 辛巳 (same input as daeun.json park-chung-hee-daeun). Published 격국 = 식신격 and engine agrees. Month branch 亥 hides 壬甲; neither on a visible stem (壬 absent) → 본기 壬 = 식신 of 庚. jianlu true: 庚's 건록 branch 申 is the day branch (a related, not 월령, position). 노무현 and 김대중 are intentionally not fixtured: the sources opened (g-enews 노무현 2015-03-18, mediapia 25강) name no 격국, and 김대중's birth data is disputed across sources."
+    "notes": "Textbook chart 丁巳 辛亥 庚申 辛巳 (same input as daeun.json park-chung-hee-daeun). Published 격국 = 식신격 and engine agrees. Month branch 亥 hides 戊·甲·壬; none of them on a visible stem (壬 absent) → 본기 壬 = 식신 of 庚. jianlu true: 庚's 건록 branch 申 is the day branch (a related, not 월령, position). 노무현 and 김대중 are intentionally not fixtured: the sources opened (g-enews 노무현 2015-03-18, mediapia 25강) name no 격국, and 김대중's birth data is disputed across sources."
   },
   {
     "id": "yangin-grid-甲-卯-month-1940",
@@ -936,7 +936,7 @@
         "citation": "knowledge/07-special-formations.md:75-98 — 화격: month stem is 합 partner of DM, combined element in season at month branch, DM isolated, no effective breaker"
       },
       {
-        "citation": "8-codes 15강 용신 — 합화격: 일간 무근, 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것; 종격: 인성·비겁 없고 한 오행이 대부분 (external cross-check 2026-10-03)",
+        "citation": "CONTRASTING SCHOOL (not ground truth for this fixture) — 8-codes 15강 용신 합화격: 일간 무근 (Day Master must have NO root), 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것 (external cross-check 2026-10-03). Under 일간 무근 this chart would NOT be accepted.",
         "url": "https://guide.8-codes.com/lecture/elementary/15.html"
       }
     ],
@@ -946,7 +946,7 @@
       }
     },
     "status": "expect_match",
-    "notes": "Pillars 己未 丁卯 壬寅 戊申. 丁壬 combine into Wood; month branch 卯 is Wood (득령); day branch 寅 is neither 인성 nor 비겁 for 壬, no allied stem visible, no effective breaker stem (any breaker is floating: unrooted and out of season)."
+    "notes": "Pillars 己未 丁卯 壬寅 戊申. 丁壬 combine into Wood; month branch 卯 is Wood (득령). Isolation per knowledge/07-special-formations.md:82 ('isolated, not strongly supported by allies') is undefined there; the engine judges it by the strength verdict (verdict weak, total_score -2.93), so isolation is satisfied. Hidden-stem roots: 壬 is rooted in 申 (hides 戊壬庚); this Day Master is therefore NOT root-less. The stricter external 일간 무근 rule (8-codes 15강) would NOT accept this chart; knowledge/07 is the ground truth here (engine == knowledge/). No allied stem is visible and no effective breaker (any breaker is floating: unrooted and out of season)."
   },
   {
     "id": "hwa-庚乙-1988",
@@ -966,7 +966,7 @@
         "citation": "knowledge/07-special-formations.md:75-98 — 화격: month stem is 합 partner of DM, combined element in season at month branch, DM isolated, no effective breaker"
       },
       {
-        "citation": "8-codes 15강 용신 — 합화격: 일간 무근, 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것; 종격: 인성·비겁 없고 한 오행이 대부분 (external cross-check 2026-10-03)",
+        "citation": "CONTRASTING SCHOOL (not ground truth for this fixture) — 8-codes 15강 용신 합화격: 일간 무근 (Day Master must have NO root), 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것 (external cross-check 2026-10-03). Under 일간 무근 this chart would NOT be accepted.",
         "url": "https://guide.8-codes.com/lecture/elementary/15.html"
       }
     ],
@@ -976,7 +976,7 @@
       }
     },
     "status": "expect_match",
-    "notes": "Pillars 戊辰 庚申 乙未 戊寅. 庚乙 combine into Metal; month branch 申 is Metal (득령); day branch 未 is neither 인성 nor 비겁 for 乙, no allied stem visible, no effective breaker stem (any breaker is floating: unrooted and out of season)."
+    "notes": "Pillars 戊辰 庚申 乙未 戊寅. 庚乙 combine into Metal; month branch 申 is Metal (득령). Isolation per knowledge/07-special-formations.md:82 ('isolated, not strongly supported by allies') is undefined there; the engine judges it by the strength verdict (verdict weak, total_score -2.22), so isolation is satisfied. Hidden-stem roots: 乙 is rooted in 辰 (乙癸戊) and 未 (丁乙己); this Day Master is therefore NOT root-less. The stricter external 일간 무근 rule (8-codes 15강) would NOT accept this chart; knowledge/07 is the ground truth here (engine == knowledge/). No allied stem is visible and no effective breaker (any breaker is floating: unrooted and out of season)."
   },
   {
     "id": "hwa-戊癸-1988",
@@ -996,7 +996,7 @@
         "citation": "knowledge/07-special-formations.md:75-98 — 화격: month stem is 합 partner of DM, combined element in season at month branch, DM isolated, no effective breaker"
       },
       {
-        "citation": "8-codes 15강 용신 — 합화격: 일간 무근, 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것; 종격: 인성·비겁 없고 한 오행이 대부분 (external cross-check 2026-10-03)",
+        "citation": "CONTRASTING SCHOOL (not ground truth for this fixture) — 8-codes 15강 용신 합화격: 일간 무근 (Day Master must have NO root), 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것 (external cross-check 2026-10-03). Under 일간 무근 this chart would NOT be accepted.",
         "url": "https://guide.8-codes.com/lecture/elementary/15.html"
       }
     ],
@@ -1006,7 +1006,7 @@
       }
     },
     "status": "expect_match",
-    "notes": "Pillars 戊辰 戊午 癸巳 丙辰. 戊癸 combine into Fire; month branch 午 is Fire (득령); day branch 巳 is neither 인성 nor 비겁 for 癸, no allied stem visible, no effective breaker stem (any breaker is floating: unrooted and out of season)."
+    "notes": "Pillars 戊辰 戊午 癸巳 丙辰. 戊癸 combine into Fire; month branch 午 is Fire (득령). Isolation per knowledge/07-special-formations.md:82 ('isolated, not strongly supported by allies') is undefined there; the engine judges it by the strength verdict (verdict weak, total_score -2.90), so isolation is satisfied. Hidden-stem roots: 癸 is rooted in 辰 (hides 乙癸戊); this Day Master is therefore NOT root-less. The stricter external 일간 무근 rule (8-codes 15강) would NOT accept this chart; knowledge/07 is the ground truth here (engine == knowledge/). No allied stem is visible and no effective breaker (any breaker is floating: unrooted and out of season)."
   },
   {
     "id": "hwa-己甲-1991",
@@ -1026,7 +1026,7 @@
         "citation": "knowledge/07-special-formations.md:75-98 — 화격: month stem is 합 partner of DM, combined element in season at month branch, DM isolated, no effective breaker"
       },
       {
-        "citation": "8-codes 15강 용신 — 합화격: 일간 무근, 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것; 종격: 인성·비겁 없고 한 오행이 대부분 (external cross-check 2026-10-03)",
+        "citation": "CONTRASTING SCHOOL (not ground truth for this fixture) — 8-codes 15강 용신 합화격: 일간 무근 (Day Master must have NO root), 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것 (external cross-check 2026-10-03). Under 일간 무근 this chart would NOT be accepted.",
         "url": "https://guide.8-codes.com/lecture/elementary/15.html"
       }
     ],
@@ -1036,7 +1036,37 @@
       }
     },
     "status": "expect_match",
-    "notes": "Pillars 庚午 己丑 甲午 丙子. 己甲 combine into Earth; month branch 丑 is Earth (득령); day branch 午 is neither 인성 nor 비겁 for 甲, no allied stem visible, no effective breaker stem (any breaker is floating: unrooted and out of season)."
+    "notes": "Pillars 庚午 己丑 甲午 丙子. 己甲 combine into Earth; month branch 丑 is Earth (득령). Isolation per knowledge/07-special-formations.md:82 ('isolated, not strongly supported by allies') is undefined there; the engine judges it by the strength verdict (verdict weak, total_score -2.79), so isolation is satisfied. Hidden-stem roots: 甲 has no 甲 root, but receives 인성 via 子 (hides 壬癸) and 丑 (hides 癸辛己); this Day Master is therefore NOT root-less. The stricter external 일간 무근 rule (8-codes 15강) would NOT accept this chart; knowledge/07 is the ground truth here (engine == knowledge/). No allied stem is visible and no effective breaker (any breaker is floating: unrooted and out of season)."
+  },
+  {
+    "id": "hwa-school-diff-戊-1940",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1940,
+      "month": 10,
+      "day": 2,
+      "hour": 21,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:75-98 — 화격 requires the DM 'isolated (not strongly supported by allies)'; engine judges isolation by strength verdict (weak)"
+      },
+      {
+        "citation": "8-codes 15강 용신 — 합화격: 일간 무근 (Day Master must have no root), strict school answer = no 화격 (external cross-check 2026-10-03)",
+        "url": "https://guide.8-codes.com/lecture/elementary/15.html"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "transformation_grid": null
+      }
+    },
+    "status": "documented_interpretation",
+    "notes": "Pillars 庚辰 乙酉 戊寅 壬戌. 乙庚 combine into Metal; month branch 酉 is Metal. Engine returns 화격 under knowledge/07 (strength verdict weak, total_score -1.91 → isolated). But Day Master 戊 is rooted in 辰, 戌 and 寅 (each hides 戊), so the stricter 일간 무근 school would NOT accept 화격 (expected null = that school's answer). School disagreement recorded; knowledge/07 does not define isolation, and the engine follows the strength verdict."
   },
   {
     "id": "hwa-negative-1953-6",
@@ -1056,7 +1086,7 @@
         "citation": "knowledge/07-special-formations.md:75-98 — 화격 conditions; breaker table knowledge/07-special-formations.md:88-98"
       },
       {
-        "citation": "8-codes 15강 용신 — 합화격: 일간 무근, 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것; 종격: 인성·비겁 없고 한 오행이 대부분 (external cross-check 2026-10-03)",
+        "citation": "CONTRASTING SCHOOL — 8-codes 15강 용신 — 합화격: 일간 무근, 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것; 종격: 인성·비겁 없고 한 오행이 대부분 (external cross-check 2026-10-03)",
         "url": "https://guide.8-codes.com/lecture/elementary/15.html"
       }
     ],
@@ -1086,7 +1116,7 @@
         "citation": "knowledge/07-special-formations.md:75-98 — 화격 conditions; breaker table knowledge/07-special-formations.md:88-98"
       },
       {
-        "citation": "8-codes 15강 용신 — 합화격: 일간 무근, 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것; 종격: 인성·비겁 없고 한 오행이 대부분 (external cross-check 2026-10-03)",
+        "citation": "CONTRASTING SCHOOL — 8-codes 15강 용신 — 합화격: 일간 무근, 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것; 종격: 인성·비겁 없고 한 오행이 대부분 (external cross-check 2026-10-03)",
         "url": "https://guide.8-codes.com/lecture/elementary/15.html"
       }
     ],
@@ -1116,7 +1146,7 @@
         "citation": "knowledge/07-special-formations.md:75-98 — 화격 conditions; breaker table knowledge/07-special-formations.md:88-98"
       },
       {
-        "citation": "8-codes 15강 용신 — 합화격: 일간 무근, 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것; 종격: 인성·비겁 없고 한 오행이 대부분 (external cross-check 2026-10-03)",
+        "citation": "CONTRASTING SCHOOL — 8-codes 15강 용신 — 합화격: 일간 무근, 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것; 종격: 인성·비겁 없고 한 오행이 대부분 (external cross-check 2026-10-03)",
         "url": "https://guide.8-codes.com/lecture/elementary/15.html"
       }
     ],

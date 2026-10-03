@@ -49,7 +49,7 @@ UNREACHABLE = {
 
 def test_coverage_every_documented_pattern():
     """≥1 positive fixture for each pattern that is reachable via compute_chart."""
-    exps = [e["expected"]["patterns"] for e in ENTRIES]
+    exps = [e["expected"]["patterns"] for e in ENTRIES if e["status"] == "expect_match"]
     assert any(x.get("regular_grid_name") for x in exps), "regular grid"
     assert any(x.get("yangin_grid") for x in exps), "양인격"
     assert any(x.get("jianlu_grid") for x in exps), "건록격"
@@ -62,4 +62,6 @@ def test_coverage_every_documented_pattern():
     assert names >= {"비견격", "겁재격", "식신격", "상관격", "편재격",
                      "정재격", "편관격", "정관격", "편인격", "정인격"}, sorted(names)
     # the declared UNREACHABLE set is not silently covered
-    assert not any(x.get("special_forms_likely") for x in exps)
+    asserted = {k for x in exps for k in x} | {
+        n for x in exps for n in x.get("structural_notes_kinds", [])}
+    assert not (UNREACHABLE & asserted), UNREACHABLE & asserted

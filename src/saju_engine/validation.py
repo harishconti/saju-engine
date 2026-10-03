@@ -924,8 +924,6 @@ def run_stars_fixture(entry: dict) -> dict:
     return check_stars(compute_chart(**kwargs), entry)
 
 
-_PATTERNS_ALLOWED_INPUT = _ALLOWED_INPUT
-
 
 def _patterns_extract(pat: dict) -> dict:
     """Extractors over the JSON shape of ``Chart._patterns_dict`` (regular_grid
@@ -969,7 +967,7 @@ def check_patterns(chart: Any, entry: dict) -> dict:
 
 def run_patterns_fixture(entry: dict) -> dict:
     """Compute the chart for a patterns fixture entry and check its 격국 subset."""
-    unknown = set(entry["input"]) - _PATTERNS_ALLOWED_INPUT
+    unknown = set(entry["input"]) - _ALLOWED_INPUT
     if unknown:
         raise ValueError(f"patterns/{entry['id']}: unknown input key(s) {sorted(unknown)}")
     kwargs = dict(entry["input"])
