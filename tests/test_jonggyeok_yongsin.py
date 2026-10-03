@@ -74,3 +74,27 @@ def test_chart_without_patterns_still_resolves():
     fe = Y.favorable_element(chart)
     assert fe.method != "jonggyeok-follow"
     assert fe.element in {"Wood", "Fire", "Earth", "Metal", "Water"}
+
+
+def _fixture_chart(fixture_id):
+    import json, pathlib
+    fx = json.loads((pathlib.Path(__file__).parent / "validation/fixtures/patterns.json").read_text())
+    return compute_chart(**next(e for e in fx if e["id"] == fixture_id)["input"], name=fixture_id)
+
+
+def test_likely_jonggyeok_governs_ahead_of_climate():
+    """1983 (癸亥 甲子 戊子 癸亥): the 조후 check would pick Fire for a cold
+    winter chart, but a "likely" 종재 follows the dominant Water."""
+    fe = Y.favorable_element(_fixture_chart("jong-likely-종재-1983"))
+    assert (fe.element, fe.method) == ("Water", "jonggyeok-follow")
+    assert fe.climate_element == "Fire"  # 조후 remedy differs from the followed element
+
+
+def test_premium_report_explains_follow_without_claiming_reader_review():
+    from saju_engine.premium_report import generate_premium_report
+    md = generate_premium_report(_fixture_chart("jong-likely-종재-1983"), tier="deep",
+                                 generation_date="2026-10-03")
+    why = next(l for l in md.splitlines() if l.startswith("- **Why this element:**"))
+    assert "following grid (종격)" in why
+    assert "does not govern a following grid" in why
+    assert "reader has weighed" not in why
