@@ -104,10 +104,10 @@ _STRENGTH_LABEL = {
     "extreme_weak": "weak",
 }
 
-# Inverse of the generating cycle: for each element, the element that generates it.
+# B4 (2026-10-01 audit): _GENERATED_BY now lives in lookup.py; keep as alias for tests.
 # Used as the strict-classical 희신 default for a reader override (Metal generates
 # Water, Wood generates Fire, etc.) — see knowledge/03-five-elements.md.
-_GENERATED_BY = {v: k for k, v in L.GENERATES.items()}
+_GENERATED_BY = L.GENERATED_BY
 
 _VALID_ELEMENTS = {"Wood", "Fire", "Earth", "Metal", "Water"}
 

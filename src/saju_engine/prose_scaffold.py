@@ -15,8 +15,7 @@ from typing import Dict, List, Tuple
 
 from .chart import Chart
 from .daeun import saju_year
-
-
+from . import report_primitives as RP
 from .hanja_glossary import inject_hanja
 from .stem_profiles import stem_profile
 
@@ -30,21 +29,11 @@ _ELEMENT_ORGANS: Dict[str, str] = {
 }
 
 
-# Ten-god class names
-_TENGOD_CLASS: Dict[str, str] = {
-    "비견": "Companion", "겁재": "Companion",
-    "식신": "Output", "상관": "Output",
-    "편재": "Wealth", "정재": "Wealth",
-    "편관": "Authority", "정관": "Authority",
-    "편인": "Resource", "정인": "Resource",
-}
-
-
 def _class_counts(chart: Chart) -> Counter:
     """Count ten-god classes across all visible and hidden stems."""
     counts: Counter = Counter()
     for hit in chart.ten_gods:
-        cls = _TENGOD_CLASS.get(hit.tengod)
+        cls = RP.TENGOD_CLASS.get(hit.tengod)
         if cls:
             counts[cls] += 1
     return counts

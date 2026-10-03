@@ -10,7 +10,7 @@ engine:
    synchrony), not for marriage.
 2. **Career domain fit** (`report_data._career_tiers`) — each person's ranked
    domains from their own 용신/희신.
-3. **Five-year luck blocks** (`luck_cycle_report._build_blocks`) — the concrete
+3. **Five-year luck blocks** (`luck_cycle_report.build_blocks`) — the concrete
    세운 inside each 대운, so the report can say *when* the group's cycles align.
 
 It also states the group's **coverage gap** honestly: which classical function
@@ -31,7 +31,8 @@ from collections import Counter
 from typing import Dict, List, Sequence, Tuple
 
 from .compat import compat_score
-from .luck_cycle_report import _build_blocks, _CLASS_KO
+from . import report_primitives as RP
+from .luck_cycle_report import build_blocks
 from .report_data import _career_tiers
 from .yongsin import favorable_element
 
@@ -60,7 +61,6 @@ _CLASS_ROLE = {
     "Resource": "research / advisory lead — depth, credentials, the knowledge base",
     "Companion": "network / team lead — relationships, peers, coalition-building",
 }
-_CLASS_ORDER = ["Companion", "Output", "Wealth", "Authority", "Resource"]
 
 
 # ── small helpers ───────────────────────────────────────────────────────────
@@ -68,13 +68,7 @@ _CLASS_ORDER = ["Companion", "Output", "Wealth", "Authority", "Resource"]
 def _class_counts(chart) -> Counter:
     counts: Counter = Counter()
     for h in chart.ten_gods:
-        cls = {
-            "비견": "Companion", "겁재": "Companion",
-            "식신": "Output", "상관": "Output",
-            "편재": "Wealth", "정재": "Wealth",
-            "편관": "Authority", "정관": "Authority",
-            "편인": "Resource", "정인": "Resource",
-        }.get(h.tengod)
+        cls = RP.TENGOD_CLASS.get(h.tengod)
         if cls:
             counts[cls] += 1
     return counts
@@ -99,7 +93,7 @@ def _lean_of(block) -> str:
 
 def _blocks(chart, override) -> List:
     fe = favorable_element(chart, override)
-    return _build_blocks(chart, fe.element, fe.supporting, fe.unfavorable)
+    return build_blocks(chart, fe.element, fe.supporting, fe.unfavorable)
 
 
 def _blocks_by_year(blocks) -> Dict[int, str]:
@@ -156,11 +150,11 @@ def _charts_at_a_glance(members) -> List[str]:
         c, ov = m["chart"], m["override"]
         fe = favorable_element(c, ov)
         tops = _dominant_classes_for(c)
-        top_ko = " / ".join(_CLASS_KO.get(t, t) for t in tops) or "—"
+        top_ko = " / ".join(RP.CLASS_KO.get(t, t) for t in tops) or "—"
         verdict = (c.strength_assessment or {}).get("verdict", "balanced")
         lines.append(
             f"| {m['name']} | {c.day_master} | {c.year.combined}·{c.month.combined}·"
-            f"{c.day.combined}·{c.hour.combined} | {verdict.title()} | {fe.element} "
+            f"{c.day.combined}·{c.hour.combined} | {RP.verdict_label(verdict)} | {fe.element} "
             f"| {fe.supporting} | {fe.unfavorable or '—'} | {top_ko} |"
         )
     lines += [
@@ -180,7 +174,7 @@ def _dominant_classes_for(c) -> List[str]:
     if not counts:
         return []
     top = max(counts.values())
-    return [k for k in _CLASS_ORDER if counts.get(k, 0) == top]
+    return [k for k in RP.CLASS_ORDER if counts.get(k, 0) == top]
 
 
 def _pairwise(members, names) -> List[str]:
@@ -253,7 +247,7 @@ def _role_coverage(members) -> List[str]:
                 funcs.append(f"**{e}** — {_ELEMENT_ROLE.get(e, '')}")
         tops = _dominant_classes_for(c)
         roles = "; ".join(
-            f"{_CLASS_KO.get(t, t)}: {_CLASS_ROLE.get(t, '')}" for t in tops
+            f"{RP.CLASS_KO.get(t, t)}: {_CLASS_ROLE.get(t, '')}" for t in tops
         ) or "—"
         lines.append(f"| {m['name']} | " + " · ".join(funcs) + f" | {roles} |")
     lines.append("")
@@ -474,7 +468,7 @@ def _role_matrix(members) -> List[str]:
         c, ov = m["chart"], m["override"]
         fe = favorable_element(c, ov)
         tops = _dominant_classes_for(c)
-        top_ko = " / ".join(_CLASS_KO.get(t, t) for t in tops) if tops else "—"
+        top_ko = " / ".join(RP.CLASS_KO.get(t, t) for t in tops) if tops else "—"
         seat, watch = seats[m["name"]]
         lines.append(
             f"| {m['name']} | {top_ko} | {fe.element}/{fe.supporting} | {seat} | {watch} |"

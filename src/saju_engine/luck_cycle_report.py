@@ -28,32 +28,15 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import date
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 from . import lookup as L
-from .daeun import first_period_start_date, saju_year
+from . import report_primitives as RP
+from .daeun import saju_year
 from .sewoon import SeWoonHit, derive_sewoon
 from .yongsin import favorable_element
 
 # ── Ten-god classes (five-group level) ──────────────────────────────────────
-
-_CLASS_OF: Dict[str, str] = {
-    "비견": "Companion", "겁재": "Companion",
-    "식신": "Output", "상관": "Output",
-    "편재": "Wealth", "정재": "Wealth",
-    "편관": "Authority", "정관": "Authority",
-    "편인": "Resource", "정인": "Resource",
-}
-
-_CLASS_KO: Dict[str, str] = {
-    "Companion": "비겁 (比劫)",
-    "Output": "식상 (食傷)",
-    "Wealth": "재성 (財星)",
-    "Authority": "관성 (官星)",
-    "Resource": "인성 (印星)",
-}
-
-_CLASS_ORDER = ["Companion", "Output", "Wealth", "Authority", "Resource"]
 
 # Storehouse branches (사고, 四庫) — knowledge/02-branches.md §Special Branches.
 _STOREHOUSE = {"辰", "戌", "丑", "未"}
@@ -67,16 +50,7 @@ def year_status(stem_e: str, branch_e: str, fav: str, sup: str,
     (neutral), not both. This keeps the luck-cycle blocks consistent with the
     premium report's own favorable/unfavorable labels and makes the counts
     non-overlapping (favorable + unfavorable + neutral == 5)."""
-    favsup = {e for e in (fav, sup) if e and e != "—"}
-    fav_hit = (stem_e in favsup) or (branch_e in favsup)
-    unfav_hit = bool(unfav) and unfav != "—" and (stem_e == unfav or branch_e == unfav)
-    if fav_hit and unfav_hit:
-        return "neutral"
-    if fav_hit:
-        return "favorable"
-    if unfav_hit:
-        return "unfavorable"
-    return "neutral"
+    return RP.favorability(stem_e, branch_e, fav, sup, unfav)
 
 
 # ── Small data container ────────────────────────────────────────────────────
@@ -131,30 +105,12 @@ def _saju_year_of_birth(chart) -> int:
     return saju_year(datetime(by, bm, bd, bh, bmi), chart.utc_offset)
 
 
-def _first_start_date(chart) -> Optional[date]:
-    """The precise calendar date the first decade begins (N-4)."""
-    try:
-        by, bm, bd = (int(x) for x in chart.birth_date.split("-"))
-    except (ValueError, AttributeError):
-        return None
-    bh, bmi = 0, 0
-    try:
-        bh, bmi = (int(x) for x in (chart.birth_time or "00:00").split(":"))
-    except (ValueError, AttributeError):
-        pass
-    direction = L.daeun_direction(chart.year.stem, chart.gender)
-    return first_period_start_date(
-        by, bm, bd, direction, hour=bh, minute=bmi,
-        utc_offset=getattr(chart, "utc_offset", 9.0) or 9.0,
-    )
-
-
 def _decade_bounds(chart, idx: int) -> Tuple[date, date]:
     """(start, end) dates of decade `idx`. The engine starts the first decade
     at a precise December date (N-4), so a 10-year label like "0–9" actually
     spans e.g. Dec 1992–Dec 2002 — the calendar-year ranges below honour that
     rather than assuming a January boundary."""
-    first = _first_start_date(chart)
+    first = RP.first_period_start(chart)
     if first is None:
         syb = _saju_year_of_birth(chart)
         period = chart.daeun[idx]
@@ -174,7 +130,7 @@ def _annual_year_for_block(start: date, half: int) -> List[int]:
     return list(range(base, base + 5))
 
 
-def _build_blocks(chart, fav: str, sup: str, unfav: Optional[str]) -> List[_Block]:
+def build_blocks(chart, fav: str, sup: str, unfav: Optional[str]) -> List[_Block]:
     ref = chart.reference_date_obj()
     blocks: List[_Block] = []
     for i, period in enumerate(chart.daeun):
@@ -189,7 +145,7 @@ def _build_blocks(chart, fav: str, sup: str, unfav: Optional[str]) -> List[_Bloc
                     natal_stems=chart.stems,
                 )
                 blk.annual.append(hit)
-                cls = _CLASS_OF.get(hit.stem_tengod, "")
+                cls = RP.TENGOD_CLASS.get(hit.stem_tengod, "")
                 if cls:
                     blk.classes[cls] += 1
                     if cls == "Wealth":
@@ -221,11 +177,15 @@ def _build_blocks(chart, fav: str, sup: str, unfav: Optional[str]) -> List[_Bloc
                 if ref and ref.year in chunk:
                     blk.is_current = True
             # Weight the decade's own stem class once, as the decade backdrop.
-            d_cls = _CLASS_OF.get(period.stem_tengod, "")
+            d_cls = RP.TENGOD_CLASS.get(period.stem_tengod, "")
             if d_cls:
                 blk.classes[d_cls] += 1
             blocks.append(blk)
     return blocks
+
+
+# B4 (2026-10-01 audit): public name; keep the private alias for one release.
+_build_blocks = build_blocks
 
 
 def _dominant_classes(blk: _Block) -> List[str]:
@@ -235,8 +195,8 @@ def _dominant_classes(blk: _Block) -> List[str]:
     if not blk.classes:
         return []
     top = max(blk.classes.values())
-    tied = [c for c in _CLASS_ORDER if blk.classes.get(c, 0) == top]
-    d_cls = _CLASS_OF.get(blk.decade.stem_tengod, "")
+    tied = [c for c in RP.CLASS_ORDER if blk.classes.get(c, 0) == top]
+    d_cls = RP.TENGOD_CLASS.get(blk.decade.stem_tengod, "")
     if d_cls in tied and d_cls != tied[0]:
         tied = [d_cls] + [c for c in tied if c != d_cls]
     return tied
@@ -248,7 +208,7 @@ def _dominant_class(blk: _Block) -> str:
 
 
 def _dominant_label(blk: _Block) -> str:
-    return " · ".join(_CLASS_KO.get(c, c) for c in _dominant_classes(blk))
+    return " · ".join(RP.CLASS_KO.get(c, c) for c in _dominant_classes(blk))
 
 
 def _lean(fav_years: int, unfav_years: int) -> str:
@@ -293,7 +253,7 @@ def _block_summary(blk: _Block, fav: str, sup: str, unfav: Optional[str]) -> str
     fav_txt = _plural(blk.fav_years, "year")
     parts = [
         f"The decade backdrop is **{d.combined}** ({d.stem_tengod_en or d.stem_tengod}, "
-        f"{_CLASS_KO.get(_CLASS_OF.get(d.stem_tengod, ''), '—')}), with the "
+        f"{RP.CLASS_KO.get(RP.TENGOD_CLASS.get(d.stem_tengod, ''), '—')}), with the "
         f"{'opening' if blk.half == 0 else 'closing'} five years led by "
         f"**{_dominant_label(blk)}** annual energy.",
     ]
@@ -535,7 +495,7 @@ def generate_luck_cycle_report(chart, *, favorable_override: Optional[str] = Non
     fav, sup = fe.element, fe.supporting
     unfav = fe.unfavorable
     verdict = (chart.strength_assessment or {}).get("verdict", "balanced")
-    blocks = _build_blocks(chart, fav, sup, unfav)
+    blocks = build_blocks(chart, fav, sup, unfav)
     # attach the day branch for the summary's spouse-palace wording
     for _b in blocks:
         setattr(_b, "_day_branch", chart.day.branch)
@@ -547,7 +507,7 @@ def generate_luck_cycle_report(chart, *, favorable_override: Optional[str] = Non
         "",
         f"**Born:** {chart.birth_date} · {chart.birth_time} · {chart.city or '—'}  ",
         f"**Day Master:** {chart.day_master}  ",
-        f"**Strength:** {_verdict_label(verdict)}  ",
+        f"**Strength:** {RP.verdict_label(verdict)}  ",
         f"**Favorable (용신):** {fav} · **Supporting (희신):** {sup}"
         + (f" · **Unfavorable (기신):** {unfav}" if unfav else ""),
         "",
@@ -629,7 +589,7 @@ def generate_luck_cycle_report(chart, *, favorable_override: Optional[str] = Non
             ]
             lines.append(
                 f"| {h.year} | {h.combined} | {h.stem_tengod_en or h.stem_tengod} "
-                f"| {_CLASS_KO.get(_CLASS_OF.get(h.stem_tengod, ''), '—')} "
+                f"| {RP.CLASS_KO.get(RP.TENGOD_CLASS.get(h.stem_tengod, ''), '—')} "
                 f"| {mark} |"
             )
         lines += [
@@ -660,20 +620,16 @@ def generate_luck_cycle_report(chart, *, favorable_override: Optional[str] = Non
     return "\n".join(lines) + "\n"
 
 
-def _verdict_label(verdict: str) -> str:
-    return {"extreme_weak": "Very Weak"}.get(verdict, verdict.title())
-
-
 def _career_mode(chart) -> str:
     counts: Counter = Counter()
     for hit in chart.ten_gods:
-        cls = _CLASS_OF.get(hit.tengod)
+        cls = RP.TENGOD_CLASS.get(hit.tengod)
         if cls:
             counts[cls] += 1
     if not counts:
         return "—"
     top = max(counts.values())
-    tied = [c for c in _CLASS_ORDER if counts.get(c, 0) == top]
+    tied = [c for c in RP.CLASS_ORDER if counts.get(c, 0) == top]
     modes = {
         "Wealth": "Business, sales, owning and growing resources",
         "Authority": "Institutions, licensed authority, management",

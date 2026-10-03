@@ -110,7 +110,8 @@ def _hour_stem(day_stem: str, hour_branch: str) -> str:
 # `_solar_time_note`, which renders this as the "⚠ Hour-boundary note".
 HOUR_BOUNDARY_MARGIN_MIN = 10
 
-_BRANCH_ORDER = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
+# B4 (2026-10-01 audit): _BRANCH_ORDER now lives in lookup.py; keep as alias for tests.
+_BRANCH_ORDER = L.BRANCH_ORDER
 
 
 def _hour_boundary_info(
@@ -422,14 +423,13 @@ _TERM_TO_MONTH_BRANCH: Dict[str, str] = {
     "寒露": "戌", "立冬": "亥", "大雪": "子", "小寒": "丑",
 }
 
+# B4 (2026-10-01 audit): _FIVE_TIGERS now lives in lookup.py; keep as alias for tests.
 # 오호둔 (五虎遁, "five tigers"): the 寅-month stem for each year-stem pair.
-_FIVE_TIGERS: Dict[str, str] = {
-    "甲": "丙", "己": "丙", "乙": "戊", "庚": "戊", "丙": "庚",
-    "辛": "庚", "丁": "壬", "壬": "壬", "戊": "甲", "癸": "甲",
-}
+_FIVE_TIGERS: Dict[str, str] = L.FIVE_TIGERS
 
+# B4 (2026-10-01 audit): _YEAR_CYCLE_ANCHOR now lives in lookup.py; keep as alias for tests.
 # 1984 is the standard 갑자 (甲子) anchor year — JIAZI_CYCLE[0].
-_YEAR_CYCLE_ANCHOR = 1984
+_YEAR_CYCLE_ANCHOR = L.JIAZI_ANCHOR_YEAR
 
 
 # N-15 remainder (2026-09-26 audit): births within this many minutes of a

@@ -104,6 +104,11 @@ def derive_daeun_overlay(
             resolved_unfavorable if resolved_unfavorable is not None
             else strength_assessment.get("candidate_unfavorable")
         )
+        # NOTE: this rule is deliberately separate from the report layers'
+        # favorability. It is 용신/기신-only and its result is baked into the
+        # overlay at compute time; report layers re-derive favorability via
+        # report_primitives.favorability (see prose_fillers.period_favorable_status
+        # docstring), which also weighs 희신.
         hits = {stem_element, branch_element}
         fav_hit = fav is not None and fav in hits
         unfav_hit = unfav is not None and unfav in hits

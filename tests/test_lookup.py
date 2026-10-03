@@ -454,3 +454,39 @@ def test_jiazi_cycle_sanity_points():
     assert L.JIAZI_CYCLE[10] == ("甲", "戌")
     assert L.JIAZI_CYCLE[-1] == ("癸", "亥")
     assert len(L.JIAZI_CYCLE) == 60
+
+
+def test_core_tables_have_single_home():
+    """B4 (2026-10-01 audit): inverse-cycle ×3, 五虎遁 ×2, 1984 anchor ×2 and
+    branch order ×2 now live only in lookup.py."""
+    from saju_engine import climate, lookup as L, pillars, sewoon, strength, yongsin
+
+    assert L.GENERATED_BY == {v: k for k, v in L.GENERATES.items()}
+    assert strength._GENERATED_BY is L.GENERATED_BY
+    assert yongsin._GENERATED_BY is L.GENERATED_BY
+    assert climate._GENERATED_BY is L.GENERATED_BY
+    assert pillars._FIVE_TIGERS is L.FIVE_TIGERS
+    assert pillars._BRANCH_ORDER is L.BRANCH_ORDER
+    assert pillars._YEAR_CYCLE_ANCHOR == sewoon._ANCHOR_YEAR == L.JIAZI_ANCHOR_YEAR == 1984
+
+
+def test_element_rules_month_is_branch_element_equality():
+    """B8 (2026-10-01 audit): element_rules_month returns True when the
+    element IS the month branch's own element (BRANCH_ELEMENT equality)."""
+    from saju_engine import lookup as L
+    for b, e in L.BRANCH_ELEMENT.items():
+        assert L.element_rules_month(e, b)
+        assert not L.element_rules_month("Nope", b)
+    assert not L.element_rules_month("Earth", "")
+
+
+def test_season_supports_uses_seasonal_groups():
+    """B8 (2026-10-01 audit): Distinct doctrine from element_rules_month:
+    辰 (Earth branch) still supports Wood (spring), 丑 supports Water (winter),
+    and every 季月 (辰戌丑未) supports Earth."""
+    from saju_engine import lookup as L
+    assert L.season_supports("Wood", "辰")
+    assert L.season_supports("Water", "丑")
+    assert L.season_supports("Metal", "戌")
+    assert all(L.season_supports("Earth", b) for b in "辰戌丑未")
+    assert not L.season_supports("Fire", "子")

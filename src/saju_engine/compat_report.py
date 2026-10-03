@@ -19,6 +19,7 @@ from __future__ import annotations
 
 from typing import List, Optional
 
+from . import report_primitives as RP
 from .chart import Chart
 from .compat import WEIGHT, CompatReport, CompatSubResult, compat_score
 from .strength import element_balance_pct
@@ -28,17 +29,12 @@ from .yongsin import favorable_element
 from datetime import date
 
 
+def _has(flags, *codes: str) -> bool:
+    """True if any typed compat Flag carries one of ``codes`` (S6: no prose matching)."""
+    return any(f.code in codes for f in flags)
+
+
 # ── Element-color emoji table (matches saju_html / engine convention) ───────
-
-_ELEMENT_EMOJI = {
-    "Wood": "🟢", "Fire": "🔴", "Earth": "🟡", "Metal": "⚪", "Water": "🔵",
-}
-
-
-def _plain(text: str) -> str:
-    """Wrap a lay restatement as a single-line 'In plain words' blockquote."""
-    return f"> **In plain words:** {text}"
-
 
 def _plain_words_verdict(report: CompatReport) -> str:
     picture = {
@@ -47,7 +43,7 @@ def _plain_words_verdict(report: CompatReport) -> str:
         "Mixed": "a workable match with real friction points to manage deliberately",
         "Challenging": "a match that asks for steady, conscious effort to hold together",
     }.get(report.band, "a match to read section by section")
-    return _plain(
+    return RP.plain(
         f"Overall this reads as {picture} ({report.score}/100). "
         f"Treat the number as a weather report, not a verdict."
     )
@@ -63,7 +59,7 @@ def _plain_words_daymaster_cross(report: CompatReport) -> str:
                 "is a strength")
     else:
         core = "your day-to-day rhythms are neutral — neither a lift nor a drag on their own"
-    return _plain(f"At the centre of the match, {core}.")
+    return RP.plain(f"At the centre of the match, {core}.")
 
 
 def _plain_words_timing(report: CompatReport) -> str:
@@ -76,19 +72,14 @@ def _plain_words_timing(report: CompatReport) -> str:
     else:
         t = ("your life-chapters turn on different clocks — plan for stretches where one of you is "
              "rising while the other is steadying")
-    return _plain(f"On timing, {t}.")
+    return RP.plain(f"On timing, {t}.")
 
 
 def _emoji(elem: str) -> str:
-    return _ELEMENT_EMOJI.get(elem, "·")
+    return RP.ELEMENT_EMOJI.get(elem, "·")
 
 
 # ── Deep-tier helpers (added for the deep compatibility product) ────────────
-
-
-def _bar(pct: float) -> str:
-    filled = int(round(pct / 10))
-    return "█" * filled + "░" * (10 - filled)
 
 
 def _element_balance_lines(chart: Chart, name: str) -> List[str]:
@@ -102,7 +93,7 @@ def _element_balance_lines(chart: Chart, name: str) -> List[str]:
     lines.append("|---|---|---|")
     for elem in ["Fire", "Wood", "Earth", "Metal", "Water"]:
         pct = dist.get(elem, 0.0)
-        lines.append(f"| {_emoji(elem)} {elem} | {_bar(pct)} | {pct:.1f}% |")
+        lines.append(f"| {_emoji(elem)} {elem} | {RP.bar(pct, 10)} | {pct:.1f}% |")
     lines.append("")
     return lines
 
@@ -120,7 +111,8 @@ def _day_master_snapshot(chart: Chart, name: str) -> List[str]:
         f"{dm.get('element', '')} ({dm.get('polarity', '')})"
     )
     fe = favorable_element(chart)
-    lines.append(f"- **Seasonal strength verdict:** {sa.get('verdict', '—')}")
+    v = sa.get("verdict")
+    lines.append(f"- **Seasonal strength verdict:** {RP.verdict_label(v) if v else '—'}")
     lines.append(f"- **Favorable element (용신):** {fe.element}")
     lines.append(f"- **Supporting element (희신):** {fe.supporting}")
     lines.append(f"- **Unfavorable / watch element:** {fe.unfavorable or '—'}")
@@ -286,8 +278,8 @@ def _cover(report: CompatReport, name_a: str, name_b: str) -> List[str]:
     """Cover: both names, DOBs, Day Masters, score, band."""
     lines: List[str] = []
     a, b = report.chart_a, report.chart_b
-    a_dm_elem = _ELEMENT_EMOJI.get(a.day_master_info.get("element", "·"), "·") if a.day_master_info else "·"
-    b_dm_elem = _ELEMENT_EMOJI.get(b.day_master_info.get("element", "·"), "·") if b.day_master_info else "·"
+    a_dm_elem = RP.ELEMENT_EMOJI.get(a.day_master_info.get("element", "·"), "·") if a.day_master_info else "·"
+    b_dm_elem = RP.ELEMENT_EMOJI.get(b.day_master_info.get("element", "·"), "·") if b.day_master_info else "·"
     lines.append(f"# {name_a} × {name_b} — 궁합 (合婚 / Compatibility Reading)")
     lines.append("")
     lines.append(f"**Composite Score (종합 점수):** **{report.score} / 100**  ")
@@ -502,22 +494,21 @@ def _practical_guidance(report: CompatReport, name_a: str, name_b: str) -> List[
 
     # Day-branch (spouse palace) — mutually exclusive: clash / 육합 / 반합 / neutral.
     db = report.daybranch
-    db_flags = " ".join(db.flags)
-    if "RED FLAG" in db_flags or any("육충" in f for f in db.flags):
+    if _has(db.flags, "daybranch.clash"):
         bullets.append(
             "**Day-branch clash (일지 육충) is present** — a classical hard "
             "indicator. Workable, but the relationship benefits from explicit "
             "communication rhythms: a weekly 'check-in' beats ad-hoc resolution. "
             "*(see knowledge/11-gunghap.md §B4)*"
         )
-    elif any("육합" in f for f in db.flags):
+    elif _has(db.flags, "daybranch.combine"):
         bullets.append(
             "**Day-branch combination (일지 육합) is present** — the strongest "
             "classical favorable. Maintain shared rituals (meals, weekly date, "
             "annual trip) that reinforce this anchor. *(see "
             "knowledge/11-gunghap.md §B1)*"
         )
-    elif any("반합" in f for f in db.flags):
+    elif _has(db.flags, "daybranch.half_harmony"):
         bullets.append(
             "**Day-branch partial harmony (일지 반합) is present** — two-of-three "
             "in a 삼합 frame. A real but incomplete anchor: nurture the shared "
@@ -528,7 +519,7 @@ def _practical_guidance(report: CompatReport, name_a: str, name_b: str) -> List[
         )
 
     # Nayin clash — practical caution for the 납음 상충 case.
-    if report.nayin.score < 0 or any("상충" in f for f in report.nayin.flags):
+    if report.nayin.score < 0 or _has(report.nayin.flags, "nayin.clash"):
         bullets.append(
             "**Nayin (납음) clash is present** — a soft, disputed indicator. "
             "Don't overweight it on its own; treat it as a reminder to align "
@@ -546,7 +537,7 @@ def _practical_guidance(report: CompatReport, name_a: str, name_b: str) -> List[
         )
 
     # Compatibility stars.
-    if any("쌍화개" in f for f in report.compat_stars.flags):
+    if _has(report.compat_stars.flags, "compat_stars.double_canopy"):
         bullets.append(
             "**쌍화개 (both have 화개):** both partners carry a Canopy overlay — "
             "spiritual / aesthetic affinity is high, but emotional distance can "
@@ -563,7 +554,7 @@ def _practical_guidance(report: CompatReport, name_a: str, name_b: str) -> List[
             "rather than trying to smooth them out. *(see "
             "knowledge/11-gunghap.md §J)*"
         )
-    elif any("음양 동일" in f for f in yy.flags) or yy.score < 0:
+    elif _has(yy.flags, "yin_yang.dm_same") or yy.score < 0:
         bullets.append(
             "**Identical Yin-Yang polarity (same wavelength).** Easy resonance, "
             "but the 권인성 school warns it can go 편의-stale — protect "
@@ -583,7 +574,7 @@ def _practical_guidance(report: CompatReport, name_a: str, name_b: str) -> List[
 
     # Daeun direction divergence + 'when to be more deliberate' timing note.
     ds = report.daeun_sync
-    if any("방향 상이" in f for f in ds.flags):
+    if _has(ds.flags, "daeun_sync.direction_differs"):
         bullets.append(
             "**Your major-luck (대운) directions diverge** — life's large phases "
             "arrive on different timing tracks for the two of you. Be more "
@@ -657,11 +648,11 @@ def _couple_narrative(report: CompatReport, name_a: str, name_b: str) -> List[st
 
     # Day-branch (spouse palace) layer.
     db = report.daybranch
-    if any("육합" in f for f in db.flags):
+    if _has(db.flags, "daybranch.combine"):
         parts.append("your spouse palaces (일지) combine")
-    elif any("반합" in f for f in db.flags):
+    elif _has(db.flags, "daybranch.half_harmony"):
         parts.append("your spouse palaces (일지) sit in a partial harmony (반합)")
-    elif "RED FLAG" in " ".join(db.flags) or any("육충" in f for f in db.flags):
+    elif _has(db.flags, "daybranch.clash"):
         parts.append("your spouse palaces (일지) carry a classical clash")
     else:
         parts.append("your spouse palaces (일지) hold a neutral, uncombined relation")
@@ -701,7 +692,7 @@ def _couple_narrative(report: CompatReport, name_a: str, name_b: str) -> List[st
 
 def _daeun_callout(report: CompatReport) -> List[str]:
     """Top-line 'Watch out for' callout when 대운 directions diverge. Empty if no divergence."""
-    if not any("방향 상이" in f for f in report.daeun_sync.flags):
+    if not _has(report.daeun_sync.flags, "daeun_sync.direction_differs"):
         return []
     return [
         "> **⚠️ Watch out for — 대운 방향 상이 (diverging major-luck directions):** "
@@ -1026,18 +1017,17 @@ def _compact_guidance_bullets(report: CompatReport, name_a: str, name_b: str) ->
             "**Peer dynamic.** You share the same Day Master — easy and familiar, "
             "but guard against sibling-style competition. Take turns leading."
         )
-    db_flags = " ".join(report.daybranch.flags)
-    if "RED FLAG" in db_flags or any("육충" in f for f in report.daybranch.flags):
+    if _has(report.daybranch.flags, "daybranch.clash"):
         bullets.append(
             "**Day-branch clash is present.** Use explicit communication rhythms — "
             "a regular check-in works better than ad-hoc conflict resolution."
         )
-    elif any("육합" in f for f in report.daybranch.flags):
+    elif _has(report.daybranch.flags, "daybranch.combine"):
         bullets.append(
             "**Day-branch combination is present.** Reinforce it with shared rituals "
             "(meals, weekly time together, annual traditions)."
         )
-    if any("방향 상이" in f for f in report.daeun_sync.flags):
+    if _has(report.daeun_sync.flags, "daeun_sync.direction_differs"):
         bullets.append(
             "**Timing divergence.** Your major-luck phases run on different tracks — "
             "overlay both annual-luck charts before big joint decisions."

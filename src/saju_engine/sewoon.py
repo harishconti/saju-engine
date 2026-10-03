@@ -19,6 +19,7 @@ from typing import Dict, List, Optional, Tuple
 from functools import lru_cache
 
 from . import lookup as L
+from . import report_primitives as RP
 
 
 @dataclass
@@ -90,7 +91,9 @@ class SeWoonHit:
 # We use the simple mapping: (year + 56) % 60 for the 60-cycle index,
 # because 1984 is index 0, and 1984 + 56 = 2040 gives index 56, etc.
 # More robustly, we derive from a known anchor.
-_ANCHOR_YEAR = 1984
+# B4 (2026-10-01 audit): the anchor year now lives in lookup.py; _ANCHOR_YEAR
+# is kept as an alias for tests.
+_ANCHOR_YEAR = L.JIAZI_ANCHOR_YEAR
 _ANCHOR_INDEX = 0
 
 
@@ -321,12 +324,7 @@ def derive_sewoon(
     """
     stem, branch = _annual_pillar_for_date(year, month, day)
     tengod = L.ten_god(day_master, stem)
-    tengod_en = {
-        "비견": "Companion", "겁재": "Robber", "식신": "Eating God",
-        "상관": "Hurting Officer", "편재": "Indirect Wealth",
-        "정재": "Direct Wealth", "편관": "Seven Killings",
-        "정관": "Direct Officer", "편인": "Indirect Resource", "정인": "Direct Resource",
-    }.get(tengod, tengod)
+    tengod_en = RP.TENGOD_SHORT_EN.get(tengod, tengod)
 
     activated: List[Tuple[str, str, str]] = []
     types: set[str] = set()
@@ -446,7 +444,7 @@ def _monthly_pillar(year: int, month: int, day: int = 15) -> Tuple[str, str]:
       - Gregorian on/after the boundary in Feb is the first Saju month (寅月).
 
     The first-month stem is derived from the year stem via 五虎遁 (Oho-dun).
-    See `lookup._OHO_DUN`. `day` defaults to 15 (mid-month, safely past the
+    See `lookup.FIVE_TIGERS`. `day` defaults to 15 (mid-month, safely past the
     ~Feb-4 boundary) so existing (year, month)-only callers are unaffected.
     """
     # Determine which Saju year this Gregorian date belongs to.
@@ -456,7 +454,7 @@ def _monthly_pillar(year: int, month: int, day: int = 15) -> Tuple[str, str]:
         sajuyear = year
 
     year_stem, _ = _annual_pillar(sajuyear)
-    first_month_stem = L._OHO_DUN[year_stem]
+    first_month_stem = L.FIVE_TIGERS[year_stem]
     sm_index = _saju_month_index(month, day)
     branch = _MONTH_BRANCHES[sm_index - 1]
     # Step the stem from the first-month stem by (sm_index - 1).
@@ -482,12 +480,7 @@ def derive_woon(
     """
     stem, branch = _monthly_pillar_for_date(year, month, day)
     tengod = L.ten_god(day_master, stem)
-    tengod_en = {
-        "비견": "Companion", "겁재": "Robber", "식신": "Eating God",
-        "상관": "Hurting Officer", "편재": "Indirect Wealth",
-        "정재": "Direct Wealth", "편관": "Seven Killings",
-        "정관": "Direct Officer", "편인": "Indirect Resource", "정인": "Direct Resource",
-    }.get(tengod, tengod)
+    tengod_en = RP.TENGOD_SHORT_EN.get(tengod, tengod)
 
     activated: List[Tuple[str, str, str]] = []
     types: set[str] = set()
@@ -550,12 +543,7 @@ def derive_ilwoon(
     """Compute the daily-luck overlay for a Gregorian calendar date."""
     stem, branch = _daily_pillar(year, month, day)
     tengod = L.ten_god(day_master, stem)
-    tengod_en = {
-        "비견": "Companion", "겁재": "Robber", "식신": "Eating God",
-        "상관": "Hurting Officer", "편재": "Indirect Wealth",
-        "정재": "Direct Wealth", "편관": "Seven Killings",
-        "정관": "Direct Officer", "편인": "Indirect Resource", "정인": "Direct Resource",
-    }.get(tengod, tengod)
+    tengod_en = RP.TENGOD_SHORT_EN.get(tengod, tengod)
 
     activated: List[Tuple[str, str, str]] = []
     types: set[str] = set()

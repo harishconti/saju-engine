@@ -31,7 +31,8 @@ engine.compute_chart(name, gender, year, month, day, hour, minute,
 |---|---|
 | `engine.py` | Top-level `compute_chart()`; wires all sub-modules into a `Chart`. |
 | `pillars.py` | Wraps `sajupy.calculate_saju()` and normalizes the result. Handles solar-time correction, Korean `야자시` vs Chinese `조자시`, and hour-stem safety recomputation. |
-| `lookup.py` | All Korean/Myeongri lookup tables: 60-cycle, hidden stems, ten gods, 12 stages, 5-element interactions, six combinations/clashes/harms/breaks, three harmonies/punishments, day-pillar stem rules. |
+| `lookup.py` | All Korean/Myeongri lookup tables: 60-cycle, hidden stems, ten gods, 12 stages, 5-element interactions, six combinations/clashes/harms/breaks, three harmonies/punishments, day-pillar stem rules. Includes `GENERATED_BY` (inverse of element generation), `FIVE_TIGERS` (五虎遁 month-stem), `JIAZI_ANCHOR_YEAR`, `element_rules_month` (the element IS the month branch's own element — 합화 / pattern-breaker test), and `season_supports` (month is in the element's seasonal group — Day-Master seasonal support). |
+| `report_primitives.py` | Shared report tables and helpers: `TENGOD_CLASS` (five-class grouping: 비겁/식상/재성/관성/인성 → Companion/Output/Wealth/Authority/Resource), `TENGOD_SHORT_EN` (short English ten-god names), `CLASS_KO`, `CLASS_ORDER`, `ELEMENT_EMOJI`, `ELEMENT_COLORS`, `verdict_label()`, `favorability()`, `plain()`, `bar()`, `first_period_start()`. Single source of truth for all report modules. |
 | `chart.py` | `Pillar`, `TenGodHit`, `DaeunPeriod`, and `Chart` dataclasses. `Chart` is the single object consumed by report generators and the `/saju` skill. |
 | `daeun.py` | Computes the 10-year major-luck (대운) sequence: direction (순행/역행) from year-stem gender polarity, stepping through the 60-cycle from the birth-month pillar, and the starting age from days to the next solar term. |
 | `daeun_overlay.py` | Adds activation metadata to each `DaeunPeriod`: 십신 of the period stem relative to the Day Master, branch relationships vs. natal branches, 천간합 with natal stems, and element favorability against the candidate 용신. |
@@ -41,7 +42,7 @@ engine.compute_chart(name, gender, year, month, day, hour, minute,
 | `sewoon.py` | Annual (세운), monthly (월운), and daily (일운) luck derivation, respecting Lichun year boundaries. |
 | `skeleton.py` | Generates a structured markdown scaffold from any `Chart`, pre-filling tables and deterministic reasoning. |
 | `premium_report.py` | Generates the 9-section client-facing markdown report. |
-| `compat.py` | Two-chart marriage-compatibility engine: 11 sub-systems, composite 0–100 score. |
+| `compat.py` | Two-chart marriage-compatibility engine: 11 sub-systems, composite 0–100 score. Uses `compat.Flag` (typed flags with kind/severity/code). |
 | `compat_report.py` | Standalone 두 분 궁합 markdown report generator. |
 | `nayin.py` | 60-jiazi → 30 Nayin lookup + 30×30 pair table with source tagging. |
 | `cli.py` | `saju-engine` command-line entry point. |
