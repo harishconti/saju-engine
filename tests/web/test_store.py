@@ -219,3 +219,35 @@ def test_permissions(tmp_path):
     IntakeStore(tmp_path / "i.sqlite", generate_key().encode(), files_root=root)
     assert stat.S_IMODE(os.stat(tmp_path / "i.sqlite").st_mode) == 0o600
     assert stat.S_IMODE(os.stat(root).st_mode) == 0o700
+
+
+# ---- final fix wave C: key list + token lookup without PII ------------------
+
+def test_multikey_first_encrypts_all_decrypt(tmp_path):
+    k1, k2 = generate_key(), generate_key()
+    s_old = IntakeStore(tmp_path / "i.sqlite", k1.encode())
+    i = _add(s_old)
+    s_multi = IntakeStore(tmp_path / "i.sqlite", f"{k2},{k1}".encode())
+    assert s_multi.get_intake(i)["pii"]["name"] == "Alice Kim"
+    j = _add(s_multi)
+    s_new_only = IntakeStore(tmp_path / "i.sqlite", k2.encode())
+    assert s_new_only.get_intake(j)["pii"]["name"] == "Alice Kim"   # first key encrypts
+    with pytest.raises(Exception):
+        s_new_only.get_intake(i)                                    # not yet rotated
+    assert s_multi.rotate_key() == 2
+    assert s_new_only.get_intake(i)["pii"]["name"] == "Alice Kim"
+
+
+def test_from_env_rejects_bad_key_in_list(monkeypatch, tmp_path):
+    monkeypatch.setenv("SAJU_INTAKE_KEY", f"{generate_key()},not-a-key")
+    with pytest.raises(RuntimeError, match="SAJU_INTAKE_KEY"):
+        IntakeStore.from_env(tmp_path / "i.sqlite")
+
+
+def test_resolve_token_does_not_need_pii_key(tmp_path):
+    s = IntakeStore(tmp_path / "i.sqlite", generate_key().encode())
+    i = _add(s)
+    s.set_status(i, "draft_ready", pdf_path="/x/y.pdf")
+    tok = s.issue_token(i)
+    other = IntakeStore(tmp_path / "i.sqlite", generate_key().encode())  # wrong key
+    assert other.resolve_token(tok) == {"id": i, "status": "approved", "pdf_path": "/x/y.pdf"}

@@ -15,6 +15,11 @@ purge). Pre-existing databases keep the plain ``INTEGER PRIMARY KEY``; for those
 ``jobs.generate_draft`` removes any leftover ``files/<id>/`` directory before
 rendering a freshly received intake, so a reused id can't inherit old files.
 
+``SAJU_INTAKE_KEY`` may hold several comma-separated keys (``MultiFernet``): the
+first encrypts, all decrypt. Rotate by prepending a new key, running
+``intake_admin rotate`` (re-encrypts every row with the first key), then dropping
+the old key. ``polished`` marks a hand-attached PDF (``regenerate`` then needs --force).
+
 Approval is only reachable via ``issue_token`` (tokened) or, for the free
 sample tier, ``mark_approved_without_token``; ``set_status`` refuses it.
 """
@@ -31,7 +36,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, List, Optional
 
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, MultiFernet
 
 STATUSES = ("received", "generating", "draft_ready", "approved", "failed")
 KINDS = ("single", "compat")
@@ -64,7 +69,11 @@ def _hash(token: str) -> str:
 class IntakeStore:
     def __init__(self, db_path: Path, key: bytes, files_root: Optional[Path] = None):
         self.db_path = Path(db_path)
-        self._fernet = Fernet(key)
+        keys = [k.strip() for k in (key.decode() if isinstance(key, bytes) else key).split(",")
+                if k.strip()]
+        if not keys:
+            raise ValueError("no encryption key given")
+        self._fernet = MultiFernet([Fernet(k.encode()) for k in keys])
         self.files_root = Path(files_root) if files_root is not None else self.db_path.parent / "files"
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self.files_root.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -79,6 +88,8 @@ class IntakeStore:
             cols = {r["name"] for r in conn.execute("PRAGMA table_info(intake)")}
             if "updated_at" not in cols:  # migrate pre-existing stores
                 conn.execute("ALTER TABLE intake ADD COLUMN updated_at TEXT")
+            if "polished" not in cols:
+                conn.execute("ALTER TABLE intake ADD COLUMN polished INTEGER DEFAULT 0")
             conn.commit()
         finally:
             conn.close()
@@ -118,6 +129,7 @@ class IntakeStore:
             "id": r["id"], "kind": r["kind"], "tier": r["tier"], "status": r["status"],
             "created_at": r["created_at"], "pii": self._dec(r["pii_enc"]),
             "birth": json.loads(r["birth_json"]), "pdf_path": r["pdf_path"], "error": r["error"],
+            "polished": bool(r["polished"]),
         }
 
     def add_intake(self, *, kind: str, tier: str, pii: dict, birth: dict) -> int:
@@ -160,6 +172,8 @@ class IntakeStore:
         if error is _UNSET and status in ("generating", "draft_ready"):
             error = None
         sets, params = ["status=?", "updated_at=?"], [status, _now().isoformat()]
+        if status == "generating":  # a fresh render supersedes any attached PDF
+            sets.append("polished=0")
         if pdf_path is not _UNSET:
             sets.append("pdf_path=?")
             params.append(pdf_path)
@@ -250,13 +264,73 @@ class IntakeStore:
         return token
 
     def resolve_token(self, token: str) -> Optional[dict]:
+        """Look up an approved order by download token. Selects only id/status/
+        pdf_path, so serving a download never decrypts PII."""
         conn = self._conn()
         try:
-            r = conn.execute("SELECT * FROM intake WHERE token_sha256=? AND status='approved'",
-                             (_hash(token),)).fetchone()
+            r = conn.execute(
+                "SELECT id, status, pdf_path FROM intake WHERE token_sha256=? AND status='approved'",
+                (_hash(token),)).fetchone()
         finally:
             conn.close()
-        return self._row(r) if r else None
+        return {"id": r["id"], "status": r["status"], "pdf_path": r["pdf_path"]} if r else None
+
+    def mark_polished(self, intake_id: int, pdf_path: str) -> None:
+        """Record a hand-polished PDF for a ``draft_ready`` row."""
+        conn = self._conn()
+        try:
+            cur = conn.execute(
+                "UPDATE intake SET pdf_path=?, polished=1, updated_at=? "
+                "WHERE id=? AND status='draft_ready'",
+                (pdf_path, _now().isoformat(), intake_id))
+            conn.commit()
+            if cur.rowcount != 1:
+                raise ValueError(f"intake {intake_id} must be in status 'draft_ready' to attach a PDF")
+        finally:
+            conn.close()
+
+    def revoke_token(self, intake_id: int) -> None:
+        """approved -> draft_ready and clear the token hash (the link stops working)."""
+        conn = self._conn()
+        try:
+            cur = conn.execute(
+                "UPDATE intake SET status='draft_ready', token_sha256=NULL, approved_at=NULL, "
+                "updated_at=? WHERE id=? AND status='approved'",
+                (_now().isoformat(), intake_id))
+            conn.commit()
+            if cur.rowcount != 1:
+                raise ValueError(f"intake {intake_id} must be 'approved' to revoke")
+        finally:
+            conn.close()
+
+    def reissue_token(self, intake_id: int) -> str:
+        """Replace the token of an approved order; the old link stops working."""
+        token = secrets.token_urlsafe(32)
+        conn = self._conn()
+        try:
+            cur = conn.execute(
+                "UPDATE intake SET token_sha256=?, approved_at=? WHERE id=? AND status='approved' "
+                "AND token_sha256 IS NOT NULL",
+                (_hash(token), _now().isoformat(), intake_id))
+            conn.commit()
+            if cur.rowcount != 1:
+                raise ValueError(f"intake {intake_id} must be an approved order with a token to reissue")
+        finally:
+            conn.close()
+        return token
+
+    def rotate_key(self) -> int:
+        """Re-encrypt every row's PII with the first (primary) key. Returns row count."""
+        conn = self._conn()
+        try:
+            rows = conn.execute("SELECT id, pii_enc FROM intake").fetchall()
+            for r in rows:
+                conn.execute("UPDATE intake SET pii_enc=? WHERE id=?",
+                             (self._fernet.rotate(bytes(r["pii_enc"])), r["id"]))
+            conn.commit()
+            return len(rows)
+        finally:
+            conn.close()
 
     def purge_older_than(self, days: int, *, now: Optional[datetime] = None) -> int:
         if now is not None:
