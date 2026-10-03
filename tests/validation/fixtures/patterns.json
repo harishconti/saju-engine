@@ -421,7 +421,7 @@
       }
     },
     "status": "expect_match",
-    "notes": "Textbook chart 丁巳 辛亥 庚申 辛巳 (same input as daeun.json park-chung-hee-daeun). Published 격국 = 식신격 and engine agrees. Month branch 亥 hides 戊·甲·壬; none of them on a visible stem (壬 absent) → 본기 壬 = 식신 of 庚. jianlu true: 庚's 건록 branch 申 is the day branch (a related, not 월령, position). 노무현 and 김대중 are intentionally not fixtured: the sources opened (g-enews 노무현 2015-03-18, mediapia 25강) name no 격국, and 김대중's birth data is disputed across sources."
+    "notes": "Textbook chart 丁巳 辛亥 庚申 辛巳 (same input as daeun.json park-chung-hee-daeun). Published 격국 = 식신격 and engine agrees. Month branch 亥 hides 壬·甲; none of them on a visible stem (壬 absent) → 본기 壬 = 식신 of 庚. jianlu true: 庚's 건록 branch 申 is the day branch (a related, not 월령, position). 노무현 and 김대중 are intentionally not fixtured: the sources opened (g-enews 노무현 2015-03-18, mediapia 25강) name no 격국, and 김대중's birth data is disputed across sources."
   },
   {
     "id": "yangin-grid-甲-卯-month-1940",
@@ -1036,7 +1036,7 @@
       }
     },
     "status": "expect_match",
-    "notes": "Pillars 庚午 己丑 甲午 丙子. 己甲 combine into Earth; month branch 丑 is Earth (득령). Isolation per knowledge/07-special-formations.md:82 ('isolated, not strongly supported by allies') is undefined there; the engine judges it by the strength verdict (verdict weak, total_score -2.79), so isolation is satisfied. Hidden-stem roots: 甲 has no 甲 root, but receives 인성 via 子 (hides 壬癸) and 丑 (hides 癸辛己); this Day Master is therefore NOT root-less. The stricter external 일간 무근 rule (8-codes 15강) would NOT accept this chart; knowledge/07 is the ground truth here (engine == knowledge/). No allied stem is visible and no effective breaker (any breaker is floating: unrooted and out of season)."
+    "notes": "Pillars 庚午 己丑 甲午 丙子. 己甲 combine into Earth; month branch 丑 is Earth (득령). Isolation per knowledge/07-special-formations.md:82 ('isolated, not strongly supported by allies') is undefined there; the engine judges it by the strength verdict (verdict weak, total_score -2.79), so isolation is satisfied. Hidden-stem roots: 甲 has no 甲 root, but receives 인성 via 子 (hides 癸) and 丑 (hides 癸辛己); this Day Master is therefore NOT root-less. The stricter external 일간 무근 rule (8-codes 15강) would NOT accept this chart; knowledge/07 is the ground truth here (engine == knowledge/). No allied stem is visible and no effective breaker (any breaker is floating: unrooted and out of season)."
   },
   {
     "id": "hwa-school-diff-戊-1940",
