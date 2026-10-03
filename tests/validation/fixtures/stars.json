@@ -1,0 +1,1967 @@
+[
+  {
+    "id": "peach-day-yin-wu-xu",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 1,
+      "day": 4,
+      "hour": 7,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:166-183 — 도화살: 寅午戌→卯, 巳酉丑→午, 申子辰→酉, 亥卯未→子 (day-branch; year-branch variant at :174-180)"
+      },
+      {
+        "citation": "신살론 - 신살 도화(桃花) 1부, 도화살(桃花殺), 년살(年殺) (sajustudy.com/88) — 삼합 그룹별 도화 지지, 년지/일지 기준 (external cross-check 2026-10-03)",
+        "url": "https://www.sajustudy.com/88"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "peach_blossom": [
+          "卯"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丙子 庚戌 己卯; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "peach-day-hai-mao-wei",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 2,
+      "day": 10,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:166-183 — 도화살: 寅午戌→卯, 巳酉丑→午, 申子辰→酉, 亥卯未→子 (day-branch; year-branch variant at :174-180)"
+      },
+      {
+        "citation": "신살론 - 신살 도화(桃花) 1부, 도화살(桃花殺), 년살(年殺) (sajustudy.com/88) — 삼합 그룹별 도화 지지, 년지/일지 기준 (external cross-check 2026-10-03)",
+        "url": "https://www.sajustudy.com/88"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "peach_blossom": [
+          "子"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 戊寅 丁亥 庚子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "peach-day-si-you-chou",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 2,
+      "day": 4,
+      "hour": 13,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:166-183 — 도화살: 寅午戌→卯, 巳酉丑→午, 申子辰→酉, 亥卯未→子 (day-branch; year-branch variant at :174-180)"
+      },
+      {
+        "citation": "신살론 - 신살 도화(桃花) 1부, 도화살(桃花殺), 년살(年殺) (sajustudy.com/88) — 삼합 그룹별 도화 지지, 년지/일지 기준 (external cross-check 2026-10-03)",
+        "url": "https://www.sajustudy.com/88"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "peach_blossom": [
+          "午"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丁丑 辛巳 甲午; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "peach-day-shen-zi-chen",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 1,
+      "day": 10,
+      "hour": 19,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:166-183 — 도화살: 寅午戌→卯, 巳酉丑→午, 申子辰→酉, 亥卯未→子 (day-branch; year-branch variant at :174-180)"
+      },
+      {
+        "citation": "신살론 - 신살 도화(桃花) 1부, 도화살(桃花殺), 년살(年殺) (sajustudy.com/88) — 삼합 그룹별 도화 지지, 년지/일지 기준 (external cross-check 2026-10-03)",
+        "url": "https://www.sajustudy.com/88"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "peach_blossom": [
+          "酉"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丁丑 丙辰 丁酉; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "peach-year-anchor",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 1,
+      "day": 10,
+      "hour": 7,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F",
+      "star_anchor": "year"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:166-183 — 도화살: 寅午戌→卯, 巳酉丑→午, 申子辰→酉, 亥卯未→子 (day-branch; year-branch variant at :174-180)"
+      },
+      {
+        "citation": "신살론 - 신살 도화(桃花) 1부, 도화살(桃花殺), 년살(年殺) (sajustudy.com/88) — 삼합 그룹별 도화 지지, 년지/일지 기준 (external cross-check 2026-10-03)",
+        "url": "https://www.sajustudy.com/88"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      },
+      {
+        "citation": "knowledge/07-special-formations.md:174-182 / 259-266 — year-branch (고법) anchoring uses the same triplet table; SAZA/sajustudy sources above state 년지 or 일지 as anchor"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "peach_blossom": [
+          "卯"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丁丑 丙辰 辛卯; anchor year. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "peach-absent-negative",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 1,
+      "day": 4,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:166-183 — 도화살: 寅午戌→卯, 巳酉丑→午, 申子辰→酉, 亥卯未→子 (day-branch; year-branch variant at :174-180)"
+      },
+      {
+        "citation": "신살론 - 신살 도화(桃花) 1부, 도화살(桃花殺), 년살(年殺) (sajustudy.com/88) — 삼합 그룹별 도화 지지, 년지/일지 기준 (external cross-check 2026-10-03)",
+        "url": "https://www.sajustudy.com/88"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "peach_blossom": []
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丙子 庚戌 丙子. Negative: the star's trigger branch/pillar is absent, so the list is empty."
+  },
+  {
+    "id": "post-horse-day-si-you-chou",
+    "subsystem": "stars",
+    "input": {
+      "year": 1977,
+      "month": 11,
+      "day": 16,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:184-192 — 역마살: 寅午戌→申, 巳酉丑→亥, 申子辰→寅, 亥卯未→巳"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "post_horse": [
+          "亥"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丁巳 辛亥 丁丑 庚子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "post-horse-day-shen-zi-chen",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 1,
+      "day": 10,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:184-192 — 역마살: 寅午戌→申, 巳酉丑→亥, 申子辰→寅, 亥卯未→巳"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "post_horse": [
+          "寅"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丁丑 丙辰 戊子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "post-horse-year-anchor",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 2,
+      "day": 16,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F",
+      "star_anchor": "year"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:184-192 — 역마살: 寅午戌→申, 巳酉丑→亥, 申子辰→寅, 亥卯未→巳"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      },
+      {
+        "citation": "knowledge/07-special-formations.md:174-182 / 259-266 — year-branch (고법) anchoring uses the same triplet table; SAZA/sajustudy sources above state 년지 or 일지 as anchor"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "post_horse": [
+          "巳"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 戊寅 癸巳 壬子; anchor year. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "canopy-day-shen-zi-chen",
+    "subsystem": "stars",
+    "input": {
+      "year": 1976,
+      "month": 8,
+      "day": 4,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:194-202 — 화개살: 寅午戌→戌, 巳酉丑→丑, 申子辰→辰, 亥卯未→未"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "canopy": [
+          "辰"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丙辰 乙未 戊子 壬子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "canopy-day-hai-mao-wei",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 7,
+      "day": 16,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:194-202 — 화개살: 寅午戌→戌, 巳酉丑→丑, 申子辰→辰, 亥卯未→未"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "canopy": [
+          "未"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 癸未 癸亥 壬子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "canopy-year-anchor",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 7,
+      "day": 10,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F",
+      "star_anchor": "year"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:194-202 — 화개살: 寅午戌→戌, 巳酉丑→丑, 申子辰→辰, 亥卯未→未"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      },
+      {
+        "citation": "knowledge/07-special-formations.md:174-182 / 259-266 — year-branch (고법) anchoring uses the same triplet table; SAZA/sajustudy sources above state 년지 or 일지 as anchor"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "canopy": [
+          "未"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 癸未 丁巳 庚子; anchor year. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "canopy-absent-negative",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 8,
+      "day": 4,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:194-202 — 화개살: 寅午戌→戌, 巳酉丑→丑, 申子辰→辰, 亥卯未→未"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "canopy": []
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 癸未 壬午 庚子. Negative: the star's trigger branch/pillar is absent, so the list is empty."
+  },
+  {
+    "id": "kong-mang-jia-zi-xun",
+    "subsystem": "stars",
+    "input": {
+      "year": 1977,
+      "month": 11,
+      "day": 4,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/00-glossary.md:34 — 공망: the two branches outside the day pillar's own 旬 (see also knowledge/09-interpretation-method.md:68)"
+      },
+      {
+        "citation": "OpenFate 명리 위키, 甲子旬 공망 戌亥 (旬 6개 공망 목록 포함) (external cross-check 2026-10-03)",
+        "url": "https://wiki.openfate.ai/ko/bazi/void/jia-zi-decade-void-xu-and-hai"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "kong_mang": [
+          "戌"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丁巳 庚戌 乙丑 丙子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "kong-mang-jia-wu-xun",
+    "subsystem": "stars",
+    "input": {
+      "year": 1977,
+      "month": 4,
+      "day": 10,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/00-glossary.md:34 — 공망: the two branches outside the day pillar's own 旬 (see also knowledge/09-interpretation-method.md:68)"
+      },
+      {
+        "citation": "OpenFate 명리 위키, 甲子旬 공망 戌亥 (旬 6개 공망 목록 포함) (external cross-check 2026-10-03)",
+        "url": "https://wiki.openfate.ai/ko/bazi/void/jia-zi-decade-void-xu-and-hai"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "kong_mang": [
+          "辰",
+          "巳"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丁巳 甲辰 丁酉 庚子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "kong-mang-absent-negative",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 1,
+      "day": 22,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/00-glossary.md:34 — 공망: the two branches outside the day pillar's own 旬 (see also knowledge/09-interpretation-method.md:68)"
+      },
+      {
+        "citation": "OpenFate 명리 위키, 甲子旬 공망 戌亥 (旬 6개 공망 목록 포함) (external cross-check 2026-10-03)",
+        "url": "https://wiki.openfate.ai/ko/bazi/void/jia-zi-decade-void-xu-and-hai"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "kong_mang": []
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丁丑 戊辰 壬子. Negative: the star's trigger branch/pillar is absent, so the list is empty."
+  },
+  {
+    "id": "heavenly-noble-jia-day",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 1,
+      "day": 28,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:212-226 — 천을귀인 by 일간 (甲戊庚→丑未, 乙己→子申, 丙丁→亥酉, 辛→寅午, 壬癸→卯巳)"
+      },
+      {
+        "citation": "사자사주, 사주 귀인 종류: 천을귀인·문창귀인 찾는법 — 천을·문창(일간별), 천덕·월덕(월지별) 표 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/gwiin-guide"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "heavenly_noble": [
+          "丑"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丁丑 甲戌 甲子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "heavenly-noble-ren-day-both",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 5,
+      "day": 16,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:212-226 — 천을귀인 by 일간 (甲戊庚→丑未, 乙己→子申, 丙丁→亥酉, 辛→寅午, 壬癸→卯巳)"
+      },
+      {
+        "citation": "사자사주, 사주 귀인 종류: 천을귀인·문창귀인 찾는법 — 천을·문창(일간별), 천덕·월덕(월지별) 표 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/gwiin-guide"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "heavenly_noble": [
+          "卯",
+          "巳"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 辛巳 壬戌 庚子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "heavenly-noble-xin-day",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 2,
+      "day": 4,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:212-226 — 천을귀인 by 일간 (甲戊庚→丑未, 乙己→子申, 丙丁→亥酉, 辛→寅午, 壬癸→卯巳)"
+      },
+      {
+        "citation": "사자사주, 사주 귀인 종류: 천을귀인·문창귀인 찾는법 — 천을·문창(일간별), 천덕·월덕(월지별) 표 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/gwiin-guide"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "heavenly_noble": [
+          "寅"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丁丑 辛巳 戊子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "literary-jia-day",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 5,
+      "day": 28,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:228-247 — 문창귀인 by 일간 (甲→巳, 乙→午, 丙戊→申, 丁己→酉, 庚→亥, 辛→子, 壬→寅, 癸→卯)"
+      },
+      {
+        "citation": "사자사주, 사주 귀인 종류: 천을귀인·문창귀인 찾는법 — 천을·문창(일간별), 천덕·월덕(월지별) 표 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/gwiin-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "literary_star": [
+          "巳"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 辛巳 甲戌 甲子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "literary-ren-day",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 1,
+      "day": 16,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:228-247 — 문창귀인 by 일간 (甲→巳, 乙→午, 丙戊→申, 丁己→酉, 庚→亥, 辛→子, 壬→寅, 癸→卯)"
+      },
+      {
+        "citation": "사자사주, 사주 귀인 종류: 천을귀인·문창귀인 찾는법 — 천을·문창(일간별), 천덕·월덕(월지별) 표 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/gwiin-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "literary_star": [
+          "寅"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丁丑 壬戌 庚子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "literary-geng-day",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 11,
+      "day": 10,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:228-247 — 문창귀인 by 일간 (甲→巳, 乙→午, 丙戊→申, 丁己→酉, 庚→亥, 辛→子, 壬→寅, 癸→卯)"
+      },
+      {
+        "citation": "사자사주, 사주 귀인 종류: 천을귀인·문창귀인 찾는법 — 천을·문창(일간별), 천덕·월덕(월지별) 표 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/gwiin-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "literary_star": [
+          "亥"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 丁亥 庚申 丙子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "deep-grudge-zi-wei",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 7,
+      "day": 10,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:286-299 — 원진살 pairs 子未, 丑午, 寅酉, 卯申, 辰亥, 巳戌"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "deep_grudge": [
+          "子-未"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 癸未 丁巳 庚子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "deep-grudge-yin-you",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 1,
+      "day": 4,
+      "hour": 19,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:286-299 — 원진살 pairs 子未, 丑午, 寅酉, 卯申, 辰亥, 巳戌"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "deep_grudge": [
+          "寅-酉"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丙子 庚戌 乙酉; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "ghost-gate-yin-wei",
+    "subsystem": "stars",
+    "input": {
+      "year": 1979,
+      "month": 2,
+      "day": 10,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:301-316 — 귀문관살 pairs 子酉, 丑午, 寅未, 卯申, 辰亥, 巳戌"
+      },
+      {
+        "citation": "사주 귀문관살의 뜻과 사주특성 (jonsewose.blogspot.com) — 귀문관살 6쌍: 辰亥·子酉·寅未·丑午·卯申·巳戌 (external cross-check 2026-10-03)",
+        "url": "https://jonsewose.blogspot.com/2021/10/blog-post_23.html"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "ghost_gate": [
+          "寅-未"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 己未 丙寅 戊申 壬子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "ghost-gate-zi-you",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 1,
+      "day": 4,
+      "hour": 19,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:301-316 — 귀문관살 pairs 子酉, 丑午, 寅未, 卯申, 辰亥, 巳戌"
+      },
+      {
+        "citation": "사주 귀문관살의 뜻과 사주특성 (jonsewose.blogspot.com) — 귀문관살 6쌍: 辰亥·子酉·寅未·丑午·卯申·巳戌 (external cross-check 2026-10-03)",
+        "url": "https://jonsewose.blogspot.com/2021/10/blog-post_23.html"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "ghost_gate": [
+          "子-酉"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丙子 庚戌 乙酉; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "grudge-ghost-overlap-chou-wu",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 1,
+      "day": 10,
+      "hour": 13,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:286-299 — 원진살 pairs 子未, 丑午, 寅酉, 卯申, 辰亥, 巳戌"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      },
+      {
+        "citation": "knowledge/07-special-formations.md:301-316 — 귀문관살 pairs 子酉, 丑午, 寅未, 卯申, 辰亥, 巳戌"
+      },
+      {
+        "citation": "사주 귀문관살의 뜻과 사주특성 (jonsewose.blogspot.com) — 귀문관살 6쌍: 辰亥·子酉·寅未·丑午·卯申·巳戌 (external cross-check 2026-10-03)",
+        "url": "https://jonsewose.blogspot.com/2021/10/blog-post_23.html"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "deep_grudge": [
+          "丑-午"
+        ],
+        "ghost_gate": [
+          "丑-午"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丁丑 丙辰 甲午; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "white-tiger-jia-chen",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 4,
+      "day": 28,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:326-332 — 백호대살 day pillars 甲辰 乙未 丙戌 丁丑 戊辰 壬戌 癸丑"
+      },
+      {
+        "citation": "사자사주, 양인살·괴강살·백호살: 강한 살 3종의 판정 기준 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/yangin-goegang-baekho-guide"
+      },
+      {
+        "citation": "knowledge/07-special-formations.md:318-324 — 괴강살 day pillars 壬辰 庚辰 庚戌 戊戌"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "white_tiger": [
+          "甲辰"
+        ],
+        "sky_hero": []
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 庚辰 甲辰 甲子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "white-tiger-ding-chou",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 9,
+      "day": 28,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:326-332 — 백호대살 day pillars 甲辰 乙未 丙戌 丁丑 戊辰 壬戌 癸丑"
+      },
+      {
+        "citation": "사자사주, 양인살·괴강살·백호살: 강한 살 3종의 판정 기준 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/yangin-goegang-baekho-guide"
+      },
+      {
+        "citation": "knowledge/07-special-formations.md:318-324 — 괴강살 day pillars 壬辰 庚辰 庚戌 戊戌"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "white_tiger": [
+          "丁丑"
+        ],
+        "sky_hero": []
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 乙酉 丁丑 庚子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "sky-hero-geng-xu",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 1,
+      "day": 4,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:318-324 — 괴강살 day pillars 壬辰 庚辰 庚戌 戊戌"
+      },
+      {
+        "citation": "사자사주, 양인살·괴강살·백호살: 강한 살 3종의 판정 기준 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/yangin-goegang-baekho-guide"
+      },
+      {
+        "citation": "knowledge/07-special-formations.md:326-332 — 백호대살 day pillars 甲辰 乙未 丙戌 丁丑 戊辰 壬戌 癸丑"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "sky_hero": [
+          "庚戌"
+        ],
+        "white_tiger": []
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丙子 庚戌 丙子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "sky-hero-ren-chen",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 4,
+      "day": 16,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:318-324 — 괴강살 day pillars 壬辰 庚辰 庚戌 戊戌"
+      },
+      {
+        "citation": "사자사주, 양인살·괴강살·백호살: 강한 살 3종의 판정 기준 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/yangin-goegang-baekho-guide"
+      },
+      {
+        "citation": "knowledge/07-special-formations.md:326-332 — 백호대살 day pillars 甲辰 乙未 丙戌 丁丑 戊辰 壬戌 癸丑"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "sky_hero": [
+          "壬辰"
+        ],
+        "white_tiger": []
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 庚辰 壬辰 庚子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "pillar-stars-negative-jia-zi",
+    "subsystem": "stars",
+    "input": {
+      "year": 1977,
+      "month": 9,
+      "day": 4,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:326-332 — 백호대살 day pillars 甲辰 乙未 丙戌 丁丑 戊辰 壬戌 癸丑"
+      },
+      {
+        "citation": "사자사주, 양인살·괴강살·백호살: 강한 살 3종의 판정 기준 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/yangin-goegang-baekho-guide"
+      },
+      {
+        "citation": "knowledge/07-special-formations.md:318-324 — 괴강살 day pillars 壬辰 庚辰 庚戌 戊戌"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "white_tiger": [],
+        "sky_hero": []
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丁巳 戊申 甲子 甲子. Negative: the star's trigger branch/pillar is absent, so the list is empty."
+  },
+  {
+    "id": "heavenly-virtue-stem-yin-month",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 2,
+      "day": 10,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:334-358 — 천덕귀인 by 월지; 卯/午/酉/子 months target a BRANCH (申/亥/寅/巳), others a stem"
+      },
+      {
+        "citation": "사자사주, 사주 귀인 종류: 천을귀인·문창귀인 찾는법 — 천을·문창(일간별), 천덕·월덕(월지별) 표 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/gwiin-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "heavenly_virtue": [
+          "丁"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 戊寅 丁亥 庚子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "heavenly-virtue-branch-wu-month",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 6,
+      "day": 10,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:334-358 — 천덕귀인 by 월지; 卯/午/酉/子 months target a BRANCH (申/亥/寅/巳), others a stem"
+      },
+      {
+        "citation": "사자사주, 사주 귀인 종류: 천을귀인·문창귀인 찾는법 — 천을·문창(일간별), 천덕·월덕(월지별) 표 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/gwiin-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "heavenly_virtue": [
+          "亥"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 壬午 丁亥 庚子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "heavenly-virtue-branch-zi-month",
+    "subsystem": "stars",
+    "input": {
+      "year": 1977,
+      "month": 12,
+      "day": 10,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:334-358 — 천덕귀인 by 월지; 卯/午/酉/子 months target a BRANCH (申/亥/寅/巳), others a stem"
+      },
+      {
+        "citation": "사자사주, 사주 귀인 종류: 천을귀인·문창귀인 찾는법 — 천을·문창(일간별), 천덕·월덕(월지별) 표 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/gwiin-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "heavenly_virtue": [
+          "巳"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丁巳 壬子 辛丑 戊子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "heavenly-virtue-negative",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 4,
+      "day": 10,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:334-358 — 천덕귀인 by 월지; 卯/午/酉/子 months target a BRANCH (申/亥/寅/巳), others a stem"
+      },
+      {
+        "citation": "사자사주, 사주 귀인 종류: 천을귀인·문창귀인 찾는법 — 천을·문창(일간별), 천덕·월덕(월지별) 표 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/gwiin-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "heavenly_virtue": []
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 庚辰 丙戌 戊子. Negative: the star's trigger branch/pillar is absent, so the list is empty."
+  },
+  {
+    "id": "monthly-virtue-yin-month",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 2,
+      "day": 10,
+      "hour": 13,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:360-379 — 월덕귀인 by 월지 (stem looked for among natal 천간)"
+      },
+      {
+        "citation": "사자사주, 사주 귀인 종류: 천을귀인·문창귀인 찾는법 — 천을·문창(일간별), 천덕·월덕(월지별) 표 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/gwiin-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "monthly_virtue": [
+          "丙"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 戊寅 丁亥 丙午; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "monthly-virtue-hai-month",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 11,
+      "day": 16,
+      "hour": 13,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:360-379 — 월덕귀인 by 월지 (stem looked for among natal 천간)"
+      },
+      {
+        "citation": "사자사주, 사주 귀인 종류: 천을귀인·문창귀인 찾는법 — 천을·문창(일간별), 천덕·월덕(월지별) 표 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/gwiin-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "monthly_virtue": [
+          "甲"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 丁亥 丙寅 甲午; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "yangin-bing-wu",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 8,
+      "day": 28,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:100-129 — 양인 branch by Day Master (甲卯 丙午 戊午 庚酉 壬子); see also knowledge/11-gunghap.md:908-917"
+      },
+      {
+        "citation": "사자사주, 양인살·괴강살·백호살: 강한 살 3종의 판정 기준 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/yangin-goegang-baekho-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "yangin": [
+          "午"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 甲申 丙午 戊子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "yangin-wu-wu",
+    "subsystem": "stars",
+    "input": {
+      "year": 1977,
+      "month": 10,
+      "day": 28,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:100-129 — 양인 branch by Day Master (甲卯 丙午 戊午 庚酉 壬子); see also knowledge/11-gunghap.md:908-917"
+      },
+      {
+        "citation": "사자사주, 양인살·괴강살·백호살: 강한 살 3종의 판정 기준 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/yangin-goegang-baekho-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "yangin": [
+          "午"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丁巳 庚戌 戊午 壬子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "yangin-ren-zi",
+    "subsystem": "stars",
+    "input": {
+      "year": 1976,
+      "month": 8,
+      "day": 28,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:100-129 — 양인 branch by Day Master (甲卯 丙午 戊午 庚酉 壬子); see also knowledge/11-gunghap.md:908-917"
+      },
+      {
+        "citation": "사자사주, 양인살·괴강살·백호살: 강한 살 3종의 판정 기준 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/yangin-goegang-baekho-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "yangin": [
+          "子"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丙辰 丙申 壬子 庚子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "yangin-yin-stem-negative",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 2,
+      "day": 28,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:100-129 — 양인 branch by Day Master (甲卯 丙午 戊午 庚酉 壬子); see also knowledge/11-gunghap.md:908-917"
+      },
+      {
+        "citation": "사자사주, 양인살·괴강살·백호살: 강한 살 3종의 판정 기준 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/yangin-goegang-baekho-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "yangin": []
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 戊寅 乙巳 丙子. Negative: the star's trigger branch/pillar is absent, so the list is empty."
+  },
+  {
+    "id": "yangin-blade-in-hour-not-day",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 1,
+      "day": 28,
+      "hour": 7,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:100-129 — 양인 branch by Day Master (甲卯 丙午 戊午 庚酉 壬子); see also knowledge/11-gunghap.md:908-917"
+      },
+      {
+        "citation": "사자사주, 양인살·괴강살·백호살: 강한 살 3종의 판정 기준 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/yangin-goegang-baekho-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "yangin": [
+          "卯"
+        ]
+      }
+    },
+    "status": "documented_interpretation",
+    "notes": "Pillars 甲寅 丁丑 甲戌 丁卯. Position convention: knowledge/07:100-129 and sazasaju let the 양인 branch appear in any pillar (non-month positions = 'related blade pattern', surfaced by patterns.py), but stars.yangin is deliberately the narrow day-branch overlay (stars.py docstring; 11-gunghap §I). Here the blade 卯 sits in the hour pillar, so stars.yangin is []."
+  },
+  {
+    "id": "sky-hero-ren-xu-alt-school",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 1,
+      "day": 16,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:318-324 — 괴강살 day pillars 壬辰 庚辰 庚戌 戊戌"
+      },
+      {
+        "citation": "사자사주, 양인살·괴강살·백호살: 강한 살 3종의 판정 기준 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/yangin-goegang-baekho-guide"
+      },
+      {
+        "citation": "두루미사주, 신살 등급 — 괴강(경진·경술·임진·임술)·백호(일주 7개) 정의 (external cross-check 2026-10-03)",
+        "url": "https://www.durumisaju.com/dict/sinsal/sinsal-grade"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "sky_hero": [
+          "壬戌"
+        ]
+      }
+    },
+    "status": "documented_interpretation",
+    "notes": "Pillars 甲寅 丁丑 壬戌 庚子. Alt-school: durumisaju lists 괴강 as 庚辰·庚戌·壬辰·壬戌, and sazasaju notes a modern six-pillar expansion adding 戊辰·壬戌. knowledge/07:318-324 (and the engine) use the classical four (壬辰 庚辰 庚戌 戊戌), so 壬戌 is NOT 괴강 in the engine."
+  },
+  {
+    "id": "hongyeom-jia-shen-alt-school",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 12,
+      "day": 4,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:897-907 — 홍염살 day stem → day branch table"
+      },
+      {
+        "citation": "daysaju, 사주 홍염살 뜻 톺아보기 — 일간별 홍염 지지표 (자료마다 표가 다름을 명시) (external cross-check 2026-10-03)",
+        "url": "https://daysaju.com/blog/hongyeomsal"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "hongyeom": [
+          "申"
+        ]
+      }
+    },
+    "status": "documented_interpretation",
+    "notes": "Pillars 乙卯 丁亥 甲申 甲子. Alt-school: daysaju's table gives 甲 → 午·申, while knowledge/11:897-907 (and the engine) give 甲 → 午 only. daysaju itself warns that sources use different tables. Engine follows the knowledge/11 table."
+  },
+  {
+    "id": "hongyeom-jia-wu",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 8,
+      "day": 16,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:897-907 — 홍염살 day stem → day branch table"
+      },
+      {
+        "citation": "daysaju, 사주 홍염살 뜻 톺아보기 — 일간별 홍염 지지표 (자료마다 표가 다름을 명시) (external cross-check 2026-10-03)",
+        "url": "https://daysaju.com/blog/hongyeomsal"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "hongyeom": [
+          "午"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 甲申 甲午 甲子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "hongyeom-bing-yin",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 11,
+      "day": 16,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:897-907 — 홍염살 day stem → day branch table"
+      },
+      {
+        "citation": "daysaju, 사주 홍염살 뜻 톺아보기 — 일간별 홍염 지지표 (자료마다 표가 다름을 명시) (external cross-check 2026-10-03)",
+        "url": "https://daysaju.com/blog/hongyeomsal"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "hongyeom": [
+          "寅"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 丁亥 丙寅 戊子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "hongyeom-bing-wei",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 10,
+      "day": 28,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:897-907 — 홍염살 day stem → day branch table"
+      },
+      {
+        "citation": "daysaju, 사주 홍염살 뜻 톺아보기 — 일간별 홍염 지지표 (자료마다 표가 다름을 명시) (external cross-check 2026-10-03)",
+        "url": "https://daysaju.com/blog/hongyeomsal"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "hongyeom": [
+          "未"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 丙戌 丁未 庚子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "hongyeom-wu-chen",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 1,
+      "day": 22,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:897-907 — 홍염살 day stem → day branch table"
+      },
+      {
+        "citation": "daysaju, 사주 홍염살 뜻 톺아보기 — 일간별 홍염 지지표 (자료마다 표가 다름을 명시) (external cross-check 2026-10-03)",
+        "url": "https://daysaju.com/blog/hongyeomsal"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "hongyeom": [
+          "辰"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丁丑 戊辰 壬子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "hongyeom-geng-xu",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 1,
+      "day": 4,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:897-907 — 홍염살 day stem → day branch table"
+      },
+      {
+        "citation": "daysaju, 사주 홍염살 뜻 톺아보기 — 일간별 홍염 지지표 (자료마다 표가 다름을 명시) (external cross-check 2026-10-03)",
+        "url": "https://daysaju.com/blog/hongyeomsal"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "hongyeom": [
+          "戌"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丙子 庚戌 丙子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "hongyeom-ren-shen",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 11,
+      "day": 22,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:897-907 — 홍염살 day stem → day branch table"
+      },
+      {
+        "citation": "daysaju, 사주 홍염살 뜻 톺아보기 — 일간별 홍염 지지표 (자료마다 표가 다름을 명시) (external cross-check 2026-10-03)",
+        "url": "https://daysaju.com/blog/hongyeomsal"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "hongyeom": [
+          "申"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 丁亥 壬申 庚子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+  },
+  {
+    "id": "hongyeom-negative-yi-wei",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 10,
+      "day": 16,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/11-gunghap.md:897-907 — 홍염살 day stem → day branch table"
+      },
+      {
+        "citation": "daysaju, 사주 홍염살 뜻 톺아보기 — 일간별 홍염 지지표 (자료마다 표가 다름을 명시) (external cross-check 2026-10-03)",
+        "url": "https://daysaju.com/blog/hongyeomsal"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "hongyeom": []
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 丙戌 乙未 丙子. Negative: the star's trigger branch/pillar is absent, so the list is empty."
+  },
+  {
+    "id": "twelve-stars-day-yin-wu-xu",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 1,
+      "day": 4,
+      "hour": 7,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:253-284 — 십이신살 table by triplet (anchor note :259-266)"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "robbery_star": [],
+        "disaster_star": [
+          "子"
+        ],
+        "heaven_bane": [],
+        "earth_bane": [
+          "寅"
+        ],
+        "annual_bane": [
+          "卯"
+        ],
+        "monthly_bane": [],
+        "lost_spirit": [],
+        "general_star": [],
+        "saddle_star": [],
+        "six_harm_bane": []
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丙子 庚戌 己卯; anchor day branch. Table row for its triplet applied to all ten stars; listed keys absent from the chart are asserted empty."
+  },
+  {
+    "id": "twelve-stars-day-shen-zi-chen",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 1,
+      "day": 10,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:253-284 — 십이신살 table by triplet (anchor note :259-266)"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "robbery_star": [],
+        "disaster_star": [],
+        "heaven_bane": [],
+        "earth_bane": [],
+        "annual_bane": [],
+        "monthly_bane": [],
+        "lost_spirit": [],
+        "general_star": [
+          "子"
+        ],
+        "saddle_star": [
+          "丑"
+        ],
+        "six_harm_bane": []
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丁丑 丙辰 戊子; anchor day branch. Table row for its triplet applied to all ten stars; listed keys absent from the chart are asserted empty."
+  },
+  {
+    "id": "twelve-stars-day-si-you-chou",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 2,
+      "day": 4,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:253-284 — 십이신살 table by triplet (anchor note :259-266)"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "robbery_star": [
+          "寅"
+        ],
+        "disaster_star": [],
+        "heaven_bane": [],
+        "earth_bane": [
+          "巳"
+        ],
+        "annual_bane": [],
+        "monthly_bane": [],
+        "lost_spirit": [],
+        "general_star": [],
+        "saddle_star": [],
+        "six_harm_bane": [
+          "子"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丁丑 辛巳 戊子; anchor day branch. Table row for its triplet applied to all ten stars; listed keys absent from the chart are asserted empty."
+  },
+  {
+    "id": "twelve-stars-day-hai-mao-wei",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 2,
+      "day": 10,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:253-284 — 십이신살 table by triplet (anchor note :259-266)"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "robbery_star": [],
+        "disaster_star": [],
+        "heaven_bane": [],
+        "earth_bane": [
+          "亥"
+        ],
+        "annual_bane": [
+          "子"
+        ],
+        "monthly_bane": [],
+        "lost_spirit": [
+          "寅"
+        ],
+        "general_star": [
+          "卯"
+        ],
+        "saddle_star": [],
+        "six_harm_bane": []
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙卯 戊寅 丁亥 庚子; anchor day branch. Table row for its triplet applied to all ten stars; listed keys absent from the chart are asserted empty."
+  },
+  {
+    "id": "twelve-stars-year-anchor",
+    "subsystem": "stars",
+    "input": {
+      "year": 1975,
+      "month": 1,
+      "day": 10,
+      "hour": 1,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "F",
+      "star_anchor": "year"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:253-284 — 십이신살 table by triplet (anchor note :259-266)"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류: 12신살과 주요 신살 정리 — 12신살 삼합 그룹별 표(년지 또는 일지 기준), 천을귀인, 원진살 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      },
+      {
+        "citation": "knowledge/07-special-formations.md:174-182 / 259-266 — year-branch (고법) anchoring uses the same triplet table; SAZA/sajustudy sources above state 년지 or 일지 as anchor"
+      }
+    ],
+    "expected": {
+      "stars": {
+        "robbery_star": [],
+        "disaster_star": [
+          "子"
+        ],
+        "heaven_bane": [
+          "丑"
+        ],
+        "earth_bane": [
+          "寅"
+        ],
+        "annual_bane": [],
+        "monthly_bane": [
+          "辰"
+        ],
+        "lost_spirit": [],
+        "general_star": [],
+        "saddle_star": [],
+        "six_harm_bane": []
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丁丑 丙辰 戊子; anchor year branch. Table row for its triplet applied to all ten stars; listed keys absent from the chart are asserted empty."
+  }
+]

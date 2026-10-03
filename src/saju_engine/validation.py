@@ -103,6 +103,20 @@ def run_fixture(entry: dict) -> dict:
     return check_pillars(chart, entry)
 
 
+def _result(entry: dict, mismatches: dict) -> dict:
+    """Turn a mismatches dict into the standard PASS/INTERPRETATION/FAIL result."""
+    if not mismatches:
+        status = "PASS"
+    elif entry.get("status") == "documented_interpretation":
+        status = "INTERPRETATION"
+    else:
+        status = "FAIL"
+    detail = "; ".join(f"{k}: expected {m['expected']}, got {m['got']}"
+                       for k, m in mismatches.items()) or "all checks matched"
+    return {"id": entry["id"], "status": status,
+            "mismatches": mismatches, "detail": detail}
+
+
 def check_daeun(chart: Any, entry: dict) -> dict:
     """Check a computed Chart's major-luck (대운) table against a daeun fixture.
 
@@ -139,16 +153,7 @@ def check_daeun(chart: Any, entry: dict) -> dict:
     elif exp_accept is not None and got_start not in exp_accept:
         mismatches["start_age"] = {"expected": f"in {exp_accept}", "got": got_start}
 
-    if not mismatches:
-        status = "PASS"
-    elif entry.get("status") == "documented_interpretation":
-        status = "INTERPRETATION"
-    else:
-        status = "FAIL"
-    detail = "; ".join(f"{k}: expected {m['expected']}, got {m['got']}"
-                       for k, m in mismatches.items()) or "all checks matched"
-    return {"id": entry["id"], "status": status,
-            "mismatches": mismatches, "detail": detail}
+    return _result(entry, mismatches)
 
 
 def run_daeun_fixture(entry: dict) -> dict:
@@ -888,15 +893,46 @@ def run_climate_fixture(entry: dict) -> dict:
     return check_climate_merge(chart, entry)
 
 
+_STARS_ALLOWED_INPUT = _ALLOWED_INPUT | {"star_anchor"}
+
+
+def check_stars(chart: Any, entry: dict) -> dict:
+    """Check a declared subset of chart.stars against a stars fixture.
+
+    expected.stars: {star_key: [branches/stems/pillars]} — each listed key must
+    equal chart.stars[key] (order-insensitive); an empty list asserts the star
+    is not activated. Unlisted keys are not checked. Unknown keys raise.
+    """
+    exp = entry.get("expected", {}).get("stars") or {}
+    unknown = set(exp) - set(chart.stars)
+    if unknown:
+        raise ValueError(f"stars/{entry['id']}: unknown star key(s) {sorted(unknown)}")
+    mismatches = {
+        k: {"expected": sorted(v), "got": sorted(chart.stars.get(k, []))}
+        for k, v in exp.items() if sorted(v) != sorted(chart.stars.get(k, []))
+    }
+    return _result(entry, mismatches)
+
+
+def run_stars_fixture(entry: dict) -> dict:
+    """Compute the chart for a stars fixture entry and check its 신살 subset."""
+    unknown = set(entry["input"]) - _STARS_ALLOWED_INPUT
+    if unknown:
+        raise ValueError(f"stars/{entry['id']}: unknown input key(s) {sorted(unknown)}")
+    kwargs = dict(entry["input"])
+    kwargs.setdefault("name", entry["id"])
+    return check_stars(compute_chart(**kwargs), entry)
+
+
 _SUBSYSTEM_ORDER = ["pillars", "daeun", "sewoon", "lookups", "yongsin",
-                    "climate", "compat", "career"]
+                    "climate", "compat", "career", "stars"]
 # Workstream label per subsystem (spec §workstreams). Extended by Plans 4–6.
 _WORKSTREAM = {"pillars": "W1", "daeun": "W2", "sewoon": "W2", "lookups": "W3",
-               "yongsin": "W4", "climate": "W5", "compat": "W6", "career": "W6"}
+               "yongsin": "W4", "climate": "W5", "compat": "W6", "career": "W6", "stars": "W7"}
 _RUNNERS = {"pillars": run_fixture, "daeun": run_daeun_fixture, "sewoon": run_sewoon_fixture,
             "lookups": run_lookups_fixture, "yongsin": run_yongsin_fixture,
             "climate": run_climate_fixture, "compat": run_compat_fixture,
-            "career": run_career_fixture}
+            "career": run_career_fixture, "stars": run_stars_fixture}
 
 
 def collect_results(fixtures_dir: Optional[Path] = None) -> dict[str, list[dict]]:
