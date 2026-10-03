@@ -15,8 +15,6 @@ from typing import Dict, List, Tuple
 
 from .chart import Chart
 from .daeun import saju_year
-
-
 from . import report_primitives as RP
 from .hanja_glossary import inject_hanja
 from .stem_profiles import stem_profile

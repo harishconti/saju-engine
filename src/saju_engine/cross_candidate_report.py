@@ -154,7 +154,7 @@ def _charts_at_a_glance(members) -> List[str]:
         verdict = (c.strength_assessment or {}).get("verdict", "balanced")
         lines.append(
             f"| {m['name']} | {c.day_master} | {c.year.combined}·{c.month.combined}·"
-            f"{c.day.combined}·{c.hour.combined} | {verdict.title()} | {fe.element} "
+            f"{c.day.combined}·{c.hour.combined} | {RP.verdict_label(verdict)} | {fe.element} "
             f"| {fe.supporting} | {fe.unfavorable or '—'} | {top_ko} |"
         )
     lines += [

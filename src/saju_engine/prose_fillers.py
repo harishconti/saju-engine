@@ -105,16 +105,15 @@ def period_favorable_status(period: Any, ctx: Any) -> str:
     # qualifying element, was labelled a "favorable-element year" by the
     # annual check — a direct, client-visible contradiction between two
     # tables describing the same period.
+    # F-7 (2026-09-26 audit): a period whose stem matches the favorable
+    # element but whose branch matches the unfavorable one (or vice versa)
+    # used to report flatly "favorable" (checked first, unconditionally),
+    # discarding the conflicting signal. Both hitting at once is a wash.
     return RP.favorability(
         getattr(period, "stem_element", None),
         getattr(period, "branch_element", None),
         favorable, supporting, unfavorable,
     )
-    if fav_hit:
-        return "favorable"
-    if unfav_hit:
-        return "unfavorable"
-    return "neutral"
 
 
 def _class_counts(chart) -> Counter:
@@ -678,8 +677,9 @@ def relationship_style(ctx) -> str:
         stage = "—"
     # Look up by the simplified class key derived from the KOREAN ten-god
     # code (via RP.TENGOD_SHORT_EN), not by `spouse_tg` (the full English gloss,
-    # e.g. "Hurting Officer (傷官)") — the dict below is keyed by the class
-    # name ("Output", "Companion", etc.), which the full gloss never matches.
+    # e.g. "Hurting Officer (傷官)") — the dict below is keyed by the
+    # short English ten-god names ("Eating God", "Companion", etc. — what
+    # RP.TENGOD_SHORT_EN maps the Korean codes to), which the full gloss never matches.
     # Bug found 2026-09-19 (external report review): this lookup always
     # missed and fell through to the generic fallback sentence below,
     # regardless of the actual spouse-palace ten-god — confirmed identical

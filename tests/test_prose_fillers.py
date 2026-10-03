@@ -602,7 +602,7 @@ def harish_chart():
 
 
 def test_class_counts_no_longer_merges_eating_god_and_hurting_officer(harish_chart):
-    """`_TENGOD_CLASS` used to map both 식신 and 상관 to one merged "Output"
+    """`_TENGOD_CLASS` (now `RP.TENGOD_SHORT_EN`) used to map both 식신 and 상관 to one merged "Output"
     key while every other class stayed split by yin/yang variant — an
     inconsistent grouping level that inflated Output's count relative to
     the (correctly split) other classes, and silently mismatched every

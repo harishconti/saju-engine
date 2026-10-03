@@ -51,11 +51,6 @@ def year_status(stem_e: str, branch_e: str, fav: str, sup: str,
     premium report's own favorable/unfavorable labels and makes the counts
     non-overlapping (favorable + unfavorable + neutral == 5)."""
     return RP.favorability(stem_e, branch_e, fav, sup, unfav)
-    if fav_hit:
-        return "favorable"
-    if unfav_hit:
-        return "unfavorable"
-    return "neutral"
 
 
 # ── Small data container ────────────────────────────────────────────────────
