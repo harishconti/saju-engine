@@ -1,0 +1,1591 @@
+[
+  {
+    "id": "regular-비견격-tuchul-1963",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1963,
+      "month": 4,
+      "day": 10,
+      "hour": 2,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:5-15,22-31 — 월지 지장간 본기→중기→여기 중 투출한 글자의 십신이 격국 (knowledge/02-branches.md:34-47 지장간 table)"
+      },
+      {
+        "citation": "두루미사주, 정관격(正官格) — 월지 본기·중기·여기 중 천간에 투출한 글자가 격; 투출이 없으면 월지 본기 (external cross-check 2026-10-03)",
+        "url": "https://www.durumisaju.com/dict/gyeokguk/jeonggwan-gyeok"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "regular_grid_name": "비견격"
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 癸卯 丙辰 癸未 癸丑. Day Master 癸; month branch 辰 hides 戊癸乙; 중기 癸 stands on a visible non-day stem and is the 비견 of 癸 → 비견격. Expected derived by hand from the knowledge tables, independent of patterns.py."
+  },
+  {
+    "id": "regular-겁재격-tuchul-1995",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1995,
+      "month": 7,
+      "day": 12,
+      "hour": 14,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:5-15,22-31 — 월지 지장간 본기→중기→여기 중 투출한 글자의 십신이 격국 (knowledge/02-branches.md:34-47 지장간 table)"
+      },
+      {
+        "citation": "두루미사주, 정관격(正官格) — 월지 본기·중기·여기 중 천간에 투출한 글자가 격; 투출이 없으면 월지 본기 (external cross-check 2026-10-03)",
+        "url": "https://www.durumisaju.com/dict/gyeokguk/jeonggwan-gyeok"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "regular_grid_name": "겁재격"
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙亥 癸未 甲辰 辛未. Day Master 甲; month branch 未 hides 己乙丁; 중기 乙 stands on a visible non-day stem and is the 겁재 of 甲 → 겁재격. Expected derived by hand from the knowledge tables, independent of patterns.py."
+  },
+  {
+    "id": "regular-식신격-tuchul-1950",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1950,
+      "month": 5,
+      "day": 23,
+      "hour": 2,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:5-15,22-31 — 월지 지장간 본기→중기→여기 중 투출한 글자의 십신이 격국 (knowledge/02-branches.md:34-47 지장간 table)"
+      },
+      {
+        "citation": "두루미사주, 정관격(正官格) — 월지 본기·중기·여기 중 천간에 투출한 글자가 격; 투출이 없으면 월지 본기 (external cross-check 2026-10-03)",
+        "url": "https://www.durumisaju.com/dict/gyeokguk/jeonggwan-gyeok"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "regular_grid_name": "식신격"
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 庚寅 辛巳 戊午 癸丑. Day Master 戊; month branch 巳 hides 丙庚戊; 중기 庚 stands on a visible non-day stem and is the 식신 of 戊 → 식신격. Expected derived by hand from the knowledge tables, independent of patterns.py."
+  },
+  {
+    "id": "regular-상관격-tuchul-1999",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1999,
+      "month": 7,
+      "day": 13,
+      "hour": 10,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:5-15,22-31 — 월지 지장간 본기→중기→여기 중 투출한 글자의 십신이 격국 (knowledge/02-branches.md:34-47 지장간 table)"
+      },
+      {
+        "citation": "두루미사주, 정관격(正官格) — 월지 본기·중기·여기 중 천간에 투출한 글자가 격; 투출이 없으면 월지 본기 (external cross-check 2026-10-03)",
+        "url": "https://www.durumisaju.com/dict/gyeokguk/jeonggwan-gyeok"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "regular_grid_name": "상관격"
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 己卯 辛未 丙寅 癸巳. Day Master 丙; month branch 未 hides 己乙丁; 본기 己 stands on a visible non-day stem and is the 상관 of 丙 → 상관격. Expected derived by hand from the knowledge tables, independent of patterns.py."
+  },
+  {
+    "id": "regular-편재격-tuchul-1965",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1965,
+      "month": 3,
+      "day": 8,
+      "hour": 10,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:5-15,22-31 — 월지 지장간 본기→중기→여기 중 투출한 글자의 십신이 격국 (knowledge/02-branches.md:34-47 지장간 table)"
+      },
+      {
+        "citation": "두루미사주, 정관격(正官格) — 월지 본기·중기·여기 중 천간에 투출한 글자가 격; 투출이 없으면 월지 본기 (external cross-check 2026-10-03)",
+        "url": "https://www.durumisaju.com/dict/gyeokguk/jeonggwan-gyeok"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "regular_grid_name": "편재격"
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙巳 己卯 辛酉 癸巳. Day Master 辛; month branch 卯 hides 乙; 본기 乙 stands on a visible non-day stem and is the 편재 of 辛 → 편재격. Expected derived by hand from the knowledge tables, independent of patterns.py."
+  },
+  {
+    "id": "regular-정재격-tuchul-1938",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1938,
+      "month": 8,
+      "day": 13,
+      "hour": 6,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:5-15,22-31 — 월지 지장간 본기→중기→여기 중 투출한 글자의 십신이 격국 (knowledge/02-branches.md:34-47 지장간 table)"
+      },
+      {
+        "citation": "두루미사주, 정관격(正官格) — 월지 본기·중기·여기 중 천간에 투출한 글자가 격; 투출이 없으면 월지 본기 (external cross-check 2026-10-03)",
+        "url": "https://www.durumisaju.com/dict/gyeokguk/jeonggwan-gyeok"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "regular_grid_name": "정재격"
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 戊寅 庚申 丁丑 癸卯. Day Master 丁; month branch 申 hides 庚壬戊; 본기 庚 stands on a visible non-day stem and is the 정재 of 丁 → 정재격. Expected derived by hand from the knowledge tables, independent of patterns.py."
+  },
+  {
+    "id": "regular-편관격-tuchul-1959",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1959,
+      "month": 2,
+      "day": 17,
+      "hour": 14,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:5-15,22-31 — 월지 지장간 본기→중기→여기 중 투출한 글자의 십신이 격국 (knowledge/02-branches.md:34-47 지장간 table)"
+      },
+      {
+        "citation": "두루미사주, 정관격(正官格) — 월지 본기·중기·여기 중 천간에 투출한 글자가 격; 투출이 없으면 월지 본기 (external cross-check 2026-10-03)",
+        "url": "https://www.durumisaju.com/dict/gyeokguk/jeonggwan-gyeok"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "regular_grid_name": "편관격"
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 己亥 丙寅 庚午 癸未. Day Master 庚; month branch 寅 hides 甲丙戊; 중기 丙 stands on a visible non-day stem and is the 편관 of 庚 → 편관격. Expected derived by hand from the knowledge tables, independent of patterns.py."
+  },
+  {
+    "id": "regular-정관격-tuchul-1984",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1984,
+      "month": 8,
+      "day": 11,
+      "hour": 6,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:5-15,22-31 — 월지 지장간 본기→중기→여기 중 투출한 글자의 십신이 격국 (knowledge/02-branches.md:34-47 지장간 table)"
+      },
+      {
+        "citation": "두루미사주, 정관격(正官格) — 월지 본기·중기·여기 중 천간에 투출한 글자가 격; 투출이 없으면 월지 본기 (external cross-check 2026-10-03)",
+        "url": "https://www.durumisaju.com/dict/gyeokguk/jeonggwan-gyeok"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "regular_grid_name": "정관격"
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲子 壬申 丁丑 癸卯. Day Master 丁; month branch 申 hides 庚壬戊; 중기 壬 stands on a visible non-day stem and is the 정관 of 丁 → 정관격. Expected derived by hand from the knowledge tables, independent of patterns.py."
+  },
+  {
+    "id": "regular-편인격-tuchul-1967",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1967,
+      "month": 6,
+      "day": 14,
+      "hour": 6,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:5-15,22-31 — 월지 지장간 본기→중기→여기 중 투출한 글자의 십신이 격국 (knowledge/02-branches.md:34-47 지장간 table)"
+      },
+      {
+        "citation": "두루미사주, 정관격(正官格) — 월지 본기·중기·여기 중 천간에 투출한 글자가 격; 투출이 없으면 월지 본기 (external cross-check 2026-10-03)",
+        "url": "https://www.durumisaju.com/dict/gyeokguk/jeonggwan-gyeok"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "regular_grid_name": "편인격"
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丁未 丙午 己酉 丁卯. Day Master 己; month branch 午 hides 丁己; 본기 丁 stands on a visible non-day stem and is the 편인 of 己 → 편인격. Expected derived by hand from the knowledge tables, independent of patterns.py."
+  },
+  {
+    "id": "regular-정인격-tuchul-1960",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1960,
+      "month": 12,
+      "day": 22,
+      "hour": 18,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:5-15,22-31 — 월지 지장간 본기→중기→여기 중 투출한 글자의 십신이 격국 (knowledge/02-branches.md:34-47 지장간 table)"
+      },
+      {
+        "citation": "두루미사주, 정관격(正官格) — 월지 본기·중기·여기 중 천간에 투출한 글자가 격; 투출이 없으면 월지 본기 (external cross-check 2026-10-03)",
+        "url": "https://www.durumisaju.com/dict/gyeokguk/jeonggwan-gyeok"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "regular_grid_name": "정인격"
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 庚子 戊子 甲申 癸酉. Day Master 甲; month branch 子 hides 癸; 본기 癸 stands on a visible non-day stem and is the 정인 of 甲 → 정인격. Expected derived by hand from the knowledge tables, independent of patterns.py."
+  },
+  {
+    "id": "regular-식신격-fallback-1946",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1946,
+      "month": 11,
+      "day": 22,
+      "hour": 2,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:11-14 — 투출 none → fall back to 월지 본기 (knowledge/02-branches.md:34-47)"
+      },
+      {
+        "citation": "두루미사주, 정관격(正官格) — 월지 본기·중기·여기 중 천간에 투출한 글자가 격; 투출이 없으면 월지 본기 (external cross-check 2026-10-03)",
+        "url": "https://www.durumisaju.com/dict/gyeokguk/jeonggwan-gyeok"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "regular_grid_name": "식신격"
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丙戌 己亥 庚子 丁丑. No hidden stem of 월지 亥 (壬甲) appears on any visible stem, so the 본기 壬 (식신 of 庚) names the grid → 식신격."
+  },
+  {
+    "id": "regular-정재격-fallback-1946",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1946,
+      "month": 11,
+      "day": 11,
+      "hour": 18,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:11-14 — 투출 none → fall back to 월지 본기 (knowledge/02-branches.md:34-47)"
+      },
+      {
+        "citation": "두루미사주, 정관격(正官格) — 월지 본기·중기·여기 중 천간에 투출한 글자가 격; 투출이 없으면 월지 본기 (external cross-check 2026-10-03)",
+        "url": "https://www.durumisaju.com/dict/gyeokguk/jeonggwan-gyeok"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "regular_grid_name": "정재격"
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丙戌 己亥 己丑 癸酉. No hidden stem of 월지 亥 (壬甲) appears on any visible stem, so the 본기 壬 (정재 of 己) names the grid → 정재격."
+  },
+  {
+    "id": "regular-편관격-fallback-2001",
+    "subsystem": "patterns",
+    "input": {
+      "year": 2001,
+      "month": 12,
+      "day": 20,
+      "hour": 2,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:11-14 — 투출 none → fall back to 월지 본기 (knowledge/02-branches.md:34-47)"
+      },
+      {
+        "citation": "두루미사주, 정관격(正官格) — 월지 본기·중기·여기 중 천간에 투출한 글자가 격; 투출이 없으면 월지 본기 (external cross-check 2026-10-03)",
+        "url": "https://www.durumisaju.com/dict/gyeokguk/jeonggwan-gyeok"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "regular_grid_name": "편관격"
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 辛巳 庚子 丁巳 辛丑. No hidden stem of 월지 子 (癸) appears on any visible stem, so the 본기 癸 (편관 of 丁) names the grid → 편관격."
+  },
+  {
+    "id": "park-chung-hee-regular-siksin",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1917,
+      "month": 11,
+      "day": 14,
+      "hour": 10,
+      "minute": 0,
+      "longitude": 128.74,
+      "utc_offset": 9.0,
+      "gender": "M",
+      "convention": "korean",
+      "use_solar_time": true
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:5-15 — 식신격: 월지 hidden stem 투출 = 식신; month branch 亥 본기 壬 is 식신 of 庚 (knowledge/02-branches.md:34-47)"
+      },
+      {
+        "citation": "글로벌이코노믹, 박정희 경금(庚金) 일간 사주 — \"월지 식신(食神)으로 식신격입니다.\" (external cross-check 2026-10-03)",
+        "url": "https://www.g-enews.com/article/Distribution/2015/04/201504241007036774349_1"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "regular_grid_name": "식신격",
+        "yangin": false,
+        "jianlu": true
+      }
+    },
+    "status": "expect_match",
+    "notes": "Textbook chart 丁巳 辛亥 庚申 辛巳 (same input as daeun.json park-chung-hee-daeun). Published 격국 = 식신격 and engine agrees. Month branch 亥 hides 壬·甲; none of them on a visible stem (壬 absent) → 본기 壬 = 식신 of 庚. jianlu true: 庚's 건록 branch 申 is the day branch (a related, not 월령, position). 노무현 and 김대중 are intentionally not fixtured: the sources opened (g-enews 노무현 2015-03-18, mediapia 25강) name no 격국, and 김대중's birth data is disputed across sources."
+  },
+  {
+    "id": "yangin-grid-甲-卯-month-1940",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1940,
+      "month": 3,
+      "day": 22,
+      "hour": 6,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:100-129 — 양인격 (월령): blade branch 甲→卯 is the month branch"
+      },
+      {
+        "citation": "명리중급공부 건록격·양인격 (daum cafe hee500) — 건록격은 월지가 일간의 건록, 양인격은 월지가 일간의 양인 (甲卯·丙戊午·庚酉·壬子; 음일간은 양인 없음) (external cross-check 2026-10-03)",
+        "url": "https://m.cafe.daum.net/hee500/6z3T/45?q=D_Pe2snkI1ZYs0"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "yangin": true,
+        "yangin_grid": true
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 庚辰 己卯 甲子 丁卯. Day Master 甲, month branch 卯 = its 양인 branch 卯 → 양인격 (월령)."
+  },
+  {
+    "id": "yangin-grid-丙-午-month-1952",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1952,
+      "month": 6,
+      "day": 9,
+      "hour": 6,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:100-129 — 양인격 (월령): blade branch 丙→午 is the month branch"
+      },
+      {
+        "citation": "명리중급공부 건록격·양인격 (daum cafe hee500) — 건록격은 월지가 일간의 건록, 양인격은 월지가 일간의 양인 (甲卯·丙戊午·庚酉·壬子; 음일간은 양인 없음) (external cross-check 2026-10-03)",
+        "url": "https://m.cafe.daum.net/hee500/6z3T/45?q=D_Pe2snkI1ZYs0"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "yangin": true,
+        "yangin_grid": true
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 壬辰 丙午 丙戌 辛卯. Day Master 丙, month branch 午 = its 양인 branch 午 → 양인격 (월령)."
+  },
+  {
+    "id": "yangin-grid-戊-午-month-1989",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1989,
+      "month": 6,
+      "day": 17,
+      "hour": 10,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:100-129 — 양인격 (월령): blade branch 戊→午 is the month branch"
+      },
+      {
+        "citation": "명리중급공부 건록격·양인격 (daum cafe hee500) — 건록격은 월지가 일간의 건록, 양인격은 월지가 일간의 양인 (甲卯·丙戊午·庚酉·壬子; 음일간은 양인 없음) (external cross-check 2026-10-03)",
+        "url": "https://m.cafe.daum.net/hee500/6z3T/45?q=D_Pe2snkI1ZYs0"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "yangin": true,
+        "yangin_grid": true
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 己巳 庚午 戊申 丁巳. Day Master 戊, month branch 午 = its 양인 branch 午 → 양인격 (월령)."
+  },
+  {
+    "id": "yangin-grid-庚-酉-month-1966",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1966,
+      "month": 10,
+      "day": 8,
+      "hour": 14,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:100-129 — 양인격 (월령): blade branch 庚→酉 is the month branch"
+      },
+      {
+        "citation": "명리중급공부 건록격·양인격 (daum cafe hee500) — 건록격은 월지가 일간의 건록, 양인격은 월지가 일간의 양인 (甲卯·丙戊午·庚酉·壬子; 음일간은 양인 없음) (external cross-check 2026-10-03)",
+        "url": "https://m.cafe.daum.net/hee500/6z3T/45?q=D_Pe2snkI1ZYs0"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "yangin": true,
+        "yangin_grid": true
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丙午 丁酉 庚子 癸未. Day Master 庚, month branch 酉 = its 양인 branch 酉 → 양인격 (월령)."
+  },
+  {
+    "id": "yangin-grid-壬-子-month-1984",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1984,
+      "month": 12,
+      "day": 14,
+      "hour": 14,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:100-129 — 양인격 (월령): blade branch 壬→子 is the month branch"
+      },
+      {
+        "citation": "명리중급공부 건록격·양인격 (daum cafe hee500) — 건록격은 월지가 일간의 건록, 양인격은 월지가 일간의 양인 (甲卯·丙戊午·庚酉·壬子; 음일간은 양인 없음) (external cross-check 2026-10-03)",
+        "url": "https://m.cafe.daum.net/hee500/6z3T/45?q=D_Pe2snkI1ZYs0"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "yangin": true,
+        "yangin_grid": true
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 甲子 丙子 壬午 丁未. Day Master 壬, month branch 子 = its 양인 branch 子 → 양인격 (월령)."
+  },
+  {
+    "id": "jianlu-grid-甲-寅-month-1939",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1939,
+      "month": 2,
+      "day": 16,
+      "hour": 22,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:131-152 — 건록격 (월령): 건록 branch 甲→寅 is the month branch"
+      },
+      {
+        "citation": "명리중급공부 건록격·양인격 (daum cafe hee500) — 건록격은 월지가 일간의 건록, 양인격은 월지가 일간의 양인 (甲卯·丙戊午·庚酉·壬子; 음일간은 양인 없음) (external cross-check 2026-10-03)",
+        "url": "https://m.cafe.daum.net/hee500/6z3T/45?q=D_Pe2snkI1ZYs0"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "jianlu": true,
+        "jianlu_grid": true
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 己卯 丙寅 甲申 乙亥. Day Master 甲, month branch 寅 = its 건록 branch 寅 → 건록격 (월령)."
+  },
+  {
+    "id": "jianlu-grid-丙-巳-month-1950",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1950,
+      "month": 5,
+      "day": 11,
+      "hour": 10,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:131-152 — 건록격 (월령): 건록 branch 丙→巳 is the month branch"
+      },
+      {
+        "citation": "명리중급공부 건록격·양인격 (daum cafe hee500) — 건록격은 월지가 일간의 건록, 양인격은 월지가 일간의 양인 (甲卯·丙戊午·庚酉·壬子; 음일간은 양인 없음) (external cross-check 2026-10-03)",
+        "url": "https://m.cafe.daum.net/hee500/6z3T/45?q=D_Pe2snkI1ZYs0"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "jianlu": true,
+        "jianlu_grid": true
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 庚寅 辛巳 丙午 癸巳. Day Master 丙, month branch 巳 = its 건록 branch 巳 → 건록격 (월령)."
+  },
+  {
+    "id": "jianlu-grid-戊-巳-month-1965",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1965,
+      "month": 5,
+      "day": 14,
+      "hour": 2,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:131-152 — 건록격 (월령): 건록 branch 戊→巳 is the month branch"
+      },
+      {
+        "citation": "명리중급공부 건록격·양인격 (daum cafe hee500) — 건록격은 월지가 일간의 건록, 양인격은 월지가 일간의 양인 (甲卯·丙戊午·庚酉·壬子; 음일간은 양인 없음) (external cross-check 2026-10-03)",
+        "url": "https://m.cafe.daum.net/hee500/6z3T/45?q=D_Pe2snkI1ZYs0"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "jianlu": true,
+        "jianlu_grid": true
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙巳 辛巳 戊辰 癸丑. Day Master 戊, month branch 巳 = its 건록 branch 巳 → 건록격 (월령)."
+  },
+  {
+    "id": "jianlu-grid-庚-申-month-1973",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1973,
+      "month": 8,
+      "day": 12,
+      "hour": 2,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:131-152 — 건록격 (월령): 건록 branch 庚→申 is the month branch"
+      },
+      {
+        "citation": "명리중급공부 건록격·양인격 (daum cafe hee500) — 건록격은 월지가 일간의 건록, 양인격은 월지가 일간의 양인 (甲卯·丙戊午·庚酉·壬子; 음일간은 양인 없음) (external cross-check 2026-10-03)",
+        "url": "https://m.cafe.daum.net/hee500/6z3T/45?q=D_Pe2snkI1ZYs0"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "jianlu": true,
+        "jianlu_grid": true
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 癸丑 庚申 庚辰 丁丑. Day Master 庚, month branch 申 = its 건록 branch 申 → 건록격 (월령)."
+  },
+  {
+    "id": "jianlu-grid-壬-亥-month-1991",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1991,
+      "month": 11,
+      "day": 8,
+      "hour": 18,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:131-152 — 건록격 (월령): 건록 branch 壬→亥 is the month branch"
+      },
+      {
+        "citation": "명리중급공부 건록격·양인격 (daum cafe hee500) — 건록격은 월지가 일간의 건록, 양인격은 월지가 일간의 양인 (甲卯·丙戊午·庚酉·壬子; 음일간은 양인 없음) (external cross-check 2026-10-03)",
+        "url": "https://m.cafe.daum.net/hee500/6z3T/45?q=D_Pe2snkI1ZYs0"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "jianlu": true,
+        "jianlu_grid": true
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 辛未 己亥 壬午 己酉. Day Master 壬, month branch 亥 = its 건록 branch 亥 → 건록격 (월령)."
+  },
+  {
+    "id": "yangin-related-丙-not-month-1990",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1990,
+      "month": 7,
+      "day": 20,
+      "hour": 22,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:100-129 — blade branch in year/day/hour is a related pattern, not the 월령 양인격"
+      },
+      {
+        "citation": "명리중급공부 건록격·양인격 (daum cafe hee500) — 건록격은 월지가 일간의 건록, 양인격은 월지가 일간의 양인 (甲卯·丙戊午·庚酉·壬子; 음일간은 양인 없음) (external cross-check 2026-10-03)",
+        "url": "https://m.cafe.daum.net/hee500/6z3T/45?q=D_Pe2snkI1ZYs0"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "yangin": true,
+        "yangin_grid": false
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 庚午 癸未 丙戌 己亥. Day Master 丙; blade branch 午 present but month branch is 未 → blade overlay present, no 월령 양인격."
+  },
+  {
+    "id": "yangin-related-庚-not-month-1938",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1938,
+      "month": 1,
+      "day": 8,
+      "hour": 18,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:100-129 — blade branch in year/day/hour is a related pattern, not the 월령 양인격"
+      },
+      {
+        "citation": "명리중급공부 건록격·양인격 (daum cafe hee500) — 건록격은 월지가 일간의 건록, 양인격은 월지가 일간의 양인 (甲卯·丙戊午·庚酉·壬子; 음일간은 양인 없음) (external cross-check 2026-10-03)",
+        "url": "https://m.cafe.daum.net/hee500/6z3T/45?q=D_Pe2snkI1ZYs0"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "yangin": true,
+        "yangin_grid": false
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丁丑 癸丑 庚子 乙酉. Day Master 庚; blade branch 酉 present but month branch is 丑 → blade overlay present, no 월령 양인격."
+  },
+  {
+    "id": "jianlu-related-甲-not-month-1938",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1938,
+      "month": 12,
+      "day": 8,
+      "hour": 6,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:131-152 — 건록 branch in year/day/hour is a related pattern, not the 월령 건록격"
+      },
+      {
+        "citation": "명리중급공부 건록격·양인격 (daum cafe hee500) — 건록격은 월지가 일간의 건록, 양인격은 월지가 일간의 양인 (甲卯·丙戊午·庚酉·壬子; 음일간은 양인 없음) (external cross-check 2026-10-03)",
+        "url": "https://m.cafe.daum.net/hee500/6z3T/45?q=D_Pe2snkI1ZYs0"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "jianlu": true,
+        "jianlu_grid": false
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 戊寅 甲子 甲戌 丁卯. Day Master 甲; 건록 branch 寅 present but month branch is 子 → no 월령 건록격."
+  },
+  {
+    "id": "jianlu-related-壬-not-month-1935",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1935,
+      "month": 9,
+      "day": 23,
+      "hour": 22,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:131-152 — 건록 branch in year/day/hour is a related pattern, not the 월령 건록격"
+      },
+      {
+        "citation": "명리중급공부 건록격·양인격 (daum cafe hee500) — 건록격은 월지가 일간의 건록, 양인격은 월지가 일간의 양인 (甲卯·丙戊午·庚酉·壬子; 음일간은 양인 없음) (external cross-check 2026-10-03)",
+        "url": "https://m.cafe.daum.net/hee500/6z3T/45?q=D_Pe2snkI1ZYs0"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "jianlu": true,
+        "jianlu_grid": false
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 乙亥 乙酉 壬寅 辛亥. Day Master 壬; 건록 branch 亥 present but month branch is 酉 → no 월령 건록격."
+  },
+  {
+    "id": "yangin-none-yin-daymaster-己-1973",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1973,
+      "month": 9,
+      "day": 10,
+      "hour": 2,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:111-117 — 양인 listed only for the five yang Day Masters 甲丙戊庚壬"
+      },
+      {
+        "citation": "명리중급공부 건록격·양인격 (daum cafe hee500) — 건록격은 월지가 일간의 건록, 양인격은 월지가 일간의 양인 (甲卯·丙戊午·庚酉·壬子; 음일간은 양인 없음) (external cross-check 2026-10-03)",
+        "url": "https://m.cafe.daum.net/hee500/6z3T/45?q=D_Pe2snkI1ZYs0"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "yangin": false,
+        "yangin_grid": false
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 癸丑 辛酉 己酉 乙丑. Day Master 己 is yin; no 양인 branch exists for it (both knowledge/07 and the external reference: 음일간은 양인 없음)."
+  },
+  {
+    "id": "jianlu-yin-school-乙-卯-1982",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1982,
+      "month": 3,
+      "day": 23,
+      "hour": 10,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:131-139 — knowledge lists 건록 only for 甲寅·丙巳·戊巳·庚申·壬亥 (engine follows this)"
+      },
+      {
+        "citation": "명리중급공부 건록격·양인격 (daum cafe hee500) — 건록격은 월지가 일간의 건록, 양인격은 월지가 일간의 양인 (甲卯·丙戊午·庚酉·壬子; 음일간은 양인 없음) (external cross-check 2026-10-03)",
+        "url": "https://m.cafe.daum.net/hee500/6z3T/45?q=D_Pe2snkI1ZYs0"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "jianlu_grid": true
+      }
+    },
+    "status": "documented_interpretation",
+    "notes": "Pillars 壬戌 癸卯 乙巳 辛巳. The external reference extends 건록격 to all ten stems (乙 in 卯 月 → 건록격); knowledge/07 and the engine list only the five yang stems, so engine returns jianlu_grid false. Expectation recorded is the other school's."
+  },
+  {
+    "id": "hwa-丁壬-1979",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1979,
+      "month": 4,
+      "day": 5,
+      "hour": 16,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:75-98 — 화격: month stem is 합 partner of DM, combined element in season at month branch, DM isolated, no effective breaker"
+      },
+      {
+        "citation": "CONTRASTING SCHOOL (not ground truth for this fixture) — 8-codes 15강 용신 합화격: 일간 무근 (Day Master must have NO root), 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것 (external cross-check 2026-10-03). Under 일간 무근 this chart would NOT be accepted.",
+        "url": "https://guide.8-codes.com/lecture/elementary/15.html"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "transformation_grid": "화격"
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 己未 丁卯 壬寅 戊申. 丁壬 combine into Wood; month branch 卯 is Wood (득령). Isolation per knowledge/07-special-formations.md:82 ('isolated, not strongly supported by allies') is undefined there; the engine judges it by the strength verdict (verdict weak, total_score -2.93), so isolation is satisfied. Hidden-stem roots: 壬 is rooted in 申 (hides 戊壬庚); this Day Master is therefore NOT root-less. The stricter external 일간 무근 rule (8-codes 15강) would NOT accept this chart; knowledge/07 is the ground truth here (engine == knowledge/). No allied stem is visible and no effective breaker (any breaker is floating: unrooted and out of season)."
+  },
+  {
+    "id": "hwa-庚乙-1988",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1988,
+      "month": 8,
+      "day": 8,
+      "hour": 4,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:75-98 — 화격: month stem is 합 partner of DM, combined element in season at month branch, DM isolated, no effective breaker"
+      },
+      {
+        "citation": "CONTRASTING SCHOOL (not ground truth for this fixture) — 8-codes 15강 용신 합화격: 일간 무근 (Day Master must have NO root), 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것 (external cross-check 2026-10-03). Under 일간 무근 this chart would NOT be accepted.",
+        "url": "https://guide.8-codes.com/lecture/elementary/15.html"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "transformation_grid": "화격"
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 戊辰 庚申 乙未 戊寅. 庚乙 combine into Metal; month branch 申 is Metal (득령). Isolation per knowledge/07-special-formations.md:82 ('isolated, not strongly supported by allies') is undefined there; the engine judges it by the strength verdict (verdict weak, total_score -2.22), so isolation is satisfied. Hidden-stem roots: 乙 is rooted in 辰 (乙癸戊) and 未 (丁乙己); this Day Master is therefore NOT root-less. The stricter external 일간 무근 rule (8-codes 15강) would NOT accept this chart; knowledge/07 is the ground truth here (engine == knowledge/). No allied stem is visible and no effective breaker (any breaker is floating: unrooted and out of season)."
+  },
+  {
+    "id": "hwa-戊癸-1988",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1988,
+      "month": 6,
+      "day": 7,
+      "hour": 8,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:75-98 — 화격: month stem is 합 partner of DM, combined element in season at month branch, DM isolated, no effective breaker"
+      },
+      {
+        "citation": "CONTRASTING SCHOOL (not ground truth for this fixture) — 8-codes 15강 용신 합화격: 일간 무근 (Day Master must have NO root), 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것 (external cross-check 2026-10-03). Under 일간 무근 this chart would NOT be accepted.",
+        "url": "https://guide.8-codes.com/lecture/elementary/15.html"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "transformation_grid": "화격"
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 戊辰 戊午 癸巳 丙辰. 戊癸 combine into Fire; month branch 午 is Fire (득령). Isolation per knowledge/07-special-formations.md:82 ('isolated, not strongly supported by allies') is undefined there; the engine judges it by the strength verdict (verdict weak, total_score -2.90), so isolation is satisfied. Hidden-stem roots: 癸 is rooted in 辰 (hides 乙癸戊); this Day Master is therefore NOT root-less. The stricter external 일간 무근 rule (8-codes 15강) would NOT accept this chart; knowledge/07 is the ground truth here (engine == knowledge/). No allied stem is visible and no effective breaker (any breaker is floating: unrooted and out of season)."
+  },
+  {
+    "id": "hwa-己甲-1991",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1991,
+      "month": 1,
+      "day": 25,
+      "hour": 0,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:75-98 — 화격: month stem is 합 partner of DM, combined element in season at month branch, DM isolated, no effective breaker"
+      },
+      {
+        "citation": "CONTRASTING SCHOOL (not ground truth for this fixture) — 8-codes 15강 용신 합화격: 일간 무근 (Day Master must have NO root), 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것 (external cross-check 2026-10-03). Under 일간 무근 this chart would NOT be accepted.",
+        "url": "https://guide.8-codes.com/lecture/elementary/15.html"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "transformation_grid": "화격"
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 庚午 己丑 甲午 丙子. 己甲 combine into Earth; month branch 丑 is Earth (득령). Isolation per knowledge/07-special-formations.md:82 ('isolated, not strongly supported by allies') is undefined there; the engine judges it by the strength verdict (verdict weak, total_score -2.79), so isolation is satisfied. Hidden-stem roots: 甲 has no 甲 root, but receives 인성 via 子 (hides 癸) and 丑 (hides 癸辛己); this Day Master is therefore NOT root-less. The stricter external 일간 무근 rule (8-codes 15강) would NOT accept this chart; knowledge/07 is the ground truth here (engine == knowledge/). No allied stem is visible and no effective breaker (any breaker is floating: unrooted and out of season)."
+  },
+  {
+    "id": "hwa-school-diff-戊-1940",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1940,
+      "month": 10,
+      "day": 2,
+      "hour": 21,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:75-98 — 화격 requires the DM 'isolated (not strongly supported by allies)'; engine judges isolation by strength verdict (weak)"
+      },
+      {
+        "citation": "8-codes 15강 용신 — 합화격: 일간 무근 (Day Master must have no root), strict school answer = no 화격 (external cross-check 2026-10-03)",
+        "url": "https://guide.8-codes.com/lecture/elementary/15.html"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "transformation_grid": null
+      }
+    },
+    "status": "documented_interpretation",
+    "notes": "Pillars 庚辰 乙酉 戊寅 壬戌. 乙庚 combine into Metal; month branch 酉 is Metal. Engine returns 화격 under knowledge/07 (strength verdict weak, total_score -1.91 → isolated). But Day Master 戊 is rooted in 辰, 戌 and 寅 (each hides 戊), so the stricter 일간 무근 school would NOT accept 화격 (expected null = that school's answer). School disagreement recorded; knowledge/07 does not define isolation, and the engine follows the strength verdict."
+  },
+  {
+    "id": "hwa-negative-1953-6",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1953,
+      "month": 6,
+      "day": 15,
+      "hour": 19,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:75-98 — 화격 conditions; breaker table knowledge/07-special-formations.md:88-98"
+      },
+      {
+        "citation": "CONTRASTING SCHOOL — 8-codes 15강 용신 — 합화격: 일간 무근, 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것; 종격: 인성·비겁 없고 한 오행이 대부분 (external cross-check 2026-10-03)",
+        "url": "https://guide.8-codes.com/lecture/elementary/15.html"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "transformation_grid": null
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 癸巳 戊午 丁酉 己酉. breaker 己 is rooted (午 hides 己) → effective, 합 cancelled."
+  },
+  {
+    "id": "hwa-negative-2003-1",
+    "subsystem": "patterns",
+    "input": {
+      "year": 2003,
+      "month": 1,
+      "day": 4,
+      "hour": 22,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:75-98 — 화격 conditions; breaker table knowledge/07-special-formations.md:88-98"
+      },
+      {
+        "citation": "CONTRASTING SCHOOL — 8-codes 15강 용신 — 합화격: 일간 무근, 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것; 종격: 인성·비겁 없고 한 오행이 대부분 (external cross-check 2026-10-03)",
+        "url": "https://guide.8-codes.com/lecture/elementary/15.html"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "transformation_grid": null
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 壬午 壬子 丁丑 辛亥. combined Wood is not in season at month 子 (Water) → no 화격."
+  },
+  {
+    "id": "hwa-negative-1943-6",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1943,
+      "month": 6,
+      "day": 22,
+      "hour": 7,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:75-98 — 화격 conditions; breaker table knowledge/07-special-formations.md:88-98"
+      },
+      {
+        "citation": "CONTRASTING SCHOOL — 8-codes 15강 용신 — 합화격: 일간 무근, 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것; 종격: 인성·비겁 없고 한 오행이 대부분 (external cross-check 2026-10-03)",
+        "url": "https://guide.8-codes.com/lecture/elementary/15.html"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "transformation_grid": null
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 癸未 戊午 辛亥 辛卯. Day Master 辛 has an allied 辛 on the hour stem and 未 resource → not isolated."
+  },
+  {
+    "id": "jong-종재-1987",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1987,
+      "month": 8,
+      "day": 1,
+      "hour": 15,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:57-74 — 종격: DM has no 인성/비겁 support; chart dominated by one force (종재)"
+      },
+      {
+        "citation": "8-codes 15강 용신 — 합화격: 일간 무근, 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것; 종격: 인성·비겁 없고 한 오행이 대부분 (external cross-check 2026-10-03)",
+        "url": "https://guide.8-codes.com/lecture/elementary/15.html"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "special_forms_names": [
+          "종재"
+        ],
+        "special_forms_confidence": {
+          "종재": "possible"
+        }
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丁卯 丁未 壬午 丁未. Day Master 壬 has no 비겁/인성 on any visible stem or hidden stem, and one element dominates (Fire) → 종재. Confidence is 'possible' under P2-W Option C: the dominant Fire is not 득령 in a 未 (Earth) month, so the in-season condition of knowledge/07:63 fails (month BRANCH used for 월령 by user decision 2026-10-03); the name and the 'possible' confidence are both asserted."
+  },
+  {
+    "id": "jong-종관-1973",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1973,
+      "month": 1,
+      "day": 1,
+      "hour": 18,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:57-74 — 종격: DM has no 인성/비겁 support; chart dominated by one force (종관)"
+      },
+      {
+        "citation": "8-codes 15강 용신 — 합화격: 일간 무근, 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것; 종격: 인성·비겁 없고 한 오행이 대부분 (external cross-check 2026-10-03)",
+        "url": "https://guide.8-codes.com/lecture/elementary/15.html"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "special_forms_names": [
+          "종관"
+        ],
+        "special_forms_confidence": {
+          "종관": "likely"
+        }
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 壬子 壬子 丁酉 己酉. Day Master 丁 has no 비겁/인성 on any visible stem or hidden stem, and Water dominates → 종관. Confidence is 'likely' under P2-W Option C: no 비겁/인성 anywhere (07:62) and the dominant Water is 득령 at the 子 month branch (07:63; month BRANCH used for 월령 by user decision 2026-10-03). Reader verification is still required."
+  },
+  {
+    "id": "jong-종식상-1998",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1998,
+      "month": 2,
+      "day": 5,
+      "hour": 4,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:57-74 — 종격: DM has no 인성/비겁 support; chart dominated by one force (종식상)"
+      },
+      {
+        "citation": "8-codes 15강 용신 — 합화격: 일간 무근, 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것; 종격: 인성·비겁 없고 한 오행이 대부분 (external cross-check 2026-10-03)",
+        "url": "https://guide.8-codes.com/lecture/elementary/15.html"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "special_forms_names": [
+          "종식상",
+          "종자"
+        ],
+        "special_forms_confidence": {
+          "종식상": "likely",
+          "종자": "likely"
+        }
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 戊寅 甲寅 癸未 甲寅. Day Master 癸 has no 비겁/인성 on any visible stem or hidden stem, and Wood dominates → 종식상 (+ the 종자 alias the engine surfaces for the output subtype per knowledge/07:64-65). Both are 'likely' under P2-W Option C: no 비겁/인성 anywhere (07:62) and the dominant Wood is 득령 at the 寅 month branch (07:63; month BRANCH used for 월령 by user decision 2026-10-03)."
+  },
+  {
+    "id": "jong-none-rooted-strong-1997",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1997,
+      "month": 1,
+      "day": 27,
+      "hour": 14,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:57-74 — 종격 requires an unsupported Day Master"
+      },
+      {
+        "citation": "8-codes 15강 용신 — 합화격: 일간 무근, 합화 오행이 월지 오행과 같을 것, 합화 오행을 극하는 오행이 없을 것; 종격: 인성·비겁 없고 한 오행이 대부분 (external cross-check 2026-10-03)",
+        "url": "https://guide.8-codes.com/lecture/elementary/15.html"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "special_forms_names": []
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丙子 辛丑 己巳 辛未. Day Master 己 is rooted/supported (巳 resource, 未 own element) → no 종격."
+  },
+  {
+    "id": "samhap-guk-巳酉丑-1973",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1973,
+      "month": 9,
+      "day": 10,
+      "hour": 2,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/02-branches.md:68-80 — 삼합 triples (the 삼합국 label itself is an engine structural-note, not defined in knowledge/; expectation derived from the triples)"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류 — 삼합 그룹 寅午戌·申子辰·巳酉丑·亥卯未 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "structural_notes_kinds": [
+          "삼합국"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 癸丑 辛酉 己酉 乙丑. All four branches lie inside the 巳酉丑 삼합 frame (丑/酉)."
+  },
+  {
+    "id": "samhap-guk-亥卯未-1991",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1991,
+      "month": 11,
+      "day": 13,
+      "hour": 14,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/02-branches.md:68-80 — 삼합 triples (the 삼합국 label itself is an engine structural-note, not defined in knowledge/; expectation derived from the triples)"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류 — 삼합 그룹 寅午戌·申子辰·巳酉丑·亥卯未 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "structural_notes_kinds": [
+          "삼합국"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 辛未 己亥 丁亥 丁未. All four branches lie inside the 亥卯未 삼합 frame (亥/未)."
+  },
+  {
+    "id": "samhap-guk-none-1967",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1967,
+      "month": 6,
+      "day": 14,
+      "hour": 6,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/02-branches.md:68-80 — 삼합 triples"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류 — 삼합 그룹 寅午戌·申子辰·巳酉丑·亥卯未 (external cross-check 2026-10-03)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "structural_notes_kinds": []
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丁未 丙午 己酉 丁卯. Four distinct branches spanning more than one 삼합 frame → no structural note."
+  },
+  {
+    "id": "sanggwan-gyeongwan-1976",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1976,
+      "month": 2,
+      "day": 10,
+      "hour": 18,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/05-ten-gods.md:81,123 — 상관견관: 상관 meets 정관 (conflict with authority); knowledge/07-special-formations.md:34-44"
+      },
+      {
+        "citation": "두루미사주, 정관격 — 상관이 정관을 극하면(상관견관) 명예·지위가 흔들림 (external cross-check 2026-10-03)",
+        "url": "https://www.durumisaju.com/dict/gyeokguk/jeonggwan-gyeok"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "tengod_conflicts_names": [
+          "상관견관"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丙辰 庚寅 壬辰 己酉. Day Master 壬: 상관 乙 and 정관 己 both appear among stems/hidden stems."
+  },
+  {
+    "id": "sanggwan-gyeongwan-1977",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1977,
+      "month": 2,
+      "day": 11,
+      "hour": 18,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/05-ten-gods.md:81,123 — 상관견관: 상관 meets 정관 (conflict with authority); knowledge/07-special-formations.md:34-44"
+      },
+      {
+        "citation": "두루미사주, 정관격 — 상관이 정관을 극하면(상관견관) 명예·지위가 흔들림 (external cross-check 2026-10-03)",
+        "url": "https://www.durumisaju.com/dict/gyeokguk/jeonggwan-gyeok"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "tengod_conflicts_names": [
+          "상관견관"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丁巳 壬寅 己亥 癸酉. Day Master 己: 상관 庚 and 정관 甲 both appear among stems/hidden stems."
+  },
+  {
+    "id": "sanggwan-gyeongwan-none-1967",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1967,
+      "month": 6,
+      "day": 14,
+      "hour": 6,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/05-ten-gods.md:81,123 — 상관견관 needs both 상관 and 정관"
+      },
+      {
+        "citation": "두루미사주, 정관격 — 상관이 정관을 극하면(상관견관) 명예·지위가 흔들림 (external cross-check 2026-10-03)",
+        "url": "https://www.durumisaju.com/dict/gyeokguk/jeonggwan-gyeok"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "tengod_conflicts_names": []
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丁未 丙午 己酉 丁卯. Not both 상관 and 정관 present (stems + hidden stems)."
+  },
+  {
+    "id": "jong-likely-종재-1948",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1948,
+      "month": 9,
+      "day": 9,
+      "hour": 1,
+      "minute": 47,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:57-65 — 종격 conditions (line 62: no 인성, no 비겁, no seasonal support; 63: dominant force)"
+      },
+      {
+        "citation": "8-codes 15강 용신 — 종격: 인성과 비겁이 없고 사주가 한 오행 세력으로 이루어진 경우 가장 강한 세력을 따른다 (external cross-check 2026-10-03)",
+        "url": "https://guide.8-codes.com/lecture/elementary/15.html"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "special_forms_names": [
+          "종재"
+        ],
+        "special_forms_confidence": {
+          "종재": "likely"
+        }
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 戊子 辛酉 丁酉 辛丑. Day Master 丁 (Fire); resource Wood. No Fire/Wood on any visible stem (戊 辛 辛), branch (子酉酉丑) or hidden stem (子 hides 癸 only; 酉 辛; 丑 己辛癸) → no 비겁/인성. Metal dominates (>50%) and the month branch 酉 is Metal → 득령. Metal is controlled by Fire → 종재, confidence 'likely' under P2-W Option C (month BRANCH used for 월령 by user decision; knowledge/07:63 says 'month stem')."
+  },
+  {
+    "id": "jong-likely-종재-1983",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1983,
+      "month": 12,
+      "day": 26,
+      "hour": 22,
+      "minute": 3,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:57-65 — 종격 conditions (line 62: no 인성, no 비겁, no seasonal support; 63: dominant force)"
+      },
+      {
+        "citation": "8-codes 15강 용신 — 종격: 인성과 비겁이 없고 사주가 한 오행 세력으로 이루어진 경우 가장 강한 세력을 따른다 (external cross-check 2026-10-03)",
+        "url": "https://guide.8-codes.com/lecture/elementary/15.html"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "special_forms_names": [
+          "종재"
+        ],
+        "special_forms_confidence": {
+          "종재": "likely"
+        }
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 癸亥 甲子 戊子 癸亥. Day Master 戊 (Earth); resource Fire. No Earth/Fire on any visible stem (癸 甲 癸), branch (亥子子亥) or hidden stem (壬甲/癸) per knowledge/02-branches.md:34,45 → no 비겁/인성. Water dominates and month branch 子 is Water → 득령. Water is controlled by Earth → 종재, 'likely' (P2-W Option C). Caveat: the month STEM is 甲 (Wood) while Water dominates, so this qualifies only under the month-BRANCH (월령) reading chosen by the user (2026-10-03), not the literal knowledge/07:63 'month stem' wording."
+  },
+  {
+    "id": "jong-visible-bigyeop-possible-종관-1938",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1938,
+      "month": 1,
+      "day": 5,
+      "hour": 23,
+      "minute": 56,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/07-special-formations.md:57-65 — 종격 conditions (line 62: no 인성, no 비겁, no seasonal support; 63: dominant force); strict reading of 'no 비겁' includes a visible stem"
+      },
+      {
+        "citation": "8-codes 15강 용신 — 종격: 인성과 비겁이 없고 사주가 한 오행 세력으로 이루어진 경우 가장 강한 세력을 따른다 (external cross-check 2026-10-03)",
+        "url": "https://guide.8-codes.com/lecture/elementary/15.html"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "special_forms_names": [
+          "종관"
+        ],
+        "special_forms_confidence": {
+          "종관": "possible"
+        }
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 丁丑 壬子 丁酉 壬子. Water dominates and is 득령 (month 子), no 비겁/인성 in any branch or hidden stem — but the year stem 丁 is a visible 비견 of the 丁 Day Master. Per the strict reading of 07:62 ('no 비겁') the candidate is downgraded to 'possible' (without the visible-stem test it would be 'likely'). knowledge/ does not say whether a visible-only 비겁 disqualifies or merely weakens 종격 (analysis doc, Honest limits)."
+  }
+]

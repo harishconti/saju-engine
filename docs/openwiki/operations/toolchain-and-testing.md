@@ -46,6 +46,15 @@ pytest tests/test_nayin.py
 pytest tests/test_pdf.py
 ```
 
+## Validation fixtures
+
+`python3 tools/run_validation.py` runs cited JSON fixtures in `tests/validation/fixtures/`
+(314 checks, 10 subsystems): `pillars.json`, `daeun.json`, `sewoon.json`, `lookups.json`,
+`yongsin.json`, `climate.json`, `compat.json`, `career.json`, plus the P3 additions
+`stars.json` (W7 신살, 57 fixtures; harness `tests/validation/test_val_stars.py`) and
+`patterns.json` (W8 격국, 51 fixtures; harness `tests/validation/test_val_patterns.py`). Gate
+history: `docs/validation/gate-history.md`.
+
 ## Engine validation priorities
 
 - **Priority A — Foundation tables.** Verifiable against standard Korean almanac tables.

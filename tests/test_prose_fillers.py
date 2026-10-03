@@ -693,7 +693,7 @@ def test_strength_reasoning_no_reconciliation_for_strong_weak_charts():
         longitude=127.0, utc_offset=9.0, convention="korean",
     )
     sa = chart.strength_assessment
-    assert sa["verdict"] in ("strong", "extreme", "weak", "extreme_weak")
+    assert sa["verdict"] in ("strong", "extreme", "weak")
     text = PF.strength_reasoning({"chart": chart})
     assert "pulls the total back into the balanced range" not in text
 

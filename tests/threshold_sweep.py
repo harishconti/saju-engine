@@ -77,7 +77,7 @@ def _recompute_verdict(chart, *, season_w=1.5, resource_w=0.8, drain_w=0.7,
     if total >= strong_band:
         return "strong", round(total, 2)
     if total <= -extreme_band:
-        return "extreme_weak", round(total, 2)
+        return "extreme_weak", round(total, 2)  # historical band: strength no longer emits it (P2-W, d292746)
     if total <= -strong_band:
         return "weak", round(total, 2)
     return "balanced", round(total, 2)

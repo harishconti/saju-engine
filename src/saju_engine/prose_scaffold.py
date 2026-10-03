@@ -287,9 +287,8 @@ def generate_prose_scaffold(chart: Chart) -> Dict[str, str]:
 
 _VERDICT_PLAIN_LABEL = {
     "strong": "strong",
-    "extreme_strong": "very strong",
+    "extreme": "very strong",
     "weak": "on the weaker side",
-    "extreme_weak": "quite weak",
     "balanced": "balanced",
 }
 

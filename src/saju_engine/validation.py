@@ -103,6 +103,20 @@ def run_fixture(entry: dict) -> dict:
     return check_pillars(chart, entry)
 
 
+def _result(entry: dict, mismatches: dict) -> dict:
+    """Turn a mismatches dict into the standard PASS/INTERPRETATION/FAIL result."""
+    if not mismatches:
+        status = "PASS"
+    elif entry.get("status") == "documented_interpretation":
+        status = "INTERPRETATION"
+    else:
+        status = "FAIL"
+    detail = "; ".join(f"{k}: expected {m['expected']}, got {m['got']}"
+                       for k, m in mismatches.items()) or "all checks matched"
+    return {"id": entry["id"], "status": status,
+            "mismatches": mismatches, "detail": detail}
+
+
 def check_daeun(chart: Any, entry: dict) -> dict:
     """Check a computed Chart's major-luck (대운) table against a daeun fixture.
 
@@ -139,16 +153,7 @@ def check_daeun(chart: Any, entry: dict) -> dict:
     elif exp_accept is not None and got_start not in exp_accept:
         mismatches["start_age"] = {"expected": f"in {exp_accept}", "got": got_start}
 
-    if not mismatches:
-        status = "PASS"
-    elif entry.get("status") == "documented_interpretation":
-        status = "INTERPRETATION"
-    else:
-        status = "FAIL"
-    detail = "; ".join(f"{k}: expected {m['expected']}, got {m['got']}"
-                       for k, m in mismatches.items()) or "all checks matched"
-    return {"id": entry["id"], "status": status,
-            "mismatches": mismatches, "detail": detail}
+    return _result(entry, mismatches)
 
 
 def run_daeun_fixture(entry: dict) -> dict:
@@ -888,15 +893,104 @@ def run_climate_fixture(entry: dict) -> dict:
     return check_climate_merge(chart, entry)
 
 
+_STARS_ALLOWED_INPUT = _ALLOWED_INPUT | {"star_anchor"}
+
+
+def check_stars(chart: Any, entry: dict) -> dict:
+    """Check a declared subset of chart.stars against a stars fixture.
+
+    expected.stars: {star_key: [branches/stems/pillars]} — each listed key must
+    equal chart.stars[key] (order-insensitive); an empty list asserts the star
+    is not activated. Unlisted keys are not checked. Unknown keys raise.
+    """
+    exp = entry.get("expected", {}).get("stars") or {}
+    unknown = set(exp) - set(chart.stars)
+    if unknown:
+        raise ValueError(f"stars/{entry['id']}: unknown star key(s) {sorted(unknown)}")
+    mismatches = {
+        k: {"expected": sorted(v), "got": sorted(chart.stars.get(k, []))}
+        for k, v in exp.items() if sorted(v) != sorted(chart.stars.get(k, []))
+    }
+    return _result(entry, mismatches)
+
+
+def run_stars_fixture(entry: dict) -> dict:
+    """Compute the chart for a stars fixture entry and check its 신살 subset."""
+    unknown = set(entry["input"]) - _STARS_ALLOWED_INPUT
+    if unknown:
+        raise ValueError(f"stars/{entry['id']}: unknown input key(s) {sorted(unknown)}")
+    anchor = entry["input"].get("star_anchor")
+    if anchor is not None and anchor not in ("day", "year"):
+        raise ValueError(
+            f"stars/{entry['id']}: star_anchor must be 'day' or 'year', got {anchor!r}"
+        )
+    kwargs = dict(entry["input"])
+    kwargs.setdefault("name", entry["id"])
+    return check_stars(compute_chart(**kwargs), entry)
+
+
+def _patterns_extract(pat: dict) -> dict:
+    """Extractors over the JSON shape of ``Chart._patterns_dict`` (regular_grid
+    already converted to dicts), one per supported ``expected.patterns`` key."""
+    grid = pat.get("regular_grid") or []
+    tg = pat.get("transformation_grid")
+    return {
+        "regular_grid_name": grid[0]["name_ko"] if grid else None,
+        "yangin": bool(pat["yangin"]["present"]),
+        "yangin_grid": bool(pat["yangin_grid"]["present"]),
+        "jianlu": bool(pat["jianlu"]["present"]),
+        "jianlu_grid": bool(pat["jianlu_grid"]["present"]),
+        "transformation_grid": tg["name_ko"] if tg else None,
+        "special_forms_names": sorted(f["name_ko"] for f in pat.get("special_forms") or []),
+        "special_forms_confidence": {f["name_ko"]: f["confidence"] for f in pat.get("special_forms") or []},
+        "structural_notes_kinds": sorted(n["name_ko"] for n in pat.get("structural_notes") or []),
+        "tengod_conflicts_names": sorted(c["name_ko"] for c in pat.get("tengod_conflicts") or []),
+    }
+
+
+def check_patterns(chart: Any, entry: dict) -> dict:
+    """Check a declared subset of chart.patterns (격국) against a fixture.
+
+    expected.patterns keys (each optional): regular_grid_name, yangin (blade
+    present at any position), yangin_grid (month-branch 양인격), jianlu,
+    jianlu_grid (month-branch 건록격), transformation_grid (name or null),
+    special_forms_names, special_forms_confidence (dict name_ko -> confidence),
+    structural_notes_kinds, tengod_conflicts_names (sorted lists). Unknown keys raise.
+    """
+    exp = entry.get("expected", {}).get("patterns") or {}
+    got = _patterns_extract(chart._patterns_dict(chart.patterns))
+    unknown = set(exp) - set(got)
+    if unknown:
+        raise ValueError(f"patterns/{entry['id']}: unknown expected key(s) {sorted(unknown)}")
+    mismatches = {}
+    for k, v in exp.items():
+        want = sorted(v) if isinstance(v, list) else v
+        if want != got[k]:
+            mismatches[k] = {"expected": want, "got": got[k]}
+    return _result(entry, mismatches)
+
+
+def run_patterns_fixture(entry: dict) -> dict:
+    """Compute the chart for a patterns fixture entry and check its 격국 subset."""
+    unknown = set(entry["input"]) - _ALLOWED_INPUT
+    if unknown:
+        raise ValueError(f"patterns/{entry['id']}: unknown input key(s) {sorted(unknown)}")
+    kwargs = dict(entry["input"])
+    kwargs.setdefault("name", entry["id"])
+    return check_patterns(compute_chart(**kwargs), entry)
+
+
 _SUBSYSTEM_ORDER = ["pillars", "daeun", "sewoon", "lookups", "yongsin",
-                    "climate", "compat", "career"]
+                    "climate", "compat", "career", "stars", "patterns"]
 # Workstream label per subsystem (spec §workstreams). Extended by Plans 4–6.
 _WORKSTREAM = {"pillars": "W1", "daeun": "W2", "sewoon": "W2", "lookups": "W3",
-               "yongsin": "W4", "climate": "W5", "compat": "W6", "career": "W6"}
+               "yongsin": "W4", "climate": "W5", "compat": "W6", "career": "W6", "stars": "W7",
+               "patterns": "W8"}
 _RUNNERS = {"pillars": run_fixture, "daeun": run_daeun_fixture, "sewoon": run_sewoon_fixture,
             "lookups": run_lookups_fixture, "yongsin": run_yongsin_fixture,
             "climate": run_climate_fixture, "compat": run_compat_fixture,
-            "career": run_career_fixture}
+            "career": run_career_fixture, "stars": run_stars_fixture,
+            "patterns": run_patterns_fixture}
 
 
 def collect_results(fixtures_dir: Optional[Path] = None) -> dict[str, list[dict]]:
@@ -913,8 +1007,9 @@ def _esc(cell: Any) -> str:
 
 
 # Historical gate record: one entry per certified workstream, appended at that
-# workstream's certification. Gate dates and at-gate counts are facts that do
-# not move; the live totals below are derived from the current run instead.
+# workstream's certification. Narrative lives in
+# docs/validation/gate-history.md. Gate dates and at-gate counts are facts that
+# do not move; the live totals below are derived from the current run instead.
 _GATE_HISTORY = [
     {"workstream": "W1 Pillars", "gate_date": "2026-09-13", "checks": 17, "passed": 17},
     {"workstream": "W2 대운/세운", "gate_date": "2026-09-13", "checks": 19, "passed": 19},
@@ -922,73 +1017,14 @@ _GATE_HISTORY = [
     {"workstream": "W4 용신", "gate_date": "2026-09-13", "checks": 13, "passed": 13,
      "note": "10 PASS + 3 documented_interpretation"},
     {"workstream": "W5 Climate (조후)", "gate_date": "2026-09-13", "checks": 30, "passed": 30,
-     "note": "30 PASS; 3 rows carry the documented_interpretation guard "
-             "(published divergences cross-referenced in source); 16 band "
-             "(12 branches + 4 edges) + 14 merge covering all 9 band × verdict "
-             "cells; 0 FAIL"},
+     "note": "30 PASS; 3 documented_interpretation guard rows; 0 FAIL"},
     {"workstream": "W6 Compat / spouse + career", "gate_date": "2026-09-14",
      "checks": 59, "passed": 59,
-     "note": "27 compat (the eleven sub-systems A-K + 10 band cut-point edges + "
-             "6 score/anchor rows) + 32 career (30 KB12 domain-map + 2 "
-             "need-keyed tier charts); 2 documented_interpretation "
-             "(harish × vinothini pillars-only reconstruction; pawan × sruthi "
-             "stale ya-ja-si chart); 0 FAIL. Gate-time pin tally, re-measured "
-             "2026-09-14: 3 bug-lock families / 6 non-strict xfail markers "
-             "(which parametrize to 10 xfailed tests) / 10 guard tests — 육합 "
-             "dead code (test_val_compat, 3 locks / 3 fix-immune guards), C9 "
-             "삼형 shadowing (test_compat, 1 lock parametrized over 5 pairs / 2 "
-             "guards), C8 order-dependence (test_compat, 1 lock / 2 guards). "
-             "NOTE: this line previously read '9 non-strict xfail markers'; no "
-             "scoping reproduces 9 (W6-scoped is 6, suite-wide is 8), so the "
-             "figure is corrected to the measured value rather than carried. "
-             "A 4th family pinned at gate time "
-             "(report_data stale candidate_favorable, 1 lock + 3 guards) was "
-             "FIXED 2026-09-14; its lock XPASSed (delete-the-marker signal), so "
-             "the marker is retired and test_report_data now pins the fixed "
-             "behaviour positively. The fix also resolved the related "
-             "report_data._career_tiers contradiction — the candidate pool is "
-             "now keyed on the resolved 용신/희신 families, so both tier "
-             "fixtures measure possible_tier_reachable true over 12 rows "
-             "(W6 coverage gap 1 closed). C8 was likewise FIXED 2026-09-14 — "
-             "compat.py::_canonical_nayin_pair() now resolves the Nayin subject "
-             "order from the couple (male-first when both genders are known and "
-             "differ, else lower NAYIN_ORDER index) instead of from the caller's "
-             "argument order, so one couple has one verdict; see "
-             "knowledge/11-gunghap.md §C 'Canonical subject order'. Its lock "
-             "XPASSed, the marker is retired, and test_compat now pins "
-             "order-independence positively (0 locks / 3 guards). The 육합 "
-             "dead-code family was FIXED 2026-09-14 as well — "
-             "compat._branch_pair_lookup now matches each relation row on its "
-             "branch columns rather than on the whole row, so the 六合 branch is "
-             "reachable at all four call sites; the defect record and its three "
-             "pins live in tests/validation/test_val_compat.py. Its 3 locks "
-             "XPASSed, their markers are retired, and they now stand as positive "
-             "behaviour pins (L1 cross-pair helper +4, L2 spouse-palace +20, L3 "
-             "띠 +3). L3 additionally had to be REPAIRED rather than merely "
-             "un-marked: _pillars_chart hardcoded 甲子 for both charts, so the "
-             "띠 sub-system compared 子 with 子 and could never reach a 육합 — "
-             "permanently unsatisfiable under any candidate fix, which is why it "
-             "never XPASSed; _pillars_chart now takes a year_branch. Its 3 "
-             "guards stay, one INVERTED: "
-             "test_guard_lookup_is_shape_tolerant_for_six_combinations had "
-             "asserted the pre-fix premise (六合 lookup is False for all six "
-             "pairs) and failed the moment the helper gained 3-tuple tolerance, "
-             "so the shape-tolerance contract is now asserted positively. One "
-             "family remains live and fix-immune (C9). Live marker tally, "
-             "re-measured 2026-09-14 after all three retirements: 1 W6-scoped "
-             "non-strict xfail marker (C9, parametrized over 5 pairs = 5 xfailed "
-             "tests); 3 markers suite-wide once the 2 client-visible climate "
-             "locks are counted, expanding to 7 xfailed tests — the other 5 "
-             "xfailed are documented_interpretation escapes (dynamic "
-             "pytest.xfail on fixture mismatch: 3 W4 용신 + 2 W6 compat), not "
-             "bug locks. The chain ORDER was deliberately not touched, so the C9 "
-             "family is otherwise unchanged: four of its five rows still report "
-             "the shadowing relation the lock names, and the fifth (巳申) now "
-             "reports 육합 instead of 육파 — a different shadowing kind, still "
-             "not 삼형, so the row remains xfailed and the lock's status is "
-             "unmoved. The arity fix alone therefore flips 0 of C9's 5 rows. The "
-             "premium_report.py instances of that bug class (spec §Known Open "
-             "Bugs #1) were FIXED 2026-09-14 -- see the W5 note below."},
+     "note": "27 compat + 32 career; 2 documented_interpretation; 0 FAIL"},
+    {"workstream": "W7 Stars (신살)", "gate_date": "2026-10-03", "checks": 57, "passed": 57,
+     "note": "54 PASS + 3 documented_interpretation"},
+    {"workstream": "W8 Patterns (격국)", "gate_date": "2026-10-03", "checks": 48, "passed": 48,
+     "note": "46 PASS + 2 documented_interpretation"},
 ]
 
 
@@ -1022,267 +1058,6 @@ def render_report(results: dict[str, list[dict]]) -> str:
         ]
         for r in rows:
             lines.append(f"| {_esc(r['id'])} | {r['status']} | {_esc(r['detail'])} |")
-        if subsystem == "yongsin":
-            lines += [
-                "",
-                "### W4 yongsin — method coverage and documented divergences",
-                "",
-                "Merge logic validated (read-only engine, yongsin.py:105-206;",
-                "knowledge/09-interpretation-method.md Step 3; knowledge/17",
-                "§How This Combines With 억부): reader override wins unconditionally,",
-                "then climate-balanced (balanced Day Master × non-temperate 조후 band),",
-                "then the strong/weak 억부 verdict. All five method labels exercised:",
-                "strong-dm-drain, weak-dm-support, balanced-heuristic,",
-                "climate-balanced, reader-confirmed.",
-                "",
-                "Fixture layers: A — synthetic merge-logic charts (weak-cold-*);",
-                "B — published client verdicts (rm, gurumoorthy, harish,",
-                "vishnu-priya, sruthi, pawan, mahesh); C — both override channels",
-                "(explicit `override` argument and",
-                "`strength_assessment['reader_override_favorable']`, byte-identical).",
-                "",
-                "3 documented divergences (INTERPRETATION rows above):",
-                "sruthi-published (published Earth vs engine climate-balanced Fire),",
-                "pawan-published (published Water vs engine balanced-heuristic Wood),",
-                "mahesh-published (published Earth vs engine climate-balanced Fire) —",
-                "reader-argued verdicts on borderline balanced charts; the",
-                "reader-override fixtures reproduce each published element exactly.",
-                "pawan/mahesh verdicts predate the ya-ja-si hour-stem fix (STALE",
-                "CHART); reports queued for regeneration at campaign close.",
-                "",
-                "External cross-check (2026-09-13): 3 rule families × ≥2 sources,",
-                "no contradiction — weak DM → 인성/비겁 and strong DM →",
-                "식상/재성/관성 drain (두루미사주 억부용신 + 사자사주), extreme",
-                "climate ⇒ 조후 priority (두루미사주 conditional + OpenFate",
-                "climate-vs-strength-priority). Citations appended to each",
-                "fixture's `source` field; full research:",
-                "docs/research/2026-09-validation-yongsin.md.",
-            ]
-        if subsystem == "climate":
-            lines += [
-                "",
-                "### W5 climate — three-band classifier and the 조후 × 억부 merge matrix",
-                "",
-                "Classifier validated (read-only engine, climate.py:assess_climate;",
-                "knowledge/17-climate-method.md §Three Bands + §How This Combines",
-                "With 억부): a pure function of the month BRANCH — 巳午未 → hot/Water",
-                "(supporting Metal), 亥子丑 → cold/Fire (supporting Wood), all other",
-                "branches → temperate with both elements None. All 12 branches are",
-                "pinned, plus 4 defensive edges (empty string, a stem, latin input,",
-                "a 子時 hour label) that must fall through to temperate rather than",
-                "crash or mis-band — the 子時 edge specifically proves an hour label",
-                "is never read as the 子 MONTH.",
-                "",
-                "Merge matrix: 14 corpus charts covering all 9 band × verdict-class",
-                "cells (strong / balanced / weak folded over the 5-value strength",
-                "enum) with both climate_agrees polarities present for every",
-                "non-temperate band. Split by which layer decided the element:",
-                "5 rows where 억부 overrides 조후 (gurumoorthy-published,",
-                "weak-cold-priority, hot-weak-priority, cold-strong-priority,",
-                "cold-strong-scan — the raw candidate is kept and the 조후 element",
-                "declined), 4 where 조후 decides (harish, sruthi, mahesh,",
-                "vishnu-priya — all climate-balanced), 3 temperate controls where",
-                "조후 must not fire at all (rm-published, pawan-published,",
-                "weak-temperate), and 2 agreement rows where the raw candidate and",
-                "the 조후 element already coincide (weak-cold-agree, hot-weak-agree).",
-                "",
-                "Engine rule measured: 억부 decides unless the verdict is",
-                "`balanced`, in which case 조후 decides for a non-temperate band.",
-                "Whether the classical sources rank 조후 above 억부 unconditionally",
-                "is examined in docs/research/2026-09-validation-climate.md §5 —",
-                "recorded as an engine-behavior finding, not changed in-campaign.",
-                "",
-                "3 rows carry the documented_interpretation guard — sruthi-published,",
-                "pawan-published, mahesh-published (published Earth / Water / Earth",
-                "reading vs engine Fire / Wood / Fire) — the same three divergences",
-                "W4 documented, here attributed to their band × verdict cause. NOTE",
-                "the guard is a safety flag, not a verdict: a guarded row renders",
-                "INTERPRETATION only when it ALSO mismatches, and these three assert",
-                "engine values the probe reproduces exactly, so they render PASS.",
-                "The divergence is against the reader's published reading, which is",
-                "what each entry's `source` records. W5 therefore contributes 0",
-                "INTERPRETATION rows; the CLI's 3 remain W4's. pawan/mahesh verdicts",
-                "predate the ya-ja-si hour-stem fix (STALE CHART); reports queued",
-                "for regeneration at campaign close.",
-                "",
-                "Open coverage gaps (logged, NOT fixed — validation-only campaign):",
-                "the 120-cell 궁통보감 per-stem-per-month table is unimplemented",
-                "(climate.py self-declares the conservative scope), and climate.py",
-                "implements only the 寒暖 (hot/cold) axis of the classical 조후",
-                "treatment, whose fuller form is the four-way 寒暖燥濕 reading",
-                "(적천수: 天道有寒暖 … 地道有燥湿; knowledge/17-climate-method.md",
-                "§The Fuller 寒暖燥濕 Reading). Measured against that reading the",
-                "engine agrees on all ten branches where it prescribes an element",
-                "at all, and diverges only on 辰 (engine temperate, source 濕→火)",
-                "and 戌 (engine temperate, source 燥→水) — and only in whether an",
-                "override fires, never in which element: nobody assigns those two",
-                "branches a different remedy; the models differ on whether they are",
-                "assigned one. 丑 and 未 agree by convergent validity — the engine",
-                "cuts by seasonal quartet (丑 with 亥子, 未 with 巳午) and the source",
-                "by damp/dry state (辰丑 damp, 戌未 dry), and the two schemes still",
-                "land on Fire for 丑 and Water for 未. The divergence is pinned as an",
-                "explicit SCOPE LIMIT rather than an open uncertainty, because",
-                "widening the model would move the client-facing band value for",
-                "every 辰/戌-month chart — so the expansion is a product decision,",
-                "recorded in the knowledge file §Why the fuller reading is not",
-                "implemented and pinned by band-chen / band-xu. Both gaps are",
-                "addressed in docs/research/2026-09-validation-climate.md.",
-                "",
-                "Known-bug regression lock (spec §Known Open Bugs Tracked #1) --",
-                "FIXED 2026-09-14: premium_report.py _right_now_callout (~L181)",
-                "and ctx_favorable_phrase (~L1399) used to read the stale raw",
-                "strength_assessment['candidate_favorable'] instead of the",
-                "resolved favorable_element(). Both now take an `override`",
-                "param threaded from _ReportContext.favorable_override and read",
-                "the resolved channel, mirroring the report_data.py career-",
-                "section fix. The two non-strict pytest xfails in",
-                "tests/validation/test_val_climate.py XPASSed and were retired;",
-                "the tests now stand as plain regression locks on the fix.",
-            ]
-        # W6 is the only workstream spanning TWO subsystems (compat + career),
-        # so this block is keyed to the LAST of them -- `_SUBSYSTEM_ORDER` puts
-        # career after compat -- and therefore renders exactly once, after both
-        # W6 detail tables, the way the W4/W5 blocks follow theirs.
-        if subsystem == "career":
-            lines += [
-                "",
-                "### W6 compat / spouse + career — composite, weight table, and "
-                "pinned defects",
-                "",
-                "Compat composite validated (read-only engine, compat.py; "
-                "knowledge/11-gunghap.md §A-K, weight table :18-40, verdict bands "
-                ":959-978). 27 rows: the eleven sub-systems A-K, 10 band "
-                "cut-point edges, 6 score/anchor rows.",
-                "",
-                "Weight table measured: `WEIGHT` has 11 keys summing to 112, and "
-                "the scored subset excluding `combined_elements` sums to exactly "
-                "100 -- so the affine composite "
-                "`round(max(0, min(100, 50 + raw_total)))` is 0-100 normalizable, "
-                "and the gap between the two sums is `WEIGHT['combined_elements']` "
-                "(12). This is the one structural invariant the whole 0-100 scale "
-                "rests on; a twelfth weighted key or a 113 total would silently "
-                "break every published number.",
-                "",
-                "Band cut-points measured (`_band_for`): >=80 Excellent, >=65 "
-                "Strong, >=45 Mixed, else Challenging. All 10 edges pinned from "
-                "both sides, plus the out-of-range clamps: -1 and 0 Challenging; "
-                "44 Mixed / 45 Mixed; 64 Mixed / 65 Strong; 79 Strong / 80 "
-                "Excellent; 100 and 101 Excellent.",
-                "",
-                "Anchor: `compat-harish-manvitha` reproduces the published "
-                "70/Strong exactly from FULL/FULL `birth` pipelines with ZERO "
-                "reader overrides, and asserts all 11 WEIGHT keys. The override "
-                "anchor (partner B favorable forced to Earth) moves to 74/Strong "
-                "-- a reader override perturbs yongshin, ilju_pair AND "
-                "combined_elements, which is why the anchor's zero-override "
-                "provenance is asserted rather than assumed.",
-                "",
-                "Cross-branch priority measured, strict and first-match-wins "
-                "(:310): 육합 -> 육충 -> 육해 -> 육파 -> 형 -> 반합. The 형 step is "
-                "reachable for exactly 子卯 and 丑戌 within the 三刑 frames; 寅巳, "
-                "巳申, 寅申, 丑未 and 戌未 are shadowed by an earlier step, and the "
-                "four self-punishments 辰午酉亥 ride the same step at -2.",
-                "",
-                "Career validated (read-only engine, report_data.py; "
-                "knowledge/12-career-and-vocation.md, industry families :25-49). "
-                "32 rows: 30 domain-map + 2 need-keyed tier charts. The 30 "
-                "domains are the 5 per-element keyword lists in "
-                "`_domain_element`, 6 domains each; 25 agree with the KB12 "
-                "family and 5 carry the documented_interpretation guard (2 "
-                "coverage gaps that return None, 3 substring/ordering artifacts "
-                "where an earlier keyword list claims the domain).",
-                "",
-                "Tier cut-points measured: `_career_tiers` scores then sorts and "
-                "labels `i<4` **Best Fit**, `i<7` **Good Fit**, else "
-                "**Possible**. The candidate pool is the resolved 용신's family "
-                "followed by the 희신's family -- 12 candidates from 2 families "
-                "on both fixture charts -- so all three tiers are live, and both "
-                "fixtures pin `possible_tier_reachable` true against the full "
-                "ordered 12-row list. That closes the KB12:130-152 contradiction "
-                "this campaign recorded: the pool is now keyed on the chart's "
-                "*need*, not the Day Master's own element (fixed 2026-09-14, "
-                "which also closes W6 coverage gap 1).",
-                "",
-                "2 documented divergences (INTERPRETATION rows above). "
-                "harish × vinothini: the published 57/100 Mixed is a FULL/FULL "
-                "measurement -- the report prints both partners' four pillars in "
-                "full -- so this entry is a pillars-only reconstruction and the "
-                "divergence is a chart-INPUT difference, not a rule conflict. "
-                "pawan × sruthi: the published 55/100 Mixed predates the 야자시 "
-                "(夜子時) hour-stem fix (STALE CHART), so the engine's current "
-                "value is ground truth and the published figure is the outdated "
-                "one; both reports are queued for regeneration at campaign close.",
-                "",
-                "1 pinned bug-lock family / 1 non-strict xfail marker (which "
-                "parametrizes to 5 xfailed tests; 3 markers suite-wide once the 2 "
-                "client-visible climate locks are counted) / 11 guard-or-pin test "
-                "functions (16 test instances, by collection). The single live "
-                "family is fix-immune, and the campaign is "
-                "validation-only, so it remains unfixed by design. Three of the "
-                "four families pinned at gate time have since been FIXED and "
-                "their markers retired: the 육합 dead code (3 locks + 3 guards, "
-                "2026-09-14); the `report_data` stale `candidate_favorable` "
-                "field (1 lock + 3 guards, 2026-09-14), whose lock went XPASS -- "
-                "the delete-the-marker signal -- so that file now pins the fixed "
-                "behaviour as a positive pin; and C8 order-dependence (1 lock / "
-                "2 guards, 2026-09-14), fixed by "
-                "`compat.py::_canonical_nayin_pair()`, which resolves the Nayin "
-                "subject order from the couple rather than from the caller's "
-                "argument order (see knowledge/11-gunghap.md §C \"Canonical "
-                "subject order\"), retiring its marker and replacing its two "
-                "*defect pins* with three order-independence guards. The "
-                "`report_data` fix necessarily resolved the second half of the "
-                "`premium_report.py` bug class in `report_data._career_tiers` as "
-                "well, because the ranking and the per-row prose had to move to "
-                "the display channel together to stay consistent -- the W4 "
-                "`premium_report.py` instances above remain the only unfixed "
-                "half:",
-                "",
-                "* 육합 dead code -- FIXED 2026-09-14. "
-                "`compat._branch_pair_lookup` matched a 2-tuple against "
-                "`lookup.SIX_COMBINATIONS`, which is declared "
-                "`List[Tuple[str, str, str]]`, so the 육합 branch was unreachable "
-                "at all four call sites (:310 intended +4, :407 the PRIMARY "
-                "spouse-palace +20, :1295 띠 +3, :428 a vacuous 반합 "
-                "suppression). The helper now matches each relation row on its "
-                "branch columns; the defect record and its three pins live in "
-                "tests/validation/test_val_compat.py. Its 3 locks XPASSed -- the "
-                "delete-the-marker signal -- so the markers are retired and the "
-                "locks now stand as positive behaviour pins; its 3 guards remain, "
-                "one INVERTED, because the shape-tolerance contract had asserted "
-                "the buggy premise (六合 lookup is False for all six pairs) and is "
-                "now asserted positively. NOTE: this fix did NOT move the C9 "
-                "family -- the fix-order coupling previously asserted here is "
-                "refuted below.",
-                "* C9 삼형 shadowing -- 1 lock parametrized over 5 pairs / 2 "
-                "guards, fix-immune and LEFT UNFIXED BY DESIGN: no `knowledge/` "
-                "file sanctions a position for 삼형 in this ladder, so any "
-                "re-ordering would invent a priority -- carried as a documented "
-                "scope limit, the same shape as the accepted #11 resolution (see "
-                "knowledge/11-gunghap.md §B9, and §B4-C9 note for the per-pair "
-                "table and the two reachable controls 子卯 / 亥亥). MEASURED, "
-                "CORRECTING A CLAIM THIS REPORT USED TO MAKE: the 육합 arity fix "
-                "and a C9 fix are NOT coupled. The arity fix alone flips 0 of "
-                "these 5 rows -- it moves 巳申 from 육파 to 육합, which is still "
-                "not 삼형. The earlier 'a C9 fix alone flips 5/5, C9 + 육합 "
-                "together flips only 4/5' figure came from hoisting 삼형 above "
-                "육충 in the ladder, which is a different and unsanctioned "
-                "change: it would relabel 丑未 and 寅申, costing them the §B4 "
-                "육충 label and the −5 weight those rows carry, and displace "
-                "육해/육파 without a source. That full-chain reorder is a NO-OP "
-                "on all 27 compat fixtures -- no published anchor, no "
-                "client-visible value and no fixture expectation moves; only the "
-                "relation LABELS and this lock's bookkeeping would change. So the "
-                "lock is unmoved by the arity fix, and its 巳申 row is knowingly "
-                "stale by design (巳申 is simultaneously 六合 and 六破 and 육합 "
-                "is tested first, so it now reports 육합); do not \"fix\" that row.",
-                "",
-                "External cross-check (2026-09-14): all 59 fixtures carry a "
-                "`source['external']` {citation, url} object plus an inline ref "
-                "on `url_or_ref`, so every expectation is traceable to a named "
-                "Korean source or to the published report it measures. Full "
-                "research: docs/research/2026-09-validation-compat-career.md.",
-            ]
     # Certification epilogue (brief-authorized placement: the CLI rewrites the
     # report file on every run, so hand-edits get clobbered; emitting it here
     # keeps it idempotent). _GATE_HISTORY carries frozen per-gate facts; the
@@ -1305,8 +1080,5 @@ def render_report(results: dict[str, list[dict]]) -> str:
         f"- Current validation checks: {total_pass}/{total_checks} PASS "
         f"across {len(results)} subsystems."
     )
-    lines.append(
-        "- Gate: Campaign COMPLETE — all six workstreams (W1-W6) certified; "
-        "no successor gate."
-    )
+    lines += ["", "Full certification history: docs/validation/gate-history.md"]
     return "\n".join(lines) + "\n"

@@ -639,7 +639,25 @@ def _section_chart_at_a_glance(ctx: _ReportContext) -> List[str]:
     # (strength-balance) channels disagree, state the tension rather than
     # silently reporting one — the resolution is already computed
     # (fe.climate_agrees / fe.climate_element); this is one field of wiring.
-    if ctx.fe.climate_element and ctx.fe.climate_agrees is False:
+    if ctx.fe.method == "jonggyeok-follow":
+        # P3 Task 7: a following grid (종격) takes the dominant element; the
+        # climate reading is shown for transparency but does not govern.
+        # Always explain the follow pick, and never claim a reader review the
+        # engine did not have (P3 Task 7 review, 2026-10-03).
+        why = (
+            "- **Why this element:** this chart reads as a following grid (종격), so the "
+            "favorable element is the dominant element itself rather than a strength-balance "
+            "or climate pick"
+        )
+        # climate_agrees compares 조후 with the raw 억부 pick; for a follow pick
+        # the relevant tension is 조후 vs the resolved (dominant) element.
+        if ctx.fe.climate_element and ctx.fe.climate_element != ctx.fe.element:
+            why += (
+                f"; the climate-balance (조후) reading points to **{ctx.fe.climate_element}** "
+                "but does not govern a following grid"
+            )
+        lines.append(why + ".")
+    elif ctx.fe.climate_element and ctx.fe.climate_agrees is False:
         lines.append(
             f"- **Why this element:** two classical checks apply here — the strength-balance "
             f"(억부) reading points one way, while the climate-balance (조후) reading points to "

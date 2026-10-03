@@ -14,7 +14,7 @@ threshold/weight over the 7 canonical charts:
   3. EXTREME BANDS (±5.0): no canonical chart is anywhere near them.
   4. 종격 DOMINANT SHARE (0.50/0.60): the closest canonical chart is
      Gurumoorthy at 0.491 — below even a −10% nudged gate (0.45), and the
-     gate additionally requires an extreme_weak/weak verdict plus no rooting,
+     gate additionally requires a weak verdict plus no rooting,
      so no canonical chart can flip onto a 종격 flag via threshold drift.
   5. FAVORABLE ELEMENTS: unchanged for every canonical chart under every
      single-axis nudge (the 용신 for balanced charts routes through the 조후
@@ -102,7 +102,7 @@ def test_extreme_bands_are_not_approached(name):
 def test_jonggeok_gate_not_approached(name):
     """Finding (4), corrected by the sweep: Gurumoorthy's dominant share
     (0.491) IS within a −10% nudge of the 0.50 gate — but the gate is
-    conjunctive (weak/extreme_weak verdict + no rooting + 득령 season check),
+    conjunctive (weak verdict + no rooting + 득령 season check),
     and his verdict is *strong*, so threshold drift alone cannot fire a 종격
     flag for him. Pin the recorded facts: the share (so a change that pushes
     it further toward the gate is noticed) and the verdict that keeps the

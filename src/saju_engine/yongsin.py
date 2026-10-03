@@ -61,7 +61,6 @@ _METHOD_BY_VERDICT = {
     "strong": "strong-dm-drain",
     "extreme": "strong-dm-drain",
     "weak": "weak-dm-support",
-    "extreme_weak": "weak-dm-support",
     "balanced": "balanced-heuristic",
 }
 
@@ -85,6 +84,13 @@ _NOTE_BY_METHOD = {
     "reader-confirmed": (
         "Favorable element confirmed by the reader from the full classical analysis."
     ),
+    # P3 Task 7 (user decision 2026-10-03); knowledge/07-special-formations.md:73.
+    "jonggyeok-follow": (
+        "This chart meets the classical conditions of a following grid (종격): one element "
+        "overwhelms the chart and the Day Master has no support, so the favorable element is "
+        "that dominant element — the chart is best followed, not fought. This is an engine "
+        "reading — a full classical analysis may refine it."
+    ),
 }
 
 # Season label used in climate-related note text.
@@ -101,7 +107,6 @@ _STRENGTH_LABEL = {
     "strong": "strong",
     "extreme": "strong",
     "weak": "weak",
-    "extreme_weak": "weak",
 }
 
 # B4 (2026-10-01 audit): _GENERATED_BY now lives in lookup.py; keep as alias for tests.
@@ -119,7 +124,7 @@ class FavorableElement:
     Attributes:
         element: one of Wood / Fire / Earth / Metal / Water (or "—" if unknown).
         method: "strong-dm-drain" | "weak-dm-support" | "balanced-heuristic"
-            | "climate-balanced" | "reader-confirmed".
+            | "climate-balanced" | "jonggyeok-follow" | "reader-confirmed".
         confidence: "heuristic" | "reader-confirmed".
         note: a client-safe one-sentence explanation of how this was derived.
         supporting: the 희신 (supporting element) that matches ``element`` —
@@ -196,7 +201,7 @@ def _with_unfavorable(fe: "FavorableElement", sa: dict) -> "FavorableElement":
     # strong 己, reader-confirmed Metal = the raw pick → 기신 Earth).
     confirms_eokbu = (
         fe.method == "reader-confirmed"
-        and sa.get("verdict") in ("strong", "extreme", "weak", "extreme_weak")
+        and sa.get("verdict") in ("strong", "extreme", "weak")
         and fe.element == sa.get("_raw_unresolved_favorable")
     )
     if confirms_eokbu and sa.get("candidate_supporting"):
@@ -290,6 +295,29 @@ def favorable_element(chart, override: Optional[str] = None) -> FavorableElement
     remedy_dominant = bool(
         climate_element and is_remedy_dominant(sa.get("month_branch", ""), counts)
     )
+
+    # P3 Task 7 (2026-10-03, user decision): a "likely" 종격 is a special grid;
+    # knowledge/07 says its 용신 is the dominant element, so it governs ahead of
+    # 조후 and 억부. Reader override still wins (returned above).
+    jong = next(
+        (f for f in ((getattr(chart, "patterns", None) or {}).get("special_forms") or [])
+         if f.get("confidence") == "likely" and f.get("dominant_element") in _VALID_ELEMENTS),
+        None,
+    )
+    if jong:
+        dom = jong["dominant_element"]
+        return _with_unfavorable(FavorableElement(
+            element=dom, method="jonggyeok-follow", confidence="heuristic",
+            note=(
+                _NOTE_BY_METHOD["jonggyeok-follow"]
+                + f" Here the engine flags a {jong['name_ko']} ({jong['name_en']}) "
+                f"dominated by {dom}."
+            ),
+            supporting=_GENERATED_BY.get(dom, "—"), climate_band=climate["band"],
+            climate_element=climate_element, climate_agrees=climate_agrees,
+            climate_temperature=temperature, climate_extreme=climate_extreme,
+            remedy_dominant=(remedy_dominant if climate_element else None),
+        ), sa)
 
     if climate_element and climate_extreme and not remedy_dominant:
         # 조후 governs the headline when the chart is genuinely climate-extreme

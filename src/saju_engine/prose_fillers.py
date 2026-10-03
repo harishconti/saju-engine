@@ -386,7 +386,7 @@ def employment_vs_entrepreneurship(ctx) -> str:
             "The Day Master reads as **strong** with visible Output or Wealth stems, which favours "
             "independent paths once the querent has built enough foundation to hold the variability."
         )
-    elif verdict in ("weak", "extreme_weak") and authority >= 2:
+    elif verdict == "weak" and authority >= 2:
         parts.append(
             "The Day Master reads as **weaker** with a strong Authority presence, which favours "
             "structured employment early on — a clear hierarchy and a defined mentor accelerate growth."
@@ -609,7 +609,7 @@ def red_flag_environments(ctx) -> str:
     sa = chart.strength_assessment or {}
     verdict = sa.get("verdict", "balanced")
     items = []
-    if verdict in ("weak", "extreme_weak"):
+    if verdict == "weak":
         items.append("environments with unclear accountability — the querent absorbs other people's work")
         items.append("constant crisis mode with no recovery windows")
         items.append("isolated creative demands with no peer feedback")
@@ -1290,7 +1290,7 @@ def stress_signature(ctx) -> str:
         f"When this chart goes out of balance, the most common early signals are: "
         f"{signals[0]}, {signals[1]}, and {signals[2]}. "
     )
-    if verdict in ("weak", "extreme_weak"):
+    if verdict == "weak":
         base += (
             f"The pattern usually appears first as physical depletion — the {dm_elem} system runs hot to "
             f"compensate, then crashes. Recovery comes from actively cultivating the favorable element before "
@@ -2145,7 +2145,7 @@ def top_growth_areas(ctx) -> List[str]:
     if verdict in ("strong", "extreme"):
         growth.append("**Receive without deflecting** — strong Day Masters often turn help away; practicing receiving builds reserves.")
         growth.append("**Rest as discipline** — output without recovery is the most common failure mode for this chart.")
-    elif verdict in ("weak", "extreme_weak"):
+    elif verdict == "weak":
         growth.append("**Build slowly** — the chart rewards accumulation over speed; trust the long arc.")
         growth.append("**Protect sleep and meals** — the Day Master's recovery runs through these anchors.")
     else:
@@ -2228,7 +2228,7 @@ def business_launch_format(ctx) -> str:
             "visible Output stems can carry the visibility, and a public launch reads as confidence "
             "rather than risk. Pair it with a small but engaged audience rather than a mass-broadcast feel."
         )
-    if verdict in ("weak", "extreme_weak") and output == 0:
+    if verdict == "weak" and output == 0:
         return (
             "**A quiet beta with a small reference audience** is the safest fit. The Day Master needs "
             "time to learn what the work wants to be before the visibility of a public launch. Treat "

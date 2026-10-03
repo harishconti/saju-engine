@@ -49,6 +49,7 @@ ELEMENT_EMOJI: Dict[str, str] = {
 
 _VERDICT_LABELS: Dict[str, str] = {
     "extreme": "Very Strong", "strong": "Strong", "balanced": "Balanced",
+    # "extreme_weak" is tolerated but no longer emitted by strength (P2-W, d292746).
     "weak": "Weak", "extreme_weak": "Very Weak",
 }
 

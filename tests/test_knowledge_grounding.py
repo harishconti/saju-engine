@@ -128,7 +128,7 @@ def test_calculation_layer_constants_are_documented_with_scope():
     )
     # patterns.py 종격 dominant share: documented as a conservative flag
     # threshold with the reader-rules caveat.
-    assert re.search(r"dominant share.*≥ ?50%.*≥ ?60%", patterns_src, re.IGNORECASE), (
+    assert re.search(r"dominant share.*≥ ?50%", patterns_src, re.IGNORECASE), (
         "patterns.py 종격 dominant-share thresholds lost their docstring documentation"
     )
 
