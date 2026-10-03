@@ -340,4 +340,4 @@ def test_module_level_type_hints_resolve():
     module-level annotations without being imported from `typing`."""
     import typing
     from saju_engine import sewoon as sewoon_module
-    typing.get_type_hints(sewoon_module._load_sajupy_calendar)
+    typing.get_type_hints(sewoon_module._annual_pillar_for_date)
