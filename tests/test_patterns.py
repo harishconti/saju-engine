@@ -637,7 +637,7 @@ def test_special_form_jongin_resource_downgraded_by_rooting():
         month_stem="甲",
         month_branch="寅",
         branches=["寅", "卯", "寅", "卯"],
-        stems=["丙", "甲", "乙", "戊"],
+        stems=["甲", "乙", "丙", "戊"],
         hidden_stems=[
             ("main", "甲"),
             ("main", "乙"),

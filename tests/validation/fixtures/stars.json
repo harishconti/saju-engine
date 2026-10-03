@@ -1669,7 +1669,7 @@
       }
     },
     "status": "expect_match",
-    "notes": "Pillars 甲寅 丙子 庚戌 丙子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py."
+    "notes": "Pillars 甲寅 丙子 庚戌 丙子; anchor day. Expected derived by hand from the knowledge table, independent of stars.py. knowledge/11 gives 庚→戌 or 酉 while daysaju gives 申·戌; the fixture confirms the overlap 戌."
   },
   {
     "id": "hongyeom-ren-shen",

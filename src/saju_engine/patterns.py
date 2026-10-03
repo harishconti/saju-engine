@@ -409,7 +409,13 @@ def detect_special_forms(
                 "Day Master has rooting support (통근) in a branch, hidden stem, or "
                 "visible stem; true 종격 requires no 비겁/인성 allies."
             )
-        if month_branch and not in_season:
+        if not month_branch:
+            confidence = "possible"
+            notes.append(
+                "month branch unknown, so 득령 (in season) cannot be confirmed; "
+                "a true 종격 requires the dominant element to be in season."
+            )
+        elif not in_season:
             confidence = "possible"
             notes.append(
                 f"dominant {dominant} is not 득령 (in season) at month branch "

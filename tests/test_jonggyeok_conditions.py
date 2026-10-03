@@ -101,3 +101,20 @@ def test_plain_label_for_extreme():
     c = compute_chart(**CHARTS["lux"], **REF)
     assert c.strength_assessment["verdict"] == "extreme"
     assert "reads as very strong" in generate_plain_words(c)["personality"]
+
+
+def test_missing_month_branch_downgrades_to_possible():
+    # Unrooted weak chart, Metal dominant (종재 for 丁). With the month branch
+    # known and in season it is "likely"; with it unknown 득령 cannot be
+    # confirmed, so it must be "possible" with an explanatory note.
+    args = dict(day_master="丁", stems=["戊", "辛", "丁", "辛"],
+                branches=["子", "酉", "酉", "子"],
+                hidden_stems=[("main", "癸"), ("main", "辛"), ("main", "辛"), ("main", "癸")],
+                strength_verdict="weak")
+    counts = PAT._element_counts(args["stems"], args["hidden_stems"])
+    known = PAT.detect_special_forms(element_counts=counts, month_branch="酉", **args)
+    assert known and known[0]["confidence"] == "likely"
+    for mb in ("", ):
+        out = PAT.detect_special_forms(element_counts=counts, month_branch=mb, **args)
+        assert out and out[0]["confidence"] == "possible"
+        assert "month branch unknown" in out[0]["note"]

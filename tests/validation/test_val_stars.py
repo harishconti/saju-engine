@@ -27,6 +27,13 @@ def test_unknown_input_key_raises():
         run_stars_fixture(entry)
 
 
+def test_invalid_star_anchor_raises():
+    entry = copy.deepcopy(ENTRIES[0])
+    entry["input"]["star_anchor"] = "month"
+    with pytest.raises(ValueError, match="star_anchor"):
+        run_stars_fixture(entry)
+
+
 def test_unknown_star_key_raises():
     entry = copy.deepcopy(ENTRIES[0])
     entry["expected"]["stars"] = {"not_a_star": []}

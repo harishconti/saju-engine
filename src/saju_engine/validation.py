@@ -919,10 +919,14 @@ def run_stars_fixture(entry: dict) -> dict:
     unknown = set(entry["input"]) - _STARS_ALLOWED_INPUT
     if unknown:
         raise ValueError(f"stars/{entry['id']}: unknown input key(s) {sorted(unknown)}")
+    anchor = entry["input"].get("star_anchor")
+    if anchor is not None and anchor not in ("day", "year"):
+        raise ValueError(
+            f"stars/{entry['id']}: star_anchor must be 'day' or 'year', got {anchor!r}"
+        )
     kwargs = dict(entry["input"])
     kwargs.setdefault("name", entry["id"])
     return check_stars(compute_chart(**kwargs), entry)
-
 
 
 def _patterns_extract(pat: dict) -> dict:
@@ -1003,8 +1007,9 @@ def _esc(cell: Any) -> str:
 
 
 # Historical gate record: one entry per certified workstream, appended at that
-# workstream's certification. Narrative lives in docs/validation/gate-history.md. Gate dates and at-gate counts are facts that do
-# not move; the live totals below are derived from the current run instead.
+# workstream's certification. Narrative lives in
+# docs/validation/gate-history.md. Gate dates and at-gate counts are facts that
+# do not move; the live totals below are derived from the current run instead.
 _GATE_HISTORY = [
     {"workstream": "W1 Pillars", "gate_date": "2026-09-13", "checks": 17, "passed": 17},
     {"workstream": "W2 대운/세운", "gate_date": "2026-09-13", "checks": 19, "passed": 19},
