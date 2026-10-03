@@ -23,6 +23,22 @@ CHARTS = [compute_chart(year=y, month=m, day=d, hour=h, minute=0, gender=g,
 PAIRS = list(itertools.combinations(range(len(CHARTS)), 2))
 
 
+# P2 Task 7 (user decision 2026-10-03): the ONLY codes whose typed
+# (kind, severity) deliberately differ from the legacy substring oracle.
+#   cross/year 육충 and cross 자형: severity = the flag's actual score delta
+#   (-5 / -3 / -2) instead of the substring token's 25 / 25 / 8.
+#   primary 육해/육파: now on the cover's yellow (caution) list.
+#   direction_differs: no longer a "favorable" highlight.
+DEVIATIONS = {
+    "daybranch.cross_clash": ("red", 5),
+    "year_branch.clash": ("red", 3),
+    "daybranch.cross_self_punish": ("red", 2),
+    "daybranch.harm": ("yellow", 0),
+    "daybranch.break": ("yellow", 0),
+    "daeun_sync.direction_differs": (None, 0),
+}
+
+
 def _all_flags(report):
     for sub in report.sub_systems():
         yield from sub.flags
@@ -33,6 +49,9 @@ def test_every_flag_is_typed_and_matches_legacy_classification(i, j):
     report = compat.compat_score(CHARTS[i], CHARTS[j])
     for flag in _all_flags(report):
         assert isinstance(flag, compat.Flag), repr(flag)
+        if flag.code in DEVIATIONS:
+            assert (flag.kind, flag.severity) == DEVIATIONS[flag.code], flag
+            continue
         assert flag.kind == compat._legacy_classify_flag(str(flag)), flag
         assert flag.severity == compat._legacy_flag_severity(str(flag)), flag
         assert flag.code

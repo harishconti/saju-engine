@@ -111,7 +111,7 @@ def _day_master_snapshot(chart: Chart, name: str) -> List[str]:
         f"{dm.get('element', '')} ({dm.get('polarity', '')})"
     )
     fe = favorable_element(chart)
-    lines.append(f"- **Seasonal strength verdict:** {sa.get('verdict', '—')}")
+    lines.append(f"- **Seasonal strength verdict:** {RP.verdict_label(sa.get('verdict', 'balanced')) if sa.get('verdict') else '—'}")
     lines.append(f"- **Favorable element (용신):** {fe.element}")
     lines.append(f"- **Supporting element (희신):** {fe.supporting}")
     lines.append(f"- **Unfavorable / watch element:** {fe.unfavorable or '—'}")
@@ -493,21 +493,21 @@ def _practical_guidance(report: CompatReport, name_a: str, name_b: str) -> List[
 
     # Day-branch (spouse palace) — mutually exclusive: clash / 육합 / 반합 / neutral.
     db = report.daybranch
-    if _has(db.flags, "daybranch.clash", "daybranch.cross_clash"):
+    if _has(db.flags, "daybranch.clash"):
         bullets.append(
             "**Day-branch clash (일지 육충) is present** — a classical hard "
             "indicator. Workable, but the relationship benefits from explicit "
             "communication rhythms: a weekly 'check-in' beats ad-hoc resolution. "
             "*(see knowledge/11-gunghap.md §B4)*"
         )
-    elif _has(db.flags, "daybranch.combine", "daybranch.cross_combine"):
+    elif _has(db.flags, "daybranch.combine"):
         bullets.append(
             "**Day-branch combination (일지 육합) is present** — the strongest "
             "classical favorable. Maintain shared rituals (meals, weekly date, "
             "annual trip) that reinforce this anchor. *(see "
             "knowledge/11-gunghap.md §B1)*"
         )
-    elif _has(db.flags, "daybranch.half_harmony", "daybranch.cross_half_harmony"):
+    elif _has(db.flags, "daybranch.half_harmony"):
         bullets.append(
             "**Day-branch partial harmony (일지 반합) is present** — two-of-three "
             "in a 삼합 frame. A real but incomplete anchor: nurture the shared "
@@ -647,11 +647,11 @@ def _couple_narrative(report: CompatReport, name_a: str, name_b: str) -> List[st
 
     # Day-branch (spouse palace) layer.
     db = report.daybranch
-    if _has(db.flags, "daybranch.combine", "daybranch.cross_combine"):
+    if _has(db.flags, "daybranch.combine"):
         parts.append("your spouse palaces (일지) combine")
-    elif _has(db.flags, "daybranch.half_harmony", "daybranch.cross_half_harmony"):
+    elif _has(db.flags, "daybranch.half_harmony"):
         parts.append("your spouse palaces (일지) sit in a partial harmony (반합)")
-    elif _has(db.flags, "daybranch.clash", "daybranch.cross_clash"):
+    elif _has(db.flags, "daybranch.clash"):
         parts.append("your spouse palaces (일지) carry a classical clash")
     else:
         parts.append("your spouse palaces (일지) hold a neutral, uncombined relation")
@@ -1016,12 +1016,12 @@ def _compact_guidance_bullets(report: CompatReport, name_a: str, name_b: str) ->
             "**Peer dynamic.** You share the same Day Master — easy and familiar, "
             "but guard against sibling-style competition. Take turns leading."
         )
-    if _has(report.daybranch.flags, "daybranch.clash", "daybranch.cross_clash"):
+    if _has(report.daybranch.flags, "daybranch.clash"):
         bullets.append(
             "**Day-branch clash is present.** Use explicit communication rhythms — "
             "a regular check-in works better than ad-hoc conflict resolution."
         )
-    elif _has(report.daybranch.flags, "daybranch.combine", "daybranch.cross_combine"):
+    elif _has(report.daybranch.flags, "daybranch.combine"):
         bullets.append(
             "**Day-branch combination is present.** Reinforce it with shared rituals "
             "(meals, weekly time together, annual traditions)."

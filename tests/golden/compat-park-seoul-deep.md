@@ -209,7 +209,7 @@ The basic reading above evaluates the natal composite across the classical eleve
 #### Day Master Snapshot — Park
 
 - **Day Master:** 庚 (경 / 庚) — Metal (Yang)
-- **Seasonal strength verdict:** balanced
+- **Seasonal strength verdict:** Balanced
 - **Favorable element (용신):** Earth
 - **Supporting element (희신):** Fire
 - **Unfavorable / watch element:** Water
@@ -228,7 +228,7 @@ The basic reading above evaluates the natal composite across the classical eleve
 #### Day Master Snapshot — Seo
 
 - **Day Master:** 癸 (계 / 癸) — Water (Yin)
-- **Seasonal strength verdict:** balanced
+- **Seasonal strength verdict:** Balanced
 - **Favorable element (용신):** Fire
 - **Supporting element (희신):** Wood
 - **Unfavorable / watch element:** Metal
@@ -271,7 +271,7 @@ The basic reading above evaluates the natal composite across the classical eleve
 ## Practical Guidance (실천 지침)
 
 - **Day-stem combination (일간합) is absent.** Attraction must build through shared activities, not first-meeting chemistry — the day-branch layer (below) is your primary anchor. *(see knowledge/11-gunghap.md §A)*
-- **Day-branch clash (일지 육충) is present** — a classical hard indicator. Workable, but the relationship benefits from explicit communication rhythms: a weekly 'check-in' beats ad-hoc resolution. *(see knowledge/11-gunghap.md §B4)*
+- **Day-branch combination (일지 육합) is present** — the strongest classical favorable. Maintain shared rituals (meals, weekly date, annual trip) that reinforce this anchor. *(see knowledge/11-gunghap.md §B1)*
 - **Ten-god cross-pattern is a classical caution.** Both partners tend to apply the same relational pattern (e.g. both authoritative, both critical). Conscious asymmetry helps: take turns leading and following. *(see knowledge/11-gunghap.md §G)*
 - **Yin-Yang polarity is complementary** — opposite Day-Master polarity, a classic complementary dynamic. Honor the differences rather than trying to smooth them out. *(see knowledge/11-gunghap.md §J)*
 - **Your major-luck (대운) directions diverge** — life's large phases arrive on different timing tracks for the two of you. Be more deliberate about timing joint decisions: for any wedding year, relocation, or major purchase, overlay both partners' 세운 (annual luck) and pick a window that is favorable for both, not just one. *(see knowledge/11-gunghap.md §H)*

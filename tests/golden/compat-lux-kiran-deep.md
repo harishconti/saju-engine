@@ -71,7 +71,7 @@
 
 ## Who You Are Together (두 사람의 관계 성향)
 
-Together, your spouse palaces (일지) combine, your ten-god cross leans complementary. This composite is a tendency, not a destiny — the daily relationship is shaped by the choices both of you make over years.
+Together, your spouse palaces (일지) hold a neutral, uncombined relation, your ten-god cross leans complementary. This composite is a tendency, not a destiny — the daily relationship is shaped by the choices both of you make over years.
 
 *see knowledge/11-gunghap.md §B, §G, §D*
 
@@ -212,7 +212,7 @@ The basic reading above evaluates the natal composite across the classical eleve
 #### Day Master Snapshot — Lux
 
 - **Day Master:** 辛 (신 / 辛) — Metal (Yin)
-- **Seasonal strength verdict:** extreme
+- **Seasonal strength verdict:** Very Strong
 - **Favorable element (용신):** Water
 - **Supporting element (희신):** Wood
 - **Unfavorable / watch element:** Metal
@@ -231,7 +231,7 @@ The basic reading above evaluates the natal composite across the classical eleve
 #### Day Master Snapshot — Kiran
 
 - **Day Master:** 壬 (임 / 壬) — Water (Yang)
-- **Seasonal strength verdict:** extreme
+- **Seasonal strength verdict:** Very Strong
 - **Favorable element (용신):** Fire
 - **Supporting element (희신):** Wood
 - **Unfavorable / watch element:** Metal
@@ -277,7 +277,6 @@ The basic reading above evaluates the natal composite across the classical eleve
 ## Practical Guidance (실천 지침)
 
 - **Day-stem combination (일간합) is absent.** Attraction must build through shared activities, not first-meeting chemistry — the day-branch layer (below) is your primary anchor. *(see knowledge/11-gunghap.md §A)*
-- **Day-branch combination (일지 육합) is present** — the strongest classical favorable. Maintain shared rituals (meals, weekly date, annual trip) that reinforce this anchor. *(see knowledge/11-gunghap.md §B1)*
 - **쌍화개 (both have 화개):** both partners carry a Canopy overlay — spiritual / aesthetic affinity is high, but emotional distance can creep in. Schedule deliberate emotional connection time. *(see knowledge/11-gunghap.md §I)*
 - **Yin-Yang polarity is complementary** — opposite Day-Master polarity, a classic complementary dynamic. Honor the differences rather than trying to smooth them out. *(see knowledge/11-gunghap.md §J)*
 - **Your major-luck (대운) directions diverge** — life's large phases arrive on different timing tracks for the two of you. Be more deliberate about timing joint decisions: for any wedding year, relocation, or major purchase, overlay both partners' 세운 (annual luck) and pick a window that is favorable for both, not just one. *(see knowledge/11-gunghap.md §H)*

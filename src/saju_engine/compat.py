@@ -363,7 +363,7 @@ def _cross_branch_score(b1: str, b2: str) -> Tuple[int, Optional[Flag]]:
     if _branch_pair_lookup(b1, b2, L.SIX_COMBINATIONS):
         return 4, Flag(f"육합 {b1}{b2}", kind="favorable", code="daybranch.cross_combine")
     if _branch_pair_lookup(b1, b2, L.SIX_CLASHES):
-        return -5, Flag(f"육충 {b1}{b2}", kind="red", code="daybranch.cross_clash", severity=25)
+        return -5, Flag(f"육충 {b1}{b2}", kind="red", code="daybranch.cross_clash", severity=5)
     if _branch_pair_lookup(b1, b2, L.SIX_HARMS):
         return -1, Flag(f"육해 {b1}{b2}", kind="yellow", code="daybranch.cross_harm")
     if _branch_pair_lookup(b1, b2, L.SIX_BREAKS):
@@ -373,7 +373,7 @@ def _cross_branch_score(b1: str, b2: str) -> Tuple[int, Optional[Flag]]:
         # The two texts _pairwise_three_punishment can emit differ by the very
         # condition it branches on (b1 == b2 → 자형, else 삼형).
         if b1 == b2:
-            return -2, Flag(pun, kind="red", code="daybranch.cross_self_punish", severity=8)
+            return -2, Flag(pun, kind="red", code="daybranch.cross_self_punish", severity=2)
         return -2, Flag(pun, kind="yellow", code="daybranch.cross_punish")
     th = _three_harmony_match(b1, b2)
     if th:
@@ -393,7 +393,9 @@ def _prefixed(prefix: str, flag: Flag) -> Flag:
 # point of origin in this file (day-branch 육충 -25, ilju_pair RED FLAG -12,
 # day-branch 자형 -8, nayin 상충 and cross-star 홍양교차 both -5); 간섭 is a
 # dampener on an otherwise-favorable 합 rather than a pure penalty, so it
-# ranks below the hard clashes/punishments. Order matters: more specific/
+# ranks below the hard clashes/punishments. (2026-10-03: Flag.severity now
+# follows the same doctrine per flag — cross-branch 육충 5, 띠 육충 3, cross
+# 자형 2 — this table is only the legacy test oracle.) Order matters: more specific/
 # severe tokens are checked first.
 _RED_FLAG_SEVERITY: List[Tuple[str, int]] = [
     ("육충", 25),
@@ -548,10 +550,10 @@ def compat_daybranch(a: Chart, b: Chart) -> CompatSubResult:
     if not _branch_pair_lookup(b1, b2, L.SIX_COMBINATIONS) and not _branch_pair_lookup(b1, b2, L.SIX_CLASHES):
         if _branch_pair_lookup(b1, b2, L.SIX_HARMS):
             primary_score -= 5
-            flags.append(Flag(f"일지 해 {b1}{b2}", kind=None, code="daybranch.harm"))
+            flags.append(Flag(f"일지 해 {b1}{b2}", kind="yellow", code="daybranch.harm"))
         elif _branch_pair_lookup(b1, b2, L.SIX_BREAKS):
             primary_score -= 3
-            flags.append(Flag(f"일지 파 {b1}{b2}", kind=None, code="daybranch.break"))
+            flags.append(Flag(f"일지 파 {b1}{b2}", kind="yellow", code="daybranch.break"))
 
     # Cross-chart secondary (half weight per pair, capped at ±15 to avoid runaway).
     # Score A's day-branch against B's month/year/hour, and B's day-branch
@@ -1283,7 +1285,7 @@ def compat_daeun_sync(a: Chart, b: Chart) -> CompatSubResult:
         score += 3
         flags.append(Flag(f"대운 방향 동일 ({dir_a})", kind="favorable", code="daeun_sync.direction_same"))
     else:
-        flags.append(Flag(f"대운 방향 상이 ({dir_a} vs {dir_b})", kind="favorable", code="daeun_sync.direction_differs"))
+        flags.append(Flag(f"대운 방향 상이 ({dir_a} vs {dir_b})", kind=None, code="daeun_sync.direction_differs"))
 
     # Starting-element similarity.
     start_a = a.daeun[0].stem
@@ -1462,7 +1464,7 @@ def compat_year_branch(a: Chart, b: Chart) -> CompatSubResult:
         flags.append(Flag(f"띠 육합 {b1}{b2}", kind="favorable", code="year_branch.combine"))
     elif _branch_pair_lookup(b1, b2, L.SIX_CLASHES):
         score = -3
-        flags.append(Flag(f"띠 육충 {b1}{b2}", kind="red", code="year_branch.clash", severity=25))
+        flags.append(Flag(f"띠 육충 {b1}{b2}", kind="red", code="year_branch.clash", severity=3))
     elif _three_harmony_match(b1, b2):
         th = _three_harmony_match(b1, b2)
         score = 2

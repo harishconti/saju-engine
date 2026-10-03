@@ -41,7 +41,7 @@
 
 ## Who You Are Together (두 사람의 관계 성향)
 
-Together, your spouse palaces (일지) combine, your ten-god cross leans complementary. This composite is a tendency, not a destiny — the daily relationship is shaped by the choices both of you make over years.
+Together, your spouse palaces (일지) hold a neutral, uncombined relation, your ten-god cross leans complementary. This composite is a tendency, not a destiny — the daily relationship is shaped by the choices both of you make over years.
 
 *see knowledge/11-gunghap.md §B, §G, §D*
 
@@ -83,7 +83,6 @@ Tags: `일간 — you — the reference point the whole chart is read against *(
 
 ## Practical Guidance
 
-- **Day-branch combination is present.** Reinforce it with shared rituals (meals, weekly time together, annual traditions).
 - **Timing divergence.** Your major-luck phases run on different tracks — overlay both annual-luck charts before big joint decisions.
 
 ## Closing Note (맺음말)

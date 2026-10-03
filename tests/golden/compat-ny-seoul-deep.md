@@ -69,7 +69,7 @@
 
 ## Who You Are Together (두 사람의 관계 성향)
 
-Together, your spouse palaces (일지) sit in a partial harmony (반합), your ten-god cross leans cautionary. This composite is a tendency, not a destiny — the daily relationship is shaped by the choices both of you make over years.
+Together, your spouse palaces (일지) carry a classical clash, your ten-god cross leans cautionary. This composite is a tendency, not a destiny — the daily relationship is shaped by the choices both of you make over years.
 
 *see knowledge/11-gunghap.md §B, §G, §D*
 
@@ -206,7 +206,7 @@ The basic reading above evaluates the natal composite across the classical eleve
 #### Day Master Snapshot — Nova
 
 - **Day Master:** 辛 (신 / 辛) — Metal (Yin)
-- **Seasonal strength verdict:** balanced
+- **Seasonal strength verdict:** Balanced
 - **Favorable element (용신):** Wood
 - **Supporting element (희신):** Water
 - **Unfavorable / watch element:** Earth
@@ -225,7 +225,7 @@ The basic reading above evaluates the natal composite across the classical eleve
 #### Day Master Snapshot — Seo
 
 - **Day Master:** 癸 (계 / 癸) — Water (Yin)
-- **Seasonal strength verdict:** balanced
+- **Seasonal strength verdict:** Balanced
 - **Favorable element (용신):** Fire
 - **Supporting element (희신):** Wood
 - **Unfavorable / watch element:** Metal
