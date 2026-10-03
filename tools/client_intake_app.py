@@ -162,7 +162,8 @@ async def generate(
         raise _bad_request("Main concern is required for The Deep Destiny Report tier.")
     _check_birth(dob, birth_time, timezone, utc_offset)
 
-    intake_id = STORE.add_intake(
+    intake_id = await run_in_threadpool(
+        STORE.add_intake,
         kind="single", tier=tier,
         pii={"name": name, "email": email.strip(), "main_concern": main_concern},
         birth={"dob": dob, "birth_time": birth_time, "location": location,
@@ -176,11 +177,11 @@ async def generate(
 
     # Free sample: render now, approve without a token, return the PDF.
     await run_in_threadpool(generate_draft, STORE, intake_id, FILES_DIR)
-    row = STORE.get_intake(intake_id)
+    row = await run_in_threadpool(STORE.get_intake, intake_id)
     if row["status"] != "draft_ready":
         # N-14: never echo exception text; generate_draft already logged it.
         raise HTTPException(status_code=500, detail="Failed to generate report. Please try again.")
-    STORE.mark_approved_without_token(intake_id)
+    await run_in_threadpool(STORE.mark_approved_without_token, intake_id)
     return FileResponse(
         path=row["pdf_path"], media_type="application/pdf",
         filename=f"{slugify(name)}-saju-report.pdf",
@@ -245,7 +246,8 @@ async def compat_generate(
     _check_birth(dob_b.strip(), birth_time_b.strip(), timezone_b.strip(), str(utc_offset_b), "Partner B: ")
 
     selected_tier = tier.strip() if tier.strip() in ("basic", "deep") else "basic"
-    intake_id = STORE.add_intake(
+    intake_id = await run_in_threadpool(
+        STORE.add_intake,
         kind="compat", tier=selected_tier,
         pii={"name_a": name_a.strip(), "name_b": name_b.strip(), "email": email.strip(),
              "main_concern": main_concern.strip()},
@@ -272,6 +274,32 @@ def slugify(s: str) -> str:
     return re.sub(r"[-\s]+", "-", s) or "report"
 
 
+_REPORT_PATH_RE = re.compile(r"(/report/)[^\s\"'?]+")
+
+
+def redact_report_tokens(text: str) -> str:
+    """Replace the secret in ``/report/<token>`` with ``[redacted]``."""
+    return _REPORT_PATH_RE.sub(r"\1[redacted]", text)
+
+
+class RedactReportTokens(logging.Filter):
+    """uvicorn.access filter: download tokens must never reach the access log."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        if isinstance(record.args, tuple):
+            record.args = tuple(redact_report_tokens(a) if isinstance(a, str) else a
+                                for a in record.args)
+        if isinstance(record.msg, str):
+            record.msg = redact_report_tokens(record.msg)
+        return True
+
+
+def install_access_log_redaction() -> None:
+    lg = logging.getLogger("uvicorn.access")
+    if not any(isinstance(f, RedactReportTokens) for f in lg.filters):
+        lg.addFilter(RedactReportTokens())
+
+
 def main(argv: list[str] | None = None) -> int:
     import uvicorn
     args = argv if argv is not None else sys.argv
@@ -279,6 +307,7 @@ def main(argv: list[str] | None = None) -> int:
     host = os.environ.get("SAJU_HOST", "127.0.0.1")
     print(f"Starting Saju self-service app at http://{host}:{port}")
     print(f"Intake store: {INTAKE_DIR}")
+    install_access_log_redaction()
     uvicorn.run(app, host=host, port=port, log_level="info")
     return 0
 

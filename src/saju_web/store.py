@@ -10,6 +10,11 @@ The ``error`` column is PLAINTEXT: callers must store sanitized messages only
 Deploy with ``umask 077`` so the SQLite -wal/-shm sidecar files are not
 group/world readable; the db file itself and ``files_root`` are chmod'ed here.
 
+New databases use ``INTEGER PRIMARY KEY AUTOINCREMENT`` (ids never reused after a
+purge). Pre-existing databases keep the plain ``INTEGER PRIMARY KEY``; for those,
+``jobs.generate_draft`` removes any leftover ``files/<id>/`` directory before
+rendering a freshly received intake, so a reused id can't inherit old files.
+
 Approval is only reachable via ``issue_token`` (tokened) or, for the free
 sample tier, ``mark_approved_without_token``; ``set_status`` refuses it.
 """
@@ -20,6 +25,7 @@ import json
 import logging
 import os
 import secrets
+import shutil
 import sqlite3
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -35,7 +41,7 @@ _UNSET: Any = object()  # sentinel: "leave column unchanged" (None means clear)
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS intake(
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     created_at TEXT, kind TEXT, tier TEXT, status TEXT,
     pii_enc BLOB, birth_json TEXT, pdf_path TEXT, error TEXT,
     token_sha256 TEXT UNIQUE, approved_at TEXT, updated_at TEXT
@@ -247,13 +253,20 @@ class IntakeStore:
             conn.close()
         root = self.files_root.resolve()
         for r in rows:
-            if not r["pdf_path"]:
-                continue
-            pdf = Path(r["pdf_path"])
-            for f in (pdf, pdf.with_suffix(".md")):
-                try:
-                    if f.resolve().is_relative_to(root):
-                        f.unlink(missing_ok=True)
-                except OSError:
-                    _log.warning("intake %s: could not remove a stored file", r["id"])
+            d = self.files_root / str(r["id"])
+            try:
+                if d.resolve().is_relative_to(root) and d.resolve() != root:
+                    shutil.rmtree(d, ignore_errors=False)
+            except FileNotFoundError:
+                pass
+            except OSError:
+                _log.warning("intake %s: could not remove stored files", r["id"])
+            if r["pdf_path"]:  # legacy/stray layouts outside files/<id>/
+                pdf = Path(r["pdf_path"])
+                for f in (pdf, pdf.with_suffix(".md")):
+                    try:
+                        if f.resolve().is_relative_to(root):
+                            f.unlink(missing_ok=True)
+                    except OSError:
+                        _log.warning("intake %s: could not remove a stored file", r["id"])
         return len(rows)

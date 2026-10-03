@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import logging
 import re
+import shutil
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -122,10 +123,18 @@ def generate_draft(store: IntakeStore, intake_id: int, files_dir: Path) -> None:
     exception class name only). ``files_dir`` must be under ``store.files_root``
     so retention purge can delete the output.
     """
-    store.set_status(intake_id, "generating")
+    try:
+        was_received = store.get_intake(intake_id)["status"] == "received"
+        store.set_status(intake_id, "generating")
+    except KeyError:  # row purged before the job ran
+        log.warning("draft generation skipped: intake %s no longer exists", intake_id)
+        return
     try:
         row = store.get_intake(intake_id)
         out_dir = Path(files_dir) / str(intake_id)
+        if was_received and out_dir.exists():
+            # Pre-AUTOINCREMENT databases can reuse an id: never inherit old files.
+            shutil.rmtree(out_dir, ignore_errors=True)
         out_dir.mkdir(parents=True, exist_ok=True)
         if row["kind"] == "compat":
             pdf = render_compat(row["pii"], row["birth"], row["tier"], out_dir)
@@ -136,6 +145,12 @@ def generate_draft(store: IntakeStore, intake_id: int, files_dir: Path) -> None:
         # Exception messages may embed birth data/PII: log class + frames only.
         log.error("draft generation failed for intake %s: %s", intake_id,
                   type(exc).__name__, exc_info=(type(exc), None, exc.__traceback__))
-        store.set_status(intake_id, "failed", error=type(exc).__name__)
+        try:
+            store.set_status(intake_id, "failed", error=type(exc).__name__)
+        except KeyError:
+            log.warning("intake %s vanished during generation", intake_id)
         return
-    store.set_status(intake_id, "draft_ready", pdf_path=str(pdf))
+    try:
+        store.set_status(intake_id, "draft_ready", pdf_path=str(pdf))
+    except KeyError:
+        log.warning("intake %s vanished during generation", intake_id)

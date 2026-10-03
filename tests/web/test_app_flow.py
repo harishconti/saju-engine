@@ -230,3 +230,51 @@ def test_failure_log_has_no_exception_message(app_mod, monkeypatch, caplog):
     text = caplog.text
     assert "ValueError" in text and "boom" in text  # class + frames
     assert "PII-SECRET" not in text
+
+
+# ---- final fix wave A --------------------------------------------------------
+
+def test_purge_removes_whole_order_dir_after_real_render(app_mod):
+    import json
+    from datetime import datetime, timedelta, timezone
+    bg = BackgroundTasks()
+    iid = json.loads(run(app_mod, bg, **single(name="Zebediah Quux")).body)["intake_id"]
+    asyncio.run(bg())
+    d = app_mod.FILES_DIR / str(iid)
+    assert d.is_dir() and any(d.iterdir())
+    future = datetime.now(timezone.utc) + timedelta(days=400)
+    assert app_mod.STORE.purge_older_than(180, now=future) == 1
+    assert not d.exists()
+    for f in app_mod.FILES_DIR.rglob("*"):
+        if f.is_file():
+            assert b"Zebediah" not in f.read_bytes()
+
+
+def test_generate_draft_on_purged_row_is_quiet(app_mod):
+    from saju_web.jobs import generate_draft
+    generate_draft(app_mod.STORE, 9999, app_mod.FILES_DIR)  # no raise
+
+
+def test_stale_dir_removed_before_render_of_received_row(app_mod):
+    from saju_web.jobs import generate_draft
+    iid = app_mod.STORE.add_intake(kind="single", tier="essential",
+                                   pii={"name": "N", "email": "e@x.io", "main_concern": ""},
+                                   birth={"dob": "1990-06-15", "birth_time": "10:00",
+                                          "location": "Seoul", "utc_offset": "9",
+                                          "timezone": "", "gender": "F"})
+    stale = app_mod.FILES_DIR / str(iid)
+    stale.mkdir(parents=True)
+    (stale / "old-client.md").write_text("old")
+    generate_draft(app_mod.STORE, iid, app_mod.FILES_DIR)
+    assert not (stale / "old-client.md").exists()
+
+
+def test_access_log_filter_redacts_report_token(app_mod):
+    import logging
+    rec = logging.LogRecord("uvicorn.access", logging.INFO, "", 0,
+                            '%s - "%s %s HTTP/%s" %d',
+                            ("127.0.0.1:1", "GET", "/report/SECRETTOKEN123", "1.1", 200), None)
+    assert app_mod.RedactReportTokens().filter(rec)
+    out = rec.getMessage()
+    assert "SECRETTOKEN123" not in out and "/report/[redacted]" in out
+    assert "/generate" in app_mod.redact_report_tokens("POST /generate")
