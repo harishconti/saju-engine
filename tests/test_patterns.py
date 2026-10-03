@@ -163,9 +163,9 @@ def test_transformation_grid_candidate():
         month_stem="己",
         month_branch="辰",
         branches=["辰", "卯", "寅", "丑"],
-        # Pillar order year/month/day/hour: DM 甲 must sit at index 2 (the new
-        # detect_special_forms guard); year stem stays 甲 so the 甲己 anchor is unchanged.
-        stems=["甲", "己", "甲", "丁"],
+        # Pillar order year/month/day/hour: DM 甲 sits at index 2 and pairs with
+        # the 己 month stem through the Day Master (pure reorder, no 쟁합).
+        stems=["丙", "己", "甲", "丁"],
         hidden_stems=[("main", "戊")],
     )
     trans = result["transformation_grid"]
@@ -409,7 +409,7 @@ def test_regular_grid_residual_used_when_main_middle_absent():
     # 상관 → 상관격 (same residual-fallback path as the original 丙/식신 case).
     result = detect_patterns(
         day_master="丁",
-        month_stem="庚",
+        month_stem="己",
         month_branch="寅",
         branches=["寅", "寅", "寅", "寅"],
         stems=["戊", "己", "丁", "壬"],

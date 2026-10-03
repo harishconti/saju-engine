@@ -333,11 +333,6 @@ def detect_special_forms(
 
     All candidates are flags for the reader; the engine does not rule.
     """
-    if len(stems) < 3 or stems[2] != day_master:
-        raise ValueError(
-            "detect_special_forms expects stems in pillar order year/month/day/hour "
-            f"so the Day Master is stems[2]; got day_master={day_master!r}, stems={list(stems)!r}"
-        )
     forms: List[Dict[str, str]] = []
     # Option C: only a weak DM can follow; confidence comes from the
     # conditions below (rooting incl. visible stems, 득령), not the verdict.
@@ -632,6 +627,11 @@ def detect_patterns(
       - dominant_element: element with highest weighted count.
       - element_balance: weighted element counts.
     """
+    if len(stems) < 3 or stems[2] != day_master:
+        raise ValueError(
+            "stems must be in pillar order year/month/day/hour; stems[2] must be the Day Master "
+            f"(got day_master={day_master!r}, stems={list(stems)!r})"
+        )
     # Visible month-stem ten-god (retained in the return dict for reference;
     # NOT used to name the regular grid — see the 투출 method below).
     month_tengod = L.ten_god(day_master, month_stem)

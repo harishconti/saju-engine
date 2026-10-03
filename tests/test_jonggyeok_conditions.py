@@ -126,6 +126,5 @@ def test_detect_special_forms_requires_dm_at_day_position():
                 hidden_stems=[("main", "戊"), ("main", "己")] * 2,
                 month_branch="辰", strength_verdict="weak")
     stems = ["戊", "己", "戊", "甲"]  # DM at index 3, not 2
-    counts = PAT._element_counts(stems, args["hidden_stems"])
     with pytest.raises(ValueError, match="year/month/day/hour"):
-        PAT.detect_special_forms(stems=stems, element_counts=counts, **args)
+        PAT.detect_patterns(stems=stems, month_stem=stems[1], **args)
