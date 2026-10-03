@@ -100,3 +100,35 @@ def test_list_flags_stale_generating(cli, capsys):
     lines = {l.split("\t")[0]: l for l in capsys.readouterr().out.splitlines()}
     assert "STALE" in lines[str(iid)]
     assert "STALE" not in lines[str(fresh)]
+
+
+def _age(store, iid, minutes):
+    import sqlite3
+    old = (datetime.now(timezone.utc) - timedelta(minutes=minutes)).isoformat()
+    conn = sqlite3.connect(store.db_path)
+    conn.execute("UPDATE intake SET updated_at=? WHERE id=?", (old, iid))
+    conn.commit()
+    conn.close()
+
+
+def test_list_flags_stale_received(cli, capsys):
+    store, iid = _add(cli)
+    fresh = _add(cli)[1]
+    _age(store, iid, 16)
+    assert cli.main(["list"]) == 0
+    lines = {l.split("\t")[0]: l for l in capsys.readouterr().out.splitlines()}
+    assert "STALE" in lines[str(iid)] and "STALE" not in lines[str(fresh)]
+
+
+def test_regenerate_refuses_live_generating_unless_force(cli, capsys):
+    store, iid = _add(cli)
+    store.set_status(iid, "generating")
+    assert cli.main(["regenerate", str(iid)]) == 1
+    assert "generating" in capsys.readouterr().err
+    assert store.get_intake(iid)["status"] == "generating"
+    assert cli.main(["regenerate", str(iid), "--force"]) == 0
+    assert store.get_intake(iid)["status"] == "draft_ready"
+    # stale generating is allowed without --force
+    store.set_status(iid, "generating")
+    _age(store, iid, 20)
+    assert cli.main(["regenerate", str(iid)]) == 0

@@ -190,6 +190,27 @@ class IntakeStore:
         finally:
             conn.close()
 
+    def list_intake_updated_at(self, intake_id: int) -> Optional[str]:
+        conn = self._conn()
+        try:
+            r = conn.execute("SELECT updated_at, created_at FROM intake WHERE id=?",
+                             (intake_id,)).fetchone()
+        finally:
+            conn.close()
+        if r is None:
+            raise KeyError(intake_id)
+        return r["updated_at"] or r["created_at"]
+
+    def count_active(self) -> int:
+        """Rows in ``received`` or ``generating`` (the render backlog)."""
+        conn = self._conn()
+        try:
+            return int(conn.execute(
+                "SELECT COUNT(*) FROM intake WHERE status IN ('received','generating')"
+            ).fetchone()[0])
+        finally:
+            conn.close()
+
     def list_intakes(self, status: Optional[str] = None) -> List[dict]:
         conn = self._conn()
         try:

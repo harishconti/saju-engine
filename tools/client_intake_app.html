@@ -387,7 +387,7 @@
       </p>
 
       <div class="error" id="error" role="status" aria-live="polite"></div>
-      <div class="spinner" id="spinner" role="status" aria-live="polite">Preparing your chart and PDF… this takes about 10–20 seconds.</div>
+      <div class="spinner" id="spinner" role="status" aria-live="polite">Submitting…</div>
     </form>
 
     <div class="card success" id="success" role="status" aria-live="polite">
@@ -424,6 +424,11 @@
 
     document.querySelectorAll('input[name="tier"]').forEach(r => r.addEventListener('change', updateConcern));
 
+    function detailText(d, fallback) {
+      if (Array.isArray(d)) return d.map(x => (x && x.msg) ? x.msg : String(x)).join('; ');
+      if (d && typeof d === 'object') return d.msg || JSON.stringify(d);
+      return d || fallback;
+    }
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       errorBox.style.display = 'none';
@@ -439,7 +444,7 @@
         });
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
-          throw new Error(body.detail || body.error || `Server error (${res.status})`);
+          throw new Error(detailText(body.detail || body.error, `Server error (${res.status})`));
         }
         const ctype = res.headers.get('content-type') || '';
         if (ctype.includes('application/pdf')) {

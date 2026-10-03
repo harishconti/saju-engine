@@ -278,3 +278,126 @@ def test_access_log_filter_redacts_report_token(app_mod):
     out = rec.getMessage()
     assert "SECRETTOKEN123" not in out and "/report/[redacted]" in out
     assert "/generate" in app_mod.redact_report_tokens("POST /generate")
+
+
+# ---- final fix wave B --------------------------------------------------------
+
+def test_queue_cap_503_single_and_compat(app_mod, monkeypatch):
+    monkeypatch.setenv("SAJU_MAX_QUEUE", "2")
+    assert run(app_mod, **single()).status_code == 202
+    assert run(app_mod, **single()).status_code == 202
+    with pytest.raises(HTTPException) as exc:
+        run(app_mod, **single())
+    assert exc.value.status_code == 503 and "lot of requests" in exc.value.detail
+    with pytest.raises(HTTPException) as exc:
+        _compat(app_mod)
+    assert exc.value.status_code == 503
+    assert len(app_mod.STORE.list_intakes()) == 2
+    # the free sample is not subject to the queue cap
+    assert Path(run(app_mod, **single(tier="sample")).path).exists()
+
+
+def test_sample_503_when_no_render_slot(app_mod, monkeypatch):
+    import threading
+    monkeypatch.setattr(app_mod.jobs, "RENDER_SLOTS", threading.BoundedSemaphore(1))
+    monkeypatch.setattr(app_mod, "SAMPLE_SLOT_WAIT", 0.05)
+    app_mod.jobs.RENDER_SLOTS.acquire()
+    with pytest.raises(HTTPException) as exc:
+        run(app_mod, **single(tier="sample"))
+    assert exc.value.status_code == 503
+
+
+@pytest.mark.parametrize("over", [
+    {"marriage_status": "complicated"}, {"marriage_status": ""},
+    {"email": "not-an-email"}, {"email": "a@b"}, {"email": "a b@c.io"},
+])
+def test_single_enum_and_email_validation(app_mod, over):
+    with pytest.raises(HTTPException) as exc:
+        run(app_mod, **single(**over))
+    assert exc.value.status_code == 400
+    assert app_mod.STORE.list_intakes() == []
+
+
+def test_marriage_status_is_encrypted(app_mod):
+    import json
+    iid = json.loads(run(app_mod, **single(marriage_status="widowed")).body)["intake_id"]
+    row = app_mod.STORE.get_intake(iid)
+    assert row["pii"]["marriage_status"] == "widowed"
+    assert "marriage_status" not in row["birth"]
+    assert b"widowed" not in app_mod.STORE.db_path.read_bytes()
+
+
+@pytest.mark.parametrize("over", [
+    {"favorable_element_a": "Wind"}, {"favorable_element_b": "Gold"},
+    {"tier": "premium"}, {"email": "nope"},
+])
+def test_compat_validation(app_mod, over):
+    with pytest.raises(HTTPException) as exc:
+        _compat(app_mod, **over)
+    assert exc.value.status_code == 400
+    assert app_mod.STORE.list_intakes() == []
+
+
+def test_compat_element_case_insensitive_and_normalised(app_mod):
+    _compat(app_mod, favorable_element_a="wATER", favorable_element_b="")
+    row = app_mod.STORE.get_intake(app_mod.STORE.list_intakes()[0]["id"])
+    assert row["birth"]["favorable_element_a"] == "Water"
+
+
+def test_compat_offset_optional_with_timezone(app_mod):
+    _compat(app_mod, utc_offset_a="", utc_offset_b="", timezone_a="Asia/Seoul",
+            timezone_b="Asia/Seoul")
+    assert len(app_mod.STORE.list_intakes()) == 1
+    with pytest.raises(HTTPException) as exc:
+        _compat(app_mod, utc_offset_a="", timezone_a="")
+    assert exc.value.status_code == 400
+
+
+def test_requeue_pending_recovers_received_and_stale_generating(app_mod):
+    import sqlite3
+    from datetime import datetime, timedelta, timezone
+    st = app_mod.STORE
+    mk = lambda: st.add_intake(kind="single", tier="essential",
+                               pii={"name": "N", "email": "e@x.io", "main_concern": ""},
+                               birth={"dob": "1990-06-15", "birth_time": "10:00", "location": "Seoul",
+                                      "utc_offset": "9", "timezone": "", "gender": "F"})
+    rec, stale, live, done = mk(), mk(), mk(), mk()
+    st.set_status(stale, "generating"); st.set_status(live, "generating")
+    st.set_status(done, "draft_ready", pdf_path="x")
+    old = (datetime.now(timezone.utc) - timedelta(minutes=30)).isoformat()
+    with sqlite3.connect(st.db_path) as c:
+        c.execute("UPDATE intake SET updated_at=? WHERE id=?", (old, stale))
+    jobs_run = []
+    ids = app_mod.requeue_pending(spawn=lambda fn: jobs_run.append(fn))
+    assert sorted(ids) == sorted([rec, stale])
+    for fn in jobs_run:
+        fn()
+    assert st.get_intake(rec)["status"] == "draft_ready"
+    assert st.get_intake(stale)["status"] == "draft_ready"
+    assert st.get_intake(live)["status"] == "generating"
+
+
+def test_render_slots_bound_concurrency(app_mod, monkeypatch):
+    import threading, time
+    import saju_web.jobs as jobs
+    monkeypatch.setattr(jobs, "RENDER_SLOTS", threading.BoundedSemaphore(1))
+    cur = {"n": 0, "max": 0}
+    lock = threading.Lock()
+
+    def slow(*a, **k):
+        with lock:
+            cur["n"] += 1; cur["max"] = max(cur["max"], cur["n"])
+        time.sleep(0.1)
+        with lock:
+            cur["n"] -= 1
+        raise RuntimeError("stop")
+    monkeypatch.setattr(jobs, "render_single", slow)
+    ids = [json_id(run(app_mod, **single())) for _ in range(3)]
+    ts = [threading.Thread(target=jobs.generate_draft, args=(app_mod.STORE, i, app_mod.FILES_DIR)) for i in ids]
+    [t.start() for t in ts]; [t.join() for t in ts]
+    assert cur["max"] == 1
+
+
+def json_id(resp):
+    import json
+    return json.loads(resp.body)["intake_id"]

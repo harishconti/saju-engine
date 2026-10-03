@@ -25,6 +25,8 @@ import math
 import os
 import re
 import sys
+import threading
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 # Make the local src/ tree importable; user-space site-packages is already on
@@ -41,10 +43,17 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse  # noqa: 
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 from starlette.concurrency import run_in_threadpool  # noqa: E402
 
-from saju_web.jobs import derive_offset, generate_draft  # noqa: E402
+from saju_web import jobs  # noqa: E402
+from saju_web.jobs import derive_offset, generate_draft, is_stale, slugify  # noqa: E402
 from saju_web.store import IntakeStore  # noqa: E402
 
-app = FastAPI(title="Saju Self-Service Intake")
+@asynccontextmanager
+async def _lifespan(_app):
+    await run_in_threadpool(requeue_pending)  # restart recovery
+    yield
+
+
+app = FastAPI(title="Saju Self-Service Intake", lifespan=_lifespan)
 log = logging.getLogger("saju.client_intake_app")
 
 # S8e: no credentials, minimal headers/methods. In production set
@@ -77,6 +86,43 @@ RECEIVED_MESSAGE = (
     "Thank you \u2014 your reading is being prepared and will be reviewed by a human "
     "reader before delivery. We'll email you a private download link."
 )
+
+
+MARRIAGE_STATUSES = ("single", "relationship", "married", "divorced", "widowed", "other")
+ELEMENTS = {"wood": "Wood", "fire": "Fire", "earth": "Earth", "metal": "Metal", "water": "Water"}
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+BUSY_DETAIL = "We're receiving a lot of requests \u2014 please try again shortly."
+SAMPLE_SLOT_WAIT = 30.0
+
+
+def _max_queue() -> int:
+    try:
+        return int(os.environ.get("SAJU_MAX_QUEUE", "50"))
+    except ValueError:
+        return 50
+
+
+def _busy() -> HTTPException:
+    return HTTPException(status_code=503, detail=BUSY_DETAIL)
+
+
+async def _check_queue_capacity() -> None:
+    if await run_in_threadpool(STORE.count_active) >= _max_queue():
+        raise _busy()
+
+
+def _check_email(email: str) -> None:
+    if not EMAIL_RE.match(email):
+        raise _bad_request("Email address looks invalid.")
+
+
+def _norm_element(value: str) -> str:
+    v = value.strip()
+    if not v:
+        return ""
+    if v.lower() not in ELEMENTS:
+        raise _bad_request("Favorable element must be Wood, Fire, Earth, Metal or Water.")
+    return ELEMENTS[v.lower()]
 
 
 def _bad_request(detail: str) -> HTTPException:
@@ -154,6 +200,9 @@ async def generate(
     _check_len(main_concern, MAX_CONCERN, "Main concern")
     if not timezone and not utc_offset:
         raise _bad_request("Provide an IANA timezone or a UTC offset (no default is assumed).")
+    _check_email(email.strip())
+    if marriage_status not in MARRIAGE_STATUSES:
+        raise _bad_request("Invalid relationship status selected.")
     if tier not in SINGLE_TIERS:
         raise _bad_request("Invalid report tier selected.")
     if gender not in ("M", "F"):
@@ -161,14 +210,16 @@ async def generate(
     if tier == "deep" and not main_concern:
         raise _bad_request("Main concern is required for The Deep Destiny Report tier.")
     _check_birth(dob, birth_time, timezone, utc_offset)
+    if tier != "sample":
+        await _check_queue_capacity()
 
     intake_id = await run_in_threadpool(
         STORE.add_intake,
         kind="single", tier=tier,
-        pii={"name": name, "email": email.strip(), "main_concern": main_concern},
+        pii={"name": name, "email": email.strip(), "main_concern": main_concern,
+             "marriage_status": marriage_status},
         birth={"dob": dob, "birth_time": birth_time, "location": location,
-               "utc_offset": utc_offset, "timezone": timezone, "gender": gender,
-               "marriage_status": marriage_status},
+               "utc_offset": utc_offset, "timezone": timezone, "gender": gender},
     )
 
     if tier != "sample":  # fail-safe: any non-sample tier goes to human review
@@ -176,7 +227,13 @@ async def generate(
         return _accepted(intake_id)
 
     # Free sample: render now, approve without a token, return the PDF.
-    await run_in_threadpool(generate_draft, STORE, intake_id, FILES_DIR)
+    got = await run_in_threadpool(jobs.RENDER_SLOTS.acquire, True, SAMPLE_SLOT_WAIT)
+    if not got:
+        raise _busy()
+    try:
+        await run_in_threadpool(generate_draft, STORE, intake_id, FILES_DIR, hold_slot=False)
+    finally:
+        jobs.RENDER_SLOTS.release()
     row = await run_in_threadpool(STORE.get_intake, intake_id)
     if row["status"] != "draft_ready":
         # N-14: never echo exception text; generate_draft already logged it.
@@ -212,13 +269,13 @@ async def compat_generate(
     dob_a: str = Form(...),
     birth_time_a: str = Form(...),
     location_a: str = Form(...),
-    utc_offset_a: float = Form(...),
+    utc_offset_a: str = Form(""),
     gender_a: str = Form(...),
     name_b: str = Form(...),
     dob_b: str = Form(...),
     birth_time_b: str = Form(...),
     location_b: str = Form(...),
-    utc_offset_b: float = Form(...),
+    utc_offset_b: str = Form(""),
     gender_b: str = Form(...),
     email: str = Form(...),
     main_concern: str = Form(""),
@@ -242,10 +299,18 @@ async def compat_generate(
                               ("Location B", location_b, MAX_LOCATION),
                               ("Email", email, MAX_EMAIL), ("Main concern", main_concern, MAX_CONCERN)):
         _check_len(val.strip(), limit, field)
-    _check_birth(dob_a.strip(), birth_time_a.strip(), timezone_a.strip(), str(utc_offset_a), "Partner A: ")
-    _check_birth(dob_b.strip(), birth_time_b.strip(), timezone_b.strip(), str(utc_offset_b), "Partner B: ")
-
-    selected_tier = tier.strip() if tier.strip() in ("basic", "deep") else "basic"
+    _check_email(email.strip())
+    off_a, off_b = str(utc_offset_a).strip(), str(utc_offset_b).strip()
+    for label, tzv, off in (("Partner A: ", timezone_a, off_a), ("Partner B: ", timezone_b, off_b)):
+        if not tzv.strip() and not off:
+            raise _bad_request(f"{label}Provide an IANA timezone or a UTC offset (no default is assumed).")
+    _check_birth(dob_a.strip(), birth_time_a.strip(), timezone_a.strip(), off_a, "Partner A: ")
+    _check_birth(dob_b.strip(), birth_time_b.strip(), timezone_b.strip(), off_b, "Partner B: ")
+    fav_a, fav_b = _norm_element(favorable_element_a), _norm_element(favorable_element_b)
+    selected_tier = tier.strip()
+    if selected_tier not in ("basic", "deep"):
+        raise _bad_request("Invalid compatibility tier selected.")
+    await _check_queue_capacity()
     intake_id = await run_in_threadpool(
         STORE.add_intake,
         kind="compat", tier=selected_tier,
@@ -253,13 +318,13 @@ async def compat_generate(
              "main_concern": main_concern.strip()},
         birth={
             "a": {"dob": dob_a.strip(), "birth_time": birth_time_a.strip(),
-                  "location": location_a.strip(), "utc_offset": str(utc_offset_a),
+                  "location": location_a.strip(), "utc_offset": off_a,
                   "timezone": timezone_a.strip(), "gender": gender_a},
             "b": {"dob": dob_b.strip(), "birth_time": birth_time_b.strip(),
-                  "location": location_b.strip(), "utc_offset": str(utc_offset_b),
+                  "location": location_b.strip(), "utc_offset": off_b,
                   "timezone": timezone_b.strip(), "gender": gender_b},
-            "favorable_element_a": favorable_element_a.strip(),
-            "favorable_element_b": favorable_element_b.strip(),
+            "favorable_element_a": fav_a,
+            "favorable_element_b": fav_b,
         },
     )
     # N-14: renders go to files/<id>/ under the store, never the curated
@@ -268,10 +333,26 @@ async def compat_generate(
     return _accepted(intake_id)
 
 
-def slugify(s: str) -> str:
-    s = s.lower().strip()
-    s = re.sub(r"[^\w\s-]", "", s)
-    return re.sub(r"[-\s]+", "-", s) or "report"
+def requeue_pending(store: IntakeStore = None, files_dir: Path = None, spawn=None) -> list[int]:
+    """Restart recovery: re-run ``received`` and STALE ``generating`` rows.
+
+    Each job runs in a daemon thread and is bounded by ``jobs.RENDER_SLOTS``.
+    Returns the re-queued ids. ``spawn(fn)`` is injectable for tests.
+    """
+    store = store or STORE
+    files_dir = files_dir or FILES_DIR
+    ids = [r["id"] for r in store.list_intakes()
+           if r["status"] == "received"
+           or (r["status"] == "generating" and is_stale(r["updated_at"]))]
+    for iid in ids:
+        fn = (lambda i=iid: generate_draft(store, i, files_dir))
+        if spawn is not None:
+            spawn(fn)
+        else:
+            threading.Thread(target=fn, daemon=True, name=f"saju-requeue-{iid}").start()
+    if ids:
+        log.info("restart recovery: re-queued intakes %s", ids)
+    return ids
 
 
 _REPORT_PATH_RE = re.compile(r"(/report/)[^\s\"'?]+")

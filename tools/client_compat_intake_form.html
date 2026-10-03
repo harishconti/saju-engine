@@ -298,6 +298,11 @@
   </div>
 
   <script>
+    function detailText(d, fallback) {
+      if (Array.isArray(d)) return d.map(x => (x && x.msg) ? x.msg : String(x)).join('; ');
+      if (d && typeof d === 'object') return d.msg || JSON.stringify(d);
+      return d || fallback;
+    }
     document.getElementById('compat-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const status = document.getElementById('status');
@@ -313,7 +318,7 @@
         });
         if (!r.ok) {
           const body = await r.json().catch(() => ({}));
-          throw new Error(body.detail || `HTTP ${r.status}`);
+          throw new Error(detailText(body.detail, `HTTP ${r.status}`));
         }
         const ctype = r.headers.get('content-type') || '';
         if (ctype.includes('application/pdf')) {

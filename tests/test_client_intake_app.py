@@ -190,12 +190,14 @@ def test_client_forms_show_usd_not_rupee_prices():
 
 def test_compat_generate_requires_explicit_utc_offsets():
     """S8b (2026-10-01 audit): /compat/generate still defaulted both offsets
-    to Form(5.5) (India) after N-13 removed it from /generate."""
+    to Form(5.5) (India) after N-13 removed it from /generate.
+    Final-fix wave: offsets are optional only when a timezone is given
+    (mirrors /generate); the default is blank, never a number."""
     import inspect
 
     params = inspect.signature(_load_app_module().compat_generate).parameters
     for name in ("utc_offset_a", "utc_offset_b"):
-        assert params[name].default.is_required(), name
+        assert params[name].default.default == "", name
 
 
 def test_compat_generate_validates_before_writing_intake():

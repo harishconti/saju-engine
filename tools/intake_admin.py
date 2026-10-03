@@ -17,7 +17,7 @@ import argparse
 import json
 import os
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -25,22 +25,10 @@ for p in (str(PROJECT_ROOT / "src"), os.environ.get("SAJU_SITE")):
     if p and p not in sys.path:
         sys.path.insert(0, p)
 
+from saju_web.jobs import is_stale  # noqa: E402
 from saju_web.store import IntakeStore, generate_key  # noqa: E402
 
 INTAKE_DIR = Path(os.environ.get("SAJU_INTAKE_DIR") or PROJECT_ROOT / "candidates_horoscope" / "intake")
-
-
-STALE_AFTER = timedelta(minutes=15)
-
-
-def _is_stale(updated_at: str | None, now: datetime) -> bool:
-    try:
-        ts = datetime.fromisoformat(updated_at)
-    except (TypeError, ValueError):
-        return False
-    if ts.tzinfo is None:
-        ts = ts.replace(tzinfo=timezone.utc)
-    return now - ts > STALE_AFTER
 
 
 def _store() -> IntakeStore:
@@ -60,6 +48,8 @@ def main(argv: list[str] | None = None) -> int:
     sp.add_argument("--base-url", default="http://localhost:8080")
     sp = sub.add_parser("regenerate")
     sp.add_argument("id", type=int)
+    sp.add_argument("--force", action="store_true",
+                    help="regenerate even if the row is still 'generating' (not stale)")
     sp = sub.add_parser("purge")
     sp.add_argument("--days", type=int, default=180)
     args = ap.parse_args(argv)
@@ -77,7 +67,7 @@ def main(argv: list[str] | None = None) -> int:
         now = datetime.now(timezone.utc)
         for r in store.list_intakes(args.status):
             line = f"{r['id']}\t{r['status']}\t{r['kind']}/{r['tier']}\t{r['created_at']}\t{r['name']}"
-            if r["status"] == "generating" and _is_stale(r["updated_at"], now):
+            if r["status"] in ("received", "generating") and is_stale(r["updated_at"], now):
                 line += "\tSTALE - run regenerate"
             print(line)
         return 0
@@ -105,6 +95,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "regenerate":
         if row["status"] == "approved":
             print(f"error: intake {args.id} is already approved", file=sys.stderr)
+            return 1
+        if (row["status"] == "generating"
+                and not is_stale(store.list_intake_updated_at(args.id)) and not args.force):
+            print(f"error: intake {args.id} is still 'generating' (not stale); "
+                  "wait for it or pass --force", file=sys.stderr)
             return 1
         from saju_web.jobs import generate_draft
         generate_draft(store, args.id, store.files_root)

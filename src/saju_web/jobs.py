@@ -8,9 +8,11 @@ go to the log. Logs must not contain PII.
 from __future__ import annotations
 
 import logging
+import os
 import re
 import shutil
-from datetime import datetime
+import threading
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -22,8 +24,21 @@ from saju_web.store import IntakeStore
 
 log = logging.getLogger("saju.jobs")
 
-# "deep" covers both the single-chart Deep Destiny report and the compat deep tier.
-PAID_TIERS = {"essential", "deep", "spark", "reading", "fullmap", "basic"}
+# Bounds concurrent PDF renders (CPU/RAM); sample sync renders and background drafts share it.
+RENDER_SLOTS = threading.BoundedSemaphore(max(1, int(os.environ.get("SAJU_MAX_RENDERS", "2"))))
+
+STALE_AFTER = timedelta(minutes=15)
+
+
+def is_stale(updated_at: Optional[str], now: Optional[datetime] = None) -> bool:
+    """True when a row has sat in received/generating for more than 15 minutes."""
+    try:
+        ts = datetime.fromisoformat(updated_at)
+    except (TypeError, ValueError):
+        return False
+    if ts.tzinfo is None:
+        ts = ts.replace(tzinfo=timezone.utc)
+    return (now or datetime.now(timezone.utc)) - ts > STALE_AFTER
 
 
 def parse_dob_time(dob: str, birth_time: str) -> tuple[int, int, int, int, int]:
@@ -116,13 +131,23 @@ def render_compat(pii: dict, birth: dict, tier: str, out_dir: Path) -> Path:
     return out_pdf
 
 
-def generate_draft(store: IntakeStore, intake_id: int, files_dir: Path) -> None:
+def generate_draft(store: IntakeStore, intake_id: int, files_dir: Path, *,
+                   hold_slot: bool = True) -> None:
     """Render the draft PDF for ``intake_id`` into ``files_dir/<id>/``.
 
     Sets "generating", then "draft_ready" (with pdf_path) or "failed" (error =
     exception class name only). ``files_dir`` must be under ``store.files_root``
-    so retention purge can delete the output.
+    so retention purge can delete the output. Rendering is bounded by
+    ``RENDER_SLOTS``; pass ``hold_slot=False`` if the caller already holds one.
     """
+    if hold_slot:
+        with RENDER_SLOTS:
+            _generate(store, intake_id, files_dir)
+    else:
+        _generate(store, intake_id, files_dir)
+
+
+def _generate(store: IntakeStore, intake_id: int, files_dir: Path) -> None:
     try:
         was_received = store.get_intake(intake_id)["status"] == "received"
         store.set_status(intake_id, "generating")
