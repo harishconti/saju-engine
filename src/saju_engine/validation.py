@@ -924,15 +924,70 @@ def run_stars_fixture(entry: dict) -> dict:
     return check_stars(compute_chart(**kwargs), entry)
 
 
+_PATTERNS_ALLOWED_INPUT = _ALLOWED_INPUT
+
+
+def _patterns_extract(pat: dict) -> dict:
+    """Extractors over the JSON shape of ``Chart._patterns_dict`` (regular_grid
+    already converted to dicts), one per supported ``expected.patterns`` key."""
+    grid = pat.get("regular_grid") or []
+    tg = pat.get("transformation_grid")
+    return {
+        "regular_grid_name": grid[0]["name_ko"] if grid else None,
+        "yangin": bool(pat["yangin"]["present"]),
+        "yangin_grid": bool(pat["yangin_grid"]["present"]),
+        "jianlu": bool(pat["jianlu"]["present"]),
+        "jianlu_grid": bool(pat["jianlu_grid"]["present"]),
+        "transformation_grid": tg["name_ko"] if tg else None,
+        "special_forms_names": sorted(f["name_ko"] for f in pat.get("special_forms") or []),
+        "structural_notes_kinds": sorted(n["name_ko"] for n in pat.get("structural_notes") or []),
+        "tengod_conflicts_names": sorted(c["name_ko"] for c in pat.get("tengod_conflicts") or []),
+    }
+
+
+def check_patterns(chart: Any, entry: dict) -> dict:
+    """Check a declared subset of chart.patterns (격국) against a fixture.
+
+    expected.patterns keys (each optional): regular_grid_name, yangin (blade
+    present at any position), yangin_grid (month-branch 양인격), jianlu,
+    jianlu_grid (month-branch 건록격), transformation_grid (name or null),
+    special_forms_names, structural_notes_kinds, tengod_conflicts_names
+    (sorted lists). Unknown keys raise.
+    """
+    exp = entry.get("expected", {}).get("patterns") or {}
+    got = _patterns_extract(chart._patterns_dict(chart.patterns))
+    unknown = set(exp) - set(got)
+    if unknown:
+        raise ValueError(f"patterns/{entry['id']}: unknown expected key(s) {sorted(unknown)}")
+    mismatches = {}
+    for k, v in exp.items():
+        want = sorted(v) if isinstance(v, list) else v
+        if want != got[k]:
+            mismatches[k] = {"expected": want, "got": got[k]}
+    return _result(entry, mismatches)
+
+
+def run_patterns_fixture(entry: dict) -> dict:
+    """Compute the chart for a patterns fixture entry and check its 격국 subset."""
+    unknown = set(entry["input"]) - _PATTERNS_ALLOWED_INPUT
+    if unknown:
+        raise ValueError(f"patterns/{entry['id']}: unknown input key(s) {sorted(unknown)}")
+    kwargs = dict(entry["input"])
+    kwargs.setdefault("name", entry["id"])
+    return check_patterns(compute_chart(**kwargs), entry)
+
+
 _SUBSYSTEM_ORDER = ["pillars", "daeun", "sewoon", "lookups", "yongsin",
-                    "climate", "compat", "career", "stars"]
+                    "climate", "compat", "career", "stars", "patterns"]
 # Workstream label per subsystem (spec §workstreams). Extended by Plans 4–6.
 _WORKSTREAM = {"pillars": "W1", "daeun": "W2", "sewoon": "W2", "lookups": "W3",
-               "yongsin": "W4", "climate": "W5", "compat": "W6", "career": "W6", "stars": "W7"}
+               "yongsin": "W4", "climate": "W5", "compat": "W6", "career": "W6", "stars": "W7",
+               "patterns": "W8"}
 _RUNNERS = {"pillars": run_fixture, "daeun": run_daeun_fixture, "sewoon": run_sewoon_fixture,
             "lookups": run_lookups_fixture, "yongsin": run_yongsin_fixture,
             "climate": run_climate_fixture, "compat": run_compat_fixture,
-            "career": run_career_fixture, "stars": run_stars_fixture}
+            "career": run_career_fixture, "stars": run_stars_fixture,
+            "patterns": run_patterns_fixture}
 
 
 def collect_results(fixtures_dir: Optional[Path] = None) -> dict[str, list[dict]]:
