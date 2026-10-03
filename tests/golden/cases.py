@@ -62,6 +62,19 @@ def golden_outputs() -> Dict[str, str]:
             out[f"compat-{a}-{b}-{tier}.md"] = generate_compat_report(
                 charts[a], charts[b], charts[a].name, charts[b].name,
                 generation_date=GEN_DATE, tier=tier)
+    # Legacy tiers still engine-supported (CLAUDE.md "Tiered Client Products").
+    for tier in ("fullmap", "companion"):
+        out[f"park-{tier}.md"] = generate_premium_report(
+            charts["park"], tier=tier, generation_date=GEN_DATE)
+    # Reader-argued 용신 override path (ny resolves to Wood; override to Fire).
+    out["ny-deep-override-fire.md"] = generate_premium_report(
+        charts["ny"], tier="deep", generation_date=GEN_DATE,
+        favorable_override="Fire")
+    # Compat favorable_element_a/_b override path.
+    out["compat-lux-kiran-deep-override.md"] = generate_compat_report(
+        charts["lux"], charts["kiran"], charts["lux"].name, charts["kiran"].name,
+        generation_date=GEN_DATE, tier="deep",
+        favorable_element_a="Wood", favorable_element_b="Water")
     out["cross-candidate.md"] = _cross_candidate(charts)
     return out
 
