@@ -1834,10 +1834,12 @@ def six_combination_transforms(chart, a: str, c: str, elem: str) -> bool:
     month branch and neither member may be struck by a natal 충. Otherwise
     the pair only binds (합이불화, 合而不化). Validation 2026-09-25 #7: 巳申 was
     reported as "transforming toward Water" in a 巳 (Fire) month with 巳亥沖.
+
+    All SIX_COMBINATIONS elements are single words, so the old substring test
+    month_elem not in elem was equivalent to inequality.
     """
     from . import lookup as L
-    month_elem = L.BRANCH_ELEMENT.get(chart.month.branch, "")
-    if not month_elem or month_elem not in elem:
+    if not L.element_rules_month(elem, chart.month.branch):
         return False
     struck = {x for pair in (chart.clashes or []) for x in pair}
     return not ({a, c} & struck)

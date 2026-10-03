@@ -151,7 +151,7 @@ def _breaker_is_powerful(
     """
     # In season: breaker element matches the month branch element.
     breaker_elem = L.STEM_INFO.get(breaker, {}).get("element", "")
-    if breaker_elem and breaker_elem == L.BRANCH_ELEMENT.get(month_branch, ""):
+    if breaker_elem and L.element_rules_month(breaker_elem, month_branch):
         return True
     # Rooted: breaker appears as a visible branch or as any hidden stem.
     if branches and breaker in branches:

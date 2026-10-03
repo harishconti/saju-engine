@@ -371,15 +371,10 @@ def normalize_tier(tier: str) -> str:
 
 def _day_master_in_season(chart: Chart) -> bool:
     """Return True if the month branch supports the Day Master's element."""
+    from . import lookup as L
     element = chart.day_master_info.get("element", "")
     month_branch = chart.month.branch
-    return (
-        (element == "Wood" and month_branch in "寅卯辰")
-        or (element == "Fire" and month_branch in "巳午未")
-        or (element == "Earth" and month_branch in "辰戌丑未")
-        or (element == "Metal" and month_branch in "申酉戌")
-        or (element == "Water" and month_branch in "亥子丑")
-    )
+    return L.season_supports(element, month_branch)
 
 
 def _chart_signature(chart: Chart) -> str:

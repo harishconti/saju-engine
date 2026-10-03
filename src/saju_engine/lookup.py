@@ -166,6 +166,30 @@ BRANCH_ELEMENT: Dict[str, str] = {
 }
 
 
+# B8 (2026-10-01 audit): "in season" was implemented four times. They are two
+# distinct doctrines, each now with one home:
+#
+# element_rules_month — the element IS the month branch's own element
+#   (BRANCH_ELEMENT equality). Used for 합화 season tests (knowledge/11-gunghap.md
+#   §A step 3; knowledge/02-branches.md 육합) and pattern-breaker strength
+#   (knowledge/07-special-formations.md).
+# season_supports — the month falls in the element's SEASON group (spring
+#   寅卯辰 Wood, summer 巳午未 Fire, autumn 申酉戌 Metal, winter 亥子丑 Water,
+#   季月 辰戌丑未 Earth). Used for Day-Master seasonal support (report_data).
+def element_rules_month(element: str, month_branch: str) -> bool:
+    return bool(month_branch) and BRANCH_ELEMENT.get(month_branch) == element
+
+
+_SEASON_GROUPS: Dict[str, str] = {
+    "Wood": "寅卯辰", "Fire": "巳午未", "Earth": "辰戌丑未",
+    "Metal": "申酉戌", "Water": "亥子丑",
+}
+
+
+def season_supports(element: str, month_branch: str) -> bool:
+    return bool(month_branch) and month_branch in _SEASON_GROUPS.get(element, "")
+
+
 def stem_combination(a: str, b: str) -> Optional[Tuple[str, str, str]]:
     """Return the ten-stem combination result for an unordered pair, or None.
 

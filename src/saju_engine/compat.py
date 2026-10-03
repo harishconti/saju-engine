@@ -194,7 +194,7 @@ def _element_in_season(element: str, branch: str) -> bool:
     the result as a flag rather than gate the score. *(see knowledge/11-
     gunghap.md §A step 3)*
     """
-    return L.BRANCH_ELEMENT.get(branch) == element
+    return L.element_rules_month(element, branch)
 
 
 def compat_daystem_combo(a: Chart, b: Chart) -> CompatSubResult:

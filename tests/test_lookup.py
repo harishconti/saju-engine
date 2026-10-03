@@ -468,3 +468,25 @@ def test_core_tables_have_single_home():
     assert pillars._FIVE_TIGERS is L.FIVE_TIGERS
     assert pillars._BRANCH_ORDER is L.BRANCH_ORDER
     assert pillars._YEAR_CYCLE_ANCHOR == sewoon._ANCHOR_YEAR == L.JIAZI_ANCHOR_YEAR == 1984
+
+
+def test_element_rules_month_is_branch_element_equality():
+    """B8 (2026-10-01 audit): element_rules_month returns True when the
+    element IS the month branch's own element (BRANCH_ELEMENT equality)."""
+    from saju_engine import lookup as L
+    for b, e in L.BRANCH_ELEMENT.items():
+        assert L.element_rules_month(e, b)
+        assert not L.element_rules_month("Nope", b)
+    assert not L.element_rules_month("Earth", "")
+
+
+def test_season_supports_uses_seasonal_groups():
+    """B8 (2026-10-01 audit): Distinct doctrine from element_rules_month:
+    辰 (Earth branch) still supports Wood (spring), 丑 supports Water (winter),
+    and every 季月 (辰戌丑未) supports Earth."""
+    from saju_engine import lookup as L
+    assert L.season_supports("Wood", "辰")
+    assert L.season_supports("Water", "丑")
+    assert L.season_supports("Metal", "戌")
+    assert all(L.season_supports("Earth", b) for b in "辰戌丑未")
+    assert not L.season_supports("Fire", "子")
