@@ -440,6 +440,7 @@ def detect_special_forms(
             "basis": f"{dominant} dominates {share:.0%} of weighted elements; strength verdict is {strength_verdict}",
             "confidence": confidence,
             "note": note,
+            "dominant_element": dominant,
         }
         forms.append(entry)
         # B6: 종자 (從子) is the rare child/output subtype, often folded into
@@ -451,6 +452,7 @@ def detect_special_forms(
                 "name_en": "Child-Following Grid",
                 "basis": entry["basis"],
                 "confidence": confidence,
+                "dominant_element": dominant,
                 "note": (
                     "Same structural basis as 종식상, read through the "
                     "'child / output' lens per knowledge/07-special-formations.md §B1. "

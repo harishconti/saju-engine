@@ -357,5 +357,28 @@
     "climate_agrees": null
    }
   }
+ },
+ {
+  "id": "jong-likely-종재-1948-follow",
+  "subsystem": "yongsin",
+  "input": {
+   "year": 1948,
+   "month": 9,
+   "day": 9,
+   "hour": 1,
+   "minute": 47,
+   "utc_offset": 9.0,
+   "longitude": 127.0
+  },
+  "source": "knowledge/07-special-formations.md:73 — 'In 종격, the favorable element (용신) is the dominant element itself'; conditions at 07:57-65 (no 비겁/인성, dominant force, in season). Pillars 戊子 辛酉 丁酉 辛丑: 丁 DM weak with no 비겁/인성 anywhere and Metal (재) dominant at 53%, 득령 in the 酉 month → 종재 'likely' → 용신 = Metal (user decision 2026-10-03: only 'likely' follows; 억부 would print Wood). Supporting = the element generating the 용신 (Earth). (external cross-check 2026-10-03: 8-codes 15강 '종격 용신' — '인성과 비겁이 하나도 없으니 억부용신을 취용할 수 없습니다. 이런 경우에는 부득이하게 오행의 세력 중에서 가장 강한 세력을 따릅니다. 그래서 좇을 종(從)자를 써서 종격 용신이라고 합니다' — https://guide.8-codes.com/lecture/elementary/15.html)",
+  "status": "expect_match",
+  "expected": {
+   "fe": {
+    "element": "Metal",
+    "method": "jonggyeok-follow",
+    "confidence": "heuristic",
+    "supporting": "Earth"
+   }
+  }
  }
 ]

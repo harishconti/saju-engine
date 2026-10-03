@@ -13,7 +13,7 @@ from saju_engine.validation import _ALLOWED_INPUT, _YONGSIN_EXTRA_INPUT, load_fi
 ENTRIES = load_fixtures("yongsin")
 
 VALID_METHODS = {"strong-dm-drain", "weak-dm-support", "balanced-heuristic",
-                 "climate-balanced", "reader-confirmed"}
+                 "climate-balanced", "reader-confirmed", "jonggyeok-follow"}
 VALID_ELEMENTS = {"Wood", "Fire", "Earth", "Metal", "Water"}
 
 
@@ -35,7 +35,7 @@ def test_yongsin_fixture(entry):
 
 def test_method_label_coverage():
     """Across all entries, the expected fe.method set must hit every one of the
-    five FavorableElement.method labels (exercises all merge branches).
+    FavorableElement.method labels (exercises all merge branches).
 
     Layer A (5 entries) covers only strong-dm-drain + weak-dm-support; the
     balanced-heuristic / climate-balanced / reader-confirmed branches arrive

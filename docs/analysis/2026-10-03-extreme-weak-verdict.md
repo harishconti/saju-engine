@@ -304,3 +304,5 @@ from `weak` charts and reaches "likely" when the dominant element is >= 50 %, no
 dominant element is in season. The in-season test **keeps the month branch (월령)**,
 a documented difference from the "month stem" wording of knowledge/07-special-formations.md:63.
 The same change fixed the `_VERDICT_PLAIN_LABEL` key (`extreme_strong` -> `extreme`).
+
+Follow-up decision (2026-10-03): a "likely" 종격 also switches the 용신 to the dominant element (`method="jonggyeok-follow"`, knowledge/07-special-formations.md:73); "possible" candidates keep the 억부/조후 resolution; a reader override still wins.
