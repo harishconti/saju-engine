@@ -194,7 +194,16 @@ def md_inline_to_html(text: str, tier: str | None = None) -> str:
     # All client-facing PDFs are English-primary. Korean/Hanja in the markdown
     # source are translated where possible and stripped otherwise, consistent
     # with the single-chart tiers.
-    text = translate_inline(text)
+    dropped: set = set()
+    text = translate_inline(text, keep_unmapped=False, unmapped=dropped)
+    if dropped:
+        import warnings
+
+        warnings.warn(
+            "ReportLab fonts cannot draw CJK; dropped unmapped characters: "
+            + "".join(sorted(dropped)),
+            stacklevel=2,
+        )
     # DejaVu/Helvetica do not contain warning/favorable/headphone emojis.
     text = _strip_client_emojis(text)
     # Bold, italic, code

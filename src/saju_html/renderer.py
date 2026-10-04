@@ -12,6 +12,8 @@ parser, cover-page builder, and PDF printer.
 from __future__ import annotations
 
 import html
+import logging
+import os
 import re
 from datetime import date
 from pathlib import Path
@@ -97,7 +99,10 @@ def _make_md_parser() -> MarkdownIt:
     return md
 
 
-def _translate_html(text: str) -> str:
+_log = logging.getLogger(__name__)
+
+
+def _translate_html(text: str, unmapped: set | None = None) -> str:
     """Apply CJK/Hanja translation to HTML text.
 
     We intentionally translate *after* markdown has been rendered to HTML, so
@@ -106,7 +111,7 @@ def _translate_html(text: str) -> str:
     """
     from saju_html import translate_inline
 
-    return translate_inline(text)
+    return translate_inline(text, keep_unmapped=True, unmapped=unmapped)
 
 
 def _build_cover_html(
@@ -213,7 +218,14 @@ def _render_markdown(md_text: str, tier: str | None = None) -> str:
     md_text = strip_engine_drafts(md_text)
     # All client-facing PDFs are English-primary; translate Korean/Hanja
     # annotations just like single-chart reports.
-    translated = _translate_html(md_text)
+    unmapped: set = set()
+    translated = _translate_html(md_text, unmapped)
+    if unmapped:
+        _log.warning(
+            "Unmapped CJK characters kept as-is in rendered HTML (add them to "
+            "the saju_html translation maps): %s",
+            "".join(sorted(unmapped)),
+        )
     html_doc = md.render(translated)
     html_doc = inject_element_balance_chart(html_doc, _style_element_balance_tables)
     html_doc = _wrap_quick_ref(html_doc)
@@ -446,6 +458,7 @@ def build_pdf(
     report_id: str = "",
     compact: bool = False,
     tier: str | None = None,
+    allow_fallback: bool = False,
 ) -> Path:
     """Convenience: read markdown from disk and produce a styled PDF.
 
@@ -473,9 +486,14 @@ def build_pdf(
     try:
         return html_to_pdf(html, output_pdf, report_id=report_id)
     except (ImportError, RuntimeError) as exc:
-        # Playwright is missing or no usable browser; fall back to ReportLab.
-        # ReportLab does not honour CSS, compact mode, or a custom generation
-        # date, but it produces a presentable PDF using the same markdown.
+        if not (allow_fallback or os.environ.get("SAJU_PDF_FALLBACK") == "reportlab"):
+            raise RuntimeError(
+                f"HTML/Playwright PDF backend unavailable: {exc}. Install with "
+                "`pip install playwright && python -m playwright install chromium`, "
+                "or pass backend='reportlab' / --reportlab explicitly."
+            ) from exc
+        # Explicitly opted in: ReportLab ignores CSS, compact mode and a custom
+        # generation date, but produces a presentable PDF from the same markdown.
         import warnings
 
         warnings.warn(

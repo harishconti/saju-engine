@@ -7,7 +7,7 @@ Both PDF generators import these maps so translations stay identical.
 from __future__ import annotations
 
 import re
-from typing import List
+from typing import List, Optional
 
 from saju_engine.report_data import ELEMENT_COLORS as ELEMENT_COLORS
 from saju_engine.report_data import ELEMENT_EMOJI as ELEMENT_EMOJI
@@ -244,6 +244,16 @@ KOR_REPL = {
     "갑기합토": "Gap-Gi Earth combination", "을경합금": "Eul-Gyeong Metal combination",
     "병신합수": "Byeong-Sin Water combination", "정임합목": "Jeong-Im Wood combination",
     "무계합화": "Mu-Gye Fire combination",
+    # Added 2026-10-04 (P5 task 1): terms the golden reports use that previously
+    # fell through to silent CJK deletion. Glosses follow knowledge/00-glossary.md
+    # (신살 -> Star, 득령 -> in-season support) and knowledge/11-gunghap.md (납음 -> Nayin).
+    "결합": "combined", "결합에서": "in the union", "괴강": "Kuigang (Commanding Star)",
+    "교차": "cross", "균형": "balance", "납음": "Nayin", "득령": "in-season support",
+    "문창귀인": "Literary Star", "배우자": "spouse", "복덕": "blessing and virtue",
+    "분": "people", "쌍화개": "double Canopy", "원소": "element", "일부": "partial",
+    "일치": "match", "혼잡": "mixed", "사고": "storehouse",
+    "고": "storehouse",
+    "는": " is", "에": " to", "의": "\u2019s",
 }
 
 # Hanja single-character (for inline like 甲, 乙 inside non-fully-translated contexts)
@@ -313,6 +323,12 @@ HANJA_MAP = {
     "怨嗔": "Deep Grudge", "鬼門關": "Ghost Gate", "地煞": "Movement Star", "年煞": "Annual Star",
     "月煞": "Withering Star", "天煞": "Heaven Star", "災煞": "Calamity Star", "亡神": "Loss-of-Face",
     "絶": "Extinction", "財庫": "wealth storehouse", "夜子時": "late Rat hour",
+    # Added 2026-10-04 (P5 task 1): Hanja glosses for the golden reports.
+    "六害": "Six Harm", "將星": "General Star", "將": "General",
+    "文昌貴人": "Literary Star", "本氣": "main qi", "魁罡": "Kuigang (Commanding Star)",
+    # Nayin (納音) tone names — see knowledge/11-gunghap.md §C.
+    "白蠟金": "White Wax Metal", "石榴木": "Pomegranate Wood",
+    "釵釧金": "Hairpin Metal", "長流水": "Long-Flowing Water",
     # Five Element Hanja (often appear after stem names like 辛金)
     "金": "Metal", "木": "Wood", "水": "Water", "火": "Fire", "土": "Earth",
 }
@@ -386,8 +402,16 @@ def _protect_parenthetical_english(text: str) -> tuple[str, list[str]]:
     return protected, placeholders
 
 
-def _translate_cjk_run(run: str) -> str:
-    """Translate one contiguous CJK run using longest-match tokenization."""
+def _translate_cjk_run(
+    run: str,
+    keep_unmapped: bool = False,
+    unmapped: Optional[set] = None,
+) -> str:
+    """Translate one contiguous CJK run using longest-match tokenization.
+
+    Unmapped characters are always added to ``unmapped`` (if given); they are
+    kept verbatim in the output when ``keep_unmapped`` is true, else dropped.
+    """
     tokens: List[str] = []
     i = 0
     n = len(run)
@@ -400,15 +424,29 @@ def _translate_cjk_run(run: str) -> str:
                 matched = True
                 break
         if not matched:
-            # Unmapped CJK character — drop it (the final _CJK_RE pass will catch it).
+            # Unmapped CJK character: report it, and keep or drop per caller.
+            if unmapped is not None:
+                unmapped.add(run[i])
+            if keep_unmapped:
+                tokens.append(run[i])
             i += 1
     # Join translated tokens with a single space so adjacent Hanja pairs like
     # 丙午 do not collapse into "BingO".
     return " ".join(tokens)
 
 
-def translate_inline(text: str) -> str:
+def translate_inline(
+    text: str,
+    *,
+    keep_unmapped: bool = True,
+    unmapped: Optional[set] = None,
+) -> str:
     """Replace Korean/Hanja terms with English.
+
+    Unmapped CJK characters are never silently lost: with ``keep_unmapped``
+    (default) they stay in the output (the HTML path renders them with a CJK
+    font); otherwise they are dropped (for fonts that cannot draw CJK). Either
+    way they are added to ``unmapped`` when a set is supplied.
 
     Improvements over the old global `.replace` loop:
       - Longest-match tokenization within CJK runs prevents adjacent Hanja pairs
@@ -439,7 +477,7 @@ def translate_inline(text: str) -> str:
             subparts = _CJK_RE.split(before)
             for j, sub in enumerate(subparts):
                 if j % 2 == 1 and sub:
-                    parts.append(_translate_cjk_run(sub))
+                    parts.append(_translate_cjk_run(sub, keep_unmapped, unmapped))
                 else:
                     parts.append(sub)
         parts.append(m.group(0))  # placeholder
@@ -450,7 +488,7 @@ def translate_inline(text: str) -> str:
         subparts = _CJK_RE.split(before)
         for j, sub in enumerate(subparts):
             if j % 2 == 1 and sub:
-                parts.append(_translate_cjk_run(sub))
+                parts.append(_translate_cjk_run(sub, keep_unmapped, unmapped))
             else:
                 parts.append(sub)
 
@@ -484,8 +522,10 @@ def translate_inline(text: str) -> str:
         out_parts.append(placeholder)
 
     out = "".join(out_parts)
-    # Final safety net: drop any CJK character the maps missed.
-    out = _CJK_RE.sub(" ", out)
+    # Final safety net: CJK the maps missed is dropped only when the caller
+    # asked for it (keep_unmapped=False); either way it was reported above.
+    if not keep_unmapped:
+        out = _CJK_RE.sub(" ", out)
     # ...and any parenthetical it left empty ("Half Harmony ()").
     out = re.sub(r"\(\s*\)", "", out)
     # Collapse a term followed by its own translation in parens, which the
@@ -496,6 +536,7 @@ def translate_inline(text: str) -> str:
     out = re.sub(r"  +", " ", out)
     out = re.sub(r" \.", ".", out)
     out = re.sub(r" ,", ",", out)
+    out = re.sub(r" \u2019s\b", "\u2019s", out)
     # Insert a space between adjacent Latin words that got concatenated by
     # CJK-to-English translation (e.g. "ADay Branch" -> "A Day Branch").
     out = re.sub(r'([a-zA-Z])([A-Z][a-z])', r'\1 \2', out)
