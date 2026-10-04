@@ -128,3 +128,17 @@ def test_generic_words_do_not_fire_inside_other_words():
 def test_unknown_hangul_word_with_mapped_syllables_stays_whole():
     # 귀인배우 contains the branch/stem syllable 인; it must not become "귀 In (Tiger) 배 우".
     assert translate_inline("학파") == "학파"
+
+
+def test_bigyeon_glossed_as_companion():
+    for src in ("비견", "比肩", "비견 (比肩)"):
+        out = translate_inline(src)
+        assert "Pillar" not in out, (src, out)
+        assert out.replace("(", "").replace(")", "").split() == ["Companion"], (src, out)
+
+
+def test_ipha_solar_term_is_lixia():
+    out = translate_inline("입하 (立夏)")
+    assert "Lihai" not in out
+    assert "Lixia" in out and "Start of Summer" in out
+    assert "Lihai" not in translate_inline("입하")

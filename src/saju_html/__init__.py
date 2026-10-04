@@ -36,7 +36,7 @@ BRANCH_MAP = {
 
 # Ten Gods
 TENGOD_MAP = {
-    "비견": "Pillar (Companion)", "겁재": "Rob Wealth (Companion)",
+    "비견": "Companion", "겁재": "Rob Wealth (Companion)",
     "식신": "Eating God (Output)", "상관": "Hurting Officer (Output)",
     "편재": "Indirect Wealth", "정재": "Direct Wealth",
     "편관": "Seven Killings (Authority)", "정관": "Direct Officer (Authority)",
@@ -70,7 +70,7 @@ KOR_REPL = {
     "건제십이신": "twelve day-officers", "이사": "moving house", "개업": "business opening",
     "상생": "generating cycle", "상극": "controlling cycle",
     "입춘": "Lichun (Feb 4)", "소한": "Xiaohan", "대설": "Daxue", "경칩": "Jingzhe",
-    "청명": "Qingming", "입하": "Lihai", "망종": "Mangzhong", "소서": "Xiaoshu",
+    "청명": "Qingming", "입하": "Lixia (Start of Summer)", "망종": "Mangzhong", "소서": "Xiaoshu",
     "입추": "Liqiu", "백로": "Bailu", "한로": "Hanlu", "입동": "Lidong",
     "십이운성": "Twelve Life Stages", "12운성": "Twelve Life Stages",
     "정관": "Direct Officer", "편관": "Seven Killings",
@@ -409,7 +409,7 @@ HANJA_MAP = {
     "正印": "Direct Resource", "偏印": "Indirect Resource",
     "正財": "Direct Wealth", "偏財": "Indirect Wealth",
     "傷官": "Hurting Officer", "食神": "Eating God",
-    "比肩": "Pillar", "劫財": "Rob Wealth",
+    "比肩": "Companion", "劫財": "Rob Wealth",
     # Marriage-compatibility Hanja
     "宮合": "Compatibility",
     "合婚": "Marriage Compatibility",
