@@ -228,6 +228,10 @@ def test_cli_suspicious_city_longitude_warning():
         env=ENV,
     )
     assert result.returncode == 0, result.stderr
+    if "Geocoding service error" in result.stderr:
+        # This test exercises the live geocoder path; skip (don't fail) when the
+        # external service is unavailable or rate-limiting (seen 2026-10-04: HTTP 429).
+        pytest.skip("geocoding service unavailable")
     assert "Warning:" in result.stderr
     assert "Pallipat" in result.stderr
 

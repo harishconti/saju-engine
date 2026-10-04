@@ -198,7 +198,10 @@ def test_harish_regression_climate_override_to_water():
     """
     chart = compute_chart(
         name="Harish", gender="M", year=1992, month=6, day=4, hour=3, minute=10,
-        city="Pallipattu, Tamil Nadu", utc_offset=5.5, use_solar_time=True,
+        # Explicit longitude (Pallipattu, Tiruvallur 79.42°E — see tests/test_engine.py),
+        # not city=: a live geocoder outage (HTTP 429) silently drops the solar
+        # correction and shifts the hour pillar, making this test flaky (2026-10-04).
+        longitude=79.42, utc_offset=5.5, use_solar_time=True,
         convention="korean",
     )
     assert chart.strength_assessment["verdict"] == "balanced"
@@ -285,7 +288,10 @@ def test_n6_harish_keeps_water_despite_neutral_temperature():
     a validated reading by deriving the element from the temperature score."""
     chart = compute_chart(
         name="Harish", gender="M", year=1992, month=6, day=4, hour=3, minute=10,
-        city="Pallipattu, Tamil Nadu", utc_offset=5.5, use_solar_time=True,
+        # Explicit longitude (Pallipattu, Tiruvallur 79.42°E — see tests/test_engine.py),
+        # not city=: a live geocoder outage (HTTP 429) silently drops the solar
+        # correction and shifts the hour pillar, making this test flaky (2026-10-04).
+        longitude=79.42, utc_offset=5.5, use_solar_time=True,
         convention="korean",
     )
     fe = favorable_element(chart)
