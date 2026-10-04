@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Golden wren-essential</title>
+<style>
+/* Saju HTML→PDF theme
+ *
+ * Designed for A4 print rendering via Playwright / Chromium.
+ * Uses CSS @page rules for margins, running footers, and print-specific styling.
+ */
+
+@page {
+    size: A4;
+    margin: 18mm;
+    margin-bottom: 22mm;
+}
+
+@page cover {
+    margin-bottom: 18mm;
+}
+
+:root {
+    --color-text: #222222;
+    --color-muted: #555555;
+    --color-light: #888888;
+    --color-heading: #2a4d6e;
+    --color-heading2: #3a5d7e;
+    --color-accent: #f3f6fa;
+    --color-rule: #cccccc;
+    --color-table-header: #2a4d6e;
+    --color-card-bg: #f8fafc;
+    --color-card-border: #d0d8e0;
+    --color-callout-bg: #eef5fa;
+    --color-callout-border: #b8d4e8;
+    --font-serif: Georgia, "Times New Roman", "Noto Serif CJK KR", "Noto Serif KR", serif;
+    --font-sans: "Helvetica Neue", Helvetica, Arial, "Noto Sans CJK KR", "Noto Sans KR", sans-serif;
+    --font-mono: Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-serif);
+    font-size: 10.5pt;
+    line-height: 1.55;
+    color: var(--color-text);
+}
+
+/* ---- Cover page --------------------------------------------------------- */
+.cover {
+    text-align: center;
+    padding-top: 18mm;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 55%, #eef2f7 100%);
+    min-height: calc(100vh - 40mm);
+    border: 1px solid transparent;
+    break-after: page;
+}
+
+.cover .watermark {
+    font-size: 110pt;
+    line-height: 1;
+    margin-bottom: 4mm;
+    opacity: 0.12;
+}
+
+.cover h1 {
+    font-family: var(--font-sans);
+    font-size: 34pt;
+    font-weight: bold;
+    color: #1a1a1a;
+    margin: 0 0 4mm 0;
+    line-height: 1.15;
+    page-break-before: auto;
+    border-bottom: none;
+}
+
+.cover .subtitle {
+    font-family: var(--font-serif);
+    font-size: 12.5pt;
+    font-style: italic;
+    color: var(--color-heading);
+    margin: 0 0 10mm 0;
+    letter-spacing: 0.3px;
+}
+
+.cover .meta-block {
+    display: inline-block;
+    text-align: left;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid var(--color-card-border);
+    border-radius: 6px;
+    padding: 6mm 10mm;
+    margin: 0 auto 12mm auto;
+    box-shadow: 0 2px 8px rgba(42, 77, 110, 0.06);
+}
+
+.cover .meta {
+    font-family: var(--font-sans);
+    font-size: 11pt;
+    color: var(--color-text);
+    margin: 2.5mm 0;
+    text-align: left;
+}
+
+.cover .meta strong {
+    color: var(--color-heading);
+    font-weight: 600;
+    margin-right: 3mm;
+    display: inline-block;
+    min-width: 22mm;
+}
+
+.cover .foot {
+    margin-top: 14mm;
+    font-family: var(--font-sans);
+    font-size: 9.5pt;
+    color: var(--color-muted);
+    line-height: 1.45;
+    padding: 0 22mm;
+}
+
+.cover .date {
+    margin-top: 6mm;
+    font-size: 10pt;
+    color: var(--color-light);
+}
+
+.cover .report-id {
+    margin-top: 3mm;
+    font-family: var(--font-sans);
+    font-size: 9pt;
+    color: var(--color-heading);
+    font-weight: 600;
+}
+
+/* ---- Compact one-page hook header --------------------------------------- */
+.compact-cover {
+    text-align: center;
+    padding: 8mm 0 4mm 0;
+    margin-bottom: 4mm;
+    border-bottom: 1.5px solid var(--color-rule);
+    page-break-after: avoid;
+}
+
+.compact-cover h1 {
+    font-family: var(--font-sans);
+    font-size: 18pt;
+    font-weight: bold;
+    color: var(--color-heading);
+    margin: 0 0 2mm 0;
+    line-height: 1.2;
+    border-bottom: none;
+}
+
+.compact-cover .subtitle {
+    font-family: var(--font-serif);
+    font-size: 10pt;
+    font-style: italic;
+    color: var(--color-muted);
+    margin: 0 0 2mm 0;
+}
+
+.compact-cover .meta,
+.compact-cover .report-line {
+    font-family: var(--font-sans);
+    font-size: 8.5pt;
+    color: var(--color-light);
+    margin: 0 0 1mm 0;
+}
+
+@page compact {
+    size: A4;
+    margin: 13mm 14mm 16mm 14mm;
+}
+
+body.compact-mode {
+    page: compact;
+    font-size: 9.5pt;
+    line-height: 1.38;
+}
+
+body.compact-mode h2 {
+    font-size: 11.5pt;
+    margin: 3mm 0 1.5mm 0;
+}
+
+body.compact-mode h3 {
+    font-size: 10pt;
+    margin: 2.5mm 0 1mm 0;
+}
+
+body.compact-mode p,
+body.compact-mode ul,
+body.compact-mode li {
+    margin: 1.2mm 0;
+}
+
+body.compact-mode table {
+    margin: 1.5mm 0;
+    font-size: 9pt;
+}
+
+body.compact-mode hr {
+    margin: 2mm 0;
+}
+
+body.compact-mode .compact-cover {
+    padding: 5mm 0 3mm 0;
+    margin-bottom: 3mm;
+}
+
+body.compact-mode .compact-cover h1 {
+    font-size: 16pt;
+    margin: 0 0 1.5mm 0;
+}
+
+body.compact-mode .compact-cover .subtitle {
+    font-size: 9pt;
+    margin: 0 0 1.5mm 0;
+}
+
+body.compact-mode .compact-cover .meta,
+body.compact-mode .compact-cover .report-line {
+    font-size: 8pt;
+    margin: 0 0 0.8mm 0;
+}
+
+/* ---- Typography --------------------------------------------------------- */
+h1 {
+    string-set: section-title content();
+    font-family: var(--font-sans);
+    font-size: 22pt;
+    font-weight: bold;
+    color: var(--color-heading);
+    border-bottom: 2px solid var(--color-heading);
+    padding-bottom: 0.2em;
+    margin: 0 0 6mm 0;
+    page-break-before: always;
+    line-height: 1.25;
+}
+
+h1:first-of-type {
+    page-break-before: auto;
+}
+
+h2 {
+    string-set: section-title content();
+    font-family: var(--font-sans);
+    font-size: 16pt;
+    font-weight: bold;
+    color: var(--color-heading2);
+    margin: 8mm 0 3mm 0;
+    line-height: 1.3;
+}
+
+h3 {
+    string-set: section-title content();
+    font-family: var(--font-sans);
+    font-size: 13pt;
+    font-weight: bold;
+    color: #444444;
+    margin: 6mm 0 2mm 0;
+    line-height: 1.3;
+}
+
+h4, h5, h6 {
+    font-family: var(--font-sans);
+    font-size: 11pt;
+    font-weight: bold;
+    color: #444444;
+    margin: 4mm 0 2mm 0;
+}
+
+p {
+    margin: 0 0 3mm 0;
+    orphans: 3;
+    widows: 3;
+}
+
+a {
+    color: var(--color-heading);
+    text-decoration: none;
+}
+
+strong {
+    font-weight: bold;
+    color: #1a1a1a;
+}
+
+em {
+    font-style: italic;
+}
+
+/* ---- Lists -------------------------------------------------------------- */
+ul, ol {
+    margin: 2mm 0 4mm 0;
+    padding-left: 6mm;
+}
+
+li {
+    margin: 1.2mm 0;
+}
+
+/* ---- Blockquotes / notes ------------------------------------------------ */
+blockquote {
+    border-left: 3px solid var(--color-rule);
+    padding-left: 1em;
+    margin: 1em 0;
+    color: #555555;
+}
+
+blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+/* ---- Code & ASCII art --------------------------------------------------- */
+code {
+    font-family: var(--font-mono);
+    font-size: 9.5pt;
+    background: #f0f0f0;
+    padding: 0 0.2em;
+    border-radius: 2px;
+}
+
+pre {
+    font-family: var(--font-mono);
+    font-size: 9pt;
+    background: #f6f6f6;
+    padding: 0.8em;
+    border-radius: 4px;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    margin: 1em 0;
+}
+
+pre code {
+    background: transparent;
+    padding: 0;
+}
+
+/* ---- Tables ------------------------------------------------------------- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+    font-size: 9.5pt;
+    page-break-inside: avoid;
+}
+
+thead {
+    display: table-header-group;
+}
+
+tr {
+    page-break-inside: avoid;
+}
+
+th, td {
+    border: 1px solid var(--color-rule);
+    padding: 5px;
+    vertical-align: top;
+    text-align: left;
+}
+
+th {
+    background: var(--color-table-header);
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background: var(--color-accent);
+}
+
+/* ---- Quick Reference card ----------------------------------------------- */
+.quick-ref-card {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-left: 4px solid var(--color-heading);
+    border-radius: 6px;
+    padding: 5mm 6mm;
+    margin: 4mm 0 6mm 0;
+    box-shadow: 0 2px 6px rgba(42, 77, 110, 0.05);
+}
+
+.quick-ref-card ul {
+    margin: 0;
+    padding-left: 5mm;
+}
+
+.quick-ref-card li {
+    margin: 1.5mm 0;
+}
+
+/* ---- Right Now callout -------------------------------------------------- */
+.right-now-callout {
+    background: var(--color-callout-bg);
+    border: 1px solid var(--color-callout-border);
+    border-radius: 6px;
+    padding: 5mm 6mm;
+    margin: 4mm 0 6mm 0;
+    font-style: italic;
+}
+
+.right-now-callout p {
+    margin: 0;
+}
+
+/* ---- Lucky Attributes grid ---------------------------------------------- */
+.lucky-attributes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3mm;
+    margin: 4mm 0 6mm 0;
+}
+
+.lucky-attribute-item {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-radius: 5px;
+    padding: 3mm 4mm;
+}
+
+.lucky-attribute-item .label {
+    font-family: var(--font-sans);
+    font-size: 8.5pt;
+    font-weight: bold;
+    color: var(--color-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 1mm;
+}
+
+.lucky-attribute-item .value {
+    font-size: 9.5pt;
+    color: var(--color-text);
+}
+
+/* ---- Element Balance SVG chart ---------------------------------------- */
+.element-balance-chart {
+    margin: 4mm 0 6mm 0;
+    page-break-inside: avoid;
+}
+
+.element-balance-chart svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* ---- Element-balance color coding --------------------------------------- */
+.element-fire { color: #e74c3c; }
+.element-earth { color: #f39c12; }
+.element-metal { color: #7f8c8d; }
+.element-water { color: #3498db; }
+.element-wood { color: #27ae60; }
+
+/* ---- Horizontal rules --------------------------------------------------- */
+hr {
+    border: none;
+    border-top: 1px solid var(--color-rule);
+    margin: 1em 0;
+}
+
+/* ---- Utility ------------------------------------------------------------ */
+.print-only {
+    display: block;
+}
+
+.no-break {
+    page-break-inside: avoid;
+}
+
+/* ---- Chart signature (Deep tier pull-quote) ----------------------------- */
+.chart-signature {
+    font-family: var(--font-serif);
+    font-size: 12.5pt;
+    font-style: italic;
+    color: var(--color-heading);
+    border-left: 4px solid var(--color-heading);
+    background: var(--color-callout-bg);
+    padding: 4mm 6mm;
+    margin: 4mm 0 6mm 0;
+    border-radius: 4px;
+}
+
+/* ---- Audio included callout (Deep tier cover) -------------------------- */
+.audio-included {
+    display: inline-block;
+    background: #fff7e6;
+    border: 1px solid #f0c674;
+    color: #8a5a00;
+    font-family: var(--font-sans);
+    font-size: 10pt;
+    padding: 2mm 4mm;
+    margin: 3mm 0 2mm 0;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* ---- Partner Chart Add-On upsell box ------------------------------------ */
+.partner-compat-upsell {
+    background: #f0f7ff;
+    border: 1px solid #b6d4f0;
+    border-left: 4px solid #2a4d6e;
+    color: #1a1a1a;
+    padding: 3mm 5mm;
+    margin: 3mm 0 5mm 0;
+    border-radius: 4px;
+    font-style: italic;
+}
+
+/* ---- Lifetime Decade Roadmap (Deep tier SVG) ---------------------------- */
+.decade-roadmap {
+    margin: 4mm 0 6mm 0;
+    page-break-inside: avoid;
+}
+
+.decade-roadmap svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 720px;
+}
+
+/* ---- Tier-aware body classes -------------------------------------------- */
+body.tier-deep h1 {
+    border-bottom: 2.5px solid var(--color-heading);
+}
+
+body.tier-essential h1 {
+    border-bottom: 2px solid var(--color-heading);
+}
+
+</style>
+</head>
+<body class="tier-essential">
+<div class="cover">
+  <div class="watermark">命</div>
+  <h1>Golden wren-essential</h1>
+  <p class="subtitle">A Reading in the Korean Four Pillars Tradition</p>
+  <div class="meta-block">
+    <p class="meta"><strong>For</strong>Golden Client</p>
+    <p class="meta"><strong>Born</strong>1 January 1990</p>
+    <p class="meta"><strong>Day Master</strong>Byeong (Yang Fire)</p>
+  </div>
+  <p class="foot">Grounded in the Five Elements and Yin-Yang philosophy. Interpreted through classical Myeongri (Korean Saju) tradition: Jeokcheon-su, Yeonhae-japyeong, Gungtong-bogam, Myeongri-jeongjong.</p>
+  <p class="date">Generated 2026-06-01</p>
+  <p class="report-id">Report ID: GOLDEN-wren-essential · CosmicSaju · cosmicsaju.com</p>
+</div>
+
+
+<h2>Wren — Essential Report · $9 intro → $19</h2>
+<p><em>Your natal chart, career arc, decade cycles, and lucky-element guide</em></p>
+<p><strong>Born:</strong> 1965-09-22 · 20:00 · —</p>
+<p><strong>Time method:</strong> recorded birth time 20:00 (local clock) corrected to true solar time <strong>20:08</strong> (birthplace 0.0°E vs the 0.0°E zone meridian), +8.1 min (longitude +0 min + equation of time +8.1 min). Hour branches follow 2-hour solar windows, so the pillars above use the corrected time.</p>
+<p><strong>Day Master:</strong> Gi (Yin Earth, Gi Earth)</p>
+<p><strong>Report generated:</strong> 2026-06-01 · <strong>Report ID:</strong> CID-wren-20260601-ESSENTIAL</p>
+<p><em>Delivered by Cosmic Saju · cosmicsaju.com</em></p>
+<p><strong>Chart signature:</strong> <em>A garden plot waiting for rain — fertile, patient, and needing the right season.</em></p>
+<hr />
+<h2>Chart at a Glance</h2>
+<h3>Four Pillars</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Year</th>
+<th>Month</th>
+<th>Day</th>
+<th>Hour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stem</td>
+<td>Eul</td>
+<td>Eul</td>
+<td>Gi</td>
+<td>Gap</td>
+</tr>
+<tr>
+<td>Branch</td>
+<td>Sa</td>
+<td>Yu</td>
+<td>Myo</td>
+<td>Sul</td>
+</tr>
+<tr>
+<td>Hidden Stems</td>
+<td>Bing (main), Gyeong (middle), Mu (residual)</td>
+<td>Sin (main)</td>
+<td>Eul (main)</td>
+<td>Mu (main), Jeong (middle), Sin (residual)</td>
+</tr>
+</tbody>
+</table>
+<h3>Element Balance</h3>
+<div class="element-balance-chart no-break">
+<svg viewBox="0 0 500 120" xmlns="http://www.w3.org/2000/svg">
+  <text x="10" y="30" font-size="13" font-weight="bold" fill="#2a4d6e" font-family="Helvetica,Arial,sans-serif">Element Balance Distribution</text>
+  <rect x="10.0" y="50" width="270.2" height="28" fill="#27ae60" rx="3"/>
+  <text x="145.1" y="68.0" text-anchor="middle" font-size="11" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">🟢 Wood 56.3%</text>
+  <rect x="280.2" y="50" width="40.3" height="28" fill="#e74c3c" rx="3"/>
+  <text x="300.4" y="68.0" text-anchor="middle" font-size="11" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">🔴 Fire 8.4%</text>
+  <rect x="320.6" y="50" width="106.6" height="28" fill="#f39c12" rx="3"/>
+  <text x="373.8" y="68.0" text-anchor="middle" font-size="11" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">🟡 Earth 22.2%</text>
+  <rect x="427.1" y="50" width="62.9" height="28" fill="#7f8c8d" rx="3"/>
+  <text x="458.6" y="68.0" text-anchor="middle" font-size="11" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">⚪ Metal 13.1%</text>
+  <rect x="490.0" y="50" width="0.0" height="28" fill="#3498db" rx="3"/>
+</svg>
+</div>
+<table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Presence</th>
+<th>Percentage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="element-fire">🔴 Fire</span></td>
+<td>██░░░░░░░░░░░░░░░░░░</td>
+<td>8.4%</td>
+</tr>
+<tr>
+<td><span class="element-earth">🟡 Earth</span></td>
+<td>████░░░░░░░░░░░░░░░░</td>
+<td>22.2%</td>
+</tr>
+<tr>
+<td><span class="element-metal">⚪ Metal</span></td>
+<td>███░░░░░░░░░░░░░░░░░</td>
+<td>13.1%</td>
+</tr>
+<tr>
+<td><span class="element-water">🔵 Water</span></td>
+<td>░░░░░░░░░░░░░░░░░░░░</td>
+<td>0.0%</td>
+</tr>
+<tr>
+<td><span class="element-wood">🟢 Wood</span></td>
+<td>███████████░░░░░░░░░</td>
+<td>56.3%</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="chart-signature">
+<p><em>Methodology: each element's share counts the 4 visible stems (year/month/day/hour) at weight 1.0, plus every branch's hidden stems at reduced weights (main qi 0.6, middle 0.3, residual 0.1) — a branch's own elemental weight is carried entirely through its hidden stems (its main-qi hidden stem is usually the branch's nominal element), not counted a second time as a separate 1.0 entry, since that would double-count it; the counts are then normalized to 100%.</em></p>
+</blockquote>
+<div class="quick-ref-card">
+<h3>Quick Reference</h3>
+<ul>
+<li><strong>Day Master:</strong> Gi (Yin Earth, Gi Earth)</li>
+<li><strong>Strength:</strong> Weak — the month branch <strong>Yu</strong> gives the Day Master a <strong>seasonally weak baseline</strong> by element relation (per Step 2); its 12-Stage Cycle stage there is <strong>Long Life</strong> — the chart tends to begin things with fresh, supported energy. The output/wealth/authority drain outweighs the peer and resource support.</li>
+<li><strong>Favorable Element:</strong> Fire — The Day Master reads as weak, so the favorable element is the one that resources and steadies it. This is an engine reading — a full classical analysis may refine it. Born in a climate-neutral month, so no climate override applies here.</li>
+<li><strong>Supporting Element:</strong> Earth</li>
+<li><strong>Avoid / Watch:</strong> Wood</li>
+<li><strong>Current Major Luck:</strong> Gi Myo (ages 54-63)</li>
+<li><strong>Luck direction:</strong> backward, retracing from the month pillar — derived from a yin year stem (Eul) and male gender, per the classical rule (yang year + male, or yin year + female → forward; otherwise backward).</li>
+<li><strong>Pattern / Formation:</strong> Follower Grid candidate</li>
+</ul>
+
+</div><div class="right-now-callout">
+<h3>What This Year Means for You</h3>
+<p>Right now, in June 2026, you are moving through a year whose energy is shaped by <strong>Bing O</strong> (Direct Resource). This sits inside your broader <strong>Gi Myo</strong> major luck period (ages 54–63), whose theme is Pillar (Companion) — a peer or equal — support, solidarity, and rivalry in equal measure. For your chart, the most useful energy to lean into this year is <strong>Fire</strong>: look for decisions, environments, and relationships that bring fire qualities forward.</p>
+<hr />
+
+</div><h2>Table of Contents</h2>
+<ul>
+<li>Chart at a Glance</li>
+<li>Day Master Portrait — Short Portrait incl. Four Pillars One by One</li>
+<li>Career &amp; Wealth — incl. Wealth Preservation Note</li>
+<li>Timing: Major Luck Periods</li>
+<li>Practical Guidance Summary</li>
+<li>Closing Note</li>
+</ul>
+<hr />
+<h2>Day Master Portrait</h2>
+<p>With <strong>Gi</strong> (Gi (Yin Earth, Gi Earth)) as your Day Master — you — the reference point the whole chart is read against, your core self carries the image of the <strong>rich garden soil nurturing many seeds</strong>. Your natural strengths run toward <strong>patience, service, and quiet organizational skill</strong>, while the shadow side can show as <strong>over-giving, worry, or losing boundaries</strong>.</p>
+<h3>Four Pillars, One by One</h3>
+<h4>Year Pillar — Eul Sa (Eul (Yin Wood, Eul Wood))</h4>
+<p>The Eul Sa pillar pairs the <strong>Eul</strong> stem (Eul (Yin Wood, Eul Wood)) with the <strong>Sa</strong> branch, together shaping <strong>ancestral and social-root energy — the wider world you were born into</strong>. Its stem reads as <strong>Seven Killings</strong> relative to your Day Master, so this area of life tends to carry that dynamic.</p>
+<p>The <strong>Fire</strong> branch is the container for this area and the <strong>Wood</strong> stem is its driver — read the two together when weighing how year-pillar matters unfold.</p>
+<h4>Month Pillar — Eul Yu (Eul (Yin Wood, Eul Wood))</h4>
+<p>The Eul Yu pillar pairs the <strong>Eul</strong> stem (Eul (Yin Wood, Eul Wood)) with the <strong>Yu</strong> branch, together shaping <strong>career and immediate environment — how you show up at work and in daily life</strong>. Its stem reads as <strong>Seven Killings</strong> relative to your Day Master, so this area of life tends to carry that dynamic.</p>
+<p>The <strong>Metal</strong> branch is the container for this area and the <strong>Wood</strong> stem is its driver — read the two together when weighing how month-pillar matters unfold.</p>
+<h4>Day Pillar — Gi Myo (Gi (Yin Earth, Gi Earth))</h4>
+<p>The Gi Myo pillar pairs the <strong>Gi</strong> stem (Gi (Yin Earth, Gi Earth)) with the <strong>Myo</strong> branch, together shaping <strong>spouse palace and the inner self — the partner you choose and the self behind the choices</strong>. Its stem reads as <strong>Companion (Pillar)</strong> relative to your Day Master, so this area of life tends to carry that dynamic.</p>
+<p>The <strong>Wood</strong> branch is the container for this area and the <strong>Earth</strong> stem is its driver — read the two together when weighing how day-pillar matters unfold.</p>
+<h4>Hour Pillar — Gap Sul (Gap (Yang Wood, Gap Wood))</h4>
+<p>The Gap Sul pillar pairs the <strong>Gap</strong> stem (Gap (Yang Wood, Gap Wood)) with the <strong>Sul</strong> branch, together shaping <strong>later life and children — what you build toward and what you pass on</strong>. Its stem reads as <strong>Direct Officer</strong> relative to your Day Master, so this area of life tends to carry that dynamic.</p>
+<p>The <strong>Earth</strong> branch is the container for this area and the <strong>Wood</strong> stem is its driver — read the two together when weighing how hour-pillar matters unfold.</p>
+<blockquote>
+<p><strong>In plain words:</strong> At your core you are steady ground — you hold, stabilise, and mediate. Your chart reads as weak, so the rest of this report is about where that helps and where leaning toward Fire keeps you in balance.</p>
+</blockquote>
+<hr />
+<h2>Career &amp; Wealth</h2>
+<h3>Career Archetypes</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Domain</th>
+<th>Why It Fits</th>
+<th>Example Roles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Best Fit</strong></td>
+<td>Leadership &amp; Executive Roles</td>
+<td>Aligns with your favorable element Fire, reducing friction.</td>
+<td>CEO, director, team lead, public office</td>
+</tr>
+<tr>
+<td><strong>Best Fit</strong></td>
+<td>Media &amp; Performing Arts</td>
+<td>Aligns with your favorable element Fire, reducing friction.</td>
+<td>broadcasting, acting, music, public speaking</td>
+</tr>
+<tr>
+<td><strong>Best Fit</strong></td>
+<td>Marketing &amp; Public Relations</td>
+<td>Aligns with your favorable element Fire, reducing friction.</td>
+<td>brand management, PR, advertising, influencer strategy</td>
+</tr>
+<tr>
+<td><strong>Best Fit</strong></td>
+<td>Teaching &amp; Coaching</td>
+<td>Aligns with your favorable element Fire, reducing friction.</td>
+<td>seminars, motivational speaking, personal coaching</td>
+</tr>
+<tr>
+<td><strong>Good Fit</strong></td>
+<td>Entrepreneurship</td>
+<td>Aligns with your favorable element Fire, reducing friction.</td>
+<td>startups, venture building, product evangelism</td>
+</tr>
+<tr>
+<td><strong>Good Fit</strong></td>
+<td>Mediation &amp; Counselling</td>
+<td>Aligns with your favorable element Fire, reducing friction.</td>
+<td>psychotherapy, life coaching, pastoral care</td>
+</tr>
+<tr>
+<td><strong>Good Fit</strong></td>
+<td>Real Estate &amp; Property</td>
+<td>Lets your native Earth energy express directly.</td>
+<td>development, brokerage, property management</td>
+</tr>
+<tr>
+<td><strong>Possible</strong></td>
+<td>Hospitality &amp; Food</td>
+<td>Lets your native Earth energy express directly.</td>
+<td>restaurants, hotels, catering, event planning</td>
+</tr>
+<tr>
+<td><strong>Possible</strong></td>
+<td>Finance &amp; Accounting</td>
+<td>Lets your native Earth energy express directly.</td>
+<td>accounting, bookkeeping, wealth management</td>
+</tr>
+<tr>
+<td><strong>Possible</strong></td>
+<td>Project Management</td>
+<td>Lets your native Earth energy express directly.</td>
+<td>operations, program management, logistics coordination</td>
+</tr>
+<tr>
+<td><strong>Possible</strong></td>
+<td>Agriculture &amp; Land</td>
+<td>Lets your native Earth energy express directly.</td>
+<td>farming, landscaping, environmental restoration</td>
+</tr>
+<tr>
+<td><strong>Possible</strong></td>
+<td>Public Affairs &amp; Advocacy</td>
+<td>Lets you express your strongest visible ten-god, Seven Killings, in a structured setting.</td>
+<td>campaigns, policy, community organizing</td>
+</tr>
+</tbody>
+</table>
+<h3>Wealth Pattern</h3>
+<p>Wealth timing is read from where Wealth ten-gods appear and are supported. Your favorable element <strong>Fire</strong> and supporting element <strong>Earth</strong> describe the broader climate that helps those wealth channels function; they are not the wealth channel itself. no direct Wealth stem is visible, so wealth is more likely to flow through resource, output, or authority channels rather than a direct wealth stem. Use the Major Luck and Annual Luck tables to see when income and value-creation themes surface most clearly. Periods dominated by <strong>Wood</strong> call for conservation rather than expansion.</p>
+<h3>Wealth Preservation Note</h3>
+<p>For a <strong>Earth</strong> Day Master with a <strong>Weak</strong> reading, wealth preservation starts with diversification — never concentrate more than your chart can comfortably hold. Liquidity buffers aligned with the <strong>Fire</strong> element (its colors, foods, and rhythms) help the querent stay flexible across unfavorable Major Luck periods. Lean on <strong>Fire</strong>-aligned custodians and instruments rather than chasing growth alone.</p>
+<blockquote>
+<p><strong>In plain words:</strong> Your chart leans toward earning inside structure — institutions, management, licensed roles. Fields and decades that carry Fire give the cleanest results; the timing tables show when.</p>
+</blockquote>
+<hr />
+<h2>Timing: Major Luck Periods</h2>
+<p><strong>Luck direction:</strong> backward, retracing from the month pillar — derived from a yin year stem (Eul) and male gender, per the classical rule (yang year + male, or yin year + female → forward; otherwise backward).</p>
+<p><strong>starting age:</strong> ~5.0 (~15.0 days to the qualifying solar term ÷ 3, per 's &quot;3 days = 1 year&quot; rule) — the first major-luck period begins roughly 60 months after birth (≈ Sep 1970), inside the <strong>4-13</strong> decade label shown below, not precisely at its first birthday; each later period changes over at the same point in the year. Korean manseryeok (Korean perpetual calendar) apps round this to a whole <strong>Major Luck Water 5</strong> and list decades as 5, 15, 25… (often in Korean age), so their labels can differ from the table below by a year or so while describing the same periods.</p>
+<h3>Major Luck Periods</h3>
+<table>
+<thead>
+<tr>
+<th>Age</th>
+<th>Pillar</th>
+<th>Elements (Stem / Branch)</th>
+<th>Ten-God</th>
+<th>Career Theme</th>
+<th>Relationship Theme</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4-13</td>
+<td>Gap Shin</td>
+<td>Wood / Metal</td>
+<td>Direct Officer</td>
+<td>structured career moves; credentials matter (mixed — protect, don't overcommit)</td>
+<td>commitment or formalization themes</td>
+</tr>
+<tr>
+<td>14-23</td>
+<td>Gye Mi</td>
+<td>Water / Earth</td>
+<td>Indirect Wealth</td>
+<td>income, assets, or value-creation themes</td>
+<td>shared resources or lifestyle alignment</td>
+</tr>
+<tr>
+<td>24-33</td>
+<td>Im O</td>
+<td>Water / Fire</td>
+<td>Direct Wealth</td>
+<td>income, assets, or value-creation themes</td>
+<td>shared resources or lifestyle alignment</td>
+</tr>
+<tr>
+<td>34-43</td>
+<td>Sin Sa</td>
+<td>Metal / Fire</td>
+<td>Eating God</td>
+<td>creative output, voice, or visible production</td>
+<td>creative partnership or playful dynamic</td>
+</tr>
+<tr>
+<td>44-53</td>
+<td>Gyeong Jin</td>
+<td>Metal / Earth</td>
+<td>Hurting Officer</td>
+<td>creative output, voice, or visible production</td>
+<td>creative partnership or playful dynamic</td>
+</tr>
+<tr>
+<td>54-63</td>
+<td>Gi Myo</td>
+<td>Earth / Wood</td>
+<td>Companion (Pillar)</td>
+<td>peer-driven or self-defined work (mixed — protect, don't overcommit)</td>
+<td>friendship-based or peer dynamic</td>
+</tr>
+<tr>
+<td>64-73</td>
+<td>Mu In</td>
+<td>Earth / Wood</td>
+<td>Robber (Rob Wealth)</td>
+<td>peer-driven or self-defined work (mixed — protect, don't overcommit)</td>
+<td>friendship-based or peer dynamic</td>
+</tr>
+<tr>
+<td>74-83</td>
+<td>Jeong Chuk</td>
+<td>Fire / Earth</td>
+<td>Indirect Resource</td>
+<td>study, mentorship, or skill-building</td>
+<td>nurturing, support, or healing connection</td>
+</tr>
+</tbody>
+</table>
+<h3>Current Period Deep-Dive</h3>
+<p>This decade carries a <strong>Companion (Pillar)</strong> ten-god over a <strong>Wood</strong> branch — a mixed window that asks for measured moves rather than bold ones. The stem ten-god is the <em>outer theme</em> — what the world sees and asks of the querent — while the branch element is the <em>underlying terrain</em> — the quieter emotional and circumstantial backdrop. Read them together rather than separately; mismatches between outer theme and inner terrain are where this decade is most likely to surprise.</p>
+<p>Specifically: <strong>do</strong> conserve, refine, and protect the foundation; <strong>avoid</strong> long commitments whose payoff is years away. Within this decade, years and months whose stem element matches the favorable <strong>Fire</strong> energy are the cleanest moments for major commitments; the annual windows table below shows them. Years dominated by the unfavorable element are best used for rest, review, and quiet preparation.</p>
+<p>Structurally, its <strong>Myo</strong> clashes (clash) with your natal <strong>Yu</strong>; its stem <strong>Gi</strong> combines with your natal <strong>Gap</strong> (Gap-Gi Earth combination), tying up what that stem represents.</p>
+<blockquote>
+<p><strong>In plain words:</strong> You are currently in a mixed decade — pick your moments using the year and month tables. Zoom in with the year and month windows that carry Fire.</p>
+</blockquote>
+<hr />
+<h2>30-Day Action Plan</h2>
+<p>A short, focused cycle designed to bring more <strong>Fire</strong> energy into your daily rhythm. These steps are tendencies and invitations, not prescriptions — adapt them to your schedule and comfort.</p>
+<table>
+<thead>
+<tr>
+<th>Week</th>
+<th>Focus</th>
+<th>Suggested Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Week 1</td>
+<td>Tune the environment</td>
+<td>Add red accents, face south when working, and clear one space that feels stagnant.</td>
+</tr>
+<tr>
+<td>Week 2</td>
+<td>Feed the element</td>
+<td>Bring bitter greens, red-colored vegetables, warm foods, light spices into two meals a day and notice which foods leave you feeling steady.</td>
+</tr>
+<tr>
+<td>Week 3</td>
+<td>Move with the energy</td>
+<td>Take one daily walk or practice session at the time of day that carries fire qi for you.</td>
+</tr>
+<tr>
+<td>Week 4</td>
+<td>Make one aligned decision</td>
+<td>Choose one small career, relationship, or health choice that leans into your favorable element and notice the result.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><em>Carry the chart’s strength into action gradually. Big changes built on small, consistent moves tend to outlast dramatic swings.</em></p>
+</blockquote>
+<hr />
+<h2>Practical Guidance Summary</h2>
+<h3>Lucky Attributes — Your Favorable Element Reference Card</h3>
+<div class="lucky-attributes">
+<div class="lucky-attribute-item"><div class="label">Element:</div><div class="value">Fire</div></div>
+<div class="lucky-attribute-item"><div class="label">Colors:</div><div class="value">red, orange, crimson</div></div>
+<div class="lucky-attribute-item"><div class="label">Direction:</div><div class="value">south</div></div>
+<div class="lucky-attribute-item"><div class="label">Numbers:</div><div class="value">2, 7</div></div>
+</div>
+<hr />
+<h2>Closing Note</h2>
+<p>This chart's gift is a strong authority presence that gives the querent real follow-through; the challenge is staying aware of the chart's pressure points rather than letting them run in the background. The single most useful next step is to weave the favorable <strong>Fire</strong> element into daily rhythm — through color, direction, season, or practice — so the chart has somewhere to land. Treat the rest of this report as a starting place; the best readings come from revisiting the same chart across different life phases.</p>
+<hr />
+<p><em>Engine-generated premium report draft. Interpretive prose must be reviewed and finalized by a qualified reader before client delivery.</em></p>
+<h2>What the Terms Mean</h2>
+<ul>
+<li><strong>Companion (Pillar):</strong> a peer or equal — support, solidarity, and rivalry in equal measure</li>
+<li><strong>Day Master:</strong> you — the reference point the whole chart is read against</li>
+</ul>
+
+</body>
+</html>

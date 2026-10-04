@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Golden ny-deep-override-fire</title>
+<style>
+/* Saju HTML→PDF theme
+ *
+ * Designed for A4 print rendering via Playwright / Chromium.
+ * Uses CSS @page rules for margins, running footers, and print-specific styling.
+ */
+
+@page {
+    size: A4;
+    margin: 18mm;
+    margin-bottom: 22mm;
+}
+
+@page cover {
+    margin-bottom: 18mm;
+}
+
+:root {
+    --color-text: #222222;
+    --color-muted: #555555;
+    --color-light: #888888;
+    --color-heading: #2a4d6e;
+    --color-heading2: #3a5d7e;
+    --color-accent: #f3f6fa;
+    --color-rule: #cccccc;
+    --color-table-header: #2a4d6e;
+    --color-card-bg: #f8fafc;
+    --color-card-border: #d0d8e0;
+    --color-callout-bg: #eef5fa;
+    --color-callout-border: #b8d4e8;
+    --font-serif: Georgia, "Times New Roman", "Noto Serif CJK KR", "Noto Serif KR", serif;
+    --font-sans: "Helvetica Neue", Helvetica, Arial, "Noto Sans CJK KR", "Noto Sans KR", sans-serif;
+    --font-mono: Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-serif);
+    font-size: 10.5pt;
+    line-height: 1.55;
+    color: var(--color-text);
+}
+
+/* ---- Cover page --------------------------------------------------------- */
+.cover {
+    text-align: center;
+    padding-top: 18mm;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 55%, #eef2f7 100%);
+    min-height: calc(100vh - 40mm);
+    border: 1px solid transparent;
+    break-after: page;
+}
+
+.cover .watermark {
+    font-size: 110pt;
+    line-height: 1;
+    margin-bottom: 4mm;
+    opacity: 0.12;
+}
+
+.cover h1 {
+    font-family: var(--font-sans);
+    font-size: 34pt;
+    font-weight: bold;
+    color: #1a1a1a;
+    margin: 0 0 4mm 0;
+    line-height: 1.15;
+    page-break-before: auto;
+    border-bottom: none;
+}
+
+.cover .subtitle {
+    font-family: var(--font-serif);
+    font-size: 12.5pt;
+    font-style: italic;
+    color: var(--color-heading);
+    margin: 0 0 10mm 0;
+    letter-spacing: 0.3px;
+}
+
+.cover .meta-block {
+    display: inline-block;
+    text-align: left;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid var(--color-card-border);
+    border-radius: 6px;
+    padding: 6mm 10mm;
+    margin: 0 auto 12mm auto;
+    box-shadow: 0 2px 8px rgba(42, 77, 110, 0.06);
+}
+
+.cover .meta {
+    font-family: var(--font-sans);
+    font-size: 11pt;
+    color: var(--color-text);
+    margin: 2.5mm 0;
+    text-align: left;
+}
+
+.cover .meta strong {
+    color: var(--color-heading);
+    font-weight: 600;
+    margin-right: 3mm;
+    display: inline-block;
+    min-width: 22mm;
+}
+
+.cover .foot {
+    margin-top: 14mm;
+    font-family: var(--font-sans);
+    font-size: 9.5pt;
+    color: var(--color-muted);
+    line-height: 1.45;
+    padding: 0 22mm;
+}
+
+.cover .date {
+    margin-top: 6mm;
+    font-size: 10pt;
+    color: var(--color-light);
+}
+
+.cover .report-id {
+    margin-top: 3mm;
+    font-family: var(--font-sans);
+    font-size: 9pt;
+    color: var(--color-heading);
+    font-weight: 600;
+}
+
+/* ---- Compact one-page hook header --------------------------------------- */
+.compact-cover {
+    text-align: center;
+    padding: 8mm 0 4mm 0;
+    margin-bottom: 4mm;
+    border-bottom: 1.5px solid var(--color-rule);
+    page-break-after: avoid;
+}
+
+.compact-cover h1 {
+    font-family: var(--font-sans);
+    font-size: 18pt;
+    font-weight: bold;
+    color: var(--color-heading);
+    margin: 0 0 2mm 0;
+    line-height: 1.2;
+    border-bottom: none;
+}
+
+.compact-cover .subtitle {
+    font-family: var(--font-serif);
+    font-size: 10pt;
+    font-style: italic;
+    color: var(--color-muted);
+    margin: 0 0 2mm 0;
+}
+
+.compact-cover .meta,
+.compact-cover .report-line {
+    font-family: var(--font-sans);
+    font-size: 8.5pt;
+    color: var(--color-light);
+    margin: 0 0 1mm 0;
+}
+
+@page compact {
+    size: A4;
+    margin: 13mm 14mm 16mm 14mm;
+}
+
+body.compact-mode {
+    page: compact;
+    font-size: 9.5pt;
+    line-height: 1.38;
+}
+
+body.compact-mode h2 {
+    font-size: 11.5pt;
+    margin: 3mm 0 1.5mm 0;
+}
+
+body.compact-mode h3 {
+    font-size: 10pt;
+    margin: 2.5mm 0 1mm 0;
+}
+
+body.compact-mode p,
+body.compact-mode ul,
+body.compact-mode li {
+    margin: 1.2mm 0;
+}
+
+body.compact-mode table {
+    margin: 1.5mm 0;
+    font-size: 9pt;
+}
+
+body.compact-mode hr {
+    margin: 2mm 0;
+}
+
+body.compact-mode .compact-cover {
+    padding: 5mm 0 3mm 0;
+    margin-bottom: 3mm;
+}
+
+body.compact-mode .compact-cover h1 {
+    font-size: 16pt;
+    margin: 0 0 1.5mm 0;
+}
+
+body.compact-mode .compact-cover .subtitle {
+    font-size: 9pt;
+    margin: 0 0 1.5mm 0;
+}
+
+body.compact-mode .compact-cover .meta,
+body.compact-mode .compact-cover .report-line {
+    font-size: 8pt;
+    margin: 0 0 0.8mm 0;
+}
+
+/* ---- Typography --------------------------------------------------------- */
+h1 {
+    string-set: section-title content();
+    font-family: var(--font-sans);
+    font-size: 22pt;
+    font-weight: bold;
+    color: var(--color-heading);
+    border-bottom: 2px solid var(--color-heading);
+    padding-bottom: 0.2em;
+    margin: 0 0 6mm 0;
+    page-break-before: always;
+    line-height: 1.25;
+}
+
+h1:first-of-type {
+    page-break-before: auto;
+}
+
+h2 {
+    string-set: section-title content();
+    font-family: var(--font-sans);
+    font-size: 16pt;
+    font-weight: bold;
+    color: var(--color-heading2);
+    margin: 8mm 0 3mm 0;
+    line-height: 1.3;
+}
+
+h3 {
+    string-set: section-title content();
+    font-family: var(--font-sans);
+    font-size: 13pt;
+    font-weight: bold;
+    color: #444444;
+    margin: 6mm 0 2mm 0;
+    line-height: 1.3;
+}
+
+h4, h5, h6 {
+    font-family: var(--font-sans);
+    font-size: 11pt;
+    font-weight: bold;
+    color: #444444;
+    margin: 4mm 0 2mm 0;
+}
+
+p {
+    margin: 0 0 3mm 0;
+    orphans: 3;
+    widows: 3;
+}
+
+a {
+    color: var(--color-heading);
+    text-decoration: none;
+}
+
+strong {
+    font-weight: bold;
+    color: #1a1a1a;
+}
+
+em {
+    font-style: italic;
+}
+
+/* ---- Lists -------------------------------------------------------------- */
+ul, ol {
+    margin: 2mm 0 4mm 0;
+    padding-left: 6mm;
+}
+
+li {
+    margin: 1.2mm 0;
+}
+
+/* ---- Blockquotes / notes ------------------------------------------------ */
+blockquote {
+    border-left: 3px solid var(--color-rule);
+    padding-left: 1em;
+    margin: 1em 0;
+    color: #555555;
+}
+
+blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+/* ---- Code & ASCII art --------------------------------------------------- */
+code {
+    font-family: var(--font-mono);
+    font-size: 9.5pt;
+    background: #f0f0f0;
+    padding: 0 0.2em;
+    border-radius: 2px;
+}
+
+pre {
+    font-family: var(--font-mono);
+    font-size: 9pt;
+    background: #f6f6f6;
+    padding: 0.8em;
+    border-radius: 4px;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    margin: 1em 0;
+}
+
+pre code {
+    background: transparent;
+    padding: 0;
+}
+
+/* ---- Tables ------------------------------------------------------------- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+    font-size: 9.5pt;
+    page-break-inside: avoid;
+}
+
+thead {
+    display: table-header-group;
+}
+
+tr {
+    page-break-inside: avoid;
+}
+
+th, td {
+    border: 1px solid var(--color-rule);
+    padding: 5px;
+    vertical-align: top;
+    text-align: left;
+}
+
+th {
+    background: var(--color-table-header);
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background: var(--color-accent);
+}
+
+/* ---- Quick Reference card ----------------------------------------------- */
+.quick-ref-card {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-left: 4px solid var(--color-heading);
+    border-radius: 6px;
+    padding: 5mm 6mm;
+    margin: 4mm 0 6mm 0;
+    box-shadow: 0 2px 6px rgba(42, 77, 110, 0.05);
+}
+
+.quick-ref-card ul {
+    margin: 0;
+    padding-left: 5mm;
+}
+
+.quick-ref-card li {
+    margin: 1.5mm 0;
+}
+
+/* ---- Right Now callout -------------------------------------------------- */
+.right-now-callout {
+    background: var(--color-callout-bg);
+    border: 1px solid var(--color-callout-border);
+    border-radius: 6px;
+    padding: 5mm 6mm;
+    margin: 4mm 0 6mm 0;
+    font-style: italic;
+}
+
+.right-now-callout p {
+    margin: 0;
+}
+
+/* ---- Lucky Attributes grid ---------------------------------------------- */
+.lucky-attributes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3mm;
+    margin: 4mm 0 6mm 0;
+}
+
+.lucky-attribute-item {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-radius: 5px;
+    padding: 3mm 4mm;
+}
+
+.lucky-attribute-item .label {
+    font-family: var(--font-sans);
+    font-size: 8.5pt;
+    font-weight: bold;
+    color: var(--color-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 1mm;
+}
+
+.lucky-attribute-item .value {
+    font-size: 9.5pt;
+    color: var(--color-text);
+}
+
+/* ---- Element Balance SVG chart ---------------------------------------- */
+.element-balance-chart {
+    margin: 4mm 0 6mm 0;
+    page-break-inside: avoid;
+}
+
+.element-balance-chart svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* ---- Element-balance color coding --------------------------------------- */
+.element-fire { color: #e74c3c; }
+.element-earth { color: #f39c12; }
+.element-metal { color: #7f8c8d; }
+.element-water { color: #3498db; }
+.element-wood { color: #27ae60; }
+
+/* ---- Horizontal rules --------------------------------------------------- */
+hr {
+    border: none;
+    border-top: 1px solid var(--color-rule);
+    margin: 1em 0;
+}
+
+/* ---- Utility ------------------------------------------------------------ */
+.print-only {
+    display: block;
+}
+
+.no-break {
+    page-break-inside: avoid;
+}
+
+/* ---- Chart signature (Deep tier pull-quote) ----------------------------- */
+.chart-signature {
+    font-family: var(--font-serif);
+    font-size: 12.5pt;
+    font-style: italic;
+    color: var(--color-heading);
+    border-left: 4px solid var(--color-heading);
+    background: var(--color-callout-bg);
+    padding: 4mm 6mm;
+    margin: 4mm 0 6mm 0;
+    border-radius: 4px;
+}
+
+/* ---- Audio included callout (Deep tier cover) -------------------------- */
+.audio-included {
+    display: inline-block;
+    background: #fff7e6;
+    border: 1px solid #f0c674;
+    color: #8a5a00;
+    font-family: var(--font-sans);
+    font-size: 10pt;
+    padding: 2mm 4mm;
+    margin: 3mm 0 2mm 0;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* ---- Partner Chart Add-On upsell box ------------------------------------ */
+.partner-compat-upsell {
+    background: #f0f7ff;
+    border: 1px solid #b6d4f0;
+    border-left: 4px solid #2a4d6e;
+    color: #1a1a1a;
+    padding: 3mm 5mm;
+    margin: 3mm 0 5mm 0;
+    border-radius: 4px;
+    font-style: italic;
+}
+
+/* ---- Lifetime Decade Roadmap (Deep tier SVG) ---------------------------- */
+.decade-roadmap {
+    margin: 4mm 0 6mm 0;
+    page-break-inside: avoid;
+}
+
+.decade-roadmap svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 720px;
+}
+
+/* ---- Tier-aware body classes -------------------------------------------- */
+body.tier-deep h1 {
+    border-bottom: 2.5px solid var(--color-heading);
+}
+
+body.tier-essential h1 {
+    border-bottom: 2px solid var(--color-heading);
+}
+
+</style>
+</head>
+<body class="tier-deep">
+<div class="cover">
+  <div class="watermark">命</div>
+  <h1>Golden ny-deep-override-fire</h1>
+  <p class="subtitle">A Reading in the Korean Four Pillars Tradition</p>
+  <div class="meta-block">
+    <p class="meta"><strong>For</strong>Golden Client</p>
+    <p class="meta"><strong>Born</strong>1 January 1990</p>
+    <p class="meta"><strong>Day Master</strong>Byeong (Yang Fire)</p>
+  </div>
+  <p class="foot">Grounded in the Five Elements and Yin-Yang philosophy. Interpreted through classical Myeongri (Korean Saju) tradition: Jeokcheon-su, Yeonhae-japyeong, Gungtong-bogam, Myeongri-jeongjong.</p>
+  <p class="date">Generated 2026-06-01</p>
+  <p class="report-id">Report ID: GOLDEN-ny-deep-override-fire · CosmicSaju · cosmicsaju.com</p>
+</div>
+
+
+<h2>Nova — Deep Destiny Report · $55</h2>
+<p><em>Full natal reading + ten-year year-by-year timing + relationship and business-launch guidance</em></p>
+<p><strong>Born:</strong> 1990-06-15 · 10:00 · —</p>
+<p><strong>Time method:</strong> recorded birth time 10:00 (local clock) corrected to true solar time <strong>10:03</strong> (birthplace -74.0°E vs the -75.0°E zone meridian), +3.8 min (longitude +4 min + equation of time -0.2 min). Hour branches follow 2-hour solar windows, so the pillars above use the corrected time.</p>
+<p><strong>Day Master:</strong> Sin (Yin Metal, Sin Metal)</p>
+<p><strong>Report generated:</strong> 2026-06-01 · <strong>Report ID:</strong> CID-nova-20260601-DEEP</p>
+<p><em>Delivered by Cosmic Saju · cosmicsaju.com</em></p>
+<p><strong>Chart signature:</strong> <em>A jewel kept in velvet — refined, reserved, and requiring the right setting.</em></p>
+<p><strong>(Audio summary included)</strong> Your MP3 audio summary is included — delivered with this report.</p>
+<hr />
+<h2>Chart at a Glance</h2>
+<h3>Four Pillars</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Year</th>
+<th>Month</th>
+<th>Day</th>
+<th>Hour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stem</td>
+<td>Gyeong</td>
+<td>Im</td>
+<td>Sin</td>
+<td>Gye</td>
+</tr>
+<tr>
+<td>Branch</td>
+<td>O</td>
+<td>O</td>
+<td>Hae</td>
+<td>Sa</td>
+</tr>
+<tr>
+<td>Hidden Stems</td>
+<td>Jeong (main), Gi (middle)</td>
+<td>Jeong (main), Gi (middle)</td>
+<td>Im (main), Gap (middle)</td>
+<td>Bing (main), Gyeong (middle), Mu (residual)</td>
+</tr>
+</tbody>
+</table>
+<h3>Element Balance</h3>
+<div class="element-balance-chart no-break">
+<svg viewBox="0 0 500 120" xmlns="http://www.w3.org/2000/svg">
+  <text x="10" y="30" font-size="13" font-weight="bold" fill="#2a4d6e" font-family="Helvetica,Arial,sans-serif">Element Balance Distribution</text>
+  <rect x="10.0" y="50" width="14.9" height="28" fill="#27ae60" rx="3"/>
+  <rect x="24.9" y="50" width="86.9" height="28" fill="#e74c3c" rx="3"/>
+  <text x="68.3" y="68.0" text-anchor="middle" font-size="11" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">🔴 Fire 18.1%</text>
+  <rect x="111.8" y="50" width="34.6" height="28" fill="#f39c12" rx="3"/>
+  <rect x="146.3" y="50" width="163.7" height="28" fill="#7f8c8d" rx="3"/>
+  <text x="228.2" y="68.0" text-anchor="middle" font-size="11" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">⚪ Metal 34.1%</text>
+  <rect x="310.0" y="50" width="180.0" height="28" fill="#3498db" rx="3"/>
+  <text x="400.0" y="68.0" text-anchor="middle" font-size="11" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">🔵 Water 37.5%</text>
+</svg>
+</div>
+<table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Presence</th>
+<th>Percentage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="element-fire">🔴 Fire</span></td>
+<td>████░░░░░░░░░░░░░░░░</td>
+<td>18.1%</td>
+</tr>
+<tr>
+<td><span class="element-earth">🟡 Earth</span></td>
+<td>█░░░░░░░░░░░░░░░░░░░</td>
+<td>7.2%</td>
+</tr>
+<tr>
+<td><span class="element-metal">⚪ Metal</span></td>
+<td>███████░░░░░░░░░░░░░</td>
+<td>34.1%</td>
+</tr>
+<tr>
+<td><span class="element-water">🔵 Water</span></td>
+<td>████████░░░░░░░░░░░░</td>
+<td>37.5%</td>
+</tr>
+<tr>
+<td><span class="element-wood">🟢 Wood</span></td>
+<td>█░░░░░░░░░░░░░░░░░░░</td>
+<td>3.1%</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="chart-signature">
+<p><em>Methodology: each element's share counts the 4 visible stems (year/month/day/hour) at weight 1.0, plus every branch's hidden stems at reduced weights (main qi 0.6, middle 0.3, residual 0.1) — a branch's own elemental weight is carried entirely through its hidden stems (its main-qi hidden stem is usually the branch's nominal element), not counted a second time as a separate 1.0 entry, since that would double-count it; the counts are then normalized to 100%.</em></p>
+</blockquote>
+<div class="quick-ref-card">
+<h3>Quick Reference</h3>
+<ul>
+<li><strong>Day Master:</strong> Sin (Yin Metal, Sin Metal)</li>
+<li><strong>Strength:</strong> Balanced — the month branch <strong>O</strong> gives the Day Master a <strong>seasonally weak baseline</strong> by element relation (per Step 2); its 12-Stage Cycle stage there is <strong>Illness</strong> — early momentum is depleted; the querent often builds strength through recovery and patience. The output/wealth/authority drain outweighs the peer and resource support — the element-relation season above (weighted more heavily in the overall formula) is what pulls the total back into the balanced range despite that skew.</li>
+<li><strong>Favorable Element:</strong> Fire — Favorable element confirmed by the reader from the full classical analysis. <em>Confirmed by a human reader from the full classical analysis.</em></li>
+<li><strong>Supporting Element:</strong> Wood</li>
+<li><strong>Avoid / Watch:</strong> Metal (Unfavorable Element, watch) · Water (Restraining Element, restrains Fire) · Earth (Draining Element, drains Fire)</li>
+<li><strong>Current Major Luck:</strong> Mu In (ages 33-42)</li>
+<li><strong>Luck direction:</strong> backward, retracing from the month pillar — derived from a yang year stem (Gyeong) and female gender, per the classical rule (yang year + male, or yin year + female → forward; otherwise backward).</li>
+<li><strong>Pattern / Formation:</strong> Seven Killings Structure / Seven Killings Grid</li>
+</ul>
+
+</div><div class="right-now-callout">
+<h3>What This Year Means for You</h3>
+<p>Right now, in June 2026, you are moving through a year whose energy is shaped by <strong>Bing O</strong> (Direct Officer (Authority)). This sits inside your broader <strong>Mu In</strong> major luck period (ages 33–42), whose theme is Direct Resource. For your chart, the most useful energy to lean into this year is <strong>Fire</strong>: look for decisions, environments, and relationships that bring fire qualities forward.</p>
+<hr />
+
+</div><h2>Table of Contents</h2>
+<ul>
+<li>Chart at a Glance</li>
+<li>How to Use This Report</li>
+<li>Day Master Portrait — incl. Four Pillars One by One &amp; Ten-God Distribution</li>
+<li>Career &amp; Wealth</li>
+<li>Relationships — incl. Relationship Deep-Dive &amp; Partner Add-On</li>
+<li>Health &amp; Vitality</li>
+<li>Natal Pattern Analysis</li>
+<li>Wealth &amp; Investment Timing</li>
+<li>Relocation, Travel &amp; Direction Guidance</li>
+<li>Business &amp; Launch Timing</li>
+<li>Timing: Major Luck &amp; Annual Windows</li>
+<li>Life Themes by Major Luck Period — incl. Lifetime Decade Roadmap</li>
+<li>Auspicious Dates — Next 90 Days</li>
+<li>Health &amp; Vitality — Deep-Dive</li>
+<li>Monthly Lucky Dates</li>
+<li>Practical Guidance Summary</li>
+<li>MP3 Audio Summary</li>
+<li>Closing Note</li>
+</ul>
+<hr />
+<h2>How to Use This Report</h2>
+<p>This document is a structured, multi-section reading. It is meant to be returned to, not read once and shelved. A few notes that make it easier to use:</p>
+<ol>
+<li><strong>What does &quot;favorable element&quot; mean in daily life?</strong> It is the element (Wood, Fire, Earth, Metal, or Water) that tends to balance your chart. Bringing it into your environment, schedule, and decisions reduces friction and supports steadier growth.</li>
+<li><strong>Should I move north or only wear fire?</strong> No. The favorable element is a tendency, not a rule. Wear the colors that feel right, work in the direction that suits you, but do not rearrange your life around a single element. The goal is balance, not obsession.</li>
+<li><strong>Can Saju tell me what illness I might get?</strong> No. Classical Saju maps tendencies in the body's elemental systems (e.g. <em>excess Wood</em> may show up in the liver channel), but it does not diagnose. Always consult a licensed healthcare provider for any health concern.</li>
+<li><strong>How often should I get a reading?</strong> Most readers find that a full re-reading every 2–3 years is enough, with a brief check-in at each major annual or lunar-new-year transition. Use the Annual Windows table in this report to track the larger currents yourself.</li>
+<li><strong>What is a major luck period?</strong> A 10-year stretch of life shaped by a new stem and branch (Major Luck) that overlays your natal chart. The Major Luck Periods table summarises all of yours. Plan long-term decisions with the table in hand.</li>
+<li><strong>How is Saju different from Western astrology?</strong> Saju is solar-lunar calendar-based and built on the Five Elements and Yin-Yang, not the tropical zodiac. There is no equivalent of &quot;rising sign&quot; or &quot;house system&quot;; the four pillars and the timing overlays are the entire frame.</li>
+<li><strong>Should I read this report chronologically?</strong> No. The Chart at a Glance, Quick Reference, and Closing Note are the entry points. Use the timing tables (Annual Windows, Monthly Lucky Dates) as a navigation layer, not as a linear story.</li>
+</ol>
+<p>Return to the Practical Guidance Summary whenever you need a reminder. Return to the Major Luck Periods table at every life transition. Return to the Closing Note when you want a single, well-formed paragraph to sit with.</p>
+<hr />
+<h2>Day Master Portrait</h2>
+<p>With <strong>Sin</strong> (Sin (Yin Metal, Sin Metal)) as your Day Master — you — the reference point the whole chart is read against, your core self carries the image of the <strong>polished jewel or fine instrument</strong>. Your natural strengths run toward <strong>precision, refinement, and a gift for detail and quality</strong>, while the shadow side can show as <strong>perfectionism, detachment, or being easily bruised by criticism</strong>.</p>
+<p>Born in a <strong>Metal</strong> chart with the engine reading as <strong>balanced</strong>, the way you meet the world is shaped by how much Metal energy is available. When balanced, you express the best of Metal; when stressed, the unintegrated side may dominate.</p>
+<p>Your growth edge is to consciously cultivate <strong>Fire</strong> energy — the favorable element — so that your Metal nature has the right container and outlet.</p>
+<p>Your Day Master <strong>Sin</strong> meets the month branch <strong>O</strong> at the <strong>recessive start</strong> twelve-stage — early momentum is depleted; the querent often builds strength through recovery and patience. This is read as a seasonally depleted arrival: a tendency in how the querent's core energy first enters the world, not a fixed early-life outcome.</p>
+<h3>Four Pillars, One by One</h3>
+<h4>Year Pillar — Gyeong O (Gyeong (Yang Metal, Gyeong Metal))</h4>
+<p>The Gyeong O pillar pairs the <strong>Gyeong</strong> stem (Gyeong (Yang Metal, Gyeong Metal)) with the <strong>O</strong> branch, together shaping <strong>ancestral and social-root energy — the wider world you were born into</strong>. Its stem reads as <strong>Robber (Rob Wealth)</strong> relative to your Day Master, so this area of life tends to carry that dynamic.</p>
+<p>The <strong>Fire</strong> branch is the container for this area and the <strong>Metal</strong> stem is its driver — read the two together when weighing how year-pillar matters unfold.</p>
+<p>Because the stem belongs to the <strong>Metal</strong> element, it tends to bring metal-flavoured themes into this life area — qualities of motion, structure, or feeling that quietly shape how the querent relates to year-pillar matters.
+Hidden stems within the O branch add layers: any mid- or residual-stem ten-god the querent carries here will surface as a recurring sub-theme when this life area activates.
+When the annual or major luck touches the O branch or the Gyeong stem, expect year-pillar themes to move to the foreground for that window.</p>
+<h4>Month Pillar — Im O (Im (Yang Water, Im Water))</h4>
+<p>The Im O pillar pairs the <strong>Im</strong> stem (Im (Yang Water, Im Water)) with the <strong>O</strong> branch, together shaping <strong>career and immediate environment — how you show up at work and in daily life</strong>. Its stem reads as <strong>Hurting Officer</strong> relative to your Day Master, so this area of life tends to carry that dynamic.</p>
+<p>The <strong>Fire</strong> branch is the container for this area and the <strong>Water</strong> stem is its driver — read the two together when weighing how month-pillar matters unfold.</p>
+<p>Because the stem belongs to the <strong>Water</strong> element, it tends to bring water-flavoured themes into this life area — qualities of motion, structure, or feeling that quietly shape how the querent relates to month-pillar matters.
+Hidden stems within the O branch add layers: any mid- or residual-stem ten-god the querent carries here will surface as a recurring sub-theme when this life area activates.
+When the annual or major luck touches the O branch or the Im stem, expect month-pillar themes to move to the foreground for that window.</p>
+<h4>Day Pillar — Sin Hae (Sin (Yin Metal, Sin Metal))</h4>
+<p>The Sin Hae pillar pairs the <strong>Sin</strong> stem (Sin (Yin Metal, Sin Metal)) with the <strong>Hae</strong> branch, together shaping <strong>spouse palace and the inner self — the partner you choose and the self behind the choices</strong>. Its stem reads as <strong>Companion (Pillar)</strong> relative to your Day Master, so this area of life tends to carry that dynamic.</p>
+<p>The <strong>Water</strong> branch is the container for this area and the <strong>Metal</strong> stem is its driver — read the two together when weighing how day-pillar matters unfold.</p>
+<p>Because the stem belongs to the <strong>Metal</strong> element, it tends to bring metal-flavoured themes into this life area — qualities of motion, structure, or feeling that quietly shape how the querent relates to day-pillar matters.
+Hidden stems within the Hae branch add layers: any mid- or residual-stem ten-god the querent carries here will surface as a recurring sub-theme when this life area activates.
+When the annual or major luck touches the Hae branch or the Sin stem, expect day-pillar themes to move to the foreground for that window.</p>
+<h4>Hour Pillar — Gye Sa (Gye (Yin Water, Gye Water))</h4>
+<p>The Gye Sa pillar pairs the <strong>Gye</strong> stem (Gye (Yin Water, Gye Water)) with the <strong>Sa</strong> branch, together shaping <strong>later life and children — what you build toward and what you pass on</strong>. Its stem reads as <strong>Eating God</strong> relative to your Day Master, so this area of life tends to carry that dynamic.</p>
+<p>The <strong>Fire</strong> branch is the container for this area and the <strong>Water</strong> stem is its driver — read the two together when weighing how hour-pillar matters unfold.</p>
+<p>Because the stem belongs to the <strong>Water</strong> element, it tends to bring water-flavoured themes into this life area — qualities of motion, structure, or feeling that quietly shape how the querent relates to hour-pillar matters.
+Hidden stems within the Sa branch add layers: any mid- or residual-stem ten-god the querent carries here will surface as a recurring sub-theme when this life area activates.
+When the annual or major luck touches the Sa branch or the Gye stem, expect hour-pillar themes to move to the foreground for that window.</p>
+<h3>Ten-God Distribution Table</h3>
+<p>A pillar-by-pillar view of the ten-god (Ten Gods) picture — including the hidden stems inside each branch, which most of the time shape the chart's deeper themes more than the visible stems alone.</p>
+<table>
+<thead>
+<tr>
+<th>Pillar</th>
+<th>Stem</th>
+<th>Ten-God (Stem)</th>
+<th>Branch Hidden Stems</th>
+<th>Hidden Ten-Gods</th>
+<th>Reading</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Year Pillar — Gyeong O</td>
+<td>Gyeong</td>
+<td>Robber (Rob Wealth)</td>
+<td>Jeong (main), Gi (middle)</td>
+<td>Seven Killings (Authority), Indirect Resource</td>
+<td>Outer layer: Robber (Rob Wealth); inner driver through the branch: Seven Killings (Authority).</td>
+</tr>
+<tr>
+<td>Month Pillar — Im O</td>
+<td>Im</td>
+<td>Hurting Officer</td>
+<td>Jeong (main), Gi (middle)</td>
+<td>Seven Killings (Authority), Indirect Resource</td>
+<td>Outer layer: Hurting Officer; inner driver through the branch: Seven Killings (Authority).</td>
+</tr>
+<tr>
+<td>Day Pillar — Sin Hae</td>
+<td>Sin</td>
+<td>Companion (Pillar)</td>
+<td>Im (main), Gap (middle)</td>
+<td>Hurting Officer (Output), Direct Wealth</td>
+<td>Outer layer: Companion (Pillar); inner driver through the branch: Hurting Officer (Output).</td>
+</tr>
+<tr>
+<td>Hour Pillar — Gye Sa</td>
+<td>Gye</td>
+<td>Eating God</td>
+<td>Bing (main), Gyeong (middle), Mu (residual)</td>
+<td>Direct Officer (Authority), Rob Wealth (Companion), Direct Resource</td>
+<td>Outer layer: Eating God; inner driver through the branch: Direct Officer (Authority).</td>
+</tr>
+</tbody>
+</table>
+<p>Use this table as a quick reference when you are unsure which ten-god a particular pillar carries. The visible stem is the persona; the hidden stems are the undertow.</p>
+<hr />
+<blockquote>
+<p><strong>In plain words:</strong> Where your chart puts its weight: most of all on peers, rivals, and how you hold your own.</p>
+</blockquote>
+<blockquote>
+<p><strong>In plain words:</strong> At your core you are a refined blade — you cut to the point and value quality. Your chart reads as balanced, so the rest of this report is about where that helps and where leaning toward Fire keeps you in balance.</p>
+</blockquote>
+<hr />
+<h2>Career &amp; Wealth</h2>
+<h3>Career Archetypes</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Domain</th>
+<th>Why It Fits</th>
+<th>Example Roles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Best Fit</strong></td>
+<td>Leadership &amp; Executive Roles</td>
+<td>Aligns with your favorable element Fire, reducing friction.</td>
+<td>CEO, director, team lead, public office</td>
+</tr>
+<tr>
+<td><strong>Best Fit</strong></td>
+<td>Media &amp; Performing Arts</td>
+<td>Aligns with your favorable element Fire, reducing friction.</td>
+<td>broadcasting, acting, music, public speaking</td>
+</tr>
+<tr>
+<td><strong>Best Fit</strong></td>
+<td>Marketing &amp; Public Relations</td>
+<td>Aligns with your favorable element Fire, reducing friction.</td>
+<td>brand management, PR, advertising, influencer strategy</td>
+</tr>
+<tr>
+<td><strong>Best Fit</strong></td>
+<td>Teaching &amp; Coaching</td>
+<td>Aligns with your favorable element Fire, reducing friction.</td>
+<td>seminars, motivational speaking, personal coaching</td>
+</tr>
+<tr>
+<td><strong>Good Fit</strong></td>
+<td>Entrepreneurship</td>
+<td>Aligns with your favorable element Fire, reducing friction.</td>
+<td>startups, venture building, product evangelism</td>
+</tr>
+<tr>
+<td><strong>Good Fit</strong></td>
+<td>Public Affairs &amp; Advocacy</td>
+<td>Lets you express your strongest visible ten-god, Robber (Rob Wealth), in a structured setting.</td>
+<td>campaigns, policy, community organizing</td>
+</tr>
+<tr>
+<td><strong>Good Fit</strong></td>
+<td>Education &amp; Training</td>
+<td>Uses Wood energy in a supportive role to your Metal Day Master.</td>
+<td>teaching, curriculum design, academic research</td>
+</tr>
+<tr>
+<td><strong>Possible</strong></td>
+<td>Healthcare &amp; Wellness</td>
+<td>Uses Wood energy in a supportive role to your Metal Day Master.</td>
+<td>nursing, therapy, fitness, holistic health</td>
+</tr>
+<tr>
+<td><strong>Possible</strong></td>
+<td>Design &amp; Publishing</td>
+<td>Uses Wood energy in a supportive role to your Metal Day Master.</td>
+<td>graphic design, writing, editing, publishing</td>
+</tr>
+<tr>
+<td><strong>Possible</strong></td>
+<td>Social &amp; Environmental Work</td>
+<td>Uses Wood energy in a supportive role to your Metal Day Master.</td>
+<td>social work, NG Os, environmental advocacy</td>
+</tr>
+<tr>
+<td><strong>Possible</strong></td>
+<td>People Development &amp; Culture</td>
+<td>Lets you express your strongest visible ten-god, Robber (Rob Wealth), in a structured setting.</td>
+<td>coaching, talent development, organizational culture</td>
+</tr>
+<tr>
+<td><strong>Possible</strong></td>
+<td>Creative Direction</td>
+<td>Uses Wood energy in a supportive role to your Metal Day Master.</td>
+<td>art direction, brand storytelling, content strategy</td>
+</tr>
+</tbody>
+</table>
+<h3>Wealth Pattern</h3>
+<p>Wealth timing is read from where Wealth ten-gods appear and are supported. Your favorable element <strong>Fire</strong> and supporting element <strong>Wood</strong> describe the broader climate that helps those wealth channels function; they are not the wealth channel itself. Wealth ten-gods are visible in the natal pillars, so earning capacity is rooted in the chart. Use the Major Luck and Annual Luck tables to see when income and value-creation themes surface most clearly. Periods dominated by <strong>Metal</strong> call for conservation rather than expansion.</p>
+<h3>Employment vs. Entrepreneurship</h3>
+<p>A double pull between Authority and Wealth suggests a hybrid path: a credible institutional platform in the early career years, then a measured move toward independent ventures once credibility and capital are in place. Treat this as a tendency reading, not a verdict; the Major Luck and annual luck tables below show when each path is more likely to land cleanly.</p>
+<h3>Income Rhythm</h3>
+<p>The chart carries <strong>Direct Wealth only as a hidden stem</strong> — real, but latent rather than actively expressed. Income from a steady, earned source is structurally present but may need a deliberate channel (a role, a contract, a platform) to become visible and regular.</p>
+<h3>Skill-Levers to Develop</h3>
+<p><strong>Robber-dominant</strong> charts tend to grow fastest through competitive positioning, negotiation, and boundary-setting. Cultivate <strong>public visibility</strong> — speaking, publishing, or teaching — to light Fire's radiance.</p>
+<h3>Wealth Preservation Note</h3>
+<p>For a <strong>Metal</strong> Day Master with a <strong>Balanced</strong> reading, wealth preservation starts with diversification — never concentrate more than your chart can comfortably hold. Liquidity buffers aligned with the <strong>Fire</strong> element (its colors, foods, and rhythms) help the querent stay flexible across unfavorable Major Luck periods. Partnerships and joint ventures work well when the partner's element supports Fire; avoid partners whose chart emphasizes the unfavorable element, since their decisions tend to amplify the chart's existing pressure. Across a full lifetime, the disciplined saver with Fire-aligned custodians outperforms the aggressive investor whose chart cannot hold the volatility.</p>
+<h3>Career Deep-Dive</h3>
+<h4>Company-Type Fit</h4>
+<p>A <strong>mid-size specialist firm with strong leadership visibility</strong> is the most likely fit. Both Direct Officer and Seven Killings are present, so the querent needs a credible structure but also room to push back when needed.</p>
+<h4>Boss / Team Dynamics</h4>
+<p>The ideal manager profile is a <strong>warm Fire motivator</strong> — someone who carries your favorable <strong>Fire</strong> element, supplying what the chart needs rather than competing with your Day Master. Watch for vague goals that blunt Metal's precision; this is the most common way the querent's energy gets drained in a team setting.</p>
+<h4>Red-Flag Environments</h4>
+<p>Look out for: long stretches of Metal-heavy work that drain the Day Master; either-or framing that forces a single dominant choice; environments that ignore the favorable element's rhythm.</p>
+<h4>Decade-by-Decade Career Strategy</h4>
+<p><strong>Ages 3-12 — Sin Sa</strong></p>
+<p>With a <strong>Companion (Pillar)</strong> ten-god over a <strong>Fire</strong> branch (stem element Metal), this is a transition and adapt decade. Use the mixed energy to refine skills and reposition rather than to launch new ventures. Years where the stem element matches the favorable <strong>Fire</strong> energy are the most reliable for visible wins; the others are best used for quiet preparation.</p>
+<p><strong>Ages 13-22 — Gyeong Jin</strong></p>
+<p>With a <strong>Robber (Rob Wealth)</strong> ten-god over a <strong>Earth</strong> branch (stem element Metal), this is a conserve and consolidate decade. Protect what already works; defer large bets and focus on craft and relationships. Years where the stem element matches the favorable <strong>Fire</strong> energy are the most reliable for visible wins; the others are best used for quiet preparation.</p>
+<p><strong>Ages 23-32 — Gi Myo</strong></p>
+<p>With a <strong>Indirect Resource</strong> ten-god over a <strong>Wood</strong> branch (stem element Earth), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable <strong>Fire</strong> energy are the most reliable for visible wins; the others are best used for quiet preparation.</p>
+<p><strong>Ages 33-42 — Mu In</strong></p>
+<p>With a <strong>Direct Resource</strong> ten-god over a <strong>Wood</strong> branch (stem element Earth), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable <strong>Fire</strong> energy are the most reliable for visible wins; the others are best used for quiet preparation.</p>
+<p><strong>Ages 43-52 — Jeong Chuk</strong></p>
+<p>With a <strong>Seven Killings</strong> ten-god over a <strong>Earth</strong> branch (stem element Fire), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable <strong>Fire</strong> energy are the most reliable for visible wins; the others are best used for quiet preparation.</p>
+<p><strong>Ages 53-62 — Bing Ja</strong></p>
+<p>With a <strong>Direct Officer</strong> ten-god over a <strong>Water</strong> branch (stem element Fire), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable <strong>Fire</strong> energy are the most reliable for visible wins; the others are best used for quiet preparation.</p>
+<p><strong>Ages 63-72 — Eul Hae</strong></p>
+<p>With a <strong>Indirect Wealth</strong> ten-god over a <strong>Water</strong> branch (stem element Wood), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable <strong>Fire</strong> energy are the most reliable for visible wins; the others are best used for quiet preparation.</p>
+<p><strong>Ages 73-82 — Gap Sul</strong></p>
+<p>With a <strong>Direct Wealth</strong> ten-god over a <strong>Earth</strong> branch (stem element Wood), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable <strong>Fire</strong> energy are the most reliable for visible wins; the others are best used for quiet preparation.</p>
+<blockquote>
+<p><strong>In plain words:</strong> Your chart leans toward earning by making and expressing — creating, teaching, building. Fields and decades that carry Fire give the cleanest results; the timing tables show when.</p>
+</blockquote>
+<hr />
+<h2>Relationships</h2>
+<h3>Relationship Style</h3>
+<p>The spouse palace is <strong>Hae</strong> (12-stage: Bathing), whose main hidden stem relates to your Day Master as <strong>Hurting Officer</strong>. In practice, you express affection candidly, sometimes bluntly, and want a partner who can take direct feedback. No <strong>Peach Blossom</strong> star is natally active, so relationship style is more shaped by the spouse palace and ten-god mix than by overt magnetism. By Japyeong-jinjeon's gendered spouse-star convention, your <strong>husband star (Authority, husband star)</strong> appears at <strong>Jeong</strong> (year branch main), <strong>Jeong</strong> (month branch main), <strong>Bing</strong> (hour branch main).</p>
+<h3>Spouse Palace Ten-God</h3>
+<p>The spouse palace <strong>Hae</strong> (12-stage: Bathing) carries a main hidden stem that relates to your Day Master as <strong>Hurting Officer (Hurting Officer (Output))</strong>. In the partner domain this points toward a candid, expressive partnership; direct conversation and shared creative output matter more than convention. Read this as an atmospheric tendency, not a prediction about a specific person.</p>
+<h3>Partner Compatibility</h3>
+<table>
+<thead>
+<tr>
+<th>Partner Type</th>
+<th>Element</th>
+<th>Fit Level</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Growth-oriented, idealistic, and principled</td>
+<td>Wood</td>
+<td><strong>Good</strong></td>
+<td>Wood supports your Fire — secondary support (Supporting Element).</td>
+</tr>
+<tr>
+<td>Radiant, expressive, and momentum-driven</td>
+<td>Fire</td>
+<td><strong>Best</strong></td>
+<td>Fire is your favorable element — the core balance your chart seeks.</td>
+</tr>
+<tr>
+<td>Grounded, nurturing, and reliability-focused</td>
+<td>Earth</td>
+<td><strong>Compatible</strong></td>
+<td>Neutral energetic exchange.</td>
+</tr>
+<tr>
+<td>Disciplined, precise, and structure-oriented</td>
+<td>Metal</td>
+<td><strong>Watch</strong></td>
+<td>Metal is your challenging element — it works against the balance your chart seeks.</td>
+</tr>
+<tr>
+<td>Adaptive, perceptive, and depth-seeking</td>
+<td>Water</td>
+<td><strong>Compatible</strong></td>
+<td>Neutral energetic exchange.</td>
+</tr>
+</tbody>
+</table>
+<h3>Three Things to Be Mindful Of</h3>
+<ul>
+<li><strong>Peach Blossom</strong> is not natally active, so your social style leans toward depth rather than breadth — protect your close-circle time.</li>
+<li>The day branch <strong>Hae</strong> is involved in a natal clash, so partnerships tend to surface change or tension — frame this as information, not a verdict.</li>
+<li>The current major-luck period (<strong>Mu In</strong>, Direct Resource — support and knowledge — education, mentors, care, property, credentials) carries favorable energy for relationships — the next few years are about consolidation rather than reinvention.</li>
+</ul>
+<h3>Key Relationship Timing</h3>
+<blockquote>
+<p><em>Relationship theme per year for the next six years — read alongside the annual windows table.</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Pillar</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026</td>
+<td>Bing O (Direct Officer)</td>
+<td><strong>Fire</strong> energy + Direct Officer: structure and visible milestones (engagement, marriage, formal commitment).</td>
+</tr>
+<tr>
+<td>2027</td>
+<td>Jeong Mi (Seven Killings)</td>
+<td><strong>Fire</strong> energy + Seven Killings: intensity or pressure in a relationship — per Myeongri-jeongjong (Korean school), Seven Killings (Authority) years read with more caution than Direct Officer (Authority) for a female Day Master; not automatically a commitment year.</td>
+</tr>
+<tr>
+<td>2028</td>
+<td>Mu Shin (Direct Resource)</td>
+<td><strong>Earth</strong> energy + Direct Resource: support and study — a partner who mentors or grounds you.</td>
+</tr>
+<tr>
+<td>2029</td>
+<td>Gi Yu (Indirect Resource)</td>
+<td><strong>Earth</strong> energy + Indirect Resource: intuition and surprise — a relationship that teaches you something unexpected.</td>
+</tr>
+<tr>
+<td>2030</td>
+<td>Gyeong Sul (Robber)</td>
+<td><strong>Metal</strong> energy + Robber: competition or boundary-setting — be clear about what you will and will not negotiate.</td>
+</tr>
+<tr>
+<td>2031</td>
+<td>Sin Hae (Companion)</td>
+<td><strong>Metal</strong> energy + Companion: peer energy — friendships and partnerships strengthen.</td>
+</tr>
+</tbody>
+</table>
+<h3>Friendship &amp; Social Energy</h3>
+<p>Friend and social energy is shaped by the chart's dominant classes — <strong>Companion (3), Authority (3), Resource (3), Output (3)</strong> — so the querent tends to give and receive in those modes. The querent is naturally drawn to people who are visible, expressive, and energetic, and tends to feel drained by people who are harsh, critical, or cold. Social settings where the favorable <strong>Fire</strong> element is present (a community garden for Wood, a quiet studio for Water, a workshop for Metal) tend to feel more nourishing than large unstructured gatherings.</p>
+<h3>Relationship Deep-Dive</h3>
+<h4>Attachment Patterns from Chart Structure</h4>
+<p>With the spouse palace <strong>Hae</strong> sitting in the <strong>Bathing</strong> 12-stage and carrying hidden-stem ten-gods of <strong>Hurting Officer (Output), Direct Wealth</strong>, the querent bonds through a mix of presence and discernment. The <strong>Bathing</strong> stage is one of the supported (strong) stages, so the querent tends to bring energy and presence into the bond. The hidden-stem ten-gods colour the undercurrent — Resource leans into safety, Output into creative play, Wealth into stability. Read this as the emotional baseline; the Major Luck/Annual Luck overlays show when the querent's bond patterns shift most.</p>
+<h4>Marriage Timing Windows</h4>
+<p>Commitment timing is read from your <strong>husband star</strong> and your spouse palace <strong>Hae</strong> (the day branch). Major-luck windows that open the theme: <strong>Mu In</strong> (ages 33-42: In Hae Six Harmony into the spouse palace); <strong>Jeong Chuk</strong> (ages 43-52: Seven Killings (Authority) spouse-star stem). The years where the most signals converge: <strong>2027 Jeong Mi</strong> (Seven Killings (Authority) spouse-star year, Hae Myo Mi three-harmony through the spouse palace); <strong>2026 Bing O</strong> (Direct Officer (Authority) spouse-star year). Years better suited to deepening privately than to formalising: 2031 (Hae Hae self-punishment on the spouse palace); 2032 (Hurting Officer (Output) year). These are tendencies for when the theme is most active — not predictions of an event.</p>
+<h4>Family Dynamics</h4>
+<p>The year pillar <strong>O</strong> carries ancestral and parental themes; its main hidden stem shapes how the querent absorbs (or pushes back on) family-of-origin patterns. The month pillar <strong>O</strong> is the career and sibling palace — its dynamics surface in how the querent shows up among peers and early mentors. The hour pillar <strong>Sa</strong> speaks to children and later life — its hidden stems indicate what the querent is likely to pass on, and what they will need to consciously teach.</p>
+<h4>Partner Chart Add-On</h4>
+<div class="partner-compat-upsell"><em>Curious about a specific person? Add a compatibility reading — the Deep Compatibility report ($45) — by replying with their birth details.</em></div>
+<blockquote>
+<p><strong>In plain words:</strong> Your partnership area points toward a partner you speak plainly with — candid exchange over convention. Treat this as the weather it tends to create, not a description of one person.</p>
+</blockquote>
+<hr />
+<h2>Health &amp; Vitality</h2>
+<h3>Primary Watchpoints</h3>
+<ul>
+<li><strong>Element excess:</strong> Water — pay attention to the kidney/bladder and hormonal/endocrine reserves system.</li>
+<li><strong>Element deficiency:</strong> Wood — the liver/gall bladder and nervous system system may need gentle support.</li>
+<li>The chart's lightest weighted element is <strong>Wood (3.1%)</strong>, which in classical Five-Element mapping is paired with the <strong>liver/gall bladder and nervous system</strong>. This is not a diagnosis; it is the least natally emphasized system, making it the natural place to begin gentle, preventive support through wood-aligned foods, seasons, and rhythms.</li>
+</ul>
+<h3>Grounding Practices</h3>
+<ul>
+<li>Short midday walks in sunlight</li>
+<li>Eating bitter greens, red-colored vegetables, and warm foods</li>
+<li>Speaking or performing in well-lit south-facing spaces</li>
+<li>Taking brief social breaks to rekindle enthusiasm</li>
+<li>Journaling by candlelight to focus scattered Fire</li>
+</ul>
+<h3>The Overdrive Warning</h3>
+<p>A <strong>Balanced</strong> Metal Day Master has reasonable reserves but still needs conscious rhythm. Watch for burning out through perfectionism, grief, or respiratory tightness when output stays high without recovery windows. In classical Five-Element reading, the <strong>lung/large intestine and respiratory/immune boundaries</strong> are a common watchpoint when energy is overstretched; the <strong>Fire</strong> element's practices (its seasons, foods, and rhythms) are the simplest countermeasure.</p>
+<h3>Seasonal &amp; Daily Rhythms</h3>
+<p>The <strong>Metal</strong> Day Master is most at home in <strong>autumn</strong>; that is when the chart's natural energy peaks. Conversely, the chart is most depleted in the season of the unfavorable element — protect rest and reduce commitments during those months. The favorable <strong>Fire</strong> element's season (<strong>summer (the peak Fire energy)</strong>) is the cleanest window for new beginnings and visible projects; use it deliberately. In the daily cycle, the Fire hours (by the twelve branch hours) are the most aligned — Sa O hours, 09:00–13:00.</p>
+<blockquote>
+<p><em>This section reflects classical Five Element organ mapping and is not a medical diagnosis. Consult a licensed healthcare provider for any health concerns.</em></p>
+</blockquote>
+<blockquote>
+<p><strong>In plain words:</strong> Your lightest element is Wood, so the liver/gall bladder and nervous system are the natural place to start gentle, preventive care — through wood-aligned food, rest, and seasons. This is a balance cue, not a diagnosis.</p>
+</blockquote>
+<hr />
+<h2>Natal Pattern Analysis</h2>
+<p>This section gathers the visible structural signals in your natal chart — combinations, clashes, harmonies, and self-punishments — so the reader can see which branches are speaking to one another. These patterns do not dictate events; they describe recurring themes and pressures that tend to appear across life areas.</p>
+<p><strong>Dominant pattern candidate:</strong> <em>Seven Killings Structure / Seven Killings Grid</em></p>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Branches</th>
+<th>Classical Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Six Clash</td>
+<td>Sa↔Hae</td>
+<td>a tension or activation between two life palaces; often a call to adjust, release, or decide</td>
+</tr>
+<tr>
+<td>Self-Punishment</td>
+<td>O O</td>
+<td>the O branch appears twice; a recurring inner pattern that asks for self-awareness</td>
+</tr>
+<tr>
+<td>Output Meets Authority</td>
+<td>Hurting Officer (Output) + Direct Officer (Authority)</td>
+<td>Classical conflict pattern : Hurting Officer (Output)'s output tends to clash with Direct Officer (Authority)'s orderly authority — often read as friction with rules, institutions, or superiors. A structural tendency to watch, not a fixed event.</td>
+</tr>
+</tbody>
+</table>
+<h3>Pattern Narratives</h3>
+<p>The engine flags a likely <strong>Seven Killings Grid</strong> as the regular grid. This points toward a life theme shaped by high-pressure authority and decisive action — careers or life phases that demand courage under constraint. It is a structural tendency, not a career verdict; the ten-god distribution and timing tables refine how it expresses.</p>
+<p>The most prominent natal branch signal is a <strong>Six Clash</strong> between <strong>Sa</strong> and <strong>Hae</strong>, linking the later life and children — what you build toward and what you pass on and spouse palace and the inner self — the partner you choose and the self behind the choices. This brings recurring tension that asks the querent to adjust, release, or choose between the two areas rather than hold both in full force.</p>
+<h3>What This Means in Plain Language</h3>
+<p>The chart's dominant pattern candidate is <strong>Seven Killings Grid</strong>. A natal clash between <strong>Sa</strong> and <strong>Hae</strong> brings recurring pressure and asks the querent to make conscious choices between the two palaces involved. Together, these patterns point to a recurring life theme rather than a single event. The favorable <strong>Fire</strong> element is the querent's lever for working with — rather than against — the chart's structure.</p>
+<blockquote>
+<p><strong>In plain words:</strong> The chart's organising theme is high-pressure authority and decisive action — careers or life phases that demand courage under constraint.</p>
+</blockquote>
+<h3>Other Active Star</h3>
+<p><em>Counted from your day branch <strong>Hae</strong> (common modern practice; traditional Korean practice counts from the year branch, which can give a different set of stars).</em></p>
+<ul>
+<li><strong>Heavenly Noble</strong> (at O): a &quot;helper&quot; star — a tendency toward receiving support from an unexpected, noble source at key turning points.</li>
+<li><strong>Movement Star</strong> (at Hae): a movement/departure marker — relocation, travel, job or residence changes; a milder, more passive sibling of the travel star (Post Horse).</li>
+<li><strong>Six Harm</strong> (at O): covert harm or friction from the six-harm branch direction.</li>
+<li><strong>Heavenly Virtue</strong> (at Hae): virtue, protection, and honorable character — help arriving in times of need; often read as one of the most favorable stars.</li>
+</ul>
+<hr />
+<h2>Wealth &amp; Investment Timing</h2>
+<p>This section identifies where wealth ten-gods appear in the natal chart and which major-luck and annual windows tend to activate the wealth story. It is not investment advice; it is a Saju lens on when the chart's energy favors planning, negotiation, or conservation.</p>
+<table>
+<thead>
+<tr>
+<th>Position</th>
+<th>Stem</th>
+<th>Ten-God</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>day_branch_middle</td>
+<td>Gap</td>
+<td>Direct Wealth</td>
+<td>Natal wealth signal visible here.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Major-luck periods that carry wealth or favorable-element energy:</strong></p>
+<ul>
+<li>Ages 43–52 (Jeong Chuk, Seven Killings — pressure and demand — deadlines, tough oversight, decisive action under stress) — your favorable element is active here, supporting overall balance rather than specifically signaling a wealth-influx window.</li>
+<li>Ages 53–62 (Bing Ja, Direct Officer — conventional authority — career structure, rules, status, institutions) — your favorable element is active here, supporting overall balance rather than specifically signaling a wealth-influx window.</li>
+<li>Ages 63–72 (Eul Hae, Indirect Wealth — variable money — deals, commissions, windfalls, higher risk and reward) — a window where income, asset, or value-creation themes are more likely to surface.</li>
+<li>Ages 73–82 (Gap Sul, Direct Wealth — steady, earned income and everyday resources — salary and savings) — a window where income, asset, or value-creation themes are more likely to surface.</li>
+</ul>
+<h3>Investment Style Cue</h3>
+<p>Because your favorable element is <strong>Fire</strong> and your supporting element is <strong>Wood</strong>, years and months that bring these elements into the annual or monthly pillar are generally more supportive for financial planning and negotiation. Years dominated by your unfavorable element call for conservation, review, and patience rather than expansion.</p>
+<hr />
+<h2>Relocation, Travel &amp; Direction Guidance</h2>
+<p>Classical Saju associates each element with a direction and a quality of space. These notes are directional tendencies, not guarantees about a specific city or property.</p>
+<table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Direction</th>
+<th>Best For</th>
+<th>Use With Care</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fire (favorable)</td>
+<td>south</td>
+<td>Restoration, big decisions, starting new rhythms</td>
+<td>Years when this element is weak in the annual luck</td>
+</tr>
+<tr>
+<td>Wood (supporting)</td>
+<td>east</td>
+<td>Building momentum, collaboration, steady growth</td>
+<td>Periods of heavy clash or punishment in the natal branches</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Favorable orientation:</strong> Facing or sleeping with head toward <strong>south</strong> is traditionally considered supportive for your chart.</li>
+<li><strong>Supporting orientation:</strong> Use <strong>east</strong> when you need steady, collaborative energy.</li>
+</ul>
+<h3>Travel &amp; Move Timing</h3>
+<p>Travel and relocation are most likely to feel aligned during <strong>Fire</strong> (and supporting <strong>Wood</strong>)-element years and months, and especially during these supportive major-luck periods: ages 23-32 (Gi Myo), ages 33-42 (Mu In), ages 43-52 (Jeong Chuk). Relocations outside those windows may bring temporary benefit but require more adjustment; plan for a longer settling-in period rather than expecting instant payoff.</p>
+<p><strong>Post Horse (Post Horse killer, Post Horse Star) is natally active at Sa</strong> — this classical star indicates a tendency toward movement: travel, relocation, or change of environment as a recurring life theme rather than a one-time event. Years or major-luck periods that activate this branch again tend to bring relocation or travel decisions to the foreground.</p>
+<hr />
+<h2>Business &amp; Launch Timing</h2>
+<p>For a Metal Day Master, the most supportive launch windows tend to come when the annual pillar carries <strong>Fire</strong> or <strong>Wood</strong> energy and does not clash the natal day branch.</p>
+<h3>Your Business Lucky Numbers</h3>
+<p>Use <strong>2, 7 (favorable Fire) and 3, 8 (supporting Wood)</strong> in pricing, launch dates, seat numbers, and branding choices where practical. These numbers carry the frequency of your favorable element.</p>
+<h3>Best Launch Types for This Chart</h3>
+<p><strong>A partnership or co-launch with one credible counterparty</strong> is the most likely fit. The Authority ten-god gives the launch a stamp of legitimacy, and a partner carries the parts the querent's chart cannot carry alone.</p>
+<h3>Year-by-Year Launch Timing (2026–2031)</h3>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Pillar</th>
+<th>Why It Matters</th>
+<th>Suggested Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026</td>
+<td>Bing O</td>
+<td>Direct Officer (Fire energy + Direct Officer — a favorable-element year.)</td>
+<td>career moves, credentials, formal commitments</td>
+</tr>
+<tr>
+<td>2027</td>
+<td>Jeong Mi</td>
+<td>Seven Killings (Fire/Earth energy + Seven Killings — a favorable-element year.)</td>
+<td>career moves, credentials, formal commitments</td>
+</tr>
+<tr>
+<td>2028</td>
+<td>Mu Shin</td>
+<td>Direct Resource (Earth/Metal energy + Direct Resource — a challenging-element year.)</td>
+<td>study, mentorship, rest, skill-building</td>
+</tr>
+<tr>
+<td>2029</td>
+<td>Gi Yu</td>
+<td>Indirect Resource (Earth/Metal energy + Indirect Resource — a challenging-element year.)</td>
+<td>study, mentorship, rest, skill-building</td>
+</tr>
+<tr>
+<td>2030</td>
+<td>Gyeong Sul</td>
+<td>Robber (Metal/Earth energy + Robber — a challenging-element year.)</td>
+<td>peer projects, friendships, self-definition</td>
+</tr>
+<tr>
+<td>2031</td>
+<td>Sin Hae</td>
+<td>Companion (Metal/Water energy + Companion — a challenging-element year.)</td>
+<td>peer projects, friendships, self-definition</td>
+</tr>
+</tbody>
+</table>
+<h3>Quarterly / Seasonal Reminders</h3>
+<p>With <strong>Fire</strong> as the favorable element, the most aligned launch window is <strong>summer (peak Fire energy supports visible launches)</strong>, the favorable element's own season. Outside that window, plan a quieter cadence — audits, refinements, and behind-the-scenes infrastructure work — rather than big public pushes. Pushing against the seasonal rhythm rarely accelerates the result; it just adds friction.</p>
+<h3>Things to Watch</h3>
+<ol>
+<li><strong>Annual branches that clash your natal day branch Hae</strong> — these tend to bring unexpected pivots; launch a soft beta, not a public campaign.</li>
+<li><strong>Annual pillars dominated by the unfavorable element</strong> — favour audits, refinements, and quiet product work over big announcements.</li>
+<li><strong>A major-luck shift into a heavier stem (strong Direct Officer (Authority) / Seven Killings (Authority))</strong> — use the first 1–2 years to set up systems rather than scale headcount.</li>
+<li><strong>Activated chart-punishment or self-punishment patterns during the launch year</strong> — keep partnerships small and written, not verbal.</li>
+<li><strong>Conjunction of new-moon or full-moon eclipses falling on spouse-palace or wealth-stem branches</strong> — defer the launch by 30–45 days if it lands on the public date.</li>
+</ol>
+<hr />
+<h2>Timing: Major Luck &amp; Annual Windows</h2>
+<p><strong>Luck direction:</strong> backward, retracing from the month pillar — derived from a yang year stem (Gyeong) and female gender, per the classical rule (yang year + male, or yin year + female → forward; otherwise backward).</p>
+<p><strong>starting age:</strong> ~3.2 (~9.7 days to the qualifying solar term ÷ 3, per 's &quot;3 days = 1 year&quot; rule) — the first major-luck period begins roughly 39 months after birth (≈ Sep 1993), inside the <strong>3-12</strong> decade label shown below, not precisely at its first birthday; each later period changes over at the same point in the year. Korean manseryeok (Korean perpetual calendar) apps round this to a whole <strong>Major Luck Water 3</strong> and list decades as 3, 13, 23… (often in Korean age), so their labels can differ from the table below by a year or so while describing the same periods.</p>
+<h3>Major Luck Periods</h3>
+<table>
+<thead>
+<tr>
+<th>Age</th>
+<th>Pillar</th>
+<th>Elements (Stem / Branch)</th>
+<th>Ten-God</th>
+<th>Career Theme</th>
+<th>Relationship Theme</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3-12</td>
+<td>Sin Sa</td>
+<td>Metal / Fire</td>
+<td>Companion (Pillar)</td>
+<td>peer-driven or self-defined work (mixed — protect, don't overcommit)</td>
+<td>friendship-based or peer dynamic</td>
+</tr>
+<tr>
+<td>13-22</td>
+<td>Gyeong Jin</td>
+<td>Metal / Earth</td>
+<td>Robber (Rob Wealth)</td>
+<td>peer-driven or self-defined work (mixed — protect, don't overcommit)</td>
+<td>friendship-based or peer dynamic</td>
+</tr>
+<tr>
+<td>23-32</td>
+<td>Gi Myo</td>
+<td>Earth / Wood</td>
+<td>Indirect Resource</td>
+<td>study, mentorship, or skill-building</td>
+<td>nurturing, support, or healing connection</td>
+</tr>
+<tr>
+<td>33-42</td>
+<td>Mu In</td>
+<td>Earth / Wood</td>
+<td>Direct Resource</td>
+<td>study, mentorship, or skill-building</td>
+<td>nurturing, support, or healing connection</td>
+</tr>
+<tr>
+<td>43-52</td>
+<td>Jeong Chuk</td>
+<td>Fire / Earth</td>
+<td>Seven Killings</td>
+<td>structured career moves; credentials matter</td>
+<td>commitment or formalization themes</td>
+</tr>
+<tr>
+<td>53-62</td>
+<td>Bing Ja</td>
+<td>Fire / Water</td>
+<td>Direct Officer</td>
+<td>structured career moves; credentials matter</td>
+<td>commitment or formalization themes</td>
+</tr>
+<tr>
+<td>63-72</td>
+<td>Eul Hae</td>
+<td>Wood / Water</td>
+<td>Indirect Wealth</td>
+<td>income, assets, or value-creation themes</td>
+<td>shared resources or lifestyle alignment</td>
+</tr>
+<tr>
+<td>73-82</td>
+<td>Gap Sul</td>
+<td>Wood / Earth</td>
+<td>Direct Wealth</td>
+<td>income, assets, or value-creation themes</td>
+<td>shared resources or lifestyle alignment</td>
+</tr>
+</tbody>
+</table>
+<h3>Current Period Deep-Dive</h3>
+<p>This decade carries a <strong>Direct Resource</strong> ten-god over a <strong>Wood</strong> branch — a clearly favorable window for visible wins. The stem ten-god is the <em>outer theme</em> — what the world sees and asks of the querent — while the branch element is the <em>underlying terrain</em> — the quieter emotional and circumstantial backdrop. Read them together rather than separately; mismatches between outer theme and inner terrain are where this decade is most likely to surprise.</p>
+<p>Specifically: <strong>do</strong> push visible projects, plant seeds, and request what is owed; <strong>avoid</strong> starting too many things at once. Within this decade, years and months whose stem element matches the favorable <strong>Fire</strong> energy are the cleanest moments for major commitments; the annual windows table below shows them. Years dominated by the unfavorable element are best used for rest, review, and quiet preparation.</p>
+<p>Structurally, its <strong>In</strong> punishes (punishment) your natal <strong>Sa</strong>; its stem <strong>Mu</strong> combines with your natal <strong>Gye</strong> (Mu-Gye Fire combination), tying up what that stem represents.</p>
+<h3>10-Year Forecast</h3>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Pillar</th>
+<th>Annual Ten-God</th>
+<th>Overall Theme</th>
+<th>Best Uses</th>
+<th>Watch Out For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026</td>
+<td>Bing O</td>
+<td>Direct Officer</td>
+<td>Fire energy + Direct Officer — a favorable-element year.</td>
+<td>career moves, credentials, formal commitments</td>
+<td>stubborn authority clashes; avoid ego fights</td>
+</tr>
+<tr>
+<td>2027</td>
+<td>Jeong Mi</td>
+<td>Seven Killings</td>
+<td>Fire/Earth energy + Seven Killings — a favorable-element year.</td>
+<td>career moves, credentials, formal commitments</td>
+<td>stubborn authority clashes; avoid ego fights</td>
+</tr>
+<tr>
+<td>2028</td>
+<td>Mu Shin</td>
+<td>Direct Resource</td>
+<td>Earth/Metal energy + Direct Resource — a challenging-element year.</td>
+<td>study, mentorship, rest, skill-building</td>
+<td>over-isolation or missed opportunities; the Metal element drains rather than feeds — slow down</td>
+</tr>
+<tr>
+<td>2029</td>
+<td>Gi Yu</td>
+<td>Indirect Resource</td>
+<td>Earth/Metal energy + Indirect Resource — a challenging-element year.</td>
+<td>study, mentorship, rest, skill-building</td>
+<td>over-isolation or missed opportunities; the Metal element drains rather than feeds — slow down</td>
+</tr>
+<tr>
+<td>2030</td>
+<td>Gyeong Sul</td>
+<td>Robber</td>
+<td>Metal/Earth energy + Robber — a challenging-element year.</td>
+<td>peer projects, friendships, self-definition</td>
+<td>comparison and competition with peers; the Metal element drains rather than feeds — slow down</td>
+</tr>
+<tr>
+<td>2031</td>
+<td>Sin Hae</td>
+<td>Companion</td>
+<td>Metal/Water energy + Companion — a challenging-element year.</td>
+<td>peer projects, friendships, self-definition</td>
+<td>comparison and competition with peers; the Metal element drains rather than feeds — slow down</td>
+</tr>
+<tr>
+<td>2032</td>
+<td>Im Ja</td>
+<td>Hurting Officer</td>
+<td>Water energy + Hurting Officer — a mixed year.</td>
+<td>creative production, writing, speaking, teaching</td>
+<td>speaking before thinking; reputation risk; a neutral year for this chart — steady maintenance over big pushes</td>
+</tr>
+<tr>
+<td>2033</td>
+<td>Gye Chuk</td>
+<td>Eating God</td>
+<td>Water/Earth energy + Eating God — a mixed year.</td>
+<td>creative production, writing, speaking, teaching</td>
+<td>speaking before thinking; reputation risk; a neutral year for this chart — steady maintenance over big pushes</td>
+</tr>
+<tr>
+<td>2034</td>
+<td>Gap In</td>
+<td>Direct Wealth</td>
+<td>Wood energy + Direct Wealth — a supporting-element year.</td>
+<td>income launches, negotiations, value-pricing</td>
+<td>over-leveraging or risky investments</td>
+</tr>
+<tr>
+<td>2035</td>
+<td>Eul Myo</td>
+<td>Indirect Wealth</td>
+<td>Wood energy + Indirect Wealth — a supporting-element year.</td>
+<td>income launches, negotiations, value-pricing</td>
+<td>over-leveraging or risky investments</td>
+</tr>
+</tbody>
+</table>
+<h3>Year-by-Year Notes</h3>
+<p>A quick reading of each year's energy relative to your Day Master and favorable element. Treat these as timing cues, not predictions.</p>
+<ul>
+<li><strong>2026 · Bing O (Direct Officer):</strong> This is a <strong>favorable-element (Fire) year</strong> — best focused on responsibility, structure, and recognition within institutions. Caution: watch for pressure, scrutiny, and stress from obligations; pace yourself rather than pushing through. Also active this year: the annual stem <strong>Bing</strong> forms <strong>Byeong-Sin Water combination (Bing Sin combination Water)</strong> with your Day Master, activating Water; the annual stem <strong>Bing</strong> clashes with your natal <strong>Im</strong> in a <strong>stem clash</strong> — pressure or abrupt change in what that stem represents; the annual branch <strong>O</strong> and natal <strong>O</strong> are in <strong>self-punishment</strong>; the annual branch <strong>O</strong> half-completes the <strong>Sa O Mi Fire / South</strong> with your natal <strong>Sa</strong> — Half Harmony.</li>
+<li><strong>2027 · Jeong Mi (Seven Killings):</strong> This is a <strong>favorable-element (Fire) year</strong> — best focused on responsibility, structure, and recognition within institutions. Caution: watch for pressure, scrutiny, and stress from obligations; pace yourself rather than pushing through. Also active this year: the annual stem <strong>Jeong</strong> forms <strong>Jeong-Im Wood combination (Jeong Im combination Wood)</strong> with your natal <strong>Im</strong> stem, drawing it toward Wood; the annual stem <strong>Jeong</strong> clashes with your natal <strong>Gye</strong> in a <strong>stem clash</strong> — pressure or abrupt change in what that stem represents; the annual branch <strong>Mi</strong> and natal <strong>O</strong> are in <strong>combination</strong>; the annual branch <strong>Mi</strong> half-completes the <strong>Hae Myo Mi Wood</strong> with your natal <strong>Hae</strong> — Half Harmony; the annual branch <strong>Mi</strong> completes the <strong>Sa O Mi Fire / South</strong> with your natal <strong>Sa O</strong>.</li>
+<li><strong>2028 · Mu Shin (Direct Resource):</strong> This is a year of your <strong>challenging element (Metal)</strong> — navigate it consciously — best focused on learning, credentials, and support from mentors. Caution: watch for passivity or leaning too heavily on others; pace yourself rather than pushing through. Also active this year: the annual stem <strong>Mu</strong> forms <strong>Mu-Gye Fire combination (Mu Gye combination Fire)</strong> with your natal <strong>Gye</strong> stem, drawing it toward Fire; the annual branch <strong>Shin</strong> and natal <strong>Hae</strong> are in <strong>harm</strong>; the annual branch <strong>Shin</strong> and natal <strong>Sa</strong> are in <strong>combination</strong>; the annual branch <strong>Shin</strong> and natal <strong>Sa</strong> are in <strong>break</strong>; the annual branch <strong>Shin</strong> and natal <strong>Sa</strong> are in <strong>punishment</strong>.</li>
+<li><strong>2029 · Gi Yu (Indirect Resource):</strong> This is a year of your <strong>challenging element (Metal)</strong> — navigate it consciously — best focused on learning, credentials, and support from mentors. Caution: watch for passivity or leaning too heavily on others; pace yourself rather than pushing through. Also active this year: the annual branch <strong>Yu</strong> half-completes the <strong>Sa Yu Chuk Metal</strong> with your natal <strong>Sa</strong> — Half Harmony.</li>
+<li><strong>2030 · Gyeong Sul (Robber):</strong> This is a year of your <strong>challenging element (Metal)</strong> — navigate it consciously — best focused on independent initiative, peers, and collaboration on equal terms. Caution: watch for competition and friction over shared money; pace yourself rather than pushing through. Also active this year: the annual branch <strong>Sul</strong> half-completes the <strong>In O Sul Fire</strong> with your natal <strong>O</strong> — Half Harmony.</li>
+<li><strong>2031 · Sin Hae (Companion):</strong> This is a year of your <strong>challenging element (Metal)</strong> — navigate it consciously — best focused on independent initiative, peers, and collaboration on equal terms. Caution: watch for competition and friction over shared money; pace yourself rather than pushing through. Also active this year: the annual branch <strong>Hae</strong> and natal <strong>Hae</strong> are in <strong>self-punishment</strong>; the annual branch <strong>Hae</strong> and natal <strong>Sa</strong> are in <strong>clash</strong>.</li>
+<li><strong>2032 · Im Ja (Hurting Officer):</strong> This is an annual energy to navigate consciously — best focused on expression, creative work, and putting your skills on show. Caution: watch for over-extending yourself or clashing with authority; pace yourself rather than pushing through. Also active this year: the annual branch <strong>Ja</strong> and natal <strong>O</strong> are in <strong>clash</strong>; the annual branch <strong>Ja</strong> half-completes the <strong>Hae Ja Chuk Water / North</strong> with your natal <strong>Hae</strong> — Half Harmony.</li>
+<li><strong>2033 · Gye Chuk (Eating God):</strong> This is an annual energy to navigate consciously — best focused on expression, creative work, and putting your skills on show. Caution: watch for over-extending yourself or clashing with authority; pace yourself rather than pushing through. Also active this year: the annual branch <strong>Chuk</strong> and natal <strong>O</strong> are in <strong>harm</strong>; the annual branch <strong>Chuk</strong> half-completes the <strong>Sa Yu Chuk Metal</strong> with your natal <strong>Sa</strong> — Half Harmony; the annual branch <strong>Chuk</strong> half-completes the <strong>Hae Ja Chuk Water / North</strong> with your natal <strong>Hae</strong> — Half Harmony.</li>
+<li><strong>2034 · Gap In (Direct Wealth):</strong> This is a <strong>supporting-element (Wood) year</strong> — best focused on income, practical projects, and managing resources. Caution: watch for overreaching or spreading resources too thin; pace yourself rather than pushing through. Also active this year: the annual stem <strong>Gap</strong> clashes with your natal <strong>Gyeong</strong> in a <strong>stem clash</strong> — pressure or abrupt change in what that stem represents; the annual branch <strong>In</strong> and natal <strong>Hae</strong> are in <strong>combination</strong>; the annual branch <strong>In</strong> and natal <strong>Hae</strong> are in <strong>break</strong>; the annual branch <strong>In</strong> and natal <strong>Sa</strong> are in <strong>harm</strong>; the annual branch <strong>In</strong> and natal <strong>Sa</strong> are in <strong>punishment</strong>; the annual branch <strong>In</strong> half-completes the <strong>In O Sul Fire</strong> with your natal <strong>O</strong> — Half Harmony. 2034 falls in your chart's Void — a void year (In is empty for your day pillar): what it brings may feel less solid, so confirm and document gains rather than assuming they will hold.</li>
+<li><strong>2035 · Eul Myo (Indirect Wealth):</strong> This is a <strong>supporting-element (Wood) year</strong> — best focused on income, practical projects, and managing resources. Caution: watch for overreaching or spreading resources too thin; pace yourself rather than pushing through. Also active this year: the annual stem <strong>Eul</strong> forms <strong>Eul-Gyeong Metal combination (Eul Gyeong combination Metal)</strong> with your natal <strong>Gyeong</strong> stem, drawing it toward Metal; the annual stem <strong>Eul</strong> clashes with your natal <strong>Sin</strong> in a <strong>stem clash</strong> — pressure or abrupt change in what that stem represents; the annual branch <strong>Myo</strong> and natal <strong>O</strong> are in <strong>break</strong>; the annual branch <strong>Myo</strong> half-completes the <strong>Hae Myo Mi Wood</strong> with your natal <strong>Hae</strong> — Half Harmony. 2035 falls in your chart's Void — a void year (Myo is empty for your day pillar): what it brings may feel less solid, so confirm and document gains rather than assuming they will hold.</li>
+</ul>
+<blockquote>
+<p><strong>In plain words:</strong> You are currently in a tailwind decade — a good stretch to push on the things that matter. Zoom in with the year and month windows that carry Fire.</p>
+</blockquote>
+<hr />
+<h2>Life Themes by Major Luck Period</h2>
+<p>Each 10-year major-luck (Major Luck) period brings a new stem and branch into prominence. The stem shows the outer theme through its Ten Gods relationship to your Day Master; the branch shows the stage of life and the underlying terrain. Read these as tendencies, not fixed events.</p>
+<h3>Ages 3–12: Sin Sa</h3>
+<ul>
+<li><strong>Ten-God theme:</strong> Companion (Pillar)</li>
+<li><strong>Branch element &amp; 12-stage:</strong> Fire · Death</li>
+<li><strong>Favorable lean:</strong> neutral</li>
+</ul>
+<p>With a <strong>Companion (Pillar)</strong> ten-god over a <strong>Fire</strong> branch (stem element Metal), this is a transition and adapt decade. Use the mixed energy to refine skills and reposition rather than to launch new ventures. Years where the stem element matches the favorable <strong>Fire</strong> energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same <strong>Companion (Pillar)</strong> undertow — themes of peer dynamics, independence, and friendship-based bonds are likely. The favorable <strong>Fire</strong> element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.</p>
+<h3>Ages 13–22: Gyeong Jin</h3>
+<ul>
+<li><strong>Ten-God theme:</strong> Robber (Rob Wealth)</li>
+<li><strong>Branch element &amp; 12-stage:</strong> Earth · Tomb</li>
+<li><strong>Favorable lean:</strong> unfavorable</li>
+</ul>
+<p>With a <strong>Robber (Rob Wealth)</strong> ten-god over a <strong>Earth</strong> branch (stem element Metal), this is a conserve and consolidate decade. Protect what already works; defer large bets and focus on craft and relationships. Years where the stem element matches the favorable <strong>Fire</strong> energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same <strong>Robber (Rob Wealth)</strong> undertow — themes of peer dynamics, independence, and friendship-based bonds are likely. The favorable <strong>Fire</strong> element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.</p>
+<h3>Ages 23–32: Gi Myo</h3>
+<ul>
+<li><strong>Ten-God theme:</strong> Indirect Resource</li>
+<li><strong>Branch element &amp; 12-stage:</strong> Wood · Cutoff (Extinction)</li>
+<li><strong>Favorable lean:</strong> favorable</li>
+</ul>
+<p>With a <strong>Indirect Resource</strong> ten-god over a <strong>Wood</strong> branch (stem element Earth), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable <strong>Fire</strong> energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same <strong>Indirect Resource</strong> undertow — themes of support and study are likely. The favorable <strong>Fire</strong> element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.</p>
+<h3>Ages 33–42: Mu In</h3>
+<ul>
+<li><strong>Ten-God theme:</strong> Direct Resource</li>
+<li><strong>Branch element &amp; 12-stage:</strong> Wood · Embryo</li>
+<li><strong>Favorable lean:</strong> favorable</li>
+</ul>
+<p>With a <strong>Direct Resource</strong> ten-god over a <strong>Wood</strong> branch (stem element Earth), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable <strong>Fire</strong> energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same <strong>Direct Resource</strong> undertow — themes of support and study are likely. The favorable <strong>Fire</strong> element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.</p>
+<h3>Ages 43–52: Jeong Chuk</h3>
+<ul>
+<li><strong>Ten-God theme:</strong> Seven Killings</li>
+<li><strong>Branch element &amp; 12-stage:</strong> Earth · Nurturing (nurture)</li>
+<li><strong>Favorable lean:</strong> favorable</li>
+</ul>
+<p>With a <strong>Seven Killings</strong> ten-god over a <strong>Earth</strong> branch (stem element Fire), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable <strong>Fire</strong> energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same <strong>Seven Killings</strong> undertow — themes of commitment and visibility are likely. The favorable <strong>Fire</strong> element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.</p>
+<h3>Ages 53–62: Bing Ja</h3>
+<ul>
+<li><strong>Ten-God theme:</strong> Direct Officer</li>
+<li><strong>Branch element &amp; 12-stage:</strong> Water · Long Life</li>
+<li><strong>Favorable lean:</strong> favorable</li>
+</ul>
+<p>With a <strong>Direct Officer</strong> ten-god over a <strong>Water</strong> branch (stem element Fire), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable <strong>Fire</strong> energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same <strong>Direct Officer</strong> undertow — themes of commitment and visibility are likely. The favorable <strong>Fire</strong> element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.</p>
+<h3>Ages 63–72: Eul Hae</h3>
+<ul>
+<li><strong>Ten-God theme:</strong> Indirect Wealth</li>
+<li><strong>Branch element &amp; 12-stage:</strong> Water · Bathing (bathe bath)</li>
+<li><strong>Favorable lean:</strong> favorable</li>
+</ul>
+<p>With a <strong>Indirect Wealth</strong> ten-god over a <strong>Water</strong> branch (stem element Wood), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable <strong>Fire</strong> energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same <strong>Indirect Wealth</strong> undertow — themes of commitment and visibility are likely. The favorable <strong>Fire</strong> element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.</p>
+<h3>Ages 73–82: Gap Sul</h3>
+<ul>
+<li><strong>Ten-God theme:</strong> Direct Wealth</li>
+<li><strong>Branch element &amp; 12-stage:</strong> Earth · Coming of Age (crown belt)</li>
+<li><strong>Favorable lean:</strong> favorable</li>
+</ul>
+<p>With a <strong>Direct Wealth</strong> ten-god over a <strong>Earth</strong> branch (stem element Wood), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable <strong>Fire</strong> energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same <strong>Direct Wealth</strong> undertow — themes of commitment and visibility are likely. The favorable <strong>Fire</strong> element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.</p>
+<hr />
+<h2>Lifetime Decade Roadmap</h2>
+<p>A single-glance view of all 8 major-luck periods in your life and the favorable lean of each. Green segments are clearly favorable, amber are mixed, red lean toward challenge. Treat this as a rhythm, not a verdict — the supporting-element periods are often where the most important growth quietly happens.</p>
+<!-- decade-roadmap:start -->
+<div class="decade-roadmap no-break">
+<svg viewBox="0 0 720 104" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Lifetime decade roadmap">
+  <text x="20" y="22" font-size="13" font-weight="bold" fill="#2a4d6e" font-family="Helvetica,Arial,sans-serif">Lifetime Decade Roadmap</text>
+  <rect x="20.0" y="34" width="81.5" height="28" fill="#f39c12" rx="3"><title>Sin Sa · neutral</title></rect>
+  <text x="60.8" y="52.0" text-anchor="middle" font-size="11" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">Sin Sa</text>
+  <rect x="105.5" y="34" width="81.5" height="28" fill="#c0392b" rx="3"><title>Gyeong Jin · challenging</title></rect>
+  <text x="146.2" y="52.0" text-anchor="middle" font-size="11" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">Gyeong Jin</text>
+  <rect x="191.0" y="34" width="81.5" height="28" fill="#27ae60" rx="3"><title>Gi Myo · favorable</title></rect>
+  <text x="231.8" y="52.0" text-anchor="middle" font-size="11" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">Gi Myo</text>
+  <rect x="276.5" y="34" width="81.5" height="28" fill="#27ae60" rx="3"><title>Mu In · favorable</title></rect>
+  <text x="317.2" y="52.0" text-anchor="middle" font-size="11" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">Mu In</text>
+  <rect x="362.0" y="34" width="81.5" height="28" fill="#27ae60" rx="3"><title>Jeong Chuk · favorable</title></rect>
+  <text x="402.8" y="52.0" text-anchor="middle" font-size="11" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">Jeong Chuk</text>
+  <rect x="447.5" y="34" width="81.5" height="28" fill="#27ae60" rx="3"><title>Bing Ja · favorable</title></rect>
+  <text x="488.2" y="52.0" text-anchor="middle" font-size="11" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">Bing Ja</text>
+  <rect x="533.0" y="34" width="81.5" height="28" fill="#27ae60" rx="3"><title>Eul Hae · favorable</title></rect>
+  <text x="573.8" y="52.0" text-anchor="middle" font-size="11" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">Eul Hae</text>
+  <rect x="618.5" y="34" width="81.5" height="28" fill="#27ae60" rx="3"><title>Gap Sul · favorable</title></rect>
+  <text x="659.2" y="52.0" text-anchor="middle" font-size="11" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">Gap Sul</text>
+  <text x="60.8" y="74" text-anchor="middle" font-size="10" fill="#666666" font-family="Helvetica,Arial,sans-serif">3–12</text>
+  <text x="146.2" y="74" text-anchor="middle" font-size="10" fill="#666666" font-family="Helvetica,Arial,sans-serif">13–22</text>
+  <text x="231.8" y="74" text-anchor="middle" font-size="10" fill="#666666" font-family="Helvetica,Arial,sans-serif">23–32</text>
+  <text x="317.2" y="74" text-anchor="middle" font-size="10" fill="#666666" font-family="Helvetica,Arial,sans-serif">33–42</text>
+  <text x="402.8" y="74" text-anchor="middle" font-size="10" fill="#666666" font-family="Helvetica,Arial,sans-serif">43–52</text>
+  <text x="488.2" y="74" text-anchor="middle" font-size="10" fill="#666666" font-family="Helvetica,Arial,sans-serif">53–62</text>
+  <text x="573.8" y="74" text-anchor="middle" font-size="10" fill="#666666" font-family="Helvetica,Arial,sans-serif">63–72</text>
+  <text x="659.2" y="74" text-anchor="middle" font-size="10" fill="#666666" font-family="Helvetica,Arial,sans-serif">73–82</text>
+  <rect x="20.0" y="77" width="12" height="12" fill="#27ae60" rx="2"/>
+  <text x="38.0" y="87" font-size="11" fill="#444444" font-family="Helvetica,Arial,sans-serif">Favorable</text>
+  <rect x="122.0" y="77" width="12" height="12" fill="#f39c12" rx="2"/>
+  <text x="140.0" y="87" font-size="11" fill="#444444" font-family="Helvetica,Arial,sans-serif">Neutral</text>
+  <rect x="208.0" y="77" width="12" height="12" fill="#c0392b" rx="2"/>
+  <text x="226.0" y="87" font-size="11" fill="#444444" font-family="Helvetica,Arial,sans-serif">Challenging</text>
+</svg>
+</div>
+<!-- decade-roadmap:end -->
+<hr />
+<h2>Auspicious Dates — Next 90 Days</h2>
+<blockquote>
+<p>The next 90-day window from June 2026 includes the following candidate dates — each one's day-stem element matches your favorable (Fire) or supporting (Wood) element, and its day-branch does not clash, harm, or break your natal day branch (Hae) or hour branch (Sa). A qualified reader should still cross-check each date against the querent's specific question and local calendar before recommending it.</p>
+</blockquote>
+<blockquote>
+<p><strong>Almanac caveat:</strong> this is a chart-relative shortlist, not a finished auspicious-date selection — a full date selection also weighs the day's own twelve day-officers/28Water almanac assignment, the specific event type, and local custom, none of which this engine computes.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Day Pillar</th>
+<th>Suggested Use / Reader Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026-06-02 (Tuesday)</td>
+<td>Jeong Mi (Seven Killings)</td>
+<td>A reasonable candidate — the day-stem carries your favorable element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-06-10 (Wednesday)</td>
+<td>Eul Myo (Indirect Wealth)</td>
+<td>A reasonable candidate — the day-stem carries your supporting element (Wood) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-06-11 (Thursday)</td>
+<td>Bing Jin (Direct Officer)</td>
+<td>A reasonable candidate — the day-stem carries your favorable element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-06-19 (Friday)</td>
+<td>Gap Ja (Direct Wealth)</td>
+<td>A reasonable candidate — the day-stem carries your supporting element (Wood) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-06-20 (Saturday)</td>
+<td>Eul Chuk (Indirect Wealth)</td>
+<td>A reasonable candidate — the day-stem carries your supporting element (Wood) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-06-22 (Monday)</td>
+<td>Jeong Myo (Seven Killings)</td>
+<td>A reasonable candidate — the day-stem carries your favorable element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-06-29 (Monday)</td>
+<td>Gap Sul (Direct Wealth)</td>
+<td>A reasonable candidate — the day-stem carries your supporting element (Wood) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-07-01 (Wednesday)</td>
+<td>Bing Ja (Direct Officer)</td>
+<td>A reasonable candidate — the day-stem carries your favorable element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-07-02 (Thursday)</td>
+<td>Jeong Chuk (Seven Killings)</td>
+<td>A reasonable candidate — the day-stem carries your favorable element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-07-10 (Friday)</td>
+<td>Eul Yu (Indirect Wealth)</td>
+<td>A reasonable candidate — the day-stem carries your supporting element (Wood) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-07-11 (Saturday)</td>
+<td>Bing Sul (Direct Officer)</td>
+<td>A reasonable candidate — the day-stem carries your favorable element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-07-19 (Sunday)</td>
+<td>Gap O (Direct Wealth)</td>
+<td>A reasonable candidate — the day-stem carries your supporting element (Wood) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-07-20 (Monday)</td>
+<td>Eul Mi (Indirect Wealth)</td>
+<td>A reasonable candidate — the day-stem carries your supporting element (Wood) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-07-22 (Wednesday)</td>
+<td>Jeong Yu (Seven Killings)</td>
+<td>A reasonable candidate — the day-stem carries your favorable element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-07-29 (Wednesday)</td>
+<td>Gap Jin (Direct Wealth)</td>
+<td>A reasonable candidate — the day-stem carries your supporting element (Wood) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-07-31 (Friday)</td>
+<td>Bing O (Direct Officer)</td>
+<td>A reasonable candidate — the day-stem carries your favorable element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-08-01 (Saturday)</td>
+<td>Jeong Mi (Seven Killings)</td>
+<td>A reasonable candidate — the day-stem carries your favorable element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-08-09 (Sunday)</td>
+<td>Eul Myo (Indirect Wealth)</td>
+<td>A reasonable candidate — the day-stem carries your supporting element (Wood) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-08-10 (Monday)</td>
+<td>Bing Jin (Direct Officer)</td>
+<td>A reasonable candidate — the day-stem carries your favorable element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-08-18 (Tuesday)</td>
+<td>Gap Ja (Direct Wealth)</td>
+<td>A reasonable candidate — the day-stem carries your supporting element (Wood) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-08-19 (Wednesday)</td>
+<td>Eul Chuk (Indirect Wealth)</td>
+<td>A reasonable candidate — the day-stem carries your supporting element (Wood) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-08-21 (Friday)</td>
+<td>Jeong Myo (Seven Killings)</td>
+<td>A reasonable candidate — the day-stem carries your favorable element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-08-28 (Friday)</td>
+<td>Gap Sul (Direct Wealth)</td>
+<td>A reasonable candidate — the day-stem carries your supporting element (Wood) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+<tr>
+<td>2026-08-30 (Sunday)</td>
+<td>Bing Ja (Direct Officer)</td>
+<td>A reasonable candidate — the day-stem carries your favorable element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Health &amp; Vitality — Deep-Dive</h2>
+<h3>Element Story</h3>
+<p>This chart's element balance shows <strong>Water (37.5%)</strong> as the most present element and <strong>Wood (3.1%)</strong> as the least. Energy tends to <strong>accumulate and congest</strong> in the Water domain; a balanced day feels like quiet movement between input, processing, and release. The Wood system is the most likely leak point — under-supported and easy to neglect — and the easiest place to begin rebuilding through the favorable element's practices.</p>
+<h3>Body-System Map</h3>
+<ul>
+<li><strong>Excess system (Water):</strong> kidney/bladder and hormonal/endocrine reserves — watch for signs of over-activity or congestion.</li>
+<li><strong>Deficient system (Wood):</strong> liver/gall bladder and nervous system — gentle rebuilding over time is usually better than forceful stimulation.</li>
+</ul>
+<h3>Stress Signature</h3>
+<p>When this chart goes out of balance, the most common early signals are: grief that surfaces unbidden, skin or respiratory sensitivity, and rigid perfectionism. With a Balanced reading, the early signs are more emotional than physical — irritability, detachment, or perfectionism show up before the body signals.</p>
+<h3>Recovery Toolkit</h3>
+<p><strong>Favorable-element practices (Fire):</strong></p>
+<ul>
+<li>midday sunlight exposure (10–15 minutes)</li>
+<li>a creative project with a visible output each week</li>
+<li>a shared meal with company</li>
+<li>a daily moment of celebration or laughter
+<strong>Day-Master practice (Metal):</strong> Refine what is already there. Metal recovers through editing, polishing, and small precision.</li>
+</ul>
+<h3>Long-Term Vitality Strategy</h3>
+<p><strong>Renewal windows</strong> — the chart's energy supports new health practices and increased capacity during: ages 23-32 (Gi Myo), ages 33-42 (Mu In), ages 43-52 (Jeong Chuk). Use these decades to build resilience.</p>
+<p><strong>Conservation windows</strong> — the chart asks for gentler practice during: ages 13-22 (Gyeong Jin). Reduce load, deepen recovery, and avoid starting ambitious new regimens in these years.</p>
+<p>Across all periods, the <strong>Fire</strong> element's daily practices (its season, foods, colors, and rhythms) are the simplest and most reliable countermeasure — small daily inputs compound more than occasional heroic efforts.</p>
+<hr />
+<h2>Monthly Lucky Dates</h2>
+<p>The next <strong>12 months</strong> of favorable days, selected when the daily stem element matches your <strong>Fire</strong> or <strong>Wood</strong> element and the day branch does not clash, harm, or break your natal day or hour branch.</p>
+<blockquote>
+<p><em>Methodology: each row filters the daily-luck (Daily Luck) stems to those whose element matches your favorable or supporting element, then drops any day whose branch clashes, harms, or breaks against your natal day or hour branch.</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Almanac caveat:</strong> this is a chart-relative shortlist, not a finished date selection — a full date selection also weighs the day's own almanac assignment, the specific event type, and local custom.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Month</th>
+<th>Favorable Dates</th>
+<th>Energy Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>June 2026</td>
+<td>2, 10, 11, 19, 20, 22, 29</td>
+<td>Jeong Mi (Seven Killings) / Eul Myo (Indirect Wealth) / Bing Jin (Direct Officer)</td>
+</tr>
+<tr>
+<td>July 2026</td>
+<td>1, 2, 10, 11, 19, 20, 22, 29, 31</td>
+<td>Bing Ja (Direct Officer) / Jeong Chuk (Seven Killings) / Eul Yu (Indirect Wealth)</td>
+</tr>
+<tr>
+<td>August 2026</td>
+<td>1, 9, 10, 18, 19, 21, 28, 30, 31</td>
+<td>Jeong Mi (Seven Killings) / Eul Myo (Indirect Wealth) / Bing Jin (Direct Officer)</td>
+</tr>
+<tr>
+<td>September 2026</td>
+<td>8, 9, 17, 18, 20, 27, 29, 30</td>
+<td>Eul Yu (Indirect Wealth) / Bing Sul (Direct Officer) / Gap O (Direct Wealth)</td>
+</tr>
+<tr>
+<td>October 2026</td>
+<td>8, 9, 17, 18, 20, 27, 29, 30</td>
+<td>Eul Myo (Indirect Wealth) / Bing Jin (Direct Officer) / Gap Ja (Direct Wealth)</td>
+</tr>
+<tr>
+<td>November 2026</td>
+<td>7, 8, 16, 17, 19, 26, 28, 29</td>
+<td>Eul Yu (Indirect Wealth) / Bing Sul (Direct Officer) / Gap O (Direct Wealth)</td>
+</tr>
+<tr>
+<td>December 2026</td>
+<td>7, 8, 16, 17, 19, 26, 28, 29</td>
+<td>Eul Myo (Indirect Wealth) / Bing Jin (Direct Officer) / Gap Ja (Direct Wealth)</td>
+</tr>
+<tr>
+<td>January 2027</td>
+<td>6, 7, 15, 16, 18, 25, 27, 28</td>
+<td>Eul Yu (Indirect Wealth) / Bing Sul (Direct Officer) / Gap O (Direct Wealth)</td>
+</tr>
+<tr>
+<td>February 2027</td>
+<td>5, 6, 14, 15, 17, 24, 26, 27</td>
+<td>Eul Myo (Indirect Wealth) / Bing Jin (Direct Officer) / Gap Ja (Direct Wealth)</td>
+</tr>
+<tr>
+<td>March 2027</td>
+<td>7, 8, 16, 17, 19, 26, 28, 29</td>
+<td>Eul Yu (Indirect Wealth) / Bing Sul (Direct Officer) / Gap O (Direct Wealth)</td>
+</tr>
+<tr>
+<td>April 2027</td>
+<td>6, 7, 15, 16, 18, 25, 27, 28</td>
+<td>Eul Myo (Indirect Wealth) / Bing Jin (Direct Officer) / Gap Ja (Direct Wealth)</td>
+</tr>
+<tr>
+<td>May 2027</td>
+<td>6, 7, 15, 16, 18, 25, 27, 28</td>
+<td>Eul Yu (Indirect Wealth) / Bing Sul (Direct Officer) / Gap O (Direct Wealth)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><em>For business-critical decisions, confirm the chosen date against the specific action type and consult a qualified reader.</em></p>
+</blockquote>
+<hr />
+<h2>Practical Guidance Summary</h2>
+<h3>Top 5 Strengths</h3>
+<ul>
+<li><strong>Metal Day Master strength</strong> — refined discernment and the ability to notice quality others miss.</li>
+<li><strong>Seven Killings-dominant</strong> — the ability to act decisively under pressure.</li>
+<li><strong>Indirect Resource-dominant</strong> — the ability to synthesize across domains and see patterns.</li>
+<li><strong>Favorable Fire responsiveness</strong> — the chart has a clear lever for growth, which not every chart does.</li>
+<li><strong>Steady practice</strong> — the chart rewards consistent effort over heroic bursts.</li>
+</ul>
+<h3>Top 5 Growth Areas</h3>
+<ul>
+<li><strong>Consistency over intensity</strong> — the chart works best with steady rhythm, not bursts.</li>
+<li><strong>Rest before the body demands it</strong> — balanced charts deplete quietly; preventive rest is the antidote.</li>
+<li><strong>Boundary-setting</strong> — learning to say no without guilt protects the Metal Day Master's energy.</li>
+<li><strong>Working with the unfavorable Metal element</strong> — denial amplifies it; conscious engagement contains it.</li>
+<li><strong>Asking for help early</strong> — Metal Day Masters often wait too long before reaching out.</li>
+</ul>
+<h3>5 Practical Recommendations</h3>
+<ul>
+<li>Take a 15-minute midday sunlight break daily</li>
+<li>Schedule one visible creative project each month</li>
+<li>Share a meal with company once a week</li>
+<li>Practice a daily moment of celebration or laughter</li>
+<li>Speak in public or present at least once a quarter</li>
+</ul>
+<h3>Lucky Attributes — Your Favorable Element Reference Card</h3>
+<div class="lucky-attributes">
+<div class="lucky-attribute-item"><div class="label">Element:</div><div class="value">Fire</div></div>
+<div class="lucky-attribute-item"><div class="label">Colors:</div><div class="value">red, orange, crimson</div></div>
+<div class="lucky-attribute-item"><div class="label">Direction:</div><div class="value">south</div></div>
+<div class="lucky-attribute-item"><div class="label">Numbers:</div><div class="value">2, 7</div></div>
+<div class="lucky-attribute-item"><div class="label">Season:</div><div class="value">summer</div></div>
+<div class="lucky-attribute-item"><div class="label">Gemstones (modern, optional):</div><div class="value">ruby, garnet, carnelian, red jasper</div></div>
+<div class="lucky-attribute-item"><div class="label">Foods:</div><div class="value">bitter greens, red-colored vegetables, warm foods, light spices</div></div>
+<div class="lucky-attribute-item"><div class="label">Best Times:</div><div class="value">late morning through early afternoon (Fire hours, 9 am–1 pm) for visibility and momentum</div></div>
+<div class="lucky-attribute-item"><div class="label">Avoid:</div><div class="value">excessive black/navy, winter cold, and Water-heavy north orientation</div></div>
+<div class="lucky-attribute-item"><div class="label">Business Lucky Numbers:</div><div class="value">2, 7 (favorable Fire) and 3, 8 (supporting Wood)</div></div>
+</div>
+<blockquote>
+<p><em>Direction, colours, season, and numbers above are classical Five Elements direction doctrine. Gemstones are a modern popular-astrology convention, not classical Myeongri (Korean Saju tradition) (destiny principles) — optional, not analytically load-bearing.</em></p>
+</blockquote>
+<hr />
+<h2>MP3 Audio Summary — Included by Default</h2>
+<p>🎧 <strong>Audio Summary:</strong> Your MP3 companion to this report will be delivered alongside this PDF. It covers your Day Master portrait, current major-luck period, key timing windows for 2026–2028, and the top 5 practical recommendations in approximately 8–10 minutes.</p>
+<p>Listen once in full, then return to the chapters that match the season you are in.</p>
+<hr />
+<h2>Closing Note</h2>
+<p><strong>Sin (Sin (Yin Metal, Sin Metal))</strong> sits at the centre of this chart, with the chart's element balance leaning toward <strong>Water</strong> and a ten-god distribution dominated by <strong>Companion (3), Authority (3), Resource (3), Output (3)</strong>. The favorable <strong>Fire</strong> element (with <strong>Wood</strong> as the quiet secondary) is the querent's main lever — not as a rule to follow, but as a rhythm to listen to. The spouse palace <strong>Hae</strong> and the chart's relationship dynamics reward the querent for showing up consistently rather than performing. The natal clash between <strong>Sa</strong> and <strong>Hae</strong> is a recurring pressure; the chart's gift is that the querent has already learned how to navigate it — and the favorable element makes the navigation gentler. Across a full lifetime, this chart rewards the querent who studies their own patterns and acts with the favorable element rather than against it. The work is not to fix the chart; it is to use what is already there well.</p>
+<hr />
+<p><em>Engine-generated premium report draft. Interpretive prose must be reviewed and finalized by a qualified reader before client delivery.</em></p>
+<h2>What the Terms Mean</h2>
+<ul>
+<li><strong>Direct Resource:</strong> support and knowledge — education, mentors, care, property, credentials</li>
+<li><strong>Day Master:</strong> you — the reference point the whole chart is read against</li>
+<li><strong>Resource class (Resource):</strong> the resource group — support, learning, and what sustains you</li>
+<li><strong>Seven Killings:</strong> pressure and demand — deadlines, tough oversight, decisive action under stress</li>
+<li><strong>Direct Officer:</strong> conventional authority — career structure, rules, status, institutions</li>
+<li><strong>Indirect Wealth:</strong> variable money — deals, commissions, windfalls, higher risk and reward</li>
+<li><strong>Wealth class (wealth star):</strong> the wealth group — how money and resources come and are held</li>
+<li><strong>Direct Wealth:</strong> steady, earned income and everyday resources — salary and savings</li>
+</ul>
+
+</body>
+</html>

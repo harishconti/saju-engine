@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Golden compat-lux-kiran-basic</title>
+<style>
+/* Saju HTML→PDF theme
+ *
+ * Designed for A4 print rendering via Playwright / Chromium.
+ * Uses CSS @page rules for margins, running footers, and print-specific styling.
+ */
+
+@page {
+    size: A4;
+    margin: 18mm;
+    margin-bottom: 22mm;
+}
+
+@page cover {
+    margin-bottom: 18mm;
+}
+
+:root {
+    --color-text: #222222;
+    --color-muted: #555555;
+    --color-light: #888888;
+    --color-heading: #2a4d6e;
+    --color-heading2: #3a5d7e;
+    --color-accent: #f3f6fa;
+    --color-rule: #cccccc;
+    --color-table-header: #2a4d6e;
+    --color-card-bg: #f8fafc;
+    --color-card-border: #d0d8e0;
+    --color-callout-bg: #eef5fa;
+    --color-callout-border: #b8d4e8;
+    --font-serif: Georgia, "Times New Roman", "Noto Serif CJK KR", "Noto Serif KR", serif;
+    --font-sans: "Helvetica Neue", Helvetica, Arial, "Noto Sans CJK KR", "Noto Sans KR", sans-serif;
+    --font-mono: Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-serif);
+    font-size: 10.5pt;
+    line-height: 1.55;
+    color: var(--color-text);
+}
+
+/* ---- Cover page --------------------------------------------------------- */
+.cover {
+    text-align: center;
+    padding-top: 18mm;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 55%, #eef2f7 100%);
+    min-height: calc(100vh - 40mm);
+    border: 1px solid transparent;
+    break-after: page;
+}
+
+.cover .watermark {
+    font-size: 110pt;
+    line-height: 1;
+    margin-bottom: 4mm;
+    opacity: 0.12;
+}
+
+.cover h1 {
+    font-family: var(--font-sans);
+    font-size: 34pt;
+    font-weight: bold;
+    color: #1a1a1a;
+    margin: 0 0 4mm 0;
+    line-height: 1.15;
+    page-break-before: auto;
+    border-bottom: none;
+}
+
+.cover .subtitle {
+    font-family: var(--font-serif);
+    font-size: 12.5pt;
+    font-style: italic;
+    color: var(--color-heading);
+    margin: 0 0 10mm 0;
+    letter-spacing: 0.3px;
+}
+
+.cover .meta-block {
+    display: inline-block;
+    text-align: left;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid var(--color-card-border);
+    border-radius: 6px;
+    padding: 6mm 10mm;
+    margin: 0 auto 12mm auto;
+    box-shadow: 0 2px 8px rgba(42, 77, 110, 0.06);
+}
+
+.cover .meta {
+    font-family: var(--font-sans);
+    font-size: 11pt;
+    color: var(--color-text);
+    margin: 2.5mm 0;
+    text-align: left;
+}
+
+.cover .meta strong {
+    color: var(--color-heading);
+    font-weight: 600;
+    margin-right: 3mm;
+    display: inline-block;
+    min-width: 22mm;
+}
+
+.cover .foot {
+    margin-top: 14mm;
+    font-family: var(--font-sans);
+    font-size: 9.5pt;
+    color: var(--color-muted);
+    line-height: 1.45;
+    padding: 0 22mm;
+}
+
+.cover .date {
+    margin-top: 6mm;
+    font-size: 10pt;
+    color: var(--color-light);
+}
+
+.cover .report-id {
+    margin-top: 3mm;
+    font-family: var(--font-sans);
+    font-size: 9pt;
+    color: var(--color-heading);
+    font-weight: 600;
+}
+
+/* ---- Compact one-page hook header --------------------------------------- */
+.compact-cover {
+    text-align: center;
+    padding: 8mm 0 4mm 0;
+    margin-bottom: 4mm;
+    border-bottom: 1.5px solid var(--color-rule);
+    page-break-after: avoid;
+}
+
+.compact-cover h1 {
+    font-family: var(--font-sans);
+    font-size: 18pt;
+    font-weight: bold;
+    color: var(--color-heading);
+    margin: 0 0 2mm 0;
+    line-height: 1.2;
+    border-bottom: none;
+}
+
+.compact-cover .subtitle {
+    font-family: var(--font-serif);
+    font-size: 10pt;
+    font-style: italic;
+    color: var(--color-muted);
+    margin: 0 0 2mm 0;
+}
+
+.compact-cover .meta,
+.compact-cover .report-line {
+    font-family: var(--font-sans);
+    font-size: 8.5pt;
+    color: var(--color-light);
+    margin: 0 0 1mm 0;
+}
+
+@page compact {
+    size: A4;
+    margin: 13mm 14mm 16mm 14mm;
+}
+
+body.compact-mode {
+    page: compact;
+    font-size: 9.5pt;
+    line-height: 1.38;
+}
+
+body.compact-mode h2 {
+    font-size: 11.5pt;
+    margin: 3mm 0 1.5mm 0;
+}
+
+body.compact-mode h3 {
+    font-size: 10pt;
+    margin: 2.5mm 0 1mm 0;
+}
+
+body.compact-mode p,
+body.compact-mode ul,
+body.compact-mode li {
+    margin: 1.2mm 0;
+}
+
+body.compact-mode table {
+    margin: 1.5mm 0;
+    font-size: 9pt;
+}
+
+body.compact-mode hr {
+    margin: 2mm 0;
+}
+
+body.compact-mode .compact-cover {
+    padding: 5mm 0 3mm 0;
+    margin-bottom: 3mm;
+}
+
+body.compact-mode .compact-cover h1 {
+    font-size: 16pt;
+    margin: 0 0 1.5mm 0;
+}
+
+body.compact-mode .compact-cover .subtitle {
+    font-size: 9pt;
+    margin: 0 0 1.5mm 0;
+}
+
+body.compact-mode .compact-cover .meta,
+body.compact-mode .compact-cover .report-line {
+    font-size: 8pt;
+    margin: 0 0 0.8mm 0;
+}
+
+/* ---- Typography --------------------------------------------------------- */
+h1 {
+    string-set: section-title content();
+    font-family: var(--font-sans);
+    font-size: 22pt;
+    font-weight: bold;
+    color: var(--color-heading);
+    border-bottom: 2px solid var(--color-heading);
+    padding-bottom: 0.2em;
+    margin: 0 0 6mm 0;
+    page-break-before: always;
+    line-height: 1.25;
+}
+
+h1:first-of-type {
+    page-break-before: auto;
+}
+
+h2 {
+    string-set: section-title content();
+    font-family: var(--font-sans);
+    font-size: 16pt;
+    font-weight: bold;
+    color: var(--color-heading2);
+    margin: 8mm 0 3mm 0;
+    line-height: 1.3;
+}
+
+h3 {
+    string-set: section-title content();
+    font-family: var(--font-sans);
+    font-size: 13pt;
+    font-weight: bold;
+    color: #444444;
+    margin: 6mm 0 2mm 0;
+    line-height: 1.3;
+}
+
+h4, h5, h6 {
+    font-family: var(--font-sans);
+    font-size: 11pt;
+    font-weight: bold;
+    color: #444444;
+    margin: 4mm 0 2mm 0;
+}
+
+p {
+    margin: 0 0 3mm 0;
+    orphans: 3;
+    widows: 3;
+}
+
+a {
+    color: var(--color-heading);
+    text-decoration: none;
+}
+
+strong {
+    font-weight: bold;
+    color: #1a1a1a;
+}
+
+em {
+    font-style: italic;
+}
+
+/* ---- Lists -------------------------------------------------------------- */
+ul, ol {
+    margin: 2mm 0 4mm 0;
+    padding-left: 6mm;
+}
+
+li {
+    margin: 1.2mm 0;
+}
+
+/* ---- Blockquotes / notes ------------------------------------------------ */
+blockquote {
+    border-left: 3px solid var(--color-rule);
+    padding-left: 1em;
+    margin: 1em 0;
+    color: #555555;
+}
+
+blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+/* ---- Code & ASCII art --------------------------------------------------- */
+code {
+    font-family: var(--font-mono);
+    font-size: 9.5pt;
+    background: #f0f0f0;
+    padding: 0 0.2em;
+    border-radius: 2px;
+}
+
+pre {
+    font-family: var(--font-mono);
+    font-size: 9pt;
+    background: #f6f6f6;
+    padding: 0.8em;
+    border-radius: 4px;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    margin: 1em 0;
+}
+
+pre code {
+    background: transparent;
+    padding: 0;
+}
+
+/* ---- Tables ------------------------------------------------------------- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+    font-size: 9.5pt;
+    page-break-inside: avoid;
+}
+
+thead {
+    display: table-header-group;
+}
+
+tr {
+    page-break-inside: avoid;
+}
+
+th, td {
+    border: 1px solid var(--color-rule);
+    padding: 5px;
+    vertical-align: top;
+    text-align: left;
+}
+
+th {
+    background: var(--color-table-header);
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background: var(--color-accent);
+}
+
+/* ---- Quick Reference card ----------------------------------------------- */
+.quick-ref-card {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-left: 4px solid var(--color-heading);
+    border-radius: 6px;
+    padding: 5mm 6mm;
+    margin: 4mm 0 6mm 0;
+    box-shadow: 0 2px 6px rgba(42, 77, 110, 0.05);
+}
+
+.quick-ref-card ul {
+    margin: 0;
+    padding-left: 5mm;
+}
+
+.quick-ref-card li {
+    margin: 1.5mm 0;
+}
+
+/* ---- Right Now callout -------------------------------------------------- */
+.right-now-callout {
+    background: var(--color-callout-bg);
+    border: 1px solid var(--color-callout-border);
+    border-radius: 6px;
+    padding: 5mm 6mm;
+    margin: 4mm 0 6mm 0;
+    font-style: italic;
+}
+
+.right-now-callout p {
+    margin: 0;
+}
+
+/* ---- Lucky Attributes grid ---------------------------------------------- */
+.lucky-attributes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3mm;
+    margin: 4mm 0 6mm 0;
+}
+
+.lucky-attribute-item {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-radius: 5px;
+    padding: 3mm 4mm;
+}
+
+.lucky-attribute-item .label {
+    font-family: var(--font-sans);
+    font-size: 8.5pt;
+    font-weight: bold;
+    color: var(--color-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 1mm;
+}
+
+.lucky-attribute-item .value {
+    font-size: 9.5pt;
+    color: var(--color-text);
+}
+
+/* ---- Element Balance SVG chart ---------------------------------------- */
+.element-balance-chart {
+    margin: 4mm 0 6mm 0;
+    page-break-inside: avoid;
+}
+
+.element-balance-chart svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* ---- Element-balance color coding --------------------------------------- */
+.element-fire { color: #e74c3c; }
+.element-earth { color: #f39c12; }
+.element-metal { color: #7f8c8d; }
+.element-water { color: #3498db; }
+.element-wood { color: #27ae60; }
+
+/* ---- Horizontal rules --------------------------------------------------- */
+hr {
+    border: none;
+    border-top: 1px solid var(--color-rule);
+    margin: 1em 0;
+}
+
+/* ---- Utility ------------------------------------------------------------ */
+.print-only {
+    display: block;
+}
+
+.no-break {
+    page-break-inside: avoid;
+}
+
+/* ---- Chart signature (Deep tier pull-quote) ----------------------------- */
+.chart-signature {
+    font-family: var(--font-serif);
+    font-size: 12.5pt;
+    font-style: italic;
+    color: var(--color-heading);
+    border-left: 4px solid var(--color-heading);
+    background: var(--color-callout-bg);
+    padding: 4mm 6mm;
+    margin: 4mm 0 6mm 0;
+    border-radius: 4px;
+}
+
+/* ---- Audio included callout (Deep tier cover) -------------------------- */
+.audio-included {
+    display: inline-block;
+    background: #fff7e6;
+    border: 1px solid #f0c674;
+    color: #8a5a00;
+    font-family: var(--font-sans);
+    font-size: 10pt;
+    padding: 2mm 4mm;
+    margin: 3mm 0 2mm 0;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* ---- Partner Chart Add-On upsell box ------------------------------------ */
+.partner-compat-upsell {
+    background: #f0f7ff;
+    border: 1px solid #b6d4f0;
+    border-left: 4px solid #2a4d6e;
+    color: #1a1a1a;
+    padding: 3mm 5mm;
+    margin: 3mm 0 5mm 0;
+    border-radius: 4px;
+    font-style: italic;
+}
+
+/* ---- Lifetime Decade Roadmap (Deep tier SVG) ---------------------------- */
+.decade-roadmap {
+    margin: 4mm 0 6mm 0;
+    page-break-inside: avoid;
+}
+
+.decade-roadmap svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 720px;
+}
+
+/* ---- Tier-aware body classes -------------------------------------------- */
+body.tier-deep h1 {
+    border-bottom: 2.5px solid var(--color-heading);
+}
+
+body.tier-essential h1 {
+    border-bottom: 2px solid var(--color-heading);
+}
+
+</style>
+</head>
+<body class="tier-compat">
+<div class="cover">
+  <div class="watermark">命</div>
+  <h1>Golden compat-lux-kiran-basic</h1>
+  <p class="subtitle">A Reading in the Korean Four Pillars Tradition</p>
+  <div class="meta-block">
+    <p class="meta"><strong>For</strong>Golden Client</p>
+    <p class="meta"><strong>Born</strong>1 January 1990</p>
+    <p class="meta"><strong>Day Master</strong>Byeong (Yang Fire)</p>
+  </div>
+  <p class="foot">Grounded in the Five Elements and Yin-Yang philosophy. Interpreted through classical Myeongri (Korean Saju) tradition: Jeokcheon-su, Yeonhae-japyeong, Gungtong-bogam, Myeongri-jeongjong.</p>
+  <p class="date">Generated 2026-06-01</p>
+  <p class="report-id">Report ID: GOLDEN-compat-lux-kiran-basic · CosmicSaju · cosmicsaju.com</p>
+</div>
+
+
+<p><strong>Composite Score:</strong> <strong>60 / 100</strong>
+<strong>Verdict Band (Verdict):</strong> <strong>Mixed</strong></p>
+<table>
+<thead>
+<tr>
+<th>Partner</th>
+<th>Day Master</th>
+<th>Day Branch</th>
+<th>Day Pillar</th>
+<th>Favorable Element</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Lux</strong></td>
+<td>Sin ⚪</td>
+<td>Sa</td>
+<td>Sin Sa</td>
+<td>Water</td>
+</tr>
+<tr>
+<td><strong>Kiran</strong></td>
+<td>Im 🔵</td>
+<td>Jin</td>
+<td>Im Jin</td>
+<td>Fire</td>
+</tr>
+</tbody>
+</table>
+<h2>Compatibility at a Glance</h2>
+<table>
+<thead>
+<tr>
+<th>Pillar</th>
+<th>Lux</th>
+<th>Kiran</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Year</td>
+<td>Gyeong Jin</td>
+<td>Im Sul</td>
+</tr>
+<tr>
+<td>Month</td>
+<td>Eul Yu</td>
+<td>Im Ja</td>
+</tr>
+<tr>
+<td>Day</td>
+<td>Sin Sa</td>
+<td>Im Jin</td>
+</tr>
+<tr>
+<td>Hour</td>
+<td>Gi Chuk</td>
+<td>Gye Myo</td>
+</tr>
+</tbody>
+</table>
+<h2>The Verdict</h2>
+<p><strong>Composite Score:</strong> 60/100 → <strong>Mixed</strong></p>
+<h3>Top Red Flags (caution points)</h3>
+<ul>
+<li>⚠️ Day-branch interaction (spouse palaces): B Day Branch·A Earthly Branches self-punishment Jin Jin</li>
+</ul>
+<h3>Yellow Flags (observation points)</h3>
+<ul>
+<li>🟡 Day-branch interaction (spouse palaces): B Day Branch·A Earthly Branches Six Break Jin Chuk</li>
+<li>🟡 Favorable element cross-supply: B’s Unfavorable Element in A — the element that unbalances your chart — minimise its influence Metal excess</li>
+</ul>
+<h3>Favorable Points (positive factors)</h3>
+<ul>
+<li>✅ Day-branch interaction (spouse palaces): B Day Branch·A Earthly Branches Six Harmony Jin Yu</li>
+<li>✅ Favorable element cross-supply: A → B Favorable Element — the element your chart most needs for balance — lean toward it Fire partial supply</li>
+</ul>
+<p><strong>What 60/100 (Mixed) means:</strong> The composite is anchored so that a perfectly neutral chart (all sub-systems scoring 0) lands at 50/100 in the Mixed band; positive classical signals lift it, and negative signals lower it. a workable union in which specific sub-systems ask for deliberate attention. Mixed is not a failure — many long, happy marriages sit in this band; the chart simply flags which dimensions want conscious effort rather than riding on natural ease.</p>
+<h2>Who You Are Together (two people's relationship character)</h2>
+<p>Together, your spouse palaces (Day Branch) hold a neutral, uncombined relation, your ten-god cross leans complementary. This composite is a tendency, not a destiny — the daily relationship is shaped by the choices both of you make over years.</p>
+<blockquote class="chart-signature">
+<p><strong>In plain words:</strong> Overall this reads as a workable match with real friction points to manage deliberately (60/100). Treat the number as a weather report, not a verdict.</p>
+</blockquote>
+<h2>Key Sub-Systems</h2>
+<p>The composite score above draws on all eleven classical sub-systems. The four below are the ones that most strongly shape day-to-day married life — the Deep Compatibility report includes the full breakdown.</p>
+<h3>Day-Branch Interaction (the heart of compatibility) — Day Branch Combination / Clash / Punishment / Break / Harm</h3>
+<p><strong>+1 / 30</strong> — Soft
+Day-branch interaction (Day Branch combination clash) is the <strong>heart of classical Compatibility</strong>. the two spouse palaces (Sa and Jin) have no direct combination/clash. Cross-chart branch interactions add a secondary layer (net +1, capped at ±15).</p>
+<p>Tags: <code>B Day Branch·A Earthly Branches self-punishment Jin Jin</code>, <code>B Day Branch·A Earthly Branches Six Harmony Jin Yu</code>, <code>B Day Branch·A Earthly Branches Six Break Jin Chuk</code></p>
+<h3>Day-Stem Combination — Day-Stem Combination (Heavenly-Stem Combination)</h3>
+<p><strong>+0 / 12</strong> — Soft
+The two Day Masters (Sin and Im) do not form a Heavenly-Stem Combination. Attraction through this layer is neutral; the relationship must lean on day-branch, element balance, and ten-god cross-relations.</p>
+<h3>Favorable Element Cross-Supply — Favorable Element Compatibility</h3>
+<p><strong>+5 / 12</strong> — Moderate
+Favorable Element cross-supply is the <strong>Gungtong-bogam (favorable-element method) deciding factor</strong>: does each partner's chart carry the element the other needs? Partial cross-supply exists; one partner brings more than the other.</p>
+<p>Tags: <code>B → A Favorable Element Water supply favorable</code>, <code>A → B Favorable Element Fire partial supply</code>, <code>excess of B’s Unfavorable Element Metal in A</code></p>
+<h3>Yin-Yang Polarity — Yin-Yang Harmony</h3>
+<p><strong>+3 / 3</strong> — Strong
+Day Masters: A=Yin, B=Yang. Opposite polarity — complementary dynamic. Union polarity balance: 50% Yang.</p>
+<p>Tags: <code>Day Master — you — the reference point the whole chart is read against Yin-Yang Yin ↔ Yang</code>, <code>combined Yin-Yang balance favorable (50% Yang)</code></p>
+<blockquote>
+<p><strong>In plain words:</strong> At the centre of the match, your day-to-day rhythms are neutral — neither a lift nor a drag on their own.</p>
+</blockquote>
+<blockquote>
+<p><strong>⚠️ Watch out for — Major Luck direction diverging major-luck directions:</strong> the two of you enter life's large phases on different timing tracks. Years that feel expansive for one can coincide with a contraction phase for the other. For any time-bound decision (wedding year, relocation, major purchase), overlay both partners' Annual Luck — the theme of a single year (annual luck) rather than reading either chart alone.</p>
+</blockquote>
+<h2>Practical Guidance</h2>
+<ul>
+<li><strong>Timing divergence.</strong> Your major-luck phases run on different tracks — overlay both annual-luck charts before big joint decisions.</li>
+</ul>
+<h2>Closing Note</h2>
+<p>This reading reflects the classical Kwon In-seong·Kwak Im-seong·Jeong Bong-jae·Song Gi-yeong Korean Myeongri consensus on Lux × Kiran's natal compatibility, across all eleven sub-systems documented in. The composite score of <strong>60/100 (Mixed)</strong> is a tendency indicator, not a destiny. No compatibility reading can account for conscious effort, life circumstances, or the choices both partners make over years. Classical Myeongri (Korean Saju tradition) text guides tendencies; the relationship itself is lived.</p>
+<p><strong>A note on challenging and mixed verdicts:</strong> these do not mean incompatibility. They mean the chart surfaces patterns that need deliberate, conscious attention — which is a different problem from having no resonance at all. Many long, happy marriages have charts with 'Challenging' compat scores; many short, painful ones have 'Excellent'.</p>
+<h2>Next Steps</h2>
+<p>This is a snapshot of your natal composite. For the full eleven-sub-system analysis, major-luck timelines, and a year-by-year couple overlay, ask for the Deep Compatibility Reading.</p>
+<p><em>Generated on 2026-06-01.</em></p>
+<h2>What the Terms Mean</h2>
+<ul>
+<li><strong>Unfavourable Element (Unfavorable Element):</strong> the element that unbalances your chart — minimise its influence</li>
+<li><strong>Favourable Element (Favorable Element):</strong> the element your chart most needs for balance — lean toward it</li>
+<li><strong>Day Master:</strong> you — the reference point the whole chart is read against</li>
+<li><strong>Annual Luck:</strong> the theme of a single year</li>
+</ul>
+
+</body>
+</html>
