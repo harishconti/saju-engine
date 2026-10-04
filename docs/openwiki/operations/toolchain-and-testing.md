@@ -15,10 +15,10 @@ Key scripts:
 | `src/saju_engine/__main__.py` | CLI entry point for chart calculation and report generation. |
 | `src/saju_engine/premium_report.py` | Single-chart premium markdown generator. |
 | `src/saju_engine/compat_report.py` | Two-chart compatibility (궁합) markdown generator. |
-| `src/saju_html/md_to_saju_pdf.py` | ReportLab two-pass PDF renderer. |
-| `src/saju_html/md_to_saju_html_pdf.py` | HTML/CSS + Playwright rich renderer. |
+| `src/saju_html/md_to_saju_pdf.py` | Legacy ReportLab two-pass PDF renderer (`--reportlab`). |
+| `src/saju_html/md_to_saju_html_pdf.py` | HTML/CSS + Playwright renderer (default); supports `--from-chart` / `--tier`. |
 | `src/saju_html/md_to_saju_compat_pdf.py` | Compat-specific PDF renderer with Korean CID font. |
-| `tools/build-pdf.sh` | Wrapper that sets `PYTHONPATH`, site-packages, and dispatches to the chosen backend. |
+| `tools/build-pdf.sh` | Wrapper that sets `PYTHONPATH`, site-packages, and dispatches to the chosen backend (HTML default; `--reportlab` legacy). |
 | `src/saju_html/combine_candidate_report.py` | Merges base report + topic follow-ups into a single client deliverable. |
 | `tools/client_intake_app.html` + `tools/client_intake_app.py` | Self-service FastAPI app: `/` single-chart, `/compat` two-chart; sample tier returns a PDF instantly; paid tiers are stored in an encrypted SQLite queue (`src/saju_web/store.py`, `SAJU_INTAKE_KEY`), drafted in the background and approved by the owner. |
 | `tools/intake_admin.py` | Owner CLI: `genkey`, `list [--status]`, `show <id>`, `approve <id> --base-url`, `regenerate <id>`, `purge --days 180`. `approve` prints the private `/report/{token}` link to email. |
@@ -103,16 +103,18 @@ assert JIAZI_TO_NAYIN[("甲", "子")] == "海中金"  # Gold in the sea
 
 ## PDF backends
 
-### ReportLab backend
-- Default, no browser required.
-- Uses DejaVu fonts for Unicode.
-- Two-pass build: first pass measures content, second pass lays out pages.
-- Adds branded footer and report ID.
-
-### HTML/Playwright backend
-- Requires Playwright and a browser install.
+### HTML/Playwright backend (default)
+- Default since 2026-10-04 for `tools/build-pdf.sh`, the compat PDF tool (`--backend html|reportlab`) and the self-service app.
+- Requires Playwright and Chromium: `pip install playwright && python -m playwright install chromium`.
 - Renders Quick Reference as a card, current-year paragraph as a callout, Lucky Attributes as a grid, and adds an SVG element-balance chart.
-- Use `--compact` for the one-page Hook/sample tier.
+- Use `--compact` for the one-page Hook/sample tier. `src/saju_html/chart_input.py` is the shared chart-to-markdown step for `--from-chart`.
+- **No silent fallback:** a missing browser raises. The renderer falls back to ReportLab only with `allow_fallback=True` or env `SAJU_PDF_FALLBACK=reportlab`.
+- Unmapped Hanja/Korean is kept in the HTML and reported (not deleted). Phrase-level Korean glosses live in `_PHRASE_RULES` (`src/saju_html/__init__.py`).
+- Env `SAJU_PDF_BACKEND=reportlab` makes the self-service job queue (`src/saju_web/jobs.py`) use ReportLab.
+
+### ReportLab backend (legacy, one more release)
+- Opt-in with `./tools/build-pdf.sh --reportlab`; writes `{name}-report-reportlab.pdf` / `{name}-combined-reportlab.pdf` so it never overwrites the HTML PDF. `--html` is a no-op alias.
+- Uses DejaVu fonts for Unicode; two-pass build; branded footer and report ID. Warns on unmapped CJK. Planned for removal after one release.
 
 ### Compat PDF
 - Separate renderer in `src/saju_html/md_to_saju_compat_pdf.py`.
@@ -123,7 +125,8 @@ assert JIAZI_TO_NAYIN[("甲", "子")] == "海中金"  # Gold in the sea
 
 - Run `pytest` before committing.
 - Run `npm test` / `npm run lint` / `npm run build` for landing-page changes.
-- Keep citations in `.md` files; client PDFs strip them automatically.
+- Keep citations in `.md` files; client PDFs strip them automatically (leak-checked via pdftotext in tests).
+- Rendered-HTML snapshots: `tests/golden_html/` (46 files), regenerate with `python tools/regen_golden.py --html`. Snapshots embed the full CSS, so any CSS change rewrites them all; regenerate deliberately.
 - Store every candidate report in `candidates_horoscope/reports/{slug}/`.
 - Store every compatibility report in `candidates_horoscope/marriage_compatibility/{name_a}_{name_b}/`.
 - Update indexes (`candidates_horoscope/README.md`, `docs/MEMORY.md`, `MEMORY.md`) when adding reports or cases.
@@ -139,11 +142,11 @@ PYTHONPATH=src python3 -m saju_engine \
   --date 1990-05-15 --time 14:30 --city Seoul --gender F \
   --format premium --tier deep --output-file report.md
 
-# Render to PDF
+# Render to PDF (HTML/Playwright default)
 ./tools/build-pdf.sh --from-chart report.md "Title" "Client" "1990-05-15" "Day Master"
 
-# Render HTML/Playwright PDF
-./tools/build-pdf.sh --html --from-chart report.md "Title" "Client" "1990-05-15" "Day Master"
+# Legacy ReportLab PDF (writes *-reportlab.pdf)
+./tools/build-pdf.sh --reportlab --from-chart report.md "Title" "Client" "1990-05-15" "Day Master"
 
 # Run tests
 pytest

@@ -253,6 +253,20 @@ As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P1 items:
 
 ## Recent Changes to Remember
 
+- **2026-10-04 (P5 HTML-first reports, branch `feat/p5-html-first`)** — User decision "flip default, keep
+  reportlab". 6401cd4 + 560e1fb: no silent backend fallback (renderer raises unless `allow_fallback=True`
+  or env `SAJU_PDF_FALLBACK=reportlab`); unmapped CJK kept in HTML and reported (reportlab warns);
+  phrase-level Korean rules `_PHRASE_RULES`; `tests/test_translation_coverage.py` +
+  `test_translation_quality.py`. f2a7e15: HTML/Playwright is the default — `build-pdf.sh` default HTML,
+  `--reportlab` legacy writes `*-reportlab.pdf`, `--html` no-op alias; `src/saju_html/chart_input.py`
+  shared chart-to-markdown; `md_to_saju_html_pdf.py --from-chart/--tier`; compat tool `--backend
+  html|reportlab` (default html); `jobs.py` env `SAJU_PDF_BACKEND=reportlab` override. 3645ea8: pdftotext
+  leak test, compat default path for both backends. a839244: 46 rendered-HTML snapshots in
+  `tests/golden_html/` (`tools/regen_golden.py --html`; they embed the full CSS, so a CSS change rewrites
+  them all — regenerate deliberately). Browser install: `pip install playwright && python -m playwright
+  install chromium`. Still open: C1-templates (Jinja2 rewrite), reportlab removal after one release,
+  P5-hangul-tokens, D1/D2/D3, P2-F, P3-reader-claim, P4-ratelimit, tests-geocoder, A1.
+
 - **2026-10-04 (P4 web hardening, branch `feat/p4-web-hardening`)** — S8a (bf131bf + 691118e): 세운/월운
   use `data/solar_terms.csv` at 12:00 KST, reused day clamped to month length (drift vs sajupy 1,355/73,414
   days, all on 절기 days except sajupy errors 1903-07 and 2019-06). C3/M15 (d0b68c1 + 1ce4aa5): encrypted
