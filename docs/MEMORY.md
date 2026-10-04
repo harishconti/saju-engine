@@ -12,7 +12,28 @@
 - **License:** MIT
 - **Stack:** Python 3.10+, `sajupy==0.2.0` (pinned 2026-09-26 — see N-17 below; was `>=0.2.0`), `reportlab>=4.1`, optional `playwright`, optional `fastapi`/`uvicorn`.
 
-## Current State (last updated 2026-09-26)
+## Current State (last updated 2026-10-04)
+
+- **2026-10-01 audit fully worked through (2026-10-02 → 10-04), all merged to `develop`, not pushed.**
+  Suite **1,794 passed / 5 skipped / 14 xfailed**; validation gate **315 checks (PASS 306,
+  INTERPRETATION 9, FAIL 0)**; `ruff --select F` clean. Branches (all merged + deleted):
+  `fix/audit-2026-10-01-wave-ab`, `refactor/p2-report-primitives`, `test/p3-validation-coverage`,
+  `feat/p4-web-hardening`, `feat/p5-html-first`. Plans in `docs/superpowers/plans/`.
+  - **Engine decisions (user, 2026-10-03):** extreme_weak verdict removed (unreachable; formula floor
+    −3.78) — 종격 decided by knowledge/07 conditions, month BRANCH kept for 득령; a "likely" 종격 takes
+    the dominant element as 용신 (`method="jonggyeok-follow"`, knowledge/07:73). Compat: guidance uses
+    day branches only, cover warnings ranked by actual score, primary 육해/육파 on the caution list,
+    different 대운 directions not "favorable", no % in compat flag labels.
+  - **Operations:** self-service app needs `SAJU_INTAKE_KEY`; paid orders queue for owner review
+    (`tools/intake_admin.py list/show/attach/approve/revoke/reissue/regenerate/rotate/purge`);
+    `SAJU_PUBLIC_URL` for links. PDFs default to HTML/Playwright (system Chrome used with a warning if
+    bundled Chromium is missing; `SAJU_ALLOW_SYSTEM_CHROME=0` = strict); `--reportlab` for legacy.
+    Delivered client PDFs were NOT regenerated (`tools/regen/pdfs.sh` overwrites them — owner's call).
+  - **Open:** D1 MoR checkout, D2 email, D3 deploy + P4-ratelimit, A1 landing-page source (not on this
+    machine), P2-F / P3-reader-claim wording, P3-yangin/bangham/isolated/geonrok, C1-templates +
+    reportlab removal, P5-hangul-tokens latent cases, tests-geocoder.
+
+### Earlier state (2026-09-26)
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"
   below. The 2026-09 audit reports that tracked this work were removed in the 2026-10-01 cleanup. **Suite: 1136 passed / 9 xfailed / 0 failed.** Validation gate:

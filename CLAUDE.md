@@ -211,7 +211,7 @@ For a structured project reference beyond this file, see `docs/openwiki/`:
 
 Current state at a glance:
 
-- ✅ **Priority 1 — Calculation Engine.** Built at `src/saju_engine/`. 520 pytest tests pass. Wraps `sajupy` (installed at `/home/harish/.local/lib/python3.12/site-packages/`) + our own 십신/12운성/대운 lookups, plus overlays for stars, strength, patterns, annual/monthly/daily luck, and a 30×30 Nayin pair table.
+- ✅ **Priority 1 — Calculation Engine.** Built at `src/saju_engine/`. 1,794 pytest tests pass (2026-10-04); validation gate 315 checks, 0 FAIL. Wraps `sajupy` (installed at `/home/harish/.local/lib/python3.12/site-packages/`) + our own 십신/12운성/대운 lookups, plus overlays for stars, strength, patterns, annual/monthly/daily luck, and a 30×30 Nayin pair table.
 - ✅ **Priority 2 — PDF toolchain.** `src/saju_html/md_to_saju_pdf.py` + `src/saju_html/md_to_saju_html_pdf.py` + `tools/build-pdf.sh` produce presentable PDFs from markdown or directly from a `Chart` (`--from-chart`).
 - ✅ **Priority 3 — Chart→PDF path.** `--from-chart` works in both HTML/Playwright (default) and reportlab backends, and accepts `--tier` for tiered reports.
 - ✅ **Priority 4 — Expand validation test suite** with Korean textbook 만세력 cases. Three externally-sourced cases (박정희, 노무현, 김대중) now cross-validate the engine; foundation lookup tables and Nayin pair table are regression-tested.
@@ -219,4 +219,5 @@ Current state at a glance:
 - ✅ **Priority 6 — Anthropic community skills.** Six skills (pdf, theme-factory, canvas-design, docx, pptx, xlsx) symlinked into `~/.claude/skills/`.
 - ✅ **Priority E — Compatibility (궁합) Reading.** Standalone product with Snapshot ($24) and Deep ($45) tiers, two-chart intake form, JSON intake server, FastAPI `/compat` route, standalone PDF renderer, and an 11-sub-system engine grounded in 적천수, 연해자평, 궁통보감, 명리정종, 자평진전, 서전구미록 + 권인성·곽임성·정봉재·송기영 Korean schools. See `knowledge/11-gunghap.md`.
 - ✅ **Priority B — Go-to-market pivot (2026-09-07).** English-global / USD positioning; 3 client-launch blockers (G1–G3) fixed.
+- ✅ **2026-10-01 audit follow-ups (2026-10-02 → 10-04).** Wave A/B correctness fixes; P2 `report_primitives` + golden snapshots + typed compat flags; P3 신살/격국 validation gates + extreme_weak Option C (종격 by conditions; "likely" 종격 follows the dominant element); P4 encrypted intake store + paid-order review queue + single solar-term calendar; P5 HTML/Playwright default PDF backend (reportlab behind `--reportlab`). Plans: `docs/superpowers/plans/2026-10-0*.md`; tracker: `docs/issues_bugs.md` (Audit 2026-10-01 table).
 - ⏳ **Priority 7+ — Future polish.** Real testimonials + Merchant-of-Record checkout + deployment (P1), the quiz funnel and embedded calculator (P2), richer engine-drafted prose (G4), and additional Korean textbook cases remain open. See `docs/MEMORY.md` for the live state.
