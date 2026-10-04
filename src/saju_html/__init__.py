@@ -115,13 +115,11 @@ KOR_REPL = {
     "일지": "Day Branch",
     # ── Marriage compatibility (궁합) terms ──────────────────────────────────
     "궁합": "Compatibility",
-    "두 분 궁합": "Compatibility Reading",
     "合婚": "Marriage Compatibility",
     "종합 점수": "Composite Score",
     "종합": "Composite",
     "점수": "Score",
     "평가": "Verdict",
-    "한눈에 보기": "At a Glance",
     "한눈에": "at a glance",
     "보기": "overview",
     "심정": "Verdict",
@@ -247,14 +245,40 @@ KOR_REPL = {
     # Added 2026-10-04 (P5 task 1): terms the golden reports use that previously
     # fell through to silent CJK deletion. Glosses follow knowledge/00-glossary.md
     # (신살 -> Star, 득령 -> in-season support) and knowledge/11-gunghap.md (납음 -> Nayin).
-    "결합": "combined", "결합에서": "in the union", "괴강": "Kuigang (Commanding Star)",
+    "결합": "combined", "결합에서": "in the union", "괴강": "Kuigang Star",
     "교차": "cross", "균형": "balance", "납음": "Nayin", "득령": "in-season support",
     "문창귀인": "Literary Star", "배우자": "spouse", "복덕": "blessing and virtue",
-    "분": "people", "쌍화개": "double Canopy", "원소": "element", "일부": "partial",
+    "쌍화개": "double Canopy", "원소": "element", "일부": "partial",
     "일치": "match", "혼잡": "mixed", "사고": "storehouse",
-    "고": "storehouse",
-    "는": " is", "에": " to", "의": "\u2019s",
 }
+
+# Phrase-level rules applied BEFORE per-term CJK tokenization. CJK runs split on
+# ASCII spaces, so multi-word Korean phrases and particle constructions can
+# only be handled here. Bare particles (는 에 의 고 분) are deliberately NOT in
+# the term maps: global substitution garbles ordinary words (의미, 분석, 사고가).
+_ELEMENT = r"(Wood|Fire|Earth|Metal|Water)"
+_HAN = "[\u4e00-\u9fff]"
+_PHRASE_RULES: List[tuple] = [
+    # "A에 B의 기신 Metal 과다" -> excess of B's Unfavorable Element Metal in A
+    (re.compile(r"\b([AB])에 ([AB])의 기신 " + _ELEMENT + r" 과다"),
+     "excess of \\2\u2019s Unfavorable Element \\3 in \\1"),
+    (re.compile(r"\b([AB])에 ([AB])의 기신"),
+     "\\2\u2019s Unfavorable Element in \\1"),
+    (re.compile(r"\b([AB])의 일간 원소"), "\\1\u2019s Day Master element"),
+    (re.compile(r"\b([AB])의 기신"), "\\1\u2019s Unfavorable Element"),
+    (re.compile(r"\b([AB])의 용신"), "\\1\u2019s Favorable Element"),
+    # "A (辛)는 B (壬)의 정인" tag -> "A (辛) is B (壬)'s 정인"
+    (re.compile(r"\b([AB]) \((" + _HAN + r")\)는 ([AB]) \((" + _HAN + r")\)의 "),
+     "\\1 (\\2) is \\3 (\\4)\u2019s "),
+    # "(38% 양)" is the Yang share of the combined chart, not the 12-stage 양.
+    (re.compile(r"\((\d+(?:\.\d+)?)% 양\)"), r"(\1% Yang)"),
+    (re.compile(r"\((\d+(?:\.\d+)?)% 음\)"), r"(\1% Yin)"),
+    (re.compile(r"두 분 궁합"), "Couple Compatibility"),
+    (re.compile(r"두 분"), "the couple"),
+    (re.compile(r"한눈에 보기"), "At a Glance"),
+    (re.compile(r"재성 혼잡"), "Mixed Wealth"),
+]
+
 
 # Hanja single-character (for inline like 甲, 乙 inside non-fully-translated contexts)
 HANJA_MAP = {
@@ -325,7 +349,7 @@ HANJA_MAP = {
     "絶": "Extinction", "財庫": "wealth storehouse", "夜子時": "late Rat hour",
     # Added 2026-10-04 (P5 task 1): Hanja glosses for the golden reports.
     "六害": "Six Harm", "將星": "General Star", "將": "General",
-    "文昌貴人": "Literary Star", "本氣": "main qi", "魁罡": "Kuigang (Commanding Star)",
+    "文昌貴人": "Literary Star", "本氣": "main qi", "魁罡": "Kuigang Star",
     # Nayin (納音) tone names — see knowledge/11-gunghap.md §C.
     "白蠟金": "White Wax Metal", "石榴木": "Pomegranate Wood",
     "釵釧金": "Hairpin Metal", "長流水": "Long-Flowing Water",
@@ -464,6 +488,8 @@ def translate_inline(
         lambda m: f"{m.group(1) or ''}{m.group(4)}{m.group(3) or ''}",
         text,
     )
+    for _rx, _repl in _PHRASE_RULES:
+        text = _rx.sub(_repl, text)
     protected, placeholders = _protect_parenthetical_english(text)
 
     # Split into CJK runs, placeholders, and plain text.

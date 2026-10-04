@@ -490,7 +490,9 @@ def build_pdf(
             raise RuntimeError(
                 f"HTML/Playwright PDF backend unavailable: {exc}. Install with "
                 "`pip install playwright && python -m playwright install chromium`, "
-                "or pass backend='reportlab' / --reportlab explicitly."
+                "or opt in to the ReportLab fallback explicitly: pass "
+                "allow_fallback=True, set env SAJU_PDF_FALLBACK=reportlab, or "
+                "use the ReportLab tool src/saju_html/md_to_saju_pdf.py."
             ) from exc
         # Explicitly opted in: ReportLab ignores CSS, compact mode and a custom
         # generation date, but produces a presentable PDF from the same markdown.

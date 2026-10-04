@@ -48,18 +48,22 @@ def main() -> None:
                          "Sets the body class for tier-specific CSS hooks.")
     args = ap.parse_args()
 
-    out = build_pdf(
-        input_md=args.input,
-        output_pdf=args.output,
-        title=args.title,
-        client=args.client,
-        dob=args.dob,
-        day_master=args.day_master,
-        css_path=args.css,
-        report_id=args.report_id,
-        compact=args.compact,
-        tier=args.tier,
-    )
+    try:
+        out = build_pdf(
+            input_md=args.input,
+            output_pdf=args.output,
+            title=args.title,
+            client=args.client,
+            dob=args.dob,
+            day_master=args.day_master,
+            css_path=args.css,
+            report_id=args.report_id,
+            compact=args.compact,
+            tier=args.tier,
+        )
+    except RuntimeError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        sys.exit(1)
     print(f"Wrote {out} ({out.stat().st_size} bytes) [html-playwright mode]")
 
 
