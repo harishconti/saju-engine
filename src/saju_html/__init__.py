@@ -237,6 +237,7 @@ KOR_REPL = {
     "고초살": "Withering Star", "천살": "Heaven Star", "재살": "Calamity Star",
     "겁살": "Robbery Star", "망신": "Loss-of-Face", "장성": "General Star", "반안": "Saddle Star",
     "자영업": "self-employment",
+    "홍염": "Red Flame", "백호": "White Tiger", "양인": "Blade Star",
     # Ten-stem combination names — without these, 병 in "병신합수" matched the
     # 12-stage term 병 (病, "Illness").
     "갑기합토": "Gap-Gi Earth combination", "을경합금": "Eul-Gyeong Metal combination",
@@ -245,17 +246,58 @@ KOR_REPL = {
     # Added 2026-10-04 (P5 task 1): terms the golden reports use that previously
     # fell through to silent CJK deletion. Glosses follow knowledge/00-glossary.md
     # (신살 -> Star, 득령 -> in-season support) and knowledge/11-gunghap.md (납음 -> Nayin).
-    "결합": "combined", "결합에서": "in the union", "괴강": "Kuigang Star",
-    "교차": "cross", "균형": "balance", "납음": "Nayin", "득령": "in-season support",
-    "문창귀인": "Literary Star", "배우자": "spouse", "복덕": "blessing and virtue",
-    "쌍화개": "double Canopy", "원소": "element", "일부": "partial",
-    "일치": "match", "혼잡": "mixed", "사고": "storehouse",
+    # (The generic words 결합/교차/균형/배우자/원소/일부/일치/혼잡 are bounded
+    # phrase rules below, not bare terms: as terms they fired inside unrelated
+    # Korean words, e.g. 일부러 -> "partial러", 불일치 -> "불match".)
+    "괴강": "Kuigang Star", "납음": "Nayin", "득령": "in-season support",
+    "문창귀인": "Literary Star", "복덕": "blessing and virtue",
+    "쌍화개": "double Canopy",
 }
 
 # Phrase-level rules applied BEFORE per-term CJK tokenization. CJK runs split on
 # ASCII spaces, so multi-word Korean phrases and particle constructions can
 # only be handled here. Bare particles (는 에 의 고 분) are deliberately NOT in
 # the term maps: global substitution garbles ordinary words (의미, 분석, 사고가).
+
+# Korean-boundary helpers: a Korean term only counts as a word when no Hangul
+# touches it (so 두 분 matches "두 분" but not "두 분석", and 사고 matches the
+# standalone term but not 사고방식). _KP additionally allows one trailing
+# case particle (은/는/이/가/을/를/의/와/과/도/로/에/에서/으로).
+_K0 = r"(?<![가-힣])"
+_K1 = r"(?![가-힣])"
+_KP = r"(?=(?:에서|으로|은|는|이|가|을|를|의|와|과|도|로|에)?(?![가-힣]))"
+
+
+def _kw(term: str) -> "re.Pattern":
+    """Compile a bounded Korean-word pattern (particle-tolerant)."""
+    return re.compile(_K0 + re.escape(term) + _KP)
+
+
+def _pair_union_gloss(m: "re.Match") -> str:
+    gloss = m.group(1)
+    return gloss if re.search(r"combination|pair|couple", gloss) else gloss + " union"
+
+
+# Rules applied BEFORE the "Hangul (English gloss)" collapse, for strings whose
+# English parenthetical would otherwise swallow/misplace the Korean phrase.
+_PRE_RULES: List[tuple] = [
+    # Ten-god pair verdicts (compat.py _TENGOD_*_PAIRS)
+    (re.compile(r"서로 신뢰·안정 — 가장 좋은 궁합 \(best\)"),
+     "mutual trust and stability — the best match"),
+    # Day-pillar pair names (compat.py _GOOD_PAIRS): "따뜻한 결합 (warm combination)"
+    (re.compile(r"천생 부부 \(heaven-made couple\) — 1순위"),
+     "heaven-made couple (top-ranked pair)"),
+    (re.compile(r"(?:따뜻한|정열적|성장|안정적|균형 잡힌|정밀한|잠재력|용과 봉황) 결합 \(([A-Za-z][^()]*)\)"),
+     _pair_union_gloss),
+    (re.compile(r"동등한 관계, 때로 경쟁 \(an equal bond, sometimes competitive\)"),
+     "an equal bond, sometimes competitive"),
+    # Classical-text titles glossed with their Hanja: keep the Korean-term gloss only.
+    (re.compile(r"(적천수|연해자평|궁통보감|명리정종|자평진전) \((?:滴天髓|淵海子平|窮通寶鑑|命理正宗|子平眞詮)\)"),
+     r"\1"),
+    # Organ pairs after an English organ gloss: "liver/gallbladder (간/담)"
+    (re.compile(r" \((?:간/담|심/소장|비/위|폐/대장|신/방광)\)"), ""),
+]
+
 _ELEMENT = r"(Wood|Fire|Earth|Metal|Water)"
 _HAN = "[\u4e00-\u9fff]"
 _PHRASE_RULES: List[tuple] = [
@@ -273,10 +315,67 @@ _PHRASE_RULES: List[tuple] = [
     # "(38% 양)" is the Yang share of the combined chart, not the 12-stage 양.
     (re.compile(r"\((\d+(?:\.\d+)?)% 양\)"), r"(\1% Yang)"),
     (re.compile(r"\((\d+(?:\.\d+)?)% 음\)"), r"(\1% Yin)"),
-    (re.compile(r"두 분 궁합"), "Couple Compatibility"),
-    (re.compile(r"두 분"), "the couple"),
-    (re.compile(r"한눈에 보기"), "At a Glance"),
-    (re.compile(r"재성 혼잡"), "Mixed Wealth"),
+    # ── Compat (궁합) engine strings — see src/saju_engine/compat.py ─────────
+    # §A day-stem combination flags
+    (re.compile(r"합화 원소 " + _ELEMENT + r" 월령 양호"),
+     "transformed element \\1 is in season (favorable)"),
+    (re.compile(r"합화 원소 " + _ELEMENT + r" 월령 불분명 \(학파마다 판단이 갈립니다\)"),
+     "transformed element \\1 — seasonal support unclear (schools judge it differently)"),
+    (re.compile(r"간섭 월지: "), "interference in the month branch: "),
+    (re.compile(r"간섭 존재: "), "interference present: "),
+    (_kw("간섭"), "interference"),
+    # §B/§D yongshin cross-supply narrative
+    (re.compile(r"서로 용신이 되는"), "each serves as the other\u2019s Favorable Element"),
+    (re.compile(r"일지 궁"), "Day-Branch palace"),
+    # §F combined elements
+    (re.compile(r"결합에서 결핍"), "missing in the union"),
+    (re.compile(r"결합 결핍"), "combined deficiency"),
+    (re.compile(r"결합 오행 불균형 심함"), "combined Five Elements severely unbalanced"),
+    (_kw("심함"), "severe"),
+    (_kw("결핍"), "deficiency"),
+    # §G ten-god cross: verdict phrases and spouse-star tags
+    (re.compile(r"따뜻한 부부 — 재물·안정·질서"), "warm couple — wealth, stability, order"),
+    (re.compile(r"부드러운 부부 — 표현·보호"), "gentle couple — expression and protection"),
+    (re.compile(r"사회적 부부 — 권위·안정"), "social couple — authority and stability"),
+    (re.compile(r"강렬한 부부 — 둘 다 압박적"), "intense couple — both pressuring"),
+    (re.compile(r"갈등 부부 — 둘 다 날카로움"), "conflict-prone couple — both sharp-edged"),
+    (re.compile(r"갈등 부부 — 둘 다 갈등"), "conflict-prone couple — both prone to conflict"),
+    (re.compile(r"\b([AB])\(남\)의 배우자 지표 "), "\\1 (male)\u2019s spouse star "),
+    (re.compile(r"\b([AB])\(여\)의 배우자 지표 "), "\\1 (female)\u2019s spouse star "),
+    (re.compile(r"(?<![A-Za-z가-힣])([AB])는 ([AB])의 "), "\\1 is \\2\u2019s "),
+    (re.compile(r"비견배우"), "companion-spouse"),
+    # §I compatibility star overlays
+    (re.compile(r"쌍도화"), "double Peach Blossom"),
+    (re.compile(r"쌍역마"), "double Post Horse"),
+    (re.compile(r"쌍양인"), "double Blade Star"),
+    (re.compile(r"쌍홍염"), "double Red Flame"),
+    (re.compile(r"도화스쳐"), "Peach Blossom strike"),
+    (re.compile(r"귀인배우"), "noble partner"),
+    # Branch/star names the premium deep report glosses with Hanja
+    (re.compile(r"백호 \(白虎\)"), "White Tiger Star"),
+    (re.compile(r"홍염 \((?:紅艶|紅艷)\)"), "Red Flame Star"),
+    (re.compile(r"양인 \(羊刃\)"), "Blade Star"),
+    # 사고 (四庫) storehouse branches — only in the 辰戌丑未 sense, never ordinary 사고
+    (re.compile(r"\(사고\)"), "(storehouse)"),
+    (re.compile(_K0 + r"사고 지지"), "storehouse branch"),
+    # Month-command / pattern vocabulary (patterns.py, strength.py)
+    (_kw("월령"), "month command"),
+    (_kw("투출"), "emergence"),
+    (_kw("통근"), "rooting"),
+    (_kw("종격"), "Following Structure"),
+    (re.compile(_K0 + r"두 분 궁합" + _K1), "Couple Compatibility"),
+    (re.compile(_K0 + r"두 분" + _KP), "the couple"),
+    (re.compile(_K0 + r"한눈에 보기" + _K1), "At a Glance"),
+    (re.compile(_K0 + r"재성 혼잡" + _K1), "Mixed Wealth"),
+    (re.compile(_K0 + r"결합에서" + _K1), "in the union"),
+    (_kw("결합"), "combined"),
+    (_kw("교차"), "cross"),
+    (_kw("균형"), "balance"),
+    (_kw("배우자"), "spouse"),
+    (_kw("원소"), "element"),
+    (_kw("일부"), "partial"),
+    (_kw("일치"), "match"),
+    (_kw("혼잡"), "mixed"),
 ]
 
 
@@ -353,6 +452,33 @@ HANJA_MAP = {
     # Nayin (納音) tone names — see knowledge/11-gunghap.md §C.
     "白蠟金": "White Wax Metal", "石榴木": "Pomegranate Wood",
     "釵釧金": "Hairpin Metal", "長流水": "Long-Flowing Water",
+    # The 30 Nayin (納音) names — glosses follow knowledge/11-gunghap.md §C and
+    # nayin.NAYIN_KOREAN (the engine's own English glosses). The five names
+    # above keep their earlier (golden-snapshotted) wording.
+    "海中金": "Gold in the Sea", "大林木": "Forest Wood", "路傍土": "Roadside Earth",
+    "劍鋒金": "Sword-Edge Metal", "山頭火": "Mountain-Top Fire",
+    "澗下水": "Water Under the Stream", "城頭土": "City-Wall Earth",
+    "楊柳木": "Willow Wood", "泉中水": "Spring Water", "屋上土": "Rooftop Earth",
+    "霹靂火": "Thunder Fire", "松柏木": "Pine-Cypress Wood",
+    "沙中金": "Sand Gold", "山下火": "Mountain-Foot Fire", "平地木": "Flatland Wood",
+    "壁上土": "Wall Earth", "金箔金": "Gold-Leaf Metal", "覆燈火": "Lamp Fire",
+    "大驛土": "Post-Horse Earth", "桑柘木": "Mulberry Wood",
+    "大溪水": "Great Stream Water", "沙中土": "Sand Earth",
+    "天上火": "Heavenly Fire", "大海水": "Great Sea Water",
+    # 24 solar terms (節氣/中氣) as the engine emits them in notes.
+    "立春": "Lichun", "雨水": "Yushui", "驚蟄": "Jingzhe", "春分": "Chunfen",
+    "淸明": "Qingming", "清明": "Qingming", "穀雨": "Guyu", "立夏": "Lixia",
+    "小滿": "Xiaoman", "芒種": "Mangzhong", "夏至": "Xiazhi", "小暑": "Xiaoshu",
+    "大暑": "Dashu", "立秋": "Liqiu", "處暑": "Chushu", "白露": "Bailu",
+    "秋分": "Qiufen", "寒露": "Hanlu", "霜降": "Shuangjiang", "立冬": "Lidong",
+    "小雪": "Xiaoxue", "大雪": "Daxue", "冬至": "Dongzhi", "小寒": "Xiaohan",
+    "大寒": "Dahan",
+    # Star / branch-relation Hanja (stars.py, skeleton, sewoon notes)
+    "三刑": "three-punishment", "六沖": "Six Clash", "六破": "Six Break",
+    "自刑": "self-punishment", "攀鞍": "Saddle Star", "白虎": "White Tiger",
+    "羊刃": "Blade Star", "紅艶": "Red Flame", "紅艷": "Red Flame",
+    "滴天髓": "Jeokcheon-su", "淵海子平": "Yeonhae-japyeong", "窮通寶鑑": "Gungtong-bogam",
+    "命理正宗": "Myeongri-jeongjong", "子平眞詮": "Japyeong-jinjeon",
     # Five Element Hanja (often appear after stem names like 辛金)
     "金": "Metal", "木": "Wood", "水": "Water", "火": "Fire", "土": "Earth",
 }
@@ -426,6 +552,49 @@ def _protect_parenthetical_english(text: str) -> tuple[str, list[str]]:
     return protected, placeholders
 
 
+_HANGUL_SEG_RE = re.compile(r"[가-힣]+")
+
+
+def _is_hangul_syllable(key: str) -> bool:
+    return len(key) == 1 and "가" <= key <= "힣"
+
+
+def _tokenize(
+    run: str, banned: frozenset = frozenset()
+) -> tuple[List[str], List[str], set]:
+    """Longest-match tokenize ``run``; consecutive unmapped chars form ONE token.
+
+    ``banned`` lists positions where single-syllable Hangul keys must not match.
+    Returns (tokens, unmapped_tokens, positions of unmapped characters).
+    """
+    tokens: List[str] = []
+    unmapped_tokens: List[str] = []
+    unmapped_pos: set = set()
+    pending = ""
+
+    def flush() -> None:
+        nonlocal pending
+        if pending:
+            tokens.append(pending)
+            unmapped_tokens.append(pending)
+            pending = ""
+
+    i, n = 0, len(run)
+    while i < n:
+        for k, v in _TRANSLATION_TERMS:
+            if run.startswith(k, i) and not (i in banned and _is_hangul_syllable(k)):
+                flush()
+                tokens.append(v)
+                i += len(k)
+                break
+        else:
+            pending += run[i]
+            unmapped_pos.add(i)
+            i += 1
+    flush()
+    return tokens, unmapped_tokens, unmapped_pos
+
+
 def _translate_cjk_run(
     run: str,
     keep_unmapped: bool = False,
@@ -435,25 +604,30 @@ def _translate_cjk_run(
 
     Unmapped characters are always added to ``unmapped`` (if given); they are
     kept verbatim in the output when ``keep_unmapped`` is true, else dropped.
+    Consecutive unmapped characters are emitted as ONE token (a word, not
+    spaced syllables). Single-syllable Hangul keys (stem/branch/12-stage names
+    such as 사, 인, 해) are only trusted when the whole Hangul word maps: if a
+    Hangul word contains any unmapped character they are NOT applied inside it,
+    so an unknown word like 사고방식 stays whole instead of "Death 고방식".
     """
-    tokens: List[str] = []
-    i = 0
-    n = len(run)
-    while i < n:
-        matched = False
-        for k, v in _TRANSLATION_TERMS:
-            if run.startswith(k, i):
-                tokens.append(v)
-                i += len(k)
-                matched = True
-                break
-        if not matched:
-            # Unmapped CJK character: report it, and keep or drop per caller.
-            if unmapped is not None:
-                unmapped.add(run[i])
-            if keep_unmapped:
-                tokens.append(run[i])
-            i += 1
+    tokens, unmapped_tokens, bad_pos = _tokenize(run)
+    if bad_pos:
+        # Ban single-syllable Hangul matches inside every Hangul word that
+        # contains an unmapped character, then re-tokenize.
+        banned = {
+            i
+            for m in _HANGUL_SEG_RE.finditer(run)
+            if any(i in bad_pos for i in range(m.start(), m.end()))
+            for i in range(m.start(), m.end())
+        }
+        if banned:
+            tokens, unmapped_tokens, _ = _tokenize(run, frozenset(banned))
+    if unmapped is not None:
+        for w in unmapped_tokens:
+            unmapped.update(w)
+    if not keep_unmapped:
+        bad = set(unmapped_tokens)
+        tokens = [t for t in tokens if t not in bad]
     # Join translated tokens with a single space so adjacent Hanja pairs like
     # 丙午 do not collapse into "BingO".
     return " ".join(tokens)
@@ -483,6 +657,8 @@ def translate_inline(
     # (stem clash)") becomes just the English gloss in the English-primary
     # PDF — translating the Hangul too produced doubles, and single syllables
     # could mis-translate (해 "harm" read as the branch 亥 "Hae (Pig)").
+    for _rx, _repl in _PRE_RULES:
+        text = _rx.sub(_repl, text)
     text = re.sub(
         r"(\*\*)?([가-힯]+)(\*\*)? \(([A-Za-z][^()]*)\)",
         lambda m: f"{m.group(1) or ''}{m.group(4)}{m.group(3) or ''}",

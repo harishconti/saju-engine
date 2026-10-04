@@ -86,6 +86,45 @@ def test_no_particle_injection():
     assert {"의", "는", "분"} <= seen
 
 
-def test_sagoga_not_garbled():
-    out = translate_inline("사고가 있다")
-    assert out.startswith("storehouse") and "가" in out
+def test_ordinary_sago_words_are_not_glossed_storehouse():
+    # 사고 is only the 四庫 "storehouse" in the engine's "(사고)" contexts; an
+    # ordinary word such as 사고방식 must stay ONE unmapped word, never
+    # "storehouse 방식"-style fragments.
+    seen: set = set()
+    out = translate_inline("사고방식이 다르다", unmapped=seen)
+    assert "storehouse" not in out
+    assert "사고방식이" in out
+    assert set("사고방식이") <= seen
+
+
+def test_storehouse_sense_is_translated():
+    assert translate_inline("a natal storehouse (사고) is clashed") == "a natal storehouse is clashed"
+    assert "storehouse branch" in translate_inline("사고 지지 충")
+
+
+def test_phrase_rules_are_anchored():
+    # 두 분 must not eat the front of 두 분석; 한눈에 보기 / 재성 혼잡 likewise.
+    assert "the couple" not in translate_inline("두 분석")
+    assert translate_inline("두 분은 잘 맞습니다").startswith("the couple")
+    assert "At a Glance" not in translate_inline("한눈에 보기좋은")
+    assert "Mixed Wealth" not in translate_inline("재성 혼잡함")
+
+
+def test_unmapped_run_stays_one_word():
+    out = translate_inline("결핍과 갈등")
+    assert "결 핍" not in out and "갈 등" not in out
+    out2 = translate_inline("갈등")
+    assert out2 == "갈등"
+
+
+def test_generic_words_do_not_fire_inside_other_words():
+    for word in ("일부러", "불일치", "교차점", "원소리"):
+        out = translate_inline(word)
+        assert out == word, (word, out)
+    assert "partial" in translate_inline("A → B 용신 Fire 일부 공급")
+    assert "cross" in translate_inline("십신 교차")
+
+
+def test_unknown_hangul_word_with_mapped_syllables_stays_whole():
+    # 귀인배우 contains the branch/stem syllable 인; it must not become "귀 In (Tiger) 배 우".
+    assert translate_inline("학파") == "학파"

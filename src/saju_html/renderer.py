@@ -21,7 +21,12 @@ from pathlib import Path
 # Markdown-It preserves raw HTML (e.g. <b>) and parses GFM tables.
 from markdown_it import MarkdownIt
 
-from saju_html import ELEMENT_EMOJI, strip_engine_drafts, strip_source_citations
+from saju_html import (
+    _CJK_RE,
+    ELEMENT_EMOJI,
+    strip_engine_drafts,
+    strip_source_citations,
+)
 from saju_html.sections import (
     _wrap_audio_included,
     _wrap_chart_signature,
@@ -112,6 +117,20 @@ def _translate_html(text: str, unmapped: set | None = None) -> str:
     from saju_html import translate_inline
 
     return translate_inline(text, keep_unmapped=True, unmapped=unmapped)
+
+
+def _translate_cover(text: str, unmapped: set | None = None) -> str:
+    """Translate a cover field (title / client / dob / Day Master) like the body.
+
+    Day Masters may arrive as raw Hanja ("壬 (Water Yang)" -> "Im (Water Yang)",
+    compat "庚/辛" -> "Gyeong/Sin"), exactly as the reportlab cover renders them.
+    """
+    if not text or not _CJK_RE.search(text):
+        return text  # plain-ASCII fields (names!) are never touched
+    # Translate only the CJK spans, so Latin text around them is left exactly
+    # as given (translate_inline's post-processing would e.g. split "McKay").
+    out = _CJK_RE.sub(lambda m: _translate_html(m.group(0), unmapped), text)
+    return out
 
 
 def _build_cover_html(
@@ -313,6 +332,18 @@ def markdown_to_html(
         "Interpreted through classical Myeongri (Korean Saju) tradition: "
         "Jeokcheon-su, Yeonhae-japyeong, Gungtong-bogam, Myeongri-jeongjong."
     )
+
+    cover_unmapped: set = set()
+    title = _translate_cover(title, cover_unmapped)
+    client = _translate_cover(client, cover_unmapped)
+    dob = _translate_cover(dob, cover_unmapped)
+    day_master = _translate_cover(day_master, cover_unmapped)
+    if cover_unmapped:
+        _log.warning(
+            "Unmapped CJK characters kept as-is on the cover (add them to "
+            "the saju_html translation maps): %s",
+            "".join(sorted(cover_unmapped)),
+        )
 
     meta_rows: list[tuple[str, str]] = []
     if client:

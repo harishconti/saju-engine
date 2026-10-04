@@ -90,3 +90,38 @@ def test_browser_smoke_golden_html_prints_to_pdf(tmp_path):
     info = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True).stdout
     assert int(re.search(r"Pages:\s+(\d+)", info).group(1)) >= 1
     assert "knowledge/" not in text and "ENGINE DRAFT" not in text
+
+
+_COVER_RE = re.compile(r'<div class="cover">\n.*?\n</div>\n', re.S)
+_CJK_CHARS = re.compile(r"[가-힣一-鿿]")
+_WATERMARK = re.compile(r'<div class="watermark">[^<]*</div>')
+
+
+@pytest.mark.parametrize("name", NAMES)
+def test_golden_cover_has_no_cjk(name):
+    html = (GOLDEN_HTML / f"{name}.html").read_text(encoding="utf-8")
+    m = _COVER_RE.search(html)
+    assert m, "cover block not found"
+    cover = _WATERMARK.sub("", m.group(0))  # the decorative 命 watermark is intentional
+    assert not _CJK_CHARS.search(cover), cover
+
+
+def test_cover_meta_rows_are_translated():
+    from saju_html.renderer import markdown_to_html
+
+    for compact in (False, True):
+        html = markdown_to_html(
+            "# T\n\nbody\n",
+            title="Compatibility Reading — A × B",
+            client="Alice (庚) · Bob (辛) · McKay",
+            dob="1990 · 1991",
+            day_master="庚/辛",
+            generation_date="January 1, 2026",
+            report_id="X-1",
+            compact=compact,
+        )
+        cover = _WATERMARK.sub("", _COVER_RE.search(html).group(0) if not compact else
+                               re.search(r'<div class="compact-cover">.*?\n</div>\n', html, re.S).group(0))
+        assert not _CJK_CHARS.search(cover), cover
+        assert "Gyeong/Sin" in cover and "Alice (Gyeong)" in cover
+        assert "McKay" in cover  # Latin names are never rewritten
