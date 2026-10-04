@@ -3,12 +3,14 @@ from __future__ import annotations
 
 import os
 import re
+import shutil
 import subprocess
 from pathlib import Path
 
 import pytest
 
 from tests.test_html_pdf import requires_browser  # noqa: F401  (skips without Chromium)
+from tests.test_pdf import requires_pdftotext
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ENV = {**os.environ, "PYTHONPATH": os.pathsep.join(
@@ -91,12 +93,47 @@ def test_reportlab_flag_produces_reportlab_pdf_with_distinct_name(tmp_path):
     assert not (tmp_path / "sruthi-report.pdf").exists()
 
 
-@requires_browser
-def test_default_pdf_text_has_no_citations(tmp_path):
+LEAK_MARKERS = ("knowledge/", "see knowledge", "ENGINE DRAFT", "[UNCERTAIN")
+
+
+def _pdf_text(pdf: Path) -> str:
+    if shutil.which("pdftotext"):
+        return subprocess.run(["pdftotext", "-layout", str(pdf), "-"], capture_output=True,
+                              text=True, check=True).stdout
     pypdf = pytest.importorskip("pypdf")
+    return "\n".join(p.extract_text() for p in pypdf.PdfReader(pdf).pages)
+
+
+@requires_browser
+@requires_pdftotext
+def test_default_pdf_text_has_no_citations(tmp_path):
     assert _run(tmp_path).returncode == 0
-    text = "\n".join(p.extract_text() for p in pypdf.PdfReader(tmp_path / "sruthi-report.pdf").pages)
-    assert "knowledge/" not in text and "ENGINE DRAFT" not in text
+    text = _pdf_text(tmp_path / "sruthi-report.pdf")
+    assert "Sruthi" in text  # extraction actually worked
+    for marker in LEAK_MARKERS:
+        assert marker not in text, marker
+
+
+@requires_browser
+@requires_pdftotext
+def test_markdown_input_pdf_strips_citations_and_draft_markers(tmp_path):
+    md = tmp_path / "leak.md"
+    md.write_text(
+        "# Leak Check\n\n[ENGINE DRAFT \u2014 REVIEW REQUIRED]\n\n"
+        "## Career & Wealth\n\nSteady growth *(see knowledge/05-ten-gods.md)* over time.\n\n"
+        "## Closing Note\n\nVisible closing text.\n",
+        encoding="utf-8")
+    out = tmp_path / "leak.pdf"
+    r = subprocess.run(
+        ["python3", str(PROJECT_ROOT / "src/saju_html/md_to_saju_html_pdf.py"),
+         "--input", str(md), "--output", str(out), "--title", "Leak", "--client", "Tester",
+         "--dob", "1 Jan 1990", "--day-master", "Byeong (Yang Fire)"],
+        capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stderr
+    text = _pdf_text(out)
+    assert "Steady growth" in text and "Visible closing text" in text
+    for marker in LEAK_MARKERS:
+        assert marker not in text, marker
 
 
 @requires_browser

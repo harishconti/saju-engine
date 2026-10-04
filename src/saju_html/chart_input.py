@@ -3,7 +3,9 @@
 Both ``md_to_saju_pdf.build_pdf_from_chart`` (ReportLab) and
 ``md_to_saju_html_pdf`` (HTML/Chromium) turn a computed ``Chart`` into the
 same intermediate markdown, then render it. Keeping that step here (no
-reportlab import) means the HTML backend does not depend on ReportLab.
+reportlab import at module level) means the HTML backend does not depend on
+ReportLab when a ``tier`` is given; only the tier-less legacy path lazily
+imports it.
 """
 from __future__ import annotations
 
@@ -48,7 +50,7 @@ def chart_markdown(chart, tier: Optional[str] = None, *, title: str = "Saju Read
     if tier:
         from saju_engine.premium_report import generate_premium_report
         return generate_premium_report(chart, tier=tier, generation_date=None)
-    from saju_html.md_to_saju_pdf import chart_to_markdown  # lazy: pulls in reportlab
+    from saju_html.md_to_saju_pdf import chart_to_markdown  # lazy: this tier-less legacy path imports reportlab
     return chart_to_markdown(chart, title=title)
 
 

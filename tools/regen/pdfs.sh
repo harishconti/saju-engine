@@ -21,10 +21,7 @@ for n in harish mahesh pawan sruthi gurumoorthy vishnu-priya rm bindu; do
   pdf $RL $R/$n/$n-report.md $R/$n/$n-report.pdf "${NAME[$n]} — Deep Destiny Report" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}" deep
 done
 for n in harish mahesh gurumoorthy vishnu-priya; do
-  pdf $RL $R/$n/$n-combined.md $R/$n/$n-combined.pdf "${NAME[$n]} — Deep Destiny Report" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}" deep
-done
-for n in mahesh vishnu-priya; do
-  pdf $HT $R/$n/$n-combined.md $R/$n/$n-combined-html.pdf "${NAME[$n]} — Deep Destiny Report" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}" deep
+  pdf $HT $R/$n/$n-combined.md $R/$n/$n-combined.pdf "${NAME[$n]} — Deep Destiny Report" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}" deep
 done
 for n in harish pawan sruthi gurumoorthy bindu rm; do
   pdf $RL $R/$n/career.md $R/$n/career.pdf "${NAME[$n]} — Career & Wealth Deep-Dive" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}"
@@ -64,9 +61,3 @@ cp $R/rm/rm-report.pdf apps/landing-page/public/demo-rm-deep.pdf
 echo "copied landing demos"
 cp candidates_horoscope/marriage_compatibility/pawan_sruthi/pawan_sruthi_compatibility.pdf apps/landing-page/public/demo-compat-basic.pdf
 cp candidates_horoscope/marriage_compatibility/pawan_sruthi/pawan_sruthi_compatibility_deep.pdf apps/landing-page/public/demo-compat-deep.pdf
-# Rich HTML/Playwright backend (falls back to ReportLab if no browser is available).
-for n in mahesh vishnu-priya; do
-  python3 "$HT" --input "$R/$n/$n-combined.md" --output "$R/$n/$n-combined-html.pdf" \
-    --title "${NAME[$n]} — Deep Destiny Report" --client "${NAME[$n]}" --dob "${DOB[$n]}" \
-    --day-master "${DM[$n]}" --tier deep >/dev/null && echo "built $R/$n/$n-combined-html.pdf"
-done
