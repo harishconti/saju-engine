@@ -290,24 +290,26 @@
         </select>
       </div>
 
-      <button type="submit">Generate Compatibility PDF</button>
+      <button type="submit">Request Compatibility Reading</button>
       <p class="disclaimer">
-        <strong>Privacy:</strong> Your submission is saved as a local JSON file for the reader to process.
-        This form is intended for a private, single-operator demo; a production service would use encrypted storage
-        and a background queue instead of an immediate in-browser download.
-      </p>
-      <div id="status" class="status"></div>
+        <strong>Privacy:</strong> Your name, email and concern are stored encrypted and deleted after a retention period. Every compatibility reading is reviewed by a human reader before delivery; we will email you a private download link.</p>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
     </form>
   </div>
 
   <script>
+    function detailText(d, fallback) {
+      if (Array.isArray(d)) return d.map(x => (x && x.msg) ? x.msg : String(x)).join('; ');
+      if (d && typeof d === 'object') return d.msg || JSON.stringify(d);
+      return d || fallback;
+    }
     document.getElementById('compat-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const status = document.getElementById('status');
       const formData = new FormData(e.target);
 
       status.className = 'status';
-      status.textContent = 'Generating PDF...';
+      status.textContent = 'Submitting...';
 
       try {
         const r = await fetch('/compat/generate', {
@@ -315,20 +317,27 @@
           body: formData,
         });
         if (!r.ok) {
-          const text = await r.text();
-          throw new Error(text || `HTTP ${r.status}`);
+          const body = await r.json().catch(() => ({}));
+          throw new Error(detailText(body.detail, `HTTP ${r.status}`));
         }
-        const blob = await r.blob();
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'compat-reading.pdf';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-        status.className = 'status ok';
-        status.textContent = 'PDF generated and downloaded.';
+        const ctype = r.headers.get('content-type') || '';
+        if (ctype.includes('application/pdf')) {
+          const blob = await r.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'compat-reading.pdf';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+          status.className = 'status ok';
+          status.textContent = 'PDF generated and downloaded.';
+        } else {
+          const body = await r.json().catch(() => ({}));
+          status.className = 'status ok';
+          status.textContent = body.message || 'Received. A reviewed report will be emailed to you.';
+        }
       } catch (err) {
         status.className = 'status err';
         status.textContent = 'Error: ' + err.message;

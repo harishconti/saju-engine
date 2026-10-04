@@ -210,7 +210,7 @@ python3 src/saju_html/md_to_saju_compat_pdf.py <compat.md> --name-a ... --name-b
 As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P1 items:
 - **Merchant-of-Record checkout** (Lemon Squeezy / Paddle) for paid tiers and the Companion subscription — nothing is charged today.
 - **Real testimonials** on the landing page — the current ones are flagged illustrative and must be replaced or removed before launch (FTC risk).
-- Self-service app hardening: encrypt PII, background queue, auth (`tools/client_intake_app.py`).
+- Self-service app hardening: DONE 2026-10-04 (encrypted store, background drafts, review queue, private links). Remaining: D2 email delivery, D3 deploy.
 - Deployment hardening for the landing-page Next.js app and FastAPI calculator.
 - **A1:** recover `apps/landing-page/src/` from the machine that built it (not in this repo).
 - Populate the 30×30 Nayin pair table from a published source (currently on the 5-element fallback).
@@ -252,6 +252,17 @@ As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P1 items:
   needs to be passed explicitly, though doing so is still fine.
 
 ## Recent Changes to Remember
+
+- **2026-10-04 (P4 web hardening, branch `feat/p4-web-hardening`)** — S8a (bf131bf + 691118e): 세운/월운
+  use `data/solar_terms.csv` at 12:00 KST, reused day clamped to month length (drift vs sajupy 1,355/73,414
+  days, all on 절기 days except sajupy errors 1903-07 and 2019-06). C3/M15 (d0b68c1 + 1ce4aa5): encrypted
+  SQLite intake store `src/saju_web/store.py` (`SAJU_INTAKE_KEY`, retention default 180 days; approval only
+  via token, free sample via `mark_approved_without_token`). S8c/S8d/S8e/S8f/C4 (72cb696 + 1976180):
+  `/generate` validates before saving; paid tiers -> 202 + background draft + owner approval; private
+  `GET /report/{token}`; CORS no credentials; `SAJU_HOST` default 127.0.0.1; `SAJU_INTAKE_DIR`; sanitized
+  logs. Owner workflow: `python3 tools/intake_admin.py genkey|list|show|approve <id> --base-url|regenerate|purge`
+  (run the app with `SAJU_INTAKE_KEY` set and umask 077). Suite 1552 passed; validation 315 checks.
+  **Open: email delivery (D2), MoR checkout (D1), deploy (D3)**, plus P2-F, P3-reader-claim, landing page A1.
 
 - **2026-10-02 (audit 2026-10-01 Wave A/B fixes, branch `fix/audit-2026-10-01-wave-ab`)** — S1: 세수/current
   대운 compare 입춘 in the birth's local time. S2: compat element-balance table uses canonical

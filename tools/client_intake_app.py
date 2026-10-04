@@ -1,34 +1,32 @@
 #!/usr/bin/env python3
-"""FastAPI self-service Saju calculator.
+"""FastAPI self-service Saju calculator with a paid-order review queue.
 
-Serves an intake form at `/` and a PDF generation endpoint at `/generate`.
-Each request is saved to `candidates_horoscope/intake/` as JSON, and a tiered
-premium PDF is computed on demand from the engine.
+Serves intake forms at `/` (single chart) and `/compat` (two charts).
+
+Flow:
+    - Both POST routes validate everything first, then store the intake in an
+      encrypted SQLite store (`saju_web.store`; name/email/concern are
+      Fernet-encrypted with `SAJU_INTAKE_KEY`, birth data stays plain).
+    - `sample` (free hook): PDF rendered immediately and returned.
+    - Paid tiers: HTTP 202 "received"; an engine draft PDF is generated in the
+      background; the owner reviews it and approves with `tools/intake_admin.py`,
+      which issues a private link served at `GET /report/{token}`.
 
 Usage:
-    python3 tools/client_intake_app.py
-    # open http://localhost:8080
+    SAJU_INTAKE_KEY=$(python3 tools/intake_admin.py genkey) python3 tools/client_intake_app.py [port]
+    # SAJU_HOST (default 127.0.0.1) sets the bind address; SAJU_INTAKE_DIR overrides storage.
 
-Dependencies:
-    pip install --user --break-system-packages fastapi uvicorn python-multipart
-
-Privacy / deployment note (demo deployment):
-    - Intake records (name, DOB, birth time/location, email, main concern) are
-      saved as unencrypted JSON files on the local filesystem.
-    - PDF generation runs synchronously inside the HTTP worker thread
-      (`run_in_threadpool`), holding the connection open until rendering ends.
-    - These choices are acceptable for a local demo or trusted single-user
-      deployment. A production service should use encrypted storage, a
-      background job queue, and email delivery instead of synchronous responses.
+Logs must not contain PII: only intake ids and exception class names are logged. Deploy with `umask 077`.
 """
 from __future__ import annotations
 
-import json
 import logging
+import math
 import os
 import re
 import sys
-from datetime import datetime
+import threading
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 # Make the local src/ tree importable; user-space site-packages is already on
@@ -40,25 +38,26 @@ for p in (str(SRC_ROOT), os.environ.get("SAJU_SITE")):
     if p and p not in sys.path:
         sys.path.insert(0, p)
 
-from typing import Optional  # noqa: E402
-
-from fastapi import FastAPI, Form, HTTPException  # noqa: E402
-from fastapi.responses import FileResponse, HTMLResponse  # noqa: E402
+from fastapi import BackgroundTasks, FastAPI, Form, HTTPException  # noqa: E402
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 from starlette.concurrency import run_in_threadpool  # noqa: E402
 
-from saju_engine.engine import compute_chart  # noqa: E402
-from saju_engine.premium_report import normalize_tier  # noqa: E402
-from saju_engine.compat_report import generate_compat_report  # noqa: E402
-from saju_html.md_to_saju_pdf import build_pdf  # noqa: E402
-from saju_html.md_to_saju_pdf import build_pdf_from_chart  # noqa: E402
+from saju_web import jobs  # noqa: E402
+from saju_web.jobs import derive_offset, generate_draft, is_stale, slugify  # noqa: E402
+from saju_web.store import IntakeStore  # noqa: E402
 
-app = FastAPI(title="Saju Self-Service Intake")
+@asynccontextmanager
+async def _lifespan(_app):
+    await run_in_threadpool(requeue_pending)  # restart recovery
+    yield
+
+
+app = FastAPI(title="Saju Self-Service Intake", lifespan=_lifespan)
 log = logging.getLogger("saju.client_intake_app")
 
-# Allow the landing-page Next.js app to call /generate and /compat/generate
-# directly in development. In production, set SAJU_ALLOWED_ORIGINS to the
-# deployed landing-page origin(s) (comma-separated).
+# S8e: no credentials, minimal headers/methods. In production set
+# SAJU_ALLOWED_ORIGINS to the deployed landing-page origin(s) (comma-separated).
 _ALLOWED_ORIGINS = [
     o.strip()
     for o in os.environ.get("SAJU_ALLOWED_ORIGINS", "http://localhost:3000").split(",")
@@ -67,111 +66,99 @@ _ALLOWED_ORIGINS = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_ALLOWED_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["POST", "GET", "OPTIONS"],
-    allow_headers=["*"],
+    allow_credentials=False,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],
     expose_headers=["Content-Disposition"],
 )
 
 TOOLS_DIR = Path(__file__).resolve().parent
-INTAKE_DIR = PROJECT_ROOT / "candidates_horoscope" / "intake"
+INTAKE_DIR = Path(os.environ.get("SAJU_INTAKE_DIR") or PROJECT_ROOT / "candidates_horoscope" / "intake")
+FILES_DIR = INTAKE_DIR / "files"
 FORM_PATH = TOOLS_DIR / "client_intake_app.html"
 COMPAT_FORM_PATH = TOOLS_DIR / "client_compat_intake_form.html"
 
+# Fails fast with a how-to RuntimeError when SAJU_INTAKE_KEY is missing/invalid.
+STORE = IntakeStore.from_env(INTAKE_DIR / "intake.sqlite", FILES_DIR)
 
-def _slugify(name: str) -> str:
-    name = name.lower().strip()
-    name = re.sub(r"[^\w\s-]", "", name)
-    return re.sub(r"[-\s]+", "-", name) or "candidate"
-
-
-def _save_intake(payload: dict) -> Path:
-    INTAKE_DIR.mkdir(parents=True, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    slug = _slugify(payload.get("name", "candidate"))[:32]
-    out = INTAKE_DIR / f"{timestamp}-{slug}.json"
-    record = {
-        "received_at": datetime.now().isoformat(),
-        "source": "client_intake_app",
-        "payload": payload,
-    }
-    out.write_text(json.dumps(record, indent=2, ensure_ascii=False), encoding="utf-8")
-    return out
+SINGLE_TIERS = ("sample", "essential", "deep", "spark", "reading", "fullmap")
+RECEIVED_MESSAGE = (
+    "Thank you \u2014 your reading is being prepared and will be reviewed by a human "
+    "reader before delivery. We'll email you a private download link."
+)
 
 
-def _parse_dob_time(dob: str, birth_time: str) -> tuple[int, int, int, int, int]:
+MARRIAGE_STATUSES = ("single", "relationship", "married", "divorced", "widowed", "other")
+ELEMENTS = {"wood": "Wood", "fire": "Fire", "earth": "Earth", "metal": "Metal", "water": "Water"}
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+BUSY_DETAIL = "We're receiving a lot of requests \u2014 please try again shortly."
+SAMPLE_SLOT_WAIT = 30.0
+
+
+def _max_queue() -> int:
     try:
-        d = datetime.strptime(dob, "%Y-%m-%d").date()
-    except ValueError as exc:
-        raise ValueError(f"Date of birth must be YYYY-MM-DD, got {dob!r}") from exc
+        return int(os.environ.get("SAJU_MAX_QUEUE", "50"))
+    except ValueError:
+        return 50
+
+
+def _busy() -> HTTPException:
+    return HTTPException(status_code=503, detail=BUSY_DETAIL)
+
+
+async def _check_queue_capacity() -> None:
+    if await run_in_threadpool(STORE.count_active) >= _max_queue():
+        raise _busy()
+
+
+def _check_email(email: str) -> None:
+    if not EMAIL_RE.match(email):
+        raise _bad_request("Email address looks invalid.")
+
+
+def _norm_element(value: str) -> str:
+    v = value.strip()
+    if not v:
+        return ""
+    if v.lower() not in ELEMENTS:
+        raise _bad_request("Favorable element must be Wood, Fire, Earth, Metal or Water.")
+    return ELEMENTS[v.lower()]
+
+
+def _bad_request(detail: str) -> HTTPException:
+    return HTTPException(status_code=400, detail=detail)
+
+
+MAX_NAME = 120
+MAX_LOCATION = 120
+MAX_EMAIL = 254
+MAX_CONCERN = 2000
+OFFSET_MIN, OFFSET_MAX = -12.0, 14.0
+
+
+def _check_len(value: str, limit: int, field: str) -> None:
+    if len(value) > limit:
+        raise _bad_request(f"{field} is too long (max {limit} characters).")
+
+
+def _check_birth(dob: str, birth_time: str, tz: str, offset: str, label: str = "") -> None:
+    """Validate date/time parse and timezone/offset resolution (no PII in errors)."""
     try:
-        t = datetime.strptime(birth_time, "%H:%M").time()
-    except ValueError as exc:
-        raise ValueError(f"Birth time must be HH:MM, got {birth_time!r}") from exc
-    return d.year, d.month, d.day, t.hour, t.minute
+        fallback = float(offset) if offset else None
+    except ValueError:
+        raise _bad_request(f"{label}UTC offset must be a number.")
+    if fallback is not None and not (math.isfinite(fallback) and OFFSET_MIN <= fallback <= OFFSET_MAX):
+        raise _bad_request(f"{label}UTC offset must be between {OFFSET_MIN:g} and {OFFSET_MAX:g}.")
+    try:
+        derive_offset(dob, birth_time, tz or None, fallback)
+    except ValueError as exc:  # includes UnknownTimezone
+        raise _bad_request(f"{label}{exc}") from exc
 
 
-def _derive_utc_offset(
-    dob: str,
-    birth_time: str,
-    timezone_name: Optional[str],
-    fallback_offset: Optional[float],
-) -> float:
-    """Return the UTC offset to use for chart computation.
-
-    Delegates to `saju_engine.timezone.derive_utc_offset` (N-13, 2026-09-26) so
-    the CLI and web app share one historical/DST-aware implementation. If
-    ``timezone_name`` is a recognized IANA zone, the exact historical offset
-    (including DST) for the local date/time is used; otherwise the numeric
-    ``fallback_offset`` is used. Raises `UnknownTimezone` when neither is
-    available — callers should validate the form first.
-    """
-    from saju_engine.timezone import derive_utc_offset
-
-    year, month, day, hour, minute = _parse_dob_time(dob, birth_time)
-    offset, _from_tz = derive_utc_offset(
-        year, month, day, hour, minute, timezone_name, fallback_offset
-    )
-    return offset
-
-
-def _generate_pdf(payload: dict, output_path: Path) -> Path:
-    """Run chart computation and PDF generation in the synchronous thread."""
-    year, month, day, hour, minute = _parse_dob_time(payload["dob"], payload["birth_time"])
-    gender = payload.get("gender")
-    if gender not in ("M", "F"):
-        raise ValueError("PDF generation requires gender Female or Male so major-luck timing can be computed.")
-
-    tier = normalize_tier(payload.get("tier", "essential"))
-    raw_offset = payload.get("utc_offset")
-    fallback = float(raw_offset) if raw_offset else None
-    utc_offset = _derive_utc_offset(
-        payload["dob"], payload["birth_time"],
-        payload.get("timezone"),
-        fallback,
-    )
-
-    chart = compute_chart(
-        name=payload.get("name") or None,
-        gender=gender,
-        year=year, month=month, day=day,
-        hour=hour, minute=minute,
-        city=payload.get("location") or None,
-        utc_offset=utc_offset,
-        use_solar_time=True,
-        convention="korean",
-    )
-
-    dob_str = f"{payload['dob']}, {payload['birth_time']}, {payload.get('location', '')}"
-    day_master_label = f"{chart.day_master} ({chart.day_master_info.get('element', '')} {chart.day_master_info.get('polarity', '')})"
-
-    return build_pdf_from_chart(
-        chart, output_path,
-        title=f"{payload.get('name', 'Client')} — Saju Reading",
-        client=payload.get("name", ""),
-        dob=dob_str,
-        day_master=day_master_label,
-        tier=tier,
+def _accepted(intake_id: int) -> JSONResponse:
+    return JSONResponse(
+        status_code=202,
+        content={"status": "received", "intake_id": intake_id, "message": RECEIVED_MESSAGE},
     )
 
 
@@ -184,12 +171,12 @@ def home() -> str:
 
 @app.post("/generate")
 async def generate(
+    background_tasks: BackgroundTasks,
     name: str = Form(...),
     dob: str = Form(...),
     birth_time: str = Form(...),
     location: str = Form(...),
-    # N-13: no default offset (the old 5.5 silently produced IST charts for a
-    # US-primary market). A blank offset is only valid when `timezone` is given.
+    # N-13: no default offset. A blank offset is only valid when `timezone` is given.
     utc_offset: str = Form(""),
     email: str = Form(...),
     gender: str = Form(...),
@@ -197,58 +184,75 @@ async def generate(
     tier: str = Form(...),
     main_concern: str = Form(""),
     timezone: str = Form(""),
-) -> FileResponse:
-    payload = {
-        "name": name.strip(),
-        "dob": dob.strip(),
-        "birth_time": birth_time.strip(),
-        "location": location.strip(),
-        "utc_offset": utc_offset.strip(),
-        "email": email.strip(),
-        "gender": gender,
-        "marriage_status": marriage_status,
-        "tier": tier,
-        "main_concern": main_concern.strip(),
-        "timezone": timezone.strip(),
-    }
+):
+    name, dob, birth_time = name.strip(), dob.strip(), birth_time.strip()
+    location, utc_offset, timezone = location.strip(), utc_offset.strip(), timezone.strip()
+    main_concern = main_concern.strip()
 
-    # Validation
-    if not payload["name"]:
-        raise HTTPException(status_code=400, detail="Name is required.")
-    if not payload["timezone"] and not payload["utc_offset"]:
-        raise HTTPException(
-            status_code=400,
-            detail="Provide an IANA timezone or a UTC offset (no default is assumed).",
-        )
-    if tier not in ("sample", "essential", "deep", "spark", "reading", "fullmap"):
-        raise HTTPException(status_code=400, detail="Invalid report tier selected.")
-    if tier == "deep" and not payload["main_concern"]:
-        raise HTTPException(status_code=400, detail="Main concern is required for The Deep Destiny Report tier.")
+    # S8d: validate EVERYTHING before anything is stored.
+    if not name:
+        raise _bad_request("Name is required.")
+    if not email.strip():
+        raise _bad_request("Email is required.")
+    _check_len(name, MAX_NAME, "Name")
+    _check_len(location, MAX_LOCATION, "Location")
+    _check_len(email.strip(), MAX_EMAIL, "Email")
+    _check_len(main_concern, MAX_CONCERN, "Main concern")
+    if not timezone and not utc_offset:
+        raise _bad_request("Provide an IANA timezone or a UTC offset (no default is assumed).")
+    _check_email(email.strip())
+    if marriage_status not in MARRIAGE_STATUSES:
+        raise _bad_request("Invalid relationship status selected.")
+    if tier not in SINGLE_TIERS:
+        raise _bad_request("Invalid report tier selected.")
+    if gender not in ("M", "F"):
+        raise _bad_request("Gender must be Female or Male so major-luck timing can be computed.")
+    if tier == "deep" and not main_concern:
+        raise _bad_request("Main concern is required for The Deep Destiny Report tier.")
+    _check_birth(dob, birth_time, timezone, utc_offset)
+    if tier != "sample":
+        await _check_queue_capacity()
 
-    _save_intake(payload)
-
-    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
-    slug = slugify(name) or "report"
-    INTAKE_DIR.mkdir(parents=True, exist_ok=True)
-    output_pdf = INTAKE_DIR / f"{timestamp}-{slug}-report.pdf"
-
-    try:
-        pdf_path = await run_in_threadpool(_generate_pdf, payload, output_pdf)
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-    except Exception:
-        # N-14 (2026-09-26 audit): an unexpected failure's exception text
-        # (which can include file paths and internal details) used to be
-        # echoed straight into the HTTP response body. Log it server-side
-        # and tell the client only that generation failed.
-        log.exception("PDF generation failed for intake payload name=%r", payload.get("name"))
-        raise HTTPException(status_code=500, detail="Failed to generate report. Please try again.")
-
-    return FileResponse(
-        path=pdf_path,
-        media_type="application/pdf",
-        filename=f"{slug}-saju-report.pdf",
+    intake_id = await run_in_threadpool(
+        STORE.add_intake,
+        kind="single", tier=tier,
+        pii={"name": name, "email": email.strip(), "main_concern": main_concern,
+             "marriage_status": marriage_status},
+        birth={"dob": dob, "birth_time": birth_time, "location": location,
+               "utc_offset": utc_offset, "timezone": timezone, "gender": gender},
     )
+
+    if tier != "sample":  # fail-safe: any non-sample tier goes to human review
+        background_tasks.add_task(generate_draft, STORE, intake_id, FILES_DIR)
+        return _accepted(intake_id)
+
+    # Free sample: render now, approve without a token, return the PDF.
+    got = await run_in_threadpool(jobs.RENDER_SLOTS.acquire, True, SAMPLE_SLOT_WAIT)
+    if not got:
+        raise _busy()
+    try:
+        await run_in_threadpool(generate_draft, STORE, intake_id, FILES_DIR, hold_slot=False)
+    finally:
+        jobs.RENDER_SLOTS.release()
+    row = await run_in_threadpool(STORE.get_intake, intake_id)
+    if row["status"] != "draft_ready":
+        # N-14: never echo exception text; generate_draft already logged it.
+        raise HTTPException(status_code=500, detail="Failed to generate report. Please try again.")
+    await run_in_threadpool(STORE.mark_approved_without_token, intake_id)
+    return FileResponse(
+        path=row["pdf_path"], media_type="application/pdf",
+        filename=f"{slugify(name)}-saju-report.pdf",
+    )
+
+
+@app.get("/report/{token}")
+def report(token: str):
+    row = STORE.resolve_token(token)
+    pdf = Path(row["pdf_path"]) if row and row["pdf_path"] else None
+    # Defence in depth: only ever serve files under the store's files root.
+    if pdf is None or not pdf.resolve().is_relative_to(STORE.files_root.resolve()) or not pdf.is_file():
+        raise HTTPException(status_code=404, detail="Not found")
+    return FileResponse(path=pdf, media_type="application/pdf", filename=pdf.name)
 
 
 @app.get("/compat", response_class=HTMLResponse)
@@ -260,17 +264,18 @@ def compat_form() -> str:
 
 @app.post("/compat/generate")
 async def compat_generate(
+    background_tasks: BackgroundTasks,
     name_a: str = Form(...),
     dob_a: str = Form(...),
     birth_time_a: str = Form(...),
     location_a: str = Form(...),
-    utc_offset_a: float = Form(...),
+    utc_offset_a: str = Form(""),
     gender_a: str = Form(...),
     name_b: str = Form(...),
     dob_b: str = Form(...),
     birth_time_b: str = Form(...),
     location_b: str = Form(...),
-    utc_offset_b: float = Form(...),
+    utc_offset_b: str = Form(""),
     gender_b: str = Form(...),
     email: str = Form(...),
     main_concern: str = Form(""),
@@ -279,158 +284,112 @@ async def compat_generate(
     timezone_a: str = Form(""),
     timezone_b: str = Form(""),
     tier: str = Form("basic"),
-) -> FileResponse:
-    """Generate a 두 분 궁합 (Compatibility) PDF from two birth charts."""
-    payload = {
-        "name_a": name_a.strip(),
-        "dob_a": dob_a.strip(),
-        "birth_time_a": birth_time_a.strip(),
-        "location_a": location_a.strip(),
-        "utc_offset_a": str(utc_offset_a),
-        "gender_a": gender_a,
-        "name_b": name_b.strip(),
-        "dob_b": dob_b.strip(),
-        "birth_time_b": birth_time_b.strip(),
-        "location_b": location_b.strip(),
-        "utc_offset_b": str(utc_offset_b),
-        "gender_b": gender_b,
-        "email": email.strip(),
-        "main_concern": main_concern.strip(),
-        "tier": tier.strip() if tier.strip() in ("basic", "deep") else "basic",
-        "favorable_element_a": favorable_element_a.strip(),
-        "favorable_element_b": favorable_element_b.strip(),
-        "timezone_a": timezone_a.strip(),
-        "timezone_b": timezone_b.strip(),
-    }
-    # S8c (2026-10-01 audit): validate BEFORE persisting — rejected payloads
-    # must never be written to INTAKE_DIR as PII.
-    # Validate genders so 대운 (major luck) can be computed.
-    for prefix, gender in (("a", gender_a), ("b", gender_b)):
+):
+    """Queue a 두 분 궁합 (Compatibility) report; the owner reviews before delivery."""
+    # S8c/S8d: validate BEFORE persisting.
+    for prefix, gender in (("A", gender_a), ("B", gender_b)):
         if gender not in ("M", "F"):
-            raise HTTPException(status_code=400,
-                                detail=f"Gender {prefix.upper()} must be M or F (got {gender!r}).")
-
-    try:
-        ya, ma, da, ha, mia = _parse_dob_time(dob_a, birth_time_a)
-        yb, mb, db, hb, mib = _parse_dob_time(dob_b, birth_time_b)
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-
-    # Save raw intake.
-    INTAKE_DIR.mkdir(parents=True, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
-    slug_a = slugify(name_a)[:24]
-    slug_b = slugify(name_b)[:24]
-    intake_path = INTAKE_DIR / f"{timestamp}-compat-{slug_a}-x-{slug_b}.json"
-    intake_path.write_text(
-        json.dumps({"received_at": datetime.now().isoformat(),
-                    "source": "client_intake_app_compat",
-                    "payload": payload}, indent=2, ensure_ascii=False),
-        encoding="utf-8",
+            raise _bad_request(f"Gender {prefix} must be M or F (got {gender!r}).")
+    if not name_a.strip() or not name_b.strip():
+        raise _bad_request("Both names are required.")
+    if not email.strip():
+        raise _bad_request("Email is required.")
+    for field, val, limit in (("Name A", name_a, MAX_NAME), ("Name B", name_b, MAX_NAME),
+                              ("Location A", location_a, MAX_LOCATION),
+                              ("Location B", location_b, MAX_LOCATION),
+                              ("Email", email, MAX_EMAIL), ("Main concern", main_concern, MAX_CONCERN)):
+        _check_len(val.strip(), limit, field)
+    _check_email(email.strip())
+    off_a, off_b = str(utc_offset_a).strip(), str(utc_offset_b).strip()
+    for label, tzv, off in (("Partner A: ", timezone_a, off_a), ("Partner B: ", timezone_b, off_b)):
+        if not tzv.strip() and not off:
+            raise _bad_request(f"{label}Provide an IANA timezone or a UTC offset (no default is assumed).")
+    _check_birth(dob_a.strip(), birth_time_a.strip(), timezone_a.strip(), off_a, "Partner A: ")
+    _check_birth(dob_b.strip(), birth_time_b.strip(), timezone_b.strip(), off_b, "Partner B: ")
+    fav_a, fav_b = _norm_element(favorable_element_a), _norm_element(favorable_element_b)
+    selected_tier = tier.strip()
+    if selected_tier not in ("basic", "deep"):
+        raise _bad_request("Invalid compatibility tier selected.")
+    await _check_queue_capacity()
+    intake_id = await run_in_threadpool(
+        STORE.add_intake,
+        kind="compat", tier=selected_tier,
+        pii={"name_a": name_a.strip(), "name_b": name_b.strip(), "email": email.strip(),
+             "main_concern": main_concern.strip()},
+        birth={
+            "a": {"dob": dob_a.strip(), "birth_time": birth_time_a.strip(),
+                  "location": location_a.strip(), "utc_offset": off_a,
+                  "timezone": timezone_a.strip(), "gender": gender_a},
+            "b": {"dob": dob_b.strip(), "birth_time": birth_time_b.strip(),
+                  "location": location_b.strip(), "utc_offset": off_b,
+                  "timezone": timezone_b.strip(), "gender": gender_b},
+            "favorable_element_a": fav_a,
+            "favorable_element_b": fav_b,
+        },
     )
-
-    # N-14 (2026-09-26 audit): this used to write straight into
-    # candidates_horoscope/marriage_compatibility/{slug_a}_{slug_b}/ — the
-    # SAME curated folder the manual /saju-client workflow uses for reviewed
-    # client deliverables. A public request naming a real past client pair
-    # (e.g. "Pawan" x "Sruthi") silently overwrote their actual PDF, and two
-    # concurrent requests for the same names raced on the same file. This
-    # self-service endpoint now renders into its own per-request scratch
-    # directory under intake/, like /generate already does, and never
-    # touches the curated folder.
-    render_dir = INTAKE_DIR / "compat-renders" / f"{timestamp}-{slug_a}-x-{slug_b}"
-    render_dir.mkdir(parents=True, exist_ok=True)
-    selected_tier = tier.strip() if tier.strip() in ("basic", "deep") else "basic"
-    name_filename = f"{slug_a}_{slug_b}_compatibility"
-    if selected_tier == "deep":
-        name_filename += "_deep"
-    output_md_path = render_dir / f"{name_filename}.md"
-    output_pdf_path = render_dir / f"{name_filename}.pdf"
-
-    def _render() -> Path:
-        # N-14: compute_chart() also belongs in the worker thread — it used
-        # to run directly in this async handler, blocking the event loop
-        # (and every other in-flight request) for as long as chart
-        # computation took.
-        offset_a = _derive_utc_offset(dob_a, birth_time_a, payload.get("timezone_a"), utc_offset_a)
-        offset_b = _derive_utc_offset(dob_b, birth_time_b, payload.get("timezone_b"), utc_offset_b)
-        chart_a = compute_chart(
-            name=name_a or None, gender=gender_a,
-            year=ya, month=ma, day=da, hour=ha, minute=mia,
-            city=location_a or None, utc_offset=offset_a,
-            use_solar_time=True, convention="korean",
-        )
-        chart_b = compute_chart(
-            name=name_b or None, gender=gender_b,
-            year=yb, month=mb, day=db, hour=hb, minute=mib,
-            city=location_b or None, utc_offset=offset_b,
-            use_solar_time=True, convention="korean",
-        )
-        # N-7 (2026-09-26 audit): a blank form field used to fall back to the
-        # chart's raw, pre-climate 억부 candidate pick (strength_assessment's
-        # candidate-favorable field) and pass it to generate_compat_report()
-        # as though a
-        # human reader had confirmed it. compat.py's favorable_element_a/_b
-        # treats ANY non-empty value as an outright reader override, bypassing
-        # the climate merge and the report's "reader-confirmed" label. Only
-        # pass an override when the form field itself was actually filled in;
-        # otherwise let favorable_element() resolve the real 용신 for both
-        # charts, same as the single-chart path.
-        md = generate_compat_report(
-            chart_a, chart_b, name_a=name_a, name_b=name_b,
-            favorable_element_a=favorable_element_a or None,
-            favorable_element_b=favorable_element_b or None,
-            tier=selected_tier,
-        )
-        output_md_path.write_text(md, encoding="utf-8")
-        dob_a_str = f"{dob_a}, {birth_time_a}, {location_a}"
-        dob_b_str = f"{dob_b}, {birth_time_b}, {location_b}"
-        title = (
-            f"Deep Compatibility Reading — {name_a} × {name_b}"
-            if selected_tier == "deep"
-            else f"Compatibility Reading — {name_a} × {name_b}"
-        )
-        build_pdf(
-            input_md=output_md_path, output_pdf=output_pdf_path,
-            title=title,
-            client=f"{name_a} ({chart_a.day_master}) · {name_b} ({chart_b.day_master})",
-            dob=f"{dob_a_str} · {dob_b_str}",
-            day_master=f"{chart_a.day_master}/{chart_b.day_master}",
-            tier="compat",
-        )
-        return output_pdf_path
-
-    try:
-        pdf_path = await run_in_threadpool(_render)
-    except Exception:
-        # N-14 (2026-09-26 audit): see the matching note in /generate above.
-        log.exception(
-            "Compat PDF generation failed for name_a=%r name_b=%r", name_a, name_b
-        )
-        raise HTTPException(status_code=500, detail="Failed to generate compatibility report. Please try again.")
-
-    download_name = f"{slug_a}_{slug_b}_compatibility.pdf"
-    if selected_tier == "deep":
-        download_name = f"{slug_a}_{slug_b}_compatibility_deep.pdf"
-    return FileResponse(
-        path=pdf_path,
-        media_type="application/pdf",
-        filename=download_name,
-    )
+    # N-14: renders go to files/<id>/ under the store, never the curated
+    # candidates_horoscope/marriage_compatibility/ folder.
+    background_tasks.add_task(generate_draft, STORE, intake_id, FILES_DIR)
+    return _accepted(intake_id)
 
 
-def slugify(s: str) -> str:
-    s = s.lower().strip()
-    s = re.sub(r"[^\w\s-]", "", s)
-    return re.sub(r"[-\s]+", "-", s) or "report"
+def requeue_pending(store: IntakeStore = None, files_dir: Path = None, spawn=None) -> list[int]:
+    """Restart recovery: re-run ``received`` and STALE ``generating`` rows.
+
+    Each job runs in a daemon thread and is bounded by ``jobs.RENDER_SLOTS``.
+    Returns the re-queued ids. ``spawn(fn)`` is injectable for tests.
+    """
+    store = store or STORE
+    files_dir = files_dir or FILES_DIR
+    ids = [r["id"] for r in store.list_intakes()
+           if r["status"] == "received"
+           or (r["status"] == "generating" and is_stale(r["updated_at"]))]
+    for iid in ids:
+        fn = (lambda i=iid: generate_draft(store, i, files_dir))
+        if spawn is not None:
+            spawn(fn)
+        else:
+            threading.Thread(target=fn, daemon=True, name=f"saju-requeue-{iid}").start()
+    if ids:
+        log.info("restart recovery: re-queued intakes %s", ids)
+    return ids
+
+
+_REPORT_PATH_RE = re.compile(r"(/report/)[^\s\"'?]+")
+
+
+def redact_report_tokens(text: str) -> str:
+    """Replace the secret in ``/report/<token>`` with ``[redacted]``."""
+    return _REPORT_PATH_RE.sub(r"\1[redacted]", text)
+
+
+class RedactReportTokens(logging.Filter):
+    """uvicorn.access filter: download tokens must never reach the access log."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        if isinstance(record.args, tuple):
+            record.args = tuple(redact_report_tokens(a) if isinstance(a, str) else a
+                                for a in record.args)
+        if isinstance(record.msg, str):
+            record.msg = redact_report_tokens(record.msg)
+        return True
+
+
+def install_access_log_redaction() -> None:
+    lg = logging.getLogger("uvicorn.access")
+    if not any(isinstance(f, RedactReportTokens) for f in lg.filters):
+        lg.addFilter(RedactReportTokens())
 
 
 def main(argv: list[str] | None = None) -> int:
     import uvicorn
-    port = int((argv or sys.argv)[1]) if len(argv or sys.argv) > 1 else 8080
-    print(f"Starting Saju self-service app at http://localhost:{port}")
-    print(f"Intake records will be saved to {INTAKE_DIR}")
-    uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")
+    args = argv if argv is not None else sys.argv
+    port = int(args[1]) if len(args) > 1 else 8080
+    host = os.environ.get("SAJU_HOST", "127.0.0.1")
+    print(f"Starting Saju self-service app at http://{host}:{port}")
+    print(f"Intake store: {INTAKE_DIR}")
+    install_access_log_redaction()
+    uvicorn.run(app, host=host, port=port, log_level="info")
     return 0
 
 

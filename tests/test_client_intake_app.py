@@ -7,6 +7,10 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
+import pytest
+
+pytestmark = pytest.mark.usefixtures("intake_env")
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 APP_PATH = PROJECT_ROOT / "tools" / "client_intake_app.py"
 
@@ -109,36 +113,48 @@ def test_no_module_reads_the_raw_favorable_field_outside_the_permitted_set():
     )
 
 
-def test_compat_generate_never_writes_into_the_curated_deliverable_folder(monkeypatch, tmp_path):
-    """N-14 (2026-09-26 audit): /compat/generate used to render straight into
-    candidates_horoscope/marriage_compatibility/{slug_a}_{slug_b}/ — the same
-    curated folder the manual /saju-client workflow uses for reviewed client
-    deliverables. A public request naming a real past client pair silently
-    overwrote their actual PDF. It must render into its own scratch directory
-    under INTAKE_DIR instead, and never touch the curated folder."""
-    import asyncio
-
-    module = _load_app_module()
-    monkeypatch.setattr(module, "INTAKE_DIR", tmp_path)
-    curated_dir = module.PROJECT_ROOT / "candidates_horoscope" / "marriage_compatibility"
-    before = set(curated_dir.rglob("*")) if curated_dir.exists() else set()
-
-    # Call the route function directly (bypassing the ASGI/HTTP layer, which
-    # this environment's httpx/starlette versions don't agree on for
-    # TestClient) — FastAPI's @app.post decorator returns the plain
-    # coroutine function unchanged, so it's callable like any other async def.
-    response = asyncio.run(module.compat_generate(
+def _compat_kwargs(**over):
+    kw = dict(
         name_a="N14-Test-A", dob_a="1990-06-15", birth_time_a="10:00",
         location_a="Seoul", utc_offset_a=9.0, gender_a="M",
         name_b="N14-Test-B", dob_b="1992-03-20", birth_time_b="14:00",
         location_b="Seoul", utc_offset_b=9.0, gender_b="F",
         email="test@example.com", main_concern="", favorable_element_a="",
         favorable_element_b="", timezone_a="", timezone_b="", tier="basic",
-    ))
-    assert Path(response.path).exists()
+    )
+    kw.update(over)
+    return kw
+
+
+def test_compat_generate_never_writes_into_the_curated_deliverable_folder():
+    """N-14 (2026-09-26 audit): /compat/generate used to render straight into
+    candidates_horoscope/marriage_compatibility/{slug_a}_{slug_b}/ — the same
+    curated folder the manual /saju-client workflow uses for reviewed client
+    deliverables. It must render into the store's own files dir instead.
+
+    P4 adaptation: the route now returns 202 and renders in a background task
+    (run explicitly here); the PDF lands under INTAKE_DIR/files/<id>/ and the
+    env fixture (tests/conftest.py) points INTAKE_DIR at a tmp dir."""
+    import asyncio
+
+    from fastapi import BackgroundTasks
+
+    module = _load_app_module()
+    curated_dir = module.PROJECT_ROOT / "candidates_horoscope" / "marriage_compatibility"
+    before = set(curated_dir.rglob("*")) if curated_dir.exists() else set()
+
+    # Route functions are called directly (TestClient is incompatible with this
+    # environment's httpx/starlette versions).
+    bg = BackgroundTasks()
+    response = asyncio.run(module.compat_generate(bg, **_compat_kwargs()))
+    assert response.status_code == 202
+    asyncio.run(bg())
+    row = module.STORE.list_intakes()[0]
+    assert row["status"] == "draft_ready"
+    pdf = Path(module.STORE.get_intake(row["id"])["pdf_path"])
+    assert pdf.exists() and pdf.resolve().is_relative_to(module.FILES_DIR.resolve())
     after = set(curated_dir.rglob("*")) if curated_dir.exists() else set()
     assert before == after, "compat_generate must never write into the curated deliverable folder"
-    assert any(tmp_path.rglob("*compatibility.pdf")), "PDF should render into the scratch INTAKE_DIR instead"
 
 
 def test_intake_forms_do_not_default_utc_offset_to_india():
@@ -174,32 +190,30 @@ def test_client_forms_show_usd_not_rupee_prices():
 
 def test_compat_generate_requires_explicit_utc_offsets():
     """S8b (2026-10-01 audit): /compat/generate still defaulted both offsets
-    to Form(5.5) (India) after N-13 removed it from /generate."""
+    to Form(5.5) (India) after N-13 removed it from /generate.
+    Final-fix wave: offsets are optional only when a timezone is given
+    (mirrors /generate); the default is blank, never a number."""
     import inspect
 
     params = inspect.signature(_load_app_module().compat_generate).parameters
     for name in ("utc_offset_a", "utc_offset_b"):
-        assert params[name].default.is_required(), name
+        assert params[name].default.default == "", name
 
 
-def test_compat_generate_validates_before_writing_intake(monkeypatch, tmp_path):
-    """S8c (2026-10-01 audit): the intake JSON was written BEFORE gender/date
-    validation, so rejected (possibly hostile) payloads accumulated as PII."""
+def test_compat_generate_validates_before_writing_intake():
+    """S8c (2026-10-01 audit): the intake was persisted BEFORE gender/date
+    validation, so rejected (possibly hostile) payloads accumulated as PII.
+    P4 adaptation: assert against the store (no more JSON files) and also
+    cover a bad date and an unknown timezone."""
     import asyncio
 
     import pytest
-    from fastapi import HTTPException
+    from fastapi import BackgroundTasks, HTTPException
 
     module = _load_app_module()
-    monkeypatch.setattr(module, "INTAKE_DIR", tmp_path)
-    with pytest.raises(HTTPException) as exc:
-        asyncio.run(module.compat_generate(
-            name_a="A", dob_a="1990-06-15", birth_time_a="10:00",
-            location_a="Seoul", utc_offset_a=9.0, gender_a="X",
-            name_b="B", dob_b="1992-03-20", birth_time_b="14:00",
-            location_b="Seoul", utc_offset_b=9.0, gender_b="F",
-            email="t@example.com", main_concern="", favorable_element_a="",
-            favorable_element_b="", timezone_a="", timezone_b="", tier="basic",
-        ))
-    assert exc.value.status_code == 400
-    assert not list(tmp_path.rglob("*.json"))
+    for over in ({"gender_a": "X"}, {"dob_b": "1992-13-40"}, {"timezone_a": "Mars/Base"}):
+        with pytest.raises(HTTPException) as exc:
+            asyncio.run(module.compat_generate(BackgroundTasks(), **_compat_kwargs(**over)))
+        assert exc.value.status_code == 400
+    assert module.STORE.list_intakes() == []
+    assert not list(module.INTAKE_DIR.rglob("*.json"))

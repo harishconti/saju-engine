@@ -13,10 +13,10 @@ its relationship to the natal chart:
 """
 from __future__ import annotations
 
+import calendar
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
-from functools import lru_cache
 
 from . import lookup as L
 from . import report_primitives as RP
@@ -126,28 +126,21 @@ def _daily_pillar(year: int, month: int, day: int) -> Tuple[str, str]:
 # Classical Saju years begin at 立春 (Lichun, ~Feb 4) and months begin at each
 # 節氣. The math-only functions above treat the Gregorian calendar as if Lichun
 # always falls on Feb 1, which is wrong for late-January / early-February dates.
-# We therefore consult sajupy's calendar_data.csv, which lists the exact
-# year_pillar and month_pillar for every day 1900–2100.
+# S8a (2026-10-01 audit): one clock — transit pillars use data/solar_terms.csv
+# (the natal/대운 table), evaluated at 12:00 KST for a calendar date (the
+# "midday representative instant" a day-granular table implies).
 
 
-@lru_cache(maxsize=1)
-def _load_sajupy_calendar() -> Dict[Tuple[int, int, int], Tuple[str, str]]:
-    """Load a {(year, month, day): (year_pillar, month_pillar)} map from sajupy."""
-    import sajupy
-    calc = sajupy.get_saju_calculator()
-    df = calc.data
-    years = df["year"].astype(int).tolist()
-    months = df["month"].astype(int).tolist()
-    days = df["day"].astype(int).tolist()
-    yps = df["year_pillar"].tolist()
-    mps = df["month_pillar"].tolist()
-    return {
-        (y, m, d): (yp, mp)
-        for y, m, d, yp, mp in zip(years, months, days, yps, mps)
-    }
+def _term_pillars_for_date(year: int, month: int, day: int):
+    """Engine term-table year/month pillars for a date at 12:00 KST, or None
+    outside the table's range."""
+    from .pillars import _independent_year_month_pillar
+    # P4 review (2026-10-03): clamp to month length — the reused reference day may not exist in a shorter month.
+    day = min(day, calendar.monthrange(year, month)[1])
+    return _independent_year_month_pillar(year, month, day, 12, 0, 9.0)
 
 
-# Outside sajupy's 1900-2100 ephemeris there is no exact 절기 date to consult,
+# Outside the term table's 1899-2101 range there is no exact 절기 date to consult,
 # so the fallback approximates Lichun (立春) as Feb 4 — the exact date varies
 # ±1 day year to year, but this is the best available without ephemeris data.
 _APPROX_LICHUN_DAY = 4
@@ -164,11 +157,9 @@ def _annual_pillar_for_date(year: int, month: int, day: int) -> Tuple[str, str]:
 
     Before Lichun (~Feb 4) the pillar belongs to the previous Saju year.
     """
-    lookup = _load_sajupy_calendar()
-    key = (year, month, day)
-    if key in lookup:
-        year_pillar = lookup[key][0]
-        return year_pillar[0], year_pillar[1]
+    ref = _term_pillars_for_date(year, month, day)
+    if ref is not None:
+        return ref["year_stem"], ref["year_branch"]
     # Outside the ephemeris range, fall back to the raw Saju-year math — F-8
     # (2026-09-26 audit): this used to ignore month/day entirely, so a
     # pre-입춘 January (or early February) date got the CURRENT year's cycle
@@ -180,11 +171,9 @@ def _annual_pillar_for_date(year: int, month: int, day: int) -> Tuple[str, str]:
 
 def _monthly_pillar_for_date(year: int, month: int, day: int) -> Tuple[str, str]:
     """Return the 60-cycle monthly pillar for the given Gregorian date."""
-    lookup = _load_sajupy_calendar()
-    key = (year, month, day)
-    if key in lookup:
-        month_pillar = lookup[key][1]
-        return month_pillar[0], month_pillar[1]
+    ref = _term_pillars_for_date(year, month, day)
+    if ref is not None:
+        return ref["month_stem"], ref["month_branch"]
     # Outside the ephemeris range, fall back to the raw month math.
     return _monthly_pillar(year, month, day)
 
@@ -523,7 +512,9 @@ def current_woon_window(
     results: List[SeWoonHit] = []
     for delta in range(-window, window + 1):
         y, m = _add_months(reference_year, reference_month, delta)
-        results.append(derive_woon(day_master, natal_branches, y, m, reference_day))
+        # P4 review (2026-10-03): clamp to month length — the reused reference day may not exist in a shorter month.
+        d = min(reference_day, calendar.monthrange(y, m)[1])
+        results.append(derive_woon(day_master, natal_branches, y, m, d))
     return results
 
 
