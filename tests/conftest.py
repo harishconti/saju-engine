@@ -2,14 +2,11 @@
 import requires SAJU_INTAKE_KEY and must never write into the real
 candidates_horoscope/intake/ directory. Web tests activate it via
 tests/web/conftest.py; tests/test_client_intake_app.py via `usefixtures`."""
-import os
 
 import pytest
 
-# This machine only has system Chrome (no `playwright install chromium`), so the
-# browser-backed PDF tests opt in to it. The gate itself is covered explicitly in
-# tests/test_browser_gate.py (which sets/unsets the variable per test).
-os.environ.setdefault("SAJU_ALLOW_SYSTEM_CHROME", "1")
+# System Chrome is allowed by default (SAJU_ALLOW_SYSTEM_CHROME unset or != "0");
+# tests/test_browser_gate.py covers both settings explicitly.
 
 
 @pytest.fixture

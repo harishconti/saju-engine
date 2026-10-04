@@ -138,7 +138,7 @@ Beyond the knowledge base, the project ships two execution paths:
 - **Solar-time correction:** Enabled by default for non-standard longitudes. Indian births east or west of the IST meridian (82.5°E) are corrected to true solar time before the hour branch and day pillar are derived.
 - **Korean `야자시` vs Chinese `조자시`:** defaults to `convention="korean"` (23:00 belongs to the *current* day's 子 hour). Use `--convention=chinese` for the Chinese early-Zi rule.
 - **CLI formats:** `table` (default), `json`, `skeleton`, and `premium`. Premium supports `--tier {sample,essential,deep,spark,reading,fullmap}` — the first three are the landing-page products (Hook / Essential Report / Deep Destiny Report), the last three are legacy internal aliases kept for backward compatibility. Skeleton supports `--year`, `--month`, `--day`, `--focus`, and `--no-prose-scaffold`. `--convention` and `--overwrite-report` are available on the PDF wrapper.
-- **Dependencies:** declared in `pyproject.toml`. For a fresh machine: `pip install -e .[html]` then `python -m playwright install chromium` (the bundled Chromium is needed for the default HTML PDF backend; a system Google Chrome is used only if you set `SAJU_ALLOW_SYSTEM_CHROME=1`).
+- **Dependencies:** declared in `pyproject.toml`. For a fresh machine: `pip install -e .[html]` then `python -m playwright install chromium` (the bundled Chromium is needed for the default HTML PDF backend; otherwise a system Google Chrome is used with a warning; `SAJU_ALLOW_SYSTEM_CHROME=0` requires the bundled one).
 
 ### Self-service calculator — `tools/client_intake_app.py`
 - FastAPI web app: the client fills the intake form (name, DOB, birth time, location, email, gender, marriage status, tier; "main concern" enabled only for the Deep tier) and the free Hook (sample) PDF comes back immediately; paid tiers are queued for owner review (202 + private download link after approval). Input is validated before storing.
@@ -162,7 +162,7 @@ Beyond the knowledge base, the project ships two execution paths:
 - **Technology:** markdown → `markdown-it-py` → styled HTML → Playwright/Chromium → A4 PDF.
 - **Why use it:** better table typography, easier theming via CSS, and native `@page` print controls.
 - **Shared translation maps:** `src/saju_html/__init__.py` keeps both backends in sync; `tests/test_translation_coverage.py` / `test_translation_quality.py` guard them, and `tests/golden_html/` holds rendered-HTML snapshots (`python tools/regen_golden.py --html`).
-- **Dependencies:** `playwright` (runtime; `pip install -e .[html]` + `python -m playwright install chromium`; system Chrome only with `SAJU_ALLOW_SYSTEM_CHROME=1`); `markdown-it-py` (already present).
+- **Dependencies:** `playwright` (runtime; `pip install -e .[html]` + `python -m playwright install chromium`; falls back to system Chrome with a warning unless `SAJU_ALLOW_SYSTEM_CHROME=0`); `markdown-it-py` (already present).
 
 ### Two-chart compatibility pipeline — `src/saju_engine/compat.py` + `src/saju_html/md_to_saju_compat_pdf.py`
 - **Engine:** `compat_score(chart_a, chart_b)` in `src/saju_engine/compat.py` runs all 11 sub-systems (일간합 → 띠 궁합), weights them per `knowledge/11-gunghap.md`, and returns a `CompatReport` with composite 0–100 score + 4-band verdict.

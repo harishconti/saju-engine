@@ -105,7 +105,7 @@ assert JIAZI_TO_NAYIN[("甲", "子")] == "海中金"  # Gold in the sea
 
 ### HTML/Playwright backend (default)
 - Default since 2026-10-04 for `tools/build-pdf.sh`, the compat PDF tool (`--backend html|reportlab`) and the self-service app.
-- Requires Playwright and its bundled Chromium: `pip install -e .[html]` then `python -m playwright install chromium`. A system Google Chrome is used only when env `SAJU_ALLOW_SYSTEM_CHROME=1` (default: bundled Chromium only, so output is identical on every machine). A missing browser raises `PdfBackendUnavailable`; the self-service app records that class name as the failure reason.
+- Requires Playwright and its bundled Chromium: `pip install -e .[html]` then `python -m playwright install chromium`. If the bundled Chromium is missing, a system Google Chrome is used with a warning; set `SAJU_ALLOW_SYSTEM_CHROME=0` to require the bundled Chromium (identical output on every machine). A missing browser raises `PdfBackendUnavailable`; the self-service app records that class name as the failure reason.
 - Renders Quick Reference as a card, current-year paragraph as a callout, Lucky Attributes as a grid, and adds an SVG element-balance chart.
 - Use `--compact` for the one-page Hook/sample tier. `src/saju_html/chart_input.py` is the shared chart-to-markdown step for `--from-chart`.
 - **No silent fallback:** a missing browser raises. The renderer falls back to ReportLab only with `allow_fallback=True` or env `SAJU_PDF_FALLBACK=reportlab`.

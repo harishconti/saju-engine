@@ -188,8 +188,8 @@ def _generate(store: IntakeStore, intake_id: int, files_dir: Path) -> None:
             # Operator-facing and PII-free: the message is never logged.
             log.error("PDF backend unavailable (intake %s): install it with "
                       "`pip install -e .[html]` and `python -m playwright install "
-                      "chromium` (or set SAJU_ALLOW_SYSTEM_CHROME=1 to use system "
-                      "Chrome).", intake_id)
+                      "chromium` (a system Google Chrome is used automatically unless "
+                      "SAJU_ALLOW_SYSTEM_CHROME=0).", intake_id)
         # Exception messages may embed birth data/PII: log class + frames only.
         log.error("draft generation failed for intake %s: %s", intake_id,
                   type(exc).__name__, exc_info=(type(exc), None, exc.__traceback__))

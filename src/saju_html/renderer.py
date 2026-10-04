@@ -14,6 +14,7 @@ from __future__ import annotations
 import html
 import logging
 import os
+import warnings
 import re
 from datetime import date
 from pathlib import Path
@@ -387,10 +388,11 @@ def _launch_browser(playwright) -> None:
     """Launch Playwright's bundled Chromium (the same binary on every machine).
 
     Install it with ``pip install -e .[html]`` and
-    ``python -m playwright install chromium``. A system Google Chrome
-    (``channel="chrome"``) is used as a fallback ONLY when the operator opts in
-    with ``SAJU_ALLOW_SYSTEM_CHROME=1``; by default output must not depend on
-    whichever Chrome a machine happens to have.
+    ``python -m playwright install chromium``. If the bundled Chromium is not
+    installed, a system Google Chrome (``channel="chrome"``) is used with a
+    warning (it may render slightly differently). Set
+    ``SAJU_ALLOW_SYSTEM_CHROME=0`` to require the bundled Chromium (identical
+    output on every machine).
 
     Raises PdfBackendUnavailable (a RuntimeError) naming the fix when no
     permitted browser can be launched.
@@ -399,9 +401,17 @@ def _launch_browser(playwright) -> None:
         return playwright.chromium.launch()
     except Exception as exc:  # pragma: no cover - environment-specific
         bundled_error = str(exc)
-    if os.environ.get("SAJU_ALLOW_SYSTEM_CHROME") == "1":
+    if os.environ.get("SAJU_ALLOW_SYSTEM_CHROME", "1") != "0":
         try:
-            return playwright.chromium.launch(channel="chrome")
+            browser = playwright.chromium.launch(channel="chrome")
+            warnings.warn(
+                "Bundled Playwright Chromium not installed; rendering with system "
+                "Google Chrome (output may differ slightly between machines). Run "
+                "`python -m playwright install chromium` or set "
+                "SAJU_ALLOW_SYSTEM_CHROME=0 to require the bundled browser.",
+                stacklevel=2,
+            )
+            return browser
         except Exception as exc:  # pragma: no cover - environment-specific
             raise PdfBackendUnavailable(
                 "No usable browser for the HTML/Playwright PDF backend. Install "
@@ -412,8 +422,8 @@ def _launch_browser(playwright) -> None:
     raise PdfBackendUnavailable(
         "No usable browser for the HTML/Playwright PDF backend. Install "
         "Playwright's Chromium with `python -m playwright install chromium` "
-        "(or set SAJU_ALLOW_SYSTEM_CHROME=1 to allow a system Google Chrome, "
-        "which may render slightly differently). "
+        "(SAJU_ALLOW_SYSTEM_CHROME=0 is set, so a system Google Chrome was not "
+        "tried). "
         f"Bundled Chromium error: {bundled_error!r}"
     )
 
@@ -452,8 +462,8 @@ def html_to_pdf(
     footer_html = footer.format(report_id=html.escape(report_id))
 
     with sync_playwright() as p:
-        # Bundled Chromium only, unless SAJU_ALLOW_SYSTEM_CHROME=1 (see
-        # _launch_browser); otherwise fail with an actionable error.
+        # Bundled Chromium preferred; system Chrome with a warning unless
+        # SAJU_ALLOW_SYSTEM_CHROME=0 (see _launch_browser).
         browser = _launch_browser(p)
         # N-8 (2026-09-26 audit) defense-in-depth: the report is static markup
         # printed to PDF, so it never needs to run script or fetch a network

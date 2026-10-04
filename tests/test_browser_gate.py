@@ -1,4 +1,6 @@
-"""System Chrome is only used when SAJU_ALLOW_SYSTEM_CHROME=1 (same output on every machine)."""
+"""Browser selection for the HTML/Playwright PDF backend: bundled Chromium is
+preferred; a system Google Chrome is used (with a warning) when it is missing,
+unless SAJU_ALLOW_SYSTEM_CHROME=0 requires the bundled browser."""
 import pytest
 
 from saju_html.renderer import PdfBackendUnavailable, _launch_browser
@@ -22,23 +24,31 @@ class _PW:
         self.chromium = _Chromium(**kw)
 
 
-def test_system_chrome_not_used_by_default(monkeypatch):
+def test_system_chrome_used_with_warning_by_default(monkeypatch):
     monkeypatch.delenv("SAJU_ALLOW_SYSTEM_CHROME", raising=False)
     pw = _PW()
-    with pytest.raises(PdfBackendUnavailable, match="SAJU_ALLOW_SYSTEM_CHROME"):
+    with pytest.warns(UserWarning, match="system Google Chrome"):
+        assert _launch_browser(pw) is not None
+    assert pw.chromium.calls == [{}, {"channel": "chrome"}]
+
+
+def test_strict_mode_refuses_system_chrome(monkeypatch):
+    monkeypatch.setenv("SAJU_ALLOW_SYSTEM_CHROME", "0")
+    pw = _PW()
+    with pytest.raises(PdfBackendUnavailable, match="playwright install chromium"):
         _launch_browser(pw)
     assert pw.chromium.calls == [{}]
 
 
-def test_system_chrome_used_when_allowed(monkeypatch):
-    monkeypatch.setenv("SAJU_ALLOW_SYSTEM_CHROME", "1")
-    pw = _PW()
-    assert _launch_browser(pw) is not None
-    assert pw.chromium.calls == [{}, {"channel": "chrome"}]
-
-
 def test_bundled_chromium_preferred(monkeypatch):
-    monkeypatch.setenv("SAJU_ALLOW_SYSTEM_CHROME", "1")
+    monkeypatch.delenv("SAJU_ALLOW_SYSTEM_CHROME", raising=False)
     pw = _PW(bundled_ok=True)
     _launch_browser(pw)
     assert pw.chromium.calls == [{}]
+
+
+def test_no_browser_at_all_raises(monkeypatch):
+    monkeypatch.delenv("SAJU_ALLOW_SYSTEM_CHROME", raising=False)
+    pw = _PW(chrome_ok=False)
+    with pytest.raises(PdfBackendUnavailable):
+        _launch_browser(pw)
