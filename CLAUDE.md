@@ -90,10 +90,12 @@ When the user asks for a "PDF", "shareable", "presentable" version of a candidat
 1. **Use the wrapper script** `tools/build-pdf.sh` — it sets up the user-space Python and shared-library paths automatically.
    - Default for Sruthi: `./tools/build-pdf.sh sruthi`
    - For a new candidate: `./tools/build-pdf.sh {name} "{title}" "{client}" "{dob}" "{day-master}"`
+   - **HTML/Playwright (Chromium) is the default backend** (since 2026-10-04). `--reportlab` selects the legacy ReportLab tool and writes `{name}-report-reportlab.pdf` / `{name}-combined-reportlab.pdf` so the two never overwrite each other; `--html` is accepted as a no-op alias. ReportLab stays for one release, then is planned for removal.
+   - **No silent fallback:** if the browser is missing the renderer raises. It falls back to ReportLab only with `allow_fallback=True` or env `SAJU_PDF_FALLBACK=reportlab`. The self-service job queue (`src/saju_web/jobs.py`) uses HTML unless env `SAJU_PDF_BACKEND=reportlab`.
 2. **Output path:** `candidates_horoscope/reports/{name}/{name}-report.pdf` (sits next to the `.md` base reading).
 3. **Style:** English-primary, Korean/Hanja translated inline (translation maps live in `src/saju_html/__init__.py`). Cover page with title, candidate info, Day Master, generation date. Body has clean headings, alternating-row tables, footer with page numbers.
-4. **Dependencies:** `reportlab` and `sajupy` are both pre-installed at `/home/harish/.local/lib/python3.12/site-packages/` (added to `PYTHONPATH` automatically by `build-pdf.sh`; the engine honours `$SAJU_SITE` as an override, `src/saju_engine/pillars.py`). If a fresh machine is used, install with `pip install --user --break-system-packages sajupy reportlab`.
-5. **Adding new translation terms:** if a Korean or Hanja term appears in the PDF that isn't translated, add it to the appropriate map (`STEM_MAP`, `BRANCH_MAP`, `TENGOD_MAP`, `KOR_REPL`, or `HANJA_MAP`) in `src/saju_html/__init__.py` and rebuild.
+4. **Dependencies:** `playwright` + Chromium (`pip install playwright && python -m playwright install chromium`) for the default HTML backend; `reportlab` and `sajupy` are both pre-installed at `/home/harish/.local/lib/python3.12/site-packages/` (added to `PYTHONPATH` automatically by `build-pdf.sh`; the engine honours `$SAJU_SITE` as an override, `src/saju_engine/pillars.py`). If a fresh machine is used, install with `pip install --user --break-system-packages sajupy reportlab`.
+5. **Adding new translation terms:** if a Korean or Hanja term appears in the PDF that isn't translated, add it to the appropriate map (`STEM_MAP`, `BRANCH_MAP`, `TENGOD_MAP`, `KOR_REPL`, `_PHRASE_RULES` for phrase-level Korean glosses, or `HANJA_MAP`) in `src/saju_html/__init__.py` and rebuild. Unmapped CJK is no longer silently deleted: the HTML path keeps it and reports it, the reportlab path warns. `tests/test_translation_coverage.py` and `tests/test_translation_quality.py` guard the maps.
 
 ## Premium Client Report Pipeline (Preferred Pattern)
 
@@ -122,8 +124,8 @@ For deliverables that combine a base natal reading with topic deep-dives, follow
    - Writes `{name}-combined.md`.
 
 4. **Build the client PDF** using the wrapper with the `--combined` flag:
-   - Default reportlab backend: `./tools/build-pdf.sh --combined {name} "{title}" "{client}" "{dob}" "{day-master}"`
-   - Rich HTML/Playwright backend: `./tools/build-pdf.sh --html --combined {name} ...`
+   - Default HTML/Playwright backend: `./tools/build-pdf.sh --combined {name} "{title}" "{client}" "{dob}" "{day-master}"` (`--html` is a no-op alias)
+   - Legacy ReportLab backend: `./tools/build-pdf.sh --reportlab --combined {name} ...` (writes `*-reportlab.pdf`)
    - The HTML backend renders Quick Reference as a card, "What This Year Means for You" as a callout, Lucky Attributes as a grid, and adds an SVG Element Balance chart.
 
 5. **Citations stay in `.md`, never in PDF.** Both backends strip inline `*(see knowledge/...)*` citations and standalone `## Sources` sections before layout.
@@ -211,7 +213,7 @@ Current state at a glance:
 
 - ✅ **Priority 1 — Calculation Engine.** Built at `src/saju_engine/`. 520 pytest tests pass. Wraps `sajupy` (installed at `/home/harish/.local/lib/python3.12/site-packages/`) + our own 십신/12운성/대운 lookups, plus overlays for stars, strength, patterns, annual/monthly/daily luck, and a 30×30 Nayin pair table.
 - ✅ **Priority 2 — PDF toolchain.** `src/saju_html/md_to_saju_pdf.py` + `src/saju_html/md_to_saju_html_pdf.py` + `tools/build-pdf.sh` produce presentable PDFs from markdown or directly from a `Chart` (`--from-chart`).
-- ✅ **Priority 3 — Chart→PDF path.** `--from-chart` works in both reportlab and HTML/Playwright backends, and accepts `--tier` for tiered reports.
+- ✅ **Priority 3 — Chart→PDF path.** `--from-chart` works in both HTML/Playwright (default) and reportlab backends, and accepts `--tier` for tiered reports.
 - ✅ **Priority 4 — Expand validation test suite** with Korean textbook 만세력 cases. Three externally-sourced cases (박정희, 노무현, 김대중) now cross-validate the engine; foundation lookup tables and Nayin pair table are regression-tested.
 - ✅ **Priority 5 — Self-service calculator.** Implemented as FastAPI app (`tools/client_intake_app.py`) with a self-service form that returns a tiered PDF.
 - ✅ **Priority 6 — Anthropic community skills.** Six skills (pdf, theme-factory, canvas-design, docx, pptx, xlsx) symlinked into `~/.claude/skills/`.

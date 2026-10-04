@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Golden kiran-luck-cycle</title>
+<style>
+/* Saju HTML→PDF theme
+ *
+ * Designed for A4 print rendering via Playwright / Chromium.
+ * Uses CSS @page rules for margins, running footers, and print-specific styling.
+ */
+
+@page {
+    size: A4;
+    margin: 18mm;
+    margin-bottom: 22mm;
+}
+
+@page cover {
+    margin-bottom: 18mm;
+}
+
+:root {
+    --color-text: #222222;
+    --color-muted: #555555;
+    --color-light: #888888;
+    --color-heading: #2a4d6e;
+    --color-heading2: #3a5d7e;
+    --color-accent: #f3f6fa;
+    --color-rule: #cccccc;
+    --color-table-header: #2a4d6e;
+    --color-card-bg: #f8fafc;
+    --color-card-border: #d0d8e0;
+    --color-callout-bg: #eef5fa;
+    --color-callout-border: #b8d4e8;
+    --font-serif: Georgia, "Times New Roman", "Noto Serif CJK KR", "Noto Serif KR", serif;
+    --font-sans: "Helvetica Neue", Helvetica, Arial, "Noto Sans CJK KR", "Noto Sans KR", sans-serif;
+    --font-mono: Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-serif);
+    font-size: 10.5pt;
+    line-height: 1.55;
+    color: var(--color-text);
+}
+
+/* ---- Cover page --------------------------------------------------------- */
+.cover {
+    text-align: center;
+    padding-top: 18mm;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 55%, #eef2f7 100%);
+    min-height: calc(100vh - 40mm);
+    border: 1px solid transparent;
+    break-after: page;
+}
+
+.cover .watermark {
+    font-size: 110pt;
+    line-height: 1;
+    margin-bottom: 4mm;
+    opacity: 0.12;
+}
+
+.cover h1 {
+    font-family: var(--font-sans);
+    font-size: 34pt;
+    font-weight: bold;
+    color: #1a1a1a;
+    margin: 0 0 4mm 0;
+    line-height: 1.15;
+    page-break-before: auto;
+    border-bottom: none;
+}
+
+.cover .subtitle {
+    font-family: var(--font-serif);
+    font-size: 12.5pt;
+    font-style: italic;
+    color: var(--color-heading);
+    margin: 0 0 10mm 0;
+    letter-spacing: 0.3px;
+}
+
+.cover .meta-block {
+    display: inline-block;
+    text-align: left;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid var(--color-card-border);
+    border-radius: 6px;
+    padding: 6mm 10mm;
+    margin: 0 auto 12mm auto;
+    box-shadow: 0 2px 8px rgba(42, 77, 110, 0.06);
+}
+
+.cover .meta {
+    font-family: var(--font-sans);
+    font-size: 11pt;
+    color: var(--color-text);
+    margin: 2.5mm 0;
+    text-align: left;
+}
+
+.cover .meta strong {
+    color: var(--color-heading);
+    font-weight: 600;
+    margin-right: 3mm;
+    display: inline-block;
+    min-width: 22mm;
+}
+
+.cover .foot {
+    margin-top: 14mm;
+    font-family: var(--font-sans);
+    font-size: 9.5pt;
+    color: var(--color-muted);
+    line-height: 1.45;
+    padding: 0 22mm;
+}
+
+.cover .date {
+    margin-top: 6mm;
+    font-size: 10pt;
+    color: var(--color-light);
+}
+
+.cover .report-id {
+    margin-top: 3mm;
+    font-family: var(--font-sans);
+    font-size: 9pt;
+    color: var(--color-heading);
+    font-weight: 600;
+}
+
+/* ---- Compact one-page hook header --------------------------------------- */
+.compact-cover {
+    text-align: center;
+    padding: 8mm 0 4mm 0;
+    margin-bottom: 4mm;
+    border-bottom: 1.5px solid var(--color-rule);
+    page-break-after: avoid;
+}
+
+.compact-cover h1 {
+    font-family: var(--font-sans);
+    font-size: 18pt;
+    font-weight: bold;
+    color: var(--color-heading);
+    margin: 0 0 2mm 0;
+    line-height: 1.2;
+    border-bottom: none;
+}
+
+.compact-cover .subtitle {
+    font-family: var(--font-serif);
+    font-size: 10pt;
+    font-style: italic;
+    color: var(--color-muted);
+    margin: 0 0 2mm 0;
+}
+
+.compact-cover .meta,
+.compact-cover .report-line {
+    font-family: var(--font-sans);
+    font-size: 8.5pt;
+    color: var(--color-light);
+    margin: 0 0 1mm 0;
+}
+
+@page compact {
+    size: A4;
+    margin: 13mm 14mm 16mm 14mm;
+}
+
+body.compact-mode {
+    page: compact;
+    font-size: 9.5pt;
+    line-height: 1.38;
+}
+
+body.compact-mode h2 {
+    font-size: 11.5pt;
+    margin: 3mm 0 1.5mm 0;
+}
+
+body.compact-mode h3 {
+    font-size: 10pt;
+    margin: 2.5mm 0 1mm 0;
+}
+
+body.compact-mode p,
+body.compact-mode ul,
+body.compact-mode li {
+    margin: 1.2mm 0;
+}
+
+body.compact-mode table {
+    margin: 1.5mm 0;
+    font-size: 9pt;
+}
+
+body.compact-mode hr {
+    margin: 2mm 0;
+}
+
+body.compact-mode .compact-cover {
+    padding: 5mm 0 3mm 0;
+    margin-bottom: 3mm;
+}
+
+body.compact-mode .compact-cover h1 {
+    font-size: 16pt;
+    margin: 0 0 1.5mm 0;
+}
+
+body.compact-mode .compact-cover .subtitle {
+    font-size: 9pt;
+    margin: 0 0 1.5mm 0;
+}
+
+body.compact-mode .compact-cover .meta,
+body.compact-mode .compact-cover .report-line {
+    font-size: 8pt;
+    margin: 0 0 0.8mm 0;
+}
+
+/* ---- Typography --------------------------------------------------------- */
+h1 {
+    string-set: section-title content();
+    font-family: var(--font-sans);
+    font-size: 22pt;
+    font-weight: bold;
+    color: var(--color-heading);
+    border-bottom: 2px solid var(--color-heading);
+    padding-bottom: 0.2em;
+    margin: 0 0 6mm 0;
+    page-break-before: always;
+    line-height: 1.25;
+}
+
+h1:first-of-type {
+    page-break-before: auto;
+}
+
+h2 {
+    string-set: section-title content();
+    font-family: var(--font-sans);
+    font-size: 16pt;
+    font-weight: bold;
+    color: var(--color-heading2);
+    margin: 8mm 0 3mm 0;
+    line-height: 1.3;
+}
+
+h3 {
+    string-set: section-title content();
+    font-family: var(--font-sans);
+    font-size: 13pt;
+    font-weight: bold;
+    color: #444444;
+    margin: 6mm 0 2mm 0;
+    line-height: 1.3;
+}
+
+h4, h5, h6 {
+    font-family: var(--font-sans);
+    font-size: 11pt;
+    font-weight: bold;
+    color: #444444;
+    margin: 4mm 0 2mm 0;
+}
+
+p {
+    margin: 0 0 3mm 0;
+    orphans: 3;
+    widows: 3;
+}
+
+a {
+    color: var(--color-heading);
+    text-decoration: none;
+}
+
+strong {
+    font-weight: bold;
+    color: #1a1a1a;
+}
+
+em {
+    font-style: italic;
+}
+
+/* ---- Lists -------------------------------------------------------------- */
+ul, ol {
+    margin: 2mm 0 4mm 0;
+    padding-left: 6mm;
+}
+
+li {
+    margin: 1.2mm 0;
+}
+
+/* ---- Blockquotes / notes ------------------------------------------------ */
+blockquote {
+    border-left: 3px solid var(--color-rule);
+    padding-left: 1em;
+    margin: 1em 0;
+    color: #555555;
+}
+
+blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+/* ---- Code & ASCII art --------------------------------------------------- */
+code {
+    font-family: var(--font-mono);
+    font-size: 9.5pt;
+    background: #f0f0f0;
+    padding: 0 0.2em;
+    border-radius: 2px;
+}
+
+pre {
+    font-family: var(--font-mono);
+    font-size: 9pt;
+    background: #f6f6f6;
+    padding: 0.8em;
+    border-radius: 4px;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    margin: 1em 0;
+}
+
+pre code {
+    background: transparent;
+    padding: 0;
+}
+
+/* ---- Tables ------------------------------------------------------------- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+    font-size: 9.5pt;
+    page-break-inside: avoid;
+}
+
+thead {
+    display: table-header-group;
+}
+
+tr {
+    page-break-inside: avoid;
+}
+
+th, td {
+    border: 1px solid var(--color-rule);
+    padding: 5px;
+    vertical-align: top;
+    text-align: left;
+}
+
+th {
+    background: var(--color-table-header);
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background: var(--color-accent);
+}
+
+/* ---- Quick Reference card ----------------------------------------------- */
+.quick-ref-card {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-left: 4px solid var(--color-heading);
+    border-radius: 6px;
+    padding: 5mm 6mm;
+    margin: 4mm 0 6mm 0;
+    box-shadow: 0 2px 6px rgba(42, 77, 110, 0.05);
+}
+
+.quick-ref-card ul {
+    margin: 0;
+    padding-left: 5mm;
+}
+
+.quick-ref-card li {
+    margin: 1.5mm 0;
+}
+
+/* ---- Right Now callout -------------------------------------------------- */
+.right-now-callout {
+    background: var(--color-callout-bg);
+    border: 1px solid var(--color-callout-border);
+    border-radius: 6px;
+    padding: 5mm 6mm;
+    margin: 4mm 0 6mm 0;
+    font-style: italic;
+}
+
+.right-now-callout p {
+    margin: 0;
+}
+
+/* ---- Lucky Attributes grid ---------------------------------------------- */
+.lucky-attributes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3mm;
+    margin: 4mm 0 6mm 0;
+}
+
+.lucky-attribute-item {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-radius: 5px;
+    padding: 3mm 4mm;
+}
+
+.lucky-attribute-item .label {
+    font-family: var(--font-sans);
+    font-size: 8.5pt;
+    font-weight: bold;
+    color: var(--color-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 1mm;
+}
+
+.lucky-attribute-item .value {
+    font-size: 9.5pt;
+    color: var(--color-text);
+}
+
+/* ---- Element Balance SVG chart ---------------------------------------- */
+.element-balance-chart {
+    margin: 4mm 0 6mm 0;
+    page-break-inside: avoid;
+}
+
+.element-balance-chart svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* ---- Element-balance color coding --------------------------------------- */
+.element-fire { color: #e74c3c; }
+.element-earth { color: #f39c12; }
+.element-metal { color: #7f8c8d; }
+.element-water { color: #3498db; }
+.element-wood { color: #27ae60; }
+
+/* ---- Horizontal rules --------------------------------------------------- */
+hr {
+    border: none;
+    border-top: 1px solid var(--color-rule);
+    margin: 1em 0;
+}
+
+/* ---- Utility ------------------------------------------------------------ */
+.print-only {
+    display: block;
+}
+
+.no-break {
+    page-break-inside: avoid;
+}
+
+/* ---- Chart signature (Deep tier pull-quote) ----------------------------- */
+.chart-signature {
+    font-family: var(--font-serif);
+    font-size: 12.5pt;
+    font-style: italic;
+    color: var(--color-heading);
+    border-left: 4px solid var(--color-heading);
+    background: var(--color-callout-bg);
+    padding: 4mm 6mm;
+    margin: 4mm 0 6mm 0;
+    border-radius: 4px;
+}
+
+/* ---- Audio included callout (Deep tier cover) -------------------------- */
+.audio-included {
+    display: inline-block;
+    background: #fff7e6;
+    border: 1px solid #f0c674;
+    color: #8a5a00;
+    font-family: var(--font-sans);
+    font-size: 10pt;
+    padding: 2mm 4mm;
+    margin: 3mm 0 2mm 0;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* ---- Partner Chart Add-On upsell box ------------------------------------ */
+.partner-compat-upsell {
+    background: #f0f7ff;
+    border: 1px solid #b6d4f0;
+    border-left: 4px solid #2a4d6e;
+    color: #1a1a1a;
+    padding: 3mm 5mm;
+    margin: 3mm 0 5mm 0;
+    border-radius: 4px;
+    font-style: italic;
+}
+
+/* ---- Lifetime Decade Roadmap (Deep tier SVG) ---------------------------- */
+.decade-roadmap {
+    margin: 4mm 0 6mm 0;
+    page-break-inside: avoid;
+}
+
+.decade-roadmap svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 720px;
+}
+
+/* ---- Tier-aware body classes -------------------------------------------- */
+body.tier-deep h1 {
+    border-bottom: 2.5px solid var(--color-heading);
+}
+
+body.tier-essential h1 {
+    border-bottom: 2px solid var(--color-heading);
+}
+
+</style>
+</head>
+<body class="tier-luck-cycle">
+<div class="cover">
+  <div class="watermark">命</div>
+  <h1>Golden kiran-luck-cycle</h1>
+  <p class="subtitle">A Reading in the Korean Four Pillars Tradition</p>
+  <div class="meta-block">
+    <p class="meta"><strong>For</strong>Golden Client</p>
+    <p class="meta"><strong>Born</strong>1 January 1990</p>
+    <p class="meta"><strong>Day Master</strong>Byeong (Yang Fire)</p>
+  </div>
+  <p class="foot">Grounded in the Five Elements and Yin-Yang philosophy. Interpreted through classical Myeongri (Korean Saju) tradition: Jeokcheon-su, Yeonhae-japyeong, Gungtong-bogam, Myeongri-jeongjong.</p>
+  <p class="date">Generated 2026-06-01</p>
+  <p class="report-id">Report ID: GOLDEN-kiran-luck-cycle · CosmicSaju · cosmicsaju.com</p>
+</div>
+
+
+<h2>Kiran — Luck Cycle &amp; Lifetime Decade Roadmap · Add-on</h2>
+<p><em>Every five-year block of your life, with wealth, business, family and investment notes, and charts</em></p>
+<p><strong>Born:</strong> 1983-01-04 · 06:00 · —</p>
+<p><strong>Time method:</strong> recorded birth time 06:00 (local clock) corrected to true solar time <strong>05:36</strong> (birthplace 78.0°E vs the 82.5°E zone meridian), -23 min (longitude -18 min + equation of time -5 min). Hour branches follow 2-hour solar windows, so the pillars above use the corrected time.</p>
+<p><strong>Day Master:</strong> Im (Yang Water, Im Water)</p>
+<p><strong>Report generated:</strong> 2026-06-01 · <strong>Report ID:</strong> CID-kiran-20260601-LUCK-CYCLE</p>
+<p><em>Delivered by Cosmic Saju · cosmicsaju.com</em></p>
+<p><strong>Chart signature:</strong> <em>A river in flood — vast, intelligent, and carrying everything before it.</em></p>
+<hr />
+<h2>Chart at a Glance</h2>
+<ul>
+<li><strong>Four Pillars:</strong> Im Sul · Im Ja · Im Jin · Gye Myo</li>
+<li><strong>Career mode (dominant ten-god):</strong> Companion — Peer/team or independent operator</li>
+<li><strong>Flavour of work (favorable element):</strong> public-facing work, media &amp; marketing, teaching/coaching, entrepreneurship</li>
+<li><strong>Spouse palace (day branch):</strong> Jin</li>
+<li><strong>Income style:</strong> Direct Wealth-weighted — salary, steady cash flow, disciplined revenue</li>
+</ul>
+<hr />
+<h2>Lifetime Timeline</h2>
+<p>Every five-year block, colour-coded by <strong>net</strong> favorable lean (favorable years minus unfavorable years): green where the favorable element leads by 2+ years, red where the unfavorable leads by 2+, amber otherwise. A block showing fewer favorable years can still read green if it has no unfavorable years — the net, not the raw count, sets the colour.</p>
+<div class="luck-timeline no-break">
+<svg viewBox="0 0 760 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Five-year luck timeline">
+<rect x="16.0" y="34" width="85.8" height="40" fill="#27ae60" rx="3"><title>1993–1997 · favorable</title></rect>
+<text x="58.9" y="53.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">1993–1997</text>
+<text x="58.9" y="66.0" text-anchor="middle" font-size="9" fill="#ffffff" opacity="0.9" font-family="Helvetica,Arial,sans-serif">favorable</text>
+<rect x="107.8" y="34" width="85.8" height="40" fill="#27ae60" rx="3"><title>1998–2002 · favorable</title></rect>
+<text x="150.6" y="53.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">1998–2002</text>
+<text x="150.6" y="66.0" text-anchor="middle" font-size="9" fill="#ffffff" opacity="0.9" font-family="Helvetica,Arial,sans-serif">favorable</text>
+<rect x="199.5" y="34" width="85.8" height="40" fill="#27ae60" rx="3"><title>2003–2007 · favorable</title></rect>
+<text x="242.4" y="53.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">2003–2007</text>
+<text x="242.4" y="66.0" text-anchor="middle" font-size="9" fill="#ffffff" opacity="0.9" font-family="Helvetica,Arial,sans-serif">favorable</text>
+<rect x="291.2" y="34" width="85.8" height="40" fill="#f39c12" rx="3"><title>2008–2012 · mixed</title></rect>
+<text x="334.1" y="53.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">2008–2012</text>
+<text x="334.1" y="66.0" text-anchor="middle" font-size="9" fill="#ffffff" opacity="0.9" font-family="Helvetica,Arial,sans-serif">mixed</text>
+<rect x="383.0" y="34" width="85.8" height="40" fill="#27ae60" rx="3"><title>2013–2017 · favorable</title></rect>
+<text x="425.9" y="53.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">2013–2017</text>
+<text x="425.9" y="66.0" text-anchor="middle" font-size="9" fill="#ffffff" opacity="0.9" font-family="Helvetica,Arial,sans-serif">favorable</text>
+<rect x="474.8" y="34" width="85.8" height="40" fill="#f39c12" rx="3"><title>2018–2022 · mixed</title></rect>
+<text x="517.6" y="53.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">2018–2022</text>
+<text x="517.6" y="66.0" text-anchor="middle" font-size="9" fill="#ffffff" opacity="0.9" font-family="Helvetica,Arial,sans-serif">mixed</text>
+<rect x="566.5" y="34" width="85.8" height="40" fill="#27ae60" rx="3"><title>2023–2027 · favorable</title></rect>
+<text x="609.4" y="53.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">2023–2027</text>
+<text x="609.4" y="66.0" text-anchor="middle" font-size="9" fill="#ffffff" opacity="0.9" font-family="Helvetica,Arial,sans-serif">favorable</text>
+<rect x="658.2" y="34" width="85.8" height="40" fill="#c0392b" rx="3"><title>2028–2032 · challenging</title></rect>
+<text x="701.1" y="53.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">2028–2032</text>
+<text x="701.1" y="66.0" text-anchor="middle" font-size="9" fill="#ffffff" opacity="0.9" font-family="Helvetica,Arial,sans-serif">challenging</text>
+<rect x="16.0" y="82" width="85.8" height="40" fill="#27ae60" rx="3"><title>2033–2037 · favorable</title></rect>
+<text x="58.9" y="101.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">2033–2037</text>
+<text x="58.9" y="114.0" text-anchor="middle" font-size="9" fill="#ffffff" opacity="0.9" font-family="Helvetica,Arial,sans-serif">favorable</text>
+<rect x="107.8" y="82" width="85.8" height="40" fill="#f39c12" rx="3"><title>2038–2042 · mixed</title></rect>
+<text x="150.6" y="101.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">2038–2042</text>
+<text x="150.6" y="114.0" text-anchor="middle" font-size="9" fill="#ffffff" opacity="0.9" font-family="Helvetica,Arial,sans-serif">mixed</text>
+<rect x="199.5" y="82" width="85.8" height="40" fill="#27ae60" rx="3"><title>2043–2047 · favorable</title></rect>
+<text x="242.4" y="101.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">2043–2047</text>
+<text x="242.4" y="114.0" text-anchor="middle" font-size="9" fill="#ffffff" opacity="0.9" font-family="Helvetica,Arial,sans-serif">favorable</text>
+<rect x="291.2" y="82" width="85.8" height="40" fill="#f39c12" rx="3"><title>2048–2052 · mixed</title></rect>
+<text x="334.1" y="101.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">2048–2052</text>
+<text x="334.1" y="114.0" text-anchor="middle" font-size="9" fill="#ffffff" opacity="0.9" font-family="Helvetica,Arial,sans-serif">mixed</text>
+<rect x="383.0" y="82" width="85.8" height="40" fill="#27ae60" rx="3"><title>2053–2057 · favorable</title></rect>
+<text x="425.9" y="101.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">2053–2057</text>
+<text x="425.9" y="114.0" text-anchor="middle" font-size="9" fill="#ffffff" opacity="0.9" font-family="Helvetica,Arial,sans-serif">favorable</text>
+<rect x="474.8" y="82" width="85.8" height="40" fill="#27ae60" rx="3"><title>2058–2062 · favorable</title></rect>
+<text x="517.6" y="101.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">2058–2062</text>
+<text x="517.6" y="114.0" text-anchor="middle" font-size="9" fill="#ffffff" opacity="0.9" font-family="Helvetica,Arial,sans-serif">favorable</text>
+<rect x="566.5" y="82" width="85.8" height="40" fill="#27ae60" rx="3"><title>2063–2067 · favorable</title></rect>
+<text x="609.4" y="101.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">2063–2067</text>
+<text x="609.4" y="114.0" text-anchor="middle" font-size="9" fill="#ffffff" opacity="0.9" font-family="Helvetica,Arial,sans-serif">favorable</text>
+<rect x="658.2" y="82" width="85.8" height="40" fill="#f39c12" rx="3"><title>2068–2072 · mixed</title></rect>
+<text x="701.1" y="101.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff" font-family="Helvetica,Arial,sans-serif">2068–2072</text>
+<text x="701.1" y="114.0" text-anchor="middle" font-size="9" fill="#ffffff" opacity="0.9" font-family="Helvetica,Arial,sans-serif">mixed</text>
+<rect x="16" y="11" width="11" height="11" fill="#27ae60" rx="2"/>
+<text x="31" y="20" font-size="10" fill="#444" font-family="Helvetica,Arial,sans-serif">favorable</text>
+<rect x="108" y="11" width="11" height="11" fill="#f39c12" rx="2"/>
+<text x="123" y="20" font-size="10" fill="#444" font-family="Helvetica,Arial,sans-serif">mixed</text>
+<rect x="172" y="11" width="11" height="11" fill="#c0392b" rx="2"/>
+<text x="187" y="20" font-size="10" fill="#444" font-family="Helvetica,Arial,sans-serif">challenging</text>
+</svg>
+</div>
+<h2>Favorable-Cycle Chart</h2>
+<p>How many of each block's five years carry your favorable element.</p>
+<div class="luck-bars no-break">
+<svg viewBox="0 0 760 488" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Favorable vs. unfavorable years per block">
+<text x="16" y="20" font-size="13" font-weight="bold" fill="#2a4d6e" font-family="Helvetica,Arial,sans-serif">Favorable-Cycle Chart</text>
+<text x="16" y="49.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">1993–1997</text>
+<rect x="108.0" y="34" width="508.8" height="22" fill="#27ae60" rx="2"><title>4 favorable</title></rect>
+<rect x="616.8" y="34" width="127.2" height="22" fill="#c0392b" rx="2"><title>1 unfavorable</title></rect>
+<text x="16" y="77.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">1998–2002</text>
+<rect x="108.0" y="62" width="381.6" height="22" fill="#27ae60" rx="2"><title>3 favorable</title></rect>
+<rect x="489.6" y="62" width="127.2" height="22" fill="#c0392b" rx="2"><title>1 unfavorable</title></rect>
+<text x="16" y="105.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2003–2007</text>
+<rect x="108.0" y="90" width="254.4" height="22" fill="#27ae60" rx="2"><title>2 favorable</title></rect>
+<text x="16" y="133.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2008–2012</text>
+<rect x="108.0" y="118" width="0.0" height="22" fill="#27ae60" rx="2"><title>0 favorable</title></rect>
+<text x="16" y="161.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2013–2017</text>
+<rect x="108.0" y="146" width="381.6" height="22" fill="#27ae60" rx="2"><title>3 favorable</title></rect>
+<text x="16" y="189.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2018–2022</text>
+<rect x="108.0" y="174" width="127.2" height="22" fill="#27ae60" rx="2"><title>1 favorable</title></rect>
+<rect x="235.2" y="174" width="254.4" height="22" fill="#c0392b" rx="2"><title>2 unfavorable</title></rect>
+<text x="16" y="217.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2023–2027</text>
+<rect x="108.0" y="202" width="636.0" height="22" fill="#27ae60" rx="2"><title>5 favorable</title></rect>
+<text x="16" y="245.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2028–2032</text>
+<rect x="108.0" y="230" width="0.0" height="22" fill="#27ae60" rx="2"><title>0 favorable</title></rect>
+<rect x="108.0" y="230" width="508.8" height="22" fill="#c0392b" rx="2"><title>4 unfavorable</title></rect>
+<text x="16" y="273.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2033–2037</text>
+<rect x="108.0" y="258" width="508.8" height="22" fill="#27ae60" rx="2"><title>4 favorable</title></rect>
+<text x="16" y="301.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2038–2042</text>
+<rect x="108.0" y="286" width="127.2" height="22" fill="#27ae60" rx="2"><title>1 favorable</title></rect>
+<rect x="235.2" y="286" width="254.4" height="22" fill="#c0392b" rx="2"><title>2 unfavorable</title></rect>
+<text x="16" y="329.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2043–2047</text>
+<rect x="108.0" y="314" width="508.8" height="22" fill="#27ae60" rx="2"><title>4 favorable</title></rect>
+<text x="16" y="357.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2048–2052</text>
+<rect x="108.0" y="342" width="127.2" height="22" fill="#27ae60" rx="2"><title>1 favorable</title></rect>
+<rect x="235.2" y="342" width="254.4" height="22" fill="#c0392b" rx="2"><title>2 unfavorable</title></rect>
+<text x="16" y="385.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2053–2057</text>
+<rect x="108.0" y="370" width="508.8" height="22" fill="#27ae60" rx="2"><title>4 favorable</title></rect>
+<rect x="616.8" y="370" width="127.2" height="22" fill="#c0392b" rx="2"><title>1 unfavorable</title></rect>
+<text x="16" y="413.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2058–2062</text>
+<rect x="108.0" y="398" width="381.6" height="22" fill="#27ae60" rx="2"><title>3 favorable</title></rect>
+<rect x="489.6" y="398" width="127.2" height="22" fill="#c0392b" rx="2"><title>1 unfavorable</title></rect>
+<text x="16" y="441.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2063–2067</text>
+<rect x="108.0" y="426" width="254.4" height="22" fill="#27ae60" rx="2"><title>2 favorable</title></rect>
+<text x="16" y="469.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2068–2072</text>
+<rect x="108.0" y="454" width="0.0" height="22" fill="#27ae60" rx="2"><title>0 favorable</title></rect>
+</svg>
+</div>
+<h2>Ten-God Class Rhythm</h2>
+<p>The five-group ten-god mix each block brings (annual stems, plus the decade's own stem once).</p>
+<div class="luck-classes no-break">
+<svg viewBox="0 0 760 514" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ten-god class rhythm per five-year block">
+<text x="16" y="20" font-size="13" font-weight="bold" fill="#2a4d6e" font-family="Helvetica,Arial,sans-serif">Ten-God Class Rhythm</text>
+<text x="16" y="49.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">1993–1997</text>
+<rect x="108.0" y="34" width="106.0" height="22" fill="#8e44ad" rx="1"><title>Companion: 1</title></rect>
+<rect x="214.0" y="34" width="212.0" height="22" fill="#2980b9" rx="1"><title>Output: 2</title></rect>
+<rect x="426.0" y="34" width="212.0" height="22" fill="#27ae60" rx="1"><title>Wealth: 2</title></rect>
+<rect x="638.0" y="34" width="106.0" height="22" fill="#e67e22" rx="1"><title>Resource: 1</title></rect>
+<text x="16" y="77.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">1998–2002</text>
+<rect x="108.0" y="62" width="106.0" height="22" fill="#8e44ad" rx="1"><title>Companion: 1</title></rect>
+<rect x="214.0" y="62" width="212.0" height="22" fill="#c0392b" rx="1"><title>Authority: 2</title></rect>
+<rect x="426.0" y="62" width="318.0" height="22" fill="#e67e22" rx="1"><title>Resource: 3</title></rect>
+<text x="16" y="105.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2003–2007</text>
+<rect x="108.0" y="90" width="106.0" height="22" fill="#8e44ad" rx="1"><title>Companion: 1</title></rect>
+<rect x="214.0" y="90" width="212.0" height="22" fill="#2980b9" rx="1"><title>Output: 2</title></rect>
+<rect x="426.0" y="90" width="212.0" height="22" fill="#27ae60" rx="1"><title>Wealth: 2</title></rect>
+<rect x="638.0" y="90" width="106.0" height="22" fill="#e67e22" rx="1"><title>Resource: 1</title></rect>
+<text x="16" y="133.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2008–2012</text>
+<rect x="108.0" y="118" width="106.0" height="22" fill="#8e44ad" rx="1"><title>Companion: 1</title></rect>
+<rect x="214.0" y="118" width="212.0" height="22" fill="#c0392b" rx="1"><title>Authority: 2</title></rect>
+<rect x="426.0" y="118" width="318.0" height="22" fill="#e67e22" rx="1"><title>Resource: 3</title></rect>
+<text x="16" y="161.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2013–2017</text>
+<rect x="108.0" y="146" width="106.0" height="22" fill="#8e44ad" rx="1"><title>Companion: 1</title></rect>
+<rect x="214.0" y="146" width="212.0" height="22" fill="#2980b9" rx="1"><title>Output: 2</title></rect>
+<rect x="426.0" y="146" width="212.0" height="22" fill="#27ae60" rx="1"><title>Wealth: 2</title></rect>
+<rect x="638.0" y="146" width="106.0" height="22" fill="#c0392b" rx="1"><title>Authority: 1</title></rect>
+<text x="16" y="189.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2018–2022</text>
+<rect x="108.0" y="174" width="106.0" height="22" fill="#8e44ad" rx="1"><title>Companion: 1</title></rect>
+<rect x="214.0" y="174" width="318.0" height="22" fill="#c0392b" rx="1"><title>Authority: 3</title></rect>
+<rect x="532.0" y="174" width="212.0" height="22" fill="#e67e22" rx="1"><title>Resource: 2</title></rect>
+<text x="16" y="217.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2023–2027</text>
+<rect x="108.0" y="202" width="106.0" height="22" fill="#8e44ad" rx="1"><title>Companion: 1</title></rect>
+<rect x="214.0" y="202" width="212.0" height="22" fill="#2980b9" rx="1"><title>Output: 2</title></rect>
+<rect x="426.0" y="202" width="212.0" height="22" fill="#27ae60" rx="1"><title>Wealth: 2</title></rect>
+<rect x="638.0" y="202" width="106.0" height="22" fill="#c0392b" rx="1"><title>Authority: 1</title></rect>
+<text x="16" y="245.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2028–2032</text>
+<rect x="108.0" y="230" width="106.0" height="22" fill="#8e44ad" rx="1"><title>Companion: 1</title></rect>
+<rect x="214.0" y="230" width="318.0" height="22" fill="#c0392b" rx="1"><title>Authority: 3</title></rect>
+<rect x="532.0" y="230" width="212.0" height="22" fill="#e67e22" rx="1"><title>Resource: 2</title></rect>
+<text x="16" y="273.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2033–2037</text>
+<rect x="108.0" y="258" width="106.0" height="22" fill="#8e44ad" rx="1"><title>Companion: 1</title></rect>
+<rect x="214.0" y="258" width="212.0" height="22" fill="#2980b9" rx="1"><title>Output: 2</title></rect>
+<rect x="426.0" y="258" width="318.0" height="22" fill="#27ae60" rx="1"><title>Wealth: 3</title></rect>
+<text x="16" y="301.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2038–2042</text>
+<rect x="108.0" y="286" width="106.0" height="22" fill="#8e44ad" rx="1"><title>Companion: 1</title></rect>
+<rect x="214.0" y="286" width="106.0" height="22" fill="#27ae60" rx="1"><title>Wealth: 1</title></rect>
+<rect x="320.0" y="286" width="212.0" height="22" fill="#c0392b" rx="1"><title>Authority: 2</title></rect>
+<rect x="532.0" y="286" width="212.0" height="22" fill="#e67e22" rx="1"><title>Resource: 2</title></rect>
+<text x="16" y="329.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2043–2047</text>
+<rect x="108.0" y="314" width="106.0" height="22" fill="#8e44ad" rx="1"><title>Companion: 1</title></rect>
+<rect x="214.0" y="314" width="212.0" height="22" fill="#2980b9" rx="1"><title>Output: 2</title></rect>
+<rect x="426.0" y="314" width="318.0" height="22" fill="#27ae60" rx="1"><title>Wealth: 3</title></rect>
+<text x="16" y="357.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2048–2052</text>
+<rect x="108.0" y="342" width="106.0" height="22" fill="#8e44ad" rx="1"><title>Companion: 1</title></rect>
+<rect x="214.0" y="342" width="106.0" height="22" fill="#27ae60" rx="1"><title>Wealth: 1</title></rect>
+<rect x="320.0" y="342" width="212.0" height="22" fill="#c0392b" rx="1"><title>Authority: 2</title></rect>
+<rect x="532.0" y="342" width="212.0" height="22" fill="#e67e22" rx="1"><title>Resource: 2</title></rect>
+<text x="16" y="385.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2053–2057</text>
+<rect x="108.0" y="370" width="106.0" height="22" fill="#8e44ad" rx="1"><title>Companion: 1</title></rect>
+<rect x="214.0" y="370" width="318.0" height="22" fill="#2980b9" rx="1"><title>Output: 3</title></rect>
+<rect x="532.0" y="370" width="212.0" height="22" fill="#27ae60" rx="1"><title>Wealth: 2</title></rect>
+<text x="16" y="413.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2058–2062</text>
+<rect x="108.0" y="398" width="106.0" height="22" fill="#8e44ad" rx="1"><title>Companion: 1</title></rect>
+<rect x="214.0" y="398" width="106.0" height="22" fill="#2980b9" rx="1"><title>Output: 1</title></rect>
+<rect x="320.0" y="398" width="212.0" height="22" fill="#c0392b" rx="1"><title>Authority: 2</title></rect>
+<rect x="532.0" y="398" width="212.0" height="22" fill="#e67e22" rx="1"><title>Resource: 2</title></rect>
+<text x="16" y="441.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2063–2067</text>
+<rect x="108.0" y="426" width="106.0" height="22" fill="#8e44ad" rx="1"><title>Companion: 1</title></rect>
+<rect x="214.0" y="426" width="318.0" height="22" fill="#2980b9" rx="1"><title>Output: 3</title></rect>
+<rect x="532.0" y="426" width="212.0" height="22" fill="#27ae60" rx="1"><title>Wealth: 2</title></rect>
+<text x="16" y="469.4" font-size="10" fill="#555" font-family="Helvetica,Arial,sans-serif">2068–2072</text>
+<rect x="108.0" y="454" width="106.0" height="22" fill="#8e44ad" rx="1"><title>Companion: 1</title></rect>
+<rect x="214.0" y="454" width="106.0" height="22" fill="#2980b9" rx="1"><title>Output: 1</title></rect>
+<rect x="320.0" y="454" width="212.0" height="22" fill="#c0392b" rx="1"><title>Authority: 2</title></rect>
+<rect x="532.0" y="454" width="212.0" height="22" fill="#e67e22" rx="1"><title>Resource: 2</title></rect>
+<rect x="16" y="497" width="11" height="11" fill="#8e44ad" rx="2"/>
+<text x="31" y="506" font-size="10" fill="#444" font-family="Helvetica,Arial,sans-serif">Companion</text>
+<rect x="108" y="497" width="11" height="11" fill="#2980b9" rx="2"/>
+<text x="123" y="506" font-size="10" fill="#444" font-family="Helvetica,Arial,sans-serif">Output</text>
+<rect x="179" y="497" width="11" height="11" fill="#27ae60" rx="2"/>
+<text x="194" y="506" font-size="10" fill="#444" font-family="Helvetica,Arial,sans-serif">Wealth</text>
+<rect x="250" y="497" width="11" height="11" fill="#c0392b" rx="2"/>
+<text x="265" y="506" font-size="10" fill="#444" font-family="Helvetica,Arial,sans-serif">Authority</text>
+<rect x="342" y="497" width="11" height="11" fill="#e67e22" rx="2"/>
+<text x="357" y="506" font-size="10" fill="#444" font-family="Helvetica,Arial,sans-serif">Resource</text>
+</svg>
+</div>
+<h2>Element Rhythm</h2>
+<p>Which elements dominate the annual stems and branches of each block.</p>
+<table>
+<thead>
+<tr>
+<th>Years</th>
+<th>Stem elements</th>
+<th>Branch elements</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1993–1997</td>
+<td>Wood:2 Fire:2 Water:1</td>
+<td>Earth:2 Water:2 Metal:1</td>
+</tr>
+<tr>
+<td>1998–2002</td>
+<td>Earth:2 Metal:2 Water:1</td>
+<td>Wood:2 Fire:2 Earth:1</td>
+</tr>
+<tr>
+<td>2003–2007</td>
+<td>Wood:2 Fire:2 Water:1</td>
+<td>Earth:2 Metal:2 Water:1</td>
+</tr>
+<tr>
+<td>2008–2012</td>
+<td>Earth:2 Metal:2 Water:1</td>
+<td>Earth:2 Wood:2 Water:1</td>
+</tr>
+<tr>
+<td>2013–2017</td>
+<td>Wood:2 Fire:2 Water:1</td>
+<td>Fire:2 Metal:2 Earth:1</td>
+</tr>
+<tr>
+<td>2018–2022</td>
+<td>Earth:2 Metal:2 Water:1</td>
+<td>Earth:2 Water:2 Wood:1</td>
+</tr>
+<tr>
+<td>2023–2027</td>
+<td>Wood:2 Fire:2 Water:1</td>
+<td>Earth:2 Fire:2 Wood:1</td>
+</tr>
+<tr>
+<td>2028–2032</td>
+<td>Earth:2 Metal:2 Water:1</td>
+<td>Metal:2 Water:2 Earth:1</td>
+</tr>
+<tr>
+<td>2033–2037</td>
+<td>Wood:2 Fire:2 Water:1</td>
+<td>Earth:2 Wood:2 Fire:1</td>
+</tr>
+<tr>
+<td>2038–2042</td>
+<td>Earth:2 Metal:2 Water:1</td>
+<td>Earth:2 Metal:2 Fire:1</td>
+</tr>
+<tr>
+<td>2043–2047</td>
+<td>Wood:2 Fire:2 Water:1</td>
+<td>Water:2 Wood:2 Earth:1</td>
+</tr>
+<tr>
+<td>2048–2052</td>
+<td>Earth:2 Metal:2 Water:1</td>
+<td>Earth:2 Fire:2 Metal:1</td>
+</tr>
+<tr>
+<td>2053–2057</td>
+<td>Wood:2 Fire:2 Water:1</td>
+<td>Earth:2 Water:2 Metal:1</td>
+</tr>
+<tr>
+<td>2058–2062</td>
+<td>Earth:2 Metal:2 Water:1</td>
+<td>Wood:2 Fire:2 Earth:1</td>
+</tr>
+<tr>
+<td>2063–2067</td>
+<td>Wood:2 Fire:2 Water:1</td>
+<td>Earth:2 Metal:2 Water:1</td>
+</tr>
+<tr>
+<td>2068–2072</td>
+<td>Earth:2 Metal:2 Water:1</td>
+<td>Earth:2 Wood:2 Water:1</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>The Five-Year Blocks</h2>
+<h3>1. 1993–1997 (Ages 9–13) — Sin Hae</h3>
+<p>The decade backdrop is <strong>Sin Hae</strong> (Direct Resource, Resource), with the opening five years led by <strong>Output (food hurt) · Wealth (wealth star)</strong> annual energy. 4 years of 5 carry your favorable element (<strong>Fire</strong> / <strong>Wood</strong>), and 1 year carries the unfavorable element (<strong>Metal</strong>) — an overall <strong>favorable</strong> phase. The spouse palace (day branch <strong>Jin</strong>) is activated in 1993 binding, 1994 clash, 1997 break — relationship, home, or partnership themes are more likely to surface.</p>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Pillar</th>
+<th>Ten-God</th>
+<th>Class</th>
+<th>Favorable?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1993</td>
+<td>Gye Yu</td>
+<td>Robber</td>
+<td>Companion (compare rob)</td>
+<td>⚠️</td>
+</tr>
+<tr>
+<td>1994</td>
+<td>Gap Sul</td>
+<td>Eating God</td>
+<td>Output (food hurt)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>1995</td>
+<td>Eul Hae</td>
+<td>Hurting Officer</td>
+<td>Output (food hurt)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>1996</td>
+<td>Bing Ja</td>
+<td>Indirect Wealth</td>
+<td>Wealth (wealth star)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>1997</td>
+<td>Jeong Chuk</td>
+<td>Direct Wealth</td>
+<td>Wealth (wealth star)</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Wealth:</strong> <strong>2 of 5</strong> annual stems are Wealth — money, pricing and asset decisions are foregrounded. Treat this as a window to <em>earn and negotiate</em>, and to put agreements in writing.</li>
+<li><strong>Business:</strong> Business energy is diffuse in this phase; let the decade backdrop and the concrete annual pillars above guide the read.</li>
+<li><strong>Family:</strong> The spouse palace is both <strong>bound and unsettled</strong> (1993 binding, 1994 clash, 1997 break) — a phase where a bond can deepen or formalise, but with friction or change around it; read it as a window, not a guarantee.</li>
+<li><strong>Investment pattern:</strong> A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; a natal storehouse is clashed/punished in 1994 clash, 1997 punishment, the classical wealth storehouse 'storehouse opens' timing — the classics do not settle release vs. scatter, so treat it as a watch, not a signal; the Companion presence argues for sole holdings or partnerships with hard boundaries.</li>
+</ul>
+<hr />
+<h3>2. 1998–2002 (Ages 14–18) — Sin Hae</h3>
+<p>The decade backdrop is <strong>Sin Hae</strong> (Direct Resource, Resource), with the closing five years led by <strong>Resource</strong> annual energy. 3 years of 5 carry your favorable element (<strong>Fire</strong> / <strong>Wood</strong>), and 1 year carries the unfavorable element (<strong>Metal</strong>) — an overall <strong>favorable</strong> phase. The spouse palace (day branch <strong>Jin</strong>) is activated in 1999 harm, 2000 self-punishment — relationship, home, or partnership themes are more likely to surface.</p>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Pillar</th>
+<th>Ten-God</th>
+<th>Class</th>
+<th>Favorable?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1998</td>
+<td>Mu In</td>
+<td>Seven Killings</td>
+<td>Authority (officer star)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>1999</td>
+<td>Gi Myo</td>
+<td>Direct Officer</td>
+<td>Authority (officer star)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2000</td>
+<td>Gyeong Jin</td>
+<td>Indirect Resource</td>
+<td>Resource</td>
+<td>⚠️</td>
+</tr>
+<tr>
+<td>2001</td>
+<td>Sin Sa</td>
+<td>Direct Resource</td>
+<td>Resource</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2002</td>
+<td>Im O</td>
+<td>Companion</td>
+<td>Companion (compare rob)</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Wealth:</strong> No direct Wealth stem, but <strong>1 of 5</strong> are Companion. The peer-drains-wealth pattern reads shared and loosely-defined money as contested here — defend rather than expand shared commitments.</li>
+<li><strong>Business:</strong> <strong>2 of 5</strong> years are Authority — an institution, rank or licensed role comes to the fore. Since Authority is your unfavorable element, read this as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit.</li>
+<li><strong>Family:</strong> The spouse palace is struck or unsettled (1999 harm, 2000 self-punishment) — better for deepening privately than for formalising commitments this phase.</li>
+<li><strong>Investment pattern:</strong> A favorable-element phase (3/5) — the chart is in better balance, which supports planning and negotiation; a natal storehouse is clashed/punished in 2000 clash, the classical wealth storehouse 'storehouse opens' timing — the classics do not settle release vs. scatter, so treat it as a watch, not a signal; the Companion presence argues for sole holdings or partnerships with hard boundaries.</li>
+</ul>
+<hr />
+<h3>3. 2003–2007 (Ages 19–23) — Gyeong Sul</h3>
+<p>The decade backdrop is <strong>Gyeong Sul</strong> (Indirect Resource, Resource), with the opening five years led by <strong>Output (food hurt) · Wealth (wealth star)</strong> annual energy. 2 years of 5 carry your favorable element (<strong>Fire</strong> / <strong>Wood</strong>) — an overall <strong>favorable</strong> phase. The spouse palace (day branch <strong>Jin</strong>) is activated in 2005 binding, 2006 clash — relationship, home, or partnership themes are more likely to surface.</p>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Pillar</th>
+<th>Ten-God</th>
+<th>Class</th>
+<th>Favorable?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2003</td>
+<td>Gye Mi</td>
+<td>Robber</td>
+<td>Companion (compare rob)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2004</td>
+<td>Gap Shin</td>
+<td>Eating God</td>
+<td>Output (food hurt)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2005</td>
+<td>Eul Yu</td>
+<td>Hurting Officer</td>
+<td>Output (food hurt)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2006</td>
+<td>Bing Sul</td>
+<td>Indirect Wealth</td>
+<td>Wealth (wealth star)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2007</td>
+<td>Jeong Hae</td>
+<td>Direct Wealth</td>
+<td>Wealth (wealth star)</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Wealth:</strong> <strong>2 of 5</strong> annual stems are Wealth — money, pricing and asset decisions are foregrounded. Treat this as a window to <em>earn and negotiate</em>, and to put agreements in writing.</li>
+<li><strong>Business:</strong> Business energy is diffuse in this phase; let the decade backdrop and the concrete annual pillars above guide the read.</li>
+<li><strong>Family:</strong> The spouse palace is both <strong>bound and unsettled</strong> (2005 binding, 2006 clash) — a phase where a bond can deepen or formalise, but with friction or change around it; read it as a window, not a guarantee.</li>
+<li><strong>Investment pattern:</strong> A favorable-element phase (2/5) — the chart is in better balance, which supports planning and negotiation; a natal storehouse is clashed/punished in 2003 punishment, 2006 clash, the classical wealth storehouse 'storehouse opens' timing — the classics do not settle release vs. scatter, so treat it as a watch, not a signal; the Companion presence argues for sole holdings or partnerships with hard boundaries.</li>
+</ul>
+<hr />
+<h3>4. 2008–2012 (Ages 24–28) — Gyeong Sul</h3>
+<p>The decade backdrop is <strong>Gyeong Sul</strong> (Indirect Resource, Resource), with the closing five years led by <strong>Resource</strong> annual energy. None of the 5 years carries your favorable element — an overall <strong>mixed</strong> phase. The spouse palace (day branch <strong>Jin</strong>) is activated in 2009 break, 2011 harm, 2012 self-punishment — relationship, home, or partnership themes are more likely to surface.</p>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Pillar</th>
+<th>Ten-God</th>
+<th>Class</th>
+<th>Favorable?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2008</td>
+<td>Mu Ja</td>
+<td>Seven Killings</td>
+<td>Authority (officer star)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2009</td>
+<td>Gi Chuk</td>
+<td>Direct Officer</td>
+<td>Authority (officer star)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2010</td>
+<td>Gyeong In</td>
+<td>Indirect Resource</td>
+<td>Resource</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2011</td>
+<td>Sin Myo</td>
+<td>Direct Resource</td>
+<td>Resource</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2012</td>
+<td>Im Jin</td>
+<td>Companion</td>
+<td>Companion (compare rob)</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Wealth:</strong> No direct Wealth stem, but <strong>1 of 5</strong> are Companion. The peer-drains-wealth pattern reads shared and loosely-defined money as contested here — defend rather than expand shared commitments.</li>
+<li><strong>Business:</strong> <strong>2 of 5</strong> years are Authority — an institution, rank or licensed role comes to the fore. Since Authority is your unfavorable element, read this as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit.</li>
+<li><strong>Family:</strong> The spouse palace is struck or unsettled (2009 break, 2011 harm, 2012 self-punishment) — better for deepening privately than for formalising commitments this phase.</li>
+<li><strong>Investment pattern:</strong> A mixed phase — keep positions simple and liquidity available; a natal storehouse is clashed/punished in 2009 punishment, 2012 clash, the classical wealth storehouse 'storehouse opens' timing — the classics do not settle release vs. scatter, so treat it as a watch, not a signal; the Companion presence argues for sole holdings or partnerships with hard boundaries.</li>
+</ul>
+<hr />
+<h3>5. 2013–2017 (Ages 29–33) — Gi Yu</h3>
+<p>The decade backdrop is <strong>Gi Yu</strong> (Direct Officer, Authority (officer star)), with the opening five years led by <strong>Output (food hurt) · Wealth (wealth star)</strong> annual energy. 3 years of 5 carry your favorable element (<strong>Fire</strong> / <strong>Wood</strong>) — an overall <strong>favorable</strong> phase. The spouse palace (day branch <strong>Jin</strong>) is activated in 2017 binding — relationship, home, or partnership themes are more likely to surface.</p>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Pillar</th>
+<th>Ten-God</th>
+<th>Class</th>
+<th>Favorable?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2013</td>
+<td>Gye Sa</td>
+<td>Robber</td>
+<td>Companion (compare rob)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2014</td>
+<td>Gap O</td>
+<td>Eating God</td>
+<td>Output (food hurt)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2015</td>
+<td>Eul Mi</td>
+<td>Hurting Officer</td>
+<td>Output (food hurt)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2016</td>
+<td>Bing Shin</td>
+<td>Indirect Wealth</td>
+<td>Wealth (wealth star)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2017</td>
+<td>Jeong Yu</td>
+<td>Direct Wealth</td>
+<td>Wealth (wealth star)</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Wealth:</strong> <strong>2 of 5</strong> annual stems are Wealth — money, pricing and asset decisions are foregrounded. Treat this as a window to <em>earn and negotiate</em>, and to put agreements in writing.</li>
+<li><strong>Business:</strong> Business energy is diffuse in this phase; let the decade backdrop and the concrete annual pillars above guide the read.</li>
+<li><strong>Family:</strong> The spouse palace is <strong>bound</strong> (2017 binding) — meetings and formal commitments cluster here; read it as a window for deepening or formalising a bond.</li>
+<li><strong>Investment pattern:</strong> A favorable-element phase (3/5) — the chart is in better balance, which supports planning and negotiation; a natal storehouse is clashed/punished in 2015 punishment, the classical wealth storehouse 'storehouse opens' timing — the classics do not settle release vs. scatter, so treat it as a watch, not a signal; the Companion presence argues for sole holdings or partnerships with hard boundaries.</li>
+</ul>
+<hr />
+<h3>6. 2018–2022 (Ages 34–38) — Gi Yu</h3>
+<p>The decade backdrop is <strong>Gi Yu</strong> (Direct Officer, Authority (officer star)), with the closing five years led by <strong>Authority (officer star)</strong> annual energy. 1 year of 5 carries your favorable element (<strong>Fire</strong> / <strong>Wood</strong>), and 2 years carry the unfavorable element (<strong>Metal</strong>) — an overall <strong>mixed</strong> phase. The spouse palace (day branch <strong>Jin</strong>) is activated in 2018 clash, 2021 break — relationship, home, or partnership themes are more likely to surface.</p>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Pillar</th>
+<th>Ten-God</th>
+<th>Class</th>
+<th>Favorable?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2018</td>
+<td>Mu Sul</td>
+<td>Seven Killings</td>
+<td>Authority (officer star)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2019</td>
+<td>Gi Hae</td>
+<td>Direct Officer</td>
+<td>Authority (officer star)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2020</td>
+<td>Gyeong Ja</td>
+<td>Indirect Resource</td>
+<td>Resource</td>
+<td>⚠️</td>
+</tr>
+<tr>
+<td>2021</td>
+<td>Sin Chuk</td>
+<td>Direct Resource</td>
+<td>Resource</td>
+<td>⚠️</td>
+</tr>
+<tr>
+<td>2022</td>
+<td>Im In</td>
+<td>Companion</td>
+<td>Companion (compare rob)</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Wealth:</strong> No direct Wealth stem, but <strong>1 of 5</strong> are Companion. The peer-drains-wealth pattern reads shared and loosely-defined money as contested here — defend rather than expand shared commitments.</li>
+<li><strong>Business:</strong> <strong>2 of 5</strong> years are Authority — an institution, rank or licensed role comes to the fore. Since Authority is your unfavorable element, read this as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit.</li>
+<li><strong>Family:</strong> The spouse palace is struck or unsettled (2018 clash, 2021 break) — better for deepening privately than for formalising commitments this phase.</li>
+<li><strong>Investment pattern:</strong> A mixed phase — keep positions simple and liquidity available; a natal storehouse is clashed/punished in 2018 clash, 2021 punishment, the classical wealth storehouse 'storehouse opens' timing — the classics do not settle release vs. scatter, so treat it as a watch, not a signal; the Companion presence argues for sole holdings or partnerships with hard boundaries.</li>
+</ul>
+<hr />
+<h3>7. 2023–2027 (Ages 39–43) — Mu Shin · <strong>current</strong></h3>
+<p>The decade backdrop is <strong>Mu Shin</strong> (Seven Killings, Authority (officer star)), with the opening five years led by <strong>Output (food hurt) · Wealth (wealth star)</strong> annual energy. 5 years of 5 carry your favorable element (<strong>Fire</strong> / <strong>Wood</strong>) — an overall <strong>favorable</strong> phase. The spouse palace (day branch <strong>Jin</strong>) is activated in 2023 harm, 2024 self-punishment — relationship, home, or partnership themes are more likely to surface.</p>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Pillar</th>
+<th>Ten-God</th>
+<th>Class</th>
+<th>Favorable?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2023</td>
+<td>Gye Myo</td>
+<td>Robber</td>
+<td>Companion (compare rob)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2024</td>
+<td>Gap Jin</td>
+<td>Eating God</td>
+<td>Output (food hurt)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2025</td>
+<td>Eul Sa</td>
+<td>Hurting Officer</td>
+<td>Output (food hurt)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2026</td>
+<td>Bing O</td>
+<td>Indirect Wealth</td>
+<td>Wealth (wealth star)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2027</td>
+<td>Jeong Mi</td>
+<td>Direct Wealth</td>
+<td>Wealth (wealth star)</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Wealth:</strong> <strong>2 of 5</strong> annual stems are Wealth — money, pricing and asset decisions are foregrounded. Treat this as a window to <em>earn and negotiate</em>, and to put agreements in writing.</li>
+<li><strong>Business:</strong> Business energy is diffuse in this phase; let the decade backdrop and the concrete annual pillars above guide the read.</li>
+<li><strong>Family:</strong> The spouse palace is struck or unsettled (2023 harm, 2024 self-punishment) — better for deepening privately than for formalising commitments this phase.</li>
+<li><strong>Investment pattern:</strong> A favorable-element phase (5/5) — the chart is in better balance, which supports planning and negotiation; a natal storehouse is clashed/punished in 2024 clash, 2027 punishment, the classical wealth storehouse 'storehouse opens' timing — the classics do not settle release vs. scatter, so treat it as a watch, not a signal; the Companion presence argues for sole holdings or partnerships with hard boundaries.</li>
+</ul>
+<hr />
+<h3>8. 2028–2032 (Ages 44–48) — Mu Shin</h3>
+<p>The decade backdrop is <strong>Mu Shin</strong> (Seven Killings, Authority (officer star)), with the closing five years led by <strong>Authority (officer star)</strong> annual energy. None of the 5 years carries your favorable element, and 4 years carry the unfavorable element (<strong>Metal</strong>) — an overall <strong>challenging</strong> phase. The spouse palace (day branch <strong>Jin</strong>) is activated in 2029 binding, 2030 clash — relationship, home, or partnership themes are more likely to surface.</p>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Pillar</th>
+<th>Ten-God</th>
+<th>Class</th>
+<th>Favorable?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2028</td>
+<td>Mu Shin</td>
+<td>Seven Killings</td>
+<td>Authority (officer star)</td>
+<td>⚠️</td>
+</tr>
+<tr>
+<td>2029</td>
+<td>Gi Yu</td>
+<td>Direct Officer</td>
+<td>Authority (officer star)</td>
+<td>⚠️</td>
+</tr>
+<tr>
+<td>2030</td>
+<td>Gyeong Sul</td>
+<td>Indirect Resource</td>
+<td>Resource</td>
+<td>⚠️</td>
+</tr>
+<tr>
+<td>2031</td>
+<td>Sin Hae</td>
+<td>Direct Resource</td>
+<td>Resource</td>
+<td>⚠️</td>
+</tr>
+<tr>
+<td>2032</td>
+<td>Im Ja</td>
+<td>Companion</td>
+<td>Companion (compare rob)</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Wealth:</strong> No direct Wealth stem, but <strong>1 of 5</strong> are Companion. The peer-drains-wealth pattern reads shared and loosely-defined money as contested here — defend rather than expand shared commitments.</li>
+<li><strong>Business:</strong> <strong>2 of 5</strong> years are Authority — an institution, rank or licensed role comes to the fore. Since Authority is your unfavorable element, read this as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit.</li>
+<li><strong>Family:</strong> The spouse palace is both <strong>bound and unsettled</strong> (2029 binding, 2030 clash) — a phase where a bond can deepen or formalise, but with friction or change around it; read it as a window, not a guarantee.</li>
+<li><strong>Investment pattern:</strong> An unfavorable-leaning phase (4/5) — conserve, review and postpone large speculative commitments; a natal storehouse is clashed/punished in 2030 clash, the classical wealth storehouse 'storehouse opens' timing — the classics do not settle release vs. scatter, so treat it as a watch, not a signal; the Companion presence argues for sole holdings or partnerships with hard boundaries.</li>
+</ul>
+<hr />
+<h3>9. 2033–2037 (Ages 49–53) — Jeong Mi</h3>
+<p>The decade backdrop is <strong>Jeong Mi</strong> (Direct Wealth, Wealth (wealth star)), with the opening five years led by <strong>Wealth (wealth star)</strong> annual energy. 4 years of 5 carry your favorable element (<strong>Fire</strong> / <strong>Wood</strong>) — an overall <strong>favorable</strong> phase. The spouse palace (day branch <strong>Jin</strong>) is activated in 2033 break, 2035 harm, 2036 self-punishment — relationship, home, or partnership themes are more likely to surface.</p>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Pillar</th>
+<th>Ten-God</th>
+<th>Class</th>
+<th>Favorable?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2033</td>
+<td>Gye Chuk</td>
+<td>Robber</td>
+<td>Companion (compare rob)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2034</td>
+<td>Gap In</td>
+<td>Eating God</td>
+<td>Output (food hurt)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2035</td>
+<td>Eul Myo</td>
+<td>Hurting Officer</td>
+<td>Output (food hurt)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2036</td>
+<td>Bing Jin</td>
+<td>Indirect Wealth</td>
+<td>Wealth (wealth star)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2037</td>
+<td>Jeong Sa</td>
+<td>Direct Wealth</td>
+<td>Wealth (wealth star)</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Wealth:</strong> <strong>2 of 5</strong> annual stems are Wealth — money, pricing and asset decisions are foregrounded. Treat this as a window to <em>earn and negotiate</em>, and to put agreements in writing.</li>
+<li><strong>Business:</strong> Business energy is diffuse in this phase; let the decade backdrop and the concrete annual pillars above guide the read.</li>
+<li><strong>Family:</strong> The spouse palace is struck or unsettled (2033 break, 2035 harm, 2036 self-punishment) — better for deepening privately than for formalising commitments this phase.</li>
+<li><strong>Investment pattern:</strong> A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; a natal storehouse is clashed/punished in 2033 punishment, 2036 clash, the classical wealth storehouse 'storehouse opens' timing — the classics do not settle release vs. scatter, so treat it as a watch, not a signal; the Companion presence argues for sole holdings or partnerships with hard boundaries.</li>
+</ul>
+<hr />
+<h3>10. 2038–2042 (Ages 54–58) — Jeong Mi</h3>
+<p>The decade backdrop is <strong>Jeong Mi</strong> (Direct Wealth, Wealth (wealth star)), with the closing five years led by <strong>Authority (officer star) · Resource</strong> annual energy. 1 year of 5 carries your favorable element (<strong>Fire</strong> / <strong>Wood</strong>), and 2 years carry the unfavorable element (<strong>Metal</strong>) — an overall <strong>mixed</strong> phase. The spouse palace (day branch <strong>Jin</strong>) is activated in 2041 binding, 2042 clash — relationship, home, or partnership themes are more likely to surface.</p>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Pillar</th>
+<th>Ten-God</th>
+<th>Class</th>
+<th>Favorable?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2038</td>
+<td>Mu O</td>
+<td>Seven Killings</td>
+<td>Authority (officer star)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2039</td>
+<td>Gi Mi</td>
+<td>Direct Officer</td>
+<td>Authority (officer star)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2040</td>
+<td>Gyeong Shin</td>
+<td>Indirect Resource</td>
+<td>Resource</td>
+<td>⚠️</td>
+</tr>
+<tr>
+<td>2041</td>
+<td>Sin Yu</td>
+<td>Direct Resource</td>
+<td>Resource</td>
+<td>⚠️</td>
+</tr>
+<tr>
+<td>2042</td>
+<td>Im Sul</td>
+<td>Companion</td>
+<td>Companion (compare rob)</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Wealth:</strong> No direct Wealth stem, but <strong>1 of 5</strong> are Companion. The peer-drains-wealth pattern reads shared and loosely-defined money as contested here — defend rather than expand shared commitments.</li>
+<li><strong>Business:</strong> <strong>2 of 5</strong> years are Authority — an institution, rank or licensed role comes to the fore. Since Authority is your unfavorable element, read this as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit.</li>
+<li><strong>Family:</strong> The spouse palace is both <strong>bound and unsettled</strong> (2041 binding, 2042 clash) — a phase where a bond can deepen or formalise, but with friction or change around it; read it as a window, not a guarantee.</li>
+<li><strong>Investment pattern:</strong> A mixed phase — keep positions simple and liquidity available; a natal storehouse is clashed/punished in 2039 punishment, 2042 clash, the classical wealth storehouse 'storehouse opens' timing — the classics do not settle release vs. scatter, so treat it as a watch, not a signal; the Companion presence argues for sole holdings or partnerships with hard boundaries.</li>
+</ul>
+<hr />
+<h3>11. 2043–2047 (Ages 59–63) — Bing O</h3>
+<p>The decade backdrop is <strong>Bing O</strong> (Indirect Wealth, Wealth (wealth star)), with the opening five years led by <strong>Wealth (wealth star)</strong> annual energy. 4 years of 5 carry your favorable element (<strong>Fire</strong> / <strong>Wood</strong>) — an overall <strong>favorable</strong> phase. The spouse palace (day branch <strong>Jin</strong>) is activated in 2045 break, 2047 harm — relationship, home, or partnership themes are more likely to surface.</p>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Pillar</th>
+<th>Ten-God</th>
+<th>Class</th>
+<th>Favorable?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2043</td>
+<td>Gye Hae</td>
+<td>Robber</td>
+<td>Companion (compare rob)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2044</td>
+<td>Gap Ja</td>
+<td>Eating God</td>
+<td>Output (food hurt)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2045</td>
+<td>Eul Chuk</td>
+<td>Hurting Officer</td>
+<td>Output (food hurt)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2046</td>
+<td>Bing In</td>
+<td>Indirect Wealth</td>
+<td>Wealth (wealth star)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2047</td>
+<td>Jeong Myo</td>
+<td>Direct Wealth</td>
+<td>Wealth (wealth star)</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Wealth:</strong> <strong>2 of 5</strong> annual stems are Wealth — money, pricing and asset decisions are foregrounded. Treat this as a window to <em>earn and negotiate</em>, and to put agreements in writing.</li>
+<li><strong>Business:</strong> Business energy is diffuse in this phase; let the decade backdrop and the concrete annual pillars above guide the read.</li>
+<li><strong>Family:</strong> The spouse palace is struck or unsettled (2045 break, 2047 harm) — better for deepening privately than for formalising commitments this phase.</li>
+<li><strong>Investment pattern:</strong> A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; a natal storehouse is clashed/punished in 2045 punishment, the classical wealth storehouse 'storehouse opens' timing — the classics do not settle release vs. scatter, so treat it as a watch, not a signal; the Companion presence argues for sole holdings or partnerships with hard boundaries.</li>
+</ul>
+<hr />
+<h3>12. 2048–2052 (Ages 64–68) — Bing O</h3>
+<p>The decade backdrop is <strong>Bing O</strong> (Indirect Wealth, Wealth (wealth star)), with the closing five years led by <strong>Authority (officer star) · Resource</strong> annual energy. 1 year of 5 carries your favorable element (<strong>Fire</strong> / <strong>Wood</strong>), and 2 years carry the unfavorable element (<strong>Metal</strong>) — an overall <strong>mixed</strong> phase. The spouse palace (day branch <strong>Jin</strong>) is activated in 2048 self-punishment — relationship, home, or partnership themes are more likely to surface.</p>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Pillar</th>
+<th>Ten-God</th>
+<th>Class</th>
+<th>Favorable?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2048</td>
+<td>Mu Jin</td>
+<td>Seven Killings</td>
+<td>Authority (officer star)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2049</td>
+<td>Gi Sa</td>
+<td>Direct Officer</td>
+<td>Authority (officer star)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2050</td>
+<td>Gyeong O</td>
+<td>Indirect Resource</td>
+<td>Resource</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2051</td>
+<td>Sin Mi</td>
+<td>Direct Resource</td>
+<td>Resource</td>
+<td>⚠️</td>
+</tr>
+<tr>
+<td>2052</td>
+<td>Im Shin</td>
+<td>Companion</td>
+<td>Companion (compare rob)</td>
+<td>⚠️</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Wealth:</strong> No direct Wealth stem, but <strong>1 of 5</strong> are Companion. The peer-drains-wealth pattern reads shared and loosely-defined money as contested here — defend rather than expand shared commitments.</li>
+<li><strong>Business:</strong> <strong>2 of 5</strong> years are Authority — an institution, rank or licensed role comes to the fore. Since Authority is your unfavorable element, read this as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit.</li>
+<li><strong>Family:</strong> The spouse palace is struck or unsettled (2048 self-punishment) — better for deepening privately than for formalising commitments this phase.</li>
+<li><strong>Investment pattern:</strong> A mixed phase — keep positions simple and liquidity available; a natal storehouse is clashed/punished in 2048 clash, 2051 punishment, the classical wealth storehouse 'storehouse opens' timing — the classics do not settle release vs. scatter, so treat it as a watch, not a signal; the Companion presence argues for sole holdings or partnerships with hard boundaries.</li>
+</ul>
+<hr />
+<h3>13. 2053–2057 (Ages 69–73) — Eul Sa</h3>
+<p>The decade backdrop is <strong>Eul Sa</strong> (Hurting Officer, Output (food hurt)), with the opening five years led by <strong>Output (food hurt)</strong> annual energy. 4 years of 5 carry your favorable element (<strong>Fire</strong> / <strong>Wood</strong>), and 1 year carries the unfavorable element (<strong>Metal</strong>) — an overall <strong>favorable</strong> phase. The spouse palace (day branch <strong>Jin</strong>) is activated in 2053 binding, 2054 clash, 2057 break — relationship, home, or partnership themes are more likely to surface.</p>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Pillar</th>
+<th>Ten-God</th>
+<th>Class</th>
+<th>Favorable?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2053</td>
+<td>Gye Yu</td>
+<td>Robber</td>
+<td>Companion (compare rob)</td>
+<td>⚠️</td>
+</tr>
+<tr>
+<td>2054</td>
+<td>Gap Sul</td>
+<td>Eating God</td>
+<td>Output (food hurt)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2055</td>
+<td>Eul Hae</td>
+<td>Hurting Officer</td>
+<td>Output (food hurt)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2056</td>
+<td>Bing Ja</td>
+<td>Indirect Wealth</td>
+<td>Wealth (wealth star)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2057</td>
+<td>Jeong Chuk</td>
+<td>Direct Wealth</td>
+<td>Wealth (wealth star)</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Wealth:</strong> <strong>2 of 5</strong> annual stems are Wealth — money, pricing and asset decisions are foregrounded. Treat this as a window to <em>earn and negotiate</em>, and to put agreements in writing.</li>
+<li><strong>Business:</strong> Business energy is diffuse in this phase; let the decade backdrop and the concrete annual pillars above guide the read.</li>
+<li><strong>Family:</strong> The spouse palace is both <strong>bound and unsettled</strong> (2053 binding, 2054 clash, 2057 break) — a phase where a bond can deepen or formalise, but with friction or change around it; read it as a window, not a guarantee.</li>
+<li><strong>Investment pattern:</strong> A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; a natal storehouse is clashed/punished in 2054 clash, 2057 punishment, the classical wealth storehouse 'storehouse opens' timing — the classics do not settle release vs. scatter, so treat it as a watch, not a signal; the Companion presence argues for sole holdings or partnerships with hard boundaries.</li>
+</ul>
+<hr />
+<h3>14. 2058–2062 (Ages 74–78) — Eul Sa</h3>
+<p>The decade backdrop is <strong>Eul Sa</strong> (Hurting Officer, Output (food hurt)), with the closing five years led by <strong>Authority (officer star) · Resource</strong> annual energy. 3 years of 5 carry your favorable element (<strong>Fire</strong> / <strong>Wood</strong>), and 1 year carries the unfavorable element (<strong>Metal</strong>) — an overall <strong>favorable</strong> phase. The spouse palace (day branch <strong>Jin</strong>) is activated in 2059 harm, 2060 self-punishment — relationship, home, or partnership themes are more likely to surface.</p>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Pillar</th>
+<th>Ten-God</th>
+<th>Class</th>
+<th>Favorable?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2058</td>
+<td>Mu In</td>
+<td>Seven Killings</td>
+<td>Authority (officer star)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2059</td>
+<td>Gi Myo</td>
+<td>Direct Officer</td>
+<td>Authority (officer star)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2060</td>
+<td>Gyeong Jin</td>
+<td>Indirect Resource</td>
+<td>Resource</td>
+<td>⚠️</td>
+</tr>
+<tr>
+<td>2061</td>
+<td>Sin Sa</td>
+<td>Direct Resource</td>
+<td>Resource</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2062</td>
+<td>Im O</td>
+<td>Companion</td>
+<td>Companion (compare rob)</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Wealth:</strong> No direct Wealth stem, but <strong>1 of 5</strong> are Companion. The peer-drains-wealth pattern reads shared and loosely-defined money as contested here — defend rather than expand shared commitments.</li>
+<li><strong>Business:</strong> <strong>2 of 5</strong> years are Authority — an institution, rank or licensed role comes to the fore. Since Authority is your unfavorable element, read this as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit.</li>
+<li><strong>Family:</strong> The spouse palace is struck or unsettled (2059 harm, 2060 self-punishment) — better for deepening privately than for formalising commitments this phase.</li>
+<li><strong>Investment pattern:</strong> A favorable-element phase (3/5) — the chart is in better balance, which supports planning and negotiation; a natal storehouse is clashed/punished in 2060 clash, the classical wealth storehouse 'storehouse opens' timing — the classics do not settle release vs. scatter, so treat it as a watch, not a signal; the Companion presence argues for sole holdings or partnerships with hard boundaries.</li>
+</ul>
+<hr />
+<h3>15. 2063–2067 (Ages 79–83) — Gap Jin</h3>
+<p>The decade backdrop is <strong>Gap Jin</strong> (Eating God, Output (food hurt)), with the opening five years led by <strong>Output (food hurt)</strong> annual energy. 2 years of 5 carry your favorable element (<strong>Fire</strong> / <strong>Wood</strong>) — an overall <strong>favorable</strong> phase. The spouse palace (day branch <strong>Jin</strong>) is activated in 2065 binding, 2066 clash — relationship, home, or partnership themes are more likely to surface.</p>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Pillar</th>
+<th>Ten-God</th>
+<th>Class</th>
+<th>Favorable?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2063</td>
+<td>Gye Mi</td>
+<td>Robber</td>
+<td>Companion (compare rob)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2064</td>
+<td>Gap Shin</td>
+<td>Eating God</td>
+<td>Output (food hurt)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2065</td>
+<td>Eul Yu</td>
+<td>Hurting Officer</td>
+<td>Output (food hurt)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2066</td>
+<td>Bing Sul</td>
+<td>Indirect Wealth</td>
+<td>Wealth (wealth star)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>2067</td>
+<td>Jeong Hae</td>
+<td>Direct Wealth</td>
+<td>Wealth (wealth star)</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Wealth:</strong> <strong>2 of 5</strong> annual stems are Wealth — money, pricing and asset decisions are foregrounded. Treat this as a window to <em>earn and negotiate</em>, and to put agreements in writing.</li>
+<li><strong>Business:</strong> Business energy is diffuse in this phase; let the decade backdrop and the concrete annual pillars above guide the read.</li>
+<li><strong>Family:</strong> The spouse palace is both <strong>bound and unsettled</strong> (2065 binding, 2066 clash) — a phase where a bond can deepen or formalise, but with friction or change around it; read it as a window, not a guarantee.</li>
+<li><strong>Investment pattern:</strong> A favorable-element phase (2/5) — the chart is in better balance, which supports planning and negotiation; a natal storehouse is clashed/punished in 2063 punishment, 2066 clash, the classical wealth storehouse 'storehouse opens' timing — the classics do not settle release vs. scatter, so treat it as a watch, not a signal; the Companion presence argues for sole holdings or partnerships with hard boundaries.</li>
+</ul>
+<hr />
+<h3>16. 2068–2072 (Ages 84–88) — Gap Jin</h3>
+<p>The decade backdrop is <strong>Gap Jin</strong> (Eating God, Output (food hurt)), with the closing five years led by <strong>Authority (officer star) · Resource</strong> annual energy. None of the 5 years carries your favorable element — an overall <strong>mixed</strong> phase. The spouse palace (day branch <strong>Jin</strong>) is activated in 2069 break, 2071 harm, 2072 self-punishment — relationship, home, or partnership themes are more likely to surface.</p>
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Pillar</th>
+<th>Ten-God</th>
+<th>Class</th>
+<th>Favorable?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2068</td>
+<td>Mu Ja</td>
+<td>Seven Killings</td>
+<td>Authority (officer star)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2069</td>
+<td>Gi Chuk</td>
+<td>Direct Officer</td>
+<td>Authority (officer star)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2070</td>
+<td>Gyeong In</td>
+<td>Indirect Resource</td>
+<td>Resource</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2071</td>
+<td>Sin Myo</td>
+<td>Direct Resource</td>
+<td>Resource</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2072</td>
+<td>Im Jin</td>
+<td>Companion</td>
+<td>Companion (compare rob)</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Wealth:</strong> No direct Wealth stem, but <strong>1 of 5</strong> are Companion. The peer-drains-wealth pattern reads shared and loosely-defined money as contested here — defend rather than expand shared commitments.</li>
+<li><strong>Business:</strong> <strong>2 of 5</strong> years are Authority — an institution, rank or licensed role comes to the fore. Since Authority is your unfavorable element, read this as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit.</li>
+<li><strong>Family:</strong> The spouse palace is struck or unsettled (2069 break, 2071 harm, 2072 self-punishment) — better for deepening privately than for formalising commitments this phase.</li>
+<li><strong>Investment pattern:</strong> A mixed phase — keep positions simple and liquidity available; a natal storehouse is clashed/punished in 2069 punishment, 2072 clash, the classical wealth storehouse 'storehouse opens' timing — the classics do not settle release vs. scatter, so treat it as a watch, not a signal; the Companion presence argues for sole holdings or partnerships with hard boundaries.</li>
+</ul>
+<hr />
+
+</body>
+</html>

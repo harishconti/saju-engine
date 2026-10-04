@@ -51,7 +51,7 @@ PYTHONPATH=src python3 -m saju_engine \
 ### Combined base report + follow-ups
 ```bash
 PYTHONPATH=src python3 src/saju_html/combine_candidate_report.py sruthi
-./tools/build-pdf.sh --combined --html sruthi "Title" "Client" "DOB" "Day Master"
+./tools/build-pdf.sh --combined sruthi "Title" "Client" "DOB" "Day Master"
 ```
 
 ### Compatibility report

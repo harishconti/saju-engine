@@ -27,8 +27,8 @@
     --color-card-border: #d0d8e0;
     --color-callout-bg: #eef5fa;
     --color-callout-border: #b8d4e8;
-    --font-serif: Georgia, "Times New Roman", serif;
-    --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-serif: Georgia, "Times New Roman", "Noto Serif CJK KR", "Noto Serif KR", serif;
+    --font-sans: "Helvetica Neue", Helvetica, Arial, "Noto Sans CJK KR", "Noto Sans KR", sans-serif;
     --font-mono: Consolas, "Liberation Mono", Menlo, monospace;
 }
 

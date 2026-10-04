@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 from saju_html import translate_inline
+from tests.test_html_pdf import requires_browser
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ENV = {**os.environ, "PYTHONPATH": str(PROJECT_ROOT / "src")}
@@ -26,6 +27,7 @@ requires_pdftotext = pytest.mark.skipif(
 )
 
 
+@requires_browser
 def test_build_pdf_from_markdown(tmp_path):
     # N-22 (2026-09-26 audit): this used to point straight at the tracked
     # client deliverable (candidates_horoscope/reports/sruthi/sruthi-report.pdf)
@@ -202,8 +204,8 @@ def test_translate_inline_protects_arbitrary_parenthetical_english():
     assert translate_inline("Some notes (do not translate this)") == "Some notes (do not translate this)"
 
 
-def test_translate_inline_drops_unmapped_cjk():
-    assert "龍" not in translate_inline("Hello 龍 world")
+def test_translate_inline_drop_mode_drops_unmapped_cjk():
+    assert "龍" not in translate_inline("Hello 龍 world", keep_unmapped=False)
 
 
 def test_translate_inline_maps_gusin_not_just_its_last_syllable():

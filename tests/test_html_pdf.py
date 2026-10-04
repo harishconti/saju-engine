@@ -60,7 +60,7 @@ def test_reportlab_inline_handles_underscore_italic_without_leaking_underscores(
     assert md_inline_to_html("the day_branch_middle stem") == "the day_branch_middle stem"
 
 
-def test_build_pdf_falls_back_to_reportlab_when_playwright_unavailable(tmp_path, monkeypatch):
+def test_build_pdf_falls_back_to_reportlab_only_when_explicitly_allowed(tmp_path, monkeypatch):
     """If the HTML/Playwright backend cannot print, build_pdf routes to ReportLab."""
     import warnings
     from saju_html.renderer import build_pdf
@@ -86,6 +86,7 @@ def test_build_pdf_falls_back_to_reportlab_when_playwright_unavailable(tmp_path,
             dob="1 January 2000",
             day_master="Gap (Yang Wood)",
             tier="essential",
+            allow_fallback=True,
         )
     assert out == pdf
     assert pdf.stat().st_size > 1024

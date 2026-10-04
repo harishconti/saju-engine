@@ -19,6 +19,8 @@ from pathlib import Path
 
 import pytest
 
+from tests.test_html_pdf import requires_browser
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 # A5 (2026-10-01 audit): this hard-coded /home/harish/.local/... and so only
 # ran on one machine. Inherit the caller's PYTHONPATH (CI installs deps
@@ -47,8 +49,13 @@ Placeholder closing note for the regression fixture.
 """
 
 
-def test_compat_pdf_default_output_lands_under_repo_root_not_src(tmp_path):
-    pytest.importorskip("reportlab")
+@pytest.mark.parametrize("backend", [
+    pytest.param("html", marks=requires_browser),
+    "reportlab",
+])
+def test_compat_pdf_default_output_lands_under_repo_root_not_src(tmp_path, backend):
+    if backend == "reportlab":
+        pytest.importorskip("reportlab")
     input_md = tmp_path / "test-pair-a_test-pair-b_compatibility.md"
     input_md.write_text(MINIMAL_COMPAT_MD, encoding="utf-8")
 
@@ -75,6 +82,7 @@ def test_compat_pdf_default_output_lands_under_repo_root_not_src(tmp_path):
                 "--day-master-a", "丙",
                 "--day-master-b", "丙",
                 "--tier", "basic",
+                "--backend", backend,
             ],
             cwd=PROJECT_ROOT,
             env=ENV,

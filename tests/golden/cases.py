@@ -87,3 +87,39 @@ def _cross_candidate(charts) -> str:
     relationships = [{"a": "Park", "b": "Seo", "kind": "co-founders"}]
     return generate_cross_candidate_report(
         members, relationships, reference_date="2026-06-01")
+
+
+# --- Rendered-HTML snapshots (P5 Task 3, 2026-10-04) -------------------------
+HTML_REPORT_ID_PREFIX = "GOLDEN-"
+
+
+def html_tier_for(md_name: str):
+    """Renderer ``tier`` argument for a golden markdown file name."""
+    stem = md_name[:-3]
+    if stem.startswith("compat-"):
+        return "compat"
+    if stem == "cross-candidate":
+        return None
+    for tier in ("luck-cycle", "career", "sample", "essential", "deep",
+                 "fullmap", "companion"):
+        if stem.endswith(tier) or f"-{tier}-" in stem:
+            return tier
+    return None
+
+
+def render_golden_html(md_name: str, md_text: str) -> str:
+    """The exact HTML string ``renderer.build_pdf`` prints to PDF, with fixed
+    metadata so it is deterministic."""
+    from saju_html.renderer import markdown_to_html
+
+    stem = md_name[:-3]
+    return markdown_to_html(
+        md_text,
+        title=f"Golden {stem}",
+        client="Golden Client",
+        dob="1 January 1990",
+        day_master="Byeong (Yang Fire)",
+        generation_date=GEN_DATE,
+        report_id=f"{HTML_REPORT_ID_PREFIX}{stem}",
+        tier=html_tier_for(md_name),
+    )

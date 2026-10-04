@@ -138,30 +138,31 @@ Beyond the knowledge base, the project ships two execution paths:
 - **Solar-time correction:** Enabled by default for non-standard longitudes. Indian births east or west of the IST meridian (82.5°E) are corrected to true solar time before the hour branch and day pillar are derived.
 - **Korean `야자시` vs Chinese `조자시`:** defaults to `convention="korean"` (23:00 belongs to the *current* day's 子 hour). Use `--convention=chinese` for the Chinese early-Zi rule.
 - **CLI formats:** `table` (default), `json`, `skeleton`, and `premium`. Premium supports `--tier {sample,essential,deep,spark,reading,fullmap}` — the first three are the landing-page products (Hook / Essential Report / Deep Destiny Report), the last three are legacy internal aliases kept for backward compatibility. Skeleton supports `--year`, `--month`, `--day`, `--focus`, and `--no-prose-scaffold`. `--convention` and `--overwrite-report` are available on the PDF wrapper.
-- **Dependencies:** declared in `pyproject.toml`. For a fresh machine: `pip install --user --break-system-packages sajupy reportlab pytest`.
+- **Dependencies:** declared in `pyproject.toml`. For a fresh machine: `pip install -e .[html]` then `python -m playwright install chromium` (the bundled Chromium is needed for the default HTML PDF backend; otherwise a system Google Chrome is used with a warning; `SAJU_ALLOW_SYSTEM_CHROME=0` requires the bundled one).
 
 ### Self-service calculator — `tools/client_intake_app.py`
 - FastAPI web app: the client fills the intake form (name, DOB, birth time, location, email, gender, marriage status, tier; "main concern" enabled only for the Deep tier) and the free Hook (sample) PDF comes back immediately; paid tiers are queued for owner review (202 + private download link after approval). Input is validated before storing.
-- Computes the chart with `src/saju_engine/`, generates the premium markdown for the chosen tier, and renders it to PDF via the reportlab backend.
+- Computes the chart with `src/saju_engine/`, generates the premium markdown for the chosen tier, and renders it to PDF via the HTML/Playwright backend (reportlab only if env `SAJU_PDF_BACKEND=reportlab`).
 - Stores intakes in an encrypted SQLite file (`SAJU_INTAKE_KEY`; name/email/concern encrypted) with draft PDFs under `candidates_horoscope/intake/`. Owner review: `python3 tools/intake_admin.py genkey|list|show|attach <id> <pdf>|approve <id>|revoke <id>|reissue <id>|regenerate <id> [--force]|rotate|purge --days 180` (approve/reissue print the private `/report/{token}` link to email; base URL from `--base-url` or `SAJU_PUBLIC_URL`, no localhost default; links do not expire until purge/revoke). Load limits: `SAJU_MAX_RENDERS` (2), `SAJU_MAX_QUEUE` (50). `SAJU_INTAKE_KEY` may be a comma-separated list for key rotation. Draft PDFs/MD hold PII on disk (use `umask 077`); the access log redacts report tokens (reverse proxies must too). Solar-term convention: a 절기 day maps to the month/year in force at 12:00 KST.
 - Run `SAJU_INTAKE_KEY=... python3 tools/client_intake_app.py 8080` (bind via `SAJU_HOST`, default `127.0.0.1`) and open `http://localhost:8080`. Requires the `web` optional dependencies: `pip install --user --break-system-packages -e ".[web]"`.
 - **Note:** The generated PDF is an engine draft marked `[ENGINE DRAFT — REVIEW REQUIRED]` for Essential and Deep Destiny reports. Use it as a first-pass deliverable only after review, or restrict self-service to **The Hook** (sample tier) for fully automated delivery.
 - **Privacy / deployment:** PII is encrypted at rest, paid PDFs are drafted in the background and human-reviewed, and retention defaults to 180 days. Still open: email delivery (D2), Merchant-of-Record checkout (D1), deployment (D3). Run with `umask 077`.
 
-### PDF toolchain — `tools/build-pdf.sh` + `src/saju_html/md_to_saju_pdf.py`
+### PDF toolchain — `tools/build-pdf.sh` + `src/saju_html/md_to_saju_html_pdf.py`
 - **Two modes:**
   - **From markdown** (default): `./tools/build-pdf.sh sruthi` reads `candidates_horoscope/reports/sruthi/sruthi-report.md` and renders it to PDF.
   - **From chart** (Priority 3 path): `./tools/build-pdf.sh sruthi "Title" "Client" "DOB" "DayMaster" --from-chart --gender F --birth-year 1993 ...` calls the engine and renders the chart directly — no intermediate `.md` needed.
 - **Flags:** `--convention korean|chinese` controls the 23:00–00:59 day handling; `--overwrite-report` lets an engine run overwrite an existing `{name}-engine.md`. Use `--tier {sample,essential,deep,spark,reading,fullmap}` with `--from-chart` for tiered engine reports.
-- **Style:** English-primary, Korean/Hanja translated inline (translation maps live in `src/saju_html/md_to_saju_pdf.py`). Cover page with title, candidate info, Day Master, generation date. Body has clean headings, alternating-row tables, footer with page numbers.
-- **Dependencies:** `reportlab` is declared in `pyproject.toml`; the wrapper script sets up `PYTHONPATH` automatically.
+- **Style:** English-primary, Korean/Hanja translated inline (translation maps live in `src/saju_html/__init__.py`). Cover page with title, candidate info, Day Master, generation date. Body has clean headings, alternating-row tables, footer with page numbers.
+- **Dependencies:** `playwright` + Chromium for the default backend; `reportlab` (legacy, `--reportlab`) is declared in `pyproject.toml`; the wrapper script sets up `PYTHONPATH` automatically.
+- **Backend:** HTML/Playwright is the default; `--reportlab` writes `*-reportlab.pdf` beside it (legacy, planned for removal after one release). A missing browser fails loudly unless env `SAJU_PDF_FALLBACK=reportlab`. Unmapped CJK is kept and reported, never silently dropped.
 
 ### HTML/Playwright PDF backend — `src/saju_html/md_to_saju_html_pdf.py`
-- **Opt-in:** `./tools/build-pdf.sh --html sruthi` routes to the new renderer; default remains reportlab.
+- **Default:** `./tools/build-pdf.sh sruthi` uses this renderer (`--html` is a no-op alias); also supports `--from-chart` and `--tier` directly.
 - **Technology:** markdown → `markdown-it-py` → styled HTML → Playwright/Chromium → A4 PDF.
 - **Why use it:** better table typography, easier theming via CSS, and native `@page` print controls.
-- **Shared translation maps:** `src/saju_html/__init__.py` keeps both backends in sync.
-- **Dependencies:** `playwright` (runtime); `markdown-it-py` (already present).
+- **Shared translation maps:** `src/saju_html/__init__.py` keeps both backends in sync; `tests/test_translation_coverage.py` / `test_translation_quality.py` guard them, and `tests/golden_html/` holds rendered-HTML snapshots (`python tools/regen_golden.py --html`).
+- **Dependencies:** `playwright` (runtime; `pip install -e .[html]` + `python -m playwright install chromium`; falls back to system Chrome with a warning unless `SAJU_ALLOW_SYSTEM_CHROME=0`); `markdown-it-py` (already present).
 
 ### Two-chart compatibility pipeline — `src/saju_engine/compat.py` + `src/saju_html/md_to_saju_compat_pdf.py`
 - **Engine:** `compat_score(chart_a, chart_b)` in `src/saju_engine/compat.py` runs all 11 sub-systems (일간합 → 띠 궁합), weights them per `knowledge/11-gunghap.md`, and returns a `CompatReport` with composite 0–100 score + 4-band verdict.

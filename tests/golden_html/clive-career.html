@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Golden clive-career</title>
+<style>
+/* Saju HTML→PDF theme
+ *
+ * Designed for A4 print rendering via Playwright / Chromium.
+ * Uses CSS @page rules for margins, running footers, and print-specific styling.
+ */
+
+@page {
+    size: A4;
+    margin: 18mm;
+    margin-bottom: 22mm;
+}
+
+@page cover {
+    margin-bottom: 18mm;
+}
+
+:root {
+    --color-text: #222222;
+    --color-muted: #555555;
+    --color-light: #888888;
+    --color-heading: #2a4d6e;
+    --color-heading2: #3a5d7e;
+    --color-accent: #f3f6fa;
+    --color-rule: #cccccc;
+    --color-table-header: #2a4d6e;
+    --color-card-bg: #f8fafc;
+    --color-card-border: #d0d8e0;
+    --color-callout-bg: #eef5fa;
+    --color-callout-border: #b8d4e8;
+    --font-serif: Georgia, "Times New Roman", "Noto Serif CJK KR", "Noto Serif KR", serif;
+    --font-sans: "Helvetica Neue", Helvetica, Arial, "Noto Sans CJK KR", "Noto Sans KR", sans-serif;
+    --font-mono: Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-serif);
+    font-size: 10.5pt;
+    line-height: 1.55;
+    color: var(--color-text);
+}
+
+/* ---- Cover page --------------------------------------------------------- */
+.cover {
+    text-align: center;
+    padding-top: 18mm;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 55%, #eef2f7 100%);
+    min-height: calc(100vh - 40mm);
+    border: 1px solid transparent;
+    break-after: page;
+}
+
+.cover .watermark {
+    font-size: 110pt;
+    line-height: 1;
+    margin-bottom: 4mm;
+    opacity: 0.12;
+}
+
+.cover h1 {
+    font-family: var(--font-sans);
+    font-size: 34pt;
+    font-weight: bold;
+    color: #1a1a1a;
+    margin: 0 0 4mm 0;
+    line-height: 1.15;
+    page-break-before: auto;
+    border-bottom: none;
+}
+
+.cover .subtitle {
+    font-family: var(--font-serif);
+    font-size: 12.5pt;
+    font-style: italic;
+    color: var(--color-heading);
+    margin: 0 0 10mm 0;
+    letter-spacing: 0.3px;
+}
+
+.cover .meta-block {
+    display: inline-block;
+    text-align: left;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid var(--color-card-border);
+    border-radius: 6px;
+    padding: 6mm 10mm;
+    margin: 0 auto 12mm auto;
+    box-shadow: 0 2px 8px rgba(42, 77, 110, 0.06);
+}
+
+.cover .meta {
+    font-family: var(--font-sans);
+    font-size: 11pt;
+    color: var(--color-text);
+    margin: 2.5mm 0;
+    text-align: left;
+}
+
+.cover .meta strong {
+    color: var(--color-heading);
+    font-weight: 600;
+    margin-right: 3mm;
+    display: inline-block;
+    min-width: 22mm;
+}
+
+.cover .foot {
+    margin-top: 14mm;
+    font-family: var(--font-sans);
+    font-size: 9.5pt;
+    color: var(--color-muted);
+    line-height: 1.45;
+    padding: 0 22mm;
+}
+
+.cover .date {
+    margin-top: 6mm;
+    font-size: 10pt;
+    color: var(--color-light);
+}
+
+.cover .report-id {
+    margin-top: 3mm;
+    font-family: var(--font-sans);
+    font-size: 9pt;
+    color: var(--color-heading);
+    font-weight: 600;
+}
+
+/* ---- Compact one-page hook header --------------------------------------- */
+.compact-cover {
+    text-align: center;
+    padding: 8mm 0 4mm 0;
+    margin-bottom: 4mm;
+    border-bottom: 1.5px solid var(--color-rule);
+    page-break-after: avoid;
+}
+
+.compact-cover h1 {
+    font-family: var(--font-sans);
+    font-size: 18pt;
+    font-weight: bold;
+    color: var(--color-heading);
+    margin: 0 0 2mm 0;
+    line-height: 1.2;
+    border-bottom: none;
+}
+
+.compact-cover .subtitle {
+    font-family: var(--font-serif);
+    font-size: 10pt;
+    font-style: italic;
+    color: var(--color-muted);
+    margin: 0 0 2mm 0;
+}
+
+.compact-cover .meta,
+.compact-cover .report-line {
+    font-family: var(--font-sans);
+    font-size: 8.5pt;
+    color: var(--color-light);
+    margin: 0 0 1mm 0;
+}
+
+@page compact {
+    size: A4;
+    margin: 13mm 14mm 16mm 14mm;
+}
+
+body.compact-mode {
+    page: compact;
+    font-size: 9.5pt;
+    line-height: 1.38;
+}
+
+body.compact-mode h2 {
+    font-size: 11.5pt;
+    margin: 3mm 0 1.5mm 0;
+}
+
+body.compact-mode h3 {
+    font-size: 10pt;
+    margin: 2.5mm 0 1mm 0;
+}
+
+body.compact-mode p,
+body.compact-mode ul,
+body.compact-mode li {
+    margin: 1.2mm 0;
+}
+
+body.compact-mode table {
+    margin: 1.5mm 0;
+    font-size: 9pt;
+}
+
+body.compact-mode hr {
+    margin: 2mm 0;
+}
+
+body.compact-mode .compact-cover {
+    padding: 5mm 0 3mm 0;
+    margin-bottom: 3mm;
+}
+
+body.compact-mode .compact-cover h1 {
+    font-size: 16pt;
+    margin: 0 0 1.5mm 0;
+}
+
+body.compact-mode .compact-cover .subtitle {
+    font-size: 9pt;
+    margin: 0 0 1.5mm 0;
+}
+
+body.compact-mode .compact-cover .meta,
+body.compact-mode .compact-cover .report-line {
+    font-size: 8pt;
+    margin: 0 0 0.8mm 0;
+}
+
+/* ---- Typography --------------------------------------------------------- */
+h1 {
+    string-set: section-title content();
+    font-family: var(--font-sans);
+    font-size: 22pt;
+    font-weight: bold;
+    color: var(--color-heading);
+    border-bottom: 2px solid var(--color-heading);
+    padding-bottom: 0.2em;
+    margin: 0 0 6mm 0;
+    page-break-before: always;
+    line-height: 1.25;
+}
+
+h1:first-of-type {
+    page-break-before: auto;
+}
+
+h2 {
+    string-set: section-title content();
+    font-family: var(--font-sans);
+    font-size: 16pt;
+    font-weight: bold;
+    color: var(--color-heading2);
+    margin: 8mm 0 3mm 0;
+    line-height: 1.3;
+}
+
+h3 {
+    string-set: section-title content();
+    font-family: var(--font-sans);
+    font-size: 13pt;
+    font-weight: bold;
+    color: #444444;
+    margin: 6mm 0 2mm 0;
+    line-height: 1.3;
+}
+
+h4, h5, h6 {
+    font-family: var(--font-sans);
+    font-size: 11pt;
+    font-weight: bold;
+    color: #444444;
+    margin: 4mm 0 2mm 0;
+}
+
+p {
+    margin: 0 0 3mm 0;
+    orphans: 3;
+    widows: 3;
+}
+
+a {
+    color: var(--color-heading);
+    text-decoration: none;
+}
+
+strong {
+    font-weight: bold;
+    color: #1a1a1a;
+}
+
+em {
+    font-style: italic;
+}
+
+/* ---- Lists -------------------------------------------------------------- */
+ul, ol {
+    margin: 2mm 0 4mm 0;
+    padding-left: 6mm;
+}
+
+li {
+    margin: 1.2mm 0;
+}
+
+/* ---- Blockquotes / notes ------------------------------------------------ */
+blockquote {
+    border-left: 3px solid var(--color-rule);
+    padding-left: 1em;
+    margin: 1em 0;
+    color: #555555;
+}
+
+blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+/* ---- Code & ASCII art --------------------------------------------------- */
+code {
+    font-family: var(--font-mono);
+    font-size: 9.5pt;
+    background: #f0f0f0;
+    padding: 0 0.2em;
+    border-radius: 2px;
+}
+
+pre {
+    font-family: var(--font-mono);
+    font-size: 9pt;
+    background: #f6f6f6;
+    padding: 0.8em;
+    border-radius: 4px;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    margin: 1em 0;
+}
+
+pre code {
+    background: transparent;
+    padding: 0;
+}
+
+/* ---- Tables ------------------------------------------------------------- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+    font-size: 9.5pt;
+    page-break-inside: avoid;
+}
+
+thead {
+    display: table-header-group;
+}
+
+tr {
+    page-break-inside: avoid;
+}
+
+th, td {
+    border: 1px solid var(--color-rule);
+    padding: 5px;
+    vertical-align: top;
+    text-align: left;
+}
+
+th {
+    background: var(--color-table-header);
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background: var(--color-accent);
+}
+
+/* ---- Quick Reference card ----------------------------------------------- */
+.quick-ref-card {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-left: 4px solid var(--color-heading);
+    border-radius: 6px;
+    padding: 5mm 6mm;
+    margin: 4mm 0 6mm 0;
+    box-shadow: 0 2px 6px rgba(42, 77, 110, 0.05);
+}
+
+.quick-ref-card ul {
+    margin: 0;
+    padding-left: 5mm;
+}
+
+.quick-ref-card li {
+    margin: 1.5mm 0;
+}
+
+/* ---- Right Now callout -------------------------------------------------- */
+.right-now-callout {
+    background: var(--color-callout-bg);
+    border: 1px solid var(--color-callout-border);
+    border-radius: 6px;
+    padding: 5mm 6mm;
+    margin: 4mm 0 6mm 0;
+    font-style: italic;
+}
+
+.right-now-callout p {
+    margin: 0;
+}
+
+/* ---- Lucky Attributes grid ---------------------------------------------- */
+.lucky-attributes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3mm;
+    margin: 4mm 0 6mm 0;
+}
+
+.lucky-attribute-item {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-radius: 5px;
+    padding: 3mm 4mm;
+}
+
+.lucky-attribute-item .label {
+    font-family: var(--font-sans);
+    font-size: 8.5pt;
+    font-weight: bold;
+    color: var(--color-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 1mm;
+}
+
+.lucky-attribute-item .value {
+    font-size: 9.5pt;
+    color: var(--color-text);
+}
+
+/* ---- Element Balance SVG chart ---------------------------------------- */
+.element-balance-chart {
+    margin: 4mm 0 6mm 0;
+    page-break-inside: avoid;
+}
+
+.element-balance-chart svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* ---- Element-balance color coding --------------------------------------- */
+.element-fire { color: #e74c3c; }
+.element-earth { color: #f39c12; }
+.element-metal { color: #7f8c8d; }
+.element-water { color: #3498db; }
+.element-wood { color: #27ae60; }
+
+/* ---- Horizontal rules --------------------------------------------------- */
+hr {
+    border: none;
+    border-top: 1px solid var(--color-rule);
+    margin: 1em 0;
+}
+
+/* ---- Utility ------------------------------------------------------------ */
+.print-only {
+    display: block;
+}
+
+.no-break {
+    page-break-inside: avoid;
+}
+
+/* ---- Chart signature (Deep tier pull-quote) ----------------------------- */
+.chart-signature {
+    font-family: var(--font-serif);
+    font-size: 12.5pt;
+    font-style: italic;
+    color: var(--color-heading);
+    border-left: 4px solid var(--color-heading);
+    background: var(--color-callout-bg);
+    padding: 4mm 6mm;
+    margin: 4mm 0 6mm 0;
+    border-radius: 4px;
+}
+
+/* ---- Audio included callout (Deep tier cover) -------------------------- */
+.audio-included {
+    display: inline-block;
+    background: #fff7e6;
+    border: 1px solid #f0c674;
+    color: #8a5a00;
+    font-family: var(--font-sans);
+    font-size: 10pt;
+    padding: 2mm 4mm;
+    margin: 3mm 0 2mm 0;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* ---- Partner Chart Add-On upsell box ------------------------------------ */
+.partner-compat-upsell {
+    background: #f0f7ff;
+    border: 1px solid #b6d4f0;
+    border-left: 4px solid #2a4d6e;
+    color: #1a1a1a;
+    padding: 3mm 5mm;
+    margin: 3mm 0 5mm 0;
+    border-radius: 4px;
+    font-style: italic;
+}
+
+/* ---- Lifetime Decade Roadmap (Deep tier SVG) ---------------------------- */
+.decade-roadmap {
+    margin: 4mm 0 6mm 0;
+    page-break-inside: avoid;
+}
+
+.decade-roadmap svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 720px;
+}
+
+/* ---- Tier-aware body classes -------------------------------------------- */
+body.tier-deep h1 {
+    border-bottom: 2.5px solid var(--color-heading);
+}
+
+body.tier-essential h1 {
+    border-bottom: 2px solid var(--color-heading);
+}
+
+</style>
+</head>
+<body class="tier-career">
+<div class="cover">
+  <div class="watermark">命</div>
+  <h1>Golden clive-career</h1>
+  <p class="subtitle">A Reading in the Korean Four Pillars Tradition</p>
+  <div class="meta-block">
+    <p class="meta"><strong>For</strong>Golden Client</p>
+    <p class="meta"><strong>Born</strong>1 January 1990</p>
+    <p class="meta"><strong>Day Master</strong>Byeong (Yang Fire)</p>
+  </div>
+  <p class="foot">Grounded in the Five Elements and Yin-Yang philosophy. Interpreted through classical Myeongri (Korean Saju) tradition: Jeokcheon-su, Yeonhae-japyeong, Gungtong-bogam, Myeongri-jeongjong.</p>
+  <p class="date">Generated 2026-06-01</p>
+  <p class="report-id">Report ID: GOLDEN-clive-career · CosmicSaju · cosmicsaju.com</p>
+</div>
+
+
+<h2>Clive — Career &amp; Wealth Deep-Dive · Add-on</h2>
+<p><em>Ranked career domains, role ladders, business/investment behaviour, and decade-by-decade transition timing</em></p>
+<p><strong>Born:</strong> 1971-11-02 · 05:00 · —</p>
+<p><strong>Time method:</strong> recorded birth time 05:00 (local clock) corrected to true solar time <strong>04:25</strong> (birthplace 2.35°E vs the 15.0°E zone meridian), -34.2 min (longitude -50.6 min + equation of time +16.4 min). Hour branches follow 2-hour solar windows, so the pillars above use the corrected time.</p>
+<p><strong>Day Master:</strong> Sin (Yin Metal, Sin Metal)</p>
+<p><strong>Report generated:</strong> 2026-06-01 · <strong>Report ID:</strong> CID-clive-20260601-CAREER</p>
+<p><em>Delivered by Cosmic Saju · cosmicsaju.com</em></p>
+<p><strong>Chart signature:</strong> <em>A honed blade in autumn air — sharp, decisive, and made to cut through clutter.</em></p>
+<hr />
+<h2>Career Archetypes — Ranked Domains</h2>
+<p>Your career archetypes are the fields the chart can carry, ranked by what it <em>needs</em> (Favorable Element / Supporting Element) rather than by the Day Master's own element — the classical priority in §Favorable Element vs. Day Master for Career Choice is to &quot;align work with what the chart needs&quot;, because work that reinforces an already-dominant element pushes the chart further out of balance. <strong>Best Fit</strong> = directly aligned; <strong>Good Fit</strong> = supportive breadth; <strong>Possible</strong> = workable but not strongly resourced by the chart.</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Domain</th>
+<th>Why It Fits</th>
+<th>Example Roles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Best Fit</strong></td>
+<td>Strategy &amp; Consulting</td>
+<td>Aligns with your favorable element Water, reducing friction.</td>
+<td>management consulting, advisory, research</td>
+</tr>
+<tr>
+<td><strong>Best Fit</strong></td>
+<td>Diplomacy &amp; International Business</td>
+<td>Aligns with your favorable element Water, reducing friction.</td>
+<td>diplomacy, import/export, global trade</td>
+</tr>
+<tr>
+<td><strong>Best Fit</strong></td>
+<td>Arts &amp; Curation</td>
+<td>Aligns with your favorable element Water, reducing friction.</td>
+<td>curation, art dealing, museum work, creative research</td>
+</tr>
+<tr>
+<td><strong>Best Fit</strong></td>
+<td>Journalism &amp; Investigation</td>
+<td>Aligns with your favorable element Water, reducing friction.</td>
+<td>reporting, investigative journalism, publishing</td>
+</tr>
+<tr>
+<td><strong>Good Fit</strong></td>
+<td>Logistics &amp; Shipping</td>
+<td>Aligns with your favorable element Water, reducing friction.</td>
+<td>supply chain, maritime, travel industry</td>
+</tr>
+<tr>
+<td><strong>Good Fit</strong></td>
+<td>Law &amp; Governance</td>
+<td>Lets your native Metal energy express directly.</td>
+<td>attorney, judge, compliance, policy</td>
+</tr>
+<tr>
+<td><strong>Good Fit</strong></td>
+<td>Engineering &amp; Technology</td>
+<td>Lets your native Metal energy express directly.</td>
+<td>software, hardware, civil, mechanical engineering</td>
+</tr>
+<tr>
+<td><strong>Possible</strong></td>
+<td>Medicine &amp; Surgery</td>
+<td>Lets your native Metal energy express directly.</td>
+<td>surgery, diagnostics, medical research</td>
+</tr>
+<tr>
+<td><strong>Possible</strong></td>
+<td>Quality &amp; Audit</td>
+<td>Lets your native Metal energy express directly.</td>
+<td>auditing, QA, forensic analysis, due diligence</td>
+</tr>
+<tr>
+<td><strong>Possible</strong></td>
+<td>Security &amp; Military</td>
+<td>Lets your native Metal energy express directly.</td>
+<td>defense, intelligence, security consulting</td>
+</tr>
+<tr>
+<td><strong>Possible</strong></td>
+<td>Psychology &amp; Counseling</td>
+<td>Uses Earth energy in a supportive role to your Metal Day Master.</td>
+<td>clinical psychology, counseling, hypnotherapy</td>
+</tr>
+<tr>
+<td><strong>Possible</strong></td>
+<td>Finance &amp; Investment</td>
+<td>Uses Earth energy in a supportive role to your Metal Day Master.</td>
+<td>investment banking, trading, risk management</td>
+</tr>
+</tbody>
+</table>
+<h2>Concrete Role Ladders</h2>
+<p>Same domains, expanded into representative roles to aim for or hire into (modern Myeongri (Korean Saju tradition) extension of the element families — §Element → Industry Families).</p>
+<table>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Roles to Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Strategy &amp; Consulting</td>
+<td>consultant, strategist, advisor, research lead</td>
+</tr>
+<tr>
+<td>Diplomacy &amp; International Business</td>
+<td>diplomat, trade lead, global BD manager</td>
+</tr>
+<tr>
+<td>Arts &amp; Curation</td>
+<td>curator, art dealer, creative researcher, museum lead</td>
+</tr>
+<tr>
+<td>Journalism &amp; Investigation</td>
+<td>reporter, investigative journalist, editor</td>
+</tr>
+<tr>
+<td>Logistics &amp; Shipping</td>
+<td>supply-chain lead, freight manager, mobility operator</td>
+</tr>
+<tr>
+<td>Law &amp; Governance</td>
+<td>lawyer, compliance officer, policy lead, judge-track</td>
+</tr>
+<tr>
+<td>Engineering &amp; Technology</td>
+<td>engineer, architect, tech lead, CTO-track</td>
+</tr>
+<tr>
+<td>Medicine &amp; Surgery</td>
+<td>physician, surgeon, diagnostics lead, researcher</td>
+</tr>
+<tr>
+<td>Quality &amp; Audit</td>
+<td>auditor, QA lead, forensic analyst, due-diligence lead</td>
+</tr>
+<tr>
+<td>Security &amp; Military</td>
+<td>security lead, intelligence analyst, defence consultant</td>
+</tr>
+<tr>
+<td>Psychology &amp; Counseling</td>
+<td>clinical psychologist, counsellor, therapist</td>
+</tr>
+<tr>
+<td>Finance &amp; Investment</td>
+<td>analyst, trader, risk manager, portfolio lead</td>
+</tr>
+</tbody>
+</table>
+<h2>Domain Deep-Dive — Why Each Archetype Fits</h2>
+<p>Each ranked archetype below is read for <em>this</em> chart: what the element family is, why the chart fits it, the practical way to use it, and the honest caveat where the fit is weaker.</p>
+<h3>Strategy &amp; Consulting (<strong>Best Fit</strong>)</h3>
+<ul>
+<li><strong>Element family:</strong> Water — this family moves information, goods or people — it connects separated things and runs below the surface (<em>Water the element that flows around obstacles and connects</em>, ).</li>
+<li><strong>Why it fits your chart:</strong> This is a <strong>Best Fit</strong>: the family runs on <strong>Water</strong>, your favorable element, so the work moves <em>with</em> the chart's grain instead of against it.</li>
+<li><strong>How to use it:</strong> Lean into it deliberately — this is where effort compounds fastest and friction is lowest.</li>
+<li><strong>Caveat:</strong> Even a favorable element can be overrun if pursued to excess; keep other tracks alive so the chart stays balanced.</li>
+<li><strong>Roles:</strong> consultant, strategist, advisor, research lead</li>
+</ul>
+<h3>Diplomacy &amp; International Business (<strong>Best Fit</strong>)</h3>
+<ul>
+<li><strong>Element family:</strong> Water — this family moves information, goods or people — it connects separated things and runs below the surface (<em>Water the element that flows around obstacles and connects</em>, ).</li>
+<li><strong>Why it fits your chart:</strong> This is a <strong>Best Fit</strong>: the family runs on <strong>Water</strong>, your favorable element, so the work moves <em>with</em> the chart's grain instead of against it.</li>
+<li><strong>How to use it:</strong> Lean into it deliberately — this is where effort compounds fastest and friction is lowest.</li>
+<li><strong>Caveat:</strong> Even a favorable element can be overrun if pursued to excess; keep other tracks alive so the chart stays balanced.</li>
+<li><strong>Roles:</strong> diplomat, trade lead, global BD manager</li>
+</ul>
+<h3>Arts &amp; Curation (<strong>Best Fit</strong>)</h3>
+<ul>
+<li><strong>Element family:</strong> Water — this family moves information, goods or people — it connects separated things and runs below the surface (<em>Water the element that flows around obstacles and connects</em>, ).</li>
+<li><strong>Why it fits your chart:</strong> This is a <strong>Best Fit</strong>: the family runs on <strong>Water</strong>, your favorable element, so the work moves <em>with</em> the chart's grain instead of against it.</li>
+<li><strong>How to use it:</strong> Lean into it deliberately — this is where effort compounds fastest and friction is lowest.</li>
+<li><strong>Caveat:</strong> Even a favorable element can be overrun if pursued to excess; keep other tracks alive so the chart stays balanced.</li>
+<li><strong>Roles:</strong> curator, art dealer, creative researcher, museum lead</li>
+</ul>
+<h3>Journalism &amp; Investigation (<strong>Best Fit</strong>)</h3>
+<ul>
+<li><strong>Element family:</strong> Water — this family moves information, goods or people — it connects separated things and runs below the surface (<em>Water the element that flows around obstacles and connects</em>, ).</li>
+<li><strong>Why it fits your chart:</strong> This is a <strong>Best Fit</strong>: the family runs on <strong>Water</strong>, your favorable element, so the work moves <em>with</em> the chart's grain instead of against it.</li>
+<li><strong>How to use it:</strong> Lean into it deliberately — this is where effort compounds fastest and friction is lowest.</li>
+<li><strong>Caveat:</strong> Even a favorable element can be overrun if pursued to excess; keep other tracks alive so the chart stays balanced.</li>
+<li><strong>Roles:</strong> reporter, investigative journalist, editor</li>
+</ul>
+<h3>Logistics &amp; Shipping (<strong>Good Fit</strong>)</h3>
+<ul>
+<li><strong>Element family:</strong> Water — this family moves information, goods or people — it connects separated things and runs below the surface (<em>Water the element that flows around obstacles and connects</em>, ).</li>
+<li><strong>Why it fits your chart:</strong> A <strong>Good Fit</strong>: the family runs on <strong>Water</strong>, your favorable element, so the work moves <em>with</em> the chart's grain instead of against it. It is well resourced by the chart, just not at the very top of the ranking.</li>
+<li><strong>How to use it:</strong> Treat it as a lead second track, or a strong complement to your Best-Fit work.</li>
+<li><strong>Caveat:</strong> Strong but not primary — pick it deliberately rather than by default, and keep the favorable element in play alongside it.</li>
+<li><strong>Roles:</strong> supply-chain lead, freight manager, mobility operator</li>
+</ul>
+<h3>Law &amp; Governance (<strong>Good Fit</strong>)</h3>
+<ul>
+<li><strong>Element family:</strong> Metal — this family demands precision, standards and clean boundaries — it refines raw material into a finished thing (<em>Metal the element that cuts, separates and finishes</em>, ).</li>
+<li><strong>Why it fits your chart:</strong> A <strong>Good Fit</strong>: the family runs on <strong>Metal</strong>, your Supporting Element, which strengthens the chart's balance rather than draining or feeding the Day Master. It is well resourced by the chart, just not at the very top of the ranking.</li>
+<li><strong>How to use it:</strong> Treat it as a lead second track, or a strong complement to your Best-Fit work.</li>
+<li><strong>Caveat:</strong> Strong but not primary — pick it deliberately rather than by default, and keep the favorable element in play alongside it.</li>
+<li><strong>Roles:</strong> lawyer, compliance officer, policy lead, judge-track</li>
+</ul>
+<h3>Engineering &amp; Technology (<strong>Good Fit</strong>)</h3>
+<ul>
+<li><strong>Element family:</strong> Metal — this family demands precision, standards and clean boundaries — it refines raw material into a finished thing (<em>Metal the element that cuts, separates and finishes</em>, ).</li>
+<li><strong>Why it fits your chart:</strong> A <strong>Good Fit</strong>: the family runs on <strong>Metal</strong>, your Supporting Element, which strengthens the chart's balance rather than draining or feeding the Day Master. It is well resourced by the chart, just not at the very top of the ranking.</li>
+<li><strong>How to use it:</strong> Treat it as a lead second track, or a strong complement to your Best-Fit work.</li>
+<li><strong>Caveat:</strong> Strong but not primary — pick it deliberately rather than by default, and keep the favorable element in play alongside it.</li>
+<li><strong>Roles:</strong> engineer, architect, tech lead, CTO-track</li>
+</ul>
+<h3>Medicine &amp; Surgery (<strong>Possible</strong>)</h3>
+<ul>
+<li><strong>Element family:</strong> Metal — this family demands precision, standards and clean boundaries — it refines raw material into a finished thing (<em>Metal the element that cuts, separates and finishes</em>, ).</li>
+<li><strong>Why it fits your chart:</strong> A <strong>Possible</strong> fit: the family runs on <strong>Metal</strong>, your Supporting Element, which strengthens the chart's balance rather than draining or feeding the Day Master.</li>
+<li><strong>How to use it:</strong> Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.</li>
+<li><strong>Caveat:</strong> The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.</li>
+<li><strong>Roles:</strong> physician, surgeon, diagnostics lead, researcher</li>
+</ul>
+<h3>Quality &amp; Audit (<strong>Possible</strong>)</h3>
+<ul>
+<li><strong>Element family:</strong> Metal — this family demands precision, standards and clean boundaries — it refines raw material into a finished thing (<em>Metal the element that cuts, separates and finishes</em>, ).</li>
+<li><strong>Why it fits your chart:</strong> A <strong>Possible</strong> fit: the family runs on <strong>Metal</strong>, your Supporting Element, which strengthens the chart's balance rather than draining or feeding the Day Master.</li>
+<li><strong>How to use it:</strong> Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.</li>
+<li><strong>Caveat:</strong> The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.</li>
+<li><strong>Roles:</strong> auditor, QA lead, forensic analyst, due-diligence lead</li>
+</ul>
+<h3>Security &amp; Military (<strong>Possible</strong>)</h3>
+<ul>
+<li><strong>Element family:</strong> Metal — this family demands precision, standards and clean boundaries — it refines raw material into a finished thing (<em>Metal the element that cuts, separates and finishes</em>, ).</li>
+<li><strong>Why it fits your chart:</strong> A <strong>Possible</strong> fit: the family runs on <strong>Metal</strong>, your Supporting Element, which strengthens the chart's balance rather than draining or feeding the Day Master.</li>
+<li><strong>How to use it:</strong> Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.</li>
+<li><strong>Caveat:</strong> The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.</li>
+<li><strong>Roles:</strong> security lead, intelligence analyst, defence consultant</li>
+</ul>
+<h3>Psychology &amp; Counseling (<strong>Possible</strong>)</h3>
+<ul>
+<li><strong>Element family:</strong> Earth — this family holds, stores and mediates — it stabilises assets and provides the base others rely on (<em>Earth the element that contains and stands between</em>, ).</li>
+<li><strong>Why it fits your chart:</strong> A <strong>Possible</strong> fit: the family runs on <strong>Earth</strong>, a neutral element for this chart — neither favorable nor unfavorable on its own.</li>
+<li><strong>How to use it:</strong> Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.</li>
+<li><strong>Caveat:</strong> The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.</li>
+<li><strong>Roles:</strong> clinical psychologist, counsellor, therapist</li>
+</ul>
+<h3>Finance &amp; Investment (<strong>Possible</strong>)</h3>
+<ul>
+<li><strong>Element family:</strong> Earth — this family holds, stores and mediates — it stabilises assets and provides the base others rely on (<em>Earth the element that contains and stands between</em>, ).</li>
+<li><strong>Why it fits your chart:</strong> A <strong>Possible</strong> fit: the family runs on <strong>Earth</strong>, a neutral element for this chart — neither favorable nor unfavorable on its own.</li>
+<li><strong>How to use it:</strong> Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.</li>
+<li><strong>Caveat:</strong> The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.</li>
+<li><strong>Roles:</strong> analyst, trader, risk manager, portfolio lead</li>
+</ul>
+<hr />
+<h2>Ten-God → Career Mode</h2>
+<p>Your dominant ten-god class is <strong>Companion (compare rob)</strong> — Peer/team or independent operator — working alongside or against equals on one's own terms..</p>
+<h2>Employment vs. Entrepreneurship</h2>
+<p>A <strong>hybrid</strong> reading: the chart supports either a structured role with side output, or an independent practice with an anchor client/employer. Keep a stable base while the independent side is proven.</p>
+<p><strong>Company / entity fit:</strong> fluid, information-moving organisations — consulting, research, logistics/data or international networks.</p>
+<h2>Archetype Deep-Dive</h2>
+<h3>Wealth Pattern</h3>
+<p>Wealth timing is read from where Wealth ten-gods appear and are supported. Your favorable element <strong>Water</strong> and supporting element <strong>Metal</strong> describe the broader climate that helps those wealth channels function; they are not the wealth channel itself. Wealth ten-gods are visible in the natal pillars, so earning capacity is rooted in the chart. Use the Major Luck and Annual Luck tables to see when income and value-creation themes surface most clearly. Periods dominated by <strong>Fire</strong> call for conservation rather than expansion.</p>
+<h3>Income Rhythm</h3>
+<p>The chart carries <strong>Direct Wealth only as a hidden stem</strong> — real, but latent rather than actively expressed. Income from a steady, earned source is structurally present but may need a deliberate channel (a role, a contract, a platform) to become visible and regular.</p>
+<h3>Skill-Levers to Develop</h3>
+<p><strong>Companion-dominant</strong> charts tend to grow fastest through peer collaboration, team facilitation, and honest self-assessment. Cultivate <strong>listening and reflective writing</strong> to strengthen Water's receptive quality.</p>
+<h3>Company-Type Fit</h3>
+<p>A <strong>mid-size specialist firm with strong leadership visibility</strong> is the most likely fit. Both Direct Officer and Seven Killings are present, so the querent needs a credible structure but also room to push back when needed.</p>
+<h3>Boss / Team Dynamics</h3>
+<p>The ideal manager profile is a <strong>patient, perceptive Water advisor</strong> — someone who carries your favorable <strong>Water</strong> element, supplying what the chart needs rather than competing with your Day Master. Watch for vague goals that blunt Metal's precision; this is the most common way the querent's energy gets drained in a team setting.</p>
+<h3>Red-Flag Environments</h3>
+<p>Look out for: slow bureaucratic processes that the querent's energy quickly overruns; unclear decision rights — strong Day Masters struggle without ownership; teams that refuse to challenge the querent's ideas.</p>
+<hr />
+<h2>Income Style &amp; Carrying Capacity</h2>
+<p><strong>Income style:</strong> <strong>Mixed Wealth</strong> — income comes from a base plus variable upside; stabilising if the Day Master can carry it, scattering if not.</p>
+<p><strong>Carrying capacity:</strong> Strong Day Master — you can carry Wealth and Authority directly; wealth that comes in can be held. The caution is not to hold <em>beyond</em> what the chart supports — diversify so no single loss is structural.</p>
+<p><strong>Partnership &amp; shared-money risk:</strong> Your chart carries <strong>4 Companion</strong> stems — the peer-drains-wealth pattern reads shared and loosely-defined money as contested. Put ownership percentages in writing, keep separate accounts, and prefer sole operation or hard-boundary partnerships.</p>
+<h2>Investment Behaviour</h2>
+<p>Plan and negotiate in periods running <strong>Water</strong> / <strong>Metal</strong>; treat years dominated by <strong>Fire</strong> as conservation, review and patience rather than expansion. Large, long-term commitments (property, deeds, contracts) key to <strong>Resource</strong> in the classics — prefer placing them where Resource is active <em>and</em> the year runs the favorable element, not in a bare Wealth year. Storehouse (wealth storehouse) charts accumulate quietly and release in bursts: be ready for the release windows rather than expecting steady flow. This describes stewardship <em>tendencies</em>, not investment instructions.</p>
+<h2>Wealth Preservation</h2>
+<p>Favour custodianship aligned with your favorable element and diversify enough that no single loss is structural; in Companion/Unfavorable Element periods, <strong>defend rather than expand</strong>.</p>
+<hr />
+<h2>Career Transition Timing — Decade by Decade</h2>
+<p>Each 10-year major-luck period (Major Luck) is read from its own ten-god theme plus the favorable balance of the annual pillars inside it.</p>
+<table>
+<thead>
+<tr>
+<th>Calendar years</th>
+<th>Ages</th>
+<th>Decade</th>
+<th>Ten-God</th>
+<th>Favorable years</th>
+<th>Read</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1980–1989</td>
+<td>8–17</td>
+<td>Jeong Yu</td>
+<td>Seven Killings</td>
+<td>5/10</td>
+<td>steady build</td>
+</tr>
+<tr>
+<td>1990–1999</td>
+<td>18–27</td>
+<td>Bing Shin</td>
+<td>Direct Officer</td>
+<td>4/10</td>
+<td>steady build</td>
+</tr>
+<tr>
+<td>2000–2009</td>
+<td>28–37</td>
+<td>Eul Mi</td>
+<td>Indirect Wealth</td>
+<td>5/10</td>
+<td>steady build</td>
+</tr>
+<tr>
+<td>2010–2019</td>
+<td>38–47</td>
+<td>Gap O</td>
+<td>Direct Wealth</td>
+<td>3/10</td>
+<td>steady build</td>
+</tr>
+<tr>
+<td>2020–2029</td>
+<td>48–57</td>
+<td>Gye Sa</td>
+<td>Eating God</td>
+<td>5/10</td>
+<td>steady build</td>
+</tr>
+<tr>
+<td>2030–2039</td>
+<td>58–67</td>
+<td>Im Jin</td>
+<td>Hurting Officer</td>
+<td>4/10</td>
+<td>steady build</td>
+</tr>
+<tr>
+<td>2040–2049</td>
+<td>68–77</td>
+<td>Sin Myo</td>
+<td>Companion</td>
+<td>5/10</td>
+<td>steady build</td>
+</tr>
+<tr>
+<td>2050–2059</td>
+<td>78–87</td>
+<td>Gyeong In</td>
+<td>Robber (Rob Wealth)</td>
+<td>4/10</td>
+<td>steady build</td>
+</tr>
+</tbody>
+</table>
+<h3>Period Notes</h3>
+<ul>
+<li><strong>Ages 8–17 (1980–1989) — Jeong Yu (Seven Killings):</strong> an authority decade — institution, rank, licensing or management; structure and pressure arrive together. Favorable years <strong>5/10</strong>.</li>
+<li><strong>Ages 18–27 (1990–1999) — Bing Shin (Direct Officer):</strong> an authority decade — institution, rank, licensing or management; structure and pressure arrive together. Favorable years <strong>4/10</strong>.</li>
+<li><strong>Ages 28–37 (2000–2009) — Eul Mi (Indirect Wealth):</strong> a wealth-activity decade — earning, spending and money decisions rise; whether it is net favourable depends on Day-Master strength. Favorable years <strong>5/10</strong>.</li>
+<li><strong>Ages 38–47 (2010–2019) — Gap O (Direct Wealth):</strong> a wealth-activity decade — earning, spending and money decisions rise; whether it is net favourable depends on Day-Master strength. Favorable years <strong>3/10</strong>.</li>
+<li><strong>Ages 48–57 (2020–2029) — Gye Sa (Eating God):</strong> an output decade — craft, expression and production lead; the output-feeds-wealth path (produce → earn) is most available here. Favorable years <strong>5/10</strong>.</li>
+<li><strong>Ages 58–67 (2030–2039) — Im Jin (Hurting Officer):</strong> an output decade — craft, expression and production lead; the output-feeds-wealth path (produce → earn) is most available here. Favorable years <strong>4/10</strong>.</li>
+<li><strong>Ages 68–77 (2040–2049) — Sin Myo (Companion):</strong> a peer/competition decade — work alongside equals; keep ownership boundaries explicit (peer-drains-wealth risk on shared money). Favorable years <strong>5/10</strong>.</li>
+<li><strong>Ages 78–87 (2050–2059) — Gyeong In (Robber (Rob Wealth)):</strong> a peer/competition decade — work alongside equals; keep ownership boundaries explicit (peer-drains-wealth risk on shared money). Favorable years <strong>4/10</strong>.</li>
+</ul>
+<hr />
+
+</body>
+</html>

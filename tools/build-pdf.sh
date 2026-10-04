@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # Build a polished PDF for a candidate's Saju report.
 #
+# Backend: HTML/Playwright (Chromium) is the DEFAULT and writes the canonical
+# names ({name}-report.pdf, {name}-combined.pdf). A missing browser is a hard
+# error (no silent fallback). Pass --reportlab for the legacy ReportLab tool,
+# which writes {name}-report-reportlab.pdf / {name}-combined-reportlab.pdf so
+# the two never overwrite each other. --html is accepted as a no-op alias.
+#
 # Usage (mode 1: from .md):
 #   tools/build-pdf.sh sruthi
 #   tools/build-pdf.sh sruthi "Sruthi — A Saju Reading" "Sruthi" "11 December 1993, 02:45 IST" "Bing Fire (Yang Fire)"
@@ -18,19 +24,22 @@
 #
 # Compat (두 분 궁합) reading:
 #   Use `python3 src/saju_html/md_to_saju_compat_pdf.py <compat.md> --name-a ... --name-b ...`
-#   instead — build-pdf.sh is for single-chart reports.
+#   (add --backend reportlab for the legacy renderer) instead — build-pdf.sh is for single-chart reports.
 
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
-# Backend selection: scan all args for --html / --combined; remove them before positional logic.
-USE_HTML=0
+# Backend selection: scan all args for --reportlab / --html / --combined; remove them
+# before positional logic. HTML is the default; --html is a no-op alias.
+USE_HTML=1
 COMBINED=0
 NEW_ARGS=()
 for a in "$@"; do
   if [ "$a" = "--html" ]; then
     USE_HTML=1
+  elif [ "$a" = "--reportlab" ]; then
+    USE_HTML=0
   elif [ "$a" = "--combined" ]; then
     COMBINED=1
   else
@@ -55,13 +64,17 @@ OUT_DIR="${SAJU_OUT_DIR:-$PROJECT_ROOT/candidates_horoscope/reports/$NAME}"
 if [ "$COMBINED" = "1" ]; then
   INPUT="$PROJECT_ROOT/candidates_horoscope/reports/$NAME/$NAME-combined.md"
   if [ "$USE_HTML" = "1" ]; then
-    OUTPUT="$OUT_DIR/$NAME-combined-html.pdf"
-  else
     OUTPUT="$OUT_DIR/$NAME-combined.pdf"
+  else
+    OUTPUT="$OUT_DIR/$NAME-combined-reportlab.pdf"
   fi
 else
   INPUT="$PROJECT_ROOT/candidates_horoscope/reports/$NAME/$NAME-report.md"
-  OUTPUT="$OUT_DIR/$NAME-report.pdf"
+  if [ "$USE_HTML" = "1" ]; then
+    OUTPUT="$OUT_DIR/$NAME-report.pdf"
+  else
+    OUTPUT="$OUT_DIR/$NAME-report-reportlab.pdf"
+  fi
 fi
 
 # Did the user pass --from-chart?

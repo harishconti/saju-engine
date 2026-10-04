@@ -19,7 +19,8 @@ from typing import Optional
 from saju_engine.compat_report import generate_compat_report
 from saju_engine.engine import compute_chart
 from saju_engine.premium_report import normalize_tier
-from saju_html.md_to_saju_pdf import build_pdf, build_pdf_from_chart
+from saju_html.chart_input import prepare_chart_render
+from saju_html.renderer import PdfBackendUnavailable
 from saju_web.store import IntakeStore
 
 log = logging.getLogger("saju.jobs")
@@ -88,6 +89,19 @@ def _compute(name: str, birth: dict, gender: str):
     )
 
 
+def _pdf_backend() -> str:
+    """`html` (default, Chromium) or `reportlab` via env SAJU_PDF_BACKEND."""
+    return "reportlab" if os.environ.get("SAJU_PDF_BACKEND", "").strip().lower() == "reportlab" else "html"
+
+
+def _build_pdf(**kwargs) -> Path:
+    if _pdf_backend() == "reportlab":
+        from saju_html.md_to_saju_pdf import build_pdf
+    else:
+        from saju_html.renderer import build_pdf
+    return build_pdf(**kwargs)
+
+
 def render_single(pii: dict, birth: dict, tier: str, out_pdf: Path) -> Path:
     gender = birth.get("gender")
     if gender not in ("M", "F"):
@@ -96,10 +110,13 @@ def render_single(pii: dict, birth: dict, tier: str, out_pdf: Path) -> Path:
     name = pii.get("name", "Client")
     dob_str = f"{birth['dob']}, {birth['birth_time']}, {birth.get('location', '')}"
     dm = f"{chart.day_master} ({chart.day_master_info.get('element', '')} {chart.day_master_info.get('polarity', '')})"
-    return build_pdf_from_chart(
-        chart, out_pdf, title=f"{name} — Saju Reading", client=pii.get("name", ""),
-        dob=dob_str, day_master=dm, tier=normalize_tier(tier),
+    tier = normalize_tier(tier)
+    title = f"{name} — Saju Reading"
+    kw = prepare_chart_render(
+        chart, out_pdf, title=title, client=pii.get("name", ""),
+        dob=dob_str, day_master=dm, tier=tier,
     )
+    return _build_pdf(output_pdf=out_pdf, title=title, tier=tier, **kw)
 
 
 def render_compat(pii: dict, birth: dict, tier: str, out_dir: Path) -> Path:
@@ -121,7 +138,7 @@ def render_compat(pii: dict, birth: dict, tier: str, out_dir: Path) -> Path:
     out_md.write_text(md, encoding="utf-8")
     title = (f"Deep Compatibility Reading — {name_a} × {name_b}" if selected == "deep"
              else f"Compatibility Reading — {name_a} × {name_b}")
-    build_pdf(
+    _build_pdf(
         input_md=out_md, output_pdf=out_pdf, title=title,
         client=f"{name_a} ({chart_a.day_master}) · {name_b} ({chart_b.day_master})",
         dob=f"{a['dob']}, {a['birth_time']}, {a.get('location', '')} · "
@@ -167,6 +184,12 @@ def _generate(store: IntakeStore, intake_id: int, files_dir: Path) -> None:
             pdf = render_single(row["pii"], row["birth"], row["tier"],
                                 out_dir / "report.pdf")
     except Exception as exc:
+        if isinstance(exc, PdfBackendUnavailable):
+            # Operator-facing and PII-free: the message is never logged.
+            log.error("PDF backend unavailable (intake %s): install it with "
+                      "`pip install -e .[html]` and `python -m playwright install "
+                      "chromium` (a system Google Chrome is used automatically unless "
+                      "SAJU_ALLOW_SYSTEM_CHROME=0).", intake_id)
         # Exception messages may embed birth data/PII: log class + frames only.
         log.error("draft generation failed for intake %s: %s", intake_id,
                   type(exc).__name__, exc_info=(type(exc), None, exc.__traceback__))

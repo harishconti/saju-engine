@@ -12,6 +12,9 @@ parser, cover-page builder, and PDF printer.
 from __future__ import annotations
 
 import html
+import logging
+import os
+import warnings
 import re
 from datetime import date
 from pathlib import Path
@@ -19,7 +22,12 @@ from pathlib import Path
 # Markdown-It preserves raw HTML (e.g. <b>) and parses GFM tables.
 from markdown_it import MarkdownIt
 
-from saju_html import ELEMENT_EMOJI, strip_engine_drafts, strip_source_citations
+from saju_html import (
+    _CJK_RE,
+    ELEMENT_EMOJI,
+    strip_engine_drafts,
+    strip_source_citations,
+)
 from saju_html.sections import (
     _wrap_audio_included,
     _wrap_chart_signature,
@@ -97,7 +105,14 @@ def _make_md_parser() -> MarkdownIt:
     return md
 
 
-def _translate_html(text: str) -> str:
+_log = logging.getLogger(__name__)
+
+
+class PdfBackendUnavailable(RuntimeError):
+    """The HTML/Playwright PDF backend cannot run (no Playwright or no browser)."""
+
+
+def _translate_html(text: str, unmapped: set | None = None) -> str:
     """Apply CJK/Hanja translation to HTML text.
 
     We intentionally translate *after* markdown has been rendered to HTML, so
@@ -106,7 +121,21 @@ def _translate_html(text: str) -> str:
     """
     from saju_html import translate_inline
 
-    return translate_inline(text)
+    return translate_inline(text, keep_unmapped=True, unmapped=unmapped)
+
+
+def _translate_cover(text: str, unmapped: set | None = None) -> str:
+    """Translate a cover field (title / client / dob / Day Master) like the body.
+
+    Day Masters may arrive as raw Hanja ("壬 (Water Yang)" -> "Im (Water Yang)",
+    compat "庚/辛" -> "Gyeong/Sin"), exactly as the reportlab cover renders them.
+    """
+    if not text or not _CJK_RE.search(text):
+        return text  # plain-ASCII fields (names!) are never touched
+    # Translate only the CJK spans, so Latin text around them is left exactly
+    # as given (translate_inline's post-processing would e.g. split "McKay").
+    out = _CJK_RE.sub(lambda m: _translate_html(m.group(0), unmapped), text)
+    return out
 
 
 def _build_cover_html(
@@ -213,7 +242,14 @@ def _render_markdown(md_text: str, tier: str | None = None) -> str:
     md_text = strip_engine_drafts(md_text)
     # All client-facing PDFs are English-primary; translate Korean/Hanja
     # annotations just like single-chart reports.
-    translated = _translate_html(md_text)
+    unmapped: set = set()
+    translated = _translate_html(md_text, unmapped)
+    if unmapped:
+        _log.warning(
+            "Unmapped CJK characters kept as-is in rendered HTML (add them to "
+            "the saju_html translation maps): %s",
+            "".join(sorted(unmapped)),
+        )
     html_doc = md.render(translated)
     html_doc = inject_element_balance_chart(html_doc, _style_element_balance_tables)
     html_doc = _wrap_quick_ref(html_doc)
@@ -302,6 +338,18 @@ def markdown_to_html(
         "Jeokcheon-su, Yeonhae-japyeong, Gungtong-bogam, Myeongri-jeongjong."
     )
 
+    cover_unmapped: set = set()
+    title = _translate_cover(title, cover_unmapped)
+    client = _translate_cover(client, cover_unmapped)
+    dob = _translate_cover(dob, cover_unmapped)
+    day_master = _translate_cover(day_master, cover_unmapped)
+    if cover_unmapped:
+        _log.warning(
+            "Unmapped CJK characters kept as-is on the cover (add them to "
+            "the saju_html translation maps): %s",
+            "".join(sorted(cover_unmapped)),
+        )
+
     meta_rows: list[tuple[str, str]] = []
     if client:
         meta_rows.append(("For", client))
@@ -337,32 +385,47 @@ def markdown_to_html(
 
 
 def _launch_browser(playwright) -> None:
-    """Launch a Chromium-compatible browser, preferring the bundled binary.
+    """Launch Playwright's bundled Chromium (the same binary on every machine).
 
-    Playwright's own Chromium lives under ``~/.cache/ms-playwright`` and is only
-    present after ``playwright install chromium``. On many machines (and some CI
-    images) a system Chrome install exists instead; fall back to it via the
-    ``channel="chrome"`` flag so `--html` PDFs work without the extra download.
+    Install it with ``pip install -e .[html]`` and
+    ``python -m playwright install chromium``. If the bundled Chromium is not
+    installed, a system Google Chrome (``channel="chrome"``) is used with a
+    warning (it may render slightly differently). Set
+    ``SAJU_ALLOW_SYSTEM_CHROME=0`` to require the bundled Chromium (identical
+    output on every machine).
 
-    Raises a RuntimeError naming the ``playwright install chromium`` fix when no
-    usable browser is found.
+    Raises PdfBackendUnavailable (a RuntimeError) naming the fix when no
+    permitted browser can be launched.
     """
-    bundling_errors = []
     try:
         return playwright.chromium.launch()
     except Exception as exc:  # pragma: no cover - environment-specific
-        bundling_errors.append(str(exc))
-    try:
-        return playwright.chromium.launch(channel="chrome")
-    except Exception as exc:  # pragma: no cover - environment-specific
-        hint = (
-            "No usable browser for the HTML/Playwright PDF backend. "
-            "Install Playwright's Chromium with `playwright install chromium`, "
-            "or install Google Chrome and it will be picked up automatically. "
-            f"Bundled Chromium error: {bundling_errors[-1]!r}; "
-            f"system Chrome error: {exc!r}"
-        )
-        raise RuntimeError(hint) from exc
+        bundled_error = str(exc)
+    if os.environ.get("SAJU_ALLOW_SYSTEM_CHROME", "1") != "0":
+        try:
+            browser = playwright.chromium.launch(channel="chrome")
+            warnings.warn(
+                "Bundled Playwright Chromium not installed; rendering with system "
+                "Google Chrome (output may differ slightly between machines). Run "
+                "`python -m playwright install chromium` or set "
+                "SAJU_ALLOW_SYSTEM_CHROME=0 to require the bundled browser.",
+                stacklevel=2,
+            )
+            return browser
+        except Exception as exc:  # pragma: no cover - environment-specific
+            raise PdfBackendUnavailable(
+                "No usable browser for the HTML/Playwright PDF backend. Install "
+                "Playwright's Chromium with `python -m playwright install chromium`. "
+                f"Bundled Chromium error: {bundled_error!r}; "
+                f"system Chrome error: {exc!r}"
+            ) from exc
+    raise PdfBackendUnavailable(
+        "No usable browser for the HTML/Playwright PDF backend. Install "
+        "Playwright's Chromium with `python -m playwright install chromium` "
+        "(SAJU_ALLOW_SYSTEM_CHROME=0 is set, so a system Google Chrome was not "
+        "tried). "
+        f"Bundled Chromium error: {bundled_error!r}"
+    )
 
 
 def html_to_pdf(
@@ -399,9 +462,8 @@ def html_to_pdf(
     footer_html = footer.format(report_id=html.escape(report_id))
 
     with sync_playwright() as p:
-        # Prefer Playwright's bundled Chromium; fall back to a system Chrome
-        # install (common on dev machines / CI images that ship google-chrome)
-        # before giving up with an actionable error.
+        # Bundled Chromium preferred; system Chrome with a warning unless
+        # SAJU_ALLOW_SYSTEM_CHROME=0 (see _launch_browser).
         browser = _launch_browser(p)
         # N-8 (2026-09-26 audit) defense-in-depth: the report is static markup
         # printed to PDF, so it never needs to run script or fetch a network
@@ -433,7 +495,12 @@ def html_to_pdf(
     return output_pdf
 
 
-def build_pdf(
+def build_pdf(*args, **kwargs) -> Path:
+    """Read markdown from disk and produce a styled PDF (see ``build_pdf_with_backend``)."""
+    return build_pdf_with_backend(*args, **kwargs)[0]
+
+
+def build_pdf_with_backend(
     input_md: Path,
     output_pdf: Path,
     *,
@@ -446,8 +513,12 @@ def build_pdf(
     report_id: str = "",
     compact: bool = False,
     tier: str | None = None,
-) -> Path:
+    allow_fallback: bool = False,
+) -> tuple[Path, str]:
     """Convenience: read markdown from disk and produce a styled PDF.
+
+    Returns ``(pdf_path, backend)`` where backend is ``"html-playwright"`` or
+    ``"reportlab-fallback"`` (the backend that actually produced the file).
 
     Uses the HTML/Playwright backend when Playwright and a Chromium-compatible
     browser are available. If either is missing or the browser cannot launch,
@@ -471,11 +542,18 @@ def build_pdf(
         tier=tier,
     )
     try:
-        return html_to_pdf(html, output_pdf, report_id=report_id)
+        return html_to_pdf(html, output_pdf, report_id=report_id), "html-playwright"
     except (ImportError, RuntimeError) as exc:
-        # Playwright is missing or no usable browser; fall back to ReportLab.
-        # ReportLab does not honour CSS, compact mode, or a custom generation
-        # date, but it produces a presentable PDF using the same markdown.
+        if not (allow_fallback or os.environ.get("SAJU_PDF_FALLBACK") == "reportlab"):
+            raise PdfBackendUnavailable(
+                f"HTML/Playwright PDF backend unavailable: {exc}. Install with "
+                "`pip install playwright && python -m playwright install chromium`, "
+                "or opt in to the ReportLab fallback explicitly: pass "
+                "allow_fallback=True, set env SAJU_PDF_FALLBACK=reportlab, or "
+                "use the ReportLab tool src/saju_html/md_to_saju_pdf.py."
+            ) from exc
+        # Explicitly opted in: ReportLab ignores CSS, compact mode and a custom
+        # generation date, but produces a presentable PDF from the same markdown.
         import warnings
 
         warnings.warn(
@@ -494,11 +572,13 @@ def build_pdf(
             day_master,
             report_id=report_id,
             tier=tier,
-        )
+        ), "reportlab-fallback"
 
 
 __all__ = [
+    "PdfBackendUnavailable",
     "build_pdf",
+    "build_pdf_with_backend",
     "markdown_to_html",
     "html_to_pdf",
     "_wrap_decade_roadmap",       # re-exported for tests

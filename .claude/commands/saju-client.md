@@ -90,7 +90,7 @@ For the `deep` tier, keep the wording that the **MP3 audio summary is included b
 
 ## 6. Build the PDF
 
-Use the richer HTML/Playwright backend by default. It produces the branded cover page, the SVG element-balance chart, card-styled Quick Reference, and page-count footer.
+Use the HTML/Playwright backend (the default; `tools/build-pdf.sh` uses it unless `--reportlab` is passed). It produces the branded cover page, the SVG element-balance chart, card-styled Quick Reference, and page-count footer.
 
 ```bash
 export LD_LIBRARY_PATH="/home/harish/.local/lib/usr/lib/x86_64-linux-gnu:/home/harish/.local/lib/lib/x86_64-linux-gnu${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
@@ -122,7 +122,7 @@ The report ID is auto-derived from the output filename if not given. This writes
 candidates_horoscope/reports/{slug}/{slug}-{tier}.pdf
 ```
 
-Use `tools/md_to_saju_pdf.py` (reportlab backend) instead if the Playwright backend is unavailable. Avoid passing manual report IDs unless you need a custom scheme; the default `CID-{slug}-{YYYYMMDD}-{TIER}` keeps orders traceable.
+If the Playwright browser is unavailable the render fails loudly (no silent fallback); install it with `python -m playwright install chromium`, or pass `--reportlab` / set `SAJU_PDF_FALLBACK=reportlab` for the legacy ReportLab output. Avoid passing manual report IDs unless you need a custom scheme; the default `CID-{slug}-{YYYYMMDD}-{TIER}` keeps orders traceable.
 
 ## 7. Update the candidate index
 
