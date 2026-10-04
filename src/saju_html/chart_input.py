@@ -54,6 +54,17 @@ def chart_markdown(chart, tier: Optional[str] = None, *, title: str = "Saju Read
     return chart_to_markdown(chart, title=title)
 
 
+def intermediate_md_path(output_pdf: Path, overwrite_report: bool = False) -> Path:
+    """Where ``prepare_chart_render`` writes the intermediate markdown."""
+    output_pdf = Path(output_pdf)
+    if overwrite_report:
+        return output_pdf.with_suffix(".md")
+    md_path = output_pdf.with_name(output_pdf.stem.replace("-report", "-engine", 1) + ".md")
+    if md_path.name == output_pdf.with_suffix(".md").name:
+        md_path = output_pdf.with_name(output_pdf.stem + "-engine.md")
+    return md_path
+
+
 def prepare_chart_render(chart, output_pdf: Path, *, title: str = "Saju Reading",
                          client: str = "", dob: str = "", day_master: str = "",
                          overwrite_report: bool = False, tier: Optional[str] = None,
@@ -72,12 +83,7 @@ def prepare_chart_render(chart, output_pdf: Path, *, title: str = "Saju Reading"
     dob = dob or _format_date_dob(chart)
     day_master = day_master or _format_day_master(chart)
 
-    if overwrite_report:
-        md_path = output_pdf.with_suffix(".md")
-    else:
-        md_path = output_pdf.with_name(output_pdf.stem.replace("-report", "-engine", 1) + ".md")
-        if md_path.name == output_pdf.with_suffix(".md").name:
-            md_path = output_pdf.with_name(output_pdf.stem + "-engine.md")
+    md_path = intermediate_md_path(output_pdf, overwrite_report)
     md_path.write_text(chart_markdown(chart, tier, title=title), encoding="utf-8")
 
     if not report_id:

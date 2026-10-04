@@ -109,6 +109,30 @@ def test_failed_generation_stores_class_name_only(app_mod, monkeypatch):
     assert row["status"] == "failed" and row["error"] == "KeyError"
 
 
+def test_missing_browser_is_actionable_failure(app_mod, monkeypatch, caplog):
+    import json
+    import logging
+
+    import saju_html.renderer as renderer
+
+    def no_browser(*a, **k):
+        raise RuntimeError("Executable doesn't exist for Test Person 1990-06-15")
+    monkeypatch.setattr(renderer, "html_to_pdf", no_browser)
+    monkeypatch.delenv("SAJU_PDF_FALLBACK", raising=False)
+    monkeypatch.delenv("SAJU_PDF_BACKEND", raising=False)
+    bg = BackgroundTasks()
+    resp = run(app_mod, bg, **single(tier="essential"))
+    with caplog.at_level(logging.ERROR, logger="saju.jobs"):
+        asyncio.run(bg())
+    iid = json.loads(resp.body)["intake_id"]
+    row = app_mod.STORE.get_intake(iid)
+    assert row["status"] == "failed" and row["error"] == "PdfBackendUnavailable"
+    assert not row.get("pdf_path")
+    assert not list((app_mod.FILES_DIR / str(iid)).glob("*.pdf"))
+    assert "playwright install chromium" in caplog.text
+    assert "Test Person" not in caplog.text and "1990-06-15" not in caplog.text
+
+
 def test_report_token_flow(app_mod):
     with pytest.raises(HTTPException) as exc:
         app_mod.report("nope")

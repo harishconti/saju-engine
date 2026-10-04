@@ -107,6 +107,10 @@ def _make_md_parser() -> MarkdownIt:
 _log = logging.getLogger(__name__)
 
 
+class PdfBackendUnavailable(RuntimeError):
+    """The HTML/Playwright PDF backend cannot run (no Playwright or no browser)."""
+
+
 def _translate_html(text: str, unmapped: set | None = None) -> str:
     """Apply CJK/Hanja translation to HTML text.
 
@@ -380,32 +384,38 @@ def markdown_to_html(
 
 
 def _launch_browser(playwright) -> None:
-    """Launch a Chromium-compatible browser, preferring the bundled binary.
+    """Launch Playwright's bundled Chromium (the same binary on every machine).
 
-    Playwright's own Chromium lives under ``~/.cache/ms-playwright`` and is only
-    present after ``playwright install chromium``. On many machines (and some CI
-    images) a system Chrome install exists instead; fall back to it via the
-    ``channel="chrome"`` flag so `--html` PDFs work without the extra download.
+    Install it with ``pip install -e .[html]`` and
+    ``python -m playwright install chromium``. A system Google Chrome
+    (``channel="chrome"``) is used as a fallback ONLY when the operator opts in
+    with ``SAJU_ALLOW_SYSTEM_CHROME=1``; by default output must not depend on
+    whichever Chrome a machine happens to have.
 
-    Raises a RuntimeError naming the ``playwright install chromium`` fix when no
-    usable browser is found.
+    Raises PdfBackendUnavailable (a RuntimeError) naming the fix when no
+    permitted browser can be launched.
     """
-    bundling_errors = []
     try:
         return playwright.chromium.launch()
     except Exception as exc:  # pragma: no cover - environment-specific
-        bundling_errors.append(str(exc))
-    try:
-        return playwright.chromium.launch(channel="chrome")
-    except Exception as exc:  # pragma: no cover - environment-specific
-        hint = (
-            "No usable browser for the HTML/Playwright PDF backend. "
-            "Install Playwright's Chromium with `playwright install chromium`, "
-            "or install Google Chrome and it will be picked up automatically. "
-            f"Bundled Chromium error: {bundling_errors[-1]!r}; "
-            f"system Chrome error: {exc!r}"
-        )
-        raise RuntimeError(hint) from exc
+        bundled_error = str(exc)
+    if os.environ.get("SAJU_ALLOW_SYSTEM_CHROME") == "1":
+        try:
+            return playwright.chromium.launch(channel="chrome")
+        except Exception as exc:  # pragma: no cover - environment-specific
+            raise PdfBackendUnavailable(
+                "No usable browser for the HTML/Playwright PDF backend. Install "
+                "Playwright's Chromium with `python -m playwright install chromium`. "
+                f"Bundled Chromium error: {bundled_error!r}; "
+                f"system Chrome error: {exc!r}"
+            ) from exc
+    raise PdfBackendUnavailable(
+        "No usable browser for the HTML/Playwright PDF backend. Install "
+        "Playwright's Chromium with `python -m playwright install chromium` "
+        "(or set SAJU_ALLOW_SYSTEM_CHROME=1 to allow a system Google Chrome, "
+        "which may render slightly differently). "
+        f"Bundled Chromium error: {bundled_error!r}"
+    )
 
 
 def html_to_pdf(
@@ -442,9 +452,8 @@ def html_to_pdf(
     footer_html = footer.format(report_id=html.escape(report_id))
 
     with sync_playwright() as p:
-        # Prefer Playwright's bundled Chromium; fall back to a system Chrome
-        # install (common on dev machines / CI images that ship google-chrome)
-        # before giving up with an actionable error.
+        # Bundled Chromium only, unless SAJU_ALLOW_SYSTEM_CHROME=1 (see
+        # _launch_browser); otherwise fail with an actionable error.
         browser = _launch_browser(p)
         # N-8 (2026-09-26 audit) defense-in-depth: the report is static markup
         # printed to PDF, so it never needs to run script or fetch a network
@@ -476,7 +485,12 @@ def html_to_pdf(
     return output_pdf
 
 
-def build_pdf(
+def build_pdf(*args, **kwargs) -> Path:
+    """Read markdown from disk and produce a styled PDF (see ``build_pdf_with_backend``)."""
+    return build_pdf_with_backend(*args, **kwargs)[0]
+
+
+def build_pdf_with_backend(
     input_md: Path,
     output_pdf: Path,
     *,
@@ -490,8 +504,11 @@ def build_pdf(
     compact: bool = False,
     tier: str | None = None,
     allow_fallback: bool = False,
-) -> Path:
+) -> tuple[Path, str]:
     """Convenience: read markdown from disk and produce a styled PDF.
+
+    Returns ``(pdf_path, backend)`` where backend is ``"html-playwright"`` or
+    ``"reportlab-fallback"`` (the backend that actually produced the file).
 
     Uses the HTML/Playwright backend when Playwright and a Chromium-compatible
     browser are available. If either is missing or the browser cannot launch,
@@ -515,10 +532,10 @@ def build_pdf(
         tier=tier,
     )
     try:
-        return html_to_pdf(html, output_pdf, report_id=report_id)
+        return html_to_pdf(html, output_pdf, report_id=report_id), "html-playwright"
     except (ImportError, RuntimeError) as exc:
         if not (allow_fallback or os.environ.get("SAJU_PDF_FALLBACK") == "reportlab"):
-            raise RuntimeError(
+            raise PdfBackendUnavailable(
                 f"HTML/Playwright PDF backend unavailable: {exc}. Install with "
                 "`pip install playwright && python -m playwright install chromium`, "
                 "or opt in to the ReportLab fallback explicitly: pass "
@@ -545,11 +562,13 @@ def build_pdf(
             day_master,
             report_id=report_id,
             tier=tier,
-        )
+        ), "reportlab-fallback"
 
 
 __all__ = [
+    "PdfBackendUnavailable",
     "build_pdf",
+    "build_pdf_with_backend",
     "markdown_to_html",
     "html_to_pdf",
     "_wrap_decade_roadmap",       # re-exported for tests

@@ -20,6 +20,7 @@ from saju_engine.compat_report import generate_compat_report
 from saju_engine.engine import compute_chart
 from saju_engine.premium_report import normalize_tier
 from saju_html.chart_input import prepare_chart_render
+from saju_html.renderer import PdfBackendUnavailable
 from saju_web.store import IntakeStore
 
 log = logging.getLogger("saju.jobs")
@@ -183,6 +184,12 @@ def _generate(store: IntakeStore, intake_id: int, files_dir: Path) -> None:
             pdf = render_single(row["pii"], row["birth"], row["tier"],
                                 out_dir / "report.pdf")
     except Exception as exc:
+        if isinstance(exc, PdfBackendUnavailable):
+            # Operator-facing and PII-free: the message is never logged.
+            log.error("PDF backend unavailable (intake %s): install it with "
+                      "`pip install -e .[html]` and `python -m playwright install "
+                      "chromium` (or set SAJU_ALLOW_SYSTEM_CHROME=1 to use system "
+                      "Chrome).", intake_id)
         # Exception messages may embed birth data/PII: log class + frames only.
         log.error("draft generation failed for intake %s: %s", intake_id,
                   type(exc).__name__, exc_info=(type(exc), None, exc.__traceback__))

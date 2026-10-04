@@ -32,8 +32,14 @@ SRC_ROOT = Path(__file__).resolve().parent.parent
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
-from saju_html.chart_input import add_chart_args, chart_from_args, prepare_chart_render  # noqa: E402
-from saju_html.renderer import build_pdf  # noqa: E402
+from saju_html.chart_input import (  # noqa: E402
+    TIER_CHOICES,
+    add_chart_args,
+    chart_from_args,
+    intermediate_md_path,
+    prepare_chart_render,
+)
+from saju_html.renderer import build_pdf_with_backend  # noqa: E402
 
 
 def main() -> None:
@@ -49,13 +55,17 @@ def main() -> None:
                     help="Unique report ID for cover/footer branding (auto-derived if omitted).")
     ap.add_argument("--compact", action="store_true",
                     help="Use a compact in-line header for the free one-page Hook tier.")
-    ap.add_argument("--tier", default=None,
+    ap.add_argument("--tier", choices=TIER_CHOICES, default=None,
                     help="Optional tier label (e.g. sample, essential, deep). "
                          "Sets the body class for tier-specific CSS hooks.")
     add_chart_args(ap)
     args = ap.parse_args()
 
+    created_md: Path | None = None
     if args.from_chart:
+        md_target = intermediate_md_path(args.output, args.overwrite_report)
+        if not md_target.exists():
+            created_md = md_target  # only remove it on failure if this run made it
         chart = chart_from_args(ap, args)
         kw = prepare_chart_render(
             chart, args.output, title=args.title, client=args.client, dob=args.dob,
@@ -68,7 +78,7 @@ def main() -> None:
               "day_master": args.day_master, "report_id": args.report_id}
 
     try:
-        out = build_pdf(
+        out, backend = build_pdf_with_backend(
             output_pdf=args.output,
             title=args.title,
             css_path=args.css,
@@ -77,9 +87,13 @@ def main() -> None:
             **kw,
         )
     except RuntimeError as exc:
+        if created_md is not None:
+            created_md.unlink(missing_ok=True)
         print(f"error: {exc}", file=sys.stderr)
         sys.exit(1)
-    print(f"Wrote {out} ({out.stat().st_size} bytes) [html-playwright mode]")
+    mode = {"html-playwright": "html-playwright mode",
+            "reportlab-fallback": "reportlab fallback mode"}[backend]
+    print(f"Wrote {out} ({out.stat().st_size} bytes) [{mode}]")
 
 
 if __name__ == "__main__":

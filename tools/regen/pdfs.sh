@@ -2,8 +2,9 @@
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 R=candidates_horoscope/reports
-RL=src/saju_html/md_to_saju_pdf.py
 HT=src/saju_html/md_to_saju_html_pdf.py
+# All canonical deliverable names are rendered with the HTML/Chromium backend ($HT).
+# Any reportlab output must use a *-reportlab.pdf name (none are produced here).
 pdf() { # tool in out title client dob dm tier
   python3 "$1" --input "$2" --output "$3" --title "$4" --client "$5" --dob "$6" --day-master "$7" ${8:+--tier $8} >/dev/null && echo "built $3"
 }
@@ -18,21 +19,21 @@ NAME[vishnu-priya]="Vishnu Priya"; DOB[vishnu-priya]="7 June 2001, 04:45 PM IST 
 NAME[rm]="RM (Kim Nam-joon)"; DOB[rm]="12 September 1994, 01:28 PM KST (Seoul)"; DM[rm]="Sin (Yin Metal)"
 NAME[bindu]="Bindu"; DOB[bindu]="24 March 1995, 10:10 AM IST (Kolar, Karnataka)"; DM[bindu]="Gap (Yang Wood)"
 for n in harish mahesh pawan sruthi gurumoorthy vishnu-priya rm bindu; do
-  pdf $RL $R/$n/$n-report.md $R/$n/$n-report.pdf "${NAME[$n]} — Deep Destiny Report" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}" deep
+  pdf $HT $R/$n/$n-report.md $R/$n/$n-report.pdf "${NAME[$n]} — Deep Destiny Report" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}" deep
 done
 for n in harish mahesh gurumoorthy vishnu-priya; do
   pdf $HT $R/$n/$n-combined.md $R/$n/$n-combined.pdf "${NAME[$n]} — Deep Destiny Report" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}" deep
 done
 for n in harish pawan sruthi gurumoorthy bindu rm; do
-  pdf $RL $R/$n/career.md $R/$n/career.pdf "${NAME[$n]} — Career & Wealth Deep-Dive" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}"
+  pdf $HT $R/$n/career.md $R/$n/career.pdf "${NAME[$n]} — Career & Wealth Deep-Dive" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}"
 done
 n=vishnu-priya
 for t in sample essential deep; do
-  pdf $RL $R/$n/$n-$t.md $R/$n/$n-$t.pdf "${NAME[$n]} — ${LABEL[$t]}" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}" $t
+  pdf $HT $R/$n/$n-$t.md $R/$n/$n-$t.pdf "${NAME[$n]} — ${LABEL[$t]}" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}" $t
 done
 n=rm
 for t in sample essential; do
-  pdf $RL $R/$n/rm-$t.md $R/$n/rm-$t-report.pdf "${NAME[$n]} — ${LABEL[$t]}" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}" $t
+  pdf $HT $R/$n/rm-$t.md $R/$n/rm-$t-report.pdf "${NAME[$n]} — ${LABEL[$t]}" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}" $t
 done
 C=candidates_horoscope/marriage_compatibility
 # Luck-cycle reports: HTML/Playwright backend so the SVG charts render.
