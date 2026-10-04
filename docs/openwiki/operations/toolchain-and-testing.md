@@ -17,7 +17,7 @@ Key scripts:
 | `src/saju_engine/compat_report.py` | Two-chart compatibility (궁합) markdown generator. |
 | `src/saju_html/md_to_saju_pdf.py` | Legacy ReportLab two-pass PDF renderer (`--reportlab`). |
 | `src/saju_html/md_to_saju_html_pdf.py` | HTML/CSS + Playwright renderer (default); supports `--from-chart` / `--tier`. |
-| `src/saju_html/md_to_saju_compat_pdf.py` | Compat-specific PDF renderer with Korean CID font. |
+| `src/saju_html/md_to_saju_compat_pdf.py` | Compat (궁합) PDF tool: HTML/Chromium by default, `--backend reportlab` for the legacy renderer. |
 | `tools/build-pdf.sh` | Wrapper that sets `PYTHONPATH`, site-packages, and dispatches to the chosen backend (HTML default; `--reportlab` legacy). |
 | `src/saju_html/combine_candidate_report.py` | Merges base report + topic follow-ups into a single client deliverable. |
 | `tools/client_intake_app.html` + `tools/client_intake_app.py` | Self-service FastAPI app: `/` single-chart, `/compat` two-chart; sample tier returns a PDF instantly; paid tiers are stored in an encrypted SQLite queue (`src/saju_web/store.py`, `SAJU_INTAKE_KEY`), drafted in the background and approved by the owner. |
@@ -105,7 +105,7 @@ assert JIAZI_TO_NAYIN[("甲", "子")] == "海中金"  # Gold in the sea
 
 ### HTML/Playwright backend (default)
 - Default since 2026-10-04 for `tools/build-pdf.sh`, the compat PDF tool (`--backend html|reportlab`) and the self-service app.
-- Requires Playwright and Chromium: `pip install playwright && python -m playwright install chromium`.
+- Requires Playwright and its bundled Chromium: `pip install -e .[html]` then `python -m playwright install chromium`. A system Google Chrome is used only when env `SAJU_ALLOW_SYSTEM_CHROME=1` (default: bundled Chromium only, so output is identical on every machine). A missing browser raises `PdfBackendUnavailable`; the self-service app records that class name as the failure reason.
 - Renders Quick Reference as a card, current-year paragraph as a callout, Lucky Attributes as a grid, and adds an SVG element-balance chart.
 - Use `--compact` for the one-page Hook/sample tier. `src/saju_html/chart_input.py` is the shared chart-to-markdown step for `--from-chart`.
 - **No silent fallback:** a missing browser raises. The renderer falls back to ReportLab only with `allow_fallback=True` or env `SAJU_PDF_FALLBACK=reportlab`.
@@ -117,8 +117,7 @@ assert JIAZI_TO_NAYIN[("甲", "子")] == "海中金"  # Gold in the sea
 - Uses DejaVu fonts for Unicode; two-pass build; branded footer and report ID. Warns on unmapped CJK. Planned for removal after one release.
 
 ### Compat PDF
-- Separate renderer in `src/saju_html/md_to_saju_compat_pdf.py`.
-- Uses a Korean CID font for CJK characters.
+- Separate tool in `src/saju_html/md_to_saju_compat_pdf.py` (HTML/Chromium default; `--backend reportlab` uses a Korean CID font).
 - Tier-aware translation skip keeps couple names and verdicts intact.
 
 ## Continuous development checklist
@@ -143,10 +142,14 @@ PYTHONPATH=src python3 -m saju_engine \
   --format premium --tier deep --output-file report.md
 
 # Render to PDF (HTML/Playwright default)
-./tools/build-pdf.sh --from-chart report.md "Title" "Client" "1990-05-15" "Day Master"
+./tools/build-pdf.sh jane "Title" "Client" "15 May 1990, 14:30" "Day Master" \
+    --from-chart --tier deep --gender F --birth-year 1990 --birth-month 5 --birth-day 15 \
+    --birth-hour 14 --birth-minute 30 --city Seoul --utc-offset 9
 
-# Legacy ReportLab PDF (writes *-reportlab.pdf)
-./tools/build-pdf.sh --reportlab --from-chart report.md "Title" "Client" "1990-05-15" "Day Master"
+# Legacy ReportLab PDF (writes *-reportlab.pdf); --reportlab may appear anywhere
+./tools/build-pdf.sh --reportlab jane "Title" "Client" "15 May 1990, 14:30" "Day Master" \
+    --from-chart --tier deep --gender F --birth-year 1990 --birth-month 5 --birth-day 15 \
+    --birth-hour 14 --birth-minute 30 --city Seoul --utc-offset 9
 
 # Run tests
 pytest
