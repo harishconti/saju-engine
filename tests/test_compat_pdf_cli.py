@@ -75,6 +75,7 @@ def test_compat_pdf_default_output_lands_under_repo_root_not_src(tmp_path):
                 "--day-master-a", "丙",
                 "--day-master-b", "丙",
                 "--tier", "basic",
+                "--backend", "reportlab",
             ],
             cwd=PROJECT_ROOT,
             env=ENV,

@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 from saju_html import translate_inline
+from tests.test_html_pdf import requires_browser
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ENV = {**os.environ, "PYTHONPATH": str(PROJECT_ROOT / "src")}
@@ -26,6 +27,7 @@ requires_pdftotext = pytest.mark.skipif(
 )
 
 
+@requires_browser
 def test_build_pdf_from_markdown(tmp_path):
     # N-22 (2026-09-26 audit): this used to point straight at the tracked
     # client deliverable (candidates_horoscope/reports/sruthi/sruthi-report.pdf)

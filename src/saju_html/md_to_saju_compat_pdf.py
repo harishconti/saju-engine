@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Render the 두 분 궁합 (Compatibility Reading) markdown to a PDF.
 
-This wraps `src/saju_html/md_to_saju_pdf.py::build_pdf` so the compat product gets
+This wraps `saju_html.renderer.build_pdf` (HTML/Chromium, default) or
+`md_to_saju_pdf.build_pdf` (`--backend reportlab`) so the compat product gets
 the same premium visual treatment as the single-chart tiers, with the only
 differences being:
   - Title is "두 분 궁합 — {name_a} × {name_b}"
@@ -36,7 +37,6 @@ _SAJU_SITE = os.environ.get("SAJU_SITE")
 if _SAJU_SITE and _SAJU_SITE not in sys.path:
     sys.path.insert(0, _SAJU_SITE)
 
-from saju_html.md_to_saju_pdf import build_pdf  # type: ignore  # noqa: E402
 
 
 def _slugify(name: str) -> str:
@@ -62,6 +62,8 @@ def main() -> int:
                        "Compat report tier: basic (default, compact ~4-page snapshot), "
                        "or deep (full 11-sub-system report + individual snapshots + timing overlay)."
                    ))
+    p.add_argument("--backend", default="html", choices=("html", "reportlab"),
+                   help="PDF backend: html (default, Chromium) or reportlab (legacy).")
     args = p.parse_args()
 
     input_md: Path = args.input_md.resolve()
@@ -102,16 +104,24 @@ def main() -> int:
     build_tier = "compat"
     report_id = args.report_id or f"COMP-{_slugify(args.name_a)}-x-{_slugify(args.name_b)}-{date.today().strftime('%Y%m%d')}-{args.tier}"
 
-    build_pdf(
-        input_md=input_md,
-        output_pdf=output_pdf,
-        title=title,
-        client=client,
-        dob=dob,
-        day_master=day_master,
-        report_id=report_id,
-        tier=build_tier,
-    )
+    if args.backend == "reportlab":
+        from saju_html.md_to_saju_pdf import build_pdf  # type: ignore
+    else:
+        from saju_html.renderer import build_pdf  # type: ignore
+    try:
+        build_pdf(
+            input_md=input_md,
+            output_pdf=output_pdf,
+            title=title,
+            client=client,
+            dob=dob,
+            day_master=day_master,
+            report_id=report_id,
+            tier=build_tier,
+        )
+    except RuntimeError as exc:  # e.g. Chromium unavailable: fail loudly, no silent switch
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
     print(f"Wrote: {output_pdf}")
     return 0
 

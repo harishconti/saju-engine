@@ -76,7 +76,15 @@ from reportlab.platypus import (  # noqa: E402
     TableStyle,
 )
 
-from saju_engine.cli_validators import utc_offset_float  # noqa: E402
+from saju_html.chart_input import (  # noqa: E402,F401
+    TIER_CHOICES,
+    _format_date_dob,
+    _format_day_master,
+    _slugify,
+    add_chart_args,
+    chart_from_args,
+    prepare_chart_render,
+)
 from saju_html import (  # noqa: E402
     ELEMENT_COLORS,
     ELEMENT_EMOJI,
@@ -157,7 +165,6 @@ def _font(name: str) -> str:
     except Exception:
         return name.replace("DejaVuSans", "Helvetica")
 
-from saju_engine.premium_report import generate_premium_report  # noqa: E402
 
 
 # ---------- Markdown parsing ----------
@@ -671,27 +678,6 @@ def build_pdf(input_md: Path, output_pdf: Path, title: str, client: str, dob: st
 # string that matches the structure of knowledge/10-output-template.md.
 # (The PDF builder below then re-translates Korean→English for layout.)
 
-_MONTH_NAME = {
-    1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June",
-    7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December",
-}
-
-
-def _format_date_dob(chart) -> str:
-    """Format a Chart's birth_date as a presentable '11 December 1993' string."""
-    try:
-        y, m, d = chart.birth_date.split("-")
-        return f"{int(d)} {_MONTH_NAME[int(m)]} {y}"
-    except (ValueError, AttributeError):
-        return str(chart.birth_date)
-
-
-def _format_day_master(chart) -> str:
-    """Return '丙 (Yang Fire)' style label from a Chart."""
-    info = chart.day_master_info
-    return f"{chart.day_master} ({info['element']}, {info['polarity']})"
-
-
 def chart_to_markdown(chart, *, title: str = "Saju Reading") -> str:
     """Render a `Chart` object as a markdown document following
     `knowledge/10-output-template.md`.
@@ -826,11 +812,6 @@ and each branch's hidden stems (지장간):
     return md
 
 
-def _slugify(name: str) -> str:
-    """Create a lowercase, hyphenated slug from a full name."""
-    return re.sub(r"[^a-z0-9]+", "-", name.lower().strip()).strip("-")
-
-
 def build_pdf_from_chart(chart, output_pdf: Path, *, title: str = "Saju Reading",
                          client: str = "", dob: str = "", day_master: str = "",
                          overwrite_report: bool = False, tier: Optional[str] = None,
@@ -849,39 +830,11 @@ def build_pdf_from_chart(chart, output_pdf: Path, *, title: str = "Saju Reading"
     premium report generator is used instead of the legacy chart_to_markdown()
     template.
     """
-    output_pdf = Path(output_pdf)
-    output_pdf.parent.mkdir(parents=True, exist_ok=True)
-
-    # Derive defaults from the chart if the caller didn't pass them
-    if not client:
-        client = chart.name or ""
-    if not dob:
-        dob = _format_date_dob(chart)
-    if not day_master:
-        day_master = _format_day_master(chart)
-
-    # Write the intermediate markdown to a sibling file unless the caller
-    # explicitly wants to overwrite the hand-written report.
-    if overwrite_report:
-        md_path = output_pdf.with_suffix(".md")
-    else:
-        md_path = output_pdf.with_name(output_pdf.stem.replace("-report", "-engine") + ".md")
-        if md_path.name == output_pdf.with_suffix(".md").name:
-            # Fallback if the PDF path does not contain '-report'.
-            md_path = output_pdf.with_name(output_pdf.stem + "-engine.md")
-
-    if tier:
-        md_text = generate_premium_report(chart, tier=tier, generation_date=None)
-    else:
-        md_text = chart_to_markdown(chart, title=title)
-    md_path.write_text(md_text, encoding="utf-8")
-
-    if not report_id:
-        slug = _slugify(client or chart.name or output_pdf.stem)
-        tier_label = (tier or "").upper()
-        report_id = f"CID-{slug}-{date.today().strftime('%Y%m%d')}-{tier_label}"
-    # Render
-    return build_pdf(md_path, output_pdf, title, client, dob, day_master, report_id=report_id, tier=tier)
+    kw = prepare_chart_render(
+        chart, output_pdf, title=title, client=client, dob=dob, day_master=day_master,
+        overwrite_report=overwrite_report, tier=tier, report_id=report_id)
+    return build_pdf(kw["input_md"], Path(output_pdf), title, kw["client"], kw["dob"],
+                     kw["day_master"], report_id=kw["report_id"], tier=tier)
 
 
 def main():
@@ -892,30 +845,8 @@ def main():
     ap.add_argument("--client", default="")
     ap.add_argument("--dob", default="")
     ap.add_argument("--day-master", default="")
-    # Chart-input mode (Priority 3): --from-chart with a single date set
-    ap.add_argument("--from-chart", action="store_true",
-                    help="Build PDF from a Chart computed by the engine (provide --birth-* flags).")
-    ap.add_argument("--name", default="")
-    ap.add_argument("--gender", choices=["M", "F"], default=None)
-    ap.add_argument("--birth-year", type=int)
-    ap.add_argument("--birth-month", type=int)
-    ap.add_argument("--birth-day", type=int)
-    ap.add_argument("--birth-hour", type=int)
-    ap.add_argument("--birth-minute", type=int, default=0)
-    ap.add_argument("--city", default="")
-    ap.add_argument("--longitude", type=float, default=None)
-    ap.add_argument("--utc-offset", type=utc_offset_float, default=9.0)
-    ap.add_argument("--no-solar-time", dest="use_solar_time", action="store_false", default=True,
-                    help="Disable true solar-time correction (enabled by default).")
-    ap.add_argument("--convention", choices=["korean", "chinese"], default="korean",
-                    help="Korean (야자시, default) or Chinese (조자시) Zi-hour convention.")
-    # Legacy aliases kept for backward compatibility.
-    ap.add_argument("--korean-yazi", action="store_true", default=None,
-                    help="Deprecated alias for --convention korean.")
-    ap.add_argument("--no-korean-yazi", dest="korean_yazi", action="store_false")
-    ap.add_argument("--overwrite-report", action="store_true",
-                    help="When using --from-chart, write the markdown to {name}-report.md instead of {name}-engine.md.")
-    ap.add_argument("--tier", choices=["sample", "essential", "deep", "spark", "reading", "fullmap", "career", "luck-cycle"], default=None,
+    add_chart_args(ap)
+    ap.add_argument("--tier", choices=TIER_CHOICES, default=None,
                     help="Report tier. With --from-chart it selects generated sections; "
                          "with an existing .md it only affects cover-page styling and translation.")
     ap.add_argument("--report-id", default="",
@@ -924,23 +855,7 @@ def main():
 
     if args.from_chart:
         # Mode 2: engine → markdown → PDF
-        if not all([args.birth_year, args.birth_month, args.birth_day,
-                    args.birth_hour is not None]):
-            ap.error("--from-chart requires --birth-year, --birth-month, --birth-day, --birth-hour")
-        from saju_engine.engine import compute_chart  # local import: keep core script lean
-        convention = args.convention
-        if args.korean_yazi is not None:
-            convention = "korean" if args.korean_yazi else "chinese"
-        chart = compute_chart(
-            name=args.name or None,
-            gender=args.gender,
-            year=args.birth_year, month=args.birth_month, day=args.birth_day,
-            hour=args.birth_hour, minute=args.birth_minute,
-            city=args.city or None, longitude=args.longitude,
-            utc_offset=args.utc_offset,
-            use_solar_time=args.use_solar_time,
-            convention=convention,
-        )
+        chart = chart_from_args(ap, args)
         out = build_pdf_from_chart(
             chart, args.output,
             title=args.title, client=args.client, dob=args.dob, day_master=args.day_master,
