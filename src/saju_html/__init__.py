@@ -265,12 +265,20 @@ KOR_REPL = {
 # case particle (은/는/이/가/을/를/의/와/과/도/로/에/에서/으로).
 _K0 = r"(?<![가-힣])"
 _K1 = r"(?![가-힣])"
-_KP = r"(?=(?:에서|으로|은|는|이|가|을|를|의|와|과|도|로|에)?(?![가-힣]))"
+# Particle-tolerant end boundary. `_KP_RE` is used to build `_KW_RE` patterns
+# (see translate_inline) that CONSUME the optional particle, so a term like
+# 혼잡은 becomes "mixed" with no leftover 을/은/는 for the CJK tokenizer to
+# garble (P5-hangul-tokens).
+_KP_RE = r"(?:에서|으로|은|는|이|가|을|를|의|와|과|도|로|에)?(?![가-힣])"
+_KP = r"(?=" + _KP_RE + r")"  # lookahead form, kept for direct uses
 
 
 def _kw(term: str) -> "re.Pattern":
-    """Compile a bounded Korean-word pattern (particle-tolerant)."""
-    return re.compile(_K0 + re.escape(term) + _KP)
+    """Compile a bounded Korean-word pattern that consumes a trailing particle.
+
+    The particle is consumed (not just looked ahead) so ``혼잡은`` -> ``mixed``
+    with no leftover ``은`` (P5-hangul-tokens)."""
+    return re.compile(_K0 + re.escape(term) + _KP_RE)
 
 
 def _pair_union_gloss(m: "re.Match") -> str:
@@ -293,6 +301,13 @@ _PRE_RULES: List[tuple] = [
      "an equal bond, sometimes competitive"),
     # Classical-text titles glossed with their Hanja: keep the Korean-term gloss only.
     (re.compile(r"(적천수|연해자평|궁통보감|명리정종|자평진전) \((?:滴天髓|淵海子平|窮通寶鑑|命理正宗|子平眞詮)\)"),
+     r"\1"),
+    # Ten-god terms glossed with their Hanja where the two map to DIFFERENT
+    # English (정관 -> "Direct Officer (Authority)" but 正官 -> "Direct Officer"),
+    # so the later placeholder dedup misses it and doubles the gloss
+    # (P5-hangul-tokens): drop the Hanja parenthetical, keep the term.
+    (re.compile(r"(정관|편관|정재|편재|정인|편인|비견|겁재|식신|상관)"
+                r" \((?:正官|偏官|正財|偏財|正印|偏印|比肩|劫財|食神|傷官)\)"),
      r"\1"),
     # Organ pairs after an English organ gloss: "liver/gallbladder (간/담)"
     (re.compile(r" \((?:간/담|심/소장|비/위|폐/대장|신/방광)\)"), ""),
@@ -554,6 +569,12 @@ def _protect_parenthetical_english(text: str) -> tuple[str, list[str]]:
 
 _HANGUL_SEG_RE = re.compile(r"[가-힣]+")
 
+# Korean grammatical particles, longest first. Consumed as a suffix after a
+# matched multi-character term so they are never tokenized as stems/branches
+# (P5-hangul-tokens: 천을귀인을 -> "Heavenly Noble", not "... Eul (Yin Wood)").
+_PARTICLES = ("에서", "으로", "은", "는", "이", "가", "을", "를", "의",
+              "와", "과", "도", "로", "에")
+
 
 def _is_hangul_syllable(key: str) -> bool:
     return len(key) == 1 and "가" <= key <= "힣"
@@ -586,6 +607,14 @@ def _tokenize(
                 flush()
                 tokens.append(v)
                 i += len(k)
+                # Consume one trailing grammatical particle after a multi-
+                # character Korean term so 을/은/는 never tokenize as a stem or
+                # branch (Heavenly Noble 을 -> not "Eul"; 혼잡은 -> not "Yin").
+                if len(k) > 1 and "가" <= run[i - 1] <= "힣":
+                    for p in _PARTICLES:
+                        if run.startswith(p, i):
+                            i += len(p)
+                            break
                 break
         else:
             pending += run[i]

@@ -21,14 +21,22 @@ _ZONES = [(9.0, 127.0), (5.5, 77.2), (-5.0, -74.0), (-8.0, -118.2), (0.0, 0.0)]
 _CJK = re.compile(r"[가-힣一-鿿]+")
 
 
+_DAYS_IN_MONTH = (31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+
+
 def _chart(rng, gender):
     utc, lon = rng.choice(_ZONES)
+    # Days 1..end-of-month (P5-hangul-tokens: widen breadth to month-end dates,
+    # incl. the N-4 S8a clamp path on short months) and both zi-hour conventions.
+    month = rng.randint(1, 12)
+    day = rng.randint(1, _DAYS_IN_MONTH[month - 1])
     return compute_chart(
         name="X", gender=gender, year=rng.randint(1940, 2010),
-        month=rng.randint(1, 12), day=rng.randint(1, 28),
+        month=month, day=day,
         hour=rng.randint(0, 23), minute=rng.randint(0, 59),
         city=None, longitude=lon, utc_offset=utc,
-        use_solar_time=rng.random() < 0.7, convention="korean",
+        use_solar_time=rng.random() < 0.7,
+        convention=rng.choice(("korean", "chinese")),
     )
 
 
@@ -57,7 +65,7 @@ def test_random_compat_has_no_unmapped_cjk():
 def test_random_premium_has_no_unmapped_cjk(tier):
     rng = random.Random(77)
     bad: set = set()
-    for _ in range(8):
+    for _ in range(20):
         chart = _chart(rng, rng.choice("MF"))
         bad |= _residuals(generate_premium_report(chart, tier=tier, generation_date=None))
     assert not bad, f"unmapped CJK in {tier} reports: {sorted(bad)}"

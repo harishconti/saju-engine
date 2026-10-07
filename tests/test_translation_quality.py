@@ -142,3 +142,37 @@ def test_ipha_solar_term_is_lixia():
     assert "Lihai" not in out
     assert "Lixia" in out and "Start of Summer" in out
     assert "Lihai" not in translate_inline("입하")
+
+
+# ── P5-hangul-tokens (2026-10-07) ───────────────────────────────────────────
+
+def test_trailing_particle_after_phrase_term_is_consumed():
+    # Phrase rules consume the optional particle, so no stray 을/은/는 reaches
+    # the CJK tokenizer (where 은 -> Yin and 을 -> 乙 mis-fires).
+    assert translate_inline("재성 혼잡은 뚜렷하다").startswith("Wealth mixed")
+    assert "Yin" not in translate_inline("재성 혼잡은 뚜렷하다")
+    assert translate_inline("일부는 그렇다").startswith("partial")
+    assert translate_inline("월령을 기준으로") == "month command 기준으로"
+    assert translate_inline("심함을 보인다") == "severe 보인다"
+
+
+def test_particle_is_not_mistaken_for_a_stem_or_branch():
+    # 을 (乙) / 은 (Yin) must not be read out of a grammatical particle.
+    for src in ("월령을", "심함을", "투출을", "천을귀인을"):
+        out = translate_inline(src)
+        assert "Eul" not in out, (src, out)
+        assert "Yin" not in out, (src, out)
+
+
+def test_tengod_hanja_parenthetical_is_not_doubled():
+    # 정관 -> "Direct Officer (Authority)" but 正官 -> "Direct Officer"; the
+    # placeholder dedup cannot see the mismatch, so the pre-rule drops the
+    # Hanja gloss (P5-hangul-tokens).
+    out = translate_inline("정관 (正官)")
+    assert out == "Direct Officer (Authority)", out
+    assert "Direct Officer (Authority) (Direct Officer)" not in out
+    # 편재/정인 map straight to English (no authoritative parenthetical), so the
+    # Hanja gloss must simply be dropped.
+    assert translate_inline("편재 (偏財)") == "Indirect Wealth"
+    assert translate_inline("정인 (正印)") == "Direct Resource"
+    assert translate_inline("상관 (傷官)") == "Hurting Officer (Output)"
