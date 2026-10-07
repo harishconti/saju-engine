@@ -12,6 +12,7 @@ from saju_engine.compat_report import generate_compat_report
 from saju_engine.cross_candidate_report import generate_cross_candidate_report
 from saju_engine.engine import compute_chart
 from saju_engine.premium_report import generate_premium_report
+from saju_engine.prose_scaffold import generate_plain_words, generate_prose_scaffold
 
 REF = dict(reference_year=2026, reference_month=6, reference_day=1)
 GEN_DATE = "2026-06-01"
@@ -77,6 +78,32 @@ def golden_outputs() -> Dict[str, str]:
         favorable_element_a="Wood", favorable_element_b="Water")
     out["cross-candidate.md"] = _cross_candidate(charts)
     return out
+
+
+# --- Prose-scaffold snapshots (P3-golden, 2026-10-07) ------------------------
+# Kept out of `golden_outputs()` so the client-report golden set (and the
+# rendered-HTML snapshots derived from it) is unaffected. These pin the engine's
+# draft scaffold + plain-words layer directly, catching label regressions that
+# premium_report does not render verbatim.
+
+
+def _render_scaffold(chart) -> str:
+    """Deterministic markdown snapshot of the draft scaffold + plain-words layer."""
+    scaffold = generate_prose_scaffold(chart)
+    plain = generate_plain_words(chart)
+    lines = [f"# Prose scaffold — {chart.name}", ""]
+    for k, v in scaffold.items():
+        lines.append(f"## {k}")
+        lines.append(v)
+        if plain.get(k):
+            lines.append("")
+            lines.append(plain[k])
+        lines.append("")
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def scaffold_outputs() -> Dict[str, str]:
+    return {f"scaffold-{key}.md": _render_scaffold(_chart(key)) for key in CHARTS}
 
 
 def _cross_candidate(charts) -> str:
