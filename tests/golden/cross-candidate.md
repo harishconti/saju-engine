@@ -44,11 +44,11 @@ Each pair is scored by the engine's 11 궁합 sub-systems *(see knowledge/11-gun
 - Day-branch interaction (spouse palaces): B일지·A지지 육충 巳亥
 
 **Yellow flags (watch):**
+- Combined element balance: 결합 과다: ['Metal']
 - Favorable element cross-supply: A에 B의 기신 Metal 과다
 - Favorable element cross-supply: B에 A의 기신 Water 과다
 - Ten-god cross-relationship: A의 일간 원소 Metal = B의 기신 [주의]
 - Ten-god cross-relationship: B의 일간 원소 Water = A의 기신 [주의]
-- Yin-Yang polarity: 결합 음양 불균형 (25% 양)
 
 **Positives:**
 - Combined element balance: A 용신 Earth 결합에서 충분

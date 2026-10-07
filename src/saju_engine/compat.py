@@ -42,6 +42,7 @@ from . import lookup as L
 from .chart import Chart
 from .fallback_log import log_fallback
 from .nayin import NAYIN_ORDER, nayin_of, nayin_relation_detail
+from .strength import element_balance_pct
 from .yongsin import favorable_element
 
 
@@ -1002,16 +1003,24 @@ def compat_combined_elements(a: Chart, b: Chart) -> CompatSubResult:
     dist_b = _weighted_presence_pct(b)
     union = {e: (dist_a.get(e, 0) + dist_b.get(e, 0)) / 2 for e in dist_a}
 
+    # P2-F (2026-10-07): the over/missing wording is derived from the CANONICAL
+    # per-partner element balance (`strength.element_balance_pct`) so it cannot
+    # contradict the client-visible per-partner tables. The SCORE below stays on
+    # the §F weighted union (frozen by the 2026-10-02 user decision).
+    canon_a = element_balance_pct(a)
+    canon_b = element_balance_pct(b)
+    canon_union = {e: (canon_a.get(e, 0) + canon_b.get(e, 0)) / 2 for e in canon_a}
+
     flags: List[Flag] = []
     score = 0
 
     # Missing-element flag.
-    missing = [e for e, v in union.items() if v == 0]
+    missing = [e for e, v in canon_union.items() if v == 0]
     if missing:
         flags.append(Flag(f"결합에서 결핍: {missing}", kind="yellow", code="combined_elements.missing"))
 
     # Over-dominant element.
-    over = [e for e, v in union.items() if v > 30]
+    over = [e for e, v in canon_union.items() if v > 30]
     if over:
         flags.append(Flag(f"결합 과다: {over}", kind="yellow", code="combined_elements.excess"))
 
@@ -1052,8 +1061,10 @@ def compat_combined_elements(a: Chart, b: Chart) -> CompatSubResult:
         narr += "The union is well-balanced across all five elements."
     elif missing:
         narr += f"The union is missing {missing}, which classical 명리 reads as a 결합 결핍."
+    elif over:
+        narr += f"The union leans heavily on {', '.join(over)} — over-dominant elements 'rule' the relationship."
     else:
-        narr += "The union has some imbalance — over-dominant elements 'rule' the relationship."
+        narr += "The union has some imbalance — no single element dominates, but the spread is uneven."
     narr += (
         " 궁통보감 framing: one chart may be 寒 (cold), the other 熱 (hot) — "
         "complementary climates balance the union."

@@ -29,7 +29,6 @@
 
 - 🟡 Favorable element cross-supply: A에 B의 기신 — the element that unbalances your chart — minimise its influence *(see knowledge/03-five-elements.md)* Metal 과다
 - 🟡 Favorable element cross-supply: B에 A의 기신 Water 과다
-- 🟡 Yin-Yang polarity: 결합 음양 불균형 (25% 양)
 
 ### Favorable Points (긍정적 요소)
 

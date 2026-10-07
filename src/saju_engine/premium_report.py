@@ -658,12 +658,17 @@ def _section_chart_at_a_glance(ctx: _ReportContext) -> List[str]:
             )
         lines.append(why + ".")
     elif ctx.fe.climate_element and ctx.fe.climate_agrees is False:
+        # P3-reader-claim (2026-10-07): do not claim a reader review the engine
+        # did not have. The provenance is already tracked (fe.confidence); only
+        # say "the reader has weighed both" when a human actually confirmed it.
+        weighed = ("the reader has weighed both." if ctx.fe.confidence == "reader-confirmed"
+                   else "the engine has weighed both.")
         lines.append(
             f"- **Why this element:** two classical checks apply here — the strength-balance "
             f"(억부) reading points one way, while the climate-balance (조후) reading points to "
             f"**{ctx.fe.climate_element}** for a {ctx.fe.climate_band}-season chart. In this chart "
             f"the {'climate reading takes priority because the chart leans clearly seasonal' if ctx.fe.method == 'climate-balanced' else 'strength reading takes priority because the chart is not extreme enough for the climate override'}; "
-            "the reader has weighed both."
+            + weighed
         )
     lines += [
         f"- **Supporting Element:** {ctx.supporting}",

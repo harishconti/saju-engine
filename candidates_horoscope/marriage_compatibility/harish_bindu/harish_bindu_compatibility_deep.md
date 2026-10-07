@@ -54,6 +54,7 @@
 
 ### Yellow Flags (관찰 사항)
 
+- 🟡 Combined element balance: 결합 과다: ['Wood']
 - 🟡 Day-branch interaction (spouse palaces): B일지·A지지 육해 寅巳
 - 🟡 Day-pillar pair classification: 배우자 복덕 (기신 일치)
 - 🟡 Yin-Yang polarity: 결합 음양 불균형 (25% 양)
@@ -132,9 +133,9 @@ The two day pillars are **辛亥** (Partner A) and **甲寅** (Partner B). Each 
 
 **Score:** +9 / 12  (Strong)
 
-Combined element distribution (average of both charts). The union has some imbalance — over-dominant elements 'rule' the relationship. 궁통보감 framing: one chart may be 寒 (cold), the other 熱 (hot) — complementary climates balance the union.
+Combined element distribution (average of both charts). The union leans heavily on Wood — over-dominant elements 'rule' the relationship. 궁통보감 framing: one chart may be 寒 (cold), the other 熱 (hot) — complementary climates balance the union.
 
-**Tags:** `A 용신 Water 결합에서 충분`
+**Tags:** `결합 과다: ['Wood']`, `A 용신 Water 결합에서 충분`
 
 *see knowledge/11-gunghap.md §F*
 

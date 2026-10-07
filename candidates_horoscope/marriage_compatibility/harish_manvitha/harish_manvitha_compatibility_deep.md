@@ -132,7 +132,7 @@ The two day pillars are **辛亥** (Partner A) and **甲戌** (Partner B). Each 
 
 **Score:** +9 / 12  (Strong)
 
-Combined element distribution (average of both charts). The union has some imbalance — over-dominant elements 'rule' the relationship. 궁통보감 framing: one chart may be 寒 (cold), the other 熱 (hot) — complementary climates balance the union.
+Combined element distribution (average of both charts). The union has some imbalance — no single element dominates, but the spread is uneven. 궁통보감 framing: one chart may be 寒 (cold), the other 熱 (hot) — complementary climates balance the union.
 
 **Tags:** `A 용신 Water 결합에서 충분`
 

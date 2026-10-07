@@ -52,6 +52,7 @@
 
 ### Yellow Flags (관찰 사항)
 
+- 🟡 Combined element balance: 결합 과다: ['Water']
 - 🟡 Favorable element cross-supply: A에 B의 기신 — the element that unbalances your chart — minimise its influence *(see knowledge/03-five-elements.md)* Metal 과다
 - 🟡 Favorable element cross-supply: B에 A의 기신 Earth 과다
 - 🟡 Ten-god cross-relationship: A의 일간 원소 Metal = B의 기신 [주의]
@@ -133,7 +134,7 @@ The two day pillars are **辛亥** (Partner A) and **癸巳** (Partner B). Each 
 
 Combined element distribution (average of both charts). The union is well-balanced across all five elements. 궁통보감 framing: one chart may be 寒 (cold), the other 熱 (hot) — complementary climates balance the union.
 
-**Tags:** `결합 오행 균형 양호`, `A 용신 Wood 결합에서 충분`, `B 용신 Fire 결합에서 충분`
+**Tags:** `결합 과다: ['Water']`, `결합 오행 균형 양호`, `A 용신 Wood 결합에서 충분`, `B 용신 Fire 결합에서 충분`
 
 *see knowledge/11-gunghap.md §F*
 

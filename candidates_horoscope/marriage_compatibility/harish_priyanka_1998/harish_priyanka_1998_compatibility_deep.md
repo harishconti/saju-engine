@@ -55,6 +55,7 @@
 ### Yellow Flags (관찰 사항)
 
 - 🟡 Day-branch interaction (spouse palaces): 일지 해 亥申
+- 🟡 Combined element balance: 결합 과다: ['Earth']
 - 🟡 Compatibility star overlays: 쌍역마 — both have 역마 but not anchored in spouse palace; parallel travel lives
 - 🟡 Yin-Yang polarity: 결합 음양 불균형 (38% 양)
 
@@ -132,9 +133,9 @@ The two day pillars are **辛亥** (Partner A) and **庚申** (Partner B). Each 
 
 **Score:** +11 / 12  (Strong)
 
-Combined element distribution (average of both charts). The union has some imbalance — over-dominant elements 'rule' the relationship. 궁통보감 framing: one chart may be 寒 (cold), the other 熱 (hot) — complementary climates balance the union.
+Combined element distribution (average of both charts). The union leans heavily on Earth — over-dominant elements 'rule' the relationship. 궁통보감 framing: one chart may be 寒 (cold), the other 熱 (hot) — complementary climates balance the union.
 
-**Tags:** `A 용신 Water 결합에서 충분`, `B 용신 Water 결합에서 충분`
+**Tags:** `결합 과다: ['Earth']`, `A 용신 Water 결합에서 충분`, `B 용신 Water 결합에서 충분`
 
 *see knowledge/11-gunghap.md §F*
 

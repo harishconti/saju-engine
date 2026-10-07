@@ -45,7 +45,7 @@
 - **Day Master:** Im (Yang Water, 壬水)
 - **Strength:** Very Strong — the month branch **子** gives the Day Master a **seasonally supported baseline** by element relation (per knowledge/09-interpretation-method.md Step 2); its 12운성 stage there is **제왕 (帝旺)** — the Day Master reaches maximum presence early; the challenge is not starting but learning to modulate intensity (knowledge/06-twelve-stages.md). Peer and resource support (visible and hidden stems) outweighs the output/wealth/authority drain.
 - **Favorable Element:** Fire — The Day Master reads as strong, but the classical 조후 (climate-balance) check takes priority ahead of 억부 (strength-balance) here, because the chart's climate is extreme rather than mild: this chart peaks in cold winter conditions, and the classical remedy is Fire. This takes priority over the strength-balance (억부) pick (Wood).
-- **Why this element:** two classical checks apply here — the strength-balance (억부) reading points one way, while the climate-balance (조후) reading points to **Fire** for a cold-season chart. In this chart the climate reading takes priority because the chart leans clearly seasonal; the reader has weighed both.
+- **Why this element:** two classical checks apply here — the strength-balance (억부) reading points one way, while the climate-balance (조후) reading points to **Fire** for a cold-season chart. In this chart the climate reading takes priority because the chart leans clearly seasonal; the engine has weighed both.
 - **Supporting Element:** Wood
 - **Avoid / Watch:** Metal (기신, watch) · Water (구신, restrains Fire) · Earth (한신, drains Fire)
 - **Current Major Luck:** 戊申 (ages 39-48)
