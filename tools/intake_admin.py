@@ -30,6 +30,7 @@ for p in (str(PROJECT_ROOT / "src"), os.environ.get("SAJU_SITE")):
     if p and p not in sys.path:
         sys.path.insert(0, p)
 
+from saju_web import notify  # noqa: E402
 from saju_web.jobs import is_stale  # noqa: E402
 from saju_web.store import IntakeStore, generate_key  # noqa: E402
 
@@ -47,6 +48,25 @@ def _base_url(cli_value: str | None) -> str | None:
               "(there is no localhost default)", file=sys.stderr)
         return None
     return base.rstrip("/")
+
+
+def _deliver_link(link: str, row: dict) -> None:
+    """Print the private link and, when SMTP is configured, email it (D2).
+
+    Always prints the link so the owner can deliver it by hand if email is
+    unavailable or fails. Never prints or logs the recipient address.
+    """
+    print(link)
+    email = (row.get("pii") or {}).get("email", "")
+    if not notify.is_configured():
+        return
+    if not email:
+        print("note: intake has no email on file; link printed only", file=sys.stderr)
+        return
+    if notify.send_report_link(link, email):
+        print(f"intake {row['id']}: emailed the private link")
+    else:
+        print(f"intake {row['id']}: email delivery failed; link printed above", file=sys.stderr)
 
 
 def _attach(store: IntakeStore, row: dict, src: Path) -> int:
@@ -151,7 +171,7 @@ def main(argv: list[str] | None = None) -> int:
         if base is None:
             return 2
         token = store.issue_token(args.id)
-        print(f"{base}/report/{token}")
+        _deliver_link(f"{base}/report/{token}", row)
         return 0
     if args.cmd == "attach":
         return _attach(store, row, args.pdf)
@@ -172,7 +192,7 @@ def main(argv: list[str] | None = None) -> int:
         except ValueError as exc:
             print(f"error: {exc}", file=sys.stderr)
             return 1
-        print(f"{base}/report/{token}")
+        _deliver_link(f"{base}/report/{token}", row)
         return 0
     if args.cmd == "regenerate":
         if row["status"] == "approved":

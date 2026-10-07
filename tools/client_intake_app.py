@@ -20,6 +20,7 @@ Logs must not contain PII: only intake ids and exception class names are logged.
 """
 from __future__ import annotations
 
+import json
 import logging
 import math
 import os
@@ -45,6 +46,7 @@ from starlette.concurrency import run_in_threadpool  # noqa: E402
 
 from saju_web import jobs  # noqa: E402
 from saju_web.jobs import derive_offset, generate_draft, is_stale, slugify  # noqa: E402
+from saju_web.ratelimit import body_too_large, from_env as _ratelimit_from_env  # noqa: E402
 from saju_web.store import IntakeStore  # noqa: E402
 
 @asynccontextmanager
@@ -56,6 +58,48 @@ async def _lifespan(_app):
 app = FastAPI(title="Saju Self-Service Intake", lifespan=_lifespan)
 log = logging.getLogger("saju.client_intake_app")
 
+# P4-ratelimit: in-app defence-in-depth (a reverse proxy still owns this at
+# deploy time, D3). Pure-ASGI middleware so it never touches the request body
+# (safe with Starlette's BaseHTTPMiddleware-free path and TestClient).
+_RATE_LIMITER, _MAX_BODY_BYTES = _ratelimit_from_env()
+
+
+async def _send_json(send, status: int, detail: str, extra_headers=None) -> None:
+    body = json.dumps({"detail": detail}).encode()
+    headers = [(b"content-type", b"application/json"),
+               (b"content-length", str(len(body)).encode())]
+    headers += extra_headers or []
+    await send({"type": "http.response.start", "status": status, "headers": headers})
+    await send({"type": "http.response.body", "body": body})
+
+
+class RateLimitMiddleware:
+    """Per-IP sliding-window limit + declared body-size cap for POSTs."""
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        client = scope.get("client")
+        ip = client[0] if client else "unknown"
+        if scope.get("method") == "POST":
+            headers = dict(scope.get("headers") or [])
+            if body_too_large(headers.get(b"content-length", b"").decode() or None,
+                              _MAX_BODY_BYTES):
+                await _send_json(send, 413, "Request body too large.")
+                return
+            ok, retry_after = _RATE_LIMITER.allow(ip)
+            if not ok:
+                await _send_json(
+                    send, 429, BUSY_DETAIL,
+                    extra_headers=[(b"retry-after", str(int(retry_after) + 1).encode())])
+                return
+        await self.app(scope, receive, send)
+
+
 # S8e: no credentials, minimal headers/methods. In production set
 # SAJU_ALLOWED_ORIGINS to the deployed landing-page origin(s) (comma-separated).
 _ALLOWED_ORIGINS = [
@@ -63,6 +107,10 @@ _ALLOWED_ORIGINS = [
     for o in os.environ.get("SAJU_ALLOWED_ORIGINS", "http://localhost:3000").split(",")
     if o.strip()
 ]
+# Registration order = inner-to-outer, so add the limiter first and CORS last:
+# CORS then wraps the limiter and its 429/413 responses still carry CORS headers
+# for the cross-origin landing-page form.
+app.add_middleware(RateLimitMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_ALLOWED_ORIGINS,
