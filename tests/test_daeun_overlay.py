@@ -191,7 +191,7 @@ def test_engine_populates_daeun_overlay():
     c = compute_chart(
         name="Tester", gender="F",
         year=1993, month=12, day=11, hour=10, minute=0,
-        city="Seoul", utc_offset=9, use_solar_time=True,
+        longitude=126.9783, utc_offset=9, use_solar_time=True,
     )
     assert c.daeun
     for p in c.daeun:

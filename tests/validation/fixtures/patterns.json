@@ -1360,6 +1360,38 @@
     "notes": "Pillars 辛未 己亥 丁亥 丁未. All four branches lie inside the 亥卯未 삼합 frame (亥/未)."
   },
   {
+    "id": "bangham-guk-巳午未-1991",
+    "subsystem": "patterns",
+    "input": {
+      "year": 1991,
+      "month": 5,
+      "day": 15,
+      "hour": 12,
+      "minute": 0,
+      "utc_offset": 9.0,
+      "longitude": 127.0,
+      "gender": "M"
+    },
+    "source": [
+      {
+        "citation": "knowledge/02-branches.md:81-92 — 방합 sets (寅卯辰 East / 巳午未 South / 申酉戌 West / 亥子丑 North); the 방합국 label itself is an engine structural-note, expectation derived from the sets"
+      },
+      {
+        "citation": "사자사주, 사주 살(신살) 종류 — 방합 그룹 寅卯辰·巳午未·申酉戌·亥子丑 (external cross-check 2026-10-07)",
+        "url": "https://www.sazasaju.com/blog/sinsal-guide"
+      }
+    ],
+    "expected": {
+      "patterns": {
+        "structural_notes_kinds": [
+          "방합국"
+        ]
+      }
+    },
+    "status": "expect_match",
+    "notes": "Pillars 辛未 癸巳 乙酉 壬午. The 巳午未 South/Fire directional frame is complete (巳/午/未). P3-bangham: pattern was reachable via compute_chart but had no detector before 2026-10-07."
+  },
+  {
     "id": "samhap-guk-none-1967",
     "subsystem": "patterns",
     "input": {

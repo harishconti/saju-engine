@@ -500,12 +500,13 @@ def detect_tengod_conflicts(
 def detect_structural_notes(
     branches: List[str],
 ) -> List[Dict[str, str]]:
-    """Detect 전국 / 편국 / 삼합국 structural formations.
+    """Detect 전국 / 편국 / 삼합국 / 방합국 structural formations.
 
     These are not grids (격국) but descriptive structural patterns recognized
     in classical 명리: all four branches dominated by one element, three-of-four
-    dominated by one element, or all four branches confined within a single
-    삼합 frame (one branch repeated).
+    dominated by one element, all four branches confined within a single
+    삼합 frame (one branch repeated), or the three branches of a single cardinal
+    direction (방합, 方合) present together.
     """
     notes: List[Dict[str, str]] = []
     branch_elements = [L.BRANCH_ELEMENT[b] for b in branches]
@@ -540,6 +541,22 @@ def detect_structural_notes(
                 "basis": f"All four branches are inside the {a}{b}{c} {elem} frame ({''.join(branches)})",
                 "confidence": "likely",
                 "note": f"The chart's substance is wholly gathered in the {elem} 삼합 frame, strongly empowering that element.",
+            })
+
+    # 방합국: the three consecutive branches of one cardinal direction
+    # (寅卯辰 East, 巳午未 South, 申酉戌 West, 亥子丑 North) all present.
+    # knowledge/02-branches.md §Directional Harmonies — "Functionally similar to
+    # 삼합 but less concentrated." This mirrors engine.py's
+    # `directional_harmonies` (full-triple presence).
+    for a, b, c, label in L.DIRECTIONAL_HARMONIES:
+        if {a, b, c}.issubset(set(branches)):
+            elem = label.split(" / ")[0]
+            notes.append({
+                "name_ko": "방합국",
+                "name_en": "Directional-Harmony Nation",
+                "basis": f"The {a}{b}{c} directional frame is complete ({''.join(branches)})",
+                "confidence": "likely",
+                "note": f"The three branches of one cardinal direction gather the chart's substance in the {elem} season — a seasonal concentration, less intense than a full 삼합.",
             })
 
     return notes

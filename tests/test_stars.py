@@ -60,6 +60,19 @@ def test_yangin_present_when_day_branch_matches():
     assert stars["yangin"] == ["卯"]
 
 
+def test_yangin_present_when_blade_is_in_a_non_day_pillar():
+    # P3-yangin: the blade branch in any pillar registers (knowledge/11 §I
+    # reads 양인 "in chart"). Here 卯 is the month branch, not the day branch.
+    stars = derive_stars(day_stem="甲", day_branch="子", branches=["丑", "卯", "子", "寅"])
+    assert stars["yangin"] == ["卯"]
+
+
+def test_yangin_absent_when_blade_not_in_chart():
+    # 甲 → 양인 at 卯; no 卯 anywhere → absent.
+    stars = derive_stars(day_stem="甲", day_branch="子", branches=["丑", "亥", "子", "寅"])
+    assert stars["yangin"] == []
+
+
 def test_yangin_absent_for_yin_day_master():
     # 乙 is a Yin Day Master — no canonical 양인. Branch 卯 should NOT register.
     stars = derive_stars(day_stem="乙", day_branch="卯", branches=["卯"])

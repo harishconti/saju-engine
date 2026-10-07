@@ -9,7 +9,7 @@ def test_scaffold_has_all_sections():
     c = compute_chart(
         name="Tester", gender="F",
         year=1993, month=12, day=11, hour=10, minute=0,
-        city="Seoul", utc_offset=9, use_solar_time=True,
+        longitude=126.9783, utc_offset=9, use_solar_time=True,
     )
     scaffold = generate_prose_scaffold(c)
     expected_keys = {
@@ -51,7 +51,7 @@ def test_scaffold_relationships_mentions_spouse_palace():
     c = compute_chart(
         name="Tester", gender="F",
         year=2002, month=6, day=7, hour=16, minute=45,
-        city="Mysore", utc_offset=5.5, use_solar_time=True,
+        longitude=76.6554, utc_offset=5.5, use_solar_time=True,
     )
     scaffold = generate_prose_scaffold(c)
     assert "spouse palace" in scaffold["relationships"]
@@ -63,7 +63,7 @@ def test_skeleton_includes_scaffold_by_default():
     c = compute_chart(
         name="Tester", gender="F",
         year=1993, month=12, day=11, hour=10, minute=0,
-        city="Seoul", utc_offset=9, use_solar_time=True,
+        longitude=126.9783, utc_offset=9, use_solar_time=True,
     )
     s = generate_skeleton(c)
     assert "engine-drafted scaffolds" in s
@@ -76,7 +76,7 @@ def test_skeleton_can_disable_scaffold():
     c = compute_chart(
         name="Tester", gender="F",
         year=1993, month=12, day=11, hour=10, minute=0,
-        city="Seoul", utc_offset=9, use_solar_time=True,
+        longitude=126.9783, utc_offset=9, use_solar_time=True,
     )
     s = generate_skeleton(c, include_prose_scaffold=False)
     assert "engine-drafted scaffolds" not in s
@@ -94,7 +94,7 @@ def test_current_time_draft_labels_the_saju_year_not_gregorian():
     c = compute_chart(
         name="Tester", gender="F",
         year=1993, month=12, day=11, hour=10, minute=0,
-        city="Seoul", utc_offset=9, use_solar_time=True,
+        longitude=126.9783, utc_offset=9, use_solar_time=True,
         reference_year=2024, reference_month=1, reference_day=15,
     )
     draft = _current_time_draft(c)

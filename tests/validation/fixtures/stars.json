@@ -1440,8 +1440,8 @@
         ]
       }
     },
-    "status": "documented_interpretation",
-    "notes": "Pillars 甲寅 丁丑 甲戌 丁卯. Position convention: knowledge/07:100-129 and sazasaju let the 양인 branch appear in any pillar (non-month positions = 'related blade pattern', surfaced by patterns.py), but stars.yangin is deliberately the narrow day-branch overlay (stars.py docstring; 11-gunghap §I). Here the blade 卯 sits in the hour pillar, so stars.yangin is []."
+    "status": "expect_match",
+    "notes": "Pillars 甲寅 丁丑 甲戌 丁卯. P3-yangin (2026-10-07): stars.yangin now scans all four pillars, so the blade 卯 in the hour pillar registers (knowledge/07:100-129 and knowledge/11-gunghap.md §I both read 양인 'in chart'). Previously pinned as documented_interpretation under the narrow day-branch-only rule."
   },
   {
     "id": "sky-hero-ren-xu-alt-school",

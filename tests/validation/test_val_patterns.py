@@ -36,11 +36,9 @@ def test_unknown_pattern_key_raises():
 
 # Patterns the engine can emit but that no compute_chart birth can reach, or
 # that the engine does not implement. Each needs a comment + report mention.
-UNREACHABLE = {
-    # 방합국 (cardinal-direction frame): knowledge/02 documents 방합 but
-    # patterns.detect_structural_notes has no 방합국 detector.
-    "방합국",
-}
+# (방합국 was here until 2026-10-07 (P3-bangham): knowledge/02 documents 방합
+# and detect_structural_notes now emits it — see bangham-guk-巳午未-1991.)
+UNREACHABLE: set = set()
 
 
 def test_coverage_every_documented_pattern():
@@ -57,6 +55,7 @@ def test_coverage_every_documented_pattern():
     assert any("possible" in (x.get("special_forms_confidence") or {}).values()
                for x in exps), "종격 possible (visible-stem downgrade)"
     assert any("삼합국" in x.get("structural_notes_kinds", []) for x in exps), "삼합국"
+    assert any("방합국" in x.get("structural_notes_kinds", []) for x in exps), "방합국"
     assert any("상관견관" in x.get("tengod_conflicts_names", []) for x in exps), "상관견관"
     # every one of the ten regular grids is exercised
     names = {x["regular_grid_name"] for x in exps if x.get("regular_grid_name")}

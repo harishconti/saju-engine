@@ -351,6 +351,36 @@ def test_structural_note_samhapguk():
     assert any(n["name_ko"] == "삼합국" for n in notes)
 
 
+def test_structural_note_banghamguk():
+    # P3-bangham: 巳午未 (South/Fire) directional frame complete — a 방합국.
+    result = detect_patterns(
+        day_master="甲",
+        month_stem="己",
+        month_branch="巳",
+        branches=["未", "巳", "酉", "午"],
+        stems=["戊", "己", "甲", "庚"],
+        hidden_stems=[("main", "甲")],
+    )
+    notes = result["structural_notes"]
+    bangham = [n for n in notes if n["name_ko"] == "방합국"]
+    assert bangham, notes
+    assert "Fire" in bangham[0]["note"]
+
+
+def test_structural_note_banghamguk_requires_all_three():
+    # 申/酉 present but 戌 absent → no 방합국 (partial frames are not flagged).
+    result = detect_patterns(
+        day_master="甲",
+        month_stem="己",
+        month_branch="申",
+        branches=["申", "酉", "子", "辰"],
+        stems=["戊", "己", "甲", "庚"],
+        hidden_stems=[("main", "甲")],
+    )
+    notes = result["structural_notes"]
+    assert not any(n["name_ko"] == "방합국" for n in notes)
+
+
 def test_jongja_alias_appears_with_output_following():
     # 丙 DM produces Earth; overwhelming Earth → 종식상 and 종자 alias.
     result = detect_patterns(

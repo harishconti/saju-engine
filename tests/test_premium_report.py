@@ -1083,7 +1083,7 @@ def test_year_one_liner_labels_the_saju_year_not_gregorian():
     chart = compute_chart(
         name="Tester", gender="F",
         year=1993, month=12, day=11, hour=10, minute=0,
-        city="Seoul", utc_offset=9, use_solar_time=True,
+        longitude=126.9783, utc_offset=9, use_solar_time=True,
         reference_year=2024, reference_month=1, reference_day=15,
     )
     line = _year_one_liner(chart)
@@ -1118,10 +1118,15 @@ def test_daeun_starting_age_note_is_independent_of_use_solar_time():
 
 
 def _harish_chart_for_dates():
+    # Pin the querier-relative reference date: the date-table sections below
+    # filter candidate days against "now", and the surrounding tests already
+    # assume 2026-09-20 (via generation_date). Without this the calendar drifts
+    # with the wall clock and past dates (e.g. early October) drop out.
     return compute_chart(
         name="Harish-r7-regression", gender="M",
         year=1992, month=6, day=4, hour=3, minute=10,
         longitude=79.4408, utc_offset=5.5,
+        reference_year=2026, reference_month=9, reference_day=20,
     )
 
 

@@ -60,7 +60,7 @@ def test_starting_age(name, year, month, day, gender, expected):
     c = compute_chart(
         name=name, gender=gender,
         year=year, month=month, day=day, hour=12, minute=0,
-        city="Seoul", utc_offset=9, use_solar_time=True,
+        longitude=126.9783, utc_offset=9, use_solar_time=True,
     )
     direction = daeun_direction(c.year.stem, gender)
     assert starting_age(year, month, day, direction) == expected

@@ -403,15 +403,23 @@ YANGIN_BRANCHES: Dict[str, str] = {
 }
 
 
-def _yangin(day_stem: str, day_branch: str) -> List[str]:
-    """Return [branch] if the day-branch is the 양인 branch for day_stem.
+def _yangin(day_stem: str, branches: List[str]) -> List[str]:
+    """Return the 양인 branch if it appears anywhere in the natal chart.
 
     Note: only Yang Day Masters have a 양인. Yin Day Masters ride on their
     Yang counterpart (e.g. 丁 follows 丙 to 午; 己 follows 戊 to 午) but classical
     Korean Myeongri treats only the five Yang stems as canonical 양인 holders.
+
+    P3-yangin (2026-10-07): the blade is scanned across **all four pillars**,
+    not just the day branch. knowledge/11-gunghap.md §I defines the compat
+    overlay as "both have 양인 **in chart**", and for 甲/庚 the blade branch
+    (卯/酉) can never occupy the day branch anyway (甲卯 and 庚酉 are not valid
+    day pillars in the 60-cycle), so a day-branch-only rule made 양인
+    unreachable for those Day Masters. `patterns.yangin` already scans all
+    positions, so this aligns the star with it.
     """
     target = YANGIN_BRANCHES.get(day_stem)
-    return [target] if target and day_branch == target else []
+    return [target] if target and target in branches else []
 
 
 def derive_stars(
@@ -435,7 +443,7 @@ def derive_stars(
       - heavenly_noble (天乙貴人): noble branches.
       - literary_star (文昌貴人): literary branch.
       - hongyeom (紅艶殺): red-flame star (single branch match on day-branch).
-      - yangin (羊刃殺): blade-of-the-sheep star (single branch match on day-branch).
+      - yangin (羊刃殺): blade-of-the-sheep star (blade branch found in any pillar).
       - robbery_star (劫煞), disaster_star (災煞), heaven_bane (天煞),
         earth_bane (地煞), annual_bane (年煞), monthly_bane (月煞),
         lost_spirit (亡神), general_star (將星), saddle_star (攀鞍),
@@ -483,9 +491,10 @@ def derive_stars(
     lit = _LITERARY_STAR.get(day_stem)
     stars["literary_star"] = [lit] if lit and lit in present else []
 
-    # 홍염 / 양인 (day-stem-based, day-branch-as-position)
+    # 홍염 (day-stem-based, day-branch-as-position) / 양인 (day-stem-based,
+    # any of the four pillars — P3-yangin).
     stars["hongyeom"] = _hongyeom(day_stem, day_branch)
-    stars["yangin"] = _yangin(day_stem, day_branch)
+    stars["yangin"] = _yangin(day_stem, branches)
 
     # 십이신살 (十二神殺) — remaining stars keyed by the same anchor branch as
     # 도화/역마/화개 (day by default; year for the traditional Korean basis —
