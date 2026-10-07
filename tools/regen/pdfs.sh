@@ -35,7 +35,6 @@ n=rm
 for t in sample essential; do
   pdf $HT $R/$n/rm-$t.md $R/$n/rm-$t-report.pdf "${NAME[$n]} — ${LABEL[$t]}" "${NAME[$n]}" "${DOB[$n]}" "${DM[$n]}" $t
 done
-C=candidates_horoscope/marriage_compatibility
 # Luck-cycle reports: HTML/Playwright backend so the SVG charts render.
 for n in harish sruthi pawan bindu mahesh gurumoorthy vishnu-priya rm; do
   python3 "$HT" --input "$R/$n/$n-luck-cycle.md" --output "$R/$n/$n-luck-cycle.pdf" \
@@ -44,17 +43,24 @@ for n in harish sruthi pawan bindu mahesh gurumoorthy vishnu-priya rm; do
     && echo "built $R/$n/$n-luck-cycle.pdf"
 done
 C=candidates_horoscope/marriage_compatibility
+# Compat pairs. harish_vinothini is omitted (birth data not on record — its
+# markdown is tracked as-is with a provenance warning and has no PDF).
+compat() { # slug name_a name_b dob_a dob_b dm_a dm_b tier
+  local slug=$1 na=$2 nb=$3 da=$4 db=$5 ma=$6 mb=$7 t=$8 sfx=""
+  [ "$t" = deep ] && sfx=_deep
+  python3 src/saju_html/md_to_saju_compat_pdf.py "$C/$slug/${slug}_compatibility$sfx.md" \
+    --name-a "$na" --name-b "$nb" --dob-a "$da" --dob-b "$db" \
+    --day-master-a "$ma" --day-master-b "$mb" --tier "$t" \
+    --output "$C/$slug/${slug}_compatibility$sfx.pdf" >/dev/null \
+    && echo "built $slug $t"
+}
 for t in basic deep; do
-  sfx=""; [ $t = deep ] && sfx=_deep
-  python3 src/saju_html/md_to_saju_compat_pdf.py $C/harish_manvitha/harish_manvitha_compatibility$sfx.md --name-a Harish --name-b Manvitha \
-    --dob-a "4 June 1992, 03:10 IST" --dob-b "3 December 1996, 21:15 IST" --day-master-a 辛 --day-master-b 甲 --tier $t \
-    --output $C/harish_manvitha/harish_manvitha_compatibility$sfx.pdf >/dev/null && echo "built harish_manvitha $t"
-  python3 src/saju_html/md_to_saju_compat_pdf.py $C/pawan_sruthi/pawan_sruthi_compatibility$sfx.md --name-a Pawan --name-b Sruthi \
-    --dob-a "3 October 1991, 23:45 IST" --dob-b "11 December 1993, 02:45 IST" --day-master-a 丙 --day-master-b 丙 --tier $t \
-    --output $C/pawan_sruthi/pawan_sruthi_compatibility$sfx.pdf >/dev/null && echo "built pawan_sruthi $t"
-  python3 src/saju_html/md_to_saju_compat_pdf.py $C/harish_bindu/harish_bindu_compatibility$sfx.md --name-a Harish --name-b Bindu \
-    --dob-a "4 June 1992, 03:10 IST" --dob-b "24 March 1995, 10:10 IST" --day-master-a 辛 --day-master-b 甲 --tier $t \
-    --output $C/harish_bindu/harish_bindu_compatibility$sfx.pdf >/dev/null && echo "built harish_bindu $t"
+  compat harish_manvitha Harish Manvitha "4 June 1992, 03:10 IST" "3 December 1996, 21:15 IST" 辛 甲 $t
+  compat pawan_sruthi Pawan Sruthi "3 October 1991, 23:45 IST" "11 December 1993, 02:45 IST" 丙 丙 $t
+  compat harish_bindu Harish Bindu "4 June 1992, 03:10 IST" "24 March 1995, 10:10 IST" 辛 甲 $t
+  compat harish_srinidhi Harish Srinidhi "4 June 1992, 03:10 IST" "9 April 1994, 20:47 IST" 辛 乙 $t
+  compat harish_priyanka Harish Priyanka "4 June 1992, 03:10 IST" "3 June 1996, 10:20 IST" 辛 辛 $t
+  compat harish_priyanka_1998 Harish Priyanka "4 June 1992, 03:10 IST" "12 July 1998, 21:43 IST" 辛 庚 $t
 done
 cp $R/rm/rm-sample-report.pdf apps/landing-page/public/demo-rm-sample.pdf
 cp $R/rm/rm-essential-report.pdf apps/landing-page/public/demo-rm-essential.pdf

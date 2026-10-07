@@ -23,7 +23,7 @@
 
 ### Yellow Flags (관찰 사항)
 
-- 🟡 Favorable element cross-supply: A에 B의 기신 — the element that unbalances your chart — minimise its influence *(see knowledge/03-five-elements.md)* Metal 과다 (28%)
+- 🟡 Favorable element cross-supply: A에 B의 기신 — the element that unbalances your chart — minimise its influence *(see knowledge/03-five-elements.md)* Metal 과다
 
 ### Favorable Points (긍정적 요소)
 
@@ -35,7 +35,7 @@
 
 ## Who You Are Together (두 사람의 관계 성향)
 
-Together, your spouse palaces (일지) sit in a partial harmony (반합), your ten-god cross leans complementary. This composite is a tendency, not a destiny — the daily relationship is shaped by the choices both of you make over years.
+Together, your spouse palaces (일지) hold a neutral, uncombined relation, your ten-god cross leans complementary. This composite is a tendency, not a destiny — the daily relationship is shaped by the choices both of you make over years.
 
 *see knowledge/11-gunghap.md §B, §G, §D*
 
@@ -60,7 +60,7 @@ The two Day Masters (辛 and 乙) do not form a 천간합. Attraction through th
 **+2 / 12** — Soft  
 용신 — the element your chart most needs for balance — lean toward it *(see knowledge/03-five-elements.md)* cross-supply is the **궁통보감 deciding factor**: does each partner's chart carry the element the other needs? Partial cross-supply exists; one partner brings more than the other. [UNCERTAIN: 궁통보감 treats 용신 alignment as the deciding factor; 적천수 weights it equal with 일지 궁 interaction; modern Korean Myeongri consensus is ~12/100.]
 
-Tags: `B → A 용신 Water 일부 공급 (7%)`, `A → B 용신 Fire 일부 공급 (9%)`, `A에 B의 기신 Metal 과다 (28%)`
+Tags: `B → A 용신 Water 일부 공급`, `A → B 용신 Fire 일부 공급`, `A에 B의 기신 Metal 과다`
 
 ### Yin-Yang Polarity — 음양 조화 (陰陽 調和)
 **-1 / 3** — Yellow Flag  

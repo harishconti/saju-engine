@@ -64,7 +64,7 @@ The two Day Masters (丙 and 丙) do not form a 천간합. Attraction through th
 **+12 / 12** — Strong  
 용신 — the element your chart most needs for balance — lean toward it *(see knowledge/03-five-elements.md)* cross-supply is the **궁통보감 deciding factor**: does each partner's chart carry the element the other needs? Both partners bring meaningful supply of the other's favorable element. This is a structural complementarity — '서로 용신이 되는' reading. [UNCERTAIN: 궁통보감 treats 용신 alignment as the deciding factor; 적천수 weights it equal with 일지 궁 interaction; modern Korean Myeongri consensus is ~12/100.]
 
-Tags: `B → A 용신 Water 공급 양호 (24%)`, `A → B 용신 Earth 공급 양호 (16%)`
+Tags: `B → A 용신 Water 공급 양호`, `A → B 용신 Earth 공급 양호`
 
 ### Yin-Yang Polarity — 음양 조화 (陰陽 調和)
 **-1 / 3** — Yellow Flag  
@@ -83,7 +83,6 @@ Tags: `일간 음양 동일 (Yang/Yang)`, `결합 음양 균형 양호 (50% 양)
 
 - **Shared lucky element.** Pawan and Sruthi's charts strongly cross-supply the favorable element — build environments and seasons that activate it for both of you at once.
 - **Peer dynamic.** You share the same Day Master — easy and familiar, but guard against sibling-style competition. Take turns leading.
-- **Day-branch clash is present.** Use explicit communication rhythms — a regular check-in works better than ad-hoc conflict resolution.
 - **Timing divergence.** Your major-luck phases run on different tracks — overlay both annual-luck charts before big joint decisions.
 
 ## Closing Note (맺음말)

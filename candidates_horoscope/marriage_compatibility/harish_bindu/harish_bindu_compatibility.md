@@ -68,7 +68,7 @@ The two Day Masters (辛 and 甲) do not form a 천간합. Attraction through th
 **+6 / 12** — Moderate  
 용신 — the element your chart most needs for balance — lean toward it *(see knowledge/03-five-elements.md)* cross-supply is the **궁통보감 deciding factor**: does each partner's chart carry the element the other needs? Partial cross-supply exists; one partner brings more than the other. [UNCERTAIN: 궁통보감 treats 용신 alignment as the deciding factor; 적천수 weights it equal with 일지 궁 interaction; modern Korean Myeongri consensus is ~12/100.]
 
-Tags: `B → A 용신 Water 일부 공급 (10%)`, `A → B 용신 Fire 일부 공급 (9%)`
+Tags: `B → A 용신 Water 일부 공급`, `A → B 용신 Fire 일부 공급`
 
 ### Yin-Yang Polarity — 음양 조화 (陰陽 調和)
 **+2 / 3** — Strong  
@@ -82,7 +82,7 @@ Tags: `일간 — you — the reference point the whole chart is read against *(
 ## Practical Guidance
 
 - **Shared lucky element.** Harish and Bindu's charts strongly cross-supply the favorable element — build environments and seasons that activate it for both of you at once.
-- **Day-branch clash is present.** Use explicit communication rhythms — a regular check-in works better than ad-hoc conflict resolution.
+- **Day-branch combination is present.** Reinforce it with shared rituals (meals, weekly time together, annual traditions).
 
 ## Closing Note (맺음말)
 

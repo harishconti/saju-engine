@@ -48,8 +48,8 @@
 
 ### Top Red Flags (주의 사항)
 
-- ⚠️ Day-branch interaction (spouse palaces): A일지·B지지 육충 午子
 - ⚠️ Compatibility star overlays: 홍양교차 — classical caution pattern
+- ⚠️ Day-branch interaction (spouse palaces): A일지·B지지 육충 午子
 - ⚠️ Nayin harmony: 납음 天河水 vs 爐中火 → 상충 [element-grammar-fallback]
 
 ### Yellow Flags (관찰 사항)
@@ -114,7 +114,7 @@ The two day pillars carry the Nayin tones 天河水 and 爐中火 (상충). In c
 
 용신 cross-supply is the **궁통보감 deciding factor**: does each partner's chart carry the element the other needs? Both partners bring meaningful supply of the other's favorable element. This is a structural complementarity — '서로 용신이 되는' reading. [UNCERTAIN: 궁통보감 treats 용신 alignment as the deciding factor; 적천수 weights it equal with 일지 궁 interaction; modern Korean Myeongri consensus is ~12/100.]
 
-**Tags:** `B → A 용신 Water 공급 양호 (24%)`, `A → B 용신 Earth 공급 양호 (16%)`
+**Tags:** `B → A 용신 Water 공급 양호`, `A → B 용신 Earth 공급 양호`
 
 *see knowledge/11-gunghap.md §D*
 
@@ -132,7 +132,7 @@ The two day pillars are **丙午** (Partner A) and **丙寅** (Partner B). Each 
 
 **Score:** +11 / 12  (Strong)
 
-Combined element distribution (avg of both charts): Wood=13%, Fire=26%, Earth=20%, Metal=24%, Water=17%. The union has some imbalance — over-dominant elements 'rule' the relationship. 궁통보감 framing: one chart may be 寒 (cold), the other 熱 (hot) — complementary climates balance the union.
+Combined element distribution (average of both charts). The union has some imbalance — over-dominant elements 'rule' the relationship. 궁통보감 framing: one chart may be 寒 (cold), the other 熱 (hot) — complementary climates balance the union.
 
 **Tags:** `A 용신 Water 결합에서 충분`, `B 용신 Earth 결합에서 충분`
 
@@ -200,16 +200,16 @@ The basic reading above evaluates the natal composite across the classical eleve
 
 | Element | Presence | Percentage |
 |---|---|---|
-| 🔴 Fire | ████░░░░░░ | 35.5% |
-| 🟢 Wood | █░░░░░░░░░ | 5.4% |
-| 🟡 Earth | ██░░░░░░░░ | 16.1% |
-| ⚪ Metal | ███░░░░░░░ | 32.3% |
-| 🔵 Water | █░░░░░░░░░ | 10.8% |
+| 🔴 Fire | ████░░░░░░ | 38.4% |
+| 🟢 Wood | ░░░░░░░░░░ | 2.8% |
+| 🟡 Earth | █░░░░░░░░░ | 8.8% |
+| ⚪ Metal | ████░░░░░░ | 40.6% |
+| 🔵 Water | █░░░░░░░░░ | 9.4% |
 
 #### Day Master Snapshot — Pawan
 
 - **Day Master:** 丙 (병 / 丙) — Fire (Yang)
-- **Seasonal strength verdict:** balanced
+- **Seasonal strength verdict:** Balanced
 - **Favorable element (용신):** Water
 - **Supporting element (희신):** Metal
 - **Unfavorable / watch element:** Fire
@@ -219,16 +219,16 @@ The basic reading above evaluates the natal composite across the classical eleve
 
 | Element | Presence | Percentage |
 |---|---|---|
-| 🔴 Fire | ██░░░░░░░░ | 15.6% |
-| 🟢 Wood | ██░░░░░░░░ | 20.8% |
-| 🟡 Earth | ██░░░░░░░░ | 24.0% |
-| ⚪ Metal | ██░░░░░░░░ | 15.6% |
-| 🔵 Water | ██░░░░░░░░ | 24.0% |
+| 🔴 Fire | ██░░░░░░░░ | 18.4% |
+| 🟢 Wood | ██░░░░░░░░ | 21.3% |
+| 🟡 Earth | ██░░░░░░░░ | 22.2% |
+| ⚪ Metal | █░░░░░░░░░ | 12.2% |
+| 🔵 Water | ███░░░░░░░ | 25.9% |
 
 #### Day Master Snapshot — Sruthi
 
 - **Day Master:** 丙 (병 / 丙) — Fire (Yang)
-- **Seasonal strength verdict:** balanced
+- **Seasonal strength verdict:** Balanced
 - **Favorable element (용신):** Earth
 - **Supporting element (희신):** Fire
 - **Unfavorable / watch element:** Water
@@ -238,25 +238,25 @@ The basic reading above evaluates the natal composite across the classical eleve
 
 #### Major Luck Timeline — Pawan
 
-**Current period (ages 28–37):** **甲午** — Indirect Resource (偏印) — unconventional learning — intuition, solitary study, restless over-thinking *(see knowledge/05-ten-gods.md)* · Favorable status: *neutral*
+**Current period (ages 28–37):** **甲午** — Indirect Resource (偏印) — unconventional learning — intuition, solitary study, restless over-thinking *(see knowledge/05-ten-gods.md)* · Favorable status: *unfavorable*
 - Activated branch patterns: clash, combine, self_punish
 
 | Ages | Pillar | Stem Ten-God | Favorable Status |
 |---|---|---|---|
-| 38–47 | 癸巳 | Direct Officer (正官) | favorable |
+| 38–47 | 癸巳 | Direct Officer (正官) | neutral |
 | 48–57 | 壬辰 | Seven Killings (偏官) | favorable |
-| 58–67 | 辛卯 | Direct Wealth (正財) | neutral |
+| 58–67 | 辛卯 | Direct Wealth (正財) | favorable |
 
 #### Major Luck Timeline — Sruthi
 
-**Current period (ages 28–37):** **丁卯** — Robber (劫財) — a rival for the same resources — competition in money or love *(see knowledge/05-ten-gods.md)* · Favorable status: *neutral*
+**Current period (ages 28–37):** **丁卯** — Robber (劫財) — a rival for the same resources — competition in money or love *(see knowledge/05-ten-gods.md)* · Favorable status: *favorable*
 - Activated branch patterns: clash, punish
 
 | Ages | Pillar | Stem Ten-God | Favorable Status |
 |---|---|---|---|
 | 38–47 | 戊辰 | Eating God (食神) | favorable |
 | 48–57 | 己巳 | Hurting Officer (傷官) | favorable |
-| 58–67 | 庚午 | Indirect Wealth (偏財) | neutral |
+| 58–67 | 庚午 | Indirect Wealth (偏財) | favorable |
 
 #### Annual Couple Timing Overlay
 
@@ -277,7 +277,7 @@ The basic reading above evaluates the natal composite across the classical eleve
 - **Lean on your shared lucky element.** Cross-용신 supply is strong (sub-system D: 12/12) — each of you brings what the other's chart needs. Consciously build environments, seasons, and activities that activate the favorable element (Water / Earth); both Day Masters benefit at once. *(see knowledge/11-gunghap.md §D)*
 - **Day-stem combination (일간합) is absent.** Attraction must build through shared activities, not first-meeting chemistry — the day-branch layer (below) is your primary anchor. *(see knowledge/11-gunghap.md §A)*
 - **You share the same Day Master (丙) — a 비견 (比肩) mirror dynamic.** You are peers rather than complements: easy and familiar, but it can drift toward a sibling/friendship tone or mild competition when both want the same role. Counter it with deliberate asymmetry — take turns leading and following, and protect romantic differentiation so the bond doesn't flatten. *(see knowledge/11-gunghap.md §G)*
-- **Day-branch clash (일지 육충) is present** — a classical hard indicator. Workable, but the relationship benefits from explicit communication rhythms: a weekly 'check-in' beats ad-hoc resolution. *(see knowledge/11-gunghap.md §B4)*
+- **Day-branch partial harmony (일지 반합) is present** — two-of-three in a 삼합 frame. A real but incomplete anchor: nurture the shared element (e.g. Fire for 寅午戌) through joint activities, and be aware the third branch is 'missing' — the bond wants a deliberate third point of connection (a shared project, place, or person) to complete the frame. *(see knowledge/11-gunghap.md §B2)*
 - **Nayin (납음) clash is present** — a soft, disputed indicator. Don't overweight it on its own; treat it as a reminder to align emotional climate (조후: cold/hot, dry/wet) rather than as a blocking verdict. *(see knowledge/11-gunghap.md §C)*
 - **Ten-god cross-pattern is a classical caution.** Both partners tend to apply the same relational pattern (e.g. both authoritative, both critical). Conscious asymmetry helps: take turns leading and following. *(see knowledge/11-gunghap.md §G)*
 - **Identical Yin-Yang polarity (same wavelength).** Easy resonance, but the 권인성 school warns it can go 편의-stale — protect differentiation and avoid drifting into parallel rather than intertwined lives. *(see knowledge/11-gunghap.md §J)*

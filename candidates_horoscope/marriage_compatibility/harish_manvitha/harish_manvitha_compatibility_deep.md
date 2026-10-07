@@ -53,7 +53,7 @@
 ### Yellow Flags (관찰 사항)
 
 - 🟡 Day-branch interaction (spouse palaces): B일지·A지지 삼형 戌丑
-- 🟡 Favorable element cross-supply: A에 B의 기신 — the element that unbalances your chart — minimise its influence *(see knowledge/03-five-elements.md)* Metal 과다 (28%)
+- 🟡 Favorable element cross-supply: A에 B의 기신 — the element that unbalances your chart — minimise its influence *(see knowledge/03-five-elements.md)* Metal 과다
 - 🟡 Nayin harmony: 납음 釵釧金 vs 山頭火 → 상해 [element-grammar-fallback]
 - 🟡 Ten-god cross-relationship: A의 일간 원소 Metal = B의 기신 [주의]
 - 🟡 Yin-Yang polarity: 결합 음양 불균형 (38% 양)
@@ -62,7 +62,7 @@
 
 - ✅ Combined element balance: A 용신 — the element your chart most needs for balance — lean toward it *(see knowledge/03-five-elements.md)* Water 결합에서 충분
 - ✅ Day-pillar pair classification: 배우자 복덕 (용신 일치)
-- ✅ Favorable element cross-supply: A → B 용신 Fire 일부 공급 (9%)
+- ✅ Favorable element cross-supply: A → B 용신 Fire 일부 공급
 
 **What 64/100 (Mixed) means:** The composite is anchored so that a perfectly neutral chart (all sub-systems scoring 0) lands at 50/100 in the Mixed band; positive classical signals lift it, and negative signals lower it. a workable union in which specific sub-systems ask for deliberate attention. Mixed is not a failure — many long, happy marriages sit in this band; the chart simply flags which dimensions want conscious effort rather than riding on natural ease.
 
@@ -114,7 +114,7 @@ The two day pillars carry the Nayin tones 釵釧金 and 山頭火 (상해). In c
 
 용신 cross-supply is the **궁통보감 deciding factor**: does each partner's chart carry the element the other needs? Partial cross-supply exists; one partner brings more than the other. [UNCERTAIN: 궁통보감 treats 용신 alignment as the deciding factor; 적천수 weights it equal with 일지 궁 interaction; modern Korean Myeongri consensus is ~12/100.]
 
-**Tags:** `B → A 용신 Water 공급 양호 (31%)`, `A → B 용신 Fire 일부 공급 (9%)`, `A에 B의 기신 Metal 과다 (28%)`
+**Tags:** `B → A 용신 Water 공급 양호`, `A → B 용신 Fire 일부 공급`, `A에 B의 기신 Metal 과다`
 
 *see knowledge/11-gunghap.md §D*
 
@@ -132,7 +132,7 @@ The two day pillars are **辛亥** (Partner A) and **甲戌** (Partner B). Each 
 
 **Score:** +9 / 12  (Strong)
 
-Combined element distribution (avg of both charts): Wood=22%, Fire=12%, Earth=22%, Metal=15%, Water=28%. The union has some imbalance — over-dominant elements 'rule' the relationship. 궁통보감 framing: one chart may be 寒 (cold), the other 熱 (hot) — complementary climates balance the union.
+Combined element distribution (average of both charts). The union has some imbalance — over-dominant elements 'rule' the relationship. 궁통보감 framing: one chart may be 寒 (cold), the other 熱 (hot) — complementary climates balance the union.
 
 **Tags:** `A 용신 Water 결합에서 충분`
 
@@ -200,16 +200,16 @@ The basic reading above evaluates the natal composite across the classical eleve
 
 | Element | Presence | Percentage |
 |---|---|---|
-| 🔴 Fire | █░░░░░░░░░ | 9.2% |
-| 🟢 Wood | █░░░░░░░░░ | 13.8% |
-| 🟡 Earth | ██░░░░░░░░ | 23.9% |
-| ⚪ Metal | ███░░░░░░░ | 27.5% |
-| 🔵 Water | ███░░░░░░░ | 25.7% |
+| 🔴 Fire | █░░░░░░░░░ | 5.6% |
+| 🟢 Wood | ██░░░░░░░░ | 18.8% |
+| 🟡 Earth | ██░░░░░░░░ | 23.1% |
+| ⚪ Metal | ███░░░░░░░ | 26.9% |
+| 🔵 Water | ███░░░░░░░ | 25.6% |
 
 #### Day Master Snapshot — Harish
 
 - **Day Master:** 辛 (신 / 辛) — Metal (Yin)
-- **Seasonal strength verdict:** balanced
+- **Seasonal strength verdict:** Balanced
 - **Favorable element (용신):** Water
 - **Supporting element (희신):** Metal
 - **Unfavorable / watch element:** Fire
@@ -219,16 +219,16 @@ The basic reading above evaluates the natal composite across the classical eleve
 
 | Element | Presence | Percentage |
 |---|---|---|
-| 🔴 Fire | ██░░░░░░░░ | 15.3% |
-| 🟢 Wood | ███░░░░░░░ | 30.6% |
-| 🟡 Earth | ██░░░░░░░░ | 20.4% |
-| ⚪ Metal | ░░░░░░░░░░ | 3.1% |
-| 🔵 Water | ███░░░░░░░ | 30.6% |
+| 🔴 Fire | ██░░░░░░░░ | 18.4% |
+| 🟢 Wood | ████░░░░░░ | 37.5% |
+| 🟡 Earth | ██░░░░░░░░ | 21.3% |
+| ⚪ Metal | ░░░░░░░░░░ | 0.9% |
+| 🔵 Water | ██░░░░░░░░ | 21.9% |
 
 #### Day Master Snapshot — Manvitha
 
 - **Day Master:** 甲 (갑 / 甲) — Wood (Yang)
-- **Seasonal strength verdict:** strong
+- **Seasonal strength verdict:** Strong
 - **Favorable element (용신):** Fire
 - **Supporting element (희신):** Wood
 - **Unfavorable / watch element:** Metal
@@ -238,22 +238,22 @@ The basic reading above evaluates the natal composite across the classical eleve
 
 #### Major Luck Timeline — Harish
 
-**Current period (ages 30–39):** **己酉** — Indirect Resource (偏印) — unconventional learning — intuition, solitary study, restless over-thinking *(see knowledge/05-ten-gods.md)* · Favorable status: *neutral*
+**Current period (ages 30–39):** **己酉** — Indirect Resource (偏印) — unconventional learning — intuition, solitary study, restless over-thinking *(see knowledge/05-ten-gods.md)* · Favorable status: *favorable*
 
 | Ages | Pillar | Stem Ten-God | Favorable Status |
 |---|---|---|---|
-| 40–49 | 庚戌 | Robber (劫財) | neutral |
+| 40–49 | 庚戌 | Robber (劫財) | favorable |
 | 50–59 | 辛亥 | Companion (比肩) | favorable |
 | 60–69 | 壬子 | Hurting Officer (傷官) | favorable |
 
 #### Major Luck Timeline — Manvitha
 
-**Current period (ages 28–37):** **丙申** — Eating God (食神) — gentle output — talent, making, teaching, slow enjoyable accumulation *(see knowledge/05-ten-gods.md)* · Favorable status: *favorable*
+**Current period (ages 28–37):** **丙申** — Eating God (食神) — gentle output — talent, making, teaching, slow enjoyable accumulation *(see knowledge/05-ten-gods.md)* · Favorable status: *neutral*
 - Activated branch patterns: harm
 
 | Ages | Pillar | Stem Ten-God | Favorable Status |
 |---|---|---|---|
-| 38–47 | 乙未 | Robber (劫財) | neutral |
+| 38–47 | 乙未 | Robber (劫財) | favorable |
 | 48–57 | 甲午 | Companion (比肩) | favorable |
 | 58–67 | 癸巳 | Direct Resource (正印) | favorable |
 

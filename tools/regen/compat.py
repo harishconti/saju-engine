@@ -13,15 +13,30 @@ sruthi = compute_chart(name="Sruthi", gender="F", year=1993, month=12, day=11, h
                        longitude=79.45, utc_offset=5.5, **REF)
 bindu = compute_chart(name="Bindu", gender="F", year=1995, month=3, day=24, hour=10, minute=10,
                       longitude=78.2669, utc_offset=5.5, **REF)
+srinidhi = compute_chart(name="Srinidhi", gender="F", year=1994, month=4, day=9, hour=20, minute=47,
+                         longitude=78.70, utc_offset=5.5, **REF)
+priyanka = compute_chart(name="Priyanka", gender="F", year=1996, month=6, day=3, hour=10, minute=20,
+                         longitude=80.2707, utc_offset=5.5, **REF)
+# `harish_priyanka_1998` is a *different* woman who shares the first name
+# (12 Jul 1998, Pallipattu) — kept distinct from `harish_priyanka` (3 Jun 1996).
+priyanka_1998 = compute_chart(name="Priyanka", gender="F", year=1998, month=7, day=12, hour=21, minute=43,
+                              longitude=79.4408, utc_offset=5.5, **REF)
+# NOTE: harish_vinothini is intentionally absent — Vinothini's birth date, time
+# and place are not on record (only her four pillars), so the engine cannot
+# rebuild her chart. Her existing .md is left as-is (see docs/issues_bugs.md).
+# generation_date preserves each pair's provenance date (matches the README).
 jobs = [
-    ("harish_manvitha", harish, manvitha, "Harish", "Manvitha", {}),
+    ("harish_manvitha", harish, manvitha, "Harish", "Manvitha", {}, "2026-09-26"),
     ("pawan_sruthi", pawan, sruthi, "Pawan", "Sruthi",
-     dict(favorable_element_a="Water", favorable_element_b="Earth")),
-    ("harish_bindu", harish, bindu, "Harish", "Bindu", {}),
+     dict(favorable_element_a="Water", favorable_element_b="Earth"), "2026-09-26"),
+    ("harish_bindu", harish, bindu, "Harish", "Bindu", {}, "2026-09-26"),
+    ("harish_srinidhi", harish, srinidhi, "Harish", "Srinidhi", {}, "2026-09-30"),
+    ("harish_priyanka", harish, priyanka, "Harish", "Priyanka", {}, "2026-10-03"),
+    ("harish_priyanka_1998", harish, priyanka_1998, "Harish", "Priyanka", {}, "2026-10-07"),
 ]
-for slug, a, b, na, nb, ov in jobs:
+for slug, a, b, na, nb, ov, gd in jobs:
     for tier, suffix in (("basic", ""), ("deep", "_deep")):
-        md = generate_compat_report(a, b, na, nb, generation_date="2026-09-26", tier=tier, **ov)
+        md = generate_compat_report(a, b, na, nb, generation_date=gd, tier=tier, **ov)
         path = f"{B}/{slug}/{slug}_compatibility{suffix}.md"
         open(path, "w").write(md)
         print("wrote", path)

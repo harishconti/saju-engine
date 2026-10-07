@@ -37,7 +37,7 @@
 | Nayin harmony | 납음오행 (納音五行) | +1 | 5 | Soft |
 | Favorable element cross-supply | 용신 궁합 (用神 宮合) | +2 | 12 | Soft |
 | Day-pillar pair classification | 일주 궁합 (日柱 宮合) | +3 | 15 | Soft |
-| Combined element balance | 결합 오행 (結合 五行) | +9 | 12 | Strong |
+| Combined element balance *(descriptive — not counted toward the composite)* | 결합 오행 (結合 五行) | +9 | — | Strong |
 | Ten-god cross-relationship | 십신 교차 (十神 交叉) | +2 | 10 | Soft |
 | Major luck synchrony | 대운·세운 동기 (大運·歲運 同期) | +2 | 5 | Moderate |
 | Compatibility star overlays | 신살 궁합 (神殺 宮合) | +0 | 5 | Soft |
@@ -49,7 +49,7 @@
 ### Yellow Flags (관찰 사항)
 
 - 🟡 Combined element balance: 결합 과다: ['Earth']
-- 🟡 Favorable element cross-supply: A에 B의 기신 — the element that unbalances your chart — minimise its influence *(see knowledge/03-five-elements.md)* Metal 과다 (28%)
+- 🟡 Favorable element cross-supply: A에 B의 기신 — the element that unbalances your chart — minimise its influence *(see knowledge/03-five-elements.md)* Metal 과다
 - 🟡 Ten-god cross-relationship: A의 일간 원소 Metal = B의 기신 [주의]
 
 ### Favorable Points (긍정적 요소)
@@ -64,7 +64,7 @@
 
 ## Who You Are Together (두 사람의 관계 성향)
 
-Together, your spouse palaces (일지) sit in a partial harmony (반합), your ten-god cross leans complementary. This composite is a tendency, not a destiny — the daily relationship is shaped by the choices both of you make over years.
+Together, your spouse palaces (일지) hold a neutral, uncombined relation, your ten-god cross leans complementary. This composite is a tendency, not a destiny — the daily relationship is shaped by the choices both of you make over years.
 
 *see knowledge/11-gunghap.md §B, §G, §D*
 
@@ -108,7 +108,7 @@ The two day pillars carry the Nayin tones 釵釧金 and 海中金 (상대). In c
 
 용신 cross-supply is the **궁통보감 deciding factor**: does each partner's chart carry the element the other needs? Partial cross-supply exists; one partner brings more than the other. [UNCERTAIN: 궁통보감 treats 용신 alignment as the deciding factor; 적천수 weights it equal with 일지 궁 interaction; modern Korean Myeongri consensus is ~12/100.]
 
-**Tags:** `B → A 용신 Water 일부 공급 (7%)`, `A → B 용신 Fire 일부 공급 (9%)`, `A에 B의 기신 Metal 과다 (28%)`
+**Tags:** `B → A 용신 Water 일부 공급`, `A → B 용신 Fire 일부 공급`, `A에 B의 기신 Metal 과다`
 
 *see knowledge/11-gunghap.md §D*
 
@@ -126,7 +126,7 @@ The two day pillars are **辛亥** (Partner A) and **乙丑** (Partner B). Each 
 
 **Score:** +9 / 12  (Strong)
 
-Combined element distribution (avg of both charts): Wood=17%, Fire=14%, Earth=34%, Metal=19%, Water=16%. The union has some imbalance — over-dominant elements 'rule' the relationship. 궁통보감 framing: one chart may be 寒 (cold), the other 熱 (hot) — complementary climates balance the union.
+Combined element distribution (average of both charts). The union has some imbalance — over-dominant elements 'rule' the relationship. 궁통보감 framing: one chart may be 寒 (cold), the other 熱 (hot) — complementary climates balance the union.
 
 **Tags:** `결합 과다: ['Earth']`, `A 용신 Water 결합에서 충분`
 
@@ -192,16 +192,16 @@ The basic reading above evaluates the natal composite across the classical eleve
 
 | Element | Presence | Percentage |
 |---|---|---|
-| 🔴 Fire | █░░░░░░░░░ | 9.2% |
-| 🟢 Wood | █░░░░░░░░░ | 13.8% |
-| 🟡 Earth | ██░░░░░░░░ | 23.9% |
-| ⚪ Metal | ███░░░░░░░ | 27.5% |
-| 🔵 Water | ███░░░░░░░ | 25.7% |
+| 🔴 Fire | █░░░░░░░░░ | 5.6% |
+| 🟢 Wood | ██░░░░░░░░ | 18.8% |
+| 🟡 Earth | ██░░░░░░░░ | 23.1% |
+| ⚪ Metal | ███░░░░░░░ | 26.9% |
+| 🔵 Water | ███░░░░░░░ | 25.6% |
 
 #### Day Master Snapshot — Harish
 
 - **Day Master:** 辛 (신 / 辛) — Metal (Yin)
-- **Seasonal strength verdict:** balanced
+- **Seasonal strength verdict:** Balanced
 - **Favorable element (용신):** Water
 - **Supporting element (희신):** Metal
 - **Unfavorable / watch element:** Fire
@@ -211,16 +211,16 @@ The basic reading above evaluates the natal composite across the classical eleve
 
 | Element | Presence | Percentage |
 |---|---|---|
-| 🔴 Fire | ██░░░░░░░░ | 17.9% |
-| 🟢 Wood | ██░░░░░░░░ | 20.5% |
-| 🟡 Earth | ████░░░░░░ | 44.6% |
-| ⚪ Metal | █░░░░░░░░░ | 9.8% |
-| 🔵 Water | █░░░░░░░░░ | 7.1% |
+| 🔴 Fire | ██░░░░░░░░ | 21.3% |
+| 🟢 Wood | ███░░░░░░░ | 32.2% |
+| 🟡 Earth | ████░░░░░░ | 38.1% |
+| ⚪ Metal | ░░░░░░░░░░ | 4.7% |
+| 🔵 Water | ░░░░░░░░░░ | 3.7% |
 
 #### Day Master Snapshot — Srinidhi
 
 - **Day Master:** 乙 (을 / 乙) — Wood (Yin)
-- **Seasonal strength verdict:** balanced
+- **Seasonal strength verdict:** Balanced
 - **Favorable element (용신):** Fire
 - **Supporting element (희신):** Wood
 - **Unfavorable / watch element:** Metal
@@ -230,24 +230,24 @@ The basic reading above evaluates the natal composite across the classical eleve
 
 #### Major Luck Timeline — Harish
 
-**Current period (ages 30–39):** **己酉** — Indirect Resource (偏印) — unconventional learning — intuition, solitary study, restless over-thinking *(see knowledge/05-ten-gods.md)* · Favorable status: *neutral*
+**Current period (ages 30–39):** **己酉** — Indirect Resource (偏印) — unconventional learning — intuition, solitary study, restless over-thinking *(see knowledge/05-ten-gods.md)* · Favorable status: *favorable*
 
 | Ages | Pillar | Stem Ten-God | Favorable Status |
 |---|---|---|---|
-| 40–49 | 庚戌 | Robber (劫財) | neutral |
+| 40–49 | 庚戌 | Robber (劫財) | favorable |
 | 50–59 | 辛亥 | Companion (比肩) | favorable |
 | 60–69 | 壬子 | Hurting Officer (傷官) | favorable |
 
 #### Major Luck Timeline — Srinidhi
 
-**Current period (ages 31–40):** **甲子** — Robber (劫財) — a rival for the same resources — competition in money or love *(see knowledge/05-ten-gods.md)* · Favorable status: *neutral*
+**Current period (ages 31–40):** **甲子** — Robber (劫財) — a rival for the same resources — competition in money or love *(see knowledge/05-ten-gods.md)* · Favorable status: *favorable*
 - Activated branch patterns: combine
 
 | Ages | Pillar | Stem Ten-God | Favorable Status |
 |---|---|---|---|
 | 41–50 | 癸亥 | Indirect Resource (偏印) | neutral |
 | 51–60 | 壬戌 | Direct Resource (正印) | neutral |
-| 61–70 | 辛酉 | Seven Killings (偏官) | neutral |
+| 61–70 | 辛酉 | Seven Killings (偏官) | unfavorable |
 
 #### Annual Couple Timing Overlay
 
@@ -266,7 +266,6 @@ The basic reading above evaluates the natal composite across the classical eleve
 ## Practical Guidance (실천 지침)
 
 - **Day-stem combination (일간합) is absent.** Attraction must build through shared activities, not first-meeting chemistry — the day-branch layer (below) is your primary anchor. *(see knowledge/11-gunghap.md §A)*
-- **Day-branch partial harmony (일지 반합) is present** — two-of-three in a 삼합 frame. A real but incomplete anchor: nurture the shared element (e.g. Fire for 寅午戌) through joint activities, and be aware the third branch is 'missing' — the bond wants a deliberate third point of connection (a shared project, place, or person) to complete the frame. *(see knowledge/11-gunghap.md §B2)*
 - **Identical Yin-Yang polarity (same wavelength).** Easy resonance, but the 권인성 school warns it can go 편의-stale — protect differentiation and avoid drifting into parallel rather than intertwined lives. *(see knowledge/11-gunghap.md §J)*
 - **Your major-luck (대운) directions diverge** — life's large phases arrive on different timing tracks for the two of you. Be more deliberate about timing joint decisions: for any wedding year, relocation, or major purchase, overlay both partners' 세운 (annual luck) and pick a window that is favorable for both, not just one. *(see knowledge/11-gunghap.md §H)*
 

@@ -28,12 +28,12 @@
 ### Yellow Flags (관찰 사항)
 
 - 🟡 Day-branch interaction (spouse palaces): B일지·A지지 삼형 戌丑
-- 🟡 Favorable element cross-supply: A에 B의 기신 — the element that unbalances your chart — minimise its influence *(see knowledge/03-five-elements.md)* Metal 과다 (28%)
+- 🟡 Favorable element cross-supply: A에 B의 기신 — the element that unbalances your chart — minimise its influence *(see knowledge/03-five-elements.md)* Metal 과다
 - 🟡 Yin-Yang polarity: 결합 음양 불균형 (38% 양)
 
 ### Favorable Points (긍정적 요소)
 
-- ✅ Favorable element cross-supply: A → B 용신 — the element your chart most needs for balance — lean toward it *(see knowledge/03-five-elements.md)* Fire 일부 공급 (9%)
+- ✅ Favorable element cross-supply: A → B 용신 — the element your chart most needs for balance — lean toward it *(see knowledge/03-five-elements.md)* Fire 일부 공급
 
 **What 64/100 (Mixed) means:** The composite is anchored so that a perfectly neutral chart (all sub-systems scoring 0) lands at 50/100 in the Mixed band; positive classical signals lift it, and negative signals lower it. a workable union in which specific sub-systems ask for deliberate attention. Mixed is not a failure — many long, happy marriages sit in this band; the chart simply flags which dimensions want conscious effort rather than riding on natural ease.
 
@@ -66,7 +66,7 @@ The two Day Masters (辛 and 甲) do not form a 천간합. Attraction through th
 **+5 / 12** — Moderate  
 용신 cross-supply is the **궁통보감 deciding factor**: does each partner's chart carry the element the other needs? Partial cross-supply exists; one partner brings more than the other. [UNCERTAIN: 궁통보감 treats 용신 alignment as the deciding factor; 적천수 weights it equal with 일지 궁 interaction; modern Korean Myeongri consensus is ~12/100.]
 
-Tags: `B → A 용신 Water 공급 양호 (31%)`, `A → B 용신 Fire 일부 공급 (9%)`, `A에 B의 기신 Metal 과다 (28%)`
+Tags: `B → A 용신 Water 공급 양호`, `A → B 용신 Fire 일부 공급`, `A에 B의 기신 Metal 과다`
 
 ### Yin-Yang Polarity — 음양 조화 (陰陽 調和)
 **+2 / 3** — Strong  
