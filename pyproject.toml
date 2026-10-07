@@ -17,11 +17,12 @@ dependencies = [
     "sajupy==0.2.0",
     "reportlab>=4.1",
     "markdown-it-py>=3.0",
+    "jinja2>=3.1",
 ]
 
 [project.optional-dependencies]
 pdf = ["reportlab>=4.1"]
-html = ["playwright>=1.40"]
+html = ["playwright>=1.40", "jinja2>=3.1"]
 web = [
     "fastapi>=0.110",
     "uvicorn>=0.25",

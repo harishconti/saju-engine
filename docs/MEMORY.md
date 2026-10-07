@@ -30,9 +30,9 @@
     bundled Chromium is missing; `SAJU_ALLOW_SYSTEM_CHROME=0` = strict); `--reportlab` for legacy.
     Delivered client PDFs were NOT regenerated (`tools/regen/pdfs.sh` overwrites them — owner's call).
   - **Open:** D1 MoR checkout, D3 deploy, A1 landing-page source (not on this machine),
-    C1-templates + reportlab removal. (`D2` email delivery and `P4-ratelimit` are now DONE —
-    code complete and tested; they only need real SMTP credentials / a proxy at deploy.)
-    P3-isolated/geonrok are deliberate `documented_interpretation` school divergences, not bugs.
+    reportlab removal (deferred). (`D2` email, `P4-ratelimit`, and `C1-templates` are now DONE —
+    code complete and tested; D2 only needs SMTP credentials / a proxy at deploy.) P3-isolated/
+    geonrok are deliberate `documented_interpretation` school divergences, not bugs.
   - **2026-10-07:** `P3-bangham` FIXED (방합국 detector in `patterns.detect_structural_notes`,
     fixture `bangham-guk-巳午未-1991`), `P3-yangin` FIXED (`stars._yangin` scans all four pillars,
     matching `knowledge/11 §I` "in chart"; no published compat score moved), `P3-golden` FIXED
@@ -43,7 +43,8 @@
     FIXED (compat F over/missing wording now from the canonical element tables; score frozen) —
     both owner-approved, both client-visible. `P5-hangul-tokens` FIXED (particle consumption +
     ten-god Hanja dedup; widened random coverage). Web/infra: `P4-ratelimit` FIXED (in-app per-IP
-    limiter + body cap) and `D2` FIXED (optional SMTP private-link delivery). Suite **1,833 passed
+    limiter + body cap), `D2` FIXED (optional SMTP private-link delivery), `C1-templates` FIXED
+    (Jinja2 document/cover templates — byte-identical, goldens unchanged). Suite **1,839 passed
     / 13 xfailed**; validation **316 (PASS 308, INTERPRETATION 8, FAIL 0)**; ruff clean. Also
     regenerated the 5 stale compat pairs (S2/S3/P2 back-port) and added the Harish×Priyanka
     **namesake** pairs — 1996 in `harish_priyanka/` (58) and 1998 in `harish_priyanka_1998/` (52)

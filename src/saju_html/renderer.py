@@ -22,6 +22,11 @@ from pathlib import Path
 # Markdown-It preserves raw HTML (e.g. <b>) and parses GFM tables.
 from markdown_it import MarkdownIt
 
+# Jinja2 renders the document/cover templates (C1, 2026-10-07). Autoescape is
+# OFF so pre-escaped values and the CSS pass through unchanged; every cover
+# value is still ``html.escape``-d before it reaches the template.
+from jinja2 import Environment as _JinjaEnvironment
+
 from saju_html import (
     _CJK_RE,
     ELEMENT_EMOJI,
@@ -43,8 +48,10 @@ from saju_html.sections import (
 from saju_html.svg_charts import inject_element_balance_chart
 
 
-# Inlined default template so the script is self-contained.
-_DEFAULT_TEMPLATE = """<!DOCTYPE html>
+# Document + cover templates (Jinja2, autoescape off). The outer <title> is
+# escaped by the renderer before it is passed in; cover values likewise. Kept
+# inline so the module stays self-contained.
+_DOCUMENT_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -54,11 +61,39 @@ _DEFAULT_TEMPLATE = """<!DOCTYPE html>
 </style>
 </head>
 <body class="{{ body_class }}">
-{{ cover|safe }}
-{{ body|safe }}
+{{ cover }}
+{{ body }}
 </body>
 </html>
 """
+
+_COVER_TEMPLATE = """<div class="cover">
+  <div class="watermark">命</div>
+  <h1>{{ title }}</h1>
+  <p class="subtitle">{{ subtitle }}</p>
+  <div class="meta-block">
+{{ meta_block }}
+  </div>
+  <p class="foot">{{ footnote }}</p>
+  <p class="date">Generated {{ generation_date }}</p>
+{% if report_id %}  <p class="report-id">Report ID: {{ report_id }} · CosmicSaju · cosmicsaju.com</p>
+{% endif %}</div>
+"""
+
+_COMPACT_COVER_TEMPLATE = """<div class="compact-cover">
+  <h1>{{ title }}</h1>
+  <p class="subtitle">{{ subtitle }}</p>
+  <p class="meta">{{ meta }}</p>
+  <p class="report-line">{{ report_line }}Generated {{ generation_date }} · CosmicSaju · cosmicsaju.com</p>
+</div>
+"""
+
+
+def _jinja_env() -> _JinjaEnvironment:
+    # keep_trailing_newline reproduces the exact byte output of the previous
+    # hand-built strings (the rendered-HTML goldens pin this).
+    return _JinjaEnvironment(autoescape=False, trim_blocks=False,
+                             lstrip_blocks=False, keep_trailing_newline=True)
 
 
 _HEADER_TEMPLATE = (
@@ -150,25 +185,17 @@ def _build_cover_html(
     # renders (via page.set_content), so unescaped user input (e.g. a name
     # from the intake form) is an injection sink. Labels are constants but
     # are escaped too for defense in depth.
-    meta_lines = [
-        f'<p class="meta"><strong>{html.escape(label)}</strong>{html.escape(value)}</p>'
-        for label, value in meta_rows
-    ]
-    report_line = ""
-    if report_id:
-        report_line = f'  <p class="report-id">Report ID: {html.escape(report_id)} · CosmicSaju · cosmicsaju.com</p>\n'
-    return (
-        '<div class="cover">\n'
-        '  <div class="watermark">命</div>\n'
-        f'  <h1>{html.escape(title)}</h1>\n'
-        f'  <p class="subtitle">{html.escape(subtitle)}</p>\n'
-        '  <div class="meta-block">\n'
-        + "\n".join(f"    {m}" for m in meta_lines)
-        + "\n  </div>\n"
-        + f'  <p class="foot">{html.escape(footnote)}</p>\n'
-        + f'  <p class="date">Generated {html.escape(generation_date)}</p>\n'
-        + report_line
-        + "</div>\n"
+    escaped = [(html.escape(label), html.escape(value)) for label, value in meta_rows]
+    meta_block = "\n".join(f'    <p class="meta"><strong>{label}</strong>{value}</p>'
+                           for label, value in escaped)
+    template = _jinja_env().from_string(_COVER_TEMPLATE)
+    return template.render(
+        title=html.escape(title),
+        subtitle=html.escape(subtitle),
+        meta_block=meta_block,
+        footnote=html.escape(footnote),
+        generation_date=html.escape(generation_date),
+        report_id=html.escape(report_id),
     )
 
 
@@ -274,17 +301,14 @@ def _build_compact_cover_html(
 ) -> str:
     """A one-page-hook style banner that sits at the top of the body."""
     meta = " · ".join(f"{html.escape(label)}: {html.escape(value)}" for label, value in meta_rows)
-    report_line = ""
-    if report_id:
-        report_line = f"Report ID: {html.escape(report_id)} · "
-    return (
-        '<div class="compact-cover">\n'
-        f'  <h1>{html.escape(title)}</h1>\n'
-        f'  <p class="subtitle">{html.escape(subtitle)}</p>\n'
-        f'  <p class="meta">{meta}</p>\n'
-        f'  <p class="report-line">{report_line}Generated {html.escape(generation_date)} · '
-        'CosmicSaju · cosmicsaju.com</p>\n'
-        '</div>\n'
+    report_line = f"Report ID: {html.escape(report_id)} · " if report_id else ""
+    template = _jinja_env().from_string(_COMPACT_COVER_TEMPLATE)
+    return template.render(
+        title=html.escape(title),
+        subtitle=html.escape(subtitle),
+        meta=meta,
+        report_line=report_line,
+        generation_date=html.escape(generation_date),
     )
 
 
@@ -374,13 +398,13 @@ def markdown_to_html(
         body_class = "compact-mode"
     elif tier:
         body_class = f"tier-{tier}"
-    template = _DEFAULT_TEMPLATE
-    return (
-        template.replace("{{ title }}", html.escape(title))
-        .replace("{{ css }}", css)
-        .replace("{{ cover|safe }}", cover_html)
-        .replace("{{ body|safe }}", body_html)
-        .replace("{{ body_class }}", body_class)
+    template = _jinja_env().from_string(_DOCUMENT_TEMPLATE)
+    return template.render(
+        title=html.escape(title),
+        css=css,
+        cover=cover_html,
+        body=body_html,
+        body_class=body_class,
     )
 
 
