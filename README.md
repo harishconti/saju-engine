@@ -88,6 +88,7 @@ saju/
 │   ├── build-pdf.sh                   # Wrapper script (sets up PYTHONPATH, forwards flags)
 │   ├── client_intake_app.html         # Self-service form with PDF download
 │   ├── client_intake_app.py           # FastAPI self-service app that returns tiered PDFs
+│   ├── qa_compliance.py               # Optional compliance QA gate (needs TYPESAFE_API_KEY)
 │   └── client_compat_intake_form.html # Two-chart compat intake form (Partner A × Partner B), served at /compat
 ├── apps/landing-page/                 # Next.js marketing site (own git repo; USD/English-global positioning)
 ├── tests/                             # pytest suite (1200+ tests)
@@ -134,7 +135,7 @@ Beyond the knowledge base, the project ships two execution paths:
 ### Calculation engine — `src/saju_engine/`
 - **What:** Python module that takes a Gregorian birth date/time/location and returns a fully-derived Saju chart (four pillars + hidden stems + 십신 + 12운성 + major-luck sequence + Day Master + branch relationships + classical stars + Day-Master strength heuristic + special-grid candidates + annual/monthly/daily luck windows).
 - **Built on:** `sajupy` (for solar-term month boundaries + base 60-cycle day math) plus our own Korean-명리 lookup tables.
-- **Validation:** 1,794 pytest cases under `tests/` (incl. byte-exact report snapshots in `tests/golden/` and rendered-HTML snapshots in `tests/golden_html/`) plus the cited-fixture gate `python3 tools/run_validation.py` (315 checks across 10 subsystems). Run `python3 -m pytest tests/ -q` from the project root.
+- **Validation:** 1,846 pytest cases under `tests/` (incl. byte-exact report snapshots in `tests/golden/` and rendered-HTML snapshots in `tests/golden_html/`) plus the cited-fixture gate `python3 tools/run_validation.py` (315 checks across 10 subsystems). Run `python3 -m pytest tests/ -q` from the project root.
 - **Solar-time correction:** Enabled by default for non-standard longitudes. Indian births east or west of the IST meridian (82.5°E) are corrected to true solar time before the hour branch and day pillar are derived.
 - **Korean `야자시` vs Chinese `조자시`:** defaults to `convention="korean"` (23:00 belongs to the *current* day's 子 hour). Use `--convention=chinese` for the Chinese early-Zi rule.
 - **CLI formats:** `table` (default), `json`, `skeleton`, and `premium`. Premium supports `--tier {sample,essential,deep,spark,reading,fullmap}` — the first three are the landing-page products (Hook / Essential Report / Deep Destiny Report), the last three are legacy internal aliases kept for backward compatibility. Skeleton supports `--year`, `--month`, `--day`, `--focus`, and `--no-prose-scaffold`. `--convention` and `--overwrite-report` are available on the PDF wrapper.

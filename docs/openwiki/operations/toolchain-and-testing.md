@@ -22,6 +22,7 @@ Key scripts:
 | `src/saju_html/combine_candidate_report.py` | Merges base report + topic follow-ups into a single client deliverable. |
 | `tools/client_intake_app.html` + `tools/client_intake_app.py` | Self-service FastAPI app: `/` single-chart, `/compat` two-chart; sample tier returns a PDF instantly; paid tiers are stored in an encrypted SQLite queue (`src/saju_web/store.py`, `SAJU_INTAKE_KEY`), drafted in the background and approved by the owner. |
 | `tools/intake_admin.py` | Owner CLI: `genkey`, `list [--status]`, `show <id>`, `approve <id> --base-url`, `regenerate <id>`, `purge --days 180`. `approve` prints the private `/report/{token}` link to email. |
+| `tools/qa_compliance.py` | Optional compliance QA gate for a report markdown file (ground-rule check on generated prose). Requires `TYPESAFE_API_KEY`. |
 
 ## Running the test suite
 
@@ -29,7 +30,7 @@ Key scripts:
 pytest
 ```
 
-The suite currently contains ~548 cases (as of 2026-07-12). Core coverage includes:
+The suite currently contains ~1,846 cases (as of 2026-10-11). Core coverage includes:
 
 - Foundation tables (HIDDEN_STEMS, STEM_INFO, BRANCH_INFO, SIX_*, THREE_*).
 - Stem/branch operations, 12운성, ten-god lookups, hidden stems, Nayin.
@@ -63,6 +64,33 @@ history: `docs/validation/gate-history.md`.
 - **Priority C — Classical star corpus.** Implemented from `knowledge/07-stars.md` with documented ambiguity rules.
 - **Priority D — PDF rendering.** Visual regression via the Hanja-pair test and manual spot checks.
 - **Priority E — Compatibility engine.** Score distribution checked against known demo pairs.
+
+## Compliance QA gate (optional)
+
+The engine derives structure deterministically, but report prose is written for human
+review. `src/saju_qa/` is an optional, self-contained classifier package that checks a
+generated report's prose blocks against the ground rules: (a) outcome-as-certain
+(predictive) language, (b) master/guarantee claims, (c) specific medical/legal/financial
+advice, and (d) missing hedging. It produces flags + scores and **never writes chart facts
+or edits the report**.
+
+```bash
+# Gate a report (exit 0 clean, 1 flagged, 2 classifier unavailable)
+python3 tools/qa_compliance.py candidates_horoscope/reports/rm/rm_deep.md
+python3 tools/qa_compliance.py --json report.md        # machine-readable
+python3 tools/qa_compliance.py --warn-only report.md   # never exit non-zero
+```
+
+- Uses the standard library only (no new runtime dependency) and is gated behind
+  `TYPESAFE_API_KEY`; the model name is overridable via `SAJU_CLASSIFY_MODEL`
+  (default `jev-latest`). Without a key the gate skips and returns exit code 2.
+- `src/saju_qa/client.py` is a minimal TypeSafe/Jev `/v1/systemone` client;
+  `src/saju_qa/compliance.py::scan_report()` splits the report into prose paragraphs
+  (dropping headings, tables, code and short fragments) and batches all block×check
+  pairs into one classifier call per batch.
+- Standalone by design: it is **not** wired into the report/web pipeline — it is a manual
+  pre-delivery gate, run alongside (not instead of) the reader review. Tests:
+  `tests/test_saju_qa.py` (no network; uses a fake client).
 
 ## Adding a new textbook case
 
@@ -154,6 +182,9 @@ PYTHONPATH=src python3 -m saju_engine \
 # Run tests
 pytest
 
+# Optional compliance QA gate on a generated report (needs TYPESAFE_API_KEY)
+python3 tools/qa_compliance.py candidates_horoscope/reports/rm/rm_deep.md
+
 # Run a single test verbosely
 pytest tests/test_textbook_cases.py::test_park_chung_hee -v
 ```
@@ -168,3 +199,5 @@ pytest tests/test_textbook_cases.py::test_park_chung_hee -v
 - `tests/test_textbook_cases.py`
 - `tests/test_nayin.py`
 - `tests/test_pdf.py`
+- `tests/test_saju_qa.py`
+- `tools/qa_compliance.py`

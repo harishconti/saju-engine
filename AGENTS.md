@@ -36,6 +36,9 @@ PYTHONPATH=src python3 -m saju_engine --date YYYY-MM-DD --time HH:MM --city "Cit
 # Combine base report + follow-ups
 PYTHONPATH=src python3 src/saju_html/combine_candidate_report.py {name}
 ./tools/build-pdf.sh --combined {name} "Title" "Client" "DOB" "Day Master"
+
+# Optional compliance QA gate on a report (needs TYPESAFE_API_KEY)
+python3 tools/qa_compliance.py report.md
 ```
 
 ## Documentation maintenance

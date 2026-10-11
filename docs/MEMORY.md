@@ -12,7 +12,7 @@
 - **License:** MIT
 - **Stack:** Python 3.10+, `sajupy==0.2.0` (pinned 2026-09-26 — see N-17 below; was `>=0.2.0`), `reportlab>=4.1`, optional `playwright`, optional `fastapi`/`uvicorn`.
 
-## Current State (last updated 2026-10-04)
+## Current State (last updated 2026-10-11)
 
 - **2026-10-01 audit fully worked through (2026-10-02 → 10-04), all merged to `develop`, not pushed.**
   Suite **1,794 passed / 5 skipped / 14 xfailed**; validation gate **315 checks (PASS 306,
@@ -49,6 +49,15 @@
     regenerated the 5 stale compat pairs (S2/S3/P2 back-port) and added the Harish×Priyanka
     **namesake** pairs — 1996 in `harish_priyanka/` (58) and 1998 in `harish_priyanka_1998/` (52)
     — wired into `tools/regen/{compat.py,pdfs.sh}`.
+  - **2026-10-11:** Added the optional **compliance-QA gate** for report prose —
+    `src/saju_qa/` (stdlib-only TypeSafe/Jev `/v1/systemone` client + `compliance.scan_report()`),
+    CLI `tools/qa_compliance.py` (exit 0 clean / 1 flagged / 2 unavailable; `--json`,
+    `--warn-only`), tests `tests/test_saju_qa.py` (7, no network). Flags predictive,
+    master-claim, sensitive-advice, and unhedged prose against the ground rules; gated behind
+    `TYPESAFE_API_KEY` (model via `SAJU_CLASSIFY_MODEL`, default `jev-latest`). **Standalone by
+    design — not wired into the report/web pipeline** (a manual pre-delivery gate, run alongside
+    reader review). Suite **1,846 passed / 5 skipped / 13 xfailed**; documented in
+    `docs/openwiki/operations/toolchain-and-testing.md` + `AGENTS.md`.
 
 ### Earlier state (2026-09-26)
 
