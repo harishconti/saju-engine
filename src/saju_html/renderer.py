@@ -156,7 +156,10 @@ def _translate_html(text: str, unmapped: set | None = None) -> str:
     """
     from saju_html import translate_inline
 
-    return translate_inline(text, keep_unmapped=True, unmapped=unmapped)
+    # gloss=True keeps the Hanja/Korean term beside its English ("Direct Officer
+    # (正官)") — the delivered artefact's convention. The browser's own font stack
+    # (theme.css lists Noto CJK) draws it.
+    return translate_inline(text, keep_unmapped=True, unmapped=unmapped, gloss=True)
 
 
 def _translate_cover(text: str, unmapped: set | None = None) -> str:

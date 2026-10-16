@@ -988,6 +988,43 @@
     sections, not within one list), and whether the owner wants Hanja *displayed* beside the English rather
     than translated — a policy question that would move every golden, so it needs an owner decision.**
 
+  - **2026-10-16 (owner decision: the report shows the Hanja — English + 正官, not English alone).** Asked whether
+    the PDF should keep Korean/Hanja or keep translating (the engine translates by design, and the HTML backend
+    always had), the owner chose **English + Hanja**. An external audit landed the same day
+    (`docs/analysis/2026-10-16-deep-report-audit.md`, reproduced at `8685fee`; it marks the price-in-the-body and the
+    blockquote-marker fixes "fixed at HEAD" ✓) whose defect #3 — broken double glosses like `Gi (Yin Earth, Gi
+    Earth)` — is the same substitution machinery, so this is the fix for both.
+    ✅ **The Hanja was never missing from the source — the renderer erased it.** The engine already writes
+    `Seven Killings (偏官)`; translation turned the parenthetical into `(Seven Killings)` and the collapse rule then
+    deleted the duplicate, leaving English only. So the convention needed no new output, only **not destroying what
+    the engine wrote**: a parenthetical that just repeats the English before it is now **kept as Hanja**
+    (`gloss=True`), and a bare CJK run is glossed once per run — `丁酉` → `Jeong Yu (丁酉)`, not `Jeong (丁) Yu (酉)`
+    (verified on the real report: **1,022 CJK characters drawn, 580 glosses, 169 distinct terms**, both faces
+    embedded). The gloss is an **argument, not a default**: `translate_inline(..., gloss=True)` from the two client
+    renderers, and deliberately *off* for the **audio script** (a narrator would read the parentheses out loud) and
+    for `(본)`-style glosses that do *not* duplicate (`Gyeong (庚) (main)`, still translated).
+    ⚠️ **Two bugs I introduced and caught by rendering, not by reasoning:** (a) protecting *every* pure-CJK
+    parenthetical left `(편재)` untranslated and turned `(본)` into a bare `()` in the audio; and (b) feeding a
+    *mixed* parenthetical into the run translator made its spaces and commas report as unmapped CJK — the
+    `test_golden_html` "no unmapped CJK" invariant caught it. Both fixed; the audio path is now regression-tested.
+    ✅ **Two P0s from the audit, fixed.** (1) *"Engine-generated premium report draft… reviewed and finalized by a
+    qualified reader before client delivery"* was printing on the **last page of the client's copy** in both
+    backends — a paying buyer being told, falsely, that nobody had read their reading (the owner reviews every paid
+    report). `strip_engine_drafts` now removes it; the review console reads the engine markdown and still sees it.
+    (2) The launch-watch list carried *"conjunction of new-moon or full-moon eclipses… defer the launch by 30–45
+    days"* — **Western astrology, in no `knowledge/` file, a Ground Rule 1 violation** — replaced with the engine's
+    own favorable-element timing. Both pinned by tests, including a doctrine-terms guard (which deliberately still
+    allows the FAQ's *"How is Saju different from Western astrology?"* contrast).
+    Tests: `test_golden_cover_has_no_cjk` → `test_golden_cover_cjk_is_only_a_gloss` (the cover may now carry
+    `Gyeong (庚)`, so the invariant is "CJK only as a parenthetical gloss", not "no CJK"), plus the same test in
+    `test_html_pdf` and the cover meta rows. Suite **1,917 → 1,919**; goldens regenerated (`.md` + `.html`); the
+    public webapp demos rebuilt from the chart. ruff `--select F` clean.
+    ⚠️ **The audit's remaining P0s are product decisions I did not take alone:** the lowercase client name on
+    the cover (`prakash`), *"the querent"* ×30 and engine/Step-N jargon in client copy, the `<!-- decade-roadmap -->`
+    comment and the undrawn roadmap in ReportLab, and — the big one — the intake's **"main concern" field is
+    collected and never answered**. The audit also recommends a `tools/qa_client_ready.py` gate wired into
+    `approve`; that is the right next step, and it turns this audit into a permanent check.
+
 ### Earlier state (2026-09-26)
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"

@@ -356,7 +356,10 @@ def md_inline_to_html(text: str, tier: str | None = None) -> str:
     # renders it (see the CJK block above), and the Hanja of pillar and star
     # names is part of the reading, not noise.
     unmapped: set = set()
-    text = translate_inline(text, keep_unmapped=True, unmapped=unmapped)
+    # `gloss=True`: the owner's convention for client PDFs is English with the
+    # Hanja beside it ("Direct Officer (正官)"), so the term the reading is about
+    # stays visible. The bundled CJK font draws it.
+    text = translate_inline(text, keep_unmapped=True, unmapped=unmapped, gloss=True)
     # DejaVu/Helvetica do not contain warning/favorable/headphone emojis.
     text = _strip_client_emojis(text)
     # Bold, italic, code
@@ -365,7 +368,11 @@ def md_inline_to_html(text: str, tier: str | None = None) -> str:
     text = UNDERSCORE_ITALIC_RE.sub(r"<i>\1</i>", text)
     text = CODE_RE.sub(r"<font face='DejaVuSansMono'>\1</font>", text)
     # Finally, point the surviving CJK at the bundled Hangul/Hanja face.
-    return _wrap_cjk_font(text)
+    text = _wrap_cjk_font(text)
+    # A gloss whose characters the face cannot draw leaves an empty "()" behind
+    # (the pair is kept verbatim by the translator, then emptied here). Drop it so
+    # the reader never sees "Seven Killings ()".
+    return re.sub(r"\(\s*\)", "", text)
 
 
 # ---------- Styles ----------

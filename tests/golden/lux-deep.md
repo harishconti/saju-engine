@@ -463,7 +463,7 @@ With **Water** as the favorable element, the most aligned launch window is **win
 2. **Annual pillars dominated by the unfavorable element** — favour audits, refinements, and quiet product work over big announcements.
 3. **A major-luck shift into a heavier stem (strong 정관 / 편관)** — use the first 1–2 years to set up systems rather than scale headcount.
 4. **Activated chart-punishment or self-punishment patterns during the launch year** — keep partnerships small and written, not verbal.
-5. **Conjunction of new-moon or full-moon eclipses falling on spouse-palace or wealth-stem branches** — defer the launch by 30–45 days if it lands on the public date.
+5. **A public date chosen without checking your favorable element** — if the launch date can move, place it in a month whose stem matches your favorable **Water** element; the auspicious-dates section lists the candidates.
 
 ---
 

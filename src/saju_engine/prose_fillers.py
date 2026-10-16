@@ -2310,6 +2310,7 @@ def business_watch_items(ctx) -> List[str]:
     chart = _ctx_get(ctx, "chart")
     sa = chart.strength_assessment or {}
     verdict = sa.get("verdict", "balanced")
+    fav = _ctx_get(ctx, "favorable", "—")
     items = [
         f"**Annual branches that clash your natal day branch {chart.day.branch}** — these tend to "
         f"bring unexpected pivots; launch a soft beta, not a public campaign.",
@@ -2319,8 +2320,15 @@ def business_watch_items(ctx) -> List[str]:
         "to set up systems rather than scale headcount.",
         "**Activated chart-punishment or self-punishment patterns during the launch year** — keep "
         "partnerships small and written, not verbal.",
-        "**Conjunction of new-moon or full-moon eclipses falling on spouse-palace or wealth-stem "
-        "branches** — defer the launch by 30–45 days if it lands on the public date.",
+        # Was: "Conjunction of new-moon or full-moon eclipses falling on
+        # spouse-palace or wealth-stem branches". Eclipses are Western astrology,
+        # appear in no knowledge/ file, and violate Ground Rule 1 (traditional
+        # principles only). Replaced with the engine's own favorable-element
+        # timing, which the dates section already computes.
+        # (External audit, 2026-10-16, P0 #5.)
+        f"**A public date chosen without checking your favorable element** — if the launch date can "
+        f"move, place it in a month whose stem matches your favorable **{fav}** element; the "
+        f"auspicious-dates section lists the candidates.",
     ]
     if verdict in ("strong", "extreme"):
         items.append(

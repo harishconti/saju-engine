@@ -544,23 +544,58 @@ _TRANSLATION_TERMS = sorted(
 _PLACEHOLDER_RE = re.compile(r"\x00(\d+)\x00")
 
 
-def _protect_parenthetical_english(text: str) -> tuple[str, list[str]]:
-    """Replace pure-ASCII parentheticals with placeholders so translation skips them.
+# A parenthetical written only in CJK — "(偏官)", "(大運)", "(丙午)". When a report
+# is glossed these are the author's own Hanja notation for the English just
+# written, so they are held aside rather than translated into a duplicate of it.
+_PURE_CJK_PAREN_RE = re.compile(r"\(([^A-Za-z()]*)\)")
 
-    Parentheticals that also contain CJK (e.g. "(the heart of 궁합)") are left
-    untouched — the Korean/Hanja inside them must be translated by the normal
-    path, otherwise the final CJK-stripping pass would erase it.
+
+def _preceding_text(parts: List[str]) -> str:
+    """The last non-empty piece already emitted, for duplicate detection."""
+    for prev in reversed(parts):
+        stripped = prev.strip()
+        if stripped:
+            return stripped
+    return ""
+
+
+def _ends_with(parts: List[str], phrase: str) -> bool:
+    """Does the text already emitted end with ``phrase``?"""
+    preceding = _preceding_text(parts).split()
+    words = phrase.split()
+    return bool(words) and len(words) <= len(preceding) and preceding[-len(words):] == words
+
+
+def _protect_parenthetical_english(text: str, gloss: bool = False) -> tuple[str, list[str]]:
+    """Replace parentheticals with placeholders so translation skips them.
+
+    Pure-ASCII parentheticals are already translated English ("(Direct Officer)",
+    "(Annual Luck)"). A parenthetical that also contains CJK (e.g. "(the heart of
+    궁합)") keeps going through the normal path so the CJK inside it is
+    translated.
+
+    When ``gloss`` is set, a parenthetical that is *only* CJK is held aside too:
+    it is the author's Hanja notation for the English just written ("Direct
+    Officer (正官)"), and translating it as a run would gloss it a second time.
+    ``translate_inline`` decides at restore time whether it repeats the English
+    (keep the Hanja) or is itself a gloss to translate.
     """
     placeholders: list[str] = []
+
+    def protect(match: "re.Match") -> str:
+        placeholders.append(match.group(0))
+        return f"\x00{len(placeholders) - 1}\x00"
 
     def replace(m: "re.Match") -> str:
         inner = m.group(0)
         # Skip if the parenthetical contains any CJK character.
         if _CJK_RE.search(inner):
             return inner
-        placeholders.append(inner)
-        return f"\x00{len(placeholders) - 1}\x00"
+        return protect(m)
 
+    if gloss:
+        text = _PURE_CJK_PAREN_RE.sub(
+            lambda m: protect(m) if _CJK_RE.search(m.group(1)) else m.group(0), text)
     # Match parentheses that contain at least one ASCII letter (treat as already
     # translated English). This catches "(Direct Officer)", "(Annual Luck)", etc.
     protected = re.sub(r"\([A-Za-z][^\)]*\)", replace, text)
@@ -628,6 +663,7 @@ def _translate_cjk_run(
     run: str,
     keep_unmapped: bool = False,
     unmapped: Optional[set] = None,
+    gloss: bool = False,
 ) -> str:
     """Translate one contiguous CJK run using longest-match tokenization.
 
@@ -659,7 +695,16 @@ def _translate_cjk_run(
         tokens = [t for t in tokens if t not in bad]
     # Join translated tokens with a single space so adjacent Hanja pairs like
     # 丙午 do not collapse into "BingO".
-    return " ".join(tokens)
+    translated = " ".join(tokens)
+    if gloss and translated and not unmapped_tokens:
+        # `gloss` is the owner's convention for *client PDFs*: English with the
+        # Hanja the report is about beside it ("Direct Officer (正官)", "Gye Mi
+        # (癸未)"). One gloss per run, so a two-character pillar reads as
+        # "Gye Mi (癸未)" rather than "Gye (癸) Mi (未)". Off by default, and
+        # deliberately off for the audio script, where a narrator would read the
+        # parentheses out loud.
+        return f"{translated} ({run})"
+    return translated
 
 
 def translate_inline(
@@ -667,6 +712,7 @@ def translate_inline(
     *,
     keep_unmapped: bool = True,
     unmapped: Optional[set] = None,
+    gloss: bool = False,
 ) -> str:
     """Replace Korean/Hanja terms with English.
 
@@ -695,7 +741,7 @@ def translate_inline(
     )
     for _rx, _repl in _PHRASE_RULES:
         text = _rx.sub(_repl, text)
-    protected, placeholders = _protect_parenthetical_english(text)
+    protected, placeholders = _protect_parenthetical_english(text, gloss)
 
     # Split into CJK runs, placeholders, and plain text.
     parts: List[str] = []
@@ -708,7 +754,7 @@ def translate_inline(
             subparts = _CJK_RE.split(before)
             for j, sub in enumerate(subparts):
                 if j % 2 == 1 and sub:
-                    parts.append(_translate_cjk_run(sub, keep_unmapped, unmapped))
+                    parts.append(_translate_cjk_run(sub, keep_unmapped, unmapped, gloss))
                 else:
                     parts.append(sub)
         parts.append(m.group(0))  # placeholder
@@ -719,7 +765,7 @@ def translate_inline(
         subparts = _CJK_RE.split(before)
         for j, sub in enumerate(subparts):
             if j % 2 == 1 and sub:
-                parts.append(_translate_cjk_run(sub, keep_unmapped, unmapped))
+                parts.append(_translate_cjk_run(sub, keep_unmapped, unmapped, gloss))
             else:
                 parts.append(sub)
 
@@ -734,21 +780,30 @@ def translate_inline(
         placeholder = placeholders[int(m.group(1))]
         # Strip parentheses and normalize whitespace for comparison.
         inner = placeholder[1:-1].strip()
-        # If the immediately preceding non-empty text already ends with the
-        # same English phrase (e.g. "正官 (Direct Officer)"), drop the
+        if gloss and _CJK_RE.search(placeholder):
+            # A parenthetical the author wrote only in Hanja/Korean. Translate it
+            # *without* glossing, then decide:
+            #   "Seven Killings (偏官)" -> the Hanja repeats the English before it,
+            #       so keep the Hanja: it is the notation the report is about, and
+            #       deleting it here is what stripped the Hanja from every
+            #       delivered report even though the source carried it;
+            #   "庚 (본)" -> "본" is a gloss of the stem, not the term, so it is
+            #       translated as before and reads "Gyeong (庚) (main)".
+            # Recurse through the public entry point, not the run translator:
+            # a parenthetical can mix CJK with digits and punctuation
+            # ("(半合, 三合)", "(0.0, 甲)"), and the run translator would
+            # report those spaces and commas as unmapped CJK.
+            inner_en = translate_inline(
+                inner, keep_unmapped=keep_unmapped, unmapped=unmapped, gloss=False).strip()
+            if inner_en and _ends_with(out_parts, inner_en):
+                out_parts.append(placeholder)
+            elif inner_en:
+                out_parts.append(f"({inner_en})")
+            continue
+        # Otherwise: if the immediately preceding non-empty text already ends
+        # with the same English phrase (e.g. "正官 (Direct Officer)"), drop the
         # parenthetical to avoid "Direct Officer (Direct Officer)" duplication.
-        preceding_text = ""
-        for prev in reversed(out_parts):
-            stripped = prev.strip()
-            if stripped:
-                preceding_text = stripped
-                break
-        preceding_words = preceding_text.split()
-        inner_words = inner.split()
-        if (
-            len(inner_words) <= len(preceding_words)
-            and preceding_words[-len(inner_words):] == inner_words
-        ):
+        if _ends_with(out_parts, inner):
             continue
         out_parts.append(placeholder)
 
@@ -846,6 +901,19 @@ _ENGINE_DRAFT_LINE_RE = re.compile(
 )
 
 
+# The sentence the engine appends to every report it generates. It is a note to
+# the *reviewer* ("Interpretive prose must be reviewed and finalized by a
+# qualified reader before client delivery"), and it was printing on the last page
+# of the client's own copy — telling a paying buyer that nobody had read their
+# reading, next to copy the reviewer had in fact rewritten. The review console
+# reads the engine markdown directly, so it still sees this; the client render
+# does not. (External audit, 2026-10-16, P0 #1.)
+_DRAFT_NOTE_RE = re.compile(
+    r"[ \t]*\*?Engine-generated premium report draft\.[^\n]*\*?[ \t]*\n?",
+    re.IGNORECASE,
+)
+
+
 def strip_engine_drafts(text: str) -> str:
     """Remove all `[ENGINE DRAFT — REVIEW REQUIRED]` markers from client output.
 
@@ -865,6 +933,8 @@ def strip_engine_drafts(text: str) -> str:
     out = _ENGINE_DRAFT_LINE_RE.sub("", text)
     # 2. Inline markers — keep the surrounding prose and any newlines.
     out = _ENGINE_DRAFT_INLINE_RE.sub("", out)
+    # 3. The trailing "engine-generated draft" note (see _DRAFT_NOTE_RE).
+    out = _DRAFT_NOTE_RE.sub("", out)
     out = re.sub(r"  +", " ", out)
     out = re.sub(r"\n\n\n+", "\n\n", out)
     return out

@@ -465,6 +465,22 @@ def test_premium_report_essential_price_and_scope():
     assert "**Season:**" not in report
 
 
+def test_no_western_astrology_in_client_copy():
+    """Ground Rule 1: traditional principles only, and every claim citeable.
+
+    The launch-watch list carried "conjunction of new-moon or full-moon eclipses
+    falling on spouse-palace or wealth-stem branches — defer the launch by 30–45
+    days". Eclipses are Western astrology and appear in no `knowledge/` file.
+    (External audit, 2026-10-16, P0 #5.) The banned list is *doctrine* terms only:
+    "zodiac" is not banned (the compat year-branch layer, 띠 궁합, is traditional),
+    and neither is "Western astrology" as a word — the how-to FAQ legitimately
+    answers "How is Saju different from Western astrology?".
+    """
+    report = generate_premium_report(_sample_chart(), tier="deep").lower()
+    for term in ("eclipse", "retrograde", "horoscope"):
+        assert term not in report, f"{term!r} reached client copy"
+
+
 def test_premium_report_deep_price_and_dynamic_window():
     chart = _sample_chart()
     report = generate_premium_report(chart, tier="deep")

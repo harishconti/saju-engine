@@ -46,9 +46,10 @@ def test_html_pdf_imports():
 
     html = markdown_to_html("# Test\n\nHello 甲 world.")
     assert "<html" in html
-    # Korean/Hanja translation should have run
-    assert "甲" not in html
-    assert "Gap" in html or "Test" in html
+    # Korean/Hanja translation should have run, and the term is kept beside its
+    # English (owner decision, 2026-10-16: English + Hanja in the delivered PDF).
+    assert "Gap (甲)" in html
+    assert "甲" not in html.replace("Gap (甲)", "")  # CJK only as a gloss
 
 
 def test_reportlab_inline_handles_underscore_italic_without_leaking_underscores():
@@ -519,6 +520,24 @@ def test_strip_keeps_plain_words_callout_and_glossary():
     assert "## What the Terms Mean" in out
     assert "Direct Wealth" in out
     assert "see knowledge/" not in out
+
+
+def test_strip_engine_drafts_drops_the_reviewer_note():
+    """The "engine-generated draft" sentence must not reach the client.
+
+    The engine appends it to every report it writes, as a note to the reviewer.
+    It was printing on the last page of the *client's* copy, telling a paying
+    buyer nobody had read their reading — and it is false, because the owner
+    reviews every paid report before delivery. The review console reads the
+    engine markdown, so it still sees the note. (External audit, 2026-10-16, P0.)
+    """
+    from saju_html import strip_engine_drafts
+
+    note = ("*Engine-generated premium report draft. Interpretive prose must be "
+            "reviewed and finalized by a qualified reader before client delivery.*")
+    out = strip_engine_drafts(f"## Closing Note\n\nAll good.\n\n{note}\n")
+    assert "Engine-generated" not in out
+    assert "All good." in out
 
 
 def test_strip_engine_drafts_drops_inline_marker():

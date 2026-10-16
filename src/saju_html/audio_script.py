@@ -80,6 +80,10 @@ def _prepare(markdown: str) -> str:
     text = strip_engine_drafts(text)
     # `keep_unmapped=False` drops any glyph the translator does not know, which is what
     # the ReportLab path does (its fonts have no CJK coverage).
+    # No gloss here, and `keep_unmapped=False`: this text is *spoken*. A narrator
+    # would read a parenthesised Hanja out loud as "open paren ... close paren",
+    # and a CJK character has no pronunciation to give. The audio stays
+    # English-only by design, unlike the written report.
     return translate_inline(text, keep_unmapped=False)
 
 

@@ -75,15 +75,28 @@ heading landed on, and the second prints. What the client receives:
   is why the printed numbers match the pages they name.
 - **An outline** (`/Outlines`) so readers get a section panel, plus **Title / Author /
   Subject / Creator** document metadata.
-- **CJK drawn, not dropped.** Report prose is English-primary and Korean/Hanja is
-  translated (`translate_inline`). Whatever survives translation is drawn with a bundled
-  glyph subset of **Noto Sans KR** (`src/saju_html/fonts/SajuCJK-*.ttf`, OFL — embedded, so
-  it renders in Chrome and phone viewers too). A character no Korean face can draw is
-  dropped with a warning rather than printed as a tofu box. After adding Hanja to
-  `knowledge/`, regenerate with `python3 tools/build-cjk-font-subset.py`;
+- **CJK: English with the Hanja beside it** (owner decision, 2026-10-16). The report is
+  written in English and every Korean/Hanja term is translated, but the term itself is kept
+  — `Direct Officer (正官)`, `Gye Mi (癸未)`, `the ten-god (십신)` picture. That is exactly the
+  notation the engine already writes in its markdown; the renderer used to *erase* it by
+  translating the Hanja gloss back into the English that preceded it and collapsing the
+  duplicate. Drawing needs an embedded face, so the PDFs carry a bundled glyph subset of
+  **Noto Sans KR** (`src/saju_html/fonts/SajuCJK-*.ttf`, OFL) — unlike the Korean CID faces it
+  replaced, which rely on the reader's CMaps and render blank in browsers. A character no
+  Korean face can draw (simplified-Chinese forms) is dropped with a warning rather than
+  printed as a tofu box, and a `()` emptied by that drop is removed. Two exceptions are
+  deliberate: the **audio script stays English-only** (`gloss=False`), because a narrator
+  would read the parentheses out loud. After adding Hanja to `knowledge/`, regenerate with
+  `python3 tools/build-cjk-font-subset.py`;
   `tests/test_pdf_navigation.py::test_cjk_font_covers_repo_cjk` fails until you do.
 - Markdown **blockquote** notes read as notes (no literal `>` surviving into the page), and
   the body heading carries the tier name only — never the price.
+- **The engine's reviewer note never reaches the client.** The markdown the engine writes
+  ends with *"Engine-generated premium report draft. Interpretive prose must be reviewed and
+  finalized by a qualified reader…"* — a note to the reviewer. It was printing on the last
+  page of the client's copy, telling a paying buyer (and falsely, since the owner reviews
+  every paid report) that nobody had read their reading. `strip_engine_drafts` removes it in
+  both backends; the review console reads the engine markdown, so the reviewer still sees it.
 
 ## Candidate folder conventions
 

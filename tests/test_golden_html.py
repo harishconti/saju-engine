@@ -94,16 +94,34 @@ def test_browser_smoke_golden_html_prints_to_pdf(tmp_path):
 
 _COVER_RE = re.compile(r'<div class="cover">\n.*?\n</div>\n', re.S)
 _CJK_CHARS = re.compile(r"[가-힣一-鿿]")
+# A parenthesised Hanja/Korean gloss — "Direct Officer (正官)", "Gyeong (庚)".
+_GLOSS = re.compile(r"\([^()]*[가-힣一-鿿][^()]*\)")
+
+
+def _unexplained_cjk(text: str) -> str:
+    """CJK that is NOT inside a parenthetical gloss — empty when the text is fine.
+
+    The delivered artefact's convention (owner decision, 2026-10-16) is English
+    with the Hanja the reading is about beside it, so CJK is expected on the page
+    — but only as a gloss in parentheses, never as untranslated prose.
+    """
+    return "".join(_CJK_CHARS.findall(_GLOSS.sub("", text)))
 _WATERMARK = re.compile(r'<div class="watermark">[^<]*</div>')
 
 
 @pytest.mark.parametrize("name", NAMES)
-def test_golden_cover_has_no_cjk(name):
+def test_golden_cover_cjk_is_only_a_gloss(name):
+    """The cover is English; the only CJK it may carry is a parenthetical gloss.
+
+    It used to assert no CJK at all, because the cover font could not draw any.
+    It now shows "Gyeong (庚)" — the Hanja beside its romanisation, the owner's
+    convention — so the invariant is "translated, with the term kept".
+    """
     html = (GOLDEN_HTML / f"{name}.html").read_text(encoding="utf-8")
     m = _COVER_RE.search(html)
     assert m, "cover block not found"
     cover = _WATERMARK.sub("", m.group(0))  # the decorative 命 watermark is intentional
-    assert not _CJK_CHARS.search(cover), cover
+    assert not _unexplained_cjk(cover), cover
 
 
 def test_cover_meta_rows_are_translated():
@@ -122,6 +140,7 @@ def test_cover_meta_rows_are_translated():
         )
         cover = _WATERMARK.sub("", _COVER_RE.search(html).group(0) if not compact else
                                re.search(r'<div class="compact-cover">.*?\n</div>\n', html, re.S).group(0))
-        assert not _CJK_CHARS.search(cover), cover
-        assert "Gyeong/Sin" in cover and "Alice (Gyeong)" in cover
+        assert not _unexplained_cjk(cover), cover
+        assert "Gyeong (庚)/Sin (辛)" in cover
+        assert "Alice (Gyeong (庚))" in cover
         assert "McKay" in cover  # Latin names are never rewritten

@@ -143,7 +143,7 @@ assert JIAZI_TO_NAYIN[("甲", "子")] == "海中金"  # Gold in the sea
 - Renders Quick Reference as a card, current-year paragraph as a callout, Lucky Attributes as a grid, and adds an SVG element-balance chart.
 - Use `--compact` for the one-page Hook/sample tier. `src/saju_html/chart_input.py` is the shared chart-to-markdown step for `--from-chart`.
 - **No silent fallback:** a missing browser raises. The renderer falls back to ReportLab only with `allow_fallback=True` or env `SAJU_PDF_FALLBACK=reportlab`.
-- Unmapped Hanja/Korean is kept in the HTML and reported (not deleted). Phrase-level Korean glosses live in `_PHRASE_RULES` (`src/saju_html/__init__.py`).
+- Korean/Hanja is translated **and kept**: client copy reads `Direct Officer (正官)`, per the owner's convention (2026-10-16). Unmapped CJK is kept and reported, never deleted. The gloss is the `gloss=True` argument of `translate_inline`, which is why the audio script can stay English-only. Phrase-level Korean glosses live in `_PHRASE_RULES` (`src/saju_html/__init__.py`).
 - Env `SAJU_PDF_BACKEND=reportlab` makes the self-service job queue (`src/saju_web/jobs.py`) use ReportLab.
 
 ### ReportLab backend (legacy, one more release)
