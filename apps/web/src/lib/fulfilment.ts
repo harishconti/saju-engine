@@ -128,6 +128,9 @@ export async function processClaimedJob(job: Job): Promise<JobOutcome> {
     const reportId = randomUUID();
     const pdfKey = buildReportKey(order.userId, order.id, reportId, "pdf");
     const mdKey = buildReportKey(order.userId, order.id, reportId, "md");
+    // The reading. Not produced for a compatibility order: that reading renders through its own
+    // two-chart renderer, which has no web mode yet.
+    const htmlKey = buildReportKey(order.userId, order.id, reportId, "html");
 
     const profileA = profileToEngine(order.profileA);
     const profileB = order.profileB ? profileToEngine(order.profileB) : null;
@@ -141,6 +144,11 @@ export async function processClaimedJob(job: Job): Promise<JobOutcome> {
       // The source markdown, stored so the audio script is derived from what was approved
       // rather than recomputed from today's engine.
       mdUploadUrl: await presignPutUrl(mdKey, "text/markdown"),
+      // …and the web document: the artefact the client actually reads on a phone, which they can
+      // also save as one file. Single-chart only; a compat reading has no web mode yet.
+      ...(engineKindFor(order) === "single"
+        ? { htmlUploadUrl: await presignPutUrl(htmlKey, "text/html") }
+        : {}),
       profileA,
       ...(profileB ? { profileB } : {}),
       favorableOverrideA: order.favorableOverrideA ?? null,
@@ -155,6 +163,9 @@ export async function processClaimedJob(job: Job): Promise<JobOutcome> {
       await failJob(job.id, "UPLOAD_NOT_VERIFIED");
       return { ok: false, note: "upload not verified" };
     }
+    // The reading is best-effort in the same way: a web document that did not land leaves the PDF
+    // as the deliverable rather than losing the order. The row records only what is really there.
+    const htmlObject = result.htmlBytes ? await headObject(htmlKey) : null;
 
     await prisma.$transaction(async (tx) => {
       await tx.report.create({
@@ -174,6 +185,8 @@ export async function processClaimedJob(job: Job): Promise<JobOutcome> {
           profileBId: order.profileBId,
           pdfKey,
           mdKey,
+          htmlKey: htmlObject ? htmlKey : null,
+          htmlBytes: htmlObject ? (result.htmlBytes ?? htmlObject.size) : null,
           enginePayload: JSON.parse(JSON.stringify(payload)) as never,
           sha256: result.sha256 ?? null,
           bytes: result.bytes ?? object.size,

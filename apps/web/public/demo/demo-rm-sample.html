@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RM (Kim Nam-joon) — The Hook · Complimentary Reading</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
+<style>
+/* Saju HTML→PDF theme
+ *
+ * Designed for A4 print rendering via Playwright / Chromium.
+ * Uses CSS @page rules for margins, running footers, and print-specific styling.
+ */
+
+@page {
+    size: A4;
+    margin: 18mm;
+    margin-bottom: 22mm;
+}
+
+@page cover {
+    margin-bottom: 18mm;
+}
+
+:root {
+    --color-text: #222222;
+    --color-muted: #555555;
+    --color-light: #888888;
+    --color-heading: #2a4d6e;
+    --color-heading2: #3a5d7e;
+    --color-accent: #f3f6fa;
+    --color-rule: #cccccc;
+    --color-table-header: #2a4d6e;
+    --color-card-bg: #f8fafc;
+    --color-card-border: #d0d8e0;
+    --color-callout-bg: #eef5fa;
+    --color-callout-border: #b8d4e8;
+    --font-serif: Georgia, "Times New Roman", "Noto Serif CJK KR", "Noto Serif KR", serif;
+    --font-sans: "Helvetica Neue", Helvetica, Arial, "Noto Sans CJK KR", "Noto Sans KR", sans-serif;
+    --font-mono: Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-serif);
+    font-size: 10.5pt;
+    line-height: 1.55;
+    color: var(--color-text);
+}
+
+/* ---- Cover page --------------------------------------------------------- */
+.cover {
+    text-align: center;
+    padding-top: 18mm;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 55%, #eef2f7 100%);
+    min-height: calc(100vh - 40mm);
+    border: 1px solid transparent;
+    break-after: page;
+}
+
+.cover .watermark {
+    font-size: 110pt;
+    line-height: 1;
+    margin-bottom: 4mm;
+    opacity: 0.12;
+}
+
+.cover h1 {
+    font-family: var(--font-sans);
+    font-size: 34pt;
+    font-weight: bold;
+    color: #1a1a1a;
+    margin: 0 0 4mm 0;
+    line-height: 1.15;
+    page-break-before: auto;
+    border-bottom: none;
+}
+
+.cover .subtitle {
+    font-family: var(--font-serif);
+    font-size: 12.5pt;
+    font-style: italic;
+    color: var(--color-heading);
+    margin: 0 0 10mm 0;
+    letter-spacing: 0.3px;
+}
+
+.cover .meta-block {
+    display: inline-block;
+    text-align: left;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid var(--color-card-border);
+    border-radius: 6px;
+    padding: 6mm 10mm;
+    margin: 0 auto 12mm auto;
+    box-shadow: 0 2px 8px rgba(42, 77, 110, 0.06);
+}
+
+.cover .meta {
+    font-family: var(--font-sans);
+    font-size: 11pt;
+    color: var(--color-text);
+    margin: 2.5mm 0;
+    text-align: left;
+}
+
+.cover .meta strong {
+    color: var(--color-heading);
+    font-weight: 600;
+    margin-right: 3mm;
+    display: inline-block;
+    min-width: 22mm;
+}
+
+.cover .foot {
+    margin-top: 14mm;
+    font-family: var(--font-sans);
+    font-size: 9.5pt;
+    color: var(--color-muted);
+    line-height: 1.45;
+    padding: 0 22mm;
+}
+
+.cover .date {
+    margin-top: 6mm;
+    font-size: 10pt;
+    color: var(--color-light);
+}
+
+.cover .report-id {
+    margin-top: 3mm;
+    font-family: var(--font-sans);
+    font-size: 9pt;
+    color: var(--color-heading);
+    font-weight: 600;
+}
+
+/* ---- Compact one-page hook header --------------------------------------- */
+.compact-cover {
+    text-align: center;
+    padding: 8mm 0 4mm 0;
+    margin-bottom: 4mm;
+    border-bottom: 1.5px solid var(--color-rule);
+    page-break-after: avoid;
+}
+
+.compact-cover h1 {
+    font-family: var(--font-sans);
+    font-size: 18pt;
+    font-weight: bold;
+    color: var(--color-heading);
+    margin: 0 0 2mm 0;
+    line-height: 1.2;
+    border-bottom: none;
+}
+
+.compact-cover .subtitle {
+    font-family: var(--font-serif);
+    font-size: 10pt;
+    font-style: italic;
+    color: var(--color-muted);
+    margin: 0 0 2mm 0;
+}
+
+.compact-cover .meta,
+.compact-cover .report-line {
+    font-family: var(--font-sans);
+    font-size: 8.5pt;
+    color: var(--color-light);
+    margin: 0 0 1mm 0;
+}
+
+@page compact {
+    size: A4;
+    margin: 13mm 14mm 16mm 14mm;
+}
+
+body.compact-mode {
+    page: compact;
+    font-size: 9.5pt;
+    line-height: 1.38;
+}
+
+body.compact-mode h2 {
+    font-size: 11.5pt;
+    margin: 3mm 0 1.5mm 0;
+}
+
+body.compact-mode h3 {
+    font-size: 10pt;
+    margin: 2.5mm 0 1mm 0;
+}
+
+body.compact-mode p,
+body.compact-mode ul,
+body.compact-mode li {
+    margin: 1.2mm 0;
+}
+
+body.compact-mode table {
+    margin: 1.5mm 0;
+    font-size: 9pt;
+}
+
+body.compact-mode hr {
+    margin: 2mm 0;
+}
+
+body.compact-mode .compact-cover {
+    padding: 5mm 0 3mm 0;
+    margin-bottom: 3mm;
+}
+
+body.compact-mode .compact-cover h1 {
+    font-size: 16pt;
+    margin: 0 0 1.5mm 0;
+}
+
+body.compact-mode .compact-cover .subtitle {
+    font-size: 9pt;
+    margin: 0 0 1.5mm 0;
+}
+
+body.compact-mode .compact-cover .meta,
+body.compact-mode .compact-cover .report-line {
+    font-size: 8pt;
+    margin: 0 0 0.8mm 0;
+}
+
+/* ---- Typography --------------------------------------------------------- */
+h1 {
+    string-set: section-title content();
+    font-family: var(--font-sans);
+    font-size: 22pt;
+    font-weight: bold;
+    color: var(--color-heading);
+    border-bottom: 2px solid var(--color-heading);
+    padding-bottom: 0.2em;
+    margin: 0 0 6mm 0;
+    page-break-before: always;
+    line-height: 1.25;
+}
+
+h1:first-of-type {
+    page-break-before: auto;
+}
+
+h2 {
+    string-set: section-title content();
+    font-family: var(--font-sans);
+    font-size: 16pt;
+    font-weight: bold;
+    color: var(--color-heading2);
+    margin: 8mm 0 3mm 0;
+    line-height: 1.3;
+}
+
+h3 {
+    string-set: section-title content();
+    font-family: var(--font-sans);
+    font-size: 13pt;
+    font-weight: bold;
+    color: #444444;
+    margin: 6mm 0 2mm 0;
+    line-height: 1.3;
+}
+
+h4, h5, h6 {
+    font-family: var(--font-sans);
+    font-size: 11pt;
+    font-weight: bold;
+    color: #444444;
+    margin: 4mm 0 2mm 0;
+}
+
+p {
+    margin: 0 0 3mm 0;
+    orphans: 3;
+    widows: 3;
+}
+
+a {
+    color: var(--color-heading);
+    text-decoration: none;
+}
+
+strong {
+    font-weight: bold;
+    color: #1a1a1a;
+}
+
+em {
+    font-style: italic;
+}
+
+/* ---- Lists -------------------------------------------------------------- */
+ul, ol {
+    margin: 2mm 0 4mm 0;
+    padding-left: 6mm;
+}
+
+li {
+    margin: 1.2mm 0;
+}
+
+/* ---- Blockquotes / notes ------------------------------------------------ */
+blockquote {
+    border-left: 3px solid var(--color-rule);
+    padding-left: 1em;
+    margin: 1em 0;
+    color: #555555;
+}
+
+blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+/* ---- Code & ASCII art --------------------------------------------------- */
+code {
+    font-family: var(--font-mono);
+    font-size: 9.5pt;
+    background: #f0f0f0;
+    padding: 0 0.2em;
+    border-radius: 2px;
+}
+
+pre {
+    font-family: var(--font-mono);
+    font-size: 9pt;
+    background: #f6f6f6;
+    padding: 0.8em;
+    border-radius: 4px;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    margin: 1em 0;
+}
+
+pre code {
+    background: transparent;
+    padding: 0;
+}
+
+/* ---- Tables ------------------------------------------------------------- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+    font-size: 9.5pt;
+    page-break-inside: avoid;
+}
+
+thead {
+    display: table-header-group;
+}
+
+tr {
+    page-break-inside: avoid;
+}
+
+th, td {
+    border: 1px solid var(--color-rule);
+    padding: 5px;
+    vertical-align: top;
+    text-align: left;
+}
+
+th {
+    background: var(--color-table-header);
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background: var(--color-accent);
+}
+
+/* ---- Quick Reference card ----------------------------------------------- */
+.quick-ref-card {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-left: 4px solid var(--color-heading);
+    border-radius: 6px;
+    padding: 5mm 6mm;
+    margin: 4mm 0 6mm 0;
+    box-shadow: 0 2px 6px rgba(42, 77, 110, 0.05);
+}
+
+.quick-ref-card ul {
+    margin: 0;
+    padding-left: 5mm;
+}
+
+.quick-ref-card li {
+    margin: 1.5mm 0;
+}
+
+/* ---- Right Now callout -------------------------------------------------- */
+.right-now-callout {
+    background: var(--color-callout-bg);
+    border: 1px solid var(--color-callout-border);
+    border-radius: 6px;
+    padding: 5mm 6mm;
+    margin: 4mm 0 6mm 0;
+    font-style: italic;
+}
+
+.right-now-callout p {
+    margin: 0;
+}
+
+/* ---- Lucky Attributes grid ---------------------------------------------- */
+.lucky-attributes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3mm;
+    margin: 4mm 0 6mm 0;
+}
+
+.lucky-attribute-item {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-radius: 5px;
+    padding: 3mm 4mm;
+}
+
+.lucky-attribute-item .label {
+    font-family: var(--font-sans);
+    font-size: 8.5pt;
+    font-weight: bold;
+    color: var(--color-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 1mm;
+}
+
+.lucky-attribute-item .value {
+    font-size: 9.5pt;
+    color: var(--color-text);
+}
+
+/* ---- Element Balance SVG chart ---------------------------------------- */
+.element-balance-chart {
+    margin: 4mm 0 6mm 0;
+    page-break-inside: avoid;
+}
+
+.element-balance-chart svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* ---- Element-balance color coding --------------------------------------- */
+.element-fire { color: #e74c3c; }
+.element-earth { color: #f39c12; }
+.element-metal { color: #7f8c8d; }
+.element-water { color: #3498db; }
+.element-wood { color: #27ae60; }
+
+/* ---- Horizontal rules --------------------------------------------------- */
+hr {
+    border: none;
+    border-top: 1px solid var(--color-rule);
+    margin: 1em 0;
+}
+
+/* ---- Utility ------------------------------------------------------------ */
+.print-only {
+    display: block;
+}
+
+.no-break {
+    page-break-inside: avoid;
+}
+
+/* ---- Chart signature (Deep tier pull-quote) ----------------------------- */
+.chart-signature {
+    font-family: var(--font-serif);
+    font-size: 12.5pt;
+    font-style: italic;
+    color: var(--color-heading);
+    border-left: 4px solid var(--color-heading);
+    background: var(--color-callout-bg);
+    padding: 4mm 6mm;
+    margin: 4mm 0 6mm 0;
+    border-radius: 4px;
+}
+
+/* ---- Audio included callout (Deep tier cover) -------------------------- */
+.audio-included {
+    display: inline-block;
+    background: #fff7e6;
+    border: 1px solid #f0c674;
+    color: #8a5a00;
+    font-family: var(--font-sans);
+    font-size: 10pt;
+    padding: 2mm 4mm;
+    margin: 3mm 0 2mm 0;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* ---- Partner Chart Add-On upsell box ------------------------------------ */
+.partner-compat-upsell {
+    background: #f0f7ff;
+    border: 1px solid #b6d4f0;
+    border-left: 4px solid #2a4d6e;
+    color: #1a1a1a;
+    padding: 3mm 5mm;
+    margin: 3mm 0 5mm 0;
+    border-radius: 4px;
+    font-style: italic;
+}
+
+/* ---- Lifetime Decade Roadmap (Deep tier SVG) ---------------------------- */
+.decade-roadmap {
+    margin: 4mm 0 6mm 0;
+    page-break-inside: avoid;
+}
+
+.decade-roadmap svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 720px;
+}
+
+/* ---- Tier-aware body classes -------------------------------------------- */
+body.tier-deep h1 {
+    border-bottom: 2.5px solid var(--color-heading);
+}
+
+body.tier-essential h1 {
+    border-bottom: 2px solid var(--color-heading);
+}
+
+
+/* ---- web layer (screen only; print rules above still apply) ---- */
+/* Web layer for the Saju report — appended after theme.css in web mode only.
+ *
+ * `theme.css` is a *print* stylesheet: A4 page boxes, running footers, table headers
+ * repeated across pages. It renders the report as a document, but on a phone it would
+ * be one A4 column squeezed into 390px with wide tables overflowing the viewport.
+ *
+ * This layer adds what a screen needs and changes nothing about the print result:
+ * a readable measure, a paper-like sheet, scrollable tables, visible heading anchors,
+ * and a highlight on the section a contents link just jumped to. It is deliberately
+ * light-only for the *document* (a reading is a sheet of paper) while the surrounding
+ * page follows the reader's colour scheme.
+ */
+
+/* ── the sheet ──────────────────────────────────────────────────────────────────── */
+html {
+    -webkit-text-size-adjust: 100%;
+}
+body.web-mode {
+    margin: 0;
+    padding: 0 0 4rem;
+    background: #eef1f4;
+    /* System stack: the document must be self-contained, so no web fonts. The
+       bundled report fonts are PDF-only. */
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+                 "Noto Sans", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+    body.web-mode {
+        background: #12161a;
+    }
+}
+body.web-mode .cover,
+body.web-mode .compact-cover,
+body.web-mode > h2,
+body.web-mode > h3,
+body.web-mode > p,
+body.web-mode > ul,
+body.web-mode > ol,
+body.web-mode > table,
+body.web-mode > .table-scroll,
+body.web-mode > div:not(.report-toolbar):not(.cover):not(.compact-cover),
+body.web-mode > hr,
+body.web-mode > blockquote {
+    box-sizing: border-box;
+    max-width: 46rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+/* The sheet: content blocks sit on white with a hairline, so the document reads as a
+   page rather than as loose text on a coloured background. */
+body.web-mode > h2,
+body.web-mode > h3,
+body.web-mode > p,
+body.web-mode > ul,
+body.web-mode > ol,
+body.web-mode > blockquote,
+body.web-mode > .table-scroll,
+body.web-mode > table,
+body.web-mode > div:not(.report-toolbar):not(.cover):not(.compact-cover) {
+    background: #ffffff;
+    padding: 0.55rem 1.15rem;
+}
+body.web-mode > h2 {
+    padding-top: 1.1rem;
+    padding-bottom: 0.3rem;
+}
+body.web-mode > hr {
+    border: 0;
+    height: 0;
+    margin: 0;
+}
+body.web-mode > h2:first-of-type {
+    margin-top: 1.5rem;
+}
+
+/* The cover watermark is a CJK glyph in the print sheet. A document that must render
+   identically everywhere cannot depend on the reader having a Korean font — on a device
+   without one it is a tofu box at 110pt on the front page. The web cover carries the
+   brand line instead; the PDF keeps the mark (its fonts are embedded). */
+body.web-mode .cover .watermark {
+    display: none;
+}
+
+/* ── reading measure on small screens ───────────────────────────────────────────── */
+@media screen and (max-width: 46rem) {
+    body.web-mode > h2,
+    body.web-mode > h3,
+    body.web-mode > p,
+    body.web-mode > ul,
+    body.web-mode > ol,
+    body.web-mode > blockquote,
+    body.web-mode > .table-scroll,
+    body.web-mode > table,
+    body.web-mode > div:not(.report-toolbar):not(.cover):not(.compact-cover) {
+        padding-left: 0.9rem;
+        padding-right: 0.9rem;
+    }
+}
+
+/* ── wide tables scroll instead of pushing the page sideways ────────────────────── */
+.table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+}
+.table-scroll:focus-visible {
+    outline: 2px solid var(--color-heading);
+    outline-offset: -2px;
+}
+.table-scroll table {
+    width: 100%;
+    min-width: 34rem;   /* keeps columns legible; the wrapper scrolls */
+}
+.table-scroll::after {
+    /* A hint that there is more to the right. */
+    content: "";
+    display: block;
+    height: 0;
+}
+
+/* ── heading anchors ────────────────────────────────────────────────────────────── */
+body.web-mode h2,
+body.web-mode h3 {
+    scroll-margin-top: 1rem;
+}
+.anchor {
+    float: right;
+    margin-left: 0.6rem;
+    color: var(--color-light);
+    text-decoration: none;
+    font-weight: 400;
+    opacity: 0;
+}
+body.web-mode h2:hover .anchor,
+body.web-mode h3:hover .anchor,
+.anchor:focus-visible {
+    opacity: 1;
+}
+@media (hover: none) {
+    .anchor { opacity: 0.5; }   /* touch devices have no hover: keep it reachable */
+}
+:target {
+    background: #fffbe8;        /* which section did the contents link open? */
+}
+
+/* ── linked contents list ────────────────────────────────────────────────────────── */
+body.web-mode nav.toc ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+body.web-mode nav.toc li {
+    padding: 0.28rem 0;
+    border-bottom: 1px solid var(--color-rule);
+    font-size: 1.02rem;
+}
+body.web-mode nav.toc li:last-child {
+    border-bottom: 0;
+}
+body.web-mode nav.toc a {
+    color: var(--color-heading);
+    text-decoration: none;
+    display: block;             /* a comfortable tap target, not just the words */
+    padding: 0.2rem 0;
+}
+body.web-mode nav.toc a:hover,
+body.web-mode nav.toc a:focus-visible {
+    text-decoration: underline;
+}
+
+/* ── the audio summary, in the page ──────────────────────────────────────────────── */
+.audio-summary {
+    max-width: 46rem;
+    margin: 0.4rem auto 1.2rem;
+    background: #fff7e6;
+    border: 1px solid #f0c674;
+    border-radius: 6px;
+    padding: 0.8rem 1rem;
+    box-sizing: border-box;
+}
+.audio-summary p {
+    margin: 0 0 0.6rem;
+    color: #8a5a00;
+    font-weight: 600;
+}
+.audio-summary audio {
+    width: 100%;
+    height: 2.75rem;            /* comfortably above the 44px control target */
+}
+
+/* ── the toolbar the webapp injects when it serves the report ───────────────────── */
+.report-toolbar {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0.75rem 1rem;
+    background: #2a4d6e;
+}
+.report-toolbar a,
+.report-toolbar button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;        /* 44px: the same bar the app's UI is audited against */
+    padding: 0 1rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    background: transparent;
+    color: #ffffff;
+    font: inherit;
+    text-decoration: none;
+}
+.report-toolbar a:hover,
+.report-toolbar a:focus-visible {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* ── printing: hand it back to the print stylesheet ─────────────────────────────── */
+@media print {
+    body.web-mode {
+        background: #ffffff;
+        padding: 0;
+    }
+    body.web-mode > h2,
+    body.web-mode > h3,
+    body.web-mode > p,
+    body.web-mode > ul,
+    body.web-mode > ol,
+    body.web-mode > blockquote,
+    body.web-mode > .table-scroll,
+    body.web-mode > table,
+    body.web-mode > div:not(.report-toolbar):not(.cover):not(.compact-cover) {
+        background: transparent;
+        padding: 0;
+        max-width: none;
+    }
+    .report-toolbar,
+    .anchor {
+        display: none;
+    }
+    .table-scroll {
+        overflow: visible;
+    }
+    .table-scroll table {
+        min-width: 0;
+    }
+    :target {
+        background: transparent;
+    }
+}
+
+</style>
+</head>
+<body class="tier-sample web-mode">
+<div class="cover">
+  <div class="watermark">命</div>
+  <h1>RM (Kim Nam-joon) — The Hook · Complimentary Reading</h1>
+  <p class="subtitle">A Reading in the Korean Four Pillars Tradition</p>
+  <p class="foot">Grounded in the Five Elements and Yin-Yang philosophy. Interpreted through classical Myeongri (Korean Saju) tradition: Jeokcheon-su, Yeonhae-japyeong, Gungtong-bogam, Myeongri-jeongjong.</p>
+  <p class="date">Generated October 16, 2026</p>
+</div>
+
+
+<h2 id="rm-kim-nam-joon-the-hook">RM (Kim Nam-joon) — The Hook<a class="anchor" href="#rm-kim-nam-joon-the-hook" aria-label="Link to this section">#</a></h2>
+<p><em>A one-page taste of your Saju chart — your elemental blueprint, no predictions</em></p>
+<p><strong>Born:</strong> 1994-09-12 · 13:28 · Seoul</p>
+<p><strong>Time method:</strong> recorded birth time 13:28 (local clock) corrected to true solar time <strong>13:00</strong> (birthplace 126.978°E vs the 135.0°E zone meridian), -27.7 min (longitude -32.1 min + equation of time +4.4 min). Hour branches follow 2-hour solar windows, so the pillars above use the corrected time.</p>
+<blockquote class="chart-signature">
+<p><strong>⚠ Hour-boundary note:</strong> the corrected time is only ~17 seconds from a 2-hour branch boundary. If the recorded clock time carries even a few minutes of error, the neighboring hour pillar (<strong>甲午</strong>, vs the primary <strong>乙未</strong> used above) is a plausible alternative — treat the hour pillar (and its palace themes) as lower-confidence in this reading.</p>
+</blockquote>
+<p><strong>Day Master:</strong> Sin (Yin Metal, 辛金)</p>
+<p><strong>Report generated:</strong> 2026-10-16 · <strong>Report ID:</strong> CID-rm-kim-nam-joon-20261016-SAMPLE</p>
+<p><em>Delivered by Cosmic Saju · cosmicsaju.com</em></p>
+<hr />
+<h2 id="your-chart-snapshot">Your Chart Snapshot<a class="anchor" href="#your-chart-snapshot" aria-label="Link to this section">#</a></h2>
+<h3 id="four-pillars">Four Pillars<a class="anchor" href="#four-pillars" aria-label="Link to this section">#</a></h3>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Table, scrollable"><table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Month</th>
+<th>Day</th>
+<th>Hour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gap Sul (甲戌)</td>
+<td>Gye Yu (癸酉)</td>
+<td>Sin Chuk (辛丑)</td>
+<td>Eul Mi (乙未)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="element-balance">Element Balance<a class="anchor" href="#element-balance" aria-label="Link to this section">#</a></h3>
+<ul>
+<li>🔴 <strong>Fire:</strong> 3.7%</li>
+<li>🟡 <strong>Earth:</strong> 16.9%</li>
+<li>⚪ <strong>Metal:</strong> 28.7%</li>
+<li>🔵 <strong>Water:</strong> 16.6%</li>
+<li>🟢 <strong>Wood:</strong> 34.1%</li>
+</ul>
+<h3 id="quick-read">Quick Read<a class="anchor" href="#quick-read" aria-label="Link to this section">#</a></h3>
+<ul>
+<li><strong>Day Master:</strong> Sin (Yin Metal, 辛金)</li>
+<li><strong>Strength:</strong> Strong</li>
+<li><strong>Favorable Element:</strong> Water</li>
+</ul>
+<div class="right-now-callout">
+<h3 id="what-this-year-means-for-you">What This Year Means for You<a class="anchor" href="#what-this-year-means-for-you" aria-label="Link to this section">#</a></h3>
+<p>2026 is a <strong>Direct Officer</strong> year — an invitation to lean into water energy.</p>
+<p><em>Your full chart contains 8 major luck periods spanning your lifetime — this snapshot shows only the surface.</em></p>
+
+</div><h3 id="your-lucky-cues">Your Lucky Cues<a class="anchor" href="#your-lucky-cues" aria-label="Link to this section">#</a></h3>
+<ul>
+<li><strong>Colors:</strong> black, navy, deep blue</li>
+<li><strong>Direction:</strong> north</li>
+<li><strong>Numbers:</strong> 1, 6</li>
+</ul>
+<p>This is just a snapshot. The full Essential or Deep Destiny report opens the story behind these numbers — your strengths, relationships, career arcs, and the timing that matters most.</p>
+<hr />
+<h3 id="want-the-full-story">Want the Full Story?<a class="anchor" href="#want-the-full-story" aria-label="Link to this section">#</a></h3>
+<p>This snapshot is just the doorway. The <strong>Essential Report</strong> ($19) explains your career arc, major luck periods, and lucky-element guide; the <strong>Deep Destiny Report</strong> ($55) adds year-by-year 2026–2031 timing, relationship and business-launch guidance, monthly lucky dates, and an included MP3 audio summary.</p>
+<h2 id="closing-note">Closing Note<a class="anchor" href="#closing-note" aria-label="Link to this section">#</a></h2>
+<p>This chart's gift is a strong companion presence that gives you real follow-through; the challenge is staying aware of the chart's pressure points rather than letting them run in the background. The single most useful next step is to weave the favorable <strong>Water</strong> element into daily rhythm — through color, direction, season, or practice — so the chart has somewhere to land. Treat the rest of this report as a starting place; the best readings come from revisiting the same chart across different life phases.</p>
+<hr />
+
+</body>
+</html>

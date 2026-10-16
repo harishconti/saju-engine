@@ -197,11 +197,19 @@ The engine can now produce **both** artefacts from one markdown source:
 | Web document | `md_to_saju_html_pdf.py --web --output report.html` | The reading. Self-contained HTML (inline CSS/SVG, no scripts or webfonts), heading anchors, a linked contents list, scrollable tables, an audio slot. Served at `/report/{token}` and **downloadable as one file**. |
 | PDF | `… --output report.pdf` (ReportLab) | The keepsake, and the record of what the reviewer approved. |
 
-**Not yet wired:** storage of the web document (`Report.htmlKey` + migration), the report
-route returning it, the download links, and the review console previewing both. Until that
-lands the web document is an engine capability, exercised from the CLI and gated with
-`qa_client_ready.py --html`. The plan is for the reviewer to approve **both** artefacts, and
-for the email to lead with the link and offer the PDF second.
+**How it is wired.** `POST /generate` takes an optional `htmlUploadUrl`; when present the engine
+renders the web document from the same markdown and PUTs it beside the PDF — best-effort, like the
+markdown, because losing the reading must not lose the order — and returns
+`htmlSha256`/`htmlBytes` so a caller can tell "not uploaded" from "not asked for". `fulfilment.ts`
+presigns that URL, verifies the object with `HeadObject`, and stores `Report.htmlKey`/`htmlBytes`.
+The client reads it at `GET /api/reports/{id}/html` and downloads it — or the PDF — from
+`GET /api/reports/{id}/download`. `12-testing.md` §Gate 4 covers the document's own properties.
+
+**Still open.** The audio player sits in the app *around* the reading (it already does, beside the
+MP3 route) rather than inside the stored document: the MP3 is produced after approval and the
+document is immutable by design. The review console still previews only the PDF. A compatibility
+reading has no web mode yet — its two-chart renderer is separate — so `htmlKey` stays null there, and
+the UI falls back to the PDF for those orders and for any report rendered before this existed.
 
 ### `/chart` — derive without rendering
 

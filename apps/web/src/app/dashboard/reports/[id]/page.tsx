@@ -80,9 +80,39 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ i
           <>
             <ReportStatusBadge status={report.status} />
             {canDownload ? (
-              <a href={`/api/reports/${report.id}/download`} className={buttonClasses("primary", "md")} download>
-                Download PDF
-              </a>
+              <>
+                {/* The reading comes first: it is what a client opens, and it is one
+                    self-contained file they can also keep. The PDF is the keepsake that
+                    matches what the reviewer approved. */}
+                {report.htmlKey ? (
+                  <a
+                    href={`/api/reports/${report.id}/html`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={buttonClasses("primary", "md")}
+                  >
+                    Read your reading
+                  </a>
+                ) : null}
+                {report.htmlKey ? (
+                  <a
+                    href={`/api/reports/${report.id}/download?kind=html`}
+                    download
+                    title="Save the reading as one file you can open anywhere"
+                    className={buttonClasses("outline", "md")}
+                  >
+                    Save
+                  </a>
+                ) : null}
+                <a
+                  href={`/api/reports/${report.id}/download?kind=pdf`}
+                  download
+                  title="The PDF, for printing or keeping"
+                  className={buttonClasses(report.htmlKey ? "outline" : "primary", "md")}
+                >
+                  PDF
+                </a>
+              </>
             ) : null}
           </>
         }

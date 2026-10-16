@@ -209,11 +209,18 @@ model Report {
   profileAId String
   profileBId String?
 
-  pdfKey    String?                                   // R2 object key
+  pdfKey    String?                                   // R2 object key (the PDF keepsake)
   mdKey     String?                                   // source markdown, kept for audit
   sha256    String?                                   // integrity check on download
   bytes     Int?
   pageCount Int?
+
+  // The web document: the reading the client opens, one self-contained HTML file (inline CSS and
+  // SVG, no scripts, no webfonts). Rendered from the same markdown as the PDF, so the two cannot
+  // disagree. Null for a compatibility reading (no web mode yet) and for reports rendered before
+  // this existed — the UI then hides the reading link and offers the PDF.
+  htmlKey   String?                                   // R2 object key
+  htmlBytes Int?
 
   chartHash String?                                   // hash of (chart inputs + overrides). Skips no-op regens.
   engineVersion String?                               // contract version of the engine service

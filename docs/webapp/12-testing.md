@@ -342,6 +342,11 @@ uses were taken on a real report through headless Chrome at 390 / 768 / 1440 px:
 | `--audio-url` puts the player in the MP3 section; absent without it | The Deep tier's copy promises the audio "on the same page as your reading" |
 | `report-toolbar` element appears only when injected | The downloadable file ships without dead links |
 | The print document gains none of it | `golden_html` snapshots stay the print artefact |
+| `/generate` renders and uploads the reading when `htmlUploadUrl` is given, keeps the PDF's integrity metadata intact, and still returns 200 when the document upload fails | `tests/test_report_engine_service.py` |
+
+**Route additions must be listed for the auth-gate spec** (§Surface 3, still planned): the new
+`GET /api/reports/{id}/html` belongs in it beside `/api/reports/{id}/download`, and both must return
+`401 UNAUTHORIZED` when signed out.
 
 ```bash
 python3 -m pytest -q tests/test_web_report.py

@@ -151,6 +151,10 @@ class GenerateRequest(BaseModel):
     # script be derived from the artefact that was actually approved, instead of being
     # recomputed later (an engine deploy in between could change the words).
     mdUploadUrl: Optional[str] = None
+    # Optional: where to PUT the **web document** — the reading the client opens, as one
+    # self-contained HTML file. Rendered from the same markdown as the PDF, so the two can
+    # never disagree. Single-chart only for now (the compat reading has its own renderer).
+    htmlUploadUrl: Optional[str] = None
     profileA: ProfileIn
     profileB: Optional[ProfileIn] = None
     favorableOverrideA: Optional[str] = None
@@ -341,7 +345,8 @@ def _strength_label(chart) -> str:
 
 
 def _render_single(profile: ProfileIn, tier: str, out_pdf: Path,
-                   override: Optional[str]) -> Tuple[Path, Path, Optional[int]]:
+                   override: Optional[str],
+                   wants_html: bool = False) -> Tuple[Path, Path, Optional[int], Optional[Path]]:
     """Mirrors `saju_web/jobs.render_single`, with the tier normalised and the override threaded."""
     data = BirthData(profile)
     chart = data.compute()
@@ -363,13 +368,32 @@ def _render_single(profile: ProfileIn, tier: str, out_pdf: Path,
     )
     pages: list = []
     pdf = build_pdf(output_pdf=out_pdf, title=title, tier=resolved, pages_out=pages, **kwargs)
-    return pdf, Path(kwargs["input_md"]), (pages[0] if pages else None)
+
+    html_path: Optional[Path] = None
+    if wants_html:
+        # The web document (the reading) beside the PDF, from the same markdown, so the two
+        # artefacts cannot disagree about a word. Self-contained: inline CSS and SVG.
+        from saju_html.renderer import markdown_to_html
+
+        document = markdown_to_html(
+            Path(kwargs["input_md"]).read_text(encoding="utf-8"),
+            title=title,
+            client=kwargs.get("client", ""),
+            dob=kwargs.get("dob", ""),
+            day_master=kwargs.get("day_master", ""),
+            report_id=kwargs.get("report_id", ""),
+            tier=resolved,
+            web=True,
+        )
+        html_path = out_pdf.with_suffix(".html")
+        html_path.write_text(document, encoding="utf-8")
+    return pdf, Path(kwargs["input_md"]), (pages[0] if pages else None), html_path
 
 
 def _render_compat(
     profile_a: ProfileIn, profile_b: ProfileIn, tier: str, out_dir: Path,
     override_a: Optional[str], override_b: Optional[str],
-) -> Tuple[Path, Path, Optional[int]]:
+) -> Tuple[Path, Path, Optional[int], Optional[Path]]:
     """Mirrors `saju_web/jobs.render_compat`."""
     data_a, data_b = BirthData(profile_a), BirthData(profile_b)
     chart_a, chart_b = data_a.compute(), data_b.compute()
@@ -410,7 +434,10 @@ def _render_compat(
         tier="compat",
         pages_out=pages,
     )
-    return pdf, out_md, (pages[0] if pages else None)
+    # No web document for a compatibility reading yet: it renders through its own two-chart
+    # renderer, which has no web mode. The response says `htmlSha256: null` either way, so a
+    # caller cannot mistake "not available" for "not asked for".
+    return pdf, out_md, (pages[0] if pages else None), None
 
 
 def _upload(artifact: Path, upload_url: str, *, content_type: str = "application/pdf",
@@ -524,21 +551,37 @@ def generate(request: GenerateRequest, authorization: Optional[str] = Header(Non
         return _fail(422, "INVALID_TIER", f"Unknown compatibility tier {request.tier!r}.")
 
     started = time.monotonic()
+    html_digest: Optional[str] = None
+    html_size: Optional[int] = None
     try:
         with tempfile.TemporaryDirectory(prefix="saju-render-") as tmp:
             out_dir = Path(tmp)
             if request.kind == "compat":
-                pdf, markdown_path, page_count = _render_compat(
+                pdf, markdown_path, page_count, html_path = _render_compat(
                     request.profileA, request.profileB, request.tier, out_dir,
                     request.favorableOverrideA, request.favorableOverrideB,
                 )
             else:
-                pdf, markdown_path, page_count = _render_single(
-                    request.profileA, request.tier, out_dir / "report.pdf", request.favorableOverrideA
+                pdf, markdown_path, page_count, html_path = _render_single(
+                    request.profileA, request.tier, out_dir / "report.pdf",
+                    request.favorableOverrideA,
+                    wants_html=bool(request.htmlUploadUrl),
                 )
             digest = hashlib.sha256(pdf.read_bytes()).hexdigest()
             size = pdf.stat().st_size
             _upload(pdf, request.uploadUrl)
+            if request.htmlUploadUrl and html_path is not None:
+                # Best-effort, like the markdown: the reading failing to upload must not
+                # lose the report. The response says so, so the caller can retry the
+                # document without re-rendering the PDF.
+                try:
+                    document = html_path.read_bytes()
+                    _upload(html_path, request.htmlUploadUrl,
+                            content_type="text/html; charset=utf-8")
+                    html_digest = hashlib.sha256(document).hexdigest()
+                    html_size = len(document)
+                except HTTPException:
+                    log.error("web document upload failed; the PDF is still delivered")
             if request.mdUploadUrl:
                 # Best-effort: a missing markdown only costs the audio and the audit
                 # trail, never the client's report.
@@ -562,6 +605,10 @@ def generate(request: GenerateRequest, authorization: Optional[str] = Header(Non
             # em dash. Null when the backend cannot report it (the HTML/Playwright renderer);
             # production renders with ReportLab.
             "pages": page_count,
+            # Integrity metadata for the web document (the reading), null when it was not
+            # requested or could not be uploaded. The PDF fields above are unaffected.
+            "htmlSha256": html_digest,
+            "htmlBytes": html_size,
             "engineVersion": ENGINE_VERSION,
             "durationMs": int((time.monotonic() - started) * 1000),
         }

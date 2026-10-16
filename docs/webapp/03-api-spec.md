@@ -100,8 +100,9 @@ export const POST = handle(async (req: Request) => {
 |---|---|---|---|
 | `GET` | `/api/reports` | user | List own reports (dashboard library) |
 | `GET` | `/api/reports/{id}` | user | Metadata: tier, status, dates, page count |
-| `GET` | `/api/reports/{id}/download` | user | 302 to a short-lived presigned R2 GET |
-| `GET` | `/api/reports/{id}/download?disposition=attachment` | user | Streamed forced download (`octet-stream`) |
+| `GET` | `/api/reports/{id}/html` | user | **The reading**: the stored web document, streamed as `text/html` with a strict CSP and `noindex`. `409 REPORT_NOT_READY` before delivery, `404 NO_WEB_DOCUMENT` when the report has no web version |
+| `GET` | `/api/reports/{id}/download` | user | **Download the reading** (`kind=html`, the default) as one self-contained `.html`. `?kind=pdf` gives the PDF; with no `kind` a report that has no web document falls back to the PDF |
+| `GET` | `/api/reports/{id}/download?disposition=attachment` | user | Streamed forced download (`octet-stream` for the PDF) |
 | `DELETE` | `/api/reports/{id}` | user | Delete report + queue the R2 object for deletion |
 | `GET` | `/api/reports/{id}/audio` | user | 302 to a presigned GET for the MP3; `?disposition=attachment` streams it. `409 AUDIO_NOT_READY` while being prepared, `404` when the tier has no audio |
 | `POST` | `/api/reports/{id}/audio` | user | The narration text, for reading instead of listening (and for audit) |
@@ -254,12 +255,34 @@ Errors: `422 TIER_PROFILE_MISMATCH` (e.g. a compat tier with no `profileBId`), `
 (the free tier), `404` if a profile does not belong to the caller, `409` on an idempotency-key reuse with
 a different body.
 
+### `GET /api/reports/{id}/html` — the reading
+
+Ownership and delivery state are checked exactly as for a download, and then the stored web document
+is streamed **through the app** rather than redirected to R2, because the response needs a policy that
+a redirect cannot set:
+
+| Header | Value | Why |
+|---|---|---|
+| `Content-Type` | `text/html; charset=utf-8` | It is a document |
+| `Content-Security-Policy` | `default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'` | The document is self-contained and scriptless; the policy makes that a guarantee rather than a property of today's template |
+| `X-Robots-Tag` | `noindex, nofollow` | A private link, in a reader's hands |
+| `Cache-Control` | `private, no-store` | Personal data; nothing in between caches it |
+| `Referrer-Policy` / `X-Content-Type-Options` | `no-referrer` / `nosniff` | — |
+
+`DRAFT_READY`/`IN_REVIEW` return `409 REPORT_NOT_READY`. A report with no web document — a
+compatibility reading, or one rendered before the web document existed — returns
+`404 NO_WEB_DOCUMENT`, which the UI treats as "offer the PDF instead".
+
 ### `GET /api/reports/{id}/download`
 
-Ownership check → presign a 1-hour R2 GET → `302`. With `disposition=attachment`, stream instead,
-forcing `Content-Type: application/octet-stream`, `Content-Disposition: attachment`,
-`X-Content-Type-Options: nosniff`, and `Cache-Control: private, no-store` — the existing
-`safeDownloadHeaders()` pattern from the reference implementation.
+**Default `kind=html`**: the reading, streamed with `Content-Disposition: attachment;
+filename="cosmic-saju-reading-<id>.html"` and the same policy as above — one file the client can keep
+and open anywhere. **`kind=pdf`**: the PDF keepsake, streamed as `application/octet-stream` with
+`X-Report-SHA256` for integrity.
+
+With no `kind` and no web document on the row, the route falls back to the PDF rather than failing: the
+client asked for their reading, not for a format. Otherwise the original behaviour stands — presign a
+1-hour R2 GET and `302`, streaming only when `disposition=attachment`.
 
 A `DRAFT_READY` or `IN_REVIEW` report is **not** downloadable by its owner. Until it is `DELIVERED`
 there is nothing to download, and the API says so with `409 REPORT_NOT_READY`.

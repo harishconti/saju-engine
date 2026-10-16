@@ -109,13 +109,13 @@ async function sweepAnonymousSamples(now: Date): Promise<number> {
       status: { in: ["DRAFT_READY", "FAILED"] },
       createdAt: { lt: cutoff },
     },
-    select: { id: true, pdfKey: true, mdKey: true, audioKey: true },
+    select: { id: true, pdfKey: true, mdKey: true, audioKey: true, htmlKey: true },
     take: 200,
   });
 
   if (stale.length > 0) {
     const keys = stale
-      .flatMap((r) => [r.pdfKey, r.mdKey, r.audioKey])
+      .flatMap((r) => [r.pdfKey, r.mdKey, r.audioKey, r.htmlKey])
       .filter((k): k is string => Boolean(k));
     if (keys.length > 0) {
       const res = await deleteObjects(keys);
@@ -161,11 +161,11 @@ async function processDueDeletions(now: Date): Promise<number> {
     const reports = await prisma.report.findMany({
       where: { userId: request.userId },
       // Include the MP3: an erasure request must not leave the audio behind.
-      select: { id: true, pdfKey: true, mdKey: true, audioKey: true },
+      select: { id: true, pdfKey: true, mdKey: true, audioKey: true, htmlKey: true },
     });
 
     const keys = reports
-      .flatMap((r) => [r.pdfKey, r.mdKey, r.audioKey])
+      .flatMap((r) => [r.pdfKey, r.mdKey, r.audioKey, r.htmlKey])
       .filter((k): k is string => Boolean(k));
     if (keys.length > 0 && isR2Configured()) {
       await deleteObjects(keys);

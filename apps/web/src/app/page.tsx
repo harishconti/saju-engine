@@ -193,25 +193,44 @@ export default async function LandingPage() {
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {[
-                { file: "demo-rm-sample.pdf", tier: "The Hook", note: "Free · ~1 page" },
-                { file: "demo-rm-essential.pdf", tier: "The Essential Report", note: "$19 · 6–7 pages" },
-                { file: "demo-rm-deep.pdf", tier: "The Deep Destiny Report", note: "$55 · 25–30 pages" },
+                { html: "demo-rm-sample.html", pdf: "demo-rm-sample.pdf", tier: "The Hook", note: "Free · ~1 page" },
+                { html: "demo-rm-essential.html", pdf: "demo-rm-essential.pdf", tier: "The Essential Report", note: "$19 · 6–7 pages" },
+                { html: "demo-rm-deep.html", pdf: "demo-rm-deep.pdf", tier: "The Deep Destiny Report", note: "$55 · 25–30 pages" },
               ].map((d) => (
-                <Card key={d.file} className="flex flex-col">
+                <Card key={d.html} className="flex flex-col">
                   <CardContent className="flex flex-1 flex-col gap-3 py-5">
                     <p className="eyebrow">{d.note}</p>
                     <h3 className="font-display text-xl">{d.tier}</h3>
                     <p className="flex-1 text-sm text-muted-foreground">
                       Single-chart reading for Kim Nam-joon.
                     </p>
+                    {/* The web document is what a client reads; the PDF is the
+                        keepsake. Same order here, so the marketing matches the product. */}
                     <a
-                      href={`/demo/${d.file}`}
-                      className={buttonClasses("outline", "sm", "w-full")}
+                      href={`/demo/${d.html}`}
+                      className={buttonClasses("primary", "sm", "w-full")}
                       target="_blank"
                       rel="noreferrer"
                     >
-                      Open the PDF
+                      Read it
                     </a>
+                    <div className="flex gap-2">
+                      <a
+                        href={`/demo/${d.html}`}
+                        download
+                        className={buttonClasses("outline", "sm", "w-1/2")}
+                      >
+                        Save
+                      </a>
+                      <a
+                        href={`/demo/${d.pdf}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={buttonClasses("outline", "sm", "w-1/2")}
+                      >
+                        PDF
+                      </a>
+                    </div>
                   </CardContent>
                 </Card>
               ))}

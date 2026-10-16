@@ -38,7 +38,7 @@ export default async function NewOrderPage({
         description="Pick a reading, choose who it's for, and we'll take it from there. Your chart is derived from the birth details you've already saved."
         actions={
           <a
-            href="/demo/demo-rm-deep.pdf"
+            href="/demo/demo-rm-deep.html"
             target="_blank"
             rel="noreferrer"
             className={buttonClasses("outline", "sm")}

@@ -60,7 +60,13 @@ function s3(): S3Client {
  *   reports/{userId}/{orderId}/{reportId}.pdf
  *   reports/{userId}/{orderId}/{reportId}.md
  */
-export function buildReportKey(userId: string, orderId: string, reportId: string, ext: "pdf" | "md" | "mp3"): string {
+export function buildReportKey(
+  userId: string,
+  orderId: string,
+  reportId: string,
+  // `html` is the web document: the reading the client opens, downloadable as one file.
+  ext: "pdf" | "md" | "mp3" | "html",
+): string {
   return `reports/${userId}/${orderId}/${reportId}.${ext}`;
 }
 

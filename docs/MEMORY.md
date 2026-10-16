@@ -1174,7 +1174,33 @@
     web document, the download links, and the review console previewing both artefacts. Docs: `reports.md`
     (§ The web document), toolchain (`--web`), `05` (the two artefacts, and what is not wired), `12` (gate 4).
 
-### Earlier state (2026-09-26)
+  - **2026-10-16 (the HTML workstream, part 2: the reading is in the product).** Owner decision carried through: the
+    reviewer approves both artefacts, the **web document is the default download** and the PDF is the additional
+    option. Wired end to end:
+    ✅ **Engine.** `POST /generate` takes an optional `htmlUploadUrl`; `_render_single` renders the web document from
+    the same markdown and PUTs it beside the PDF, returning `htmlSha256`/`htmlBytes`. **Best-effort on purpose** —
+    losing the reading must not lose the order — and the response distinguishes "not uploaded" from "not asked for".
+    Compat readings return `null`: their two-chart renderer has no web mode yet.
+    ✅ **Data.** `Report.htmlKey`/`htmlBytes` + a hand-written migration (no DB connection needed), because the schema
+    change must be deployable without me touching the dev branch. **`cleanup.ts` sweeps the new key** in both retention
+    paths — a retention sweep that forgets an artefact leaks the client's reading forever.
+    ✅ **Delivery.** `fulfilment.ts` presigns the HTML PUT (single-chart only), verifies it with `HeadObject` like the
+    PDF, and stores the key only when the object is really there. `GET /api/reports/{id}/html` serves the reading with
+    a strict policy (`default-src 'none'`, `noindex`, `private, no-store`, `nosniff`) and the right 409/404 codes;
+    the download route turns `kind=html` into the default and falls back to the PDF when a row has no web document.
+    ✅ **UI.** The report page leads with **Read your reading**, then Save (the `.html`), then PDF — the same order as
+    the marketing page, which now offers the three demo readings as web documents with the PDFs beside them.
+    ⚠️ **Two traps hit while wiring this, both worth remembering.** (1) A stale Prisma client made `htmlKey` a
+    *type* error rather than a missing column — `prisma generate` is part of the loop, not an afterthought. (2) I
+    edited a JSX demo grid by splicing line ranges and **silently dropped an array opener**; `tsc` caught it (and
+    two more type errors from the same edit), which is why `npm run typecheck` runs before committing a TSX change,
+    not just the vitest suite — vitest passed the whole time the page was broken.
+    Tests: three new engine cases (renders and uploads the reading; a failed document upload still returns 200 with
+    `htmlSha256: null`; nothing is rendered unless asked for) — **30 passed** in that file. Webapp: typecheck clean,
+    **116 vitest passed**. Docs: `02` (the fields), `03` (the new route, the `kind` default, the header table), `05`
+    (how it is wired, and what is still open), `12` (the new test, and the auth-gate route list). Still open: the
+    review console previews only the PDF, and the auth-gate spec is still unwritten — so the new route is *recorded*
+    in `03`/`12` and must be added to that spec when it lands.
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"
   below. The 2026-09 audit reports that tracked this work were removed in the 2026-10-01 cleanup. **Suite: 1136 passed / 9 xfailed / 0 failed.** Validation gate:

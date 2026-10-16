@@ -199,6 +199,13 @@ model Report {
   bytes     Int?
   pageCount Int?
 
+  // The web document: the reading the client opens, one self-contained HTML file (inline CSS
+  // and SVG, no scripts, no webfonts). Rendered from the same markdown as the PDF, so the two
+  // cannot disagree. Null for a compatibility reading (no web mode yet) and for reports
+  // rendered before this existed — the PDF stays the fallback.
+  htmlKey   String? // R2 object key
+  htmlBytes Int?
+
   chartHash     String? // hash of (chart inputs + overrides); skips no-op regens
   engineVersion String?
 

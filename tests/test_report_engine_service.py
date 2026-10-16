@@ -240,6 +240,82 @@ def test_generate_rejects_bad_birth_data_before_touching_the_upload():
     assert body_of(response)["code"] == "MISSING_LONGITUDE"
 
 
+def test_generate_renders_the_reading_when_asked(monkeypatch):
+    """With `htmlUploadUrl`, the engine PUTs the web document beside the PDF.
+
+    The web document is the artefact the client reads and can save as one file; it is rendered
+    from the same markdown as the PDF, so the two cannot disagree about a word.
+    """
+    import api.index as svc
+
+    uploaded: dict = {}
+
+    def fake_upload(artifact, url, *, content_type="application/pdf", timeout=60.0):
+        uploaded[str(url)] = (artifact.read_bytes(), content_type)
+
+    monkeypatch.setattr(svc, "_upload", fake_upload)
+    response = generate(
+        generate_request(uploadUrl="http://pdf.test/put", mdUploadUrl="http://md.test/put",
+                         htmlUploadUrl="http://html.test/put"),
+        authorization=AUTH,
+    )
+    assert response.status_code == 200, body_of(response)
+
+    body = body_of(response)
+    assert set(uploaded) == {"http://pdf.test/put", "http://md.test/put", "http://html.test/put"}
+
+    document, content_type = uploaded["http://html.test/put"]
+    assert content_type.startswith("text/html")
+    assert document.startswith(b"<!DOCTYPE html")
+    # Self-contained and private, which is what makes it safe to serve and to download.
+    assert b"noindex" in document
+    assert b"<script" not in document and b"<link " not in document
+    assert b'name="viewport"' in document
+    # Integrity metadata for the reading travels with the PDF's.
+    assert body["htmlBytes"] == len(document)
+    assert body["htmlSha256"] and len(body["htmlSha256"]) == 64
+
+
+def test_a_failed_web_document_upload_still_delivers_the_report(monkeypatch):
+    """Best-effort, like the markdown: losing the reading must not lose the order.
+
+    The response says `htmlSha256: null`, so a caller can tell "not uploaded" from "not asked
+    for" without guessing.
+    """
+    import api.index as svc
+    from fastapi import HTTPException
+
+    def fake_upload(artifact, url, *, content_type="application/pdf", timeout=60.0):
+        if content_type.startswith("text/html"):
+            raise HTTPException(status_code=502, detail="storage refused the document")
+
+    monkeypatch.setattr(svc, "_upload", fake_upload)
+    response = generate(
+        generate_request(uploadUrl="http://pdf.test/put", htmlUploadUrl="http://html.test/put"),
+        authorization=AUTH,
+    )
+    assert response.status_code == 200, body_of(response)
+    body = body_of(response)
+    assert body["htmlSha256"] is None and body["htmlBytes"] is None
+    assert body["sha256"], "the PDF still reported its own integrity metadata"
+
+
+def test_no_web_document_is_rendered_unless_asked_for(monkeypatch):
+    """A caller that does not ask pays nothing for it — and the response says so."""
+    import api.index as svc
+
+    uploaded: dict = {}
+
+    def fake_upload(artifact, url, *, content_type="application/pdf", timeout=60.0):
+        uploaded[str(url)] = content_type
+
+    monkeypatch.setattr(svc, "_upload", fake_upload)
+    response = generate(generate_request(uploadUrl="http://pdf.test/put"), authorization=AUTH)
+    assert response.status_code == 200, body_of(response)
+    assert list(uploaded) == ["http://pdf.test/put"]
+    assert body_of(response)["htmlSha256"] is None
+
+
 def test_generate_surfaces_an_upload_failure_without_leaking_the_url():
     """The render succeeds; the upload target is unreachable. The error must be clean."""
     response = generate(generate_request(tier="sample"), authorization=AUTH)

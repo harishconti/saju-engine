@@ -78,17 +78,28 @@ DEMO=apps/web/public/demo
 # robots.txt allows /demo/, so a sidecar landing there would publish internal citations.
 SCRATCH=tmp/demo-render
 mkdir -p "$SCRATCH"
-demo_rm() { # tier output_filename
+# Both artefacts, from one chart: the web document is what a client reads, the PDF is the
+# keepsake. The marketing page links the reading first — keep the two in step.
+demo_rm() { # tier
+  local t=$1
   python3 src/saju_html/md_to_saju_pdf.py --from-chart \
     --name "RM (Kim Nam-joon)" --gender M \
     --birth-year 1994 --birth-month 9 --birth-day 12 --birth-hour 13 --birth-minute 28 \
-    --city "Seoul" --longitude 126.978 --utc-offset 9 --tier "$1" --output "$SCRATCH/$2" >/dev/null \
-    && cp "$SCRATCH/$2" "$DEMO/$2" \
-    && echo "built $DEMO/$2  (sidecar kept in $SCRATCH)"
+    --city "Seoul" --longitude 126.978 --utc-offset 9 --tier "$t" \
+    --output "$SCRATCH/demo-rm-$t.pdf" >/dev/null \
+    && cp "$SCRATCH/demo-rm-$t.pdf" "$DEMO/demo-rm-$t.pdf" \
+    && echo "built $DEMO/demo-rm-$t.pdf  (sidecar kept in $SCRATCH)"
+  python3 src/saju_html/md_to_saju_html_pdf.py --from-chart --web \
+    --name "RM (Kim Nam-joon)" --gender M \
+    --birth-year 1994 --birth-month 9 --birth-day 12 --birth-hour 13 --birth-minute 28 \
+    --city "Seoul" --longitude 126.978 --utc-offset 9 --tier "$t" \
+    --output "$DEMO/demo-rm-$t.html" >/dev/null \
+    && echo "built $DEMO/demo-rm-$t.html  (the reading)"
 }
-demo_rm sample    demo-rm-sample.pdf
-demo_rm essential demo-rm-essential.pdf
-demo_rm deep      demo-rm-deep.pdf
+
+demo_rm sample
+demo_rm essential
+demo_rm deep
 
 # Compat demos are copies of the tracked pair report above. NOTE: `compat()` renders with the
 # HTML backend by default (better local typography), while the shipped demos and every deployed

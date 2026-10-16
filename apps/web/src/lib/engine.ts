@@ -32,6 +32,9 @@ export interface EnginePayload {
   /** Where the engine should also PUT the source markdown, so the audio script and the
    *  audit trail derive from the artefact that was actually reviewed. */
   mdUploadUrl?: string;
+  /** Where the engine should also PUT the web document — the reading the client opens, as one
+   *  self-contained HTML file. Omitted for a compatibility reading, which has no web mode. */
+  htmlUploadUrl?: string;
   profileA: EngineProfile;
   profileB?: EngineProfile;
   favorableOverrideA?: string | null;
@@ -48,6 +51,9 @@ export interface EngineResult {
    * renders with ReportLab, which counts pages during its two-pass build and now returns the total.
    */
   pages?: number | null;
+  /** Integrity metadata for the web document; null when it was not requested. */
+  htmlSha256?: string | null;
+  htmlBytes?: number | null;
 }
 
 function engineUrl(): string {
