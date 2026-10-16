@@ -169,7 +169,7 @@ heading landed on, and the second prints. What the client receives:
   `tests/test_pdf_navigation.py::test_cjk_font_covers_repo_cjk` fails until you do.
 - Markdown **blockquote** notes read as notes (no literal `>` surviving into the page), and
   the body heading carries the tier name only — never the price.
-- **`approve` runs a client-ready gate.** `tools/qa_client_ready.py` fails a draft that still contains the audit's defect classes (internal jargon, template debris, double glosses, a lowercase name, `a Earth`, a repeated word, a sentence repeated more than twice, a price). `intake_admin.py approve` runs it over the draft's markdown and PDF and refuses to issue the link unless you pass `--force`.
+- **`approve` runs a client-ready gate.** `tools/qa_client_ready.py` fails a draft that still contains the audit's defect classes (internal jargon, template debris, double glosses, a lowercase name, `a Earth`, a repeated word, a sentence repeated more than twice, a price). `intake_admin.py approve` runs it over the draft's markdown and PDF and refuses to issue the link unless you pass `--force`. If the PDF's text cannot be extracted at all — it needs `pdftotext` (poppler) — the gate reports `ARTEFACT_NOT_CHECKED` and blocks rather than passing silently: a draft's only readable text *is* the PDF, so silence would mean approving a report nothing had read.
 - **The reader's letter is drafted at review time, not by a template.** The audit's §1 wants a
   one-page letter naming the two or three features that drive the whole reading, plus the caveat
   about birth-time accuracy — the page that proves a human read *this* order. `tools/suggest_letter.py`

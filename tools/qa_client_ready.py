@@ -149,6 +149,17 @@ def _lines(text: str) -> Iterable[tuple[int, str]]:
         yield n, line
 
 
+def artefact_not_checked(path, *, source: str, why: str) -> Finding:
+    """A finding for an artefact the gate *could not read*.
+
+    Extracting text from a rendered PDF needs `pdftotext` (poppler). When it is missing, the honest
+    result is "not checked" — returning nothing instead let `approve` pass a client report that no gate
+    had ever looked at, which is the one direction a review gate must never fail (found by CI, which has
+    no poppler: approval succeeded and the blocking test failed).
+    """
+    return Finding("ARTEFACT_NOT_CHECKED", source, 0, str(path), why)
+
+
 def _is_table_row(line: str) -> bool:
     return line.lstrip().startswith("|")
 
@@ -358,6 +369,11 @@ def main() -> int:
             findings.extend(scan(text, source="pdf", rendered=True, name=args.name,
                                  tier=args.tier,
                                  max_sentence_repeats=args.max_sentence_repeats))
+        else:
+            # Asking for the PDF and not getting its text is a FLAGGED result, not a clean one.
+            findings.append(artefact_not_checked(
+                args.pdf, source="pdf",
+                why="no text extractor (`pdftotext`/poppler) — the PDF was NOT checked"))
     if args.html is not None:
         if not args.html.exists():
             print(f"no such html: {args.html}", file=sys.stderr)

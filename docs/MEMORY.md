@@ -1329,6 +1329,32 @@
     are symmetric (16px each side, verified). The asymmetry the owner saw was the clipped row. If they want the *hero*
     centred on mobile that is a separate design choice, not a bug — offered, not assumed.
 
+  - **2026-10-17 (CI was red on `develop` — and the reason was a review gate that silently checked nothing).** Noticed
+    while confirming the header fix: `Engine — pytest` failed on `test_approve_is_blocked_by_the_client_ready_gate`
+    (expected the gate to block; it returned clean), on **both** 3.10 and 3.12, and it had been failing since before
+    this session's work. It passes locally. `2007 passed / 5 skipped` here versus `1994 passed / 17 skipped` in CI was
+    the clue that the environments differ rather than the code.
+    ✅ **Root cause, and it is a product defect, not a test one.** `generate_draft` writes exactly two files:
+    `report-engine.md` (a sidecar the gate **skips by design**) and `report.pdf`. So **the gate's only readable text is
+    the PDF**, extracted with `pdftotext`. CI has no poppler — and `_pdf_text()` returned `None` on that, which the
+    caller treated as "nothing to check". The gate therefore found **nothing**, `approve` issued a delivery link, and
+    the test correctly failed. On a machine without poppler this was also live: **the one control between the engine
+    and a paying client would fail open, silently, while printing nothing**. `qa_client_ready.py --pdf` had the same
+    hole (it printed an stderr note, still said CLEAN, still exited 0).
+    ✅ **Fixed so it fails loud.** A new `artefact_not_checked(...)` finding (`ARTEFACT_NOT_CHECKED`) is returned
+    whenever an artefact cannot be read, in both `intake_admin.approve` and the `qa_client_ready.py` CLI. `--force`
+    remains the deliberate, warning override. This **changes the owner's workflow in one real way**: on a machine
+    without `poppler-utils`/`poppler`, `approve` now blocks with `ARTEFACT_NOT_CHECKED` instead of passing — recorded
+    as a runbook in `09-operations.md` with the install line, and in `05`/`openwiki` as the gate's contract.
+    ✅ **Tests:** the failing test now declares its requirement (`requires_pdf_text` — skip when poppler is absent,
+    matching the suite's existing `requires_pdftotext` pattern, because it asserts *which* finding fires), and the
+    behaviour that must hold **without** the tool is covered **deterministically** by monkeypatching the extractor
+    (`test_approve_blocks_when_the_artefact_cannot_be_read`, plus a CLI test in `test_qa_client_ready.py`). Verified by
+    running the pair under `PATH=/nonexistent`: the first skips with a reason, the second passes. Suite 2007 → 2009.
+    ⚠️ **The lesson is the same one this file keeps repeating.** The audit found a *gate* whose coverage depended on an
+    unstated system dependency, and whose failure mode was silence. Adding a check is not the same as making it
+    measurable — and "not checked" must never render as "clean".
+
 ### Earlier state (2026-09-26)
 
   - **2026-10-16 (the reading joins the design system — "the report UI is very ugly").** Owner feedback on the web

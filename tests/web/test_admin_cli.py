@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import importlib.util
+import shutil
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -148,6 +149,15 @@ def _fake_pdf(tmp_path, body=b"%PDF-1.4 polished"):
     return f
 
 
+# The generated draft writes only `report-engine.md` (a sidecar the gate skips, by design) plus the PDF,
+# so the gate's readable text *is* the PDF. Without `pdftotext` this test measured nothing — and passing
+# while measuring nothing is the failure mode it exists to prevent. CI has no poppler.
+requires_pdf_text = pytest.mark.skipif(
+    shutil.which("pdftotext") is None,
+    reason="needs pdftotext (poppler-utils) to read the draft's only readable artefact",
+)
+
+
 def test_attach_copies_pdf_and_blocks_regenerate(cli, tmp_path, capsys):
     store, iid = _draft(cli)
     src = _fake_pdf(tmp_path)
@@ -203,6 +213,7 @@ def test_approve_base_url_env_and_no_localhost_default(cli, monkeypatch, capsys)
     assert capsys.readouterr().out.startswith("https://pub.test/report/")
 
 
+@requires_pdf_text
 def test_approve_is_blocked_by_the_client_ready_gate(cli, capsys):
     """A report that fails the client-ready gate cannot be approved without --force.
 
@@ -217,6 +228,29 @@ def test_approve_is_blocked_by_the_client_ready_gate(cli, capsys):
     assert "INTERNAL_JARGON" in err or "DOUBLE_GLOSS" in err
     assert store.get_intake(iid)["status"] == "draft_ready"  # nothing was issued
     # --force is the deliberate override, and it warns while doing so.
+    assert cli.main(["approve", str(iid), "--base-url", "https://x.test", "--force"]) == 0
+
+
+def test_approve_blocks_when_the_artefact_cannot_be_read(cli, capsys, monkeypatch):
+    """An artefact the gate cannot read must block approval, never pass it silently.
+
+    The draft's only readable text is the PDF (`-engine.md` is skipped as a sidecar), so a missing
+    `pdftotext` used to mean the gate found nothing and `approve` issued a delivery link to a report no
+    gate had looked at — fail-open, on the one control standing between the engine and a paying client.
+    CI (which has no poppler) surfaced it: approval succeeded, so the test above failed there.
+
+    Deterministic on purpose: it monkeypatches the extractor, so it runs everywhere rather than skipping
+    where poppler is absent — the place the behaviour matters most.
+    """
+    store, iid = _draft(cli)
+    monkeypatch.setattr(cli, "_pdf_text", lambda _path: None)
+    assert cli.main(["approve", str(iid), "--base-url", "https://x.test"]) == 1
+    err = capsys.readouterr().err
+    assert "client-ready gate flagged" in err
+    assert "ARTEFACT_NOT_CHECKED" in err
+    assert "NOT checked" in err
+    assert store.get_intake(iid)["status"] == "draft_ready"  # nothing was issued
+    # --force stays the deliberate, warning override.
     assert cli.main(["approve", str(iid), "--base-url", "https://x.test", "--force"]) == 0
 
 

@@ -299,6 +299,22 @@ The site keeps working; only the sample flow and new generation break.
 4. If the error was ours, refund. Dodo Payments refunds are at their discretion — a clear, polite
    request with the specifics works better than a bulk appeal.
 
+### `approve` refuses with `ARTEFACT_NOT_CHECKED`
+
+The client-ready gate reads the rendered PDF through `pdftotext`, and a draft's *only* readable text is
+that PDF (`report-engine.md` is skipped as a sidecar). So without poppler the gate would have nothing to
+read — which used to mean it reported nothing and `approve` issued a link to a report no gate had looked
+at. It now blocks instead, by design:
+
+1. Install poppler: `brew install poppler` (macOS) or `apt-get install -y poppler-utils` (Linux).
+2. Re-run `approve`. The gate should then read the PDF and either pass or flag real defects.
+3. `--force` is still the deliberate override, and it warns. If you reach for it *because* of
+   `ARTEFACT_NOT_CHECKED` rather than an actual finding, you are approving an unread report — don't.
+
+CI installs no poppler, so the test that asserts *which* finding fires skips there; the fail-loud
+behaviour is covered deterministically by a test that stubs the extractor
+(`tests/web/test_admin_cli.py::test_approve_blocks_when_the_artefact_cannot_be_read`).
+
 ### Suspected key exposure
 
 1. Rotate the specific credential **first**, then investigate. In order of blast radius:

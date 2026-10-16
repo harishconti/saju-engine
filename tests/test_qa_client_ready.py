@@ -159,6 +159,35 @@ def test_cli_flags_a_real_report_and_clears_a_clean_one(tmp_path):
     assert warn.returncode == 0
 
 
+def test_cli_flags_a_pdf_it_cannot_read(tmp_path, monkeypatch, capsys):
+    """Asking for the PDF and getting no text is FLAGGED, not CLEAN.
+
+    The gate reads the rendered PDF through `pdftotext`. When that is missing it used to report nothing
+    and still print CLEAN — `--pdf` silently degraded to "markdown only" while looking like a full check.
+    Deterministic: the extractor is monkeypatched, so this runs on machines without poppler too.
+    """
+    report = tmp_path / "clean.md"
+    report.write_text("## Alice Smith — Deep Destiny Report\n\n"
+                      "You were born on a Gyeong (庚) day, with Water (水) as your favourable element.\n",
+                      encoding="utf-8")
+    pdf = tmp_path / "report.pdf"
+    pdf.write_bytes(b"%PDF-1.4")
+
+    monkeypatch.setattr(gate, "_pdf_text", lambda _path: None)
+    monkeypatch.setattr(sys, "argv",
+                        ["qa_client_ready", str(report), "--name", "Alice", "--pdf", str(pdf)])
+    assert gate.main() == 1
+    out = capsys.readouterr()
+    assert "ARTEFACT_NOT_CHECKED" in out.out
+    assert "NOT checked" in out.out
+    # --warn-only is the reviewer's deliberate override, and still reports the finding.
+    monkeypatch.setattr(sys, "argv",
+                        ["qa_client_ready", str(report), "--name", "Alice", "--pdf", str(pdf),
+                         "--warn-only"])
+    assert gate.main() == 0
+    assert "ARTEFACT_NOT_CHECKED" in capsys.readouterr().out
+
+
 def test_every_golden_report_passes_the_gate():
     """The committed report snapshots must be deliverable.
 

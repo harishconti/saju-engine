@@ -83,7 +83,7 @@ def _client_ready_findings(store: IntakeStore, intake_id: int) -> list:
     _tools = str(Path(__file__).resolve().parent)
     if _tools not in _sys.path:
         _sys.path.insert(0, _tools)
-    from qa_client_ready import scan
+    from qa_client_ready import artefact_not_checked, scan
 
     root = store.files_root / str(intake_id)
     findings: list = []
@@ -92,9 +92,16 @@ def _client_ready_findings(store: IntakeStore, intake_id: int) -> list:
             continue  # a sidecar, not the deliverable
         findings.extend(scan(Path(md).read_text(encoding="utf-8"), source="markdown"))
     for pdf in sorted(glob.glob(str(root / "*.pdf"))):
-        text = _pdf_text(Path(pdf))
+        path = Path(pdf)
+        text = _pdf_text(path)
         if text:
             findings.extend(scan(text, source="pdf", rendered=True))
+        else:
+            # Do not pass silently: the generated draft's ONLY readable text is the PDF (the markdown
+            # is the excluded `-engine.md` sidecar), so an unreadable PDF means nothing was checked.
+            findings.append(artefact_not_checked(
+                path, source="pdf",
+                why="no text extractor (`pdftotext`/poppler) — the rendered reading was NOT checked"))
     return findings
 
 

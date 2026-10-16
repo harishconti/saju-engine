@@ -186,6 +186,13 @@ Run for every tier (sample, essential, deep, compat basic, compat deep) as part 
 existing worklog records a real incident where a reviewer note leaked into client PDFs (G1) — this
 test is the reason it cannot happen again.
 
+**Environment-dependent tests say so.** Anything needing `pdftotext` (poppler) — this leak check, the PDF
+navigation probes, and the client-ready gate's assertion about *which* finding fires — is skipped, not
+silently passed, where poppler is absent, which includes CI. The behaviour that must hold *without* the
+tool is covered by a test that stubs the extractor
+(`tests/web/test_admin_cli.py::test_approve_blocks_when_the_artefact_cannot_be_read`), because a gate that
+cannot read an artefact must block rather than report clean.
+
 ## Specialised gate 3 — the UI/UX audit (`tools/audit-ui.py`)
 
 `06-frontend-ux.md` states an acceptance bar of measurable things — no horizontal body scroll at
