@@ -125,8 +125,9 @@ ADMIN_EMAILS=«your login email»
 CRON_SECRET=«openssl rand -base64 32»    # Vercel Cron sends this as a bearer token
 
 # ── Optional ──
-TURNSTILE_SECRET_KEY=«…»
-NEXT_PUBLIC_TURNSTILE_SITE_KEY=«…»
+TURNSTILE_SECRET_KEY=«from the Turnstile widget»            # server verification; fails CLOSED when set
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=«from the Turnstile widget»  # rendered by the sample form; inlined at BUILD time,
+                                                            # so changing it needs a redeploy
 ```
 
 #### Mail

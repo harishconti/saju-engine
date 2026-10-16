@@ -16,6 +16,7 @@ import {
 import { ENGINE_CONTRACT_VERSION, callEngine, isEngineConfigured } from "@/lib/engine";
 import { sampleRequestSchema } from "@/lib/validation/schemas";
 import { computeAndStoreChart } from "@/lib/chart-compute";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -34,6 +35,18 @@ export const POST = handle(async (req) => {
   await rateLimit(`sample:${ip}`, 5, WINDOW.minute);
 
   const input = await parseJson(req, sampleRequestSchema);
+
+  // Bot protection. Deliberately after the rate limit (cheap, and it bounds the cost of this call)
+  // and before any storage or engine work. Skips itself when TURNSTILE_SECRET_KEY is absent, which
+  // is what keeps local development working; once the secret exists a bad token is a hard refusal.
+  const turnstile = await verifyTurnstile(input.turnstileToken, ip);
+  if (!turnstile.ok) {
+    throw new ApiError(
+      403,
+      "TURNSTILE_FAILED",
+      "We couldn't confirm you're a person. Please refresh the page and try again.",
+    );
+  }
 
   if (!isR2Configured()) {
     throw ApiError.unavailable("Report storage is not configured", "STORAGE_UNAVAILABLE");

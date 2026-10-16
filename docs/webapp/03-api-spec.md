@@ -184,7 +184,14 @@ which is swept after 7 days.
 
 Errors: `422 VALIDATION_FAILED` (bad or missing birth fields), `409 BIRTH_DATA_AMBIGUOUS`
 (the engine flagged a solar-term or hour-boundary knife-edge and wants confirmation), `429
-RATE_LIMITED`, `503 STORAGE_UNAVAILABLE`, `503 ENGINE_UNAVAILABLE`.
+RATE_LIMITED`, `403 TURNSTILE_FAILED` (bot check not satisfied — see below), `503 STORAGE_UNAVAILABLE`,
+`503 ENGINE_UNAVAILABLE`.
+
+**Turnstile.** The form is protected by Cloudflare Turnstile. `turnstileToken` is verified server-side
+**before** any storage or engine work, so a failed check costs nothing. The check **skips itself when
+`TURNSTILE_SECRET_KEY` is unset** (local development), and **fails closed** once it is set — an absent or
+invalid token is a `403`, never a silent pass. Keep the secret and the public site key deployed as a pair:
+the secret alone verifies, the site key alone renders, and only both together protect anything.
 
 The response includes `chartPreview` on purpose: **the four pillars are shown to the user before we
 ask for money.** See the ground rule in [`CLAUDE.md`](../../CLAUDE.md) — no silent auto-calculation.

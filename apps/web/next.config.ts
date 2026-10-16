@@ -2,6 +2,21 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const r2 = "https://*.r2.cloudflarestorage.com";
+// Cloudflare Turnstile (bot protection on the free-sample form). It needs:
+//   script-src  — to load https://challenges.cloudflare.com/turnstile/v0/api.js
+//   frame-src   — the widget is rendered in an iframe served from that origin
+// The challenge itself is then fetched from a REGIONAL subdomain (observed:
+// hagen.challenges.cloudflare.com), so the wildcard is required as well as the bare host — a CSP
+// source of `https://challenges.cloudflare.com` matches that host only, never its subdomains.
+// (Adding the bare host is still right: `*.challenges.cloudflare.com` does not match it.)
+// Omitting any of these does not throw: the widget simply never completes, and because the client
+// treats an unverified widget as "not yet done", every submission is then blocked and no visitor can
+// take a free snapshot. The funnel dies silently.
+const turnstileHosts = "https://challenges.cloudflare.com https://*.challenges.cloudflare.com";
+// Google Fonts, loaded by a <link> in app/layout.tsx. `style-src` covers the stylesheet and
+// `font-src` the font files themselves; without both, the three brand faces silently fall back.
+const googleFontsCss = "https://fonts.googleapis.com";
+const googleFontsFiles = "https://fonts.gstatic.com";
 const isProd = process.env.NODE_ENV === "production";
 
 /**
@@ -10,15 +25,20 @@ const isProd = process.env.NODE_ENV === "production";
  * `frame-src 'self'` allows the admin console to embed a presigned R2 PDF in an <iframe>.
  * `connect-src`/`img-src` allow R2. `'unsafe-inline'` for styles is required by Next's
  * injected critical CSS; scripts stay strict in production.
+ *
+ * NOTE for a future privacy pass: the Google Fonts entries make every visitor's browser call
+ * Google, which shares their IP. Self-hosting the three faces under `public/fonts/` would drop
+ * those two sources entirely and is the better answer for a product with a privacy policy — see
+ * docs/webapp/10-privacy-and-compliance.md.
  */
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}`,
-  "style-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline' ${turnstileHosts}${isProd ? "" : " 'unsafe-eval'"}`,
+  `style-src 'self' 'unsafe-inline' ${googleFontsCss}`,
   `img-src 'self' data: blob: ${r2}`,
-  "font-src 'self' data:",
-  `connect-src 'self' ${r2} https://api.resend.com`,
-  `frame-src 'self' blob: ${r2}`,
+  `font-src 'self' data: ${googleFontsFiles}`,
+  `connect-src 'self' ${r2} https://api.resend.com ${turnstileHosts}`,
+  `frame-src 'self' blob: ${r2} ${turnstileHosts}`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

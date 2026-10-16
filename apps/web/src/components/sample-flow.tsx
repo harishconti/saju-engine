@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Alert, Button, Card, CardContent, Field, Input, Select, Steps, buttonClasses } from "@/components/ui";
+import { TurnstileWidget, turnstileEnabled } from "@/components/turnstile-widget";
 import { findCity, searchCities } from "@/lib/cities";
 import { ElementalRule, SealMark } from "@/components/viz";
 
@@ -26,6 +27,8 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
   const [birthTime, setBirthTime] = useState("12:00");
   const [timeKnown, setTimeKnown] = useState(true);
   const [city, setCity] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReset, setTurnstileReset] = useState(0);
 
   const cityOptions = useMemo(() => searchCities(city, 8), [city]);
   const resolved = useMemo(() => findCity(city), [city]);
@@ -36,6 +39,11 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
     if (!fullName.trim()) return setError("Please give your name.");
     if (!/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) return setError("Add your date of birth.");
     if (!resolved) return setError("Pick your birthplace from the suggestions.");
+    // Only required when the widget is actually rendered. The server enforces the same rule from
+    // TURNSTILE_SECRET_KEY; the two are deployed as a pair.
+    if (turnstileEnabled && !turnstileToken) {
+      return setError("Please complete the quick verification below, then try again.");
+    }
 
     setBusy(true);
     try {
@@ -51,18 +59,22 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
           city: resolved.name,
           countryCode: resolved.countryCode,
           country: resolved.country,
+          ...(turnstileToken ? { turnstileToken } : {}),
         }),
       });
 
       const body = (await res.json().catch(() => ({}))) as SampleResult & { error?: string; code?: string };
       if (!res.ok || !body.downloadUrl) {
         setError(body.error ?? "We couldn't generate your snapshot. Please try again.");
+        // A Turnstile token is single-use, so any retry needs a fresh challenge.
+        setTurnstileReset((n) => n + 1);
         return;
       }
       setResult(body);
       setStep(2);
     } catch {
       setError("Network problem. Please try again.");
+      setTurnstileReset((n) => n + 1);
     } finally {
       setBusy(false);
     }
@@ -157,6 +169,8 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
                 </span>
               </span>
             </label>
+
+            <TurnstileWidget onToken={setTurnstileToken} resetKey={turnstileReset} />
 
             <div className="flex flex-wrap items-center gap-3">
               <Button onClick={generate} loading={busy}>

@@ -215,9 +215,15 @@ document the reasoning for *not* notifying — the reasoning is what an auditor 
 
 - [ ] Privacy policy published: what we collect, why, lawful basis, retention periods, **what survives
       account deletion**, sub-processors listed by name
-- [ ] Sub-processors named: Neon (database + auth), Cloudflare (storage + DNS), Vercel (hosting), Resend
-      (transactional email), **Hostinger (mailbox — holds customer correspondence)**, Dodo Payments
-      (payments, MoR), Google (OAuth)
+- [ ] Sub-processors named: Neon (database + auth), Cloudflare (storage + DNS + **Turnstile bot
+      protection**), Vercel (hosting), Resend (transactional email), **Hostinger (mailbox — holds
+      customer correspondence)**, Dodo Payments (payments, MoR), Google (OAuth)
+- [ ] **Third-party browser requests are accounted for.** Loading a font or a script from someone
+      else's CDN hands them the visitor's IP and User-Agent, which is a transfer of personal data that
+      the policy has to cover. Today there are exactly two. **Google Fonts** — `layout.tsx` pulls
+      Cormorant Garamond, IBM Plex Mono and Inter from `fonts.googleapis.com` — is avoidable: self-host
+      the three faces under `public/fonts/` and the request disappears. **Cloudflare Turnstile** is the
+      other, and it is load-bearing for abuse control, so it stays and is named above.
 - [ ] Terms of Service published
 - [ ] **Refund policy published** — required by Dodo Payments, and a consumer-law expectation
 - [x] **Real, monitored addresses**: `hello@cosmicsaju.com` (general + where replies land) and

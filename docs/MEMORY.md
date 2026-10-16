@@ -621,6 +621,59 @@
     `apps/web/.gitignore` refuses `public/demo/*.md` as a second line of defence. Generalisation worth
     keeping: *anything the renderer strips must never be regenerated into `public/`.*
 
+  - **2026-10-16 (credential rotation, Turnstile, and two CSP bugs the browser found).** Owner asked to
+    rotate the leaked credentials, keep `ADMIN_EMAILS` as-is, and wire Turnstile now that the keys are in
+    `.env`.
+    **Resend key rotated — from full-access to sending-only.** The leaked key was `saju-app`
+    (`d34c2952…`), created 2026-10-15 and last used today, and it was **full-access**: it could list and
+    delete API keys. The replacement (`saju-app-2026-10-16`) is created with `permission: "sending_access"`
+    — which is all the app needs, since it only ever `POST`s `/emails` (the resent webhook is signature-
+    verified and needs no key). Wired into `apps/web/.env` and all three Vercel scopes, then proven by a
+    real send. ⚠️ **Two lessons, both worth keeping:**
+    (1) **A sending-only key cannot revoke anything** — including itself. `GET/DELETE /api-keys` returns
+    `401 restricted_api_key`, so **the old leaked key cannot be revoked programmatically** and needs one
+    click in the Resend dashboard. Rotate *as* a full-access key, or revoke first and replace second.
+    (2) **`vercel env add` given a value on stdin stores it as a *Sensitive* variable**, which
+    `vercel env pull` then reads back as the literal `[SENSITIVE]`. That is an improvement (write-only),
+    but it means the value cannot be verified by reading it back — verify functionally. The Development
+    scope came back readable, and matched the new key **exactly** (36 chars), with
+    `NEXT_PUBLIC_CONTACT_EMAIL` as a control — which is what proved the storage path faithful.
+    ⚠️ The orphan from a first, aborted attempt (a key whose token was lost) was revoked in-band.
+    **Turnstile is now real, not decorative.** New `src/lib/turnstile.ts` (verify via `siteverify`,
+    **fail closed when `TURNSTILE_SECRET_KEY` is set, skip when it is not** so local dev works) and
+    `src/components/turnstile-widget.tsx` (explicit render, script injected by hand rather than through
+    `next/script`, reset on retry because **tokens are single-use**). Wired into `/api/sample` after the
+    rate limit and before any storage or engine work. **Verified live:** a request with no token *and* one
+    with a forged token both return `403 TURNSTILE_FAILED` — a skipped check would have generated a sample.
+    11 new unit tests; webapp suite 69 → 80.
+    ⚠️ **The CSP would have broken the funnel silently.** `next.config.ts` allowed only `'self'` for
+    scripts and frames, so the challenge would never complete — and because the client treats an
+    unverified widget as "not yet done", **every** submission would have been blocked with *"please
+    complete the verification"* on a page with nothing to complete. Worse, the challenge script and
+    iframe are fetched from **regional subdomains** (`hagen.challenges.cloudflare.com`,
+    `brunhild.challenges.cloudflare.com`), and a CSP source of `https://challenges.cloudflare.com` matches
+    that host *only* — never its subdomains. Now both the bare host and `https://*.challenges.cloudflare.com`
+    are listed in `script-src`, `frame-src` and `connect-src`.
+    ⚠️ **A second, pre-existing bug the same probe exposed: the brand fonts had never loaded.** 
+    `layout.tsx` pulls Cormorant Garamond, IBM Plex Mono and Inter from `fonts.googleapis.com`, but the CSP
+    never allowed `fonts.googleapis.com` (style-src) or `fonts.gstatic.com` (font-src) — so every visitor
+    since launch got fallback fonts, with a CSP violation in the console. Fixed and **verified in a real
+    browser**: zero CSP violations, and `document.fonts` reports all three faces loaded. Flagged in `10`:
+    self-hosting the three faces would remove the third-party request entirely, which matters for a product
+    with a privacy policy (a CDN font hands Google the visitor's IP).
+    **How this was actually checked:** a headless Chrome (`channel="chrome"`) load of the live `/sample`,
+    collecting console + `requestfailed`. Note the limit of that method — Turnstile is *designed* to refuse
+    automation, so the run reliably reaches "script loads, `window.turnstile` is defined, `render()` injects
+    its DOM, challenge never completes". That is expected and is not evidence of breakage; **only a real
+    browser can settle it**, so the runbook in `09` documents the two escape hatches (drop the site key to
+    stop the client demanding a token; drop the secret to make the server skip) and warns against "fixing"
+    it by accepting unverified tokens.
+    <br>**Still open after this session:** the old full-access Resend key needs a dashboard revoke; the Neon
+    database password is **still unrotated** (rotating it needs a brief outage: rotate → rewrite the three
+    DB URLs in three scopes → redeploy both projects); Dodo approval is still in progress, so payments
+    remain `test_mode` and the checkout route still has no test/live guard; `ADMIN_EMAILS` is unchanged by
+    request, and with **0 users** nobody can sign in to `/admin` until the owner signs up with that address.
+
 ### Earlier state (2026-09-26)
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"

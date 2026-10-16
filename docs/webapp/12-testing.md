@@ -88,6 +88,7 @@ vi.mock('@/lib/prisma', () => ({ prisma: mocks.prisma }));
 | Deletion | `scheduledFor` arithmetic, cancel before/after, anonymisation shape |
 | Consent | Append-only semantics; withdrawal sets `withdrawnAt` |
 | Chart-hash | Same inputs → same hash; override change → different hash |
+| **Bot protection** (`turnstile.test.ts`) | Unconfigured → **skips** and does not call Cloudflare (so local dev works); configured + missing/whitespace token → **refuses** without calling out; valid token → posts `secret`/`response`/`remoteip`; `success:false` → refuses and surfaces Cloudflare's error codes; HTTP error or an unreachable Cloudflare → **refuses, never 500s and never allows** |
 | **Mail routing** (`email-reply-to.test.ts`) | `EMAIL_REPLY_TO` lands as `reply_to`; an explicit caller `replyTo` wins; the header is **omitted, not empty**, when unset; an unconfigured Resend reports `skipped` and sends nothing; the published `hello@` / `privacy@` defaults |
 
 Mock-boundary rule: mock the **network and the database**, never our own modules. If a test needs to

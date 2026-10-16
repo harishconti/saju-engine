@@ -183,7 +183,8 @@ and it moves the golden snapshots, so it is its own change.
 | Doc says | Reality |
 |---|---|
 | `POST /api/contact` exists | **Resolved:** it never did. Removed from [03](03-api-spec.md) — contact is a `mailto:` to a monitored address, which is honest and needs no spam-filtering surface |
-| Turnstile protects the free-sample form | Only a `turnstileToken` field in the zod schema. **No widget, no server-side verification**; the Postgres rate limit (5/min/IP) is the only protection |
+| Turnstile protects the free-sample form | ✅ **Resolved 2026-10-16.** Widget + server-side verification, failing closed. Verified live: a request with no token, and one with a forged token, both return `403 TURNSTILE_FAILED` (a skipped check would have generated a sample) |
+| Google Fonts render on the site | ❌ **They never did.** `layout.tsx` loads Cormorant Garamond / IBM Plex Mono / Inter from Google, but the CSP's `style-src`/`font-src` never allowed those origins, so every visitor silently got fallback fonts. Fixed 2026-10-16; verified in a real browser — zero CSP violations and all three faces load |
 | Playwright specs exist | None do |
 | CI covers the webapp | ✅ **Fixed 2026-10-16** — it now triggers on `develop` (production) and runs a webapp job. Only the Playwright tier is still outstanding (§B5) |
 | The repo tracks the webapp | ❌ **It did not.** `apps/web` had **0 tracked files**, and the root `.gitignore`'s unanchored `lib/` was silently swallowing `apps/web/src/lib/` — 34 files including `fulfilment.ts`, `queue.ts` and the entire Vitest suite. Committed 2026-10-16 after anchoring those patterns; verified against a fresh clone |
