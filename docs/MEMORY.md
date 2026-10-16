@@ -1294,9 +1294,17 @@
     was clipped by the layout rather than expanding the document. That is why the page read as left-shifted with uneven
     "padding" — the whole row was simply wider than the phone.
     ✅ **Fixed in the header** (`components/site.tsx`): below `sm` the brand shows the seal mark alone (the link keeps
-    its accessible name via `aria-label`), the CTA shortens to "Free snapshot", the actions group is `shrink-0`, and the
-    row is `flex-wrap` + `min-h-16` so 320dp wraps instead of clipping. Measured after: CTA right edge **304 / 344 /
-    374** at 320 / 360 / 390 — inside the viewport at every width, `scrollWidth == innerWidth`, header height 67px.
+    (the link keeps its name for screen readers — see the note below), the CTA shortens
+    to "Free snapshot", the actions group is `shrink-0`, and the row is `flex-wrap` + `min-h-16` so 320dp wraps instead
+    of clipping. Measured after: CTA right edge **304 / 344 / 374** at 320 / 360 / 390 — inside the viewport at every
+    width, `scrollWidth == innerWidth`, header height 67px.
+    ⚠️ **And the gate caught me reintroducing a bug this project had already fixed once.** To keep the link's name when the
+    wordmark became visually hidden, I added `aria-label="Cosmic Saju — home"` to a link whose visible text is "Cosmic
+    Saju 사주" — **exactly** item 2 of the axe sweep recorded earlier in this file: `label-content-name-mismatch`, which
+    fired on five pages at tablet and desktop (not at phone, where that text is hidden). The right fix is the one already
+    written down there — *no label where there is visible text* — so the wordmark is now `sr-only sm:not-sr-only`:
+    visually gone on a phone, still in the accessibility tree, and the link's name still contains its visible text at
+    every width. **A gate that re-catches a known mistake is worth more than one that only finds new ones.**
     ✅ **And the checker was taught to look there.** `tools/audit-ui.py` now includes a **360dp `phone` viewport**
     alongside 390 / 768 / 1440. It already had the right *kind* of check (any element whose rect passes the viewport
     fails, exemptions for genuinely swipeable ancestors) — it was simply measuring 390, where the header happens to
