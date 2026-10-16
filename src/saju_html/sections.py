@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import re
 
+from saju_engine.report_data import AUDIO_COVER_CALLOUT
 from saju_html.svg_charts import (
     _build_decade_roadmap_svg,
     build_luck_bars_svg,
@@ -274,14 +275,18 @@ def _wrap_chart_signature(html: str) -> str:
 
 
 def _wrap_audio_included(html: str) -> str:
-    """Style the Deep-tier '🎧 Your MP3 audio summary is included' callout."""
+    """Style the Deep-tier '🎧 Your MP3 audio summary is included' callout.
+
+    The replacement text comes from ``AUDIO_COVER_CALLOUT`` — this used to hardcode its own
+    copy of the sentence, which drifted out of step with the engine's cover the moment the
+    audio delivery pipeline changed.
+    """
     pattern = re.compile(
         r"<p>\s*🎧\s*<strong>Your MP3 audio summary is included[^<]*</strong>\s*</p>",
         re.IGNORECASE,
     )
     return pattern.sub(
-        '<div class="audio-included">🎧 Your MP3 audio summary is included — '
-        "delivered with this report.</div>",
+        f'<div class="audio-included">🎧 {AUDIO_COVER_CALLOUT}</div>',
         html,
     )
 

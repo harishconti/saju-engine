@@ -29,6 +29,14 @@ from .report_primitives import ELEMENT_COLORS, ELEMENT_EMOJI  # noqa: E402,F401
 
 
 # ── Tier metadata ──────────────────────────────────────────────────────────
+#
+# Deep-tier audio callout. This sentence used to exist as THREE hardcoded copies — the engine
+# markdown cover (premium_report), the ReportLab cover (saju_html.md_to_saju_pdf) and the HTML
+# wrapper (saju_html.sections) — and they drifted: two of them still said "delivered with this
+# report" long after the pipeline changed so the MP3 is rendered AFTER approval and emailed
+# separately. Keep it here, and import it, so that cannot happen again.
+AUDIO_COVER_CALLOUT = "Your MP3 audio summary is included — it follows this report by email."
+
 TIER_CONFIG: Dict[str, Dict[str, str]] = {
     "sample": {
         "name": "The Hook",
@@ -38,7 +46,7 @@ TIER_CONFIG: Dict[str, Dict[str, str]] = {
     },
     "essential": {
         "name": "Essential Report",
-        "price": "$9 intro → $19",
+        "price": "$19",
         "pages": "6–7",
         "tagline": "Your natal chart, career arc, decade cycles, and lucky-element guide",
     },

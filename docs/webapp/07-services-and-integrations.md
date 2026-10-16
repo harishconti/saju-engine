@@ -645,11 +645,13 @@ to keep in sync, because the checkout `return_url` comes from `NEXT_PUBLIC_APP_U
 | Deep Compatibility | `compat-deep` | `COMPAT` `deep` | $45 | `DODO_PRODUCT_COMPAT_DEEP` |
 | The Hook | — | `sample` | free | **not** a Dodo product |
 
-> ⚠️ **Price drift to settle.** [`openwiki/products/reports.md`](../openwiki/products/reports.md)
-> records the Essential tier as **"$9 intro → $19"**. A Dodo product carries **one** price, so pick one
-> and make the landing-page copy match. This document uses $19 (the standard price). If the intro price
-> is kept it must be a genuinely separate product with a launch window, not a footnote in prose — and
-> [02 — Data model](02-data-model.md)'s tier map is the single place to encode it.
+> ✅ **Price drift settled (2026-10-16).** The Essential tier is **$19** everywhere: the Dodo product
+> ($19), the webapp tier map, the landing page, and — the part that was actually broken — the engine's own
+> `TIER_CONFIG` cover, which still printed **"$9 intro → $19"** on every *delivered* Essential report as
+> well as in `demo-rm-essential.pdf`. That launch promo is retired. A Dodo product carries exactly **one**
+> price, and [02 — Data model](02-data-model.md)'s tier map is the single place to encode it. If an intro
+> price is ever wanted again it must be a genuinely separate product with a launch window, not a footnote
+> in prose.
 
 > **Cosmic Companion ($9/mo) is deliberately not offered in v1.** The engine supports the tier; the
 > billing does not.

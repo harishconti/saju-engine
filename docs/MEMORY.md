@@ -578,10 +578,48 @@
     payment and receive a fulfilled report; `ADMIN_EMAILS` is `ngharish.conti@gmail.com` in Vercel but
     **empty** in local `.env` and unverified as the owner's sign-in address (if wrong, no report can ever
     be approved); the two credentials leaked into the transcript are still **unrotated**;
-    `demo-rm-essential.pdf` still advertises a retired `$9 intro → $19`; and the current engine still says
-    the MP3 is *"delivered with this report"* / *"alongside this PDF"* although it arrives later by email
-    (plus the known `+2` vs `+5` window mismatch). Production held **0 users, 0 orders, 0 reports**, so
-    none of this is customer-visible yet.
+    `demo-rm-essential.pdf` advertised a retired `$9 intro → $19`, and the engine said the MP3 was
+    *"delivered with this report"* / *"alongside this PDF"* although it arrives later (plus a `+2` vs `+5`
+    window mismatch). All three were **fixed in the same session** — see the next entry. Production held
+    **0 users, 0 orders, 0 reports**, so none of it was customer-visible.
+  - **2026-10-16 (the stale-price and audio-copy fix, and the duplication that caused it).** Owner-approved
+    engine prose change, in three parts. **(1) The retired price**, the most serious of the three: the
+    Essential cover printed **"$9 intro → $19"** on *every delivered Essential report*, because
+    `report_data.TIER_CONFIG["essential"]["price"]` still carried a launch promo the store no longer runs
+    (Dodo charges $19; the site says $19; the tier map says $19). Now `$19`. Corrected in the same pass:
+    **8 documentation files** that advertised the dead price — `CLAUDE.md`, `README.md`,
+    `candidates_horoscope/README.md`, `docs/openwiki/products/reports.md`, both
+    `.claude/commands/saju*.md`, and two canonical tables in this file. **(2) The audio window** — the note
+    said `current_year`–`current_year + 2` while the report's own "Year-by-Year Launch Timing" section
+    covers `current_year + 5`, so it *under*-promised what the narration reads. Now `+5`. **(3) The audio
+    timing** — the cover claimed the MP3 was *"delivered with this report"* and the note *"delivered
+    alongside this PDF"*, but the pipeline renders audio **after** approval and emails it separately
+    (delivery deliberately never waits for it). Now: *"included — it follows this report by email"*.
+    ⚠️ **The reason this needed three edits for one sentence:** the claim was **hardcoded in three
+    renderers** — the engine markdown cover (`premium_report.py`), the **ReportLab** cover
+    (`md_to_saju_pdf.py:541`) and the **HTML** wrapper (`sections.py:284`) — and they had drifted, which is
+    exactly what the first demo re-render exposed (the markdown was fixed but the PDF still said the old
+    line, because the ReportLab renderer injects its own copy). There is now a single
+    `report_data.AUDIO_COVER_CALLOUT` imported by all three. The HTML wrapper's copy is latent — its regex
+    never fires on current output — but it is fixed and pinned by a test.
+    **Regenerated:** 46 markdown + 46 HTML goldens (diff verified to be *only* the intended lines: 7
+    Essential covers and 9 Deep audio blocks in each set), and the three RM demo PDFs re-rendered with
+    ReportLab **from the chart** (`md_to_saju_pdf.py --from-chart`), because the stored demo markdown
+    embeds its own cover and re-rendering it alone would have preserved the stale price. The HTML/renderer
+    tests that pinned the old wording were updated to pin the new invariants instead — including that
+    `current_year + 5` appears and `current_year + 2` does not. Engine suite green again (1,909).
+    **Deliberately NOT changed:** the stored candidate reports (`candidates_horoscope/reports/rm/
+    rm-essential.md`, `vishnu-priya-essential.md`, and their PDFs) still carry the old cover. They are
+    stored artefacts of work already produced, not product documentation, and rewriting them would put the
+    markdown out of step with the PDFs beside them.
+    ⚠️ **A second leak nearly shipped with the demos.** `--from-chart` always writes a `*-engine.md`
+    **sidecar** next to its output, and pointing it at `apps/web/public/demo/` deposited three of them
+    there — the deep one carrying **13 `knowledge/` citations**, which the PDF renderer strips but the
+    markdown does not. `public/` is served verbatim and `robots.txt` explicitly **allows `/demo/`**, so
+    they would have been publicly fetchable; only the absence of a redeploy kept them private. The demo
+    build now renders into the git-ignored `tmp/demo-render/` and copies **only the PDF**, and
+    `apps/web/.gitignore` refuses `public/demo/*.md` as a second line of defence. Generalisation worth
+    keeping: *anything the renderer strips must never be regenerated into `public/`.*
 
 ### Earlier state (2026-09-26)
 
@@ -657,7 +695,7 @@
   and whether `climate.py` should expand to the full 寒暖燥濕 four-way 궁통보감 reading.
 - **Products implemented** (USD, after the 2026-09-07 pivot — see `docs/market-research-2026-09.md`):
   - **The Hook** (`sample`) — free 1-page report.
-  - **The Essential Report** (`essential`) — $9 intro → $19, 6–7 pages.
+  - **The Essential Report** (`essential`) — $19, 6–7 pages.
   - **The Deep Destiny Report** (`deep`) — $55, 10–12 pages.
   - **Cosmic Companion** (`companion`) — $9/month or $79/year, 3–4 pages; manual-billing subscription (off the primary pricing grid).
   - **두 분 궁합 / Compatibility** (`compat`) — Snapshot ($24) and Deep ($45) tiers, 11 sub-systems, composite 0–100 score. Deep is the hero product.
@@ -736,7 +774,7 @@ fulfilment: ~$1–3K/month; most likely 12-month outcome is a kill/skip.
 | Client-facing name | Engine tier | Price | Page target | Notes |
 |---|---|---|---|---|
 | The Hook | `sample` | Free | ~1 page | Fully automatable. |
-| The Essential Report | `essential` | $9 intro → $19 | 6–7 pages | Engine draft → review required. |
+| The Essential Report | `essential` | $19 | 6–7 pages | Engine draft → review required. |
 | The Deep Destiny Report | `deep` | $55 | 10–12 pages | Includes year-by-year windows; MP3 audio summary wording included by default. |
 | Compatibility Snapshot (두 분 궁합) | `compat_report(..., tier="basic")` | $24 | ~4 pages | Two-chart snapshot: composite 0–100 score + 4-band verdict, four-pillar glance, four decisive sub-systems, condensed Practical Guidance, Closing Note. |
 | Deep Compatibility (두 분 궁합) — hero | `compat_report(..., tier="deep")` | $45 | 9–10 pages | Basic + all 11 sub-system cards, per-partner element balance / Day Master snapshots, major-luck timelines, year-by-year couple timing overlay, full Practical Guidance, Closing Note. |

@@ -16,7 +16,7 @@
 
 **Chart signature:** *A garden plot waiting for rain — fertile, patient, and needing the right season.*
 
-**(Audio summary included)** Your MP3 audio summary is included — delivered with this report.
+**(Audio summary included)** Your MP3 audio summary is included — it follows this report by email.
 
 ---
 
@@ -757,7 +757,7 @@ The next **12 months** of favorable days, selected when the daily stem element m
 
 ## MP3 Audio Summary — Included by Default
 
-🎧 **Audio Summary:** Your MP3 companion to this report will be delivered alongside this PDF. It covers your Day Master portrait, current major-luck period, key timing windows for 2026–2028, and the top 5 practical recommendations in approximately 8–10 minutes.
+🎧 **Audio Summary:** Your MP3 companion to this report is included and follows shortly after it — we email you the moment it is ready, and it appears on the same page as your reading. It covers your Day Master portrait, current major-luck period, key timing windows for 2026–2031, and the top 5 practical recommendations in about ten minutes.
 
 Listen once in full, then return to the chapters that match the season you are in.
 

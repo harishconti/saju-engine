@@ -418,9 +418,11 @@ def test_premium_report_essential_price_and_scope():
     chart = _sample_chart()
     report = generate_premium_report(chart, tier="essential")
     assert "Essential Report" in report
-    # F-13 (2026-09-26 audit): TIER_CONFIG must match CLAUDE.md's documented
-    # launch price ("$9 intro → $19"), not the bare regular price alone.
-    assert "$9 intro → $19" in report
+    # TIER_CONFIG must state the price the store actually charges ($19) and that CLAUDE.md
+    # documents. It previously carried a launch promo ("$9 intro → $19") the product no longer
+    # runs, so a delivered report was quoting a price that did not exist.
+    assert "$19" in report
+    assert "9 intro" not in report
     assert "## Chart at a Glance" in report
     assert "## Table of Contents" in report
     assert "## Day Master Portrait" in report
@@ -600,11 +602,31 @@ def test_premium_report_deep_cover_mentions_audio_included():
 
 
 def test_premium_report_deep_audio_section_uses_default_wording():
-    """Deep tier audio section wording should say 'delivered alongside' (default),
-    not the old 'on request' wording."""
+    """The Deep-tier audio note must match how the audio is actually delivered.
+
+    Two things went wrong here and both are pinned now:
+
+    * It said the MP3 "will be delivered alongside this PDF", but the audio is rendered AFTER
+      approval and emailed separately — delivery deliberately never waits for it.
+    * It promised timing windows for ``current_year``–``current_year + 2`` while the report's own
+      "Year-by-Year Launch Timing" section covers ``current_year + 5``, so the note
+      *under*-promised what the narration actually reads.
+    """
+    from saju_engine.report_data import AUDIO_COVER_CALLOUT
+
     chart = _sample_chart()
     report = generate_premium_report(chart, tier="deep")
-    assert "delivered alongside this PDF" in report
+
+    assert AUDIO_COVER_CALLOUT in report
+    assert "follows shortly after it" in report
+
+    # The window must match the rest of the report, not under-state it.
+    year = chart.reference_date_obj().year
+    assert f"{year}–{year + 5}" in report
+    assert f"{year}–{year + 2}" not in report
+
+    # The old, inaccurate timing claim must be gone; so must the even older wording.
+    assert "delivered alongside this PDF" not in report
     assert "on request" not in report
 
 

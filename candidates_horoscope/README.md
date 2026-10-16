@@ -87,7 +87,7 @@ The generated PDF and engine markdown are saved alongside the intake JSON in `ca
 1. **Gather data** via the intake form or manually: full name, Gregorian DOB, exact birth time, birthplace (lat/long for time-zone), gender, calendar system, and marriage/relationship status.
 2. **Ask for the tier** before generating the report. Landing-page options:
    - **The Hook** (complimentary, 1 page) — a free sample with four pillars, element balance, and lucky cues
-   - **The Essential Report** ($9 intro → $19, 6–7 pages) — natal chart + career arc + relationships + health + major luck + annual windows + lucky-element guide
+   - **The Essential Report** ($19, 6–7 pages) — natal chart + career arc + relationships + health + major luck + annual windows + lucky-element guide
    - **The Deep Destiny Report** ($55, 10–12 pages) — full natal reading + career deep-dive + relationship deep-dive + health deep-dive + year-by-year timing + business-launch guidance + auspicious dates + lucky-element guide
    
    Engine tier flags are `sample`, `essential`, `deep`. Legacy flags `spark/reading/fullmap` still work for older templates.

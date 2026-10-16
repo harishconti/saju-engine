@@ -211,7 +211,7 @@ for the strategy and research behind it).
 | Tier | Name | Price | Length | Core Contents |
 |---|---|---|---|---|
 | 1 | **The Hook** ✦ | Free | 1 page | Compact cover + four pillars + element balance + Day Master + lucky colors/directions/numbers + invitation to upgrade |
-| 2 | **The Essential Report** ✦✦ | $9 intro → $19 | 6–7 pages | Cover + four pillars + element balance + quick reference + short Day Master portrait + Career & Wealth overview + Major Luck (대운) table + abbreviated Lucky Attributes + short Closing Note |
+| 2 | **The Essential Report** ✦✦ | $19 | 6–7 pages | Cover + four pillars + element balance + quick reference + short Day Master portrait + Career & Wealth overview + Major Luck (대운) table + abbreviated Lucky Attributes + short Closing Note |
 | 3 | **The Deep Destiny Report** ✦✦✦ | $55 | 10–12 pages | Everything in Essential + full Day Master portrait + Relationships + Health & Vitality + Business & Launch Timing + year-by-year windows + full Practical Guidance + full Closing Note. (The MP3 audio summary is produced separately.) |
 | 4 | **Compatibility Snapshot (두 분 궁합)** ✦✦✦ | $24 | ~4 pages | Two-chart snapshot: composite 0–100 + 4-band verdict on cover; four-pillar glance; the four most decisive sub-systems; condensed Practical Guidance; Closing Note. |
 | 5 | **Deep Compatibility (두 분 궁합)** ✦✦✦✦ | $45 | 9–10 pages | Basic + all 11 sub-system cards (일간합, 일지 합충, Nayin, 용신, 일주, 결합 오행, 십신 교차, 대운 동기, 신살, 음양, 띠); individual element balance / Day Master snapshots; major-luck timelines for both partners; year-by-year couple timing overlay; full Practical Guidance; Closing Note. |

@@ -19,6 +19,12 @@ node_modules
 Thumbs.db
 *.log
 
+# Never publish report SOURCE markdown. `public/` is served verbatim and robots.txt allows
+# /demo/, and the generated `*-engine.md` sidecar still carries knowledge/ citations that the
+# PDF renderer strips. The demo build writes its sidecar to tmp/ instead (see tools/regen/pdfs.sh);
+# this rule is the belt to that braces.
+/public/demo/*.md
+
 # env — never commit real values.
 # Catch-all, then re-allow the committed template only. This covers .env.local,
 # .env.production, and any scratch copy (e.g. `vercel env pull .env.vchk`).

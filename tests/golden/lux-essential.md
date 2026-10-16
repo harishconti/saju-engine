@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Lux — Essential Report · $9 intro → $19
+## Lux — Essential Report · $19
 
 *Your natal chart, career arc, decade cycles, and lucky-element guide*
 

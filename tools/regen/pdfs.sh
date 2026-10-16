@@ -62,9 +62,38 @@ for t in basic deep; do
   compat harish_priyanka Harish Priyanka "4 June 1992, 03:10 IST" "3 June 1996, 10:20 IST" 辛 辛 $t
   compat harish_priyanka_1998 Harish Priyanka "4 June 1992, 03:10 IST" "12 July 1998, 21:43 IST" 辛 庚 $t
 done
-cp $R/rm/rm-sample-report.pdf apps/landing-page/public/demo-rm-sample.pdf
-cp $R/rm/rm-essential-report.pdf apps/landing-page/public/demo-rm-essential.pdf
-cp $R/rm/rm-report.pdf apps/landing-page/public/demo-rm-deep.pdf
-echo "copied landing demos"
-cp candidates_horoscope/marriage_compatibility/pawan_sruthi/pawan_sruthi_compatibility.pdf apps/landing-page/public/demo-compat-basic.pdf
-cp candidates_horoscope/marriage_compatibility/pawan_sruthi/pawan_sruthi_compatibility_deep.pdf apps/landing-page/public/demo-compat-deep.pdf
+# ── Public demo PDFs ──────────────────────────────────────────────────────────────
+# These are served by the WEBAPP (apps/web/public/demo/), not by the legacy landing page,
+# and they are rendered with the **ReportLab** backend *from the chart* — the same backend the
+# deployed engine service uses (SAJU_PDF_BACKEND=reportlab).
+#
+# Rendering from the chart matters: the stored markdown embeds its own cover, so re-rendering
+# an existing .md would freeze a stale price/wording into the public artefact forever. That is
+# exactly what happened — demo-rm-essential.pdf advertised a retired "$9 intro → $19" long
+# after the product sold at $19.
+DEMO=apps/web/public/demo
+# Render into a scratch dir and copy ONLY the PDF. `--from-chart` always writes a sidecar
+# `*-engine.md` beside the output, and that markdown still carries its knowledge/ citations —
+# which the PDF renderer strips but the .md does not. `public/` is served verbatim and
+# robots.txt allows /demo/, so a sidecar landing there would publish internal citations.
+SCRATCH=tmp/demo-render
+mkdir -p "$SCRATCH"
+demo_rm() { # tier output_filename
+  python3 src/saju_html/md_to_saju_pdf.py --from-chart \
+    --name "RM (Kim Nam-joon)" --gender M \
+    --birth-year 1994 --birth-month 9 --birth-day 12 --birth-hour 13 --birth-minute 28 \
+    --city "Seoul" --longitude 126.978 --utc-offset 9 --tier "$1" --output "$SCRATCH/$2" >/dev/null \
+    && cp "$SCRATCH/$2" "$DEMO/$2" \
+    && echo "built $DEMO/$2  (sidecar kept in $SCRATCH)"
+}
+demo_rm sample    demo-rm-sample.pdf
+demo_rm essential demo-rm-essential.pdf
+demo_rm deep      demo-rm-deep.pdf
+
+# Compat demos are copies of the tracked pair report above. NOTE: `compat()` renders with the
+# HTML backend by default (better local typography), while the shipped demos and every deployed
+# report are ReportLab — so if the compat demos ever need regenerating, render them explicitly
+# with `md_to_saju_compat_pdf.py … --backend reportlab` rather than copying a Chromium render.
+cp $C/pawan_sruthi/pawan_sruthi_compatibility.pdf      $DEMO/demo-compat-basic.pdf
+cp $C/pawan_sruthi/pawan_sruthi_compatibility_deep.pdf $DEMO/demo-compat-deep.pdf
+echo "copied webapp demos into $DEMO"

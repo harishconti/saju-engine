@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Seo — Essential Report · $9 intro → $19
+## Seo — Essential Report · $19
 
 *Your natal chart, career arc, decade cycles, and lucky-element guide*
 

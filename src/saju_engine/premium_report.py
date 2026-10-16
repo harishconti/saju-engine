@@ -515,9 +515,14 @@ def _section_cover(ctx: _ReportContext, compact: bool = False) -> List[str]:
         lines.append("")
     # Deep Destiny cover: confirm the MP3 audio is included by default.
     # V7: fullmap renders as deep — same cover line.
+    # Wording note: the audio is rendered AFTER approval and emailed separately, so the cover
+    # must not imply it arrives with the PDF. The sentence is shared with the renderers via
+    # report_data.AUDIO_COVER_CALLOUT — it used to be three hardcoded copies that drifted.
     if ctx.tier in ("deep", "fullmap"):
+        from .report_data import AUDIO_COVER_CALLOUT
+
         lines += [
-            "**(Audio summary included)** Your MP3 audio summary is included — delivered with this report.",
+            f"**(Audio summary included)** {AUDIO_COVER_CALLOUT}",
             "",
         ]
     lines += [
@@ -2277,12 +2282,21 @@ def _section_monthly_lucky_dates(ctx: _ReportContext, months_ahead: int = 3, max
 
 
 def _section_audio_summary_note(ctx: _ReportContext) -> List[str]:
-    """Deep-tier note that the MP3 audio summary is included by default."""
+    """Deep-tier note that the MP3 audio summary is included by default.
+
+    Two wording constraints, both learned the hard way:
+
+    * The year window must match the rest of the report. This said ``current_year + 2``
+      while "Year-by-Year Launch Timing" covers ``current_year + 5``, so the note
+      *under*-promised what the narration actually reads.
+    * It must not imply the audio arrives with the PDF. Audio is rendered after approval and
+      emailed separately; delivery deliberately never waits for it.
+    """
     current_year = (ctx.chart.reference_date_obj() or datetime.now().date()).year
     return [
         "## MP3 Audio Summary — Included by Default",
         "",
-        f"🎧 **Audio Summary:** Your MP3 companion to this report will be delivered alongside this PDF. It covers your Day Master portrait, current major-luck period, key timing windows for {current_year}–{current_year + 2}, and the top 5 practical recommendations in approximately 8–10 minutes.",
+        f"🎧 **Audio Summary:** Your MP3 companion to this report is included and follows shortly after it — we email you the moment it is ready, and it appears on the same page as your reading. It covers your Day Master portrait, current major-luck period, key timing windows for {current_year}–{current_year + 5}, and the top 5 practical recommendations in about ten minutes.",
         "",
         "Listen once in full, then return to the chapters that match the season you are in.",
         "",

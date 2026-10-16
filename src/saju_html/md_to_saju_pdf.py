@@ -76,6 +76,7 @@ from reportlab.platypus import (  # noqa: E402
     TableStyle,
 )
 
+from saju_engine.report_data import AUDIO_COVER_CALLOUT  # noqa: E402
 from saju_html.chart_input import (  # noqa: E402,F401
     TIER_CHOICES,
     _format_date_dob,
@@ -538,7 +539,7 @@ def _md_to_story(text: str, title: str, client: str, dob: str, day_master: str,
     if tier == "deep":
         story.append(Spacer(1, 8 * mm))
         story.append(Paragraph(
-            "(Audio summary included) Your MP3 audio summary is included — delivered with this report.",
+            f"(Audio summary included) {AUDIO_COVER_CALLOUT}",
             styles["cover_audio"],
         ))
     story.append(Spacer(1, 20 * mm))

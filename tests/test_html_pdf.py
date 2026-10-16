@@ -456,7 +456,7 @@ def test_html_pdf_audio_included_wrapper():
     """The '🎧 Your MP3 audio summary is included' paragraph is wrapped."""
     from saju_html.renderer import _wrap_audio_included
 
-    html = "<p>🎧 <strong>Your MP3 audio summary is included — delivered with this report.</strong></p>"
+    html = "<p>🎧 <strong>Your MP3 audio summary is included — it follows this report by email.</strong></p>"
     out = _wrap_audio_included(html)
     assert '<div class="audio-included">' in out
     assert "🎧 Your MP3 audio summary is included" in out
@@ -491,7 +491,7 @@ def test_html_pdf_render_passes_through_all_wrappers(tmp_path):
         "| 23-32 | 甲辰 | Yang Wood | Neutral |\n\n"
         "<!-- decade-roadmap:end -->\n\n"
         "> Polished blade in autumn wind.\n\n"
-        "🎧 **Your MP3 audio summary is included — delivered with this report.**\n\n"
+        "🎧 **Your MP3 audio summary is included — it follows this report by email.**\n\n"
         "#### Partner Chart Add-On\n\n"
         "*Want a side-by-side compatibility reading? Add a Partner Chart.*\n"
     )

@@ -12,7 +12,7 @@ Prices are USD launch prices — see `docs/market-research-2026-09.md` for range
 | Client-facing name | Engine tier | Price | Pages | Contents |
 |---|---:|---:|---:|---|
 | **The Hook** | `sample` | Free | ~1 | Compact cover, four pillars, element balance, Day Master, lucky colors/directions/numbers, upgrade CTA. |
-| **The Essential Report** | `essential` | $9 intro → $19 | 6–7 | Cover, four pillars, element balance, quick reference, short Day Master portrait, career & wealth overview, major-luck table, abbreviated lucky attributes, short closing note. |
+| **The Essential Report** | `essential` | $19 | 6–7 | Cover, four pillars, element balance, quick reference, short Day Master portrait, career & wealth overview, major-luck table, abbreviated lucky attributes, short closing note. |
 | **The Deep Destiny Report** | `deep` | $55 | 10–12 | Everything in Essential + full Day Master portrait, relationships, health & vitality, business & launch timing, year-by-year windows, full practical guidance, full closing note. |
 | **Cosmic Companion** | `companion` | $9/mo or $79/yr | 3–4 | Focused timing read for the current month/quarter; manual-billing subscription (off the primary pricing grid). |
 

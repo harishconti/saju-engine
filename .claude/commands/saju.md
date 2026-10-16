@@ -107,7 +107,7 @@ Then read `/tmp/skeleton.md` or `/tmp/premium-report.md` and use its pre-filled 
 - Daily-luck (일운) window around the requested/reference day with natal activations.
 - Structural/grid candidates (격국) with evidence, including 천간합, 화격, and conservative 종격 flags.
 - Optional engine-drafted prose scaffolds for each interpretive section (Day Master strength, 용신, personality, career/wealth, relationships, health, current themes) — reader must review and refine.
-- With `--format premium`: a complete 9-section report draft (cover, chart at a glance with element-balance bars, day master portrait, career/wealth, relationships, health/vitality, timing windows, practical guidance summary, closing note) — reader must refine and remove engine-draft markers. Use `--tier sample` for The Hook (1 page, complimentary), `--tier essential` (default) for The Essential Report (6–7 pages, $9 intro → $19), or `--tier deep` for The Deep Destiny Report (10–12 pages, $55, with deep-dive sections and a 90-day auspicious-dates window).
+- With `--format premium`: a complete 9-section report draft (cover, chart at a glance with element-balance bars, day master portrait, career/wealth, relationships, health/vitality, timing windows, practical guidance summary, closing note) — reader must refine and remove engine-draft markers. Use `--tier sample` for The Hook (1 page, complimentary), `--tier essential` (default) for The Essential Report (6–7 pages, $19), or `--tier deep` for The Deep Destiny Report (10–12 pages, $55, with deep-dive sections and a 90-day auspicious-dates window).
 
 ### What you still do
 

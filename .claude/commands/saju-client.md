@@ -15,7 +15,7 @@ If any of these are missing, ask for **all of them in a single message**:
 - **Birth time** — `HH:MM`, 24-hour clock (use the best estimate if exact minute is unknown)
 - **Birthplace** — city/country, **or** `longitude` + `UTC offset`
 - **Gender** — `M` or `F` (needed for 대운 direction)
-- **Tier** — `sample` (free hook), `essential` ($9 intro → $19), or `deep` ($55); compat `basic` ($24) / `deep` ($45)
+- **Tier** — `sample` (free hook), `essential` ($19), or `deep` ($55); compat `basic` ($24) / `deep` ($45)
 
 Optional but useful:
 

@@ -209,9 +209,11 @@ No `og:image` (social shares are text-only; `twitter:card` is `summary`, not `su
 The demos are **stale ReportLab renders** — inspection (2026-10-16) shows all five carry
 `Producer: ReportLab PDF Library` and a creation date of **2026-10-01**, so they use the *same* renderer
 customers receive. An earlier note here claimed they were "old HTML/Chromium renders"; that was wrong.
-The real drift is age, not toolchain: they predate the audio summary, and `demo-rm-essential.pdf` still
-advertises **"$9 intro → $19"** while the product sells at **$19** flat. Regenerate them, and drop the
-retired intro price from the Essential cover.
+The real drift was age, not toolchain: they predated the audio summary, and `demo-rm-essential.pdf`
+advertised **"$9 intro → $19"** while the product sells at **$19** flat. **Fixed 2026-10-16.** Note where
+that promo actually lived: the engine's own `TIER_CONFIG["essential"]["price"]`, so **every delivered
+Essential report** quoted a price that no longer existed — not just the demo. It is now `$19` from a
+single source, goldens regenerated, and the three RM demo PDFs re-rendered with ReportLab from the chart.
 
 ---
 
@@ -241,8 +243,10 @@ Nothing had leaked yet — `users (real): 0` at the time.
 1. ~~Build `services/report-engine` and land E1/E2/E3~~ — **done** (engine at `api/index.py`, root = repo root); fixes the broken CTA **and** unblocks fulfilment
 2. ~~Make the contact address real~~ — **done**: mailbox + aliases in Cloudflare, receiving verified
    (`delivered`), default `Reply-To` wired. ⚠️ Add the three **DKIM CNAMEs** — §B4
-3. Regenerate the demo PDFs with ReportLab; remove the MP3 promise; drop the `$9 intro` from the
-   Essential cover
+3. ~~Regenerate the demo PDFs with ReportLab; drop the `$9 intro` from the Essential cover~~ — **done
+   2026-10-16.** The MP3 promise is kept rather than removed (the audio is real — §D1); the three RM demo
+   PDFs were re-rendered with ReportLab from the chart, and the price plus the audio wording were fixed in
+   the engine itself
 4. Rotate both leaked credentials; confirm `ADMIN_EMAILS`
 5. **Then** go live: 4 live products, a live webhook endpoint, `live_mode`
 
