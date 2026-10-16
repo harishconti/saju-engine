@@ -45,7 +45,7 @@
 ### Quick Reference
 
 - **Day Master:** Gyeong (Yang Metal, 庚金)
-- **Strength:** Balanced — the month branch **亥** gives the Day Master a **seasonally weak baseline** by element relation (per knowledge/09-interpretation-method.md); its 12운성 stage there is **병 (病)** — early momentum is depleted; you often build strength through recovery and patience (knowledge/06-twelve-stages.md). Peer/resource support and the output/wealth/authority drain sit close to even.
+- **Strength:** Balanced — the month branch **亥** gives the Day Master a **seasonally weak baseline** by element relation *(see knowledge/09-interpretation-method.md)*; its 12운성 stage there is **병 (病)** — early momentum is depleted; you often build strength through recovery and patience (knowledge/06-twelve-stages.md). Peer/resource support and the output/wealth/authority drain sit close to even.
 - **Favorable Element:** Earth *(provisional — requires reader confirmation)* — The chart is close to balanced, so the least-represented element is offered as a starting point only — it is a folk heuristic, not a classical ruling, and the final 용신 (用神) requires the reader's argument from temperature, season, and blockage. Born in a non-temperate month, but the chart as a whole leans the other way, so the classical 조후 check is set aside and the strength-balance (억부) reading governs.
 - **Why this element:** two classical checks apply here — the strength-balance (억부) reading points one way, while the climate-balance (조후) reading points to **Fire** for a cold-season chart. In this chart the strength reading takes priority because the chart is not extreme enough for the climate override; the classical priority rule decides between them.
 - **Supporting Element:** Fire

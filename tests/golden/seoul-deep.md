@@ -45,7 +45,7 @@
 ### Quick Reference
 
 - **Day Master:** Gye (Yin Water, 癸水)
-- **Strength:** Balanced — the month branch **子** gives the Day Master a **seasonally supported baseline** by element relation (per knowledge/09-interpretation-method.md); its 12운성 stage there is **건록 (建祿)** — the Day Master is already strong in the month branch, so competence arrives without much fanfare (knowledge/06-twelve-stages.md). The output/wealth/authority drain outweighs the peer and resource support — the element-relation season above (weighted more heavily in the overall formula) is what pulls the total back into the balanced range despite that skew.
+- **Strength:** Balanced — the month branch **子** gives the Day Master a **seasonally supported baseline** by element relation *(see knowledge/09-interpretation-method.md)*; its 12운성 stage there is **건록 (建祿)** — the Day Master is already strong in the month branch, so competence arrives without much fanfare (knowledge/06-twelve-stages.md). The output/wealth/authority drain outweighs the peer and resource support — the element-relation season above (weighted more heavily in the overall formula) is what pulls the total back into the balanced range despite that skew.
 - **Favorable Element:** Fire — The Day Master reads as balanced, so the classical 조후 (climate-balance) check applies: this chart peaks in cold winter conditions, and the classical remedy is Fire. This matches the chart's own least-represented element, reinforcing the pick.
 - **Supporting Element:** Wood
 - **Avoid / Watch:** Metal (기신, watch) · Water (구신, restrains Fire) · Earth (한신, drains Fire)

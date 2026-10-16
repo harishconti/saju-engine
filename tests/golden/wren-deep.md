@@ -45,7 +45,7 @@
 ### Quick Reference
 
 - **Day Master:** Gi (Yin Earth, 己土)
-- **Strength:** Weak — the month branch **酉** gives the Day Master a **seasonally weak baseline** by element relation (per knowledge/09-interpretation-method.md); its 12운성 stage there is **장생 (長生)** — the chart tends to begin things with fresh, supported energy (knowledge/06-twelve-stages.md). The output/wealth/authority drain outweighs the peer and resource support.
+- **Strength:** Weak — the month branch **酉** gives the Day Master a **seasonally weak baseline** by element relation *(see knowledge/09-interpretation-method.md)*; its 12운성 stage there is **장생 (長生)** — the chart tends to begin things with fresh, supported energy (knowledge/06-twelve-stages.md). The output/wealth/authority drain outweighs the peer and resource support.
 - **Favorable Element:** Fire — The Day Master reads as weak, so the favorable element is the one that resources and steadies it. This is an engine reading — a full classical analysis may refine it. Born in a climate-neutral month, so no 조후 override applies here.
 - **Supporting Element:** Earth
 - **Avoid / Watch:** Wood

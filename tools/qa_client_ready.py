@@ -103,6 +103,9 @@ _WEAK_GLOSS_OK = {"yang", "yin", "wood", "fire", "earth", "metal", "water",
 # "per 's '3 days = 1 year' rule" — the quoted source's name was erased, leaving a
 # stranded possessive (audit §2.1 #3).
 _STRANDED_POSSESSIVE = re.compile(r"\bper 's\b|\bby 's\b")
+# A citation the renderer half-removed: the word that introduced it survives, the path
+# does not — "(per)", "(see)", "(cf.)". Every report carried "(per)" until 2026-10-16.
+_DANGLING_CITATION = re.compile(r"\(\s*(?:per|see|cf\.?|source|ref\.?)\s*\)", re.IGNORECASE)
 
 # A price belongs on the order, not in the reading (audit §2.1 #8). The free
 # sample tier is the one place it is copy by design: that report's job is to
@@ -255,6 +258,9 @@ def scan(
                 if second.startswith(first[:4]) and first != second:
                     findings.append(Finding("WEAK_GLOSS", source, n, m.group(0),
                                             "a gloss that adds no information"))
+            for m in _DANGLING_CITATION.finditer(line):
+                findings.append(Finding("DANGLING_CITATION", source, n, m.group(0),
+                                        "a citation the renderer half-removed"))
             for m in _STRANDED_POSSESSIVE.finditer(line):
                 findings.append(Finding("ERASED_SOURCE", source, n, m.group(0),
                                         "a quoted source's name was erased"))

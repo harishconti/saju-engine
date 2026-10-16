@@ -43,7 +43,7 @@
 ### Quick Reference
 
 - **Day Master:** Sin (Yin Metal, 辛金)
-- **Strength:** Strong — the month branch **戌** gives the Day Master a **seasonally supported baseline** by element relation (per knowledge/09-interpretation-method.md); its 12운성 stage there is **관대 (冠帶)** — you grow into form gradually; adolescence and early adulthood often bring ambition (knowledge/06-twelve-stages.md). Peer and resource support (visible and hidden stems) outweighs the output/wealth/authority drain.
+- **Strength:** Strong — the month branch **戌** gives the Day Master a **seasonally supported baseline** by element relation *(see knowledge/09-interpretation-method.md)*; its 12운성 stage there is **관대 (冠帶)** — you grow into form gradually; adolescence and early adulthood often bring ambition (knowledge/06-twelve-stages.md). Peer and resource support (visible and hidden stems) outweighs the output/wealth/authority drain.
 - **Favorable Element:** Water — The Day Master reads as strong, but the classical 조후 (climate-balance) check takes priority ahead of 억부 (strength-balance) here, because the chart's climate is extreme rather than mild: this chart peaks in dry earth-storage conditions, and the classical remedy is Water. This matches the chart's own least-represented element, reinforcing the pick.
 - **Supporting Element:** Metal
 - **Avoid / Watch:** Fire (기신, watch) · Earth (구신, restrains Water) · Wood (한신, drains Water)

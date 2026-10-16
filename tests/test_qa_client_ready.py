@@ -71,6 +71,10 @@ def test_audit_defects_are_caught(text, expected):
     ("Bathing (bathe bath) describes the phase.", "WEAK_GLOSS"),
     ("Nurturing (nurture) follows.", "DOUBLE_GLOSS"),
     ("per 's '3 days = 1 year' rule, the count differs.", "ERASED_SOURCE"),
+    # A citation the renderer half-removed. Every report carried "(per)" on its first
+    # screen until 2026-10-16; the engine now cites in the form the stripper removes whole.
+    ("supported by element relation (per); its stage follows.", "DANGLING_CITATION"),
+    ("see the method (see) for the argument.", "DANGLING_CITATION"),
     # §2.3 — grammar is corrected at the render layer, so it is checked there.
     ("Born in a Earth chart with the engine reading as strong.", "GRAMMAR_ARTICLE"),
     ("This is a Indirect Resource year.", "GRAMMAR_ARTICLE"),

@@ -323,7 +323,10 @@ def strength_reasoning(ctx) -> str:
     offset_note = offset_note[0].upper() + offset_note[1:]
     return (
         f"the month branch **{chart.month.branch}** gives the Day Master a **{season_note}** by "
-        f"element relation (per knowledge/09-interpretation-method.md); its 12운성 stage "
+        # Cited in the form the renderer strips entirely (`*(see …)*`). The old
+        # "(per knowledge/…)" left an orphaned "(per)" on the first screen of every
+        # report, because the stripper removes the path but not the wrapping words.
+        f"element relation *(see knowledge/09-interpretation-method.md)*; its 12운성 stage "
         f"there is **{stage}** — {description} (knowledge/06-twelve-stages.md). {offset_note}{reconcile}."
     )
 

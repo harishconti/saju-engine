@@ -43,7 +43,7 @@
 ### Quick Reference
 
 - **Day Master:** Sin (Yin Metal, 辛金)
-- **Strength:** Very Strong — the month branch **酉** gives the Day Master a **seasonally supported baseline** by element relation (per knowledge/09-interpretation-method.md); its 12운성 stage there is **건록 (建祿)** — the Day Master is already strong in the month branch, so competence arrives without much fanfare (knowledge/06-twelve-stages.md). Peer and resource support (visible and hidden stems) outweighs the output/wealth/authority drain.
+- **Strength:** Very Strong — the month branch **酉** gives the Day Master a **seasonally supported baseline** by element relation *(see knowledge/09-interpretation-method.md)*; its 12운성 stage there is **건록 (建祿)** — the Day Master is already strong in the month branch, so competence arrives without much fanfare (knowledge/06-twelve-stages.md). Peer and resource support (visible and hidden stems) outweighs the output/wealth/authority drain.
 - **Favorable Element:** Water — The Day Master reads as strong, so the favorable element is the one that channels and expresses its excess. This is an engine reading — a full classical analysis may refine it. Born in a climate-neutral month, so no 조후 override applies here.
 - **Supporting Element:** Wood
 - **Avoid / Watch:** Metal
