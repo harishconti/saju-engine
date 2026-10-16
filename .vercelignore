@@ -1,0 +1,27 @@
+# Files the Vercel CLI must NOT upload.
+#
+# `.env` is the important one. `vercel deploy` from the repository root uploads the working tree,
+# and NOTHING here stopped `apps/web/.env` from going with it. Next loads `.env` at **both build and
+# runtime**, so that local file silently took precedence over the project's environment variables:
+#
+#   * a `TURNSTILE_SECRET_KEY` removed from Vercel kept producing live `403 TURNSTILE_FAILED`
+#     responses, because the runtime still found the secret in the uploaded file;
+#   * a removed `NEXT_PUBLIC_TURNSTILE_SITE_KEY` kept being inlined into the build;
+#   * and every secret in that file — the Neon password, the Resend key, the ElevenLabs key, the
+#     Dodo keys — travelled inside every deployment bundle.
+#
+# Vercel's own env vars are the single source of truth for a deployed build. `.env` is for running
+# locally. Never let the two overlap.
+.env
+.env.*
+!.env.example
+
+# Upload hygiene only — these are rebuilt on Vercel and only bloat the upload.
+node_modules/
+.next/
+.vercel/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+tmp/

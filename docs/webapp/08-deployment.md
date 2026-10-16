@@ -261,7 +261,18 @@ env:
 ```
 
 Verified locally by running all five webapp steps with exactly those placeholders and nothing else —
-`lint`, `typecheck`, 69 tests and `next build` all pass.
+`lint`, `typecheck`, 80 tests and `next build` all pass.
+
+### ⚠️ `vercel deploy` uploads the working tree — keep `.env` out of it
+
+A CLI deploy sends the repository as it sits on disk, and Next loads `.env` at **build and runtime**.
+Without a `/.vercelignore`, `apps/web/.env` therefore travelled with every deployment and *silently
+overrode the project's environment variables*: a deleted `TURNSTILE_SECRET_KEY` kept producing live
+`403`s, a deleted `NEXT_PUBLIC_*` kept being inlined, and every secret in that file shipped inside the
+bundle. The repository root now has a `.vercelignore` that excludes `.env*`.
+
+**Rule: Vercel's env vars are the only source of truth for a deployed build.** `.env` is for running
+locally. If an env change appears to do nothing, check for an uploaded `.env` before anything else.
 
 CI does **not** run migrations (no database service), and the **Playwright public tier does not exist
 yet** — that is the outstanding piece, see [13](13-launch-audit.md) §B5 and [12](12-testing.md).

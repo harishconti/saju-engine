@@ -230,6 +230,12 @@ This looks like a code bug and usually is not — it is DNS.
 The gate is Cloudflare Turnstile. It is deliberate, but it is also the one control that can take the
 whole funnel down for real visitors, so the failure direction matters more than the happy path.
 
+0. **Confirm the project's env vars are the ones actually in use.** `vercel deploy` from the repository
+   root uploads `apps/web/.env` unless `.vercelignore` excludes it, and Next loads `.env` at **build and
+   runtime** — so a local file silently wins over the project's environment variables. This is not
+   hypothetical: it is exactly why deleting `TURNSTILE_SECRET_KEY` from Vercel kept producing live `403`
+   responses and why the deleted site key kept being inlined. `/.vercelignore` now excludes `.env*`.
+   **If an env change ever appears to do nothing, suspect this first.**
 1. **Is it the visitor or the widget?** A real visitor sees a checkbox above *"Get my free snapshot"*.
    If the widget is missing, the client refuses to submit — a keyed widget with no token is treated as
    *"not yet verified"* — so the symptom is *"Please complete the quick verification below"* on a page
@@ -240,17 +246,25 @@ whole funnel down for real visitors, so the failure direction matters more than 
    `https://challenges.cloudflare.com` **and** `https://*.challenges.cloudflare.com` in `script-src`,
    `frame-src` **and** `connect-src` — a bare host never matches its own subdomains. Read the browser
    console for `Refused to load` / `… violates …` before looking anywhere else.
-3. **Escape hatches, in order of preference.**
-   - *Widget fails to render* → remove **`NEXT_PUBLIC_TURNSTILE_SITE_KEY`** and redeploy. The client
-     stops rendering and stops demanding a token; the server still verifies, so it simply skips.
-   - *Verifier misbehaving* → remove **`TURNSTILE_SECRET_KEY`**. The server then skips verification
-     (fail-open) and the 5/min/IP rate limit is the only protection left.
-   Both need a redeploy: the site key is inlined at build time.
-4. **Never "fix" it by accepting tokens the server could not verify.** That is precisely the state this
+3. **The other usual cause is the widget's own configuration**, which lives in the Cloudflare
+   dashboard and cannot be seen from here: the widget must list this domain under **allowed hostnames**
+   (`cosmicsaju.com` **and** `www.cosmicsaju.com`), and the **site key and secret must come from the same
+   widget**. A valid secret that does not pair with the site key verifies nothing. Symptom in both cases:
+   the script loads, `turnstile.render()` runs, and the challenge never appears.
+4. **Escape hatch — remove BOTH variables.** `NEXT_PUBLIC_TURNSTILE_SITE_KEY` **and**
+   `TURNSTILE_SECRET_KEY`, then redeploy. Removing only the site key is **not** enough: the client stops
+   rendering the widget so no token is ever produced, while the server still sees a configured secret and
+   refuses everything with `403` — an outage that looks like the widget merely failed to load. Removing
+   only the secret makes the server skip while the client still demands a token nobody can obtain.
+   Redeploy either way: the site key is inlined at build time.
+   Check `/api/health` afterwards and confirm `/api/sample` returns **200**.
+5. **Never "fix" it by accepting tokens the server could not verify.** That is precisely the state this
    replaced — a `turnstileToken` field that nothing on either end ever read.
-5. **Turnstile refuses automation on purpose.** A headless/Playwright check typically reaches "script
-   loads, `render()` runs, challenge never completes". That is expected, and is **not** evidence of a
-   broken deployment; only a real browser settles it.
+6. **Turnstile refuses automation on purpose.** A headless/Playwright check typically reaches "script
+   loads, `window.turnstile` is defined, `render()` injects its DOM, challenge never completes". Do **not**
+   conclude from that alone that the deployment is fine — on 2026-10-16 exactly this signal was dismissed
+   as "automation detection" while the widget was in fact broken for real visitors too. A real browser is
+   the only authority.
 
 ### The engine service is down
 

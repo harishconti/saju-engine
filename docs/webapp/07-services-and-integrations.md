@@ -23,7 +23,7 @@ out of it, where those credentials go, and what order to do it in.
 | 10 | **GitHub** | Repo + Actions CI | free | ✅ existing |
 | 11 | **Uptime monitoring** | Probe `/api/health` | free tiers exist | ⬜ optional |
 | 12 | **Product analytics** | Funnel: sample → signup → purchase | Vercel Web Analytics or Plausible/Umami | ⬜ optional |
-| 13 | **Cloudflare Turnstile** | Bot protection on the free-sample form | free | ✅ live — server-side verification fails closed; ⚠️ CSP must allow `challenges.cloudflare.com` **and** its subdomains (see [09](09-operations.md)) |
+| 13 | **Cloudflare Turnstile** | Bot protection on the free-sample form | free | ⏸️ **built, currently disabled** — keys removed after the widget failed to render for real visitors (funnel restored). Re-enabling needs the widget's allowed hostnames to list this domain; CSP must also allow `challenges.cloudflare.com` **and its subdomains**. See [09](09-operations.md) |
 | 14 | **Password manager** | Source of truth for every secret | 1Password / Bitwarden | ⬜ create |
 
 **Steady-state fixed cost: ~$21–25/month** — inside the "<$50/month" assumption in

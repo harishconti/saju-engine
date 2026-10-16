@@ -674,6 +674,42 @@
     remain `test_mode` and the checkout route still has no test/live guard; `ADMIN_EMAILS` is unchanged by
     request, and with **0 users** nobody can sign in to `/admin` until the owner signs up with that address.
 
+  - **2026-10-16 (the `.env` upload — why an env change did nothing, and a live funnel outage).** Two
+    incidents in one, and the second is why the first was invisible for so long.
+    ⚠️ **`vercel deploy` had been uploading `apps/web/.env`, and Next loads `.env` at BOTH build and
+    runtime — so the local file silently overrode the project's Vercel environment variables.** The
+    repository had **no `.vercelignore`**, so nothing excluded it. Consequences: (a) **every secret in
+    that file travelled inside every deployment bundle** — the Neon password, Resend key, ElevenLabs
+    key, Dodo keys, Neon cookie secret; (b) env changes were partly *decorative* — deleting a variable
+    from Vercel did nothing while a matching line remained in `.env`; (c) the divergence had been
+    invisible until now **because the two sources held identical values**, which I had mirrored out of
+    habit. It surfaced only when I removed the Turnstile pair from Vercel and the live app kept behaving
+    as though they were still set. Fixed with a root `/.vercelignore` excluding `.env*`. **Rule to keep:
+    Vercel's env vars are the single source of truth for a deployed build; `.env` is for running
+    locally; never let them overlap. If an env change appears to do nothing, suspect this first.**
+    **The outage itself.** Turnstile was wired, the server side was verified (`403` for both a missing
+    and a **forged** token — a skipped check would have generated a sample), and the widget rendered its
+    container on the live page. But it never produced the challenge **iframe**, so no token ever arrived
+    and every visitor hit *"We couldn't confirm you're a person."* — the top of the funnel was dead in
+    production. My headless probe had shown the same thing, and I wrongly wrote it off as Turnstile
+    refusing automation; the owner's screenshot from a real browser disproved that. **Lesson: for a
+    third-party widget, "it fails in automation" and "it fails for humans" look identical from a
+    headless client — only a real browser settles it, and a screenshot of the live page is worth more
+    than any number of probes.** The secret itself was valid (siteverify reached it and rejected only
+    the dummy token) and both keys shared the `0x4AAAAAAF` prefix, so the likely cause is the widget's
+    **allowed hostnames** not listing `cosmicsaju.com`/`www.cosmicsaju.com` — a dashboard setting
+    invisible from here, or a site key/secret pair from two different widgets.
+    **Remediation, in order:** (1) removed **both** Turnstile variables from every scope and redeployed;
+    (2) that did *not* fix it, which is what exposed the `.env` upload; (3) added `/.vercelignore`;
+    (4) verified **`/api/sample` → 200** with a real 70,953-byte PDF and the widget gone from the page.
+    ⚠️ **A correction to my own runbook:** the escape hatch must remove **both** variables. Removing only
+    the site key was documented as safe — it is not: the client stops rendering so no token is produced,
+    while the server still sees a secret and refuses *everything*, which is a **worse** outage because it
+    looks like a widget that merely failed to load. `09` is corrected, and now opens with the `.env`
+    check.
+    Turnstile stays **built but disabled** until the widget's hostnames are configured; `07`, `08`, `13`
+    (§D2) and MEMORY record that state, including the `.vercelignore` rule.
+
 ### Earlier state (2026-09-26)
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"
