@@ -652,6 +652,13 @@ body.web-mode :target {
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 55%, transparent);
 }
 
+.colophon {
+    margin: 1.5rem 0 0;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    text-align: center;
+}
+
 /* ── printing hands the page back to the A4 stylesheet ───────────────────── */
 
 @media print {

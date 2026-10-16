@@ -1202,6 +1202,59 @@
     review console previews only the PDF, and the auth-gate spec is still unwritten — so the new route is *recorded*
     in `03`/`12` and must be added to that spec when it lands.
 
+  - **2026-10-16 (the reading embeds the app's own typefaces — and stops phoning Google).** Owner asked for the font
+    work next, after the design pass left the reading in Georgia and the system stack.
+    ✅ **`tools/build-web-fonts.py`** mirrors the CJK subsetter: it fetches the three families the app's `layout.tsx`
+    links, subsets them to the glyphs a report actually sets (Latin, punctuation, the block elements the presence bars
+    use — emoji and CJK deliberately *excluded* so they keep falling back to the reader's colour-emoji and CJK fonts),
+    writes `woff2` and the OFL notices into `src/saju_html/fonts/`. Inter and Cormorant Garamond ship as **variable**
+    fonts, so one file each serves every weight the tokens ask for (Inter 93 KB, Cormorant 62 KB, Plex Mono 16 KB);
+    Inter's italic is left out because the app does not load one either, so both synthesise the same oblique.
+    ✅ **The renderer inlines them as `woff2` data URIs** (`_web_font_css`, cached per process), so the faces land in
+    place with no CSS change at all — the app's token stacks already name them first.
+    ✅ **And it closes a privacy leak nobody had asked about.** The *app* loads fonts from `fonts.googleapis.com`/`gstatic`,
+    so opening the app tells Google; the reading now makes **zero network requests** — verified in the browser
+    (`document.fonts` shows all three loaded, one request total and it is the file itself). The reading is now better
+    behaved than the product it belongs to, which is worth deciding about for the app too.
+    Cost, measured: **+235 KB** per reading (Deep 135 → 370 KB, the one-page tier 273 KB), fetched once and kept.
+    `--check` compares against the *source* face, so "Inter has no box-drawing glyphs" is reported as information, not
+    as a build failure — the same distinction the CJK tool makes, and the mistake I made first.
+    Guards: `test_the_embedded_faces_are_the_apps_own` (the embedded families must equal the app's `--font-*` tokens,
+    and exactly the expected number of `@font-face` blocks must be data URIs), `test_the_reading_stays_a_reasonable_download`
+    (a size budget, so the next face is a decision rather than a surprise), and the self-containment test now *requires*
+    the embedded faces while still refusing any external URL. Suite **2,005 → 2,019**; demo readings regenerated
+    (273–371 KB).
+
+  - **2026-10-16 (Functions Storage was at 7.17/10 GB — retention, not artefacts; pruned and made repeatable).** Owner
+    showed the Vercel Hobby usage screen. It was not our files: the repo upload is 39 MB, but **every retained
+    deployment's function bundle** is charged, and a bundle here is ~157 MB for the engine (125 MB of Python deps —
+    pandas 65 + numpy 38 arrive transitively via `sajupy`, plus reportlab and PIL — and ~32 MB of repo) and ~40–80 MB
+    for the webapp. With **63 deployments on `saju-engine` (the webapp project, which serves www.cosmicsaju.com) and 33
+    on `saju-report-engine`** that is ~7 GB. Also learned from the screenshot: the project called `saju-engine` is the
+    *webapp*, and **every push deploys both projects (~220 MB)** — this session's ~12 pushes were ~2.6 GB of it.
+    ✅ **Fixed now:** `tools/prune_deployments.py` (dry-run by default, always `--safe`, `--keep 3`) removed **90
+    deployments**, verified without touching anything live — `www.cosmicsaju.com` 200, the engine `POST /health` green
+    (`engineVersion 0.2.0`), and two old deployment URLs now 404. Four remain per project: the newest three plus one
+    aliased deployment Vercel keeps (`--safe` refuses it, correctly — the tool now reports that as "retained by Vercel"
+    rather than looking like a failure).
+    ✅ **Fixed for the future:** the root `.vercelignore` (which governs the engine's upload, since its root is the repo)
+    now excludes `tests/`, `candidates_horoscope/`, `docs/`, `apps/`, `tools/`, `.github/` — files the engine function
+    can never read at runtime. It cannot affect the webapp, whose project root is `apps/web`.
+    ⚠️ **The cause is retention, and the defaults get *worse* on Pro** (Production 1 year, Pre-Production 180 days,
+    versus 30/30 on Hobby). Two places set it: team (Settings → Deployment Retention, with *apply to all existing
+    projects*) and per project (Project → Settings → **Security** → Deployment Retention Policy), which overrides the
+    team value. The docs also pin the floor: Hobby keeps the last 3 created and the last 3 Ready production deployments
+    per project plus anything aliased — **~4 per project here, which is exactly why `--keep 3` is the right default and
+    why it will stay put**. Deletion is not instant: the sweep runs within ~48 h, then a 30-day restorable window.
+    ⚠️ **The real long-term lever is the dependency closure**: ~103 MB of every engine deployment is pandas + numpy,
+    and **nothing in `src/` or `api/` imports them directly** — they come with `sajupy`. Replacing or lazy-loading that
+    dependency would cut ~80% of the bundle. Documented as open in the new runbook (`09-operations.md` § Functions
+    Storage is filling); it is a code change, not a settings one, so it waits for after the Pro upgrade.
+    Two self-inflicted messes while building this, both worth remembering: I mangled `tools/prune_deployments.py` **twice**
+    with index-range edits (the same mistake that damaged `tools/regen/pdfs.sh` earlier) — rewriting the file whole was
+    faster than the third repair; and the CLI returns its paging cursor as a **number**, which cannot go into an argv
+    list, so the first run died inside `subprocess`.
+
 ### Earlier state (2026-09-26)
 
   - **2026-10-16 (the reading joins the design system — "the report UI is very ugly").** Owner feedback on the web

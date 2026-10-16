@@ -11,6 +11,9 @@ parser, cover-page builder, and PDF printer.
 """
 from __future__ import annotations
 
+import base64
+from functools import lru_cache
+
 import html
 import logging
 import os
@@ -135,6 +138,46 @@ def _load_css(css_path: Path | None) -> str:
         return Path(css_path).read_text(encoding="utf-8")
     here = Path(__file__).resolve().parent
     return (here / "theme.css").read_text(encoding="utf-8")
+
+
+# The faces the reading embeds, subsetted by `tools/build-web-fonts.py`. Weights match the
+# tokens in the app (`--font-display` 400/600/700, `--font-sans` 300–600, `--font-mono` 400).
+# Inter and Cormorant are variable fonts, so one file serves every weight.
+_WEB_FACES = (
+    ("Inter", "Inter-web.woff2", "100 900"),
+    ("Cormorant Garamond", "CormorantGaramond-web.woff2", "300 700"),
+    ("IBM Plex Mono", "IBMPlexMono-web.woff2", "400"),
+)
+
+
+@lru_cache(maxsize=1)
+def _web_font_css() -> str:
+    """`@font-face` rules with the app's faces inlined as data URIs.
+
+    The webapp loads these from Google's CDN. A delivered reading cannot: it has to be one
+    self-contained file, and a third-party font request would also tell someone when a client
+    opened their report. Subsetted to the glyphs a report sets, the three faces add ~230 KB to
+    a document that is served once and kept — cheaper than the four requests the app makes, and
+    it removes the dependency on the reader having any of these fonts.
+
+    Cached for the life of the process: a batch of reports should not re-encode them each time.
+    """
+    rules = []
+    fonts_dir = Path(__file__).resolve().parent / "fonts"
+    for family, filename, weight in _WEB_FACES:
+        path = fonts_dir / filename
+        if not path.exists():  # pragma: no cover - the files are bundled
+            _log.warning("web font %s missing; the reading will fall back", filename)
+            continue
+        encoded = base64.b64encode(path.read_bytes()).decode("ascii")
+        rules.append(
+            "@font-face {"
+            f" font-family: '{family}'; font-style: normal; font-weight: {weight};"
+            " font-display: swap;"
+            f" src: url(data:font/woff2;base64,{encoded}) format('woff2');"
+            " }"
+        )
+    return "\n".join(rules)
 
 
 def _load_web_css() -> str:
@@ -566,7 +609,11 @@ def markdown_to_html(
     generation_date = generation_date or date.today().strftime("%B %d, %Y")
     css = _load_css(css_path)
     if web:
-        css = f"{css}\n\n/* ---- web layer (screen only; print rules above still apply) ---- */\n{_load_web_css()}"
+        # Order matters: the faces, then the layer that puts them to work.
+        css = (f"{css}\n\n/* ---- embedded faces (the app's own, subsetted) ---- */\n"
+               f"{_web_font_css()}"
+               f"\n\n/* ---- web layer (screen only; print rules above still apply) ---- */\n"
+               f"{_load_web_css()}")
 
     subtitle = "A Reading in the Korean Four Pillars Tradition"
     footnote = (
@@ -616,6 +663,10 @@ def markdown_to_html(
         body_html = _link_contents(body_html, headings)
         body_html = _group_sections(body_html)
         body_html = _wrap_tables_for_web(body_html)
+        body_html += (
+            '<p class="colophon">Typeset in Inter, Cormorant Garamond and IBM Plex Mono, '
+            "embedded under the SIL Open Font License.</p>"
+        )
 
     classes = []
     if compact:

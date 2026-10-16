@@ -323,6 +323,58 @@ once the storage cap is hit. Neither deletes data.
 3. Prevent the next occurrence: the biggest CU-hours consumer is an always-on compute or a frequent
    health check. Both are configuration mistakes, not load.
 
+### Functions Storage is filling (Hobby: 10 GB)
+
+**Symptom.** The Vercel team dashboard shows Functions Storage approaching 10 GB. It does not take
+the site down — it stops **new deployments**, which is the real risk before a fix is urgent.
+
+**What it is.** Vercel charges the account for every *retained* deployment's function bundle. It is
+not any single artefact:
+
+| | |
+|---|---|
+| Repo upload | ~39 MB (and `.vercelignore` trims the engine's to what it can actually read) |
+| **Engine bundle, per deployment** | **~157 MB** — the Python closure is ~125 MB, of which pandas 65 + numpy 38 come in transitively via `sajupy`; reportlab 8, PIL 6.5 |
+| Webapp bundle, per deployment | ~40–80 MB (Next server output + Prisma engines) |
+| Growth rate | **Every push deploys both projects** — ~220 MB per push |
+
+**Diagnose.**
+
+```bash
+python3 tools/prune_deployments.py            # counts deployments, shows what is removable
+npx vercel ls <project> --json                # raw list; paging needs --next
+npx vercel list <project> --policy            # view the retention policy in effect
+```
+
+**Act.**
+
+```bash
+python3 tools/prune_deployments.py --apply    # keep the newest 3 per project; --safe guards aliases
+```
+
+Then stop it recurring, because pruning is a cleanup and retention is the cause. Retention has two
+places, both in the dashboard: **team** (Settings → Deployment Retention, with *Apply this policy to
+all existing projects*) and **per project** (Project → Settings → **Security** → Deployment Retention
+Policy), which overrides the team value for that project. Set the shortest offered duration for
+Canceled and Errored, and for the **engine** project especially — it is the 157 MB one. Note the lag:
+a deployment past its limit is marked for deletion by a background job **within ~48 h**, then
+restorable for 30 days, so the storage number falls over a day or two rather than instantly.
+
+**The floor, and why `--keep 3` is the right default.** Vercel retains regardless of policy: on Hobby
+the **last 3 deployments created** and the **last 3 Ready production deployments** per project, plus
+anything holding an alias and the latest preview of an active branch. That is ~4 per project here
+(~900 MB), so a `--keep` below 3 achieves nothing and the dry run will keep listing one deployment
+per project that `--safe` refuses to touch. That is the guard working, not a failure.
+
+⚠️ **On Pro, the defaults get *longer*, not shorter** — Production 1 year, Pre-Production 180 days
+(versus 30/30 on Hobby). Upgrading raises the allowance but not the ceiling on growth, so set a custom
+**team** policy as part of the upgrade or this comes back bigger.
+
+**Reduce the bundle itself (open).** ~103 MB of every engine deployment is pandas + numpy, pulled in
+by `sajupy` — nothing in `src/` or `api/` imports them directly. Replacing or lazy-loading that
+dependency would cut roughly 80 % of the engine bundle, which is worth investigating after the Pro
+upgrade; it is a code change, not a settings one.
+
 ## Backups
 
 | Asset | Backup | Restore |

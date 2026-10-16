@@ -96,10 +96,26 @@ and the markdown's own title block is dropped when it only repeats the cover. Th
 `p { margin: … }` in the same sheet, which left the front matter hard left while the panels below it
 were centred. `test_the_readable_column_is_a_wrapper` pins that, on screen only.
 
-**Font fidelity, honestly:** the app renders in Cormorant Garamond, Inter and IBM Plex Mono, loaded
-by `next/font`. A self-contained file cannot fetch them, so the reading uses the tokens' fallbacks —
-Georgia and the system stack, which the token definitions already name. Embedding subsetted copies
-(~100–300 KB per report, OFL) is the next fidelity step; the repo already has the subsetting tool.
+**The app's own typefaces are embedded.** The app loads Inter, Cormorant Garamond and IBM Plex Mono
+from a Google Fonts `<link>`; a delivered reading cannot make that request — it has to be one
+self-contained file, and a third-party font request would tell someone when a client opened their
+report. So `tools/build-web-fonts.py` subsets those three faces (variable Inter and Cormorant, static
+Plex Mono; Inter's italic is left out because the app does not load one either) and the renderer
+inlines them as `woff2` data URIs:
+
+```bash
+python3 tools/build-web-fonts.py           # regenerate into src/saju_html/fonts/
+python3 tools/build-web-fonts.py --check    # coverage; informational about glyphs the face lacks
+```
+
+Cost and effect, measured: **+235 KB** per reading (Inter 93 KB, Cormorant 62 KB, Plex Mono 16 KB,
+base64-inflated) — a Deep reading is ~370 KB, the one-page teal ~273 KB, and it is fetched once and
+kept. The rendered page makes **zero network requests**, against four or more that the app's font link
+issues. `test_the_embedded_faces_are_the_apps_own` compares the embedded families to the app's
+`--font-*` tokens, so changing the app's stack cannot silently leave the reading in the old face, and
+`test_the_reading_stays_a_reasonable_download` keeps the size a deliberate decision. The faces are
+OFL; their notices travel in `src/saju_html/fonts/LICENSE-WebFonts.txt` and as the colophon line at
+the foot of the reading.
 
 What the web layer adds on top of the print stylesheet (`theme.css` is built for A4):
 

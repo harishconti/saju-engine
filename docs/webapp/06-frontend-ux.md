@@ -14,8 +14,12 @@ callout idioms, same 44 px control bar, dark by default with the OS light palett
 
 - `tests/test_web_report.py::test_report_tokens_match_the_webapp` compares the mirror to
   `globals.css` in both schemes, so the two cannot drift.
-- It is a **self-contained** file (inline CSS and SVG, no scripts, no webfonts), so the app's faces
-  are referenced with the token fallbacks. Font embedding is a known fidelity gap, not an oversight.
+- It is a **self-contained** file: inline CSS, inline SVG, no scripts, and the app's three faces
+  **embedded as subsetted `woff2`** rather than linked. The app's own `layout.tsx` pulls them from a
+  Google Fonts `<link>`; a delivered reading cannot, both because it must be one file and because a
+  third-party font request would tell someone when a client opened their report. The rendered reading
+  makes **zero network requests**. `tests/test_web_report.py` compares the embedded families to the
+  `--font-*` tokens here, so the two cannot drift.
 - Print is deliberately separate: `theme.css` remains the A4 sheet, and `@media print` in the web
   layer hands the page back to it, so the PDF and its golden snapshots are unaffected.
 

@@ -25,3 +25,19 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 tmp/
+
+  # Upload weight is not free: Vercel counts every deployment's *function bundle* against the
+  # account's Functions Storage (Hobby: 10 GB), and a push to `develop` deploys twice — the
+  # webapp and the engine. The engine function is rooted at this repository, so without this
+  # list it carries files it can never read at runtime: the test suite and its manseryeok PNG
+  # evidence, the candidate PDFs, the docs tree, and the whole `apps/` webapp. What it actually
+  # needs is `src/`, `api/`, `knowledge/` and the packaging files.
+  #
+  # (`apps/` here is safe for the webapp: that project's root is `apps/web`, so this file —
+  # which belongs to the root-rooted engine project — never governs its upload.)
+tests/
+candidates_horoscope/
+docs/
+apps/
+tools/
+.github/

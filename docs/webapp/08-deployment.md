@@ -2,6 +2,19 @@
 
 Two Vercel projects, one repository, one domain.
 
+## What each project uploads
+
+Upload weight is billed — Functions Storage, per retained deployment — so `.vercelignore` at the repo
+root (which belongs to the **engine** project, because that project's root is the repository) excludes
+what the engine function can never read at runtime: `tests/`, `candidates_horoscope/`, `docs/`,
+`apps/`, `tools/`, `.github/`. It keeps `src/`, `api/`, `knowledge/` and the packaging files. This
+cannot affect the webapp: that project's root is `apps/web`, so the root ignore file never governs its
+upload.
+
+The dominant cost is not the repository at all — it is the Python dependency closure (~125 MB per
+engine deployment, mostly pandas and numpy via `sajupy`). See
+[09-operations.md](09-operations.md) § Functions Storage is filling, and `tools/prune_deployments.py`.
+
 ## Repo layout
 
 ```

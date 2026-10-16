@@ -83,7 +83,9 @@ def test_web_document_is_self_contained(web):
     assert not re.search(r"<link\b", web, re.IGNORECASE)
     assert not re.search(r"url\(\s*['\"]?https?:", web, re.IGNORECASE)
     assert "@import" not in web
-    assert "@font-face" not in web
+    # The faces *are* embedded — as data URIs, which is the opposite of an external request.
+    assert "@font-face" in web
+    assert re.search(r"src:\s*url\(data:font/woff2;base64,", web)
     # …and the styling is present inline. (A chart SVG only appears when the report has
     # an element-balance table; the real-report test below checks that separately.)
     assert web.count("<style") == 1
@@ -256,6 +258,43 @@ def test_sections_are_grouped_into_panels_with_an_eyebrow(web):
     # Headings outside a panel would render as unstyled text between cards.
     loose = re.findall(r'(?<!</section>)\s*<h2', web)
     assert len(loose) <= len(panels)
+
+
+def test_the_embedded_faces_are_the_apps_own(web):
+    """The reading embeds Inter, Cormorant Garamond and IBM Plex Mono — the app's faces.
+
+    The app loads them from Google's CDN; a delivered reading cannot make that request (it must
+    be self-contained, and it would tell a third party when a client opened their report), so
+    the faces travel inside the file. This compares the embedded families to the app's tokens,
+    so changing the app's stack cannot silently leave the reading in the old typeface.
+    """
+    from saju_html.renderer import _WEB_FACES
+
+    app_css = APP_CSS.read_text(encoding="utf-8")
+    declared = {
+        name: re.search(rf"{name}:\s*([^;]+);", app_css).group(1).split(",")[0].strip().strip('"')
+        for name in ("--font-display", "--font-sans", "--font-mono")
+    }
+    embedded = [family for family, _file, _weight in _WEB_FACES]
+    assert set(embedded) == set(declared.values()), (embedded, declared)
+
+    for family in embedded:
+        assert f"font-family: '{family}'" in web, family
+    assert web.count("src: url(data:font/woff2;base64,") == len(embedded)
+    assert web.count("@font-face") == len(embedded)
+
+
+def test_the_reading_stays_a_reasonable_download():
+    """The embedded faces are the point, and they cost size — keep an eye on it.
+
+    ~230 KB of base64 font on top of a ~135 KB document. Well inside anything a phone will
+    happily open; this test is here so that a future face (or a full CJK embed) is a deliberate
+    decision rather than a surprise.
+    """
+    md = (REPO_ROOT / "tests" / "golden" / "wren-deep.md").read_text(encoding="utf-8")
+    document = markdown_to_html(md, title="Golden wren-deep", tier="deep", web=True)
+    size_kb = len(document.encode("utf-8")) / 1024
+    assert size_kb < 600, f"the reading grew to {size_kb:.0f} KB"
 
 
 def test_the_readable_column_is_a_wrapper(web, print_doc):

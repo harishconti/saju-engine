@@ -23,6 +23,8 @@ Key scripts:
 | `tools/client_intake_app.html` + `tools/client_intake_app.py` | Self-service FastAPI app: `/` single-chart, `/compat` two-chart; sample tier returns a PDF instantly; paid tiers are stored in an encrypted SQLite queue (`src/saju_web/store.py`, `SAJU_INTAKE_KEY`), drafted in the background and approved by the owner. |
 | `tools/intake_admin.py` | Owner CLI: `genkey`, `list [--status]`, `show <id>`, `approve <id> --base-url`, `regenerate <id>`, `purge --days 180`. `approve` prints the private `/report/{token}` link to email. |
 | `tools/audit-ui.py` | **UI/UX audit and CI gate** for the deployed webapp: real Chrome at 390/768/1440 px in both colour schemes, reporting horizontal overflow, axe-core violations, hydration warnings, `<h1>` count, missing shells and sub-44 px controls. `--strict` fails on any of them; wired into CI as the `ui` job. See `docs/webapp/12-testing.md`. |
+| `tools/prune_deployments.py` | Prunes old Vercel deployments, because Functions Storage counts every retained function bundle (~157 MB per engine deployment here). Dry-run by default, always passes `--safe` so an aliased deployment cannot be removed, and keeps the newest `--keep` (default 3) for rollback. Runbook: [09-operations.md](../webapp/09-operations.md). |
+| `tools/build-web-fonts.py` | Subsets the app's three webfaces (Inter, Cormorant Garamond, IBM Plex Mono) to the glyphs a report sets and writes them as `woff2` into `src/saju_html/fonts/`, with the OFL notices. `--check` verifies coverage and reports glyphs the face itself lacks. Run it when the app's font stack changes. |
 | `tools/build-cjk-font-subset.py` | Regenerates the bundled Hangul/Hanja font subset (`src/saju_html/fonts/SajuCJK-*.ttf`) from OFL Noto Sans KR, scanning report-prose sources only; `--check` verifies coverage. Run it after adding Hanja to `knowledge/`. |
 | `tools/suggest_letter.py` | **Review-time letter drafter** (suggest-only, never in the delivery path). Builds a *grounding pack* from the computed chart plus `knowledge/` excerpts and asks an API-key provider (Ollama Cloud by default, `deepseek-v4.1-flash`) for the one page a template cannot write. `--dry-run` prints the exact request and sends nothing; no PII is included; unknown citations, invented numbers, wrong length, a missing birth-time caveat or any client-ready gate finding fails the draft. Writes to `--out`/stdout only — it never edits a report. See `src/saju_ai/` and [products/reports.md](../products/reports.md). |
 | `tools/qa_client_ready.py` | **Client-ready gate**: fails a report carrying internal jargon (`querent`, `the engine`, `Step N`, raw engine keys), template debris, double glosses, a lowercase client name, an `a Earth` article, a repeated word, a sentence repeated more than twice, or a price. Runs on the engine markdown *and* (`--pdf`) on text extracted from the artefact, because only there can a renderer leak show up. `intake_admin.py approve` runs it and refuses to issue a link unless `--force`. Wired to `tests/test_qa_client_ready.py`. |
@@ -213,6 +215,7 @@ pytest tests/test_textbook_cases.py::test_park_chung_hee -v
 - `tests/test_pdf_navigation.py`
 - `tests/test_web_report.py`
 - `src/saju_html/theme-web.css`
+- `src/saju_html/fonts/` (the embedded webfaces and their licence)
 - `tests/test_qa_client_ready.py`
 - `tests/test_saju_ai_letter.py`
 - `src/saju_ai/pack.py`
