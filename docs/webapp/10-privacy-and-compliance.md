@@ -45,7 +45,13 @@ One checkbox at sign-up, recorded as a `ConsentRecord` with `policyVersion`, `gr
 
 Rules:
 
-- Consent is recorded **before** any birth data is submitted, not after.
+- Consent is recorded **before** any birth data is submitted, not after. **This is enforced, not merely
+  promised:** `POST /api/profiles` and `PATCH /api/profiles/{id}` refuse with `403 CONSENT_REQUIRED` unless
+  the most recent `ConsentRecord` is un-withdrawn and grants the `service` purpose
+  (`src/lib/consent.ts`). Withdrawal needs no second code path — it is the same check reversed.
+  It had to be made explicit because it was not true: recording consent was a best-effort *browser* call
+  and nothing on the server ever looked, so the first real signup produced an account with **no**
+  `ConsentRecord`, and the account page displayed the required consent as already granted on top of that.
 - Withdrawing consent is a first-class action in `/dashboard/account`, not an email request.
   Withdrawing `service` stops processing and starts the deletion path.
 - `ConsentRecord` is **append-only**. Never update a consent row; insert a new one and set
@@ -230,7 +236,8 @@ document the reasoning for *not* notifying — the reasoning is what an auditor 
       `privacy@cosmicsaju.com` (data-protection requests only). Records published in Cloudflare and
       **receiving verified** (`delivered`); ⚠️ the three **DKIM CNAMEs** are still to add — see
       [07](07-services-and-integrations.md) §Mailbox records
-- [ ] Consent checkbox records a `ConsentRecord` before any birth data is collected
+- [x] Consent checkbox records a `ConsentRecord` before any birth data is collected — **enforced
+      server-side** at the profile write, not merely displayed (`403 CONSENT_REQUIRED`)
 - [ ] Birth-data consent wording reviewed specifically for the sensitive category
 - [ ] Deletion path works end to end and is cancellable
 - [ ] Retention sweep and 7-day anonymous-sample purge are running

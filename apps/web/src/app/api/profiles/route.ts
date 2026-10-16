@@ -1,6 +1,7 @@
 import { ApiError, handle, json, parseJson } from "@/lib/api";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { CONSENT_REQUIRED_MESSAGE, hasActiveServiceConsent } from "@/lib/consent";
 import { rateLimit, WINDOW } from "@/lib/ratelimit";
 import { writeAudit } from "@/lib/audit";
 import { birthUtcOffset, resolveBirthLocation, validateBirth } from "@/lib/birth";
@@ -30,6 +31,13 @@ export const POST = handle(async (req) => {
   await rateLimit(`profile:${user.id}`, 30, WINDOW.hour);
 
   const input = await parseJson(req, profileSchema);
+
+  // Consent is the lawful basis for the sensitive category (birth date/time/place), so it is enforced
+  // where the data is actually written rather than trusted to a best-effort browser call at signup.
+  if (!(await hasActiveServiceConsent(user.id))) {
+    throw new ApiError(403, "CONSENT_REQUIRED", CONSENT_REQUIRED_MESSAGE);
+  }
+
 
   const location = resolveBirthLocation({
     city: input.city,

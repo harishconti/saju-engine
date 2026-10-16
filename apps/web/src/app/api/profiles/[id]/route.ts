@@ -1,6 +1,7 @@
 import { ApiError, handle, json, parseJson } from "@/lib/api";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { CONSENT_REQUIRED_MESSAGE, hasActiveServiceConsent } from "@/lib/consent";
 import { writeAudit } from "@/lib/audit";
 import { birthUtcOffset, resolveBirthLocation, validateBirth } from "@/lib/birth";
 import { profileUpdateSchema } from "@/lib/validation/schemas";
@@ -29,6 +30,13 @@ export const PATCH = handle(async (req, ctx: Ctx) => {
   const { id } = await ctx.params;
   const existing = await ownedProfile(user.id, id);
   const input = await parseJson(req, profileUpdateSchema);
+
+  // Consent is the lawful basis for the sensitive category (birth date/time/place), so it is enforced
+  // where the data is actually written rather than trusted to a best-effort browser call at signup.
+  if (!(await hasActiveServiceConsent(user.id))) {
+    throw new ApiError(403, "CONSENT_REQUIRED", CONSENT_REQUIRED_MESSAGE);
+  }
+
 
   // "Make primary" only. Nothing else is a partial update in practice.
   if (input.isDefault === true && Object.keys(input).length === 1) {

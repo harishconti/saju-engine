@@ -1,7 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { orderSchema, profileSchema, sampleRequestSchema } from "../validation/schemas";
 import { formatUSD, timeAgo, REPORT_STATUS_HELP } from "../format";
-import { isAdminEmail, hasMinRole, ROLE_RANK } from "../roles";
+import { isAdminEmail, hasMinRole, roleForEmail, ROLE_RANK } from "../roles";
 import { parseChartSummary, elementCountsFrom } from "../chart";
 
 describe("profile validation", () => {
@@ -145,5 +145,41 @@ describe("chart summary", () => {
     expect(counts.Wood).toBe(30);
     expect(counts.Fire).toBe(10);
     expect(counts.Water).toBe(0);
+  });
+});
+
+/**
+ * The role an account holds. This is the seam that had no implementation at all: nothing in the
+ * codebase could set `role = ADMIN`, so an `ADMIN_EMAILS` entry on its own was inert and the review
+ * console was unreachable — proven by the first real signup, which produced a `USER` row.
+ */
+describe("roleForEmail", () => {
+  const previous = process.env.ADMIN_EMAILS;
+
+  afterEach(() => {
+    if (previous === undefined) delete process.env.ADMIN_EMAILS;
+    else process.env.ADMIN_EMAILS = previous;
+  });
+
+  it("grants ADMIN to an allowlisted address, case-insensitively", () => {
+    process.env.ADMIN_EMAILS = "owner@cosmicsaju.com";
+    expect(roleForEmail("owner@cosmicsaju.com", "USER")).toBe("ADMIN");
+    expect(roleForEmail("OWNER@cosmicsaju.com", "USER")).toBe("ADMIN");
+  });
+
+  it("leaves everyone else exactly as they were", () => {
+    process.env.ADMIN_EMAILS = "owner@cosmicsaju.com";
+    expect(roleForEmail("someone@else.com", "USER")).toBe("USER");
+  });
+
+  it("never demotes — revocation is the other half of the gate, not a role change", () => {
+    process.env.ADMIN_EMAILS = "";
+    expect(roleForEmail("owner@cosmicsaju.com", "ADMIN")).toBe("ADMIN");
+  });
+
+  it("is safe with no email at all", () => {
+    process.env.ADMIN_EMAILS = "owner@cosmicsaju.com";
+    expect(roleForEmail(null, "USER")).toBe("USER");
+    expect(roleForEmail(undefined, "USER")).toBe("USER");
   });
 });

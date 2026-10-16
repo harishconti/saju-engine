@@ -61,17 +61,27 @@ export function ConsentForm({
   const [purposes, setPurposes] = useState(initial);
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function save(next: typeof purposes) {
     setPurposes(next);
     setBusy(true);
     setSaved(false);
+    setError(null);
     try {
-      await fetch("/api/account/consent", {
+      const res = await fetch("/api/account/consent", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ policyVersion, purposes: next }),
       });
+      if (!res.ok) {
+        // Never claim it saved. Consent is the lawful basis for birth data, so a failed write here
+        // must be visible rather than silently absent.
+        const body = (await res.json().catch(() => ({}))) as { error?: string };
+        setError(body.error ?? "We couldn't save that. Please try again.");
+        setPurposes(initial); // snap the checkbox back to what is actually recorded
+        return;
+      }
       setSaved(true);
       router.refresh();
     } finally {
@@ -111,6 +121,7 @@ export function ConsentForm({
       </label>
       {busy ? <p className="text-xs text-muted-foreground">Saving…</p> : null}
       {saved && !busy ? <p className="text-xs text-success">Preferences saved.</p> : null}
+      {error && !busy ? <p className="text-xs text-destructive">{error}</p> : null}
     </div>
   );
 }

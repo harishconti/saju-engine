@@ -33,7 +33,11 @@ export default async function AccountPage() {
     }),
   ]);
 
-  const purposes = (latestConsent?.purposes ?? { service: true, service_messages: false }) as {
+  // Default to NOT granted. This previously said `service: true`, so an account with no
+  // `ConsentRecord` at all rendered the required consent as already ticked — the UI asserting a
+  // state the database did not have, in exactly the place the privacy policy makes claims. The
+  // checkbox below is what records it; it must start unticked and be an explicit action.
+  const purposes = (latestConsent?.purposes ?? { service: false, service_messages: false }) as {
     service: boolean;
     service_messages: boolean;
   };

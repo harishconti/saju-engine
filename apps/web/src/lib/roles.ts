@@ -31,3 +31,11 @@ export function isAdminEmail(email: string | null | undefined): boolean {
   if (!email) return false;
   return adminEmails().includes(email.toLowerCase());
 }
+
+/**
+ * The role an account should hold, given its email. Grants ADMIN from the allowlist; never revokes
+ * (see the reasoning in auth/index.ts). Pure, so the decision can be tested without a database.
+ */
+export function roleForEmail(email: string | null | undefined, current: Role): Role {
+  return isAdminEmail(email) ? "ADMIN" : current;
+}

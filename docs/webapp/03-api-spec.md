@@ -74,9 +74,9 @@ export const POST = handle(async (req: Request) => {
 | Method | Path | Auth | Purpose |
 |---|---|---|---|
 | `GET` | `/api/profiles` | user | List own profiles |
-| `POST` | `/api/profiles` | user | Create a profile (resolves lat/long/tz server-side) |
+| `POST` | `/api/profiles` | user | Create a profile (resolves lat/long/tz server-side). **Requires an active `service` consent** -> `403 CONSENT_REQUIRED` |
 | `GET` | `/api/profiles/{id}` | user | Read one |
-| `PATCH` | `/api/profiles/{id}` | user | Update |
+| `PATCH` | `/api/profiles/{id}` | user | Update. **Requires an active `service` consent** -> `403 CONSENT_REQUIRED` (it can rewrite birth data) |
 | `DELETE` | `/api/profiles/{id}` | user | Soft delete |
 
 ### Orders

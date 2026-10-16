@@ -39,19 +39,32 @@ export default function LoginPage() {
     return `${origin}/auth/complete?next=${encodeURIComponent(target)}`;
   };
 
-  /** Consent is recorded best-effort after a session exists — never blocks sign-in. */
+  /**
+   * Record consent after sign-up, once a session exists.
+   *
+   * Retried once, because the session cookie is not always readable by the server on the very first
+   * request after `signUp.email`. The old version fired a single request and swallowed every failure,
+   * which is how the first real signup produced a `User` row with **no** `ConsentRecord` at all. A
+   * failure here is no longer silent in effect: the server refuses to store birth data without an
+   * active `service` consent and points the visitor at their account settings, where it can be granted.
+   */
   async function recordConsent() {
-    try {
-      await fetch("/api/account/consent", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          policyVersion: CONSENT_VERSION,
-          purposes: { service: true, service_messages: false },
-        }),
-      });
-    } catch {
-      /* non-fatal */
+    const body = JSON.stringify({
+      policyVersion: CONSENT_VERSION,
+      purposes: { service: true, service_messages: false },
+    });
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const res = await fetch("/api/account/consent", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body,
+        });
+        if (res.ok) return;
+      } catch {
+        /* fall through to the retry */
+      }
+      await new Promise((resolve) => setTimeout(resolve, 700));
     }
   }
 

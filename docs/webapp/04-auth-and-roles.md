@@ -155,8 +155,17 @@ export async function requireRole(minRole: Role): Promise<AppUser> {
 `ADMIN_EMAILS` environment variable. Two independent conditions means a database compromise alone
 does not hand over the review console, and revoking access does not require a data change.
 
-A user's own first admin row is created manually (a seed script or a one-off `UPDATE`). There is no
-self-service promotion path, by design.
+**How the role is granted.** `mirrorUser()` derives it from the allowlist: an account whose email is in
+`ADMIN_EMAILS` is written `ADMIN`, and everyone else is left exactly as they were. It deliberately never
+*demotes* — removing an address from `ADMIN_EMAILS` already revokes access through the other half of the
+gate, and a surprise demotion would lock an operator out mid-session.
+
+- This replaced a gap, not a design. The prose above described the gate correctly, but **nothing in the
+  codebase could set `role = ADMIN`** — no route, no script, no seed — so an `ADMIN_EMAILS` entry on its
+  own was inert and the review console was unreachable. The first real signup proved it: the row was
+  created `USER`, which would have made **every paid report unapprovable**.
+- If an existing row is ever stuck on `USER`, one sign-in heals it, or
+  `UPDATE "User" SET role = 'ADMIN' WHERE email = '…'` does it directly.
 
 ## Sign-in surfaces
 

@@ -2,7 +2,7 @@ import { cache } from "react";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { ApiError } from "@/lib/api";
-import { hasMinRole, isAdminEmail, type Role } from "@/lib/roles";
+import { hasMinRole, isAdminEmail, roleForEmail, type Role } from "@/lib/roles";
 import { auth } from "./server";
 
 /**
@@ -48,14 +48,25 @@ async function mirrorUser(u: NeonUser): Promise<AppUser | null> {
     select: { id: true, name: true, email: true, role: true, deletedAt: true },
   });
 
+  // Admin is derived from the allowlist here, because nothing else can grant it: there is no route,
+  // script or CLI that sets `role = ADMIN`, and an `ADMIN_EMAILS` entry on its own is inert — it is
+  // only one half of the double gate. The first real signup proved the consequence: the row was
+  // created `USER` and the review console was unreachable, which would have made every paid report
+  // unapprovable. Deliberately never *demotes*: dropping an address from `ADMIN_EMAILS` already
+  // revokes access through the other half of the gate, and a surprise demotion would lock an
+  // operator out mid-session.
+  const grantedRole: Role = roleForEmail(n.email, "USER");
+  const grantAdmin = grantedRole === "ADMIN";
+
   if (existing) {
     if (existing.deletedAt) return null; // anonymised account: treat as signed out
-    if (existing.name === n.name && existing.email === n.email) {
+    const needsRole = grantAdmin && existing.role !== "ADMIN";
+    if (!needsRole && existing.name === n.name && existing.email === n.email) {
       return { id: existing.id, name: existing.name, email: existing.email, role: existing.role as Role };
     }
     const updated = await prisma.user.update({
       where: { id: n.id },
-      data: { name: n.name, email: n.email },
+      data: { name: n.name, email: n.email, ...(needsRole ? { role: "ADMIN" as const } : {}) },
       select: { id: true, name: true, email: true, role: true },
     });
     return { ...updated, role: updated.role as Role };
@@ -63,7 +74,7 @@ async function mirrorUser(u: NeonUser): Promise<AppUser | null> {
 
   try {
     const created = await prisma.user.create({
-      data: { id: n.id, name: n.name, email: n.email },
+      data: { id: n.id, name: n.name, email: n.email, ...(grantAdmin ? { role: "ADMIN" as const } : {}) },
       select: { id: true, name: true, email: true, role: true },
     });
     return { ...created, role: created.role as Role };
