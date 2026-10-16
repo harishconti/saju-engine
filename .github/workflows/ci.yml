@@ -1,22 +1,33 @@
 name: CI
 
+# `develop` is the PRODUCTION branch (Vercel deploys it to www.cosmicsaju.com), so it must be
+# gated. Triggering on `main` alone meant this workflow never ran for real work.
 on:
   push:
-    branches: [main]
+    branches: [develop, main]
   pull_request:
-    branches: [main]
+    branches: [develop, main]
+
+# A new push supersedes the previous run for the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test:
+  engine:
+    name: Engine — pytest (py${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        # The declared floor plus the runtime production actually uses. The middle
+        # version added ~4 minutes for no extra signal.
+        python-version: ["3.10", "3.12"]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
@@ -25,8 +36,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[dev,html,web]"
+          pip install -r requirements.txt
 
       - name: Install Playwright browser
+        # The HTML backend is the default PDF renderer, and its tests need Chromium.
         run: |
           python -m playwright install chromium
           python -m playwright install-deps chromium
@@ -34,7 +47,60 @@ jobs:
       - name: Lint (pyflakes rules)
         run: |
           pip install ruff
-          ruff check --select F src tools tests
+          ruff check --select F src tools tests api
 
       - name: Run pytest
         run: python -m pytest tests/ -q
+
+      - name: Cited-fixture validation gate
+        run: python tools/run_validation.py
+
+  webapp:
+    name: Webapp — lint, types, tests, build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+
+    # Placeholders only — this job needs no secrets at all. Every client is lazy, so
+    # `prisma generate`, the unit suite and `next build` all run without a database,
+    # without network access, and without a single real credential. Keeping it that way
+    # is what makes CI safe on a fork or a PR from anywhere.
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      DIRECT_URL: postgresql://ci:ci@localhost:5432/ci
+      DATABASE_URL_UNPOOLED: postgresql://ci:ci@localhost:5432/ci
+      NEXT_PUBLIC_APP_URL: https://www.cosmicsaju.com
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          # Matches the Vercel project setting and `engines.node`.
+          node-version: "24.x"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate the Prisma client
+        # Must precede the tests: `src/lib/__tests__/email-reply-to.test.ts` imports the real
+        # `email.ts`, which imports the real Prisma singleton. Without a generated client
+        # that import throws before a single assertion runs.
+        run: npm run prisma:generate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        # Proves the no-secrets build works. `build` also runs `prisma generate`.
+        run: npm run build
