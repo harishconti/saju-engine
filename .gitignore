@@ -4,27 +4,30 @@ __pycache__/
 *$py.class
 *.so
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
+# Anchored with a leading "/": these are setuptools/PyPI output written at the REPO ROOT.
+# Unanchored, they match at ANY depth — `lib/` was silently swallowing apps/web/src/lib/
+# (the entire webapp core) so `git add apps/web` staged nothing from it.
+/build/
+/develop-eggs/
+/dist/
+/downloads/
+/eggs/
+/.eggs/
+/lib/
+/lib64/
+/parts/
+/sdist/
+/var/
+/wheels/
+/*.egg-info/
 .installed.cfg
 *.egg
 
-# Virtual environments
-venv/
-env/
-ENV/
-.venv/
+# Virtual environments (likewise root-level; an unanchored `env/` would hide any nested env dir)
+/venv/
+/env/
+/ENV/
+/.venv/
 
 # IDEs
 .vscode/
