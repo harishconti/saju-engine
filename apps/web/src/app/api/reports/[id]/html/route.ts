@@ -42,8 +42,8 @@ export const GET = handle(async (_req, ctx: Ctx) => {
     );
   }
   if (!report.htmlKey) {
-    // Reports rendered before the web document existed, and compatibility readings (no web mode
-    // yet). A clear 404 lets the UI fall back to the PDF rather than showing an empty page.
+    // Only one reason remains: the report was rendered before the web document existed. A clear 404
+    // lets the UI fall back to the PDF rather than showing an empty page.
     throw new ApiError(
       404,
       "NO_WEB_DOCUMENT",

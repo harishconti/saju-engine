@@ -36,6 +36,7 @@ import tempfile
 import time
 import urllib.error
 import urllib.request
+from datetime import date
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -393,6 +394,7 @@ def _render_single(profile: ProfileIn, tier: str, out_pdf: Path,
 def _render_compat(
     profile_a: ProfileIn, profile_b: ProfileIn, tier: str, out_dir: Path,
     override_a: Optional[str], override_b: Optional[str],
+    wants_html: bool = False,
 ) -> Tuple[Path, Path, Optional[int], Optional[Path]]:
     """Mirrors `saju_web/jobs.render_compat`."""
     data_a, data_b = BirthData(profile_a), BirthData(profile_b)
@@ -424,6 +426,10 @@ def _render_compat(
         else f"Compatibility Reading — {data_a.name} × {data_b.name}"
     )
     pages: list = []
+    # One report ID for both artefacts. The renderer would derive exactly this string itself (as does
+    # the ReportLab backend), so passing it changes nothing about the PDF — it just means the reading
+    # and the PDF cannot disagree about the ID printed in the footer.
+    report_id = f"CID-{out_pdf.stem}-{date.today().strftime('%Y%m%d')}"
     pdf = build_pdf(
         input_md=out_md,
         output_pdf=out_pdf,
@@ -432,12 +438,31 @@ def _render_compat(
         dob=f"{data_a.dob_label} · {data_b.dob_label}",
         day_master=f"{chart_a.day_master}/{chart_b.day_master}",
         tier="compat",
+        report_id=report_id,
         pages_out=pages,
     )
-    # No web document for a compatibility reading yet: it renders through its own two-chart
-    # renderer, which has no web mode. The response says `htmlSha256: null` either way, so a
-    # caller cannot mistake "not available" for "not asked for".
-    return pdf, out_md, (pages[0] if pages else None), None
+    html_path: Optional[Path] = None
+    if wants_html:
+        # The same renderer and the same web mode a single-chart reading uses: the compat markdown is
+        # just markdown, so `markdown_to_html(web=True)` gives the two-chart reading the same screen
+        # artefact — self-contained, inline CSS and SVG, no external requests. (This used to be
+        # withheld on the belief that the compat product rendered through a separate renderer with no
+        # web mode; it does not — `md_to_saju_compat_pdf.py` wraps this very `build_pdf`.)
+        from saju_html.renderer import markdown_to_html
+
+        document = markdown_to_html(
+            out_md.read_text(encoding="utf-8"),
+            title=title,
+            client=f"{data_a.name} ({chart_a.day_master}) · {data_b.name} ({chart_b.day_master})",
+            dob=f"{data_a.dob_label} · {data_b.dob_label}",
+            day_master=f"{chart_a.day_master}/{chart_b.day_master}",
+            report_id=report_id,
+            tier="compat",
+            web=True,
+        )
+        html_path = out_pdf.with_suffix(".html")
+        html_path.write_text(document, encoding="utf-8")
+    return pdf, out_md, (pages[0] if pages else None), html_path
 
 
 def _upload(artifact: Path, upload_url: str, *, content_type: str = "application/pdf",
@@ -560,6 +585,7 @@ def generate(request: GenerateRequest, authorization: Optional[str] = Header(Non
                 pdf, markdown_path, page_count, html_path = _render_compat(
                     request.profileA, request.profileB, request.tier, out_dir,
                     request.favorableOverrideA, request.favorableOverrideB,
+                    wants_html=bool(request.htmlUploadUrl),
                 )
             else:
                 pdf, markdown_path, page_count, html_path = _render_single(

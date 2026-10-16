@@ -1181,6 +1181,7 @@
     the same markdown and PUTs it beside the PDF, returning `htmlSha256`/`htmlBytes`. **Best-effort on purpose** —
     losing the reading must not lose the order — and the response distinguishes "not uploaded" from "not asked for".
     Compat readings return `null`: their two-chart renderer has no web mode yet.
+    **SUPERSEDED 2026-10-17 — that was never true; compat readings render one now.** See the entry below.
     ✅ **Data.** `Report.htmlKey`/`htmlBytes` + a hand-written migration (no DB connection needed), because the schema
     change must be deployable without me touching the dev branch. **`cleanup.ts` sweeps the new key** in both retention
     paths — a retention sweep that forgets an artefact leaks the client's reading forever.
@@ -1270,12 +1271,14 @@
     ✅ **The console leads with the reading**: "Read the reading" then "Open PDF", plus one sentence stating what
     Approve actually publishes — and that sentence is the interesting part. *Not every report has both artefacts*:
     a compatibility reading renders through its own two-chart pipeline (no web mode yet), and anything generated
+    **SUPERSEDED 2026-10-17: compat has a reading now, so the only missing-reading reason left is age.**
     before the reading existed carries only a PDF. Promising "the reading and the PDF" regardless would be the
     documentation-asserting-a-control-that-does-not-exist bug again, in copy this time.
     ✅ **So the decision is a tested function, not console prose.** `apps/web/src/lib/report-artifacts.ts` holds
     `artifactSummary(report, kind)` (what exists, which one to open first, and the sentence for the reviewer) and
     `previewKeyFor` (which key to sign, or the 403/404 with its reason). Eight unit tests cover the branches,
     including the two different reasons a reading can be missing — "compatibility readings are PDF-only for now"
+    **SUPERSEDED 2026-10-17: the compat branch was deleted; age is the only reason, and it is actionable.**
     versus "generated before the reading existed; regenerate to add it" — because the second one is actionable and
     the first is not. The route stays thin (auth, fetch, presign) and the console renders what the function returns.
     Webapp suite **116 → 124** across **13** files; typecheck clean. Docs: `03` (the `kind` param), `06` (the result
@@ -1354,6 +1357,44 @@
     ⚠️ **The lesson is the same one this file keeps repeating.** The audit found a *gate* whose coverage depended on an
     unstated system dependency, and whose failure mode was silence. Adding a check is not the same as making it
     measurable — and "not checked" must never render as "clean".
+
+  - **2026-10-17 (a compatibility order now gets the reading, like every other tier).** Owner, from the product:
+    *"I see html reports essential and deep but not in comparability reports."* Exactly right, and it was a
+    **withheld capability, not a missing one** — the worst kind, because nothing errored.
+    ✅ **The claim was simply wrong.** Two files asserted that a compat reading "renders through its own two-chart
+    renderer, which has no web mode yet": `api/index.py::_render_compat` (which returned `html_path=None` with a
+    comment saying so) and `apps/web/src/lib/fulfilment.ts` (which asked for `htmlUploadUrl` only when
+    `engineKindFor(order) === "single"`). But `md_to_saju_compat_pdf.py` is a 130-line CLI that wraps the **very same**
+    `renderer.build_pdf`, and `markdown_to_html(web=True)` is tier-agnostic — it differs only by a `tier-compat`
+    class. Rendered live as a check: the deep compat reading produced a **298 KB self-contained web document**, 3
+    embedded woff2 faces, zero external requests (the only `http://` is the inline SVG namespace), 23 panels, one
+    `<h1>`, and **no overflow at 360 or 1440**. It looked right the first time.
+    ✅ **Fixed on both sides.** The engine renders and PUTs the web document for `kind="compat"`; the webapp always
+    presigns `htmlUploadUrl`. One **report ID** is now computed once in `_render_compat` and passed to `build_pdf` and
+    to `markdown_to_html` — both PDF backends derive exactly that string themselves
+    (`CID-{stem}-{YYYYMMDD}`), so this is behaviour-preserving and means the reading and the PDF cannot disagree about
+    the ID in the footer. Deploy-safe either way: the upload is best-effort on both sides, so while one project lags
+    the other the engine just reports `htmlSha256: null` and the row keeps `htmlKey: null`.
+    ✅ **The stale code was hunted down, not just the stale comment.** `report-artifacts.ts` had a `kind` parameter
+    whose only job was the branch *"Compatibility readings are PDF-only for now"* — shown to the reviewer at approval
+    time. That branch, the parameter, its caller in `admin/reports/[id]/page.tsx`, and the test asserting it are all
+    gone; a compat report with no reading is now only ever "generated before the reading existed — regenerate". Same
+    for `html/route.ts`'s comment, `engine.ts`'s field doc, and `02`/`05`/`12`. **This is the sixth time this project
+    has caught documentation asserting a capability the code did not have** — the first five were the reverse direction
+    (claiming a control that did not exist); this one withheld one that did.
+    ✅ **Tests that fail when the bug is present — verified by restoring the bug.** New
+    `apps/web/src/lib/__tests__/fulfilment-payload.test.ts` asserts the *payload the webapp sends* (the layer where the
+    gap actually was, and which had **no** unit coverage at all): compat asks for the reading, single asks too, the row
+    records `htmlKey` only when the object really landed, and a failed upload still files the report. Restoring the old
+    single-only condition makes exactly one test fail. `tests/test_report_engine_service.py` gains
+    `test_generate_renders_the_reading_for_a_compatibility_report`, which asserts the two-chart document actually
+    contains both partners; removing `wants_html` from the compat dispatch makes it fail. Webapp 124 → 128; that file
+    30 → 31.
+    ⚠️ **A note on the delivered reports.** The existing compat orders predate this, so their rows have no `htmlKey` and
+    nothing can add one after the fact (the document is rendered from the markdown at generate time and the artefacts
+    are immutable by design). **A compat client who wants the reading needs a regenerate, which creates a new version** —
+    the reviewer sees "this report was generated before the reading existed. Regenerate to add it" rather than a wrong
+    claim about compat being PDF-only.
 
 ### Earlier state (2026-09-26)
 

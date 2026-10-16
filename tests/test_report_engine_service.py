@@ -276,6 +276,52 @@ def test_generate_renders_the_reading_when_asked(monkeypatch):
     assert body["htmlSha256"] and len(body["htmlSha256"]) == 64
 
 
+def test_generate_renders_the_reading_for_a_compatibility_report(monkeypatch):
+    """A compatibility order gets the same reading a single-chart order gets.
+
+    The two-chart reading renders through the very same `build_pdf` /
+    `markdown_to_html(web=True)` as every other tier — `md_to_saju_compat_pdf.py` is a thin wrapper
+    over that renderer — so there was never a reason to withhold the web document. But the engine
+    returned `html_path=None` for `kind="compat"`, and the webapp did not ask for one either, so the
+    compat product shipped a PDF and no reading. Owner, 2026-10-17: *"I see html reports essential and
+    deep but not in comparability reports."*
+    """
+    import api.index as svc
+
+    uploaded: dict = {}
+
+    def fake_upload(artifact, url, *, content_type="application/pdf", timeout=60.0):
+        uploaded[str(url)] = (artifact.read_bytes(), content_type)
+
+    monkeypatch.setattr(svc, "_upload", fake_upload)
+    response = generate(
+        generate_request(kind="compat", tier="basic",
+                         profileB={**RM, "fullName": "Arun", "gender": "F",
+                                   "birthDate": "1992-03-20", "birthTime": "14:00"},
+                         uploadUrl="http://pdf.test/put",
+                         htmlUploadUrl="http://html.test/put"),
+        authorization=AUTH,
+    )
+    assert response.status_code == 200, body_of(response)
+
+    body = body_of(response)
+    assert set(uploaded) == {"http://pdf.test/put", "http://html.test/put"}
+    document, content_type = uploaded["http://html.test/put"]
+    assert content_type.startswith("text/html")
+    assert document.startswith(b"<!DOCTYPE html")
+    # Self-contained and private, exactly like the single-chart reading.
+    assert b"noindex" in document
+    assert b"<script" not in document and b"<link " not in document
+    assert b'name="viewport"' in document
+    # It really is the two-chart document: both partners and the composite score are in it.
+    assert "Kim Nam-joon" in document.decode("utf-8")
+    assert "Arun" in document.decode("utf-8")
+    assert "Compatibility Reading" in document.decode("utf-8")
+    # Integrity metadata travels with the PDF's, so a caller can tell "not uploaded" from "not asked".
+    assert body["htmlBytes"] == len(document)
+    assert body["htmlSha256"] and len(body["htmlSha256"]) == 64
+
+
 def test_a_failed_web_document_upload_still_delivers_the_report(monkeypatch):
     """Best-effort, like the markdown: losing the reading must not lose the order.
 

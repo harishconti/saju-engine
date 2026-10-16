@@ -2,10 +2,14 @@
  * Which artefacts a report actually has, and what approving one will deliver.
  *
  * The reviewer approves **both** artefacts (owner decision, 2026-10-16): the web document is what
- * the client reads and can save as one file, and the PDF is the keepsake. But not every report has
- * both — a compatibility reading renders through its own two-chart pipeline, which has no web mode
- * yet, and any report generated before the web document existed carries only a PDF. The console must
- * therefore say what it is about to publish rather than implying both are always there.
+ * the client reads and can save as one file, and the PDF is the keepsake. Every tier now produces
+ * both, including a compatibility reading — so the only remaining reason to have a PDF and no reading
+ * is age: the report predates the reading. The console must say what it is about to publish rather
+ * than implying both are always there.
+ *
+ * (This used to carry a `kind` argument, because compatibility readings had no web mode. They do:
+ * the two-chart reading renders through the same renderer, so a compat report with no reading is just
+ * an old report, and there is nothing compat-specific left to say.)
  *
  * Kept as a plain function with no Prisma or React in scope so the copy and the branches can be
  * tested directly; the console renders what this returns and the preview route uses `previewKeyFor`
@@ -30,11 +34,7 @@ export interface ArtifactSummary {
   approvalNote: string;
 }
 
-export function artifactSummary(
-  report: ArtifactReport,
-  /** `COMPAT` readings have no web mode yet, which is a different reason from "too old to have one". */
-  kind: "SINGLE" | "COMPAT" = "SINGLE",
-): ArtifactSummary {
+export function artifactSummary(report: ArtifactReport): ArtifactSummary {
   const reading = Boolean(report.htmlKey);
   const pdf = Boolean(report.pdfKey);
 
@@ -45,15 +45,6 @@ export function artifactSummary(
       previewable: "html",
       approvalNote:
         "Approving delivers the reading (the web page, which the client can also save as one file) and the PDF.",
-    };
-  }
-  if (pdf && kind === "COMPAT") {
-    return {
-      reading,
-      pdf,
-      previewable: "pdf",
-      approvalNote:
-        "Approving delivers the PDF. Compatibility readings are PDF-only for now — the web document covers single-chart readings.",
     };
   }
   if (pdf) {

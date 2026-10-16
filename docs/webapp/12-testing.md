@@ -70,9 +70,8 @@ the `webapp` job.** See
 `lib/__tests__/report-artifacts.test.ts` is the shape to copy when a decision has branches worth
 naming: the console's "what will Approve publish" and the preview route's "which object to sign" are
 one plain function in `lib/report-artifacts.ts`, unit-tested there, because the answer is not always
-*both* artefacts — a compatibility reading has no web document, and a report made before the reading
-existed has no HTML key. The route stays thin (auth, fetch, presign) and the console renders what the
-function returns.
+*both* artefacts — a report made before the reading existed has no HTML key. The route stays thin
+(auth, fetch, presign) and the console renders what the function returns.
 
 Node environment, Prisma mocked. The pattern that works:
 

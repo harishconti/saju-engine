@@ -33,7 +33,7 @@ export interface EnginePayload {
    *  audit trail derive from the artefact that was actually reviewed. */
   mdUploadUrl?: string;
   /** Where the engine should also PUT the web document — the reading the client opens, as one
-   *  self-contained HTML file. Omitted for a compatibility reading, which has no web mode. */
+   *  self-contained HTML file. Every tier gets one, compatibility included. */
   htmlUploadUrl?: string;
   profileA: EngineProfile;
   profileB?: EngineProfile;

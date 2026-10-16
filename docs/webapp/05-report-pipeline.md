@@ -200,16 +200,19 @@ The engine can now produce **both** artefacts from one markdown source:
 **How it is wired.** `POST /generate` takes an optional `htmlUploadUrl`; when present the engine
 renders the web document from the same markdown and PUTs it beside the PDF — best-effort, like the
 markdown, because losing the reading must not lose the order — and returns
-`htmlSha256`/`htmlBytes` so a caller can tell "not uploaded" from "not asked for". `fulfilment.ts`
-presigns that URL, verifies the object with `HeadObject`, and stores `Report.htmlKey`/`htmlBytes`.
-The client reads it at `GET /api/reports/{id}/html` and downloads it — or the PDF — from
-`GET /api/reports/{id}/download`. `12-testing.md` §Gate 4 covers the document's own properties.
+`htmlSha256`/`htmlBytes` so a caller can tell "not uploaded" from "not asked for". **Every kind now
+sends it**, compatibility included: a two-chart reading is markdown through the same renderer, so the
+engine renders one for `kind: "compat"` too. (Until 2026-10-17 both sides withheld it — see MEMORY.)
+`fulfilment.ts` presigns that URL, verifies the object with `HeadObject`, and stores
+`Report.htmlKey`/`htmlBytes`. The client reads it at `GET /api/reports/{id}/html` and downloads it —
+or the PDF — from `GET /api/reports/{id}/download`. `12-testing.md` §Gate 4 covers the document's own
+properties.
 
 **Still open.** The audio player sits in the app *around* the reading (it already does, beside the
 MP3 route) rather than inside the stored document: the MP3 is produced after approval and the
-document is immutable by design. The review console still previews only the PDF. A compatibility
-reading has no web mode yet — its two-chart renderer is separate — so `htmlKey` stays null there, and
-the UI falls back to the PDF for those orders and for any report rendered before this existed.
+document is immutable by design. The review console still previews only the PDF. Every tier now has a
+web reading, compatibility included — it renders through the same renderer, so `htmlKey` is null only
+for a report rendered before this existed, and the UI falls back to the PDF for those.
 
 ### `/chart` — derive without rendering
 

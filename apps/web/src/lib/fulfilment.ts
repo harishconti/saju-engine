@@ -128,8 +128,9 @@ export async function processClaimedJob(job: Job): Promise<JobOutcome> {
     const reportId = randomUUID();
     const pdfKey = buildReportKey(order.userId, order.id, reportId, "pdf");
     const mdKey = buildReportKey(order.userId, order.id, reportId, "md");
-    // The reading. Not produced for a compatibility order: that reading renders through its own
-    // two-chart renderer, which has no web mode yet.
+    // The reading: the artefact the client actually opens on a phone, and can save as one file. Every
+    // paid kind gets one — a compatibility reading is markdown through the same renderer, so it has a
+    // web document too. (It used to be withheld from compat orders.)
     const htmlKey = buildReportKey(order.userId, order.id, reportId, "html");
 
     const profileA = profileToEngine(order.profileA);
@@ -145,10 +146,9 @@ export async function processClaimedJob(job: Job): Promise<JobOutcome> {
       // rather than recomputed from today's engine.
       mdUploadUrl: await presignPutUrl(mdKey, "text/markdown"),
       // …and the web document: the artefact the client actually reads on a phone, which they can
-      // also save as one file. Single-chart only; a compat reading has no web mode yet.
-      ...(engineKindFor(order) === "single"
-        ? { htmlUploadUrl: await presignPutUrl(htmlKey, "text/html") }
-        : {}),
+      // also save as one file. Best-effort — a reading that fails to upload leaves the PDF as the
+      // deliverable rather than losing the order.
+      htmlUploadUrl: await presignPutUrl(htmlKey, "text/html"),
       profileA,
       ...(profileB ? { profileB } : {}),
       favorableOverrideA: order.favorableOverrideA ?? null,

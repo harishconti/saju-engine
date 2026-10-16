@@ -46,12 +46,9 @@ export default async function AdminReviewPage({ params }: { params: Promise<{ id
 
   if (!report) notFound();
 
-  // What approving this will publish, from the tested helper: not every report has both artefacts
-  // (a compatibility reading renders through a separate pipeline, or it predates the reading).
-  const artifacts = artifactSummary(
-    { pdfKey: report.pdfKey, htmlKey: report.htmlKey },
-    report.kind === "COMPAT" ? "COMPAT" : "SINGLE",
-  );
+  // What approving this will publish, from the tested helper: the reading and the PDF, unless this
+  // report predates the reading (every tier renders one now, compatibility included).
+  const artifacts = artifactSummary({ pdfKey: report.pdfKey, htmlKey: report.htmlKey });
 
   const tier = tierFor(report.kind, report.tier);
   const chartA = parseChartSummary(report.profileA.chartJson);

@@ -217,7 +217,7 @@ model Report {
 
   // The web document: the reading the client opens, one self-contained HTML file (inline CSS and
   // SVG, no scripts, no webfonts). Rendered from the same markdown as the PDF, so the two cannot
-  // disagree. Null for a compatibility reading (no web mode yet) and for reports rendered before
+  // disagree. Every tier produces one, compatibility included; null only for a report rendered before
   // this existed — the UI then hides the reading link and offers the PDF.
   htmlKey   String?                                   // R2 object key
   htmlBytes Int?
