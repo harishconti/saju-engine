@@ -6,8 +6,10 @@ import { useEffect, useRef } from "react";
  * Cloudflare Turnstile widget.
  *
  * Renders nothing and reports nothing when `NEXT_PUBLIC_TURNSTILE_SITE_KEY` is unset, so local
- * development works without keys. The server is what enforces the control (`lib/turnstile.ts`),
- * and it fails closed only once `TURNSTILE_SECRET_KEY` exists.
+ * development works without keys. **It never blocks the form**: whether a token is required is the
+ * server's decision (`TURNSTILE_MODE` in `lib/turnstile.ts`), so a widget that fails to render cannot
+ * stop a legitimate visitor from submitting. That asymmetry is deliberate — it is what keeps a broken
+ * challenge from taking the whole funnel down.
  *
  * The script is injected by hand rather than through `next/script` so this stays independent of
  * Next's script-injection semantics, and rendered in **explicit** mode so a used token can be
@@ -27,9 +29,6 @@ interface TurnstileApi {
 function turnstileApi(): TurnstileApi | undefined {
   return (window as unknown as { turnstile?: TurnstileApi }).turnstile;
 }
-
-/** True when the widget should be rendered. Exported so the caller can require a token. */
-export const turnstileEnabled = Boolean(SITE_KEY);
 
 export function TurnstileWidget({
   onToken,

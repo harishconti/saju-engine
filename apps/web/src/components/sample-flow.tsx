@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Alert, Button, Card, CardContent, Field, Input, Select, Steps, buttonClasses } from "@/components/ui";
-import { TurnstileWidget, turnstileEnabled } from "@/components/turnstile-widget";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 import { findCity, searchCities } from "@/lib/cities";
 import { ElementalRule, SealMark } from "@/components/viz";
 
@@ -39,12 +39,6 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
     if (!fullName.trim()) return setError("Please give your name.");
     if (!/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) return setError("Add your date of birth.");
     if (!resolved) return setError("Pick your birthplace from the suggestions.");
-    // Only required when the widget is actually rendered. The server enforces the same rule from
-    // TURNSTILE_SECRET_KEY; the two are deployed as a pair.
-    if (turnstileEnabled && !turnstileToken) {
-      return setError("Please complete the quick verification below, then try again.");
-    }
-
     setBusy(true);
     try {
       const res = await fetch("/api/sample", {
