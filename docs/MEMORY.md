@@ -1574,9 +1574,16 @@ As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P1 items:
   in the Resend dashboard**, because a sending-only key cannot revoke anything, including itself. **The Neon
   database password is still unrotated** — it needs a brief outage (rotate → rewrite the three DB URLs in
   three scopes → redeploy).
-- **Run the paid path once, end to end** — the biggest remaining unknown: **0 orders, 0 jobs, 0 reports,
-  0 deliveries.** The free sample, the engine, the review console and the audio pipeline each work in
-  isolation, but checkout → webhook → job → render → review → delivery (PDF **+** MP3) has never executed.
+- **The paid path has now run** — ✅ checked against production 2026-10-17: **3 PAID orders, 1
+  AWAITING_PAYMENT, 1 report DELIVERED, 2 in review, deliveries recorded on both PROFILE and EMAIL.** The
+  first order executed the whole chain: Dodo `payment.succeeded` → job `GENERATE SUCCEEDED` → review →
+  `DELIVERED v1`. ⚠️ **What has *not* executed is the MP3: every report still shows `audioStatus = NONE`**,
+  so the Deep tier's audio promise — the thing that tier sells — has never run through the app end to end.
+  (The previous text claimed "0 orders, 0 jobs, 0 reports, 0 deliveries"; it was written 2026-09-07 and had
+  gone stale.)
+- ⚠️ **No report has a web document yet** — `htmlKey` is null for all three, because the first orders predate
+  the reading. The console now says exactly that and offers Regenerate, which would produce the reading
+  alongside the PDF.
 - **Playwright end-to-end tier** — still missing (launch-audit B5). CI now covers the engine, the webapp
   (lint / types / 112 tests / build) and the **UI/UX audit** (`tools/audit-ui.py --strict`), but nothing
   drives a browser through the funnel. `12-testing.md` marks that surface as planned rather than present.
