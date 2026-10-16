@@ -742,6 +742,51 @@
     4 new tests pin the mode mapping and the "`log` must never block" invariant; webapp suite 80 → 84.
     `03`, `07`, `08`, `09`, `13` (§D2) and `.env.example` updated. Probe objects swept from R2 (bucket empty).
 
+  - **2026-10-16 (the first real signup, and three things it broke).** The owner signed up as
+    `ngharish.conti@gmail.com` — the address already in `ADMIN_EMAILS` — which made this the first
+    account the product has ever had (production had been at **0 users**). It immediately exposed three
+    defects that only a real user could surface, all of the same family: *prose describing a control that
+    nothing enforced*.
+    ⚠️ **1. There was no way to become an admin, and `/admin` is where paid reports are approved.**
+    The gate was described correctly (`role = ADMIN` **and** the email in `ADMIN_EMAILS`), but **nothing in
+    the codebase could set `role = ADMIN`** — no route, no script, no seed. The mirrored row was created
+    `USER`, so the allowlisted address was inert and the review console was unreachable. Left alone, **every
+    paid report would have been unapprovable**. Fixed by deriving the role from the allowlist inside
+    `mirrorUser()` via a new pure `roles.roleForEmail()` (so it is testable): an allowlisted email is
+    written `ADMIN`, nothing is ever demoted — removing an address from `ADMIN_EMAILS` already revokes
+    access through the other half of the gate. The existing row was promoted directly as well.
+    ⚠️ A related foot-gun: the **local** `.env` had `ADMIN_EMAILS=` empty while Vercel had the address, so
+    my first promotion attempt computed `in ADMIN_EMAILS=false` and silently did nothing. Local now matches
+    production.
+    ⚠️ **2. Consent was a promise, not a control.** `docs/webapp/10` says consent is recorded *before* any
+    birth data is collected. In reality recording it was a **best-effort browser call** that fired once after
+    `signUp.email` and swallowed every failure, and **nothing on the server ever checked**. The evidence:
+    the first real signup produced a `User` row with **no `ConsentRecord` at all** — an evidence gap in
+    precisely the place a data-protection review looks, since birth date/time/place is the sensitive
+    category and consent is the lawful basis. Three fixes: a new `src/lib/consent.ts`
+    (`hasActiveServiceConsent`) enforced at **both** profile write paths (`POST /api/profiles`,
+    `PATCH /api/profiles/[id]` → `403 CONSENT_REQUIRED`); the signup call now checks `res.ok` and retries
+    once (the session cookie is not always readable on the first request after sign-up); and the account
+    page's consent panel now reports a failed save instead of always claiming "Preferences saved".
+    ⚠️ **It also *displayed* consent that did not exist.** `dashboard/account/page.tsx` defaulted to
+    `{ service: true, ... }` when there was no record, so an account with no `ConsentRecord` saw the
+    required consent **already ticked** — the UI asserting a state the database did not have. Now defaults
+    to *not granted*, so the checkbox starts unticked and ticking it is the explicit act that records it.
+    ⚠️ **3. The shell invited signed-in visitors to sign in** (reported by the owner). `SiteHeader`
+    hardcoded `Sign in` and `/` was **statically prerendered**, so the HTML a signed-in visitor received was
+    baked at build time and could not know. `SiteHeader` now takes the session as a prop and every caller
+    reads it: signed in → `Dashboard` (primary) with the snapshot CTA demoted to secondary. `/`, `/privacy`,
+    `/terms` and `/refund-policy` are consequently **dynamic** (`export const dynamic = "force-dynamic"`,
+    declared explicitly on the legal pages so Next stops logging a recoverable "Dynamic server usage"
+    error that reads like a build failure — the build exits 0 either way, which matters because CI runs it).
+    The trade is recorded in `06`: correct CTA over static caching for now, and if it is ever reverted the
+    alternative must **degrade to signed-out on failure** rather than fail open.
+    Tests: `consent.test.ts` (6), four `roleForEmail` cases in `core.test.ts`, and a new
+    `components/__tests__/site.test.tsx` (5) pinning both header variants. Webapp suite **84 → 99**.
+    Docs updated: `03` (the `CONSENT_REQUIRED` contract), `04` (how ADMIN is granted, replacing the claim
+    that it was "manual, by design"), `06` (header + the dynamic trade), `10` (consent enforced),
+    `13` (§D2 gains both findings), plus a stale "read by Lemon Squeezy" comment in `legal.tsx`.
+
 ### Earlier state (2026-09-26)
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"

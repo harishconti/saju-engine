@@ -15,7 +15,7 @@ export default async function SamplePage() {
 
   return (
     <>
-      <SiteHeader cta={false} />
+      <SiteHeader user={user} cta={false} />
       <main className="grid-noise">
         <div className="mx-auto max-w-3xl space-y-8 px-4 py-12 sm:px-6">
           <header className="space-y-3 text-center">

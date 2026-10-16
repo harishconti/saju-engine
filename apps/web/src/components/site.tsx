@@ -14,7 +14,24 @@ const NAV = [
   { href: "/#faq", label: "FAQ" },
 ];
 
-export function SiteHeader({ cta = true }: { cta?: boolean }) {
+/**
+ * Site header.
+ *
+ * `user` is passed in by the page rather than fetched here, so the shell stays a plain component and
+ * the page controls its own caching. It is `null` for signed-out visitors — the common case, and the
+ * one the prerendered HTML should match.
+ *
+ * This used to hardcode "Sign in" with no way to know otherwise, and the landing page was statically
+ * prerendered, so a signed-in visitor was still invited to sign in — the page could not tell. Where
+ * the header is rendered, the callers now read the session and pass it down.
+ */
+export function SiteHeader({
+  user = null,
+  cta = true,
+}: {
+  user?: { name?: string | null } | null;
+  cta?: boolean;
+}) {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
@@ -37,11 +54,17 @@ export function SiteHeader({ cta = true }: { cta?: boolean }) {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link href="/login" className={buttonClasses("ghost", "sm")}>
-            Sign in
-          </Link>
+          {user ? (
+            <Link href="/dashboard" className={buttonClasses("primary", "sm")}>
+              Dashboard
+            </Link>
+          ) : (
+            <Link href="/login" className={buttonClasses("ghost", "sm")}>
+              Sign in
+            </Link>
+          )}
           {cta ? (
-            <Link href="/sample" className={buttonClasses("primary", "sm")}>
+            <Link href="/sample" className={buttonClasses(user ? "outline" : "primary", "sm")}>
               Free chart snapshot
             </Link>
           ) : null}

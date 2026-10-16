@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { SiteFooter, SiteHeader } from "@/components/site";
 import { CONTACT_EMAIL } from "@/lib/contact";
+import { getCurrentUser } from "@/lib/auth";
 
-/** Shared shell for the legal pages. These pages are also read by Lemon Squeezy during store
- *  activation, so they must be reachable and substantive. */
+/** Shared shell for the legal pages. A payments provider reviews them during store activation (the
+ *  MoR is Dodo Payments), so they must be reachable and substantive. */
 
 export const LEGAL_CONTACT = CONTACT_EMAIL;
 export const LEGAL_UPDATED = "15 October 2026";
 
-export function LegalLayout({
+export async function LegalLayout({
   title,
   intro,
   children,
@@ -17,9 +18,13 @@ export function LegalLayout({
   intro?: React.ReactNode;
   children: React.ReactNode;
 }) {
+  // Same reason as the landing page: the shell must reflect the signed-in state rather than always
+  // offering "Sign in".
+  const user = await getCurrentUser();
+
   return (
     <>
-      <SiteHeader cta={false} />
+      <SiteHeader user={user} cta={false} />
       <main className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
         <p className="eyebrow">Legal</p>
         <h1 className="h2 mt-2">{title}</h1>

@@ -3,6 +3,11 @@ import { PRIVACY_EMAIL, PRIVACY_HREF } from "@/lib/contact";
 
 export const metadata = { title: "Privacy policy" };
 
+// The shared legal shell reads the session so the header can offer "Dashboard" instead of
+// "Sign in". Declared explicitly: without this, Next attempts to prerender the page, discovers
+// `cookies()` and recovers by rendering dynamically anyway — correct, but it logs a
+// "Dynamic server usage" error on every build, which reads like a failure.
+export const dynamic = "force-dynamic";
 export default function PrivacyPage() {
   return (
     <LegalLayout

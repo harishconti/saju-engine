@@ -47,6 +47,20 @@ static prototype at `misc/landing-page/archive/cosmicsaju_landing.html`.
 
 Plus, persistently: **header** (nav + canonical CTA) and a **mobile sticky CTA**.
 
+**The header reflects who is looking at it.** Signed out: `Sign in` (ghost) + `Free chart snapshot`
+(primary). Signed in: `Dashboard` (primary), with the snapshot CTA demoted to secondary. `SiteHeader`
+takes the session as a prop and each caller reads it. It was previously hardcoded to `Sign in`, and `/`
+was statically prerendered, so a signed-in visitor was still invited to sign in — the page had no way to
+know. Reported by the owner right after signing up.
+
+- **Consequence to keep in mind: `/`, `/privacy`, `/terms` and `/refund-policy` are now dynamic**
+  (`export const dynamic = "force-dynamic"`). Rendering the shell from the session opts a route out of
+  static prerendering, so those pages are server-rendered per request and are not CDN-cacheable. That is
+  the deliberate trade while the CTA matters more than static caching. If it ever needs reverting, the
+  honest alternative is a client-side upgrade that **degrades to the signed-out header on failure** — a
+  client patch that fails open would show the wrong state silently, which is the same class of bug this
+  page keeps producing.
+
 ### Copy rules
 
 - **Delivery expectation must be stated.** Decision D5 means paid reports are reviewed first. The

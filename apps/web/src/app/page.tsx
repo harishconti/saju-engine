@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Alert, Badge, Button, buttonClasses, Card, CardContent, SectionHeading } from "@/components/ui";
 import { MobileStickyCta, SiteFooter, SiteHeader } from "@/components/site";
+import { getCurrentUser } from "@/lib/auth";
 import { ElementBalanceBars, ElementBalanceWheel, ElementLegend, FourPillarsChart, KoreanWatermark, SealMark, type PillarCell } from "@/components/viz";
 import { PAID_TIERS, TIERS } from "@/lib/tiers";
 import { formatUSD } from "@/lib/format";
@@ -55,10 +56,17 @@ const FAQ = [
   },
 ];
 
-export default function LandingPage() {
+/** Reading the session below opts this route out of static prerendering. That is a deliberate trade:
+ *  a signed-in visitor must not be invited to sign in, and the header cannot know otherwise from HTML
+ *  that was baked at build time. Revisit only with a client-side upgrade that cannot fail silently. */
+export const dynamic = "force-dynamic";
+
+export default async function LandingPage() {
+  const user = await getCurrentUser();
+
   return (
     <>
-      <SiteHeader />
+      <SiteHeader user={user} />
 
       <main className="pb-24 lg:pb-0">
         {/* ───────────────────────── 1. Hero ───────────────────────── */}
