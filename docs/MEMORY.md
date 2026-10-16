@@ -1151,6 +1151,14 @@
     the first section heading after the cover (pre-existing, both artefacts; the markdown's own cover block runs to the
     first `hr`, which is late in the deep report) — **left as is**: it is cosmetic, affects both backends equally, and
     the reviewer sees it in the preview.
+    ⚠️ **A fourth defect the phone screenshot gave away: every report carried an orphaned "(per)".** The text read
+    "supported baseline by element relation (per); its 12-Stage Cycle…" — the citation stripper removes the path but
+    not the words that introduced it, so an earlier fix to that line ("per Step 2" → "(per knowledge/09-…)") had traded
+    one fragment for another. The engine now cites in the form the renderer removes **whole** (`*(see knowledge/…)*`,
+    which leaves "…by element relation; its 12-Stage Cycle…"), and the gate grew a `DANGLING_CITATION` rule — "(per)",
+    "(see)", "(cf.)" — so the family cannot come back. Inserting that rule also broke the gate's indentation: the tool
+    stopped parsing, and the loop I was using to check the goldens reported "0 flagged" from a crashing tool. **Check a
+    tool's exit code, not its silence.**
     ✅ **And the new `--html` gate mode immediately earned its keep.** Gating the *artefact* rather than the source is
     what surfaced a still-open audit defect on the live chart: the engine writes some terms in both scripts in one gloss
     ("(합이불화, 合而不化)"), both translated to the same English, and the reader saw it **twice, three times over** —
@@ -1161,7 +1169,7 @@
     Also fixed while looking: the article rule missed markdown emphasis ("a **Earth** chart") because the HTML path
     runs before the markdown parser — the gap now accepts both `**emphasis**` and `<b>tags</b>`. Goldens regenerated
     (one added viewport tag, then the render-layer fixes); **print output is otherwise byte-identical by construction**
-    (`tests/test_web_report.py` asserts the print document gains nothing from the web layer). Suite **1,984 → 1,994**.
+    (`tests/test_web_report.py` asserts the print document gains nothing from the web layer). Suite **1,984 → 1,996**.
     ⚠️ **Not wired yet** — this is the engine half only: `Report.htmlKey` + migration, the report route returning the
     web document, the download links, and the review console previewing both artefacts. Docs: `reports.md`
     (§ The web document), toolchain (`--web`), `05` (the two artefacts, and what is not wired), `12` (gate 4).
