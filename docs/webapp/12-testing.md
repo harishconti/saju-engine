@@ -178,6 +178,35 @@ Run for every tier (sample, essential, deep, compat basic, compat deep) as part 
 existing worklog records a real incident where a reviewer note leaked into client PDFs (G1) — this
 test is the reason it cannot happen again.
 
+## Specialised gate 3 — the UI/UX audit (`tools/audit-ui.py`)
+
+`06-frontend-ux.md` states an acceptance bar of measurable things — no horizontal body scroll at
+390 / 768 / 1440, zero hydration warnings, axe clean on every screen, ≥44 px touch targets, one `<h1>`
+per page, both themes — so none of it should be a matter of opinion. This runs the measurements in a
+real Chrome against a deployed URL:
+
+```bash
+python3 tools/audit-ui.py                       # public pages, 3 viewports
+AUDIT_EMAIL=… AUDIT_PASSWORD=… python3 tools/audit-ui.py   # + the pages behind the login
+```
+
+It reports, per page and viewport: HTTP status, elements forcing horizontal scroll (ignoring anything
+inside an `overflow-x: auto` ancestor, which is *meant* to overflow), targets under 44 px (ignoring
+inline prose links, which WCAG exempts), `<h1>` count, whether a shell/nav is present, hydration
+warnings, and axe-core violations with the offending node.
+
+The a11y engine is **`axe-core` as a devDependency of `apps/web`** (added 2026-10-16) so the audit and any
+future end-to-end gate use the same version. Turnstile noise is filtered deliberately: it cannot solve a
+challenge under automation, and counting that as a page defect drowns the real findings.
+
+**Not yet in CI**, and it should be — a headless Chrome job on a preview deployment would turn this from
+something a human remembers to run into a gate. That is the same gap as the Playwright public tier
+([13](13-launch-audit.md) §B5).
+
+**Authenticated runs need an account.** Use a throwaway, never your own, and delete it afterwards
+(`neon neon-auth user delete <id>`, plus the `User` row and its dependants — see
+[09](09-operations.md)).
+
 ## Specialised gate 2 — the compliance QA gate
 
 `tools/qa_compliance.py` flags predictive language, master/guarantee claims, sensitive
