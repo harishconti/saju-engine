@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Park — Luck Cycle & Lifetime Decade Roadmap · Add-on
+## Park — Luck Cycle & Lifetime Decade Roadmap
 
 *Every five-year block of your life, with wealth, business, family and investment notes, and charts*
 

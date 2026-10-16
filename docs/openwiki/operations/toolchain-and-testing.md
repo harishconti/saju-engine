@@ -23,6 +23,7 @@ Key scripts:
 | `tools/client_intake_app.html` + `tools/client_intake_app.py` | Self-service FastAPI app: `/` single-chart, `/compat` two-chart; sample tier returns a PDF instantly; paid tiers are stored in an encrypted SQLite queue (`src/saju_web/store.py`, `SAJU_INTAKE_KEY`), drafted in the background and approved by the owner. |
 | `tools/intake_admin.py` | Owner CLI: `genkey`, `list [--status]`, `show <id>`, `approve <id> --base-url`, `regenerate <id>`, `purge --days 180`. `approve` prints the private `/report/{token}` link to email. |
 | `tools/audit-ui.py` | **UI/UX audit and CI gate** for the deployed webapp: real Chrome at 390/768/1440 px in both colour schemes, reporting horizontal overflow, axe-core violations, hydration warnings, `<h1>` count, missing shells and sub-44 px controls. `--strict` fails on any of them; wired into CI as the `ui` job. See `docs/webapp/12-testing.md`. |
+| `tools/build-cjk-font-subset.py` | Regenerates the bundled Hangul/Hanja font subset (`src/saju_html/fonts/SajuCJK-*.ttf`) from OFL Noto Sans KR, scanning report-prose sources only; `--check` verifies coverage. Run it after adding Hanja to `knowledge/`. |
 | `tools/qa_compliance.py` | Optional compliance QA gate for a report markdown file (ground-rule check on generated prose). Requires `TYPESAFE_API_KEY`. |
 
 ## Running the test suite
@@ -147,7 +148,9 @@ assert JIAZI_TO_NAYIN[("甲", "子")] == "海中金"  # Gold in the sea
 
 ### ReportLab backend (legacy, one more release)
 - Opt-in with `./tools/build-pdf.sh --reportlab`; writes `{name}-report-reportlab.pdf` / `{name}-combined-reportlab.pdf` so it never overwrites the HTML PDF. `--html` is a no-op alias.
-- Uses DejaVu fonts for Unicode; two-pass build; branded footer and report ID. Warns on unmapped CJK. Planned for removal after one release.
+- Uses DejaVu fonts for Latin and a **bundled glyph subset of Noto Sans KR** (`src/saju_html/fonts/SajuCJK-*.ttf`) for the Hangul/Hanja that survives translation — embedded, so CJK renders in Chrome and phone viewers, unlike the Korean CID faces it replaced. A character no Korean face can draw is dropped with a stderr warning rather than printed as a tofu box. Regenerate the subset after adding Hanja to `knowledge/` with `python3 tools/build-cjk-font-subset.py` (`--check` verifies coverage).
+- **Two-pass build** producing a linked contents page with page numbers, a PDF outline, and Title/Author/Subject/Creator metadata; markdown blockquote notes render as notes. See `docs/openwiki/products/reports.md` § The PDF artefact.
+- Planned for removal after one release. Note that the *webapp* engine service renders with ReportLab (`api/index.py`), where Chromium does not fit in a Vercel function.
 
 ### Compat PDF
 - Separate tool in `src/saju_html/md_to_saju_compat_pdf.py` (HTML/Chromium default; `--backend reportlab` uses a Korean CID font).
@@ -204,5 +207,6 @@ pytest tests/test_textbook_cases.py::test_park_chung_hee -v
 - `tests/test_textbook_cases.py`
 - `tests/test_nayin.py`
 - `tests/test_pdf.py`
+- `tests/test_pdf_navigation.py`
 - `tests/test_saju_qa.py`
 - `tools/qa_compliance.py`

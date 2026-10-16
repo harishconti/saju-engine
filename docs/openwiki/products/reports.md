@@ -59,6 +59,32 @@ PYTHONPATH=src python3 src/saju_html/combine_candidate_report.py sruthi
 python3 src/saju_html/md_to_saju_compat_pdf.py <compat.md> --name-a ... --name-b ... --tier deep
 ```
 
+### The PDF artefact (ReportLab backend)
+
+`src/saju_html/md_to_saju_pdf.py` renders the client PDF, and builds the document **twice**:
+the first pass measures the page count for the "Page N / M" footer *and* the page each
+heading landed on, and the second prints. What the client receives:
+
+- **A linked contents page.** Each entry links to its heading and prints the page that
+  heading is on. Contents labels are not always literal headings (the engine writes
+  composite ones, e.g. "Life Themes by Major Luck Period — incl. Lifetime Decade Roadmap"
+  for the heading "Life Themes by Major Luck Period", and the MP3 heading is *longer* than
+  its label), so links resolve exact-first, then by closest prefix in either direction, and
+  otherwise fall back to plain text — a contents page never ships a link to nowhere. The
+  two passes lay out identically because the page number sits in a fixed-width column, which
+  is why the printed numbers match the pages they name.
+- **An outline** (`/Outlines`) so readers get a section panel, plus **Title / Author /
+  Subject / Creator** document metadata.
+- **CJK drawn, not dropped.** Report prose is English-primary and Korean/Hanja is
+  translated (`translate_inline`). Whatever survives translation is drawn with a bundled
+  glyph subset of **Noto Sans KR** (`src/saju_html/fonts/SajuCJK-*.ttf`, OFL — embedded, so
+  it renders in Chrome and phone viewers too). A character no Korean face can draw is
+  dropped with a warning rather than printed as a tofu box. After adding Hanja to
+  `knowledge/`, regenerate with `python3 tools/build-cjk-font-subset.py`;
+  `tests/test_pdf_navigation.py::test_cjk_font_covers_repo_cjk` fails until you do.
+- Markdown **blockquote** notes read as notes (no literal `>` surviving into the page), and
+  the body heading carries the tier name only — never the price.
+
 ## Candidate folder conventions
 
 Each person receiving a reading gets a dedicated subfolder:

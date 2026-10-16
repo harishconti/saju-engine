@@ -37,12 +37,33 @@ def test_html_renderer_logs_unmapped(caplog):
     assert any("龍" in r.getMessage() for r in caplog.records)
 
 
-def test_reportlab_path_warns_on_dropped():
-    from saju_html.md_to_saju_pdf import md_inline_to_html
+def test_reportlab_path_keeps_cjk_in_the_bundled_face():
+    """CJK the translation maps cannot reach is drawn, not dropped.
 
-    with pytest.warns(UserWarning, match="龍"):
-        out = md_inline_to_html("Hello 龍")
-    assert "龍" not in out
+    The ReportLab backend used to erase surviving CJK because DejaVu has no
+    Hangul or Hanja. It now routes those runs to a bundled subset of Noto Sans KR
+    (see tools/build-cjk-font-subset.py), so a client sees the character.
+    """
+    from saju_html.md_to_saju_pdf import _CJK_FONT, md_inline_to_html
+
+    out = md_inline_to_html("Hello 龍")
+    assert "龍" in out
+    assert f"face='{_CJK_FONT}'" in out
+
+
+def test_reportlab_path_drops_only_characters_no_face_can_draw(capsys):
+    """A character outside the bundled face is omitted, never a tofu box.
+
+    A box is indistinguishable from a typo in a paid report, so the renderer
+    prefers to drop the character and say so on stderr. U+9F98 龘 is outside Noto
+    Sans KR, which is why it stands in here.
+    """
+    import saju_html.md_to_saju_pdf as pdfmod
+
+    pdfmod._CJK_DROP_WARNED.clear()
+    out = pdfmod.md_inline_to_html("Hello 龘")
+    assert "龘" not in out
+    assert "U+9F98" in capsys.readouterr().err
 
 
 def test_theme_css_has_cjk_fallback():

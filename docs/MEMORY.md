@@ -929,6 +929,65 @@
     `pageCount`), `06` (the audio panel's two routes), `07` (§CORS applied, with a real preflight to run),
     `12` (the new tests).
 
+  - **2026-10-16 (the report artefact itself — a lie I had to retract, a navigable PDF, and boilerplate
+    removed at its source).** The owner asked whether the delivered PDF stands up to market standards and
+    what to fix. Four items: restore CJK, kill the repetition, make it navigable, and polish.
+    ⚠️ **Correction first: "1,098 CJK characters in the markdown → 0 in the PDF" was not a defect.** I had
+    reported it as "Hanja dropped". It is not dropped — it is **translated**: `translate_inline` maps
+    正官→"Direct Officer", 大運→"Major Luck", 정관→"Direct Officer (Authority)", and all three demo reports
+    have **0 unmapped CJK** after translation. That is the documented, tested, English-primary design the
+    HTML backend already follows (`renderer.py` passes `keep_unmapped=True`; `test_golden_cover_has_no_cjk`
+    pins it). The real gap was narrower: the PDFs **erased the unmapped remnant** that the HTML backend
+    keeps. Fixed by aligning the backends, and the remnant now *draws* rather than vanishing.
+    ✅ **`SajuCJK`: a bundled Hangul/Hanja face.** The old code could not do this — the Noto CJK on disk is
+    CFF/OTC, which reportlab's `TTFont` rejects, and the registered Korean **CID** faces are not embedded:
+    their glyphs come from the reader's Adobe-Korea1 CMaps, which **browsers do not ship**, so wiring them
+    would have traded missing Hanja for tofu in Chrome — worse for a client. Instead a **glyph subset of
+    Noto Sans KR** (OFL) is bundled: 199 KB per face, **embedded**, so it renders everywhere. New tool
+    `tools/build-cjk-font-subset.py` regenerates it (scans report-prose sources only — the engine's Hanja
+    *data* files hold ~20k ideographs and would inflate the subset from 199 KB to 2.4 MB per face for
+    characters no report draws) and `--check` verifies coverage; `test_cjk_font_covers_repo_cjk` fails if a
+    new Hanja in `knowledge/` is not in it. Characters **no Korean face can draw** (simplified-Chinese
+    forms, and the regex range-boundary ideographs in the routing patterns) are **dropped with a stderr
+    warning rather than printed as a tofu box** — a box is indistinguishable from a typo in a paid report.
+    ✅ **Navigation, for a 28-page document.** The contents page was a bare bullet list: no page numbers, no
+    links, no outline. `SajuDoc.afterFlowable` now bookmarks every heading and builds the outline; the
+    contents list is a two-column table (title linked to its heading, page number right-aligned) where the
+    page numbers come from the **measuring pass** the two-pass build already ran for the footer — the number
+    column is fixed-width so both passes lay out identically, which is what makes the printed numbers exact
+    (verified: 17 entries, 0 wrong). Contents labels are not always literal headings ("Life Themes by Major
+    Luck Period — incl. Lifetime Decade Roadmap" names the heading "Life Themes by Major Luck Period"; the
+    MP3 heading is *longer* than its label), so links resolve exact-first, then closest prefix either way,
+    and **fall back to plain text — a contents page must never ship a link to nowhere**. (The first cut of
+    that fallback silently compared an anchor hash against plain text and never fired; the dead destination
+    only surfaced because reportlab refuses to write an unresolved link. Fixed and covered by a test that
+    re-derives each number from the page it names.) Also: document **Title/Author/Subject/Creator**
+    (every delivered PDF had reported itself as `Title: (anonymous)`), and the cover footer is gone.
+    ✅ **Boilerplate removed where it was generated.** The Auspicious Dates table repeated one ~41-word
+    sentence on all ~23 rows — **943 of the report's words were a single disclaimer**; the row cell is now
+    short and row-specific ("Fire — your favorable element") with the criteria and the "confirm before
+    booking" advice stated once above the table. The decade paragraphs repeated one sentence **16×** (8
+    periods × 2 sections) and one status line **10×**; the shared "how to read a favorable year" note is now
+    stated **once per section**, and decade guidance rotates through equivalent phrasings (no two adjacent
+    decades read identically). The `>` blockquote marker was printing literally in the client PDF (16 notes
+    in the Deep tier) — now rendered as a note. And the client-facing body heading carried the **price**
+    ("## Clive — Deep Destiny Report · $55", or "· Add-on"): a delivered report can be forwarded or printed,
+    so the price lives in `TIER_CONFIG` and on the order, never beside the client's name. Five tests that had
+    *pinned the leak* were rewritten to assert the price on the config and the heading without it.
+    Suite **1,910 → 1,917** (new `tests/test_pdf_navigation.py`; goldens regenerated: 38 `.md` + 38 `.html`),
+    ruff `--select F` clean. Verified by rendering: CJK 龍 draws (embedded, subset), tofu gone, contents
+    numbers re-derived from the pages they name, `pdffonts` clean. Removing the boilerplate moved **Deep
+    28 → 26 pages** — still inside the corrected **25–30** claim, and Essential stays 7 (`6–7` ✓). The
+    public demos `apps/web/public/demo/demo-rm-*.pdf` were **regenerated through `tools/regen/pdfs.sh`'s
+    `demo_rm` path** (ReportLab, from the chart, not from a stored `.md`), because they are served on the
+    live site and had frozen the old heading and disclaimer into the marketing artefact — the same class of
+    stale-public-artefact bug that had demo-rm-essential.pdf advertising a retired "$9 intro" price. The
+    `apps/landing-page/public/demo-rm-*.pdf` copies are **orphaned** (nothing in the landing page references
+    them) and still carry the old text; left in place deliberately rather than silently rewritten. **The remaining report-quality items are
+    the ones I did not start: the ~12% residual sentence duplication (template sentences reused across
+    sections, not within one list), and whether the owner wants Hanja *displayed* beside the English rather
+    than translated — a policy question that would move every golden, so it needs an owner decision.**
+
 ### Earlier state (2026-09-26)
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"

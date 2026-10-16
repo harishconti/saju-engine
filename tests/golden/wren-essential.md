@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Wren — Essential Report · $19
+## Wren — Essential Report
 
 *Your natal chart, career arc, decade cycles, and lucky-element guide*
 

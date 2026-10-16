@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Nova — Essential Report · $19
+## Nova — Essential Report
 
 *Your natal chart, career arc, decade cycles, and lucky-element guide*
 

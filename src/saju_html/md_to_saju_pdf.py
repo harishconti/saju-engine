@@ -25,10 +25,12 @@ The script intentionally:
 """
 
 import argparse
+import hashlib
 import os
 import re
 import sys
 from datetime import date
+from html import unescape as _unescape_html
 from pathlib import Path
 from typing import Optional
 
@@ -41,7 +43,7 @@ if str(SRC_ROOT) not in sys.path:
 # override for non-standard installs.
 try:
     from reportlab.lib import colors
-    from reportlab.lib.enums import TA_CENTER, TA_LEFT
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
     from reportlab.lib.units import mm
@@ -51,7 +53,7 @@ except ImportError:
         sys.path.insert(0, _USER_LIB)
     try:
         from reportlab.lib import colors
-        from reportlab.lib.enums import TA_CENTER, TA_LEFT
+        from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
         from reportlab.lib.pagesizes import A4
         from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
         from reportlab.lib.units import mm
@@ -160,21 +162,56 @@ def _register_dejavu_fonts() -> None:
 _register_dejavu_fonts()
 
 
-# ---------- CJK font (compat tier) ----------
-# DejaVu has no Hangul/Hanja coverage, so the bilingual compat (두 분 궁합)
-# report would render Korean/Hanja as "tofu" boxes. The Noto CJK OTF/TTC on
-# disk is rejected by reportlab's TTFont ("postscript outlines are not
-# supported"), so instead we use reportlab's built-in Korean CID font. CID
-# fonts need no font file — the glyphs come from the PDF viewer's Adobe-Korea1
-# CMap, which covers both Hangul and the Hanja used in Saju (丙午 辛未 甲子 …).
-# We register two faces and route CJK runs to them via inline <font face=...>
-# tags, leaving Latin in DejaVu so the existing visual design is preserved.
-_CJK_SANS = "HYGothic-Medium"   # sans (matches the DejaVu sans body)
-_CJK_SERIF = "HYSMyeongJo-Medium"  # serif (unused for now; available if needed)
+# ---------- CJK font (Hangul + Hanja) ----------
+# DejaVu has no Hangul/Hanja coverage, so CJK that survives translation (pillar
+# Hanja, star names, glossary terms the maps do not cover) used to be dropped
+# from the client PDF entirely. We now keep it and draw it with a *bundled*
+# face: a glyph-subset of Noto Sans KR (OFL — see fonts/LICENSE-NotoSansKR.txt)
+# trimmed to the codepoints the reports actually use, ~195 KB per face instead
+# of the 10 MB original. It is embedded, so Hangul/Hanja render in every reader,
+# Chrome's PDF viewer and phone viewers included. reportlab's built-in Korean
+# CID faces are *not* embedded — their glyphs come from the reader's
+# Adobe-Korea1 CMaps, which browsers do not ship — so they are only a
+# last-resort fallback when the bundled file is missing (a stripped install).
+_CJK_SANS = "SajuCJK"             # sans, matches the DejaVu sans body
+_CJK_SANS_BOLD = "SajuCJK-Bold"
+_CJK_SERIF = "HYSMyeongJo-Medium"  # legacy CID serif; fallback only
 _CJK_FONT = _CJK_SANS
+_CJK_FACE_FILES = ((_CJK_SANS, "SajuCJK-Regular.ttf"),
+                   (_CJK_SANS_BOLD, "SajuCJK-Bold.ttf"))
+# Codepoints the bundled face can actually draw, filled in at registration. Used
+# to drop the few characters no Korean face covers rather than print a tofu box.
+_CJK_COVERED: set = set()
+_CJK_DROP_WARNED: set = set()
 
 
 def _register_cjk_fonts() -> None:
+    """Register the bundled Hangul/Hanja faces; fall back to CID fonts if absent."""
+    global _CJK_COVERED
+    registered = False
+    for name, filename in _CJK_FACE_FILES:
+        for candidate in _DEJAVU_CANDIDATES:
+            path = candidate / filename if candidate else None
+            if path and path.exists():
+                try:
+                    pdfmetrics.registerFont(TTFont(name, str(path)))
+                    registered = True
+                    if name == _CJK_SANS:
+                        _CJK_COVERED = set(pdfmetrics.getFont(name).face.charToGlyph)
+                except Exception as exc:  # pragma: no cover - environment-dependent
+                    print(f"Warning: could not register CJK font {name}: {exc}", file=sys.stderr)
+                break
+    if registered:
+        # A family lets <b> inside a CJK run pick the bold face rather than
+        # synthesising one, so Hanja inside **bold** keeps its weight.
+        try:
+            pdfmetrics.registerFontFamily(
+                _CJK_SANS, normal=_CJK_SANS, bold=_CJK_SANS_BOLD,
+                italic=_CJK_SANS, boldItalic=_CJK_SANS_BOLD,
+            )
+        except Exception:  # pragma: no cover - environment-dependent
+            pass
+        return
     for name in (_CJK_SANS, _CJK_SERIF):
         try:
             pdfmetrics.registerFont(UnicodeCIDFont(name))
@@ -185,8 +222,9 @@ def _register_cjk_fonts() -> None:
 _register_cjk_fonts()
 
 
-# CJK runs (Hangul syllables, compat jamo, Hanja ideographs) routed to the
-# Korean CID font so they render instead of becoming tofu boxes.
+# CJK runs (Hangul syllables, compat jamo, Hanja ideographs). `_CJK_RE` routes
+# surviving CJK to the bundled face here; the HTML backend uses it for
+# translation. Kept identical to the pattern in `saju_html/__init__`.
 _CJK_RE = re.compile(
     r"[㄰-㆏㐀-䶿一-鿿豈-﫿가-힯]+"
 )
@@ -217,6 +255,35 @@ CODE_RE = re.compile(r"`([^`]+)`")
 LIST_RE = re.compile(r"^\s*[-*]\s+(.+)$")
 NUM_RE = re.compile(r"^\s*(\d+)\.\s+(.+)$")
 HRULE_RE = re.compile(r"^---+$")
+# Markdown blockquote. The reports use `>` for reader notes ("Almanac caveat:",
+# "In plain words:") — 16 of them in the Deep tier. Without this the marker was
+# printed literally, so the client saw "> Methodology: ..." in the PDF body.
+BLOCKQUOTE_RE = re.compile(r"^>\s?(.*)$")
+TOC_HEADING_RE = re.compile(r"^table of contents$", re.IGNORECASE)
+
+
+def _toc_key(text: str) -> str:
+    """Lookup key for a heading or TOC entry: markup- and whitespace-insensitive.
+
+    The two sides of a TOC link are written differently in the source (a heading
+    line vs. a bullet), so compare them on the plain text only.
+    """
+    plain = re.sub(r"[*`_#]", "", text or "")
+    return re.sub(r"\s+", " ", plain).strip().casefold()
+
+
+def _anchor_key(text: str) -> str:
+    """Deterministic PDF anchor for a heading, stable across both build passes.
+
+    Deriving it from the title text (not a counter) means the contents page built
+    in pass 2 can name a destination that pass 1 already wrote, without either
+    pass having to know the other's flowable order. Tags are stripped and
+    entities unescaped first, because the two callers see the same title in
+    different shapes: reportlab gives the drawn heading's plain text, while the
+    contents entries are still inline-markdown-converted HTML.
+    """
+    plain = _unescape_html(re.sub(r"<[^>]+>", "", text or ""))
+    return "saju-" + hashlib.md5(_toc_key(plain).encode("utf-8")).hexdigest()[:12]
 
 
 # Client-marker emojis that DejaVu cannot render and that should not reach PDF text.
@@ -230,23 +297,66 @@ def _strip_client_emojis(text: str) -> str:
     return text
 
 
+def _cjk_span(match, face: str) -> str:
+    """Wrap one CJK run in a <font> tag, dropping characters the face cannot draw.
+
+    A missing glyph is printed by reportlab as a tofu box, which is worse in a
+    paid report than an omitted character: the reader cannot tell a box from a
+    typo. The bundled Korean face has no simplified-Chinese forms, and the CJK
+    routing patterns themselves contain range-boundary ideographs, so this is a
+    real case. Each drop is reported once on stderr so it is diagnosable.
+    """
+    run = match.group(0)
+    if _CJK_COVERED:
+        kept = "".join(ch for ch in run if ord(ch) in _CJK_COVERED)
+        dropped = {ch for ch in run if ch not in kept}
+        if dropped:
+            new = dropped - _CJK_DROP_WARNED
+            if new:
+                _CJK_DROP_WARNED.update(new)
+                print(
+                    "Warning: bundled CJK font cannot draw "
+                    + " ".join(f"U+{ord(ch):04X}" for ch in sorted(new))
+                    + "; dropped rather than shown as a tofu box.",
+                    file=sys.stderr,
+                )
+        run = kept
+    return f"<font face='{face}'>{run}</font>" if run else ""
+
+
+def _wrap_cjk_font(text: str) -> str:
+    """Route CJK runs in already-converted inline HTML to the bundled CJK face.
+
+    Called *after* translation: whatever CJK is left is text the maps could not
+    translate and that must still be drawn (pillar and star Hanja, glossary
+    terms, Korean a reviewer typed into the review console). Latin around it stays
+    in DejaVu, so the existing design — and the golden HTML rendered by the other
+    backend — is unchanged. Runs inside a bold span are wrapped in the bold face
+    first; the pass after that nests a regular tag around them, and reportlab lets
+    the inner tag win, so bold stays bold.
+    """
+    if not text or not _CJK_RE.search(text):
+        return text
+    text = re.sub(
+        r"<b>(.*?)</b>",
+        lambda m: "<b>" + _CJK_RE.sub(
+            lambda mm: _cjk_span(mm, _CJK_SANS_BOLD), m.group(1)) + "</b>",
+        text,
+        flags=re.S,
+    )
+    return _CJK_RE.sub(lambda m: _cjk_span(m, _CJK_SANS), text)
+
+
 def md_inline_to_html(text: str, tier: str | None = None) -> str:
     """Convert inline markdown to minimal HTML for reportlab Paragraph."""
     # Escape HTML
     text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-    # All client-facing PDFs are English-primary. Korean/Hanja in the markdown
-    # source are translated where possible and stripped otherwise, consistent
-    # with the single-chart tiers.
-    dropped: set = set()
-    text = translate_inline(text, keep_unmapped=False, unmapped=dropped)
-    if dropped:
-        import warnings
-
-        warnings.warn(
-            "ReportLab fonts cannot draw CJK; dropped unmapped characters: "
-            + "".join(sorted(dropped)),
-            stacklevel=2,
-        )
+    # All client-facing PDFs are English-primary, but CJK the translation maps
+    # cannot reach is *kept*, never dropped: the bundled Noto Sans KR subset
+    # renders it (see the CJK block above), and the Hanja of pillar and star
+    # names is part of the reading, not noise.
+    unmapped: set = set()
+    text = translate_inline(text, keep_unmapped=True, unmapped=unmapped)
     # DejaVu/Helvetica do not contain warning/favorable/headphone emojis.
     text = _strip_client_emojis(text)
     # Bold, italic, code
@@ -254,7 +364,8 @@ def md_inline_to_html(text: str, tier: str | None = None) -> str:
     text = ITALIC_RE.sub(r"<i>\1</i>", text)
     text = UNDERSCORE_ITALIC_RE.sub(r"<i>\1</i>", text)
     text = CODE_RE.sub(r"<font face='DejaVuSansMono'>\1</font>", text)
-    return text
+    # Finally, point the surviving CJK at the bundled Hangul/Hanja face.
+    return _wrap_cjk_font(text)
 
 
 # ---------- Styles ----------
@@ -353,6 +464,18 @@ def make_styles():
         "footer", parent=base["Normal"],
         fontName=_font("DejaVuSans"), fontSize=8, leading=10,
         textColor=colors.HexColor("#888888"), alignment=TA_CENTER,
+    )
+    # Contents list: the page number sits in its own narrow right-aligned column
+    # so the row height cannot change between the pass that measures and the pass
+    # that prints, which is what keeps the printed numbers exact.
+    styles["toc_entry"] = ParagraphStyle(
+        "toc_entry", parent=styles["body"],
+        fontSize=10, leading=14, spaceAfter=0, spaceBefore=0,
+    )
+    styles["toc_page"] = ParagraphStyle(
+        "toc_page", parent=styles["body"],
+        fontSize=9, leading=14, alignment=TA_RIGHT,
+        textColor=colors.HexColor("#555555"), spaceAfter=0, spaceBefore=0,
     )
     return styles
 
@@ -464,7 +587,8 @@ def _colorize_element_table(cells: list[str], styles: dict, bar_width: float) ->
 
 class SajuDoc(BaseDocTemplate):
     def __init__(self, filename, *, report_id: str = "", client: str = "",
-                 brand: str = "CosmicSaju · cosmicsaju.com", total_pages: int = 0, **kw):
+                 brand: str = "CosmicSaju · cosmicsaju.com", total_pages: int = 0,
+                 doc_title: str = "", doc_author: str = "", **kw):
         BaseDocTemplate.__init__(self, filename, pagesize=A4,
                                  leftMargin=18 * mm, rightMargin=18 * mm,
                                  topMargin=18 * mm, bottomMargin=18 * mm,
@@ -473,12 +597,64 @@ class SajuDoc(BaseDocTemplate):
         self.client = client
         self.brand = brand
         self.total_pages = total_pages
+        self.doc_title = doc_title or "Saju Reading"
+        self.doc_author = doc_author or brand
+        # Heading title -> page number of its first occurrence, and the anchors
+        # already written, so the outline and the TOC agree between passes.
+        self.heading_pages: dict = {}
+        self._bookmarked: set = set()
+        self._heading_count = 0
         frame = Frame(self.leftMargin, self.bottomMargin,
                       self.width, self.height, id="normal")
         self.addPageTemplates([
             PageTemplate(id="cover", frames=[frame], onPage=self.draw_cover_chrome),
             PageTemplate(id="normal", frames=[frame], onPage=self.draw_chrome),
         ])
+
+    def handle_documentBegin(self):
+        # Document properties: without these a premium PDF reports itself as
+        # anonymous ("Title: (anonymous)") in every reader's window and tab.
+        try:
+            self.canv.setTitle(self.doc_title)
+            self.canv.setAuthor(self.doc_author)
+            self.canv.setSubject("Korean Four Pillars (Saju) reading")
+            self.canv.setCreator("CosmicSaju report engine · cosmicsaju.com")
+        except Exception:  # pragma: no cover - canvas metadata is best-effort
+            pass
+        BaseDocTemplate.handle_documentBegin(self)
+
+    def afterFlowable(self, flowable):
+        """Bookmark each heading, build the outline, and record its page.
+
+        reportlab calls this right after a flowable is drawn, which is the only
+        point where the current page number and canvas are both known. The page
+        recorded here is what the contents page prints.
+        """
+        if not isinstance(flowable, Paragraph):
+            return
+        style_name = getattr(getattr(flowable, "style", None), "name", "") or ""
+        m = re.fullmatch(r"h([1-6])", style_name)
+        if not m:
+            return
+        title = flowable.getPlainText().strip()
+        if not title:
+            return
+        self._heading_count += 1
+        base_key = _anchor_key(title)
+        key = base_key
+        if key in self._bookmarked:
+            # A repeated title (e.g. a section reopened later) gets its own
+            # destination, but the contents entry keeps pointing at the first.
+            key = f"{base_key}-{self._heading_count}"
+        else:
+            self._bookmarked.add(key)
+            self.heading_pages.setdefault(_toc_key(title), self.page)
+        self.canv.bookmarkPage(key)
+        level = {1: 0, 2: 0, 3: 1}.get(int(m.group(1)), 2)
+        try:
+            self.canv.addOutlineEntry(title, key, level=level, closed=False)
+        except Exception:  # pragma: no cover - outline is best-effort
+            pass
 
     def _page_number_text(self, doc) -> str:
         if self.total_pages and self.total_pages > 0:
@@ -501,19 +677,101 @@ class SajuDoc(BaseDocTemplate):
         canvas.restoreState()
 
     def draw_cover_chrome(self, canvas, doc):
-        # Lighter footer on cover
-        canvas.saveState()
-        canvas.setFont(_font("DejaVuSans"), 8)
-        canvas.setFillColor(colors.HexColor("#888888"))
-        canvas.drawCentredString(A4[0] / 2, 10 * mm,
-                                 f"Korean Four Pillars of Destiny  ·  {self.brand}")
-        canvas.restoreState()
+        # The cover is deliberately chrome-free: brand, date and report ID are
+        # already part of the cover layout, so a running footer there only
+        # repeats them. Page numbering starts on the contents page.
+        pass
 
 
 # ---------- Markdown -> story conversion ----------
 
+def _heading_anchor_map(lines, tier) -> dict:
+    """Map every heading anchor to its lookup key, for the contents page.
+
+    Scanned from the same source the story is built from, using the same
+    conversion as the drawn heading, so the anchors here are exactly the ones
+    ``SajuDoc.afterFlowable`` will write.
+    """
+    keys: dict = {}
+    skipped_title = False
+    for line in lines:
+        m = HEADING_RE.match(line.strip())
+        if not m:
+            continue
+        if len(m.group(1)) == 1 and not skipped_title:
+            skipped_title = True
+            continue
+        plain = _unescape_html(re.sub(r"<[^>]+>", "", md_inline_to_html(m.group(2), tier)))
+        keys[_anchor_key(plain)] = _toc_key(plain)
+    return keys
+
+
+def _resolve_toc_anchor(entry_key: str, heading_keys: dict) -> Optional[str]:
+    """Find the heading a contents entry points at, by its lookup key.
+
+    Contents labels are not always literal headings: the engine writes composite
+    ones ("Life Themes by Major Luck Period — incl. Lifetime Decade Roadmap" for
+    the heading "Life Themes by Major Luck Period") and sometimes the heading
+    carries extra words ("MP3 Audio Summary — Included by Default"). So beyond an
+    exact match, accept the closest prefix in either direction and otherwise
+    return None, which leaves the entry as plain text. A contents page must never
+    ship a link to nowhere.
+    """
+    if not entry_key:
+        return None
+    lookup_keys = {anchor: key for anchor, key in heading_keys.items()}
+    for anchor, key in lookup_keys.items():
+        if key == entry_key:
+            return anchor
+    best = None
+    for anchor, key in lookup_keys.items():
+        if key.startswith(entry_key) or entry_key.startswith(key):
+            distance = abs(len(key) - len(entry_key))
+            if best is None or distance < best[0]:
+                best = (distance, anchor)
+    return best[1] if best else None
+
+
+def _toc_flowables(entries, toc_pages, styles, tier, content_width, heading_keys=None) -> list:
+    """Render the markdown contents list as a linked table of titles + pages.
+
+    Two columns rather than a run of bullets: the page number needs its own cell
+    so the row height is the same whether or not a number has been measured yet.
+    That is what lets pass 1 (measuring) and pass 2 (printing) lay the pages out
+    identically, and therefore what makes the printed numbers exact.
+    """
+    heading_keys = heading_keys or {}
+    rows = []
+    for entry in entries:
+        label = md_inline_to_html(entry, tier)
+        plain = _unescape_html(re.sub(r"<[^>]+>", "", label))
+        anchor = _resolve_toc_anchor(_toc_key(plain), heading_keys)
+        if anchor:
+            page = toc_pages.get(heading_keys.get(anchor, ""), "")
+            title_cell = f"&bull;&nbsp; <a href='#{anchor}' color='#2a4d6e'>{label}</a>"
+        else:
+            page = ""
+            title_cell = f"&bull;&nbsp; {label}"
+        rows.append([
+            Paragraph(title_cell, styles["toc_entry"]),
+            Paragraph(str(page), styles["toc_page"]),
+        ])
+    if not rows:
+        return []
+    table = Table(rows, colWidths=[content_width - 14 * mm, 14 * mm])
+    table.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 1.2),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 1.2),
+    ]))
+    return [table, Spacer(1, 4 * mm)]
+
+
 def _md_to_story(text: str, title: str, client: str, dob: str, day_master: str,
-                 report_id: str, tier: str | None = None) -> list:
+                 report_id: str, tier: str | None = None,
+                 toc_pages: dict | None = None) -> list:
     """Convert stripped markdown text into a reportlab flowable story (cover + content)."""
     lines = text.splitlines()
     styles = make_styles()
@@ -569,6 +827,12 @@ def _md_to_story(text: str, title: str, client: str, dob: str, day_master: str,
     # ---- Content ----
     i = 0
     skipped_title = False
+    # Contents state: entries are collected while inside the "Table of Contents"
+    # section and flushed as a linked table when the next heading arrives.
+    toc_entries: list = []
+    in_contents = False
+    content_width = A4[0] - 36 * mm
+    heading_keys = _heading_anchor_map(lines, tier)
 
     while i < len(lines):
         line = lines[i]
@@ -586,13 +850,20 @@ def _md_to_story(text: str, title: str, client: str, dob: str, day_master: str,
         m = HEADING_RE.match(stripped)
         if m:
             level = len(m.group(1))
-            content = md_inline_to_html(m.group(2), tier)
+            raw_title = m.group(2)
+            if in_contents:
+                story.extend(_toc_flowables(toc_entries, toc_pages or {},
+                                            styles, tier, content_width, heading_keys))
+                toc_entries, in_contents = [], False
             if level == 1 and not skipped_title:
                 skipped_title = True
                 i += 1
                 continue
+            content = md_inline_to_html(raw_title, tier)
             style = styles.get(f"h{level}", styles["h4"])
             story.append(Paragraph(content, style))
+            if level <= 2 and TOC_HEADING_RE.match(re.sub(r"[*`_]", "", raw_title).strip()):
+                in_contents = True
             i += 1
             continue
 
@@ -640,10 +911,31 @@ def _md_to_story(text: str, title: str, client: str, dob: str, day_master: str,
             story.append(Spacer(1, 3 * mm))
             continue
 
+        m = BLOCKQUOTE_RE.match(stripped)
+        if m:
+            # A note block: drop the marker, gather consecutive `>` lines into one
+            # paragraph, and set it as a note (italic, indented, grey).
+            quote_lines = [m.group(1).strip()]
+            i += 1
+            while i < len(lines):
+                nxt = BLOCKQUOTE_RE.match(lines[i].strip())
+                if not nxt:
+                    break
+                quote_lines.append(nxt.group(1).strip())
+                i += 1
+            story.append(Paragraph(
+                md_inline_to_html(" ".join(q for q in quote_lines if q), tier),
+                styles["note"],
+            ))
+            continue
+
         m = LIST_RE.match(line)
         if m:
-            content = md_inline_to_html(m.group(1), tier)
-            story.append(Paragraph(f"&bull; {content}", styles["bullet"]))
+            if in_contents:
+                toc_entries.append(m.group(1).strip())
+            else:
+                content = md_inline_to_html(m.group(1), tier)
+                story.append(Paragraph(f"&bull; {content}", styles["bullet"]))
             i += 1
             continue
 
@@ -662,6 +954,7 @@ def _md_to_story(text: str, title: str, client: str, dob: str, day_master: str,
                 break
             if (HEADING_RE.match(nxt) or TABLE_ROW_RE.match(nxt) or
                 LIST_RE.match(lines[i]) or NUM_RE.match(lines[i]) or
+                BLOCKQUOTE_RE.match(nxt) or
                 HRULE_RE.match(nxt)):
                 break
             para_lines.append(nxt)
@@ -674,6 +967,9 @@ def _md_to_story(text: str, title: str, client: str, dob: str, day_master: str,
         else:
             story.append(Paragraph(para, styles["body"]))
 
+    if in_contents:
+        story.extend(_toc_flowables(toc_entries, toc_pages or {}, styles, tier,
+                                    content_width, heading_keys))
     return story
 
 
@@ -695,11 +991,20 @@ def build_pdf(input_md: Path, output_pdf: Path, title: str, client: str, dob: st
     # print "Page N / total", so the number is free — the service reports it so the review console can
     # show a real page count instead of an em dash. (The HTML/Playwright backend never populates it;
     # production renders with ReportLab.)
+    # The same pass also records the page each heading landed on, which is what the
+    # contents page prints and what its links jump to. Both passes lay the document
+    # out identically — the only difference is the page numbers in the contents
+    # table's fixed-width right column — so what is printed is what was measured.
+    doc_title = title or "Saju Reading"
+    doc_author = "CosmicSaju"
     tmp_path = output_pdf.with_suffix('.tmp.pdf')
     try:
-        doc1 = SajuDoc(str(tmp_path), report_id=report_id, client=client)
-        doc1.build(_md_to_story(text, title, client, dob, day_master, report_id, tier=tier))
+        doc1 = SajuDoc(str(tmp_path), report_id=report_id, client=client,
+                       doc_title=doc_title, doc_author=doc_author)
+        doc1.build(_md_to_story(text, title, client, dob, day_master, report_id,
+                                tier=tier, toc_pages={}))
         total_pages = doc1.page
+        heading_pages = dict(doc1.heading_pages)
         if pages_out is not None:
             pages_out.append(total_pages)
     finally:
@@ -708,10 +1013,13 @@ def build_pdf(input_md: Path, output_pdf: Path, title: str, client: str, dob: st
         except FileNotFoundError:
             pass
 
-    # Final pass: write the real PDF with "Page X / Y" in the footer.
+    # Final pass: write the real PDF with "Page X / Y" in the footer and the
+    # contents page numbered.
     output_pdf.parent.mkdir(parents=True, exist_ok=True)
-    doc2 = SajuDoc(str(output_pdf), report_id=report_id, client=client, total_pages=total_pages)
-    doc2.build(_md_to_story(text, title, client, dob, day_master, report_id, tier=tier))
+    doc2 = SajuDoc(str(output_pdf), report_id=report_id, client=client,
+                   total_pages=total_pages, doc_title=doc_title, doc_author=doc_author)
+    doc2.build(_md_to_story(text, title, client, dob, day_master, report_id,
+                            tier=tier, toc_pages=heading_pages))
     return output_pdf
 
 

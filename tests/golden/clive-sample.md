@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Clive — The Hook · Complimentary
+## Clive — The Hook
 
 *A one-page taste of your Saju chart — your elemental blueprint, no predictions*
 

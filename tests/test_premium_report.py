@@ -8,6 +8,7 @@ import pytest
 from saju_engine.engine import compute_chart
 from saju_engine.premium_report import generate_premium_report
 from saju_engine.report_data import (
+    TIER_CONFIG,
     _career_tiers,
     _chart_signature,
     _compatibility_rows,
@@ -16,6 +17,16 @@ from saju_engine.report_data import (
     _strength_label,
 )
 from saju_engine.yongsin import favorable_element
+
+
+def _body_heading(report: str) -> str:
+    """The report's own H2 title line — the first thing a client reads.
+
+    The tier's price label lives in TIER_CONFIG and on the order, never in the
+    body: a delivered report can be forwarded or printed, and "· $55" or
+    "· Add-on" beside the client's name turns a reading into an invoice.
+    """
+    return next(line for line in report.splitlines() if line.startswith("## "))
 
 
 def _sample_chart():
@@ -315,7 +326,7 @@ def test_career_and_luck_cycle_are_premium_tiers():
     """career / luck-cycle are standalone add-ons routed through the tier
     system: they get a cover (name + Add-on price), the full module body, and
     the client-draft banner."""
-    from saju_engine.report_data import TIER_CONFIG, normalize_tier
+    from saju_engine.report_data import normalize_tier
 
     assert "career" in TIER_CONFIG and "luck-cycle" in TIER_CONFIG
     assert normalize_tier("career") == "career"
@@ -325,7 +336,8 @@ def test_career_and_luck_cycle_are_premium_tiers():
     chart = _sample_chart()
     career = generate_premium_report(chart, tier="career")
     assert "Career & Wealth Deep-Dive" in career
-    assert "Add-on" in career
+    assert TIER_CONFIG["career"]["price"] == "Add-on"
+    assert _body_heading(career) == "## Sruthi — Career & Wealth Deep-Dive"
     assert "## Career Archetypes — Ranked Domains" in career
     assert "## Career Transition Timing — Decade by Decade" in career
     assert "Sources & Limits" in career
@@ -343,7 +355,8 @@ def test_premium_report_sample_hook_is_compact():
     chart = _sample_chart()
     report = generate_premium_report(chart, tier="sample")
     assert "The Hook" in report
-    assert "Complimentary" in report
+    assert TIER_CONFIG["sample"]["price"] == "Complimentary"
+    assert _body_heading(report) == "## Sruthi — The Hook"
     assert "## Your Chart Snapshot" in report
     assert "### Four Pillars" in report
     assert "### Element Balance" in report
@@ -401,7 +414,8 @@ def test_premium_report_companion_is_focused_timing_read():
     chart = _sample_chart()
     report = generate_premium_report(chart, tier="companion")
     assert "Cosmic Companion" in report
-    assert "$9/month" in report
+    assert TIER_CONFIG["companion"]["price"] == "$9/month"
+    assert _body_heading(report) == "## Sruthi — Cosmic Companion"
     assert "## Chart at a Glance" in report
     assert "## Timing: Major Luck & Annual Windows" in report
     assert "## Practical Guidance Summary" in report
@@ -420,9 +434,11 @@ def test_premium_report_essential_price_and_scope():
     assert "Essential Report" in report
     # TIER_CONFIG must state the price the store actually charges ($19) and that CLAUDE.md
     # documents. It previously carried a launch promo ("$9 intro → $19") the product no longer
-    # runs, so a delivered report was quoting a price that did not exist.
-    assert "$19" in report
-    assert "9 intro" not in report
+    # runs, so a delivered report was quoting a price that did not exist. The price is an
+    # order detail, so it is asserted on the config — not in the client-facing body.
+    assert TIER_CONFIG["essential"]["price"] == "$19"
+    assert "9 intro" not in TIER_CONFIG["essential"]["price"]
+    assert _body_heading(report) == "## Sruthi — Essential Report"
     assert "## Chart at a Glance" in report
     assert "## Table of Contents" in report
     assert "## Day Master Portrait" in report
@@ -454,7 +470,8 @@ def test_premium_report_deep_price_and_dynamic_window():
     report = generate_premium_report(chart, tier="deep")
     current_year = chart.sewoon[len(chart.sewoon) // 2].year
     assert "Deep Destiny Report" in report
-    assert "$55" in report
+    assert TIER_CONFIG["deep"]["price"] == "$55"
+    assert _body_heading(report) == "## Sruthi — Deep Destiny Report"
     assert "## Career & Wealth" in report
     assert "## Relationships" in report
     assert "## Health & Vitality" in report
@@ -680,7 +697,6 @@ def test_every_premium_tier_is_client_facing():
     """All tiers routed through generate_premium_report are client-facing, so
     _reviewer_note suppresses the notes for every one of them."""
     from saju_engine.premium_report import _CLIENT_TIERS
-    from saju_engine.report_data import TIER_CONFIG
     assert set(TIER_CONFIG) <= _CLIENT_TIERS
 
 

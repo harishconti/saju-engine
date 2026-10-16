@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Kiran — Essential Report · $19
+## Kiran — Essential Report
 
 *Your natal chart, career arc, decade cycles, and lucky-element guide*
 

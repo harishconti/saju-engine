@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Nova — Career & Wealth Deep-Dive · Add-on
+## Nova — Career & Wealth Deep-Dive
 
 *Ranked career domains, role ladders, business/investment behaviour, and decade-by-decade transition timing*
 

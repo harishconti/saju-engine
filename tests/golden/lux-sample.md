@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Lux — The Hook · Complimentary
+## Lux — The Hook
 
 *A one-page taste of your Saju chart — your elemental blueprint, no predictions*
 

@@ -493,7 +493,7 @@ def _section_cover(ctx: _ReportContext, compact: bool = False) -> List[str]:
     lines = [
         "# Korean Four Pillars of Destiny · Saju Reading",
         "",
-        f"## {ctx.chart.name or 'Client'} — {tier['name']} · {tier['price']}",
+        f"## {ctx.chart.name or 'Client'} — {tier['name']}",
         "",
         f"*{tier['tagline']}*",
         "",
@@ -942,6 +942,8 @@ def _section_career_wealth(ctx: _ReportContext, mode: str = "standard") -> List[
             PF.red_flag_environments(ctx),
             "",
             "#### Decade-by-Decade Career Strategy",
+            "",
+            PF.FAVORABLE_YEAR_NOTE,
         ]
         for p in ctx.chart.daeun:
             lines.append("")
@@ -1378,6 +1380,8 @@ def _section_major_luck_narrative(ctx: _ReportContext) -> List[str]:
         "## Life Themes by Major Luck Period",
         "",
         "Each 10-year major-luck (대운) period brings a new stem and branch into prominence. The stem shows the outer theme through its 십신 relationship to your Day Master; the branch shows the stage of life and the underlying terrain. Read these as tendencies, not fixed events.",
+          "",
+          PF.FAVORABLE_YEAR_NOTE,
         "",
     ]
     for p in ctx.chart.daeun:
@@ -1814,11 +1818,14 @@ def _section_auspicious_dates(ctx: _ReportContext, window_days: int = 90) -> Lis
     if selected:
         for d, combo, tg, stem_elem in selected:
             role = "favorable" if stem_elem == ctx.favorable else "supporting"
+            # One short, row-specific cell. This column used to repeat the same
+            # ~41-word sentence on every row (943 of the report's words were one
+            # disclaimer, 23 times over); the selection criteria and the
+            # "confirm before booking" advice are stated once, in the note above
+            # the table, where a reader meets them before the list.
             lines.append(
                 f"| {d.strftime('%Y-%m-%d (%A)')} | {combo} ({tg}) | "
-                f"A reasonable candidate — the day-stem carries your {role} element ({stem_elem}) and its "
-                f"branch does not clash, harm, or break your natal day/hour branch; confirm against the "
-                f"querent's specific question before booking. |"
+                f"{stem_elem} — your {role} element |"
             )
     else:
         lines.append(

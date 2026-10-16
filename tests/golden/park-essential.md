@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Park — Essential Report · $19
+## Park — Essential Report
 
 *Your natal chart, career arc, decade cycles, and lucky-element guide*
 

@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Park — The Hook · Complimentary
+## Park — The Hook
 
 *A one-page taste of your Saju chart — your elemental blueprint, no predictions*
 

@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Park — Cosmic Companion · $9/month
+## Park — Cosmic Companion
 
 *Ongoing monthly timing guidance, annual outlook refresh, and priority email support*
 

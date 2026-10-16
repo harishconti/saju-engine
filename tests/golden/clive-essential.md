@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Clive — Essential Report · $19
+## Clive — Essential Report
 
 *Your natal chart, career arc, decade cycles, and lucky-element guide*
 

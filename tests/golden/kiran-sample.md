@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Kiran — The Hook · Complimentary
+## Kiran — The Hook
 
 *A one-page taste of your Saju chart — your elemental blueprint, no predictions*
 

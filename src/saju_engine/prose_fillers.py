@@ -624,13 +624,43 @@ def red_flag_environments(ctx) -> str:
     return "Look out for: " + "; ".join(items[:3]) + "."
 
 
+# Guidance for a decade, in several equivalent phrasings. The same chart repeats
+# a status across several decades (a strong Day Master often has five favorable
+# periods in a row), and one sentence printed eight times reads as a template
+# rather than a reading. `p.start_age` rotates the variants so adjacent periods
+# never say the same thing; the text stays practical, with no new interpretation.
+_DECADE_GUIDANCE = {
+    "favorable": (
+        "Plant several seeds at once — the chart can carry more than one initiative in this window.",
+        "Move on the opportunities you have already prepared; this window rewards visible effort.",
+        "This is a decade to start, publish, and ask — the support is there to be used.",
+        "Say yes to the stretch role or the larger scope; capacity is not the constraint here.",
+    ),
+    "unfavorable": (
+        "Protect what already works; defer large bets to a later decade and focus on craft and relationships.",
+        "Consolidate rather than expand — keep reserves intact and let the pressure pass.",
+        "Hold your position and invest in the skills that will still matter when the cycle turns.",
+    ),
+    "neutral": (
+        "Use the mixed energy to refine skills and reposition rather than to launch new ventures.",
+        "Test small before committing: this decade rewards adjustment more than bold moves.",
+        "Keep options open and let the strongest signal, not the loudest one, set the direction.",
+    ),
+}
+# How to read a favorable-element year, stated once per section rather than in
+# every period paragraph (it is the same sentence for every period).
+FAVORABLE_YEAR_NOTE = (
+    "Within any period, years and months whose stem matches your favorable element are the most "
+    "reliable for visible wins; the rest are best used for quiet preparation."
+)
+
+
 def decade_career_strategy(ctx, p) -> str:
     """One paragraph per 대운 connecting ten-god + favorable_status to career phase."""
     tg = p.stem_tengod_en or p.stem_tengod or "—"
     status = period_favorable_status(p, ctx)
     branch_elem = p.branch_element or "—"
     stem_elem = p.stem_element or "—"
-    fav = _ctx_get(ctx, "favorable", "—")
     # Bug found 2026-09-25 (external report review, E-3 follow-up): a naive
     # `"favor" in status` substring check matches "unfavorable" too (it
     # contains "favor"), so a genuinely unfavorable decade was silently
@@ -641,17 +671,15 @@ def decade_career_strategy(ctx, p) -> str:
     # instead of substring-matching.
     if status == "favorable":
         phase = "build and rise"
-        guidance = "Plant several seeds at once — the chart can carry more than one initiative in this window."
     elif status == "unfavorable":
         phase = "conserve and consolidate"
-        guidance = "Protect what already works; defer large bets and focus on craft and relationships."
     else:
         phase = "transition and adapt"
-        guidance = "Use the mixed energy to refine skills and reposition rather than to launch new ventures."
+    variants = _DECADE_GUIDANCE.get(status, _DECADE_GUIDANCE["neutral"])
+    guidance = variants[(p.start_age // 10) % len(variants)]
     return (
         f"With a **{tg}** ten-god over a **{branch_elem}** branch (stem element {stem_elem}), this is a "
-        f"{phase} decade. {guidance} Years where the stem element matches the favorable **{fav}** energy "
-        f"are the most reliable for visible wins; the others are best used for quiet preparation."
+        f"{phase} decade. {guidance}"
     )
 
 
@@ -1397,7 +1425,6 @@ def major_luck_narrative(p, ctx) -> str:
     """Full 1-paragraph interpretation per 대운."""
     tg = p.stem_tengod_en or p.stem_tengod or "—"
     period_favorable_status(p, ctx)
-    fav = _ctx_get(ctx, "favorable", "—")
     cls = RP.TENGOD_CLASS.get(p.stem_tengod, "")
     # E-12 (2026-09-25 audit): every non-Authority/Wealth/Output decade used
     # to fall through to "support and study" — including 비견/겁재 decades.
@@ -1413,8 +1440,7 @@ def major_luck_narrative(p, ctx) -> str:
     return decade_career_strategy(ctx, p) + (
         f" Relationships in this window carry the same **{tg}** undertow — themes of "
         f"{undertow} "
-        f"are likely. The favorable **{fav}** element shows up most clearly in years and months whose "
-        f"stem matches it — these are the periods to lean in."
+        f"are likely."
     )
 
 

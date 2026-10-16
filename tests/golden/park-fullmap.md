@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Park — The Full Map · $129
+## Park — The Full Map
 
 *Your life's complete map — natal reading + deep-dive modules + 10-year forecast*
 
@@ -224,37 +224,39 @@ Look out for: long stretches of Water-heavy work that drain the Day Master; eith
 
 #### Decade-by-Decade Career Strategy
 
+Within any period, years and months whose stem matches your favorable element are the most reliable for visible wins; the rest are best used for quiet preparation.
+
 **Ages 2-11 — 庚戌**
 
-With a **Companion (比肩)** ten-god over a **Earth** branch (stem element Metal), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation.
+With a **Companion (比肩)** ten-god over a **Earth** branch (stem element Metal), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window.
 
 **Ages 12-21 — 己酉**
 
-With a **Direct Resource (正印)** ten-god over a **Metal** branch (stem element Earth), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation.
+With a **Direct Resource (正印)** ten-god over a **Metal** branch (stem element Earth), this is a build and rise decade. Move on the opportunities you have already prepared; this window rewards visible effort.
 
 **Ages 22-31 — 戊申**
 
-With a **Indirect Resource (偏印)** ten-god over a **Metal** branch (stem element Earth), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation.
+With a **Indirect Resource (偏印)** ten-god over a **Metal** branch (stem element Earth), this is a build and rise decade. This is a decade to start, publish, and ask — the support is there to be used.
 
 **Ages 32-41 — 丁未**
 
-With a **Direct Officer (正官)** ten-god over a **Earth** branch (stem element Fire), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation.
+With a **Direct Officer (正官)** ten-god over a **Earth** branch (stem element Fire), this is a build and rise decade. Say yes to the stretch role or the larger scope; capacity is not the constraint here.
 
 **Ages 42-51 — 丙午**
 
-With a **Seven Killings (偏官)** ten-god over a **Fire** branch (stem element Fire), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation.
+With a **Seven Killings (偏官)** ten-god over a **Fire** branch (stem element Fire), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window.
 
 **Ages 52-61 — 乙巳**
 
-With a **Direct Wealth (正財)** ten-god over a **Fire** branch (stem element Wood), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation.
+With a **Direct Wealth (正財)** ten-god over a **Fire** branch (stem element Wood), this is a build and rise decade. Move on the opportunities you have already prepared; this window rewards visible effort.
 
 **Ages 62-71 — 甲辰**
 
-With a **Indirect Wealth (偏財)** ten-god over a **Earth** branch (stem element Wood), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation.
+With a **Indirect Wealth (偏財)** ten-god over a **Earth** branch (stem element Wood), this is a build and rise decade. This is a decade to start, publish, and ask — the support is there to be used.
 
 **Ages 72-81 — 癸卯**
 
-With a **Hurting Officer (傷官)** ten-god over a **Wood** branch (stem element Water), this is a conserve and consolidate decade. Protect what already works; defer large bets and focus on craft and relationships. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation.
+With a **Hurting Officer (傷官)** ten-god over a **Wood** branch (stem element Water), this is a conserve and consolidate decade. Consolidate rather than expand — keep reserves intact and let the pressure pass.
 
 > **In plain words:** Your chart leans toward earning alongside peers — teams, partnerships, independent practice. Fields and decades that carry Earth give the cleanest results; the timing tables show when.
 
@@ -535,13 +537,15 @@ A quick reading of each year's energy relative to your Day Master and favorable 
 
 Each 10-year major-luck (대운) period brings a new stem and branch into prominence. The stem shows the outer theme through its 십신 (十神) relationship to your Day Master; the branch shows the stage of life and the underlying terrain. Read these as tendencies, not fixed events.
 
+Within any period, years and months whose stem matches your favorable element are the most reliable for visible wins; the rest are best used for quiet preparation.
+
 ### Ages 2–11: 庚戌
 
 - **Ten-God theme:** Companion (比肩)
 - **Branch element & 12-stage:** Earth · 쇠 (衰)
 - **Favorable lean:** favorable
 
-With a **Companion (比肩)** ten-god over a **Earth** branch (stem element Metal), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Companion (比肩)** undertow — themes of peer dynamics, independence, and friendship-based bonds are likely. The favorable **Earth** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
+With a **Companion (比肩)** ten-god over a **Earth** branch (stem element Metal), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Relationships in this window carry the same **Companion (比肩)** undertow — themes of peer dynamics, independence, and friendship-based bonds are likely.
 
 ### Ages 12–21: 己酉
 
@@ -549,7 +553,7 @@ With a **Companion (比肩)** ten-god over a **Earth** branch (stem element Meta
 - **Branch element & 12-stage:** Metal · 제왕 (帝旺)
 - **Favorable lean:** favorable
 
-With a **Direct Resource (正印)** ten-god over a **Metal** branch (stem element Earth), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Direct Resource (正印)** undertow — themes of support and study are likely. The favorable **Earth** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
+With a **Direct Resource (正印)** ten-god over a **Metal** branch (stem element Earth), this is a build and rise decade. Move on the opportunities you have already prepared; this window rewards visible effort. Relationships in this window carry the same **Direct Resource (正印)** undertow — themes of support and study are likely.
 
 ### Ages 22–31: 戊申
 
@@ -557,7 +561,7 @@ With a **Direct Resource (正印)** ten-god over a **Metal** branch (stem elemen
 - **Branch element & 12-stage:** Metal · 건록 (建祿)
 - **Favorable lean:** favorable
 
-With a **Indirect Resource (偏印)** ten-god over a **Metal** branch (stem element Earth), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Indirect Resource (偏印)** undertow — themes of support and study are likely. The favorable **Earth** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
+With a **Indirect Resource (偏印)** ten-god over a **Metal** branch (stem element Earth), this is a build and rise decade. This is a decade to start, publish, and ask — the support is there to be used. Relationships in this window carry the same **Indirect Resource (偏印)** undertow — themes of support and study are likely.
 
 ### Ages 32–41: 丁未
 
@@ -565,7 +569,7 @@ With a **Indirect Resource (偏印)** ten-god over a **Metal** branch (stem elem
 - **Branch element & 12-stage:** Earth · 관대 (冠帶)
 - **Favorable lean:** favorable
 
-With a **Direct Officer (正官)** ten-god over a **Earth** branch (stem element Fire), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Direct Officer (正官)** undertow — themes of commitment and visibility are likely. The favorable **Earth** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
+With a **Direct Officer (正官)** ten-god over a **Earth** branch (stem element Fire), this is a build and rise decade. Say yes to the stretch role or the larger scope; capacity is not the constraint here. Relationships in this window carry the same **Direct Officer (正官)** undertow — themes of commitment and visibility are likely.
 
 ### Ages 42–51: 丙午
 
@@ -573,7 +577,7 @@ With a **Direct Officer (正官)** ten-god over a **Earth** branch (stem element
 - **Branch element & 12-stage:** Fire · 목욕 (沐浴)
 - **Favorable lean:** favorable
 
-With a **Seven Killings (偏官)** ten-god over a **Fire** branch (stem element Fire), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Seven Killings (偏官)** undertow — themes of commitment and visibility are likely. The favorable **Earth** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
+With a **Seven Killings (偏官)** ten-god over a **Fire** branch (stem element Fire), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Relationships in this window carry the same **Seven Killings (偏官)** undertow — themes of commitment and visibility are likely.
 
 ### Ages 52–61: 乙巳
 
@@ -581,7 +585,7 @@ With a **Seven Killings (偏官)** ten-god over a **Fire** branch (stem element 
 - **Branch element & 12-stage:** Fire · 장생 (長生)
 - **Favorable lean:** favorable
 
-With a **Direct Wealth (正財)** ten-god over a **Fire** branch (stem element Wood), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Direct Wealth (正財)** undertow — themes of commitment and visibility are likely. The favorable **Earth** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
+With a **Direct Wealth (正財)** ten-god over a **Fire** branch (stem element Wood), this is a build and rise decade. Move on the opportunities you have already prepared; this window rewards visible effort. Relationships in this window carry the same **Direct Wealth (正財)** undertow — themes of commitment and visibility are likely.
 
 ### Ages 62–71: 甲辰
 
@@ -589,7 +593,7 @@ With a **Direct Wealth (正財)** ten-god over a **Fire** branch (stem element W
 - **Branch element & 12-stage:** Earth · 양 (養)
 - **Favorable lean:** favorable
 
-With a **Indirect Wealth (偏財)** ten-god over a **Earth** branch (stem element Wood), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Indirect Wealth (偏財)** undertow — themes of commitment and visibility are likely. The favorable **Earth** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
+With a **Indirect Wealth (偏財)** ten-god over a **Earth** branch (stem element Wood), this is a build and rise decade. This is a decade to start, publish, and ask — the support is there to be used. Relationships in this window carry the same **Indirect Wealth (偏財)** undertow — themes of commitment and visibility are likely.
 
 ### Ages 72–81: 癸卯
 
@@ -597,7 +601,7 @@ With a **Indirect Wealth (偏財)** ten-god over a **Earth** branch (stem elemen
 - **Branch element & 12-stage:** Wood · 태 (胎)
 - **Favorable lean:** unfavorable
 
-With a **Hurting Officer (傷官)** ten-god over a **Wood** branch (stem element Water), this is a conserve and consolidate decade. Protect what already works; defer large bets and focus on craft and relationships. Years where the stem element matches the favorable **Earth** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Hurting Officer (傷官)** undertow — themes of creative exploration are likely. The favorable **Earth** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
+With a **Hurting Officer (傷官)** ten-god over a **Wood** branch (stem element Water), this is a conserve and consolidate decade. Consolidate rather than expand — keep reserves intact and let the pressure pass. Relationships in this window carry the same **Hurting Officer (傷官)** undertow — themes of creative exploration are likely.
 
 ---
 
@@ -630,30 +634,30 @@ A single-glance view of all 8 major-luck periods in your life and the favorable 
 
 | Date | Day Pillar | Suggested Use / Reader Note |
 |---|---|---|
-| 2026-06-02 (Tuesday) | 丁未 (Direct Officer) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-06-04 (Thursday) | 己酉 (Direct Resource) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-06-11 (Thursday) | 丙辰 (Seven Killings) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-06-13 (Saturday) | 戊午 (Indirect Resource) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-06-14 (Sunday) | 己未 (Direct Resource) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-06-22 (Monday) | 丁卯 (Direct Officer) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-06-23 (Tuesday) | 戊辰 (Indirect Resource) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-07-01 (Wednesday) | 丙子 (Seven Killings) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-07-02 (Thursday) | 丁丑 (Direct Officer) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-07-04 (Saturday) | 己卯 (Direct Resource) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-07-11 (Saturday) | 丙戌 (Seven Killings) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-07-13 (Monday) | 戊子 (Indirect Resource) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-07-14 (Tuesday) | 己丑 (Direct Resource) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-07-22 (Wednesday) | 丁酉 (Direct Officer) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-07-23 (Thursday) | 戊戌 (Indirect Resource) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-07-31 (Friday) | 丙午 (Seven Killings) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-08-01 (Saturday) | 丁未 (Direct Officer) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-08-03 (Monday) | 己酉 (Direct Resource) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-08-10 (Monday) | 丙辰 (Seven Killings) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-08-12 (Wednesday) | 戊午 (Indirect Resource) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-08-13 (Thursday) | 己未 (Direct Resource) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-08-21 (Friday) | 丁卯 (Direct Officer) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-08-22 (Saturday) | 戊辰 (Indirect Resource) | A reasonable candidate — the day-stem carries your favorable element (Earth) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-08-30 (Sunday) | 丙子 (Seven Killings) | A reasonable candidate — the day-stem carries your supporting element (Fire) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
+| 2026-06-02 (Tuesday) | 丁未 (Direct Officer) | Fire — your supporting element |
+| 2026-06-04 (Thursday) | 己酉 (Direct Resource) | Earth — your favorable element |
+| 2026-06-11 (Thursday) | 丙辰 (Seven Killings) | Fire — your supporting element |
+| 2026-06-13 (Saturday) | 戊午 (Indirect Resource) | Earth — your favorable element |
+| 2026-06-14 (Sunday) | 己未 (Direct Resource) | Earth — your favorable element |
+| 2026-06-22 (Monday) | 丁卯 (Direct Officer) | Fire — your supporting element |
+| 2026-06-23 (Tuesday) | 戊辰 (Indirect Resource) | Earth — your favorable element |
+| 2026-07-01 (Wednesday) | 丙子 (Seven Killings) | Fire — your supporting element |
+| 2026-07-02 (Thursday) | 丁丑 (Direct Officer) | Fire — your supporting element |
+| 2026-07-04 (Saturday) | 己卯 (Direct Resource) | Earth — your favorable element |
+| 2026-07-11 (Saturday) | 丙戌 (Seven Killings) | Fire — your supporting element |
+| 2026-07-13 (Monday) | 戊子 (Indirect Resource) | Earth — your favorable element |
+| 2026-07-14 (Tuesday) | 己丑 (Direct Resource) | Earth — your favorable element |
+| 2026-07-22 (Wednesday) | 丁酉 (Direct Officer) | Fire — your supporting element |
+| 2026-07-23 (Thursday) | 戊戌 (Indirect Resource) | Earth — your favorable element |
+| 2026-07-31 (Friday) | 丙午 (Seven Killings) | Fire — your supporting element |
+| 2026-08-01 (Saturday) | 丁未 (Direct Officer) | Fire — your supporting element |
+| 2026-08-03 (Monday) | 己酉 (Direct Resource) | Earth — your favorable element |
+| 2026-08-10 (Monday) | 丙辰 (Seven Killings) | Fire — your supporting element |
+| 2026-08-12 (Wednesday) | 戊午 (Indirect Resource) | Earth — your favorable element |
+| 2026-08-13 (Thursday) | 己未 (Direct Resource) | Earth — your favorable element |
+| 2026-08-21 (Friday) | 丁卯 (Direct Officer) | Fire — your supporting element |
+| 2026-08-22 (Saturday) | 戊辰 (Indirect Resource) | Earth — your favorable element |
+| 2026-08-30 (Sunday) | 丙子 (Seven Killings) | Fire — your supporting element |
 
 ---
 

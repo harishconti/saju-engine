@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Kiran — Luck Cycle & Lifetime Decade Roadmap · Add-on
+## Kiran — Luck Cycle & Lifetime Decade Roadmap
 
 *Every five-year block of your life, with wealth, business, family and investment notes, and charts*
 

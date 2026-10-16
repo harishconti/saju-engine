@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Wren — Career & Wealth Deep-Dive · Add-on
+## Wren — Career & Wealth Deep-Dive
 
 *Ranked career domains, role ladders, business/investment behaviour, and decade-by-decade transition timing*
 

@@ -151,6 +151,14 @@ product is a refund request waiting to happen.
 functions. A container with Python + Chromium restores the HTML templates byte-for-byte. That is a
 later, isolated change to this one project — it does not touch the webapp.
 
+**What the ReportLab artefact contains.** Because this is the backend the client actually gets, its
+output is a contract, not an implementation detail: a **linked contents page** with page numbers (from
+the same measuring pass that fills `pageCount`), a **PDF outline**, **Title/Author/Subject/Creator**
+metadata, markdown blockquote notes rendered as notes, and Hangul/Hanja drawn with a bundled glyph
+subset of Noto Sans KR (embedded, so it renders in browsers and phone viewers). Report prose stays
+English-primary — Korean/Hanja is translated, and only what survives translation is drawn. Details and
+the regeneration command: [products/reports.md](../openwiki/products/reports.md) § The PDF artefact.
+
 ### `/chart` — derive without rendering
 
 Called when a profile is created or when anything chart-affecting changes. The webapp stores the
