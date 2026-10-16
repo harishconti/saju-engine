@@ -28,6 +28,7 @@ from __future__ import annotations
 import json
 import os
 import pathlib
+import re
 import sys
 
 from playwright.sync_api import sync_playwright
@@ -39,7 +40,11 @@ BASE = os.environ.get("AUDIT_BASE_URL", "https://www.cosmicsaju.com")
 # Text links and the deliberately bare /login are not failures — see docs/webapp/06.
 STRICT = "--strict" in sys.argv
 
-VIEWPORTS = [("mobile", 390, 844), ("tablet", 768, 1024), ("desktop", 1440, 900)]
+# `phone` is 360dp on purpose: it is the default logical width of most Android devices and the smallest
+# width the bar claims. A 390-only audit missed a real defect — the landing header's CTA ran 27px past a
+# 360dp viewport and was *clipped*, so nothing scrolled to reveal it and the page-level check saw nothing
+# (2026-10-17). Only an element-level check at the real width could see it.
+VIEWPORTS = [("phone", 360, 800), ("mobile", 390, 844), ("tablet", 768, 1024), ("desktop", 1440, 900)]
 # The bar requires both themes to render on every screen, so each viewport is measured twice.
 SCHEMES = ["dark", "light"] if os.environ.get("AUDIT_SCHEMES", "dark,light") == "dark,light" else [os.environ["AUDIT_SCHEMES"]]
 PUBLIC = ["/", "/sample", "/login", "/privacy", "/terms", "/refund-policy"]
@@ -159,9 +164,38 @@ def sign_in(ctx, email, password):
     pg.close()
 
 
+def _bar_widths() -> list[int] | None:
+    """The widths docs/webapp/06-frontend-ux.md states in its acceptance bar, in order.
+
+    The audit exists to check that page's bar, so the two must not drift. They did once: the docstring and
+    the bar were edited to say 360 while VIEWPORTS still held only 390 / 768 / 1440 — the docstring claimed a
+    check the code did not perform, and the run count (36 = 6 routes x 3 viewports x 2 schemes) was the only
+    clue. Returns None when the page cannot be found or parsed, which is not itself a failure.
+    """
+    page = pathlib.Path(__file__).resolve().parent.parent / "docs/webapp/06-frontend-ux.md"
+    if not page.exists():
+        return None
+    m = re.search(r"No horizontal body scroll at([^\n]+(?:\n[^\n]+)?)", page.read_text(encoding="utf-8"))
+    if not m:
+        return None
+    widths = [int(w) for w in re.findall(r"\b\d{3,4}\b", m.group(1))]
+    return widths or None
+
+
 def main() -> int:
     if not AXE.exists():
         print(f"  axe-core not found at {AXE}\n  run `npm install` in apps/web first.", file=sys.stderr)
+        return 2
+
+    promised, measured = _bar_widths(), [w for _, w, _ in VIEWPORTS]
+    if promised and promised != measured:
+        print(
+            f"  audit and the bar disagree about widths:\n"
+            f"    06-frontend-ux.md says {promised}\n"
+            f"    VIEWPORTS measures   {measured}\n"
+            f"  Fix both — a doc claiming a width the audit does not measure is the bug this gate is for.",
+            file=sys.stderr,
+        )
         return 2
 
     email, password = os.environ.get("AUDIT_EMAIL"), os.environ.get("AUDIT_PASSWORD")

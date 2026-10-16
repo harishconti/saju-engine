@@ -1306,7 +1306,20 @@
     visually gone on a phone, still in the accessibility tree, and the link's name still contains its visible text at
     every width. **A gate that re-catches a known mistake is worth more than one that only finds new ones.**
     ✅ **And the checker was taught to look there.** `tools/audit-ui.py` now includes a **360dp `phone` viewport**
-    alongside 390 / 768 / 1440. It already had the right *kind* of check (any element whose rect passes the viewport
+    fit. This is the third time this session that the gap was the checker's scope rather than its logic, so `06` now
+    states, in the bar itself, what it still does **not** cover: **320dp; overflow off the left edge (the element check
+    tests `right > viewport` and reports at most the first four offenders); text clipped inside an element that is itself
+    within the viewport; and whether a scrollable table is discoverable as swipeable.** (The wide tier comparison table
+    is exempt on purpose — it sits in an `overflow-x-auto` box, verified.)
+    ⚠️ **And the same fix very nearly shipped as a lie.** My first attempt at adding the 360dp viewport asserted on the
+    header markup and died *before* reaching the audit edit; a later pass then updated only the audit's **docstring** to
+    say 360. So for two commits the file *said* 360 while `VIEWPORTS` still held 390 / 768 / 1440 — the bar claiming a
+    check the code did not perform, which is the exact family of bug this project has now hit **five** times
+    (`requiresReview`, `turnstileToken`, the admin role, the light theme). What gave it away was arithmetic: a full run
+    reported **36** page/viewport passes where 6 routes x 4 viewports x 2 schemes is **48**. The viewport is now really
+    added, and `tools/audit-ui.py` grows a guard (`_bar_widths`) that reads the widths out of `06` and **refuses to run**
+    if they disagree with `VIEWPORTS` — verified by deleting 360 and watching it exit non-zero with the two lists side
+    by side. A doc can no longer promise a width the audit does not measure.
     fails, exemptions for genuinely swipeable ancestors) — it was simply measuring 390, where the header happens to
     fit. This is the third time this session that the gap was the checker's scope rather than its logic, so `06` now
     states, in the bar itself, what it still does **not** cover: **320dp, text clipped inside an element that is

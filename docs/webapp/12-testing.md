@@ -194,7 +194,7 @@ per page, both themes — so none of it should be a matter of opinion. This runs
 real Chrome against a deployed URL:
 
 ```bash
-python3 tools/audit-ui.py                       # public pages, 3 viewports
+python3 tools/audit-ui.py                       # public pages, 4 viewports (360/390/768/1440)
 AUDIT_EMAIL=… AUDIT_PASSWORD=… python3 tools/audit-ui.py   # + the pages behind the login
 ```
 

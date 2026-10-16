@@ -229,7 +229,9 @@ The acceptance bar carried over from the previous redesign, and still the bar:
   logical width of most Android phones — the smallest width this bar claims — and it is checked because a
   390-only audit missed a real defect: the landing header's CTA ran 27px past a 360dp viewport and was
   **clipped**, so nothing scrolled to reveal it and a page-level scroll check saw nothing. Only an
-  element-level check at the real width could see it (2026-10-17).
+  element-level check at the real width could see it (2026-10-17). The audit reads these widths **out of
+  this page** and refuses to run if they disagree with its own viewport list — because they did disagree
+  once, and this page and the docstring both promised 360 while the code measured only 390 / 768 / 1440.
 - **What the checker still does not cover**, so it is not read as more than it is: 320dp (the smallest
   devices); overflow off the **left** edge (the element check tests `right > viewport`, and reports at most
   the first four offenders); text clipped *inside* an element that is itself within the viewport (a
