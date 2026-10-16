@@ -66,9 +66,9 @@ _DOCUMENT_TEMPLATE = """<!DOCTYPE html>
 </head>
 <body class="{{ body_class }}">
 {% if toolbar %}{{ toolbar }}
-{% endif %}{{ cover }}
+{% endif %}{{ page_open }}{{ cover }}
 {{ body }}
-</body>
+{{ page_close }}</body>
 </html>
 """
 
@@ -634,6 +634,12 @@ def markdown_to_html(
         body_class=" ".join(classes),
         web_head=_WEB_HEAD if web else "",
         toolbar=toolbar_html,
+        # The readable column is a *wrapper*, not a rule on every top-level child: a
+        # `body > *` rule with `margin: auto` is silently undone by the next `p { margin: … }`
+        # that comes after it, which is exactly what left the front matter ragged while the
+        # panels below it were centred. Print gets nothing, so its bytes are unchanged.
+        page_open='<div class="page">' if web else "",
+        page_close="</div>" if web else "",
     )
 
 

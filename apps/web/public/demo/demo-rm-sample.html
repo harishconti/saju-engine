@@ -684,14 +684,15 @@ body.web-mode ::selection {
     background: color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
-/* One readable column, whatever the width. */
-body.web-mode > * {
+/* One readable column, whatever the width. Owned by a wrapper so that a later
+   `p { margin: … }` cannot quietly undo the centring — which is exactly what happened when
+   this was a rule on `body > *`: the front matter sat hard left while the panels were
+   centred. */
+body.web-mode .page {
     box-sizing: border-box;
     max-width: 46rem;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 1.15rem;
-    padding-right: 1.15rem;
+    margin: 0 auto;
+    padding: 0 1.15rem 4rem;
 }
 
 /* ── the toolbar the app injects when it serves the report ────────────────── */
@@ -1262,7 +1263,7 @@ body.web-mode :target {
 </style>
 </head>
 <body class="tier-sample web-mode">
-<div class="cover">
+<div class="page"><div class="cover">
   <div class="watermark">命</div>
   <h1>RM (Kim Nam-joon) — The Hook · Complimentary Reading</h1>
   <p class="subtitle">A Reading in the Korean Four Pillars Tradition</p>
@@ -1335,5 +1336,5 @@ body.web-mode :target {
 <p>This chart's gift is a strong companion presence that gives you real follow-through; the challenge is staying aware of the chart's pressure points rather than letting them run in the background. The single most useful next step is to weave the favorable <strong>Water</strong> element into daily rhythm — through color, direction, season, or practice — so the chart has somewhere to land. Treat the rest of this report as a starting place; the best readings come from revisiting the same chart across different life phases.</p>
 <hr />
 </section>
-</body>
+</div></body>
 </html>

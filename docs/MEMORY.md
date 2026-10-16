@@ -1230,6 +1230,16 @@
     self-contained file cannot fetch them, so the reading uses the tokens' fallbacks (Georgia and the system stack,
     which the token definitions already name). Embedding subsetted copies (~100–300 KB per report, OFL — and the repo
     already has the subsetting tool) is the next fidelity step. Suite **1,999 → 2,014**; demo readings regenerated.
+    ⚠️ **And the owner's follow-up caught the half I had missed: the front matter was still ragged.** "Some
+    improvement but the initial part is still misaligned." Measured it in the browser rather than guessing again:
+    the heading panels and the cover were centred (`x=352`), the loose front-matter paragraphs were not (`x=0`). The
+    cause was my own `body.web-mode > * { margin: auto; max-width: 46rem }` being undone by the *next* rule in the same
+    sheet — `body.web-mode p { margin: 0 0 0.9rem }` — while panels, having no competing `margin` rule, stayed centred.
+    The fix is structural, not another override: a real `<div class="page">` wrapper owns the column, so a block rule
+    cannot break the layout. Print gets no wrapper, so its bytes are unchanged. Verified: `.page`, `p`, `.panel` and
+    `blockquote` all at `x=370, w=699`, 0 px overflow. `test_the_readable_column_is_a_wrapper` pins it (screen rules
+    only — the `@media print` block is allowed to reset the top level, which is the trap that made my first version of
+    the guard fail).
     ⚠️ **And a bookkeeping bug of my own, found while writing this entry:** one of my earlier `rep()` calls replaced
     the `### Earlier state (2026-09-26)` heading instead of re-appending it, silently deleting the heading from this
     file. Restored below. Entries here are appended *before* that anchor, so the anchor is load-bearing.

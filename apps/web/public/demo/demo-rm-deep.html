@@ -684,14 +684,15 @@ body.web-mode ::selection {
     background: color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
-/* One readable column, whatever the width. */
-body.web-mode > * {
+/* One readable column, whatever the width. Owned by a wrapper so that a later
+   `p { margin: … }` cannot quietly undo the centring — which is exactly what happened when
+   this was a rule on `body > *`: the front matter sat hard left while the panels were
+   centred. */
+body.web-mode .page {
     box-sizing: border-box;
     max-width: 46rem;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 1.15rem;
-    padding-right: 1.15rem;
+    margin: 0 auto;
+    padding: 0 1.15rem 4rem;
 }
 
 /* ── the toolbar the app injects when it serves the report ────────────────── */
@@ -1262,7 +1263,7 @@ body.web-mode :target {
 </style>
 </head>
 <body class="tier-deep web-mode">
-<div class="cover">
+<div class="page"><div class="cover">
   <div class="watermark">命</div>
   <h1>RM (Kim Nam-joon) — Deep Destiny Report</h1>
   <p class="subtitle">A Reading in the Korean Four Pillars Tradition</p>
@@ -2551,5 +2552,5 @@ When the annual or major luck touches the Mi (未) branch or the Eul (乙) stem,
 <li><strong>Indirect Wealth (偏財):</strong> variable money — deals, commissions, windfalls, higher risk and reward</li>
 </ul>
 </section>
-</body>
+</div></body>
 </html>

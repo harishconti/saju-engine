@@ -91,7 +91,10 @@ Two mechanics make that work and are worth knowing before editing it:
   per row with `:has()`.
 
 Sections are laid out as **panels** — the app's card idiom — each with a monospace ordinal eyebrow,
-and the markdown's own title block is dropped when it only repeats the cover.
+and the markdown's own title block is dropped when it only repeats the cover. The readable column is a
+**wrapper** (`.page`), not a rule on `body > *`: a `margin: auto` there was silently undone by the next
+`p { margin: … }` in the same sheet, which left the front matter hard left while the panels below it
+were centred. `test_the_readable_column_is_a_wrapper` pins that, on screen only.
 
 **Font fidelity, honestly:** the app renders in Cormorant Garamond, Inter and IBM Plex Mono, loaded
 by `next/font`. A self-contained file cannot fetch them, so the reading uses the tokens' fallbacks —

@@ -258,6 +258,25 @@ def test_sections_are_grouped_into_panels_with_an_eyebrow(web):
     assert len(loose) <= len(panels)
 
 
+def test_the_readable_column_is_a_wrapper(web, print_doc):
+    """The column is a wrapper, not a rule on `body > *`.
+
+    It was `body.web-mode > * { margin: auto; max-width: 46rem }`, which the *next* block-level
+    rule in the same sheet (`p { margin: 0 0 0.9rem }`) silently undid: the front matter sat hard
+    left while the panels below it were centred, because panels had no competing `margin` rule.
+    A wrapper cannot be undone that way.
+    """
+    assert '<div class="page">' in web
+    assert "</div>" in web
+    # …on screen. The `@media print` block is allowed to reset the top level, because it is
+    # handing the page back to the A4 sheet.
+    screen_only = WEB_CSS.read_text(encoding="utf-8").split("@media print")[0]
+    assert "body.web-mode > *" not in screen_only, \
+        "the screen column must not depend on every top-level child behaving"
+    # Print gets no wrapper, so its markup and snapshots are unchanged.
+    assert '<div class="page">' not in print_doc
+
+
 def test_the_markdown_title_block_does_not_repeat_the_cover():
     """The cover already names the client and the tier.
 
