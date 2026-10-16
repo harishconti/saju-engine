@@ -31,7 +31,7 @@ export function DashboardShell({
       {/* Sidebar (desktop) */}
       <aside className="hidden border-r border-border bg-surface lg:flex lg:flex-col">
         <div className="flex h-16 items-center gap-3 border-b border-border px-4">
-          <Link href="/" className="flex items-center gap-3" aria-label="Cosmic Saju home">
+          <Link href="/" className="flex items-center gap-3">
             <SealMark char="四" />
             <span className="font-display text-lg leading-none">Cosmic Saju</span>
           </Link>
@@ -52,7 +52,7 @@ export function DashboardShell({
         {/* Mobile header */}
         <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur lg:hidden">
           <div className="flex h-14 items-center justify-between gap-3 px-4">
-            <Link href="/" className="flex items-center gap-2" aria-label="Cosmic Saju home">
+            <Link href="/" className="flex items-center gap-2">
               <SealMark char="四" />
               <span className="font-display text-base">Cosmic Saju</span>
             </Link>

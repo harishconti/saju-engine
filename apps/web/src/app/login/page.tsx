@@ -152,7 +152,10 @@ export default function LoginPage() {
     <main className="grid-noise min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 px-4 py-12">
         <div className="flex flex-col items-center gap-3 text-center">
-          <Link href="/" aria-label="Cosmic Saju home">
+          {/* This link holds only the seal glyph, so it needs a label — unlike the marketing header,
+              where the visible "Cosmic Saju 사주" text is the accessible name (an aria-label there
+              would *omit* that text and fail `label-content-name-mismatch`). */}
+          <Link href="/" aria-label="Cosmic Saju — home">
             <SealMark char="四" />
           </Link>
           <h1 className="h2">{mode === "signin" ? "Welcome back" : "Create your account"}</h1>
@@ -177,10 +180,13 @@ export default function LoginPage() {
                     setError(null);
                     setNotice(null);
                   }}
+                  // min-h-11 (44px): these are real controls on a touch-first page, and `py-2` alone
+                  // measured 36px — under the >=44 px bar in docs/webapp/06.
                   className={
-                    mode === m
-                      ? "rounded-md bg-muted px-3 py-2 text-sm font-medium text-foreground"
-                      : "rounded-md px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
+                    (mode === m
+                      ? "rounded-md bg-muted px-3 text-sm font-medium text-foreground"
+                      : "rounded-md px-3 text-sm text-muted-foreground hover:text-foreground") +
+                    " inline-flex min-h-11 items-center justify-center py-2"
                   }
                 >
                   {m === "signin" ? "Sign in" : "Sign up"}

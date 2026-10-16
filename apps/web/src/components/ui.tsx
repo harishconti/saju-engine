@@ -25,8 +25,11 @@ const VARIANT: Record<ButtonVariant, string> = {
     "bg-destructive text-white hover:brightness-110 border border-transparent font-semibold",
 };
 
+// `sm` is 44px (h-11), not the more usual 36px: `06-frontend-ux.md` sets a ≥44 px touch-target bar, and
+// this is the one place that decides it for every compact button in the product. `sm` and `md` are
+// therefore the same height and differ by padding — compact *width*, not a shorter hit area.
 const SIZE: Record<ButtonSize, string> = {
-  sm: "h-9 px-3 text-sm rounded-md",
+  sm: "h-11 px-3 text-sm rounded-md",
   md: "h-11 px-4 text-sm rounded-md",
   lg: "h-12 px-6 text-base rounded-lg",
 };
@@ -222,7 +225,9 @@ export function EmptyState({
   return (
     <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border px-6 py-12 text-center">
       {icon ? <div className="text-muted-foreground">{icon}</div> : null}
-      <h3 className="font-display text-lg">{title}</h3>
+      {/* h2, not h3: this renders directly under the page's <h1>, and skipping a level fails
+          `heading-order` (axe). A nested usage should pass a heading level instead of nesting h3s. */}
+      <h2 className="font-display text-lg">{title}</h2>
       {description ? <p className="max-w-md text-sm text-muted-foreground">{description}</p> : null}
       {action ? <div className="pt-1">{action}</div> : null}
     </div>

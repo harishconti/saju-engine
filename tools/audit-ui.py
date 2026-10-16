@@ -35,8 +35,13 @@ from playwright.sync_api import sync_playwright
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 AXE = ROOT / "apps/web/node_modules/axe-core/axe.min.js"
 BASE = os.environ.get("AUDIT_BASE_URL", "https://www.cosmicsaju.com")
+# `--strict` turns the audit into a gate: overflow, axe, hydration and sub-44px *controls* fail it.
+# Text links and the deliberately bare /login are not failures — see docs/webapp/06.
+STRICT = "--strict" in sys.argv
 
 VIEWPORTS = [("mobile", 390, 844), ("tablet", 768, 1024), ("desktop", 1440, 900)]
+# The bar requires both themes to render on every screen, so each viewport is measured twice.
+SCHEMES = ["dark", "light"] if os.environ.get("AUDIT_SCHEMES", "dark,light") == "dark,light" else [os.environ["AUDIT_SCHEMES"]]
 PUBLIC = ["/", "/sample", "/login", "/privacy", "/terms", "/refund-policy"]
 AUTHED = [
     "/dashboard",
@@ -94,9 +99,14 @@ def _targets(pg):
           el.parentElement.textContent.trim().length > el.textContent.trim().length + 8;
         if (inline) continue;
         if (r.height < 44 || r.width < 44) {
-          out.push({ tag: el.tagName.toLowerCase(), h: Math.round(r.height), w: Math.round(r.width),
+          // A control is a button, tab or select. A text link is governed by the WCAG 2.5.8 spacing
+          // exception instead (its target may be small provided neighbours are far enough apart), so it
+          // is reported separately rather than counted as a defect — see docs/webapp/06.
+          const control = el.tagName !== 'A';
+          out.push({ kind: control ? 'control' : 'text-link', tag: el.tagName.toLowerCase(),
+                     h: Math.round(r.height), w: Math.round(r.width),
                      text: (el.textContent || el.getAttribute('aria-label') || '').trim().slice(0, 34) });
-          if (out.length >= 6) break;
+          if (out.length >= 8) break;
         }
       }
       return out;
@@ -173,17 +183,18 @@ def main() -> int:
             cookies = None
 
         for label, w, h in VIEWPORTS:
-            ctx = browser.new_context(viewport={"width": w, "height": h})
-            if cookies:
-                ctx.add_cookies(cookies)
-            for path in pages:
-                pg = ctx.new_page()
-                try:
-                    rows.append(measure(pg, path, label))
-                except Exception as err:  # a page that cannot be measured is itself a finding
-                    rows.append({"path": path, "vp": label, "error": str(err)[:120]})
-                pg.close()
-            ctx.close()
+            for scheme in SCHEMES:
+                ctx = browser.new_context(viewport={"width": w, "height": h}, color_scheme=scheme)
+                if cookies:
+                    ctx.add_cookies(cookies)
+                for path in pages:
+                    pg = ctx.new_page()
+                    try:
+                        rows.append(measure(pg, path, f"{label}/{scheme}"))
+                    except Exception as err:  # a page that cannot be measured is itself a finding
+                        rows.append({"path": path, "vp": f"{label}/{scheme}", "error": str(err)[:120]})
+                    pg.close()
+                ctx.close()
         browser.close()
 
     print(f"\n=== {BASE} — {'public + authenticated' if cookies else 'public pages only'} ===")
@@ -207,9 +218,14 @@ def main() -> int:
         if r["ovf"] and (path, "ovf") not in seen:
             seen.add((path, "ovf"))
             print(f"  H-SCROLL  {path} @{vp}: {json.dumps(r['ovf'][:3])}")
-        if r["targets"] and (path, "tg") not in seen:
+        controls = [t for t in r["targets"] if t["kind"] == "control"]
+        if controls and (path, "tg") not in seen:
             seen.add((path, "tg"))
-            print(f"  TARGET<44 {path} @{vp}: {json.dumps(r['targets'][:4])}")
+            print(f"  CONTROL<44 {path} @{vp}: {json.dumps(controls[:4])}")
+        links = [t for t in r["targets"] if t["kind"] == "text-link"]
+        if links and (vp.split("/")[0] == "mobile") and (path, "tl") not in seen:
+            seen.add((path, "tl"))
+            print(f"  text-links<44 {path} @{vp}: {len(links)} (WCAG spacing exception; informal)")
         if r["h1"] != 1 and (path, "h1") not in seen:
             seen.add((path, "h1"))
             print(f"  H1 COUNT  {path}: {r['h1']}")
@@ -224,6 +240,30 @@ def main() -> int:
             if key not in seen:
                 seen.add(key)
                 print(f"  AXE       {path} @{vp}: {a['id']} ({a['impact']}, {a['n']}) — {a['target']}")
+
+    failures: list[str] = []
+    for r in rows:
+        if "error" in r:
+            failures.append(f"{r['path']} @{r['vp']}: could not be measured — {r['error']}")
+            continue
+        where = f"{r['path']} @{r['vp']}"
+        if r["ovf"]:
+            failures.append(f"{where}: horizontal scroll ({len(r['ovf'])} element(s))")
+        for a in r["axe"]:
+            failures.append(f"{where}: axe {a['id']} ({a['impact']}, {a['n']} node(s))")
+        if r["hydration"]:
+            failures.append(f"{where}: hydration warning")
+        for t in (x for x in r["targets"] if x["kind"] == "control"):
+            failures.append(f"{where}: control under 44px — {t['tag']} {t['w']}x{t['h']} {t['text']!r}")
+
+    print(f"\n=== SUMMARY: {len(rows)} page/viewport runs, {len(failures)} blocking issue(s) ===")
+    if failures:
+        for line in failures[:25]:
+            print("  ✗ " + line)
+        if len(failures) > 25:
+            print(f"  … +{len(failures) - 25} more")
+        return 1 if STRICT else 0
+    print("  ✓ clean: no overflow, no axe violations, no hydration warnings, no small controls")
     return 0
 
 

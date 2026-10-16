@@ -35,7 +35,7 @@ export function SiteHeader({
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-3" aria-label="Cosmic Saju home">
+        <Link href="/" className="flex items-center gap-3">
           <SealMark char="四" />
           <span className="font-display text-xl leading-none">
             Cosmic Saju
@@ -80,7 +80,10 @@ export function SiteFooter() {
   return (
     <footer className="border-t border-border bg-surface">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-        <div className="flex flex-col gap-8 md:flex-row md:justify-between">
+        {/* `lg`, not `md`: at 768px the brand block plus three text columns cannot fit, and flex
+            children do not shrink below their content — so the contact address pushed the row 27px
+            past the viewport (measured: right=795 in a 768px viewport, on every page with a footer). */}
+        <div className="flex flex-col gap-8 lg:flex-row lg:justify-between">
           <div className="max-w-sm space-y-3">
             <div className="flex items-center gap-3">
               <SealMark char="四" />
@@ -97,17 +100,17 @@ export function SiteFooter() {
               <p className="eyebrow">Product</p>
               <ul className="space-y-1.5 text-muted-foreground">
                 <li>
-                  <Link href="/sample" className="hover:text-foreground">
+                  <Link href="/sample" className="inline-block py-1 hover:text-foreground">
                     Free snapshot
                   </Link>
                 </li>
                 <li>
-                  <Link href="/#pricing" className="hover:text-foreground">
+                  <Link href="/#pricing" className="inline-block py-1 hover:text-foreground">
                     Pricing
                   </Link>
                 </li>
                 <li>
-                  <Link href="/dashboard" className="hover:text-foreground">
+                  <Link href="/dashboard" className="inline-block py-1 hover:text-foreground">
                     Your reports
                   </Link>
                 </li>
@@ -117,17 +120,17 @@ export function SiteFooter() {
               <p className="eyebrow">Legal</p>
               <ul className="space-y-1.5 text-muted-foreground">
                 <li>
-                  <Link href="/privacy" className="hover:text-foreground">
+                  <Link href="/privacy" className="inline-block py-1 hover:text-foreground">
                     Privacy
                   </Link>
                 </li>
                 <li>
-                  <Link href="/terms" className="hover:text-foreground">
+                  <Link href="/terms" className="inline-block py-1 hover:text-foreground">
                     Terms
                   </Link>
                 </li>
                 <li>
-                  <Link href="/refund-policy" className="hover:text-foreground">
+                  <Link href="/refund-policy" className="inline-block py-1 hover:text-foreground">
                     Refunds
                   </Link>
                 </li>
@@ -139,7 +142,7 @@ export function SiteFooter() {
                 <li>
                   <a
                     href={CONTACT_HREF}
-                    className="hover:text-foreground"
+                    className="inline-block py-1 hover:text-foreground"
                   >
                     {CONTACT_EMAIL}
                   </a>
@@ -166,10 +169,15 @@ export function SiteFooter() {
 
 export function MobileStickyCta() {
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 p-3 backdrop-blur lg:hidden">
+    // A <nav> landmark, not a bare <div>: fixed content outside any landmark is unreachable when a
+    // screen-reader user navigates by region (axe `region`).
+    <nav
+      aria-label="Get a free snapshot"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 p-3 backdrop-blur lg:hidden"
+    >
       <Link href="/sample" className={buttonClasses("primary", "md", "w-full")}>
         Get your free chart snapshot
       </Link>
-    </div>
+    </nav>
   );
 }

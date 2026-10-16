@@ -191,6 +191,7 @@ and it moves the golden snapshots, so it is its own change.
 | Consent failures are actionable | ❌ **They were a dead end.** The server correctly refused to store birth data without consent, but the refusal was a sentence pointing at another page, so it read as "save did nothing". Fixed: the profile form asks for consent inline, beside the data it covers, and handles a mid-session `CONSENT_REQUIRED` by re-offering it. Also consolidated the policy-version string, which had been declared twice identically under two names — in the one place where that string *is* the evidence of which text was agreed to |
 | Anyone can become an admin | ❌ **There was no way at all.** Nothing in the codebase could set `role = ADMIN` — no route, script or seed — so an `ADMIN_EMAILS` entry was inert and the review console was unreachable. The first real signup created a `USER` row, which would have left **every paid report unapprovable**. Fixed 2026-10-16: the role is now derived from the allowlist as accounts are mirrored. Found only because the owner signed up |
 | The shell reflects a signed-in visitor | ❌ **It did not.** `SiteHeader` hardcoded `Sign in` and `/` was **statically prerendered**, so after signing up the landing page still invited you to sign in — the delivered HTML was baked at build time. Fixed 2026-10-16: the header takes the session as a prop and every caller reads it; `/`, `/privacy`, `/terms` and `/refund-policy` are now dynamic as a result |
+| Both themes render (`06`'s bar) | ❌ **Only dark existed.** `globals.css` carried a complete, considered light palette under `.theme-light` that **nothing ever applied** — `next-themes` was never installed and no component added the class — while `06` claimed a theme system and "light and dark both render on every screen". Fixed 2026-10-16 by wiring the tokens to `@media (prefers-color-scheme: light)`; both schemes are now axe-clean and overflow-free at all three viewports |
 | Google Fonts render on the site | ❌ **They never did.** `layout.tsx` loads Cormorant Garamond / IBM Plex Mono / Inter from Google, but the CSP's `style-src`/`font-src` never allowed those origins, so every visitor silently got fallback fonts. Fixed 2026-10-16; verified in a real browser — zero CSP violations and all three faces load |
 | Playwright specs exist | None do |
 | CI covers the webapp | ✅ **Fixed 2026-10-16** — it now triggers on `develop` (production) and runs a webapp job. Only the Playwright tier is still outstanding (§B5) |
@@ -243,6 +244,48 @@ The implementation only *accidentally* agreed with that, in four ways:
 | 4 | 🐛 **Anonymous samples were never deleted.** The sweep found stale objects by querying `Report` rows with `orderId: null` — but anonymous samples create **no row**, so it matched nothing and they accumulated in R2 forever (~70 KB per visitor) while `05` claimed a 7-day sweep | The sweep now lists `reports/anonymous/` **by prefix and deletes by object age**, plus a row-backed pass scoped to never-delivered drafts so it cannot touch a sample a user kept |
 
 Nothing had leaked yet — `users (real): 0` at the time.
+
+## 3b. The UI/UX audit (2026-10-16)
+
+Measured, not eyeballed: real Chrome across **390 / 768 / 1440 px** and **both colour schemes**, 13 pages,
+axe-core for accessibility. Now repeatable — `tools/audit-ui.py`, run in CI by the `ui` job with
+`--strict`. Authenticated pages were audited once against a throwaway account (since deleted).
+
+**Result: 36 page/viewport runs, 0 blocking issues, both schemes.**
+
+| Bar (`06`) | Before | After |
+|---|---|---|
+| No horizontal body scroll at 390 / 768 / 1440 | ❌ footer overflowed 27 px at 768 on **5 pages** | ✅ clean |
+| axe clean | ❌ **4 rules, one on every page** | ✅ 0 |
+| ≥44 px touch targets | ❌ compact buttons 36 px | ✅ controls 44 px |
+| One `<h1>` per page | ✅ | ✅ |
+| Zero hydration warnings | ✅ | ✅ |
+| Light and dark both render | ❌ light was dead CSS | ✅ wired to `prefers-color-scheme` |
+| Nav reachable on every page | ✅ once `/admin` and `/reports/new` had layouts | ✅ (only `/login`, deliberately) |
+
+What was wrong, and why it hid:
+
+- **The logo link's accessible name omitted its own visible text** — `aria-label="Cosmic Saju home"` on a
+  link reading "Cosmic Saju 사주" — so `label-content-name-mismatch` fired on **every page in the
+  product** (four call sites). The label is now absent where there is visible text, and present on
+  `/login`, whose link holds only the seal glyph and so needs one.
+- **The compare-tiers scroller was not keyboard-focusable**: at ≤768 px the 640 px-min table overflows its
+  wrapper, and the rest of it was unreachable without a mouse.
+- **The fixed mobile CTA sat outside every landmark**, so screen-reader users navigating by region never
+  reached it.
+- **`EmptyState` rendered an `<h3>` directly under the page `<h1>`** (`heading-order`) on the empty
+  dashboard lists.
+- **`buttonClasses("sm")` was 36 px**, under this document's own ≥44 px bar — one line fixed every
+  compact button in the product.
+- **The footer switched to a row at `md`**, where the brand block plus three link columns cannot fit, so
+  the contact address pushed the row 27 px past a 768 px viewport on every page with a footer.
+
+Two readings worth stating rather than assuming: **text links are held to WCAG 2.5.8's spacing exception,
+not the 44 px control bar** (the footer lists also gained `py-1`, clearing the 24 px minimum outright),
+and **the audit does not cover** Lighthouse, `prefers-reduced-motion`, tab order, or any page behind the
+login unless it is run deliberately.
+
+---
 
 ## 4. Remediation, ordered
 

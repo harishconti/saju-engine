@@ -180,9 +180,9 @@ reason). Keyboard-friendly, because the reviewer may do this repeatedly.
 | Primitives | `src/components/ui/` only — Button, Field/TextInput/DateInput/Textarea/Select, Alert, Toast, ConfirmDialog, Sheet, Skeleton, EmptyState, Badge, Lightbox |
 | Styling | Semantic tokens only (`--background`, `--foreground`, `--primary`, `--el-wood`…) — never a raw hex in a component |
 | Charts | In-house SVG under `src/components/viz/` — `FourPillarsChart`, `ElementBalance`, `LuckTimeline`, `DayMasterBadge`, `SealMark`, `KoreanWatermark`, `SectionHeading`, `ElementalRule` |
-| Theming | `darkMode: 'class'` via `next-themes`; both themes must render every screen |
+| Theming | Dark is the brand surface (`:root`); **`@media (prefers-color-scheme: light)`** swaps the token set for visitors whose OS asks for light. Both must render every screen. ⚠️ This row used to name `next-themes` and a `.theme-light` class — **neither existed**: the class was on nothing, so a complete light palette sat dead in `globals.css` while this table claimed a theme system. Corrected 2026-10-16 by wiring the tokens to the media query. There is deliberately **no user-facing toggle**; add one only if asked, and move the block behind a class if so |
 | Motion | Subtle, `prefers-reduced-motion`-safe. Content must be fully visible with motion disabled |
-| Targets | ≥44 px touch targets; no `window.confirm` |
+| Targets | **≥44 px on controls** (buttons, tabs, selects) — `buttonClasses("sm")` is `h-11` for exactly this reason, not the usual 36 px. Text links follow WCAG 2.5.8's **spacing exception** instead (small is allowed when targets are far enough apart); the footer link lists carry `py-1` so they clear the 24 px minimum outright. No `window.confirm` |
 | Roles | Hide write affordances from non-owners rather than letting them fail |
 | Data fetching | Server Components read Prisma directly with `force-dynamic`; **no client fetching of own APIs** for reads |
 | Forms | zod schema shared between client and server where practical |
@@ -196,9 +196,25 @@ The acceptance bar carried over from the previous redesign, and still the bar:
 - Zero hydration warnings.
 - `prefers-reduced-motion` leaves all content visible.
 - Light and dark both render on every screen.
-- axe clean (light and dark) on every screen, asserted in e2e.
+- axe clean (light and dark) on every screen, **asserted** — see below.
 - Keyboard reachable: every control, including the admin override select and the PDF viewer's page
   controls.
+
+**What actually asserts this bar: `tools/audit-ui.py`**, run in CI by the `ui` job. It measures, per page
+and per viewport, in **both colour schemes**: horizontal overflow (ignoring anything inside an
+`overflow-x: auto` ancestor, which is *meant* to overflow), axe-core violations with the offending node,
+hydration warnings, one `<h1>`, whether a shell is present, and sub-44 px controls (text links are
+reported separately, per the spacing exception). `--strict` makes any of those a build failure.
+
+⚠️ **What it does *not* cover**, so nobody assumes otherwise: **Lighthouse** (no budget is asserted here
+— the line above is aspirational until it is), `prefers-reduced-motion` content visibility, keyboard *tab
+order*, screen-reader reading order, contrast beyond what axe checks, or any page behind the login (the
+tool can do authenticated runs with `AUDIT_EMAIL`/`AUDIT_PASSWORD`, but CI does not, so the dashboard,
+`/admin` and the ordering flow are audited only when someone runs it deliberately).
+
+Two findings this bar was silently failing until 2026-10-16: `.theme-light` was dead CSS (above), and the
+footer overflowed 27 px at exactly 768 px on five pages because it switched to a row at `md` where the
+brand block plus three columns cannot fit.
 
 ## Anti-patterns to avoid
 

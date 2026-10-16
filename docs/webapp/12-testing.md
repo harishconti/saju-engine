@@ -199,9 +199,15 @@ The a11y engine is **`axe-core` as a devDependency of `apps/web`** (added 2026-1
 future end-to-end gate use the same version. Turnstile noise is filtered deliberately: it cannot solve a
 challenge under automation, and counting that as a page defect drowns the real findings.
 
-**Not yet in CI**, and it should be — a headless Chrome job on a preview deployment would turn this from
-something a human remembers to run into a gate. That is the same gap as the Playwright public tier
-([13](13-launch-audit.md) §B5).
+**In CI**, as the `ui` job: it builds the app, serves it on `localhost:3000`, installs a Playwright
+browser, and runs the audit with `--strict`, so overflow, an axe violation, a hydration warning or a
+sub-44 px control fails the build. Build/serve/audit happen in **one step**, because a background server
+launched in one step is not guaranteed to survive into the next.
+
+It audits the **public** pages. Authenticated runs need `AUDIT_EMAIL`/`AUDIT_PASSWORD`, and CI has no
+account — so the dashboard, `/admin` and the ordering flow are covered only when someone runs the tool
+deliberately against a throwaway account ([13](13-launch-audit.md) §B5, the Playwright public tier, is the
+other half of this gap).
 
 **Authenticated runs need an account.** Use a throwaway, never your own, and delete it afterwards
 (`neon neon-auth user delete <id>`, plus the `User` row and its dependants — see

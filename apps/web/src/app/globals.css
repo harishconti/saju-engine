@@ -4,9 +4,10 @@
    Cosmic Saju design tokens
 
    Dark cosmic base + gold accent, the five-element (오방색) palette as
-   data-viz colors. Dark is the DEFAULT brand surface: base values live in
-   :root so there is no flash and no theme script. `.theme-light` on <html>
-   swaps to the light surface.
+   data-viz colors. Dark is the DEFAULT brand surface: the base values live in
+   `:root`, so there is no flash and no theme script to hydrate. A
+   `@media (prefers-color-scheme: light)` block further down swaps to the light
+   surface for visitors whose operating system asks for it.
    ───────────────────────────────────────────────────────────── */
 
 :root {
@@ -46,38 +47,52 @@
   --radius: 0.625rem;
 }
 
-.theme-light {
-  color-scheme: light;
+/* Light theme, taken from the operating system.
+ *
+ * This was `.theme-light`: a complete, considered light palette that **nothing ever applied**.
+ * `next-themes` was never installed and no component ever added the class, so it was dead CSS while
+ * `06-frontend-ux.md` claimed "light and dark both render on every screen". Wiring it to the media
+ * query makes that claim true without inventing a toggle to maintain.
+ *
+ * `color-scheme: light` matters beyond the tokens: it is what tells the browser to draw form controls,
+ * scrollbars and the caret in light mode, which swapping variables alone does not do.
+ *
+ * A manual override would need this same block behind a class instead — do that only when someone asks,
+ * and keep the two in step if so. */
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
 
-  --background: #fbfaf7;
-  --surface: #ffffff;
-  --foreground: #1a1a1f;
+    --background: #fbfaf7;
+    --surface: #ffffff;
+    --foreground: #1a1a1f;
 
-  --card: #ffffff;
-  --card-foreground: #1a1a1f;
+    --card: #ffffff;
+    --card-foreground: #1a1a1f;
 
-  --muted: #f2f0ea;
-  --muted-foreground: #6b6558;
+    --muted: #f2f0ea;
+    --muted-foreground: #6b6558;
 
-  --primary: #8a6d1f;
-  --primary-foreground: #ffffff;
+    --primary: #8a6d1f;
+    --primary-foreground: #ffffff;
 
-  --accent: #5b46a8;
-  --accent-foreground: #ffffff;
+    --accent: #5b46a8;
+    --accent-foreground: #ffffff;
 
-  --border: #e2ded4;
-  --input: #e2ded4;
-  --ring: #8a6d1f;
+    --border: #e2ded4;
+    --input: #e2ded4;
+    --ring: #8a6d1f;
 
-  --destructive: #b03a26;
-  --success: #2f7a52;
-  --warning: #9a6b12;
+    --destructive: #b03a26;
+    --success: #2f7a52;
+    --warning: #9a6b12;
 
-  --el-wood: #2f7d57;
-  --el-fire: #b8442e;
-  --el-earth: #9a7c17;
-  --el-metal: #7b8089;
-  --el-water: #2f68a8;
+    --el-wood: #2f7d57;
+    --el-fire: #b8442e;
+    --el-earth: #9a7c17;
+    --el-metal: #7b8089;
+    --el-water: #2f68a8;
+  }
 }
 
 @theme inline {

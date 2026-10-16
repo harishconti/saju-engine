@@ -293,7 +293,15 @@ export default async function LandingPage() {
             </div>
 
             {/* Compare tiers */}
-            <div className="overflow-x-auto">
+            {/* Scrollable regions must be reachable without a mouse, or the rest of this table is
+                invisible to keyboard and screen-reader users at ≤768px (axe
+                `scrollable-region-focusable`). `role="region"` + a label also makes it a landmark. */}
+            <div
+              className="overflow-x-auto"
+              tabIndex={0}
+              role="region"
+              aria-label="Comparison of report tiers"
+            >
               <table className="w-full min-w-[640px] border-collapse text-sm">
                 <caption className="sr-only">Comparison of report tiers</caption>
                 <thead>

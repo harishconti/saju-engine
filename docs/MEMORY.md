@@ -846,6 +846,53 @@
     Tests: **103 → 112**. Docs: `06` (three shells + the "top-level route with UI needs a layout" rule),
     `10` (sub-processors now named on the page, checklist item closed), `13` (§D2 gains both findings).
 
+  - **2026-10-16 (the UI/UX audit — and the design system was lying about two things).** Owner asked for a
+    full frontend audit: same design standards everywhere, navigation on every page, mobile-supported.
+    Rather than eyeball it, built a measurement tool — **`tools/audit-ui.py`**, now a CI gate — that runs
+    real Chrome across **390/768/1440 px in both colour schemes** and reports horizontal overflow, axe-core
+    violations (via **`axe-core`**, added as an `apps/web` devDependency so the audit and any future e2e
+    gate share one version), hydration warnings, `<h1>` count, shell presence, and sub-44 px controls.
+    `--strict` makes any of them fail the build. Authenticated pages were audited once against a
+    throwaway account, then deleted (app rows, consent, profile and the Neon Auth user — verified it can
+    no longer sign in).
+    **Result: 36 page/viewport runs, 0 blocking issues, both schemes.** The foundations were sound — tokens
+    used properly (the only raw hex are the metadata `themeColor` and Google's brand-mark SVG, both of
+    which *must* be literal), `card-surface` is what `Card` itself uses rather than a deviation, one `<h1>`
+    per page, zero hydration warnings, and no horizontal scroll at 390 px anywhere.
+    ⚠️ **What it found, and the pattern is now unmistakable.** Six real defects, and **two of them were the
+    documentation claiming a control the code did not have** — the same family as `requiresReview`,
+    `turnstileToken` and the admin role before it:
+    1. **`06` claimed `darkMode: 'class' via next-themes` and "light and dark both render every screen".
+       Neither existed.** A complete, considered light palette sat in `globals.css` under `.theme-light`
+       that **nothing ever applied** — `next-themes` was never installed and no component added the class.
+       Fixed by wiring the tokens to `@media (prefers-color-scheme: light)`; both schemes now axe-clean and
+       overflow-free at all three viewports. Deliberately **no user-facing toggle**; if one is wanted, the
+       block has to move behind a class.
+    2. **The logo link's accessible name omitted its own visible text** — `aria-label="Cosmic Saju home"`
+       on a link reading "Cosmic Saju 사주" — so `label-content-name-mismatch` fired on **every page in the
+       product** (4 call sites). Fixed: no label where there is visible text; a label *only* on `/login`,
+       whose link holds just the seal glyph (removing it there produced a `link-name` violation, which the
+       gate caught immediately — a good argument for measuring rather than reasoning).
+    3. **`buttonClasses("sm")` was 36 px**, under this project's own ≥44 px touch bar. One line (`h-11`)
+       lifted every compact button; the login tabs had their own raw styles and needed `min-h-11` too.
+    4. **The footer overflowed 27 px at exactly 768 px on five pages** — it switched to a row at `md`, where
+       the brand block plus three link columns cannot fit and flex children do not shrink below their
+       content. Now `lg`.
+    5. **The compare-tiers scroller was not keyboard-focusable** (`scrollable-region-focusable`): at
+       ≤768 px the 640 px-min table overflows its wrapper and the rest was unreachable without a mouse.
+       Fixed with `tabIndex={0} role="region" aria-label`.
+    6. **`EmptyState` rendered `<h3>` under the page's `<h1>`** (`heading-order`) on the empty dashboard
+       lists, and the fixed mobile CTA sat **outside every landmark** (`region`). Both fixed.
+    **Two readings recorded rather than assumed:** text links are held to WCAG 2.5.8's spacing exception
+    instead of the 44 px control bar (the footer lists also gained `py-1`, clearing the 24 px minimum
+    outright); and `06` now states plainly **what the gate does not cover** — Lighthouse,
+    `prefers-reduced-motion`, tab order, screen-reader reading order, and any page behind the login unless
+    the tool is run deliberately with `AUDIT_EMAIL`/`AUDIT_PASSWORD`. Claiming coverage we do not have is
+    what produced every defect above.
+    CI: new **`ui` job** (build → serve on localhost → install a Playwright browser → audit `--strict`), all
+    in one step because a background server started in one step is not guaranteed to survive into the next.
+    Webapp suite **112 passed**; the audit reports **0 blocking issues** against production and locally.
+
 ### Earlier state (2026-09-26)
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"
