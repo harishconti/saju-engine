@@ -159,6 +159,35 @@ subset of Noto Sans KR (embedded, so it renders in browsers and phone viewers). 
 English-primary — Korean/Hanja is translated, and only what survives translation is drawn. Details and
 the regeneration command: [products/reports.md](../openwiki/products/reports.md) § The PDF artefact.
 
+### AI-assisted drafting (review time only)
+
+The one page the engine cannot template is the reader's letter: the audit's §1 asks for
+150–250 words naming the two or three chart features that drive everything, plus the caveat
+about birth-time accuracy. `tools/suggest_letter.py` (package `src/saju_ai/`) drafts it for
+the reviewer. The design constraints are the whole story:
+
+- **Never in the delivery path.** No client request ever reaches a model. The tool runs when
+  the owner asks; a provider outage or a bad generation cannot affect a delivered report.
+- **Grounded, never free-written.** The engine builds a *grounding pack*: computed chart
+  facts from a fixed whitelist, plus six to eight short excerpts from `knowledge/` chosen by
+  heading keyword. The model must answer with JSON that cites those excerpts by id.
+- **No PII leaves the building.** The pack carries no name, birth date, time or place; the
+  letter is written as "you" and the engine adds the name downstream. `--dry-run` prints the
+  exact request so it can be read before it is sent, and the tool refuses to send a pack that
+  contains any supplied identifier.
+- **A deterministic validator disposes.** Unknown citations, numbers absent from the facts,
+  a stated time measurement the chart does not give, wrong length, a missing birth-time
+  caveat, ground-rule absolutes, machinery words, or anything `qa_client_ready.py` flags all
+  fail the draft. The live example that motivated the duration check: the model wrote the
+  knife-edge margin as "a minute and a half" where the chart says 41 seconds — and the pack
+  was ambiguous about it, so the pack was fixed as well as the check.
+- **Suggest-only.** It writes to `--out` or stdout. Nothing edits a report automatically, and
+  the accepted text is frozen into the markdown before approval, so an approved artefact can
+  never change under a client.
+
+Provider: Ollama Cloud (`OLLAMA_API_KEY`, default `deepseek-v4.1-flash`) via an OpenAI-shaped
+call; Anthropic and OpenAI are one flag away. Env and cost: [07](07-services-and-integrations.md).
+
 ### `/chart` — derive without rendering
 
 Called when a profile is created or when anything chart-affecting changes. The webapp stores the

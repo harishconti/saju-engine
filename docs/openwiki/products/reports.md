@@ -92,6 +92,14 @@ heading landed on, and the second prints. What the client receives:
 - Markdown **blockquote** notes read as notes (no literal `>` surviving into the page), and
   the body heading carries the tier name only — never the price.
 - **`approve` runs a client-ready gate.** `tools/qa_client_ready.py` fails a draft that still contains the audit's defect classes (internal jargon, template debris, double glosses, a lowercase name, `a Earth`, a repeated word, a sentence repeated more than twice, a price). `intake_admin.py approve` runs it over the draft's markdown and PDF and refuses to issue the link unless you pass `--force`.
+- **The reader's letter is drafted at review time, not by a template.** The audit's §1 wants a
+  one-page letter naming the two or three features that drive the whole reading, plus the caveat
+  about birth-time accuracy — the page that proves a human read *this* order. `tools/suggest_letter.py`
+  grounds a draft in the computed chart and short `knowledge/` excerpts, and a deterministic validator
+  rejects anything ungrounded before a reviewer sees it (unknown citations, numbers absent from the
+  facts, a missing birth-time caveat, the client-ready gate's own rules). It is **suggest-only and never
+  in the delivery path**; the reviewer edits and the name is added downstream, so no identifying data
+  is ever sent to a provider.
 - **The engine's reviewer note never reaches the client.** The markdown the engine writes
   ends with *"Engine-generated premium report draft. Interpretive prose must be reviewed and
   finalized by a qualified reader…"* — a note to the reviewer. It was printing on the last

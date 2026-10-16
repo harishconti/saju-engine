@@ -1095,6 +1095,39 @@
     Suite **1,951 passed** (unchanged count: assertions updated, one test repurposed); goldens regenerated; demos
     rebuilt; ruff `--select F` clean. Verified on the artefact: `an Earth` (9×), 0 defects, 0 findings from the gate.
 
+  - **2026-10-16 (the letter drafter: grounded generation, and the validator catching the model — and me).** Owner
+    decisions: the reviewer approves **both HTML and PDF**, and the first LLM use targets **the letter**. Built
+    `tools/suggest_letter.py` + `src/saju_ai/` (pack · prompt · validate · client · letter), suggest-only and never in
+    the delivery path, on the owner's `OLLAMA_API_KEY` (`apps/web/.env`) with **`deepseek-v4.1-flash`** — verified live
+    against `https://ollama.com/v1/chat/completions` (`api.ollama.com` answers 405 on that path). The model is a
+    *reasoning* model: it returns `message.reasoning` plus `content`, so a 1,200-token budget came back empty
+    mid-thought; the default is 8,000 and a truncated JSON now says so instead of "empty response".
+    ✅ **The pack is the safety story.** Computed chart facts from a fixed whitelist (day master, four pillars with
+    romanisation + elements + animals + hidden stems, strength, the resolved 용신 with its method, dominant ten-god
+    *classes with counts*, stars in the report's own English+Hanja form, all eight decades, the current annual
+    overlay, the chart signature, and the knife-edge margin), plus 6–8 short `knowledge/` excerpts chosen by heading
+    keyword — 1,359 words, ~3,000 tokens, a fraction of a cent. **No PII**: no name, date, time or place, proved by
+    `GroundingPack.contains_pii()` and a test; `--dry-run` prints the exact request.
+    ✅ **The live result is the audit's own "After".** On the delivered `prakash` chart the draft led with "two
+    Horses — one in your month pillar, one in your hour pillar — sitting in high summer", explained why the 조후
+    (climate) reading takes priority over the 억부 strength count, folded in "a garden plot waiting for rain", and
+    carried the birth-time caveat in one sentence — 250 words, five valid citations, and **CLEAN** on every check.
+    That is the specificity the audit said the templates cannot reach, produced from the pack alone.
+    ⚠️ **And the validator caught the model — and then caught me.** Run three times: (1) it wrote the knife-edge
+    margin as "a minute and a half" where the chart says **41 seconds**; my first number check only looked at years
+    and percentages, so I added a time-measurement rule — which then false-fired on the term of art "hour pillar"
+    and on "one in your month pillar", so it is now restricted to genuine measurement phrases in either word order
+    ("41 seconds", "a minute and a half", "half an hour"). (2) The *pack itself* was ambiguous — it sent both
+    `distance_minutes: 1` and `distance_seconds: 41`, inviting exactly that conflation — so the pack now carries one
+    precise `margin_seconds` with `margin_text`. (3) A run was cut off mid-JSON by the token budget. Three runs, three
+    different letters: **the model is non-deterministic and the validator is the stabiliser** — which is the argument
+    for keeping it out of the delivery path.
+    Also added: an element-claim check (a letter may not call an element favourable if the chart's is another) and a
+    method check (it may not claim the climate reading governs unless the chart's method says so). Suite
+    **1,951 → 1,982**; ruff clean. Docs: `07` (the service + env var), `05` (the drafting section), `reports.md`,
+    toolchain. Nothing is wired into the webapp yet — the next step is the console's diff/accept flow, which is where
+    the reviewer's 30–45-minute routine actually needs it.
+
 ### Earlier state (2026-09-26)
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"

@@ -25,8 +25,11 @@ out of it, where those credentials go, and what order to do it in.
 | 12 | **Product analytics** | Funnel: sample → signup → purchase | Vercel Web Analytics or Plausible/Umami | ⬜ optional |
 | 13 | **Cloudflare Turnstile** | Bot protection on the free-sample form | free | 🟡 **built and deployed, running at `TURNSTILE_MODE=log`** — the server verifies and records but never blocks, so the funnel is safe while the widget is validated in a real browser. Was briefly enforcing and took the free sample down (2026-10-16). CSP must allow `challenges.cloudflare.com` **and its subdomains**; the site key needs `--type config` in Vercel. See [09](09-operations.md) |
 | 14 | **Password manager** | Source of truth for every secret | 1Password / Bitwarden | ⬜ create |
+| 15 | **Ollama Cloud** | Drafts the reader's letter **at review time only** (`tools/suggest_letter.py`). Never in the delivery path: a client request never reaches it, so an outage or a bad generation cannot affect a delivered report. Key `OLLAMA_API_KEY` in `apps/web/.env` (read by the tool from there; not a deployed env var yet). Default model `deepseek-v4.1-flash` — verified against `https://ollama.com/v1/chat/completions` 2026-10-16. `OPENROUTER_API_KEY` is also present in that file, unused. See [05](05-report-pipeline.md) §AI-assisted drafting | ⬜ optional; CLI-only today |
 
-**Steady-state fixed cost: ~$21–25/month** — inside the "<$50/month" assumption in
+**Steady-state fixed cost: ~$21–25/month** (the drafting step is metered per use — a
+1,400-word grounding pack plus a 250-word letter costs well under a cent on
+`deepseek-v4.1-flash` at $0.15/$0.60 per million tokens) — inside the "<$50/month" assumption in
 [`docs/market-research-2026-09.md`](../market-research-2026-09.md) §7.
 
 ---
