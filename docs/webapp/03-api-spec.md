@@ -188,10 +188,18 @@ RATE_LIMITED`, `403 TURNSTILE_FAILED` (bot check not satisfied — see below), `
 `503 ENGINE_UNAVAILABLE`.
 
 **Turnstile.** The form is protected by Cloudflare Turnstile. `turnstileToken` is verified server-side
-**before** any storage or engine work, so a failed check costs nothing. The check **skips itself when
-`TURNSTILE_SECRET_KEY` is unset** (local development), and **fails closed** once it is set — an absent or
-invalid token is a `403`, never a silent pass. Keep the secret and the public site key deployed as a pair:
-the secret alone verifies, the site key alone renders, and only both together protect anything.
+**before** any storage or engine work, so a failed check costs nothing.
+
+`TURNSTILE_MODE` controls enforcement: `off` (default) skips verification entirely, `log` verifies and
+records but **never refuses**, and `enforce` returns `403 TURNSTILE_FAILED` on an absent or invalid token.
+**Deploy new keys at `log`**, confirm real visitors actually receive tokens, then move to `enforce`. The
+switch exists because this control can take the whole funnel down: a widget that fails to render produces
+no token, and an enforcing server then refuses *everybody* — which happened on 2026-10-16.
+
+`TURNSTILE_SECRET_KEY` and the public site key must be deployed as a pair — the secret alone verifies, the
+site key alone renders, and only both together protect anything. Note the site key is public by design
+(it is rendered into the HTML) and must be added to Vercel with an explicit `--type config`; Vercel's CLI
+otherwise refuses any `NEXT_PUBLIC_*` name that looks like a credential.
 
 The response includes `chartPreview` on purpose: **the four pillars are shown to the user before we
 ask for money.** See the ground rule in [`CLAUDE.md`](../../CLAUDE.md) — no silent auto-calculation.

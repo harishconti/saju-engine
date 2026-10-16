@@ -16,7 +16,7 @@ import {
 import { ENGINE_CONTRACT_VERSION, callEngine, isEngineConfigured } from "@/lib/engine";
 import { sampleRequestSchema } from "@/lib/validation/schemas";
 import { computeAndStoreChart } from "@/lib/chart-compute";
-import { verifyTurnstile } from "@/lib/turnstile";
+import { turnstileMode, verifyTurnstile } from "@/lib/turnstile";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -37,15 +37,26 @@ export const POST = handle(async (req) => {
   const input = await parseJson(req, sampleRequestSchema);
 
   // Bot protection. Deliberately after the rate limit (cheap, and it bounds the cost of this call)
-  // and before any storage or engine work. Skips itself when TURNSTILE_SECRET_KEY is absent, which
-  // is what keeps local development working; once the secret exists a bad token is a hard refusal.
-  const turnstile = await verifyTurnstile(input.turnstileToken, ip);
-  if (!turnstile.ok) {
-    throw new ApiError(
-      403,
-      "TURNSTILE_FAILED",
-      "We couldn't confirm you're a person. Please refresh the page and try again.",
-    );
+  // and before any storage or engine work.
+  //
+  // The mode gate matters: this control has already taken the funnel down once, because a widget that
+  // fails to render produces no token and an enforcing server then refuses everybody. `log` mode
+  // verifies and records but never blocks, so protection can be validated against real traffic
+  // before it is allowed to refuse anyone.
+  const tMode = turnstileMode();
+  if (tMode !== "off") {
+    const turnstile = await verifyTurnstile(input.turnstileToken, ip);
+    if (!turnstile.ok) {
+      if (tMode === "enforce") {
+        throw new ApiError(
+          403,
+          "TURNSTILE_FAILED",
+          "We couldn't confirm you're a person. Please refresh the page and try again.",
+        );
+      }
+      // Log-only: surface it for the rollout without refusing a real visitor.
+      console.warn(`turnstile[log]: not satisfied (${turnstile.error}) ip=${ip}`);
+    }
   }
 
   if (!isR2Configured()) {

@@ -710,6 +710,38 @@
     Turnstile stays **built but disabled** until the widget's hostnames are configured; `07`, `08`, `13`
     (§D2) and MEMORY record that state, including the `.vercelignore` rule.
 
+  - **2026-10-16 (Turnstile, round two: a `--type` guard, and making the control incapable of an outage).**
+    Owner revoked the old Resend key (verified: the replacement still sends) and added both hostnames to
+    the Turnstile widget, confirming site key and secret come from the same widget.
+    ⚠️ **Then a third cause surfaced, and it explains why the key had "worked" before.** Vercel's CLI
+    **refuses to add any `NEXT_PUBLIC_*` name that looks like a credential** unless the type is given
+    explicitly: `{"reason":"public_prefix_requires_type"}`. So
+    **`NEXT_PUBLIC_TURNSTILE_SITE_KEY` had never actually been added to Vercel** — the widget only ever
+    rendered because the uploaded `.env` inlined it, which is exactly what the `/.vercelignore` fix
+    removed. The site key is public by design (it is rendered into the HTML), and the correct form is
+    `vercel env add NEXT_PUBLIC_TURNSTILE_SITE_KEY <scope> --type config` (`--type` accepts only `config`
+    or `secret`). My earlier "added to 3 scopes" report was wrong because I only checked `stdout` for
+    `Added` and the CLI returns the error as JSON on stdout with `rc=1`. **Lesson: check the return code,
+    not a substring of stdout.** Note this also means every `NEXT_PUBLIC_*` I "set" via stdin needs
+    re-checking — `NEXT_PUBLIC_CONTACT_EMAIL`/`NEXT_PUBLIC_APP_URL` predate the guard's trigger words and
+    do show as `Config`, so only the Turnstile site key was affected.
+    ⚠️ **Adding the hostnames did NOT fix the widget.** With the site key genuinely in Vercel (verified),
+    redeployed, a real Chrome load still reaches "site key inlined, `window.turnstile` defined,
+    `render()` injects its container, **challenge iframe never appears**". The remaining cause is
+    dashboard-side and invisible from here; it needs either a Turnstile-level check by the owner or a
+    different widget configuration.
+    ✅ **So the control was redesigned to be incapable of an outage.** New `TURNSTILE_MODE` — `off`
+    (default) | `log` | `enforce`. The API verifies and **logs** but never refuses at `log`; `enforce` is
+    the only mode that throws. Deployed live at **`log`**, which is provable without logs: the secret *is*
+    set, so an enforcing server would have refused a token-less request — it returned **200**. Funnel
+    verified working (70,944-byte PDF) with the widget present on the page. **The rollout rule going
+    forward: new keys always start at `log`; only flip to `enforce` after a real browser is observed
+    completing the challenge.** This is the general lesson from the whole episode — *a bot control that
+    can silently refuse every legitimate visitor is worse than no bot control*, and the switch that makes
+    that impossible belongs in the code, not in a runbook.
+    4 new tests pin the mode mapping and the "`log` must never block" invariant; webapp suite 80 → 84.
+    `03`, `07`, `08`, `09`, `13` (§D2) and `.env.example` updated. Probe objects swept from R2 (bucket empty).
+
 ### Earlier state (2026-09-26)
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"

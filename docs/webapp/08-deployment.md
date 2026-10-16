@@ -125,7 +125,15 @@ ADMIN_EMAILS=«your login email»
 CRON_SECRET=«openssl rand -base64 32»    # Vercel Cron sends this as a bearer token
 
 # ── Optional ──
-TURNSTILE_SECRET_KEY=«from the Turnstile widget»            # server verification; fails CLOSED when set
+TURNSTILE_MODE=off                                        # off (default) | log (verify, never block) | enforce
+TURNSTILE_SECRET_KEY=«from the Turnstile widget»            # server verification; only bites in `enforce`
+
+# ⚠️ Adding the site key needs an explicit type, or Vercel's CLI refuses it:
+#   vercel env add NEXT_PUBLIC_TURNSTILE_SITE_KEY production --type config
+# Without `--type` you get `public_prefix_requires_type`, because `NEXT_PUBLIC_` exposes the value and
+# the name looks credential-ish. The site key IS public — it is rendered into the HTML — but the guard
+# means a silent failure: the variable never lands, the widget never renders, and (in `enforce`) the
+# funnel refuses every visitor. This happened on 2026-10-16 and was masked by the uploaded `.env`.
 NEXT_PUBLIC_TURNSTILE_SITE_KEY=«from the Turnstile widget»  # rendered by the sample form; inlined at BUILD time,
                                                             # so changing it needs a redeploy
 ```

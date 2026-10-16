@@ -230,6 +230,13 @@ This looks like a code bug and usually is not — it is DNS.
 The gate is Cloudflare Turnstile. It is deliberate, but it is also the one control that can take the
 whole funnel down for real visitors, so the failure direction matters more than the happy path.
 
+**Enforcement is opt-in.** `TURNSTILE_MODE` is `off` (default) | `log` | `enforce`. **Deploy new keys at
+`log`**: the server verifies whatever token arrives, logs the outcome, and never refuses anyone — so an
+unrendered widget costs nothing while real traffic proves whether tokens are actually issued. Move to
+`enforce` only after a **real browser** is observed completing the challenge. That switch exists because
+the opposite happened on 2026-10-16: the widget failed to render and the enforcing server refused every
+visitor at the top of the funnel.
+
 0. **Confirm the project's env vars are the ones actually in use.** `vercel deploy` from the repository
    root uploads `apps/web/.env` unless `.vercelignore` excludes it, and Next loads `.env` at **build and
    runtime** — so a local file silently wins over the project's environment variables. This is not
@@ -251,8 +258,11 @@ whole funnel down for real visitors, so the failure direction matters more than 
    (`cosmicsaju.com` **and** `www.cosmicsaju.com`), and the **site key and secret must come from the same
    widget**. A valid secret that does not pair with the site key verifies nothing. Symptom in both cases:
    the script loads, `turnstile.render()` runs, and the challenge never appears.
-4. **Escape hatch — remove BOTH variables.** `NEXT_PUBLIC_TURNSTILE_SITE_KEY` **and**
-   `TURNSTILE_SECRET_KEY`, then redeploy. Removing only the site key is **not** enough: the client stops
+4. **Escape hatch — set `TURNSTILE_MODE=off` and redeploy.** That is the intended switch and it cannot
+   half-apply. Removing variables also works but is trap-laden: removing only the site key leaves the
+   client unable to produce a token while the server still refuses everything (**worse**); removing only
+   the secret makes the server skip while the client still demands a token nobody can obtain. If you do
+   remove them, remove **both**. Removing only the site key is **not** enough: the client stops
    rendering the widget so no token is ever produced, while the server still sees a configured secret and
    refuses everything with `403` — an outage that looks like the widget merely failed to load. Removing
    only the secret makes the server skip while the client still demands a token nobody can obtain.

@@ -16,7 +16,28 @@
 
 const SITEVERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
-/** True when the server can verify tokens. Drives whether the API demands one. */
+/**
+ * Rollout mode, from `TURNSTILE_MODE`:
+ *
+ *   `off`     (default) — do not verify at all. The safe state.
+ *   `log`     — verify when a token is present, log the outcome, **never block**.
+ *   `enforce` — refuse on failure.
+ *
+ * This exists because the control can take the whole funnel down: if the widget fails to render,
+ * no token is ever produced, and an enforcing server then refuses *every* visitor. That is not
+ * hypothetical — it happened on 2026-10-16. `log` lets real traffic prove the widget works before
+ * anything is enforced, and it cannot cause an outage because it never returns a refusal.
+ */
+export type TurnstileMode = "off" | "log" | "enforce";
+
+export function turnstileMode(): TurnstileMode {
+  const raw = process.env.TURNSTILE_MODE?.trim().toLowerCase();
+  if (raw === "enforce") return "enforce";
+  if (raw === "log") return "log";
+  return "off";
+}
+
+/** True when the server can verify tokens. Drives whether `verifyTurnstile` does anything. */
 export function isTurnstileConfigured(): boolean {
   return Boolean(process.env.TURNSTILE_SECRET_KEY?.trim());
 }

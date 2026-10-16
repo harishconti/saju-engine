@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { isTurnstileConfigured, verifyTurnstile } from "../turnstile";
+import { isTurnstileConfigured, turnstileMode, verifyTurnstile } from "../turnstile";
 
 /**
  * Turnstile is the only thing standing between a script and our report engine, so the failure
@@ -32,6 +32,33 @@ function stubSiteverify(response: { ok?: boolean; status?: number; body?: unknow
 afterEach(() => {
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
+});
+
+describe("rollout mode", () => {
+  it("defaults to off — the safe state, so a fresh deploy cannot block anyone", () => {
+    vi.stubEnv("TURNSTILE_MODE", "");
+    expect(turnstileMode()).toBe("off");
+  });
+
+  it("reads log and enforce, case-insensitively", () => {
+    vi.stubEnv("TURNSTILE_MODE", "log");
+    expect(turnstileMode()).toBe("log");
+    vi.stubEnv("TURNSTILE_MODE", "ENFORCE");
+    expect(turnstileMode()).toBe("enforce");
+  });
+
+  it("treats an unrecognised value as off rather than guessing at enforcement", () => {
+    vi.stubEnv("TURNSTILE_MODE", "yes-please");
+    expect(turnstileMode()).toBe("off");
+  });
+
+  it("leaves `log` non-blocking by contract: it must never be the reason a visitor is refused", () => {
+    // The route only throws when the mode is `enforce`. This pins the invariant that makes
+    // validating a new widget safe: an unrendered widget produces no token, and log mode must
+    // still let the visitor through.
+    vi.stubEnv("TURNSTILE_MODE", "log");
+    expect(turnstileMode()).not.toBe("enforce");
+  });
 });
 
 describe("when Turnstile is not configured", () => {
