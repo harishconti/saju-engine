@@ -1138,10 +1138,21 @@ As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P1 items:
   Remaining: Hostinger serves **empty** DKIM keys for selectors `b`/`c` (`v=DKIM1;p=`) — a Hostinger-side
   fix — and `_dmarc` still wants `rua=mailto:dmarc@cosmicsaju.com`. Neither risks delivery
   (`p=none`; DMARC passes on SPF alignment). See `docs/webapp/07` §Mailbox records.
-- **Rotate the two credentials leaked into the session transcript** — the Neon password and the Resend
-  API key `re_Nb6…`. Highest priority now that a real mailbox exists.
-- **Webapp CI + end-to-end tests** — still missing (launch-audit B5). `12-testing.md` now marks the
-  Playwright surface as planned rather than present.
+- **Rotate the two credentials leaked into the session transcript** — 🟡 **half done.** The Resend key is
+  rotated to a **sending-only** replacement and verified; ⚠️ **the old full-access key still needs one click
+  in the Resend dashboard**, because a sending-only key cannot revoke anything, including itself. **The Neon
+  database password is still unrotated** — it needs a brief outage (rotate → rewrite the three DB URLs in
+  three scopes → redeploy).
+- **Run the paid path once, end to end** — the biggest remaining unknown: **0 orders, 0 jobs, 0 reports,
+  0 deliveries.** The free sample, the engine, the review console and the audio pipeline each work in
+  isolation, but checkout → webhook → job → render → review → delivery (PDF **+** MP3) has never executed.
+- **Playwright end-to-end tier** — still missing (launch-audit B5). CI now covers the engine, the webapp
+  (lint / types / 112 tests / build) and the **UI/UX audit** (`tools/audit-ui.py --strict`), but nothing
+  drives a browser through the funnel. `12-testing.md` marks that surface as planned rather than present.
+- **Turnstile is deployed at `TURNSTILE_MODE=log`** — it verifies and records but never blocks, because the
+  widget cannot yet produce a challenge (Cloudflare-side) and an enforcing server took the funnel down once.
+  Flip to `enforce` only after a real browser completes a challenge.
+
 - **A1:** ~~recover `apps/landing-page/src/` from the machine that built it~~ — **closed**: the landing
   page was rebuilt inside `apps/web`, which is what serves the site.
 - Engine prerequisites E1/E2/E3: **DONE**; the engine is deployed at `api/index.py` (Vercel root = repo
