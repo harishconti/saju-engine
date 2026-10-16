@@ -61,6 +61,20 @@ know. Reported by the owner right after signing up.
   client patch that fails open would show the wrong state silently, which is the same class of bug this
   page keeps producing.
 
+**Every authenticated page shares one shell.** The sidebar/mobile-nav/footer/padding markup lives in
+`components/dashboard/shell-frame.tsx` and is used by both `dashboard/layout.tsx` and
+`admin/layout.tsx`. `/admin` previously had **no layout at all**, so the review console rendered
+straight into `<body>`: no navigation, no sign-out, no route back to the dashboard and no padding — one
+missing file, reported as three separate problems ("no back button", "no dashboard button", "padding is
+not good"). The nav is what supplies the way back (`Overview` → `/dashboard`), and the queue page also
+carries an explicit `← Dashboard` action in its header.
+
+**Consent is asked for where it bites.** `ProfileForm` takes `hasConsent`; when the account holds no
+active `service` consent the form shows the privacy-policy checkbox **inline**, above the save button,
+and records consent immediately before writing the profile. The server refuses the write either way
+(`403 CONSENT_REQUIRED`) — the point of the inline prompt is that the refusal is actionable there and
+then, rather than reading as a save that silently did nothing.
+
 ### Copy rules
 
 - **Delivery expectation must be stated.** Decision D5 means paid reports are reviewed first. The

@@ -1,6 +1,15 @@
 import { prisma } from "./prisma";
 
 /**
+ * The privacy-policy version recorded with every consent.
+ *
+ * Single source deliberately: this string is the evidence of *which* text someone agreed to, so two
+ * copies drifting apart would quietly weaken the audit trail — and it had already been declared twice,
+ * identically, under two different names.
+ */
+export const POLICY_VERSION = "2026-10-15";
+
+/**
  * Consent enforcement.
  *
  * The privacy policy states that consent is recorded **before** any birth data is collected

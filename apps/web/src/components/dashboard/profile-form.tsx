@@ -1,9 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Alert, Button, Card, CardContent, Field, Input, Select } from "@/components/ui";
 import { findCity, searchCities } from "@/lib/cities";
+import { POLICY_VERSION } from "@/lib/consent";
 
 export interface ProfileFormValues {
   id?: string;
@@ -38,10 +40,18 @@ export function ProfileForm({
   initial,
   onDone,
   submitLabel,
+  hasConsent = true,
 }: {
   initial?: Partial<ProfileFormValues>;
   onDone?: () => void;
   submitLabel?: string;
+  /**
+   * False when the account holds no active `service` consent. The server refuses to store birth data
+   * without one (`403 CONSENT_REQUIRED`), so consent is taken **here**, beside the data it covers.
+   * Previously the refusal only printed a sentence pointing at another page, and read as "the save
+   * silently did nothing" — which is exactly how the owner reported it.
+   */
+  hasConsent?: boolean;
 }) {
   const router = useRouter();
   const editing = Boolean(initial?.id);
@@ -50,6 +60,8 @@ export function ProfileForm({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [consentNeeded, setConsentNeeded] = useState(!hasConsent);
+  const [agreed, setAgreed] = useState(hasConsent);
 
   const cityOptions = useMemo(() => {
     const q = values.city?.trim() ?? "";
@@ -81,6 +93,35 @@ export function ProfileForm({
       return;
     }
 
+    // Consent first: it is the lawful basis for what follows, and the server enforces it.
+    if (consentNeeded) {
+      if (!agreed) {
+        setError("Please accept the privacy policy below — it is what allows us to store birth details.");
+        return;
+      }
+      setBusy(true);
+      try {
+        const consentRes = await fetch("/api/account/consent", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            policyVersion: POLICY_VERSION,
+            purposes: { service: true, service_messages: false },
+          }),
+        });
+        if (!consentRes.ok) {
+          setError("We couldn't record your consent, so nothing was saved. Please try again.");
+          setBusy(false);
+          return;
+        }
+        setConsentNeeded(false);
+      } catch {
+        setError("We couldn't record your consent, so nothing was saved. Please try again.");
+        setBusy(false);
+        return;
+      }
+    }
+
     setBusy(true);
     try {
       const payload = {
@@ -104,6 +145,9 @@ export function ProfileForm({
 
       if (!res.ok) {
         const body = (await res.json().catch(() => ({}))) as { error?: string; code?: string };
+        // Consent can be withdrawn elsewhere between page load and save, so re-offer it rather than
+        // leaving the visitor at a dead end.
+        if (body.code === "CONSENT_REQUIRED") setConsentNeeded(true);
         setError(body.error ?? "Couldn't save that. Try again.");
         return;
       }
@@ -235,6 +279,28 @@ export function ProfileForm({
               </span>
             </span>
           </label>
+
+          {consentNeeded ? (
+            <label className="flex items-start gap-3 rounded-md border border-primary/40 bg-muted/30 p-3 text-sm">
+              <input
+                type="checkbox"
+                className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--primary)]"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+              />
+              <span>
+                <span className="font-medium text-foreground">I accept the privacy policy</span>
+                <span className="ml-1 text-muted-foreground">
+                  Required before we can store birth details — it is the lawful basis for keeping them, and
+                  you can withdraw it any time in your{" "}
+                  <Link href="/dashboard/account" className="underline hover:text-foreground">
+                    account settings
+                  </Link>
+                  .
+                </span>
+              </span>
+            </label>
+          ) : null}
 
           {error ? <Alert tone="danger">{error}</Alert> : null}
 

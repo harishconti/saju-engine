@@ -5,11 +5,11 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/format";
 import { PRIVACY_EMAIL, PRIVACY_HREF } from "@/lib/contact";
+import { POLICY_VERSION } from "@/lib/consent";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Account" };
 
-const POLICY_VERSION = "2026-10-15";
 const DELETION_GRACE_DAYS = 30;
 
 export default async function AccountPage() {

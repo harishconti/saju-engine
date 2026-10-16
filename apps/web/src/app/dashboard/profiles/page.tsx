@@ -7,12 +7,17 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { elementCountsFrom, parseChartSummary } from "@/lib/chart";
 import { describeBirth } from "@/lib/birth";
+import { hasActiveServiceConsent } from "@/lib/consent";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "People" };
 
 export default async function ProfilesPage() {
   const user = await requireUser();
+
+  // Passed to the form so it can ask for consent in place rather than making the visitor hunt for the
+  // account page to find out why saving did nothing.
+  const hasConsent = await hasActiveServiceConsent(user.id);
 
   const profiles = await prisma.profile.findMany({
     where: { userId: user.id, deletedAt: null },
@@ -123,7 +128,7 @@ export default async function ProfilesPage() {
           <p className="pb-4 text-sm text-muted-foreground">
             Yourself, a partner, or a friend. Nothing is ordered until you choose a reading.
           </p>
-          <ProfileForm onDone={undefined} />
+          <ProfileForm onDone={undefined} hasConsent={hasConsent} />
         </CardContent>
       </Card>
     </>

@@ -6,11 +6,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Alert, Button, Card, CardContent, Field, Input, buttonClasses } from "@/components/ui";
 import { ElementalRule, SealMark } from "@/components/viz";
 import { authClient } from "@/lib/auth/client";
+import { POLICY_VERSION } from "@/lib/consent";
 
 type Mode = "signin" | "signup";
 type Busy = null | "google" | "email" | "magic";
-
-const CONSENT_VERSION = "2026-10-15";
 
 function safeNext(raw: string | null): string {
   // Allowlist: only same-site, single-leading-slash paths. A naive `next` is an open redirect.
@@ -50,7 +49,7 @@ export default function LoginPage() {
    */
   async function recordConsent() {
     const body = JSON.stringify({
-      policyVersion: CONSENT_VERSION,
+      policyVersion: POLICY_VERSION,
       purposes: { service: true, service_messages: false },
     });
     for (let attempt = 0; attempt < 2; attempt++) {

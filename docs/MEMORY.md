@@ -787,6 +787,37 @@
     that it was "manual, by design"), `06` (header + the dynamic trade), `10` (consent enforced),
     `13` (§D2 gains both findings), plus a stale "read by Lemon Squeezy" comment in `legal.tsx`.
 
+  - **2026-10-16 (the review console had no shell, and consent was a dead end).** Two reports from the
+    owner, both traced to a single cause each.
+    ⚠️ **`/admin` had no layout at all.** There was no `src/app/admin/layout.tsx`, so the review console
+    rendered straight into `RootLayout`'s bare `<body>`: **no navigation, no sign-out, no route back to the
+    dashboard, and no padding** — reported as three separate problems ("no back button", "no dashboard
+    button", "all padding are not good") and it was one missing file. `/dashboard` has a full shell; `/admin`
+    never got one. Fixed by extracting the shell markup into `components/dashboard/shell-frame.tsx` and using
+    it from **both** layouts, so the nav (`Overview` → `/dashboard`, plus `Review queue`) and the
+    `px-4 py-6 sm:px-6 lg:px-8 lg:py-8` wrapper come along. The queue page also gained an explicit
+    `← Dashboard` action. The admin gate is now a **redirect**, not `requireAdmin()` — which *throws*
+    (`ApiError.unauthorized`), so a signed-in non-admin previously landed on an error page instead of their
+    own dashboard; `requireAdmin()` still guards the page body, and `src/proxy.ts` matches `/admin/:path*`
+    before either.
+    ⚠️ **"I added a person and pressed save but I don't see any saved person."** Nothing was broken in the
+    form: this was **my own consent gate** from earlier the same day doing its job, badly framed. Evidence
+    rather than guesswork — `profiles=0, consentRecords=0, **auditRows=0**`, and an audit row is written
+    *after* the gate, so the write was refused before anything happened. The form *did* print the server's
+    sentence, but it pointed at another page, so it read as a save that silently did nothing. Fixed by taking
+    consent **where it bites**: `ProfileForm` now receives `hasConsent`, renders the privacy-policy checkbox
+    inline above the save button, and records consent immediately before writing the profile; a
+    mid-session `CONSENT_REQUIRED` re-offers it instead of dead-ending. `profiles/page.tsx` supplies the
+    state.
+    Also in this pass: the policy-version string was declared **twice, identically, under two names**
+    (`CONSENT_VERSION` in the login page, `POLICY_VERSION` in the account page) — in the one place where that
+    string *is* the evidence of which policy text someone agreed to. Both now import
+    `consent.POLICY_VERSION`.
+    Tests: a new `components/__tests__/profile-form.test.tsx` (4) pins that the consent prompt appears only
+    when it is needed, that it starts unasserted, and that the save button still renders (the prompt must not
+    look like a dead end). Webapp suite **99 → 103**. Docs: `06` (the shared shell + inline consent), `13`
+    (§D2 gains both findings).
+
 ### Earlier state (2026-09-26)
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"

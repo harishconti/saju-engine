@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Alert, Badge, Card, CardContent, EmptyState, PageHeader, Stat } from "@/components/ui";
+import { Alert, Badge, Card, CardContent, EmptyState, PageHeader, Stat, buttonClasses } from "@/components/ui";
 import { ReportStatusBadge } from "@/components/dashboard/report-row";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -43,6 +43,11 @@ export default async function AdminQueuePage() {
         eyebrow="Admin"
         title="Review queue"
         description="Every paid report waits here until a human checks it. Approved readings are emailed and filed in the client's profile."
+        actions={
+          <Link href="/dashboard" className={buttonClasses("outline", "sm")}>
+            ← Dashboard
+          </Link>
+        }
       />
 
       <Alert tone="danger" title="SLA risk if the oldest item exceeds 24 hours">
