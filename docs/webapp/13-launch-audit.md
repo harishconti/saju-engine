@@ -131,11 +131,13 @@ not deliverability.
 external provider"* is expected — the zone is Cloudflare's. `_dmarc` should still gain
 `rua=mailto:dmarc@cosmicsaju.com` (it is currently bare `p=none`).
 
-### 🟠 B5 — Nothing would catch a regression
+### 🟠 B5 — Partly resolved: CI now gates the webapp; end-to-end tests still missing
 
-- **No webapp CI.** `.github/workflows/ci.yml` runs `pytest` for the Python engine only — the webapp's
-  lint, typecheck, vitest and build are **not gated**. Worse, it triggers on `main` while the production
-  branch is **`develop`**, so it does not run on the branch that actually deploys. (Verified 2026-10-16.)
+- ✅ **Fixed 2026-10-16.** `.github/workflows/ci.yml` now triggers on **`develop`** (the production
+  branch) and `main`, and adds a **webapp** job: `npm ci` → `prisma generate` → lint → typecheck →
+  `vitest run` → `next build`. Before this it triggered on **`main` only**, so it never ran for real
+  work at all, and it covered the Python engine alone. All five webapp steps were run locally with
+  placeholder secrets before committing, so the first push is green rather than a discovery exercise.
 - **No end-to-end tests exist**, although [12 — Testing](12-testing.md) describes Playwright specs
   (`auth-gate.spec.ts`, `landing.spec.ts`, `order.spec.ts`, …) as though they did.
 
@@ -183,7 +185,8 @@ and it moves the golden snapshots, so it is its own change.
 | `POST /api/contact` exists | **Resolved:** it never did. Removed from [03](03-api-spec.md) — contact is a `mailto:` to a monitored address, which is honest and needs no spam-filtering surface |
 | Turnstile protects the free-sample form | Only a `turnstileToken` field in the zod schema. **No widget, no server-side verification**; the Postgres rate limit (5/min/IP) is the only protection |
 | Playwright specs exist | None do |
-| CI covers the webapp | It covers only the Python engine — and it triggers on `main` while production is `develop`, so it never runs for real work |
+| CI covers the webapp | ✅ **Fixed 2026-10-16** — it now triggers on `develop` (production) and runs a webapp job. Only the Playwright tier is still outstanding (§B5) |
+| The repo tracks the webapp | ❌ **It did not.** `apps/web` had **0 tracked files**, and the root `.gitignore`'s unanchored `lib/` was silently swallowing `apps/web/src/lib/` — 34 files including `fulfilment.ts`, `queue.ts` and the entire Vitest suite. Committed 2026-10-16 after anchoring those patterns; verified against a fresh clone |
 | The demo PDFs are "old HTML/Chromium renders" (D5 below) | ❌ **Wrong, corrected by inspection:** all five are **ReportLab** renders (`Producer: ReportLab PDF Library`, dated 2026-10-01), i.e. the same toolchain customers get. They are simply **stale** — pre-audio and pre-`$19` |
 
 ### 🟢 D3 — What is already right

@@ -541,6 +541,48 @@
     suite), `06` (which address appears where), `11` (Phase-0 rows), `04` (the magic-link From caveat),
     `00`/`01`/`03`/`09` and `openwiki/quickstart.md`.
 
+  - **2026-10-16 (audit; the repo starts tracking the product).** A full app+engine audit — run against
+    the system rather than by reading the docs — found the product live but **entirely uncommitted**:
+    `apps/web` and `api/` had **0 tracked files**, so the paid product's source had no version history,
+    Vercel's git integration could not build it (deployment depended on one machine and a manual CLI
+    upload from the repo root), and `/api/health` reported a frozen `version: 9a016a1`.
+    **Committed in five commits** (audio script → report-engine service → `.gitignore` fix → webapp →
+    docs) and verified against a **fresh clone** (`git clone --no-hardlinks`): 638 tracked files, every
+    `@/lib` import resolves, no `.env` leaked, 5 migrations, 5 demo PDFs, 5 bundled TTFs.
+    ⚠️ **The trap that nearly made this a silent failure.** The root `.gitignore`'s stock Python block
+    listed setuptools output as *unanchored* directory patterns, and `lib/` matches at **any depth** — so
+    it was swallowing `apps/web/src/lib/`: **34 files**, i.e. `fulfilment.ts`, `queue.ts`, `tiers.ts`,
+    `tts.ts`, `email.ts`, `contact.ts`, `prisma.ts`, the auth wrapper, validation, and **all 7 Vitest
+    test files**. `git add apps/web` exited **0** and staged nothing from it. It was caught only by
+    asserting that specific paths were tracked instead of trusting the exit code. All of those patterns
+    (`lib/ build/ dist/ var/ env/ …`, plus `tmp/`) are now anchored with a leading `/`;
+    `apps/web/src/lib/` was the only such path hidden anywhere in the repo.
+    **Observable payoff:** `/api/health` now reports the **live** commit (`version: 01b55c3`) rather than a
+    stale one, so "what is actually deployed?" is answerable again.
+    **CI fixed (audit finding B5, partly).** `.github/workflows/ci.yml` triggered on **`main`** while the
+    production branch is **`develop`** — so it never ran for real work, and it covered `pytest` only. It
+    now triggers on `develop` + `main`, cancels superseded runs, and adds a **webapp** job (`npm ci` →
+    `prisma generate` → lint → typecheck → `vitest run` → `next build`). `prisma generate` **must** precede
+    the tests because `email-reply-to.test.ts` imports the real Prisma singleton and throws at import
+    otherwise. All five steps were run locally against placeholder secrets so the first push is green
+    rather than a discovery exercise. The engine job also gains the cited-fixture gate and drops the 3.11
+    matrix entry. The **Playwright public tier remains unimplemented**.
+    ⚠️ **A second mismatch the audit surfaced:** `engines.node` said `22.x` while the dashboard said
+    `24.x`. Vercel honours `engines.node` for the **function runtime**, so production was *building* on
+    Node 24 and *running* on **nodejs22.x** — visible in `vercel inspect --json`
+    (`builds.config.nodeVersion = 24.x`, `builds.output.lambda.runtime = nodejs22.x`). Aligned on 24.x in
+    all three places (dashboard, `engines.node`, CI), refreshed `package-lock.json` (it records the root
+    package's `engines`), redeployed, and verified the functions now report **`nodejs24.x`**.
+    **Still open from that audit:** payments are `test_mode` — the only true revenue blocker — and the
+    checkout route has no test/live guard, so a signed-in visitor can currently complete a *test*
+    payment and receive a fulfilled report; `ADMIN_EMAILS` is `ngharish.conti@gmail.com` in Vercel but
+    **empty** in local `.env` and unverified as the owner's sign-in address (if wrong, no report can ever
+    be approved); the two credentials leaked into the transcript are still **unrotated**;
+    `demo-rm-essential.pdf` still advertises a retired `$9 intro → $19`; and the current engine still says
+    the MP3 is *"delivered with this report"* / *"alongside this PDF"* although it arrives later by email
+    (plus the known `+2` vs `+5` window mismatch). Production held **0 users, 0 orders, 0 reports**, so
+    none of this is customer-visible yet.
+
 ### Earlier state (2026-09-26)
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"

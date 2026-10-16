@@ -44,8 +44,10 @@ Thumbs.db
 *.deb
 *.rpm
 
-# Local outputs (keep reports in repo, but ignore temporary renders)
-tmp/
+# Local outputs (keep reports in repo, but ignore temporary renders).
+# Anchored: unanchored it would also hide any nested `tmp/` (this class of pattern is what hid
+# `apps/web/src/lib/` — see the `lib/` note above).
+/tmp/
 *.tmp
 
 # Test / coverage artifacts

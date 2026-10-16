@@ -41,7 +41,7 @@ saju-engine/
 | Install command | `npm install` |
 | Build command | `prisma generate && next build` |
 | Output directory | `.next` |
-| Node | 24.x (as deployed) |
+| Node | **24.x** — must agree in three places: the Vercel dashboard, `engines.node` in `apps/web/package.json`, and CI. Vercel honours `engines.node` for the **function runtime**, so a stale value silently pins the runtime while the build uses the dashboard's version. That happened here: `builds.config.nodeVersion = 24.x` but `builds.output.lambda.runtime = nodejs22.x`. Verify with `vercel inspect --json <url>` |
 | Region | **`sin1`** — matches the Neon project region `aws-ap-southeast-1`. A mismatch adds ~100 ms to every query. |
 | Domains | `cosmicsaju.com` (redirects) + `www.cosmicsaju.com` (**canonical**) |
 | DNS | **Cloudflare** (nameservers delegated from Hostinger), A record **DNS-only** — grey cloud, so `server: Vercel`. The apex is therefore free for the mailbox's MX records; Resend's MX lives on the `send` subdomain and does not conflict |
@@ -229,42 +229,41 @@ the GitHub link).
 
 ## CI/CD
 
-`.github/workflows/ci.yml`, triggered on all branches.
+`.github/workflows/ci.yml` — **two jobs**, triggered on push and PR to **`develop`** and `main`, with
+`concurrency` cancelling superseded runs.
 
-```yaml
-jobs:
-  web:
-    steps:
-      - npm ci
-      - npx prisma generate
-      - npm run lint
-      - npm run typecheck          # tsc --noEmit
-      - npm test                   # vitest
-      - npm run build              # proves the no-secrets build works
-      - npx playwright install --with-deps chromium
-      - npm run test:e2e           # public tier only (read-only)
-      - upload Playwright report on failure
+> ⚠️ `develop` is the production branch. The workflow originally triggered on **`main` only**, so it
+> never ran for real work and every "CI covers X" claim was wrong in practice. Fixed 2026-10-16.
 
-  engine:
-    if: files changed under src/ or api/
-    steps:
-      - pip install -r requirements.txt -r requirements-dev.txt
-      - python -m pytest tests/ -q            # the 1,909-case net
-      - python -m pytest tests/test_engine_service.py -q   # contract test
-      - python tools/run_validation.py
-```
+| Job | Steps |
+|---|---|
+| **engine** — Python 3.10 and 3.12 | `pip install -e ".[dev,html,web]"` plus `-r requirements.txt` → Playwright **chromium** → `ruff check --select F src tools tests api` → `pytest -q` → `tools/run_validation.py` (the cited-fixture gate) |
+| **webapp** — Node 24.x | `npm ci` → **`prisma generate`** → `lint` → `typecheck` → `vitest run` → `next build` |
 
-CI needs **no real secrets**. Placeholder values are enough because everything is lazy:
+**`prisma generate` must run before the tests.** `src/lib/__tests__/email-reply-to.test.ts` imports the
+real `email.ts`, which imports the real Prisma singleton — without a generated client that import throws
+before a single assertion runs.
+
+Chromium is required for the engine job because the **HTML/Playwright backend is the default PDF
+renderer**, so its tests need a browser. The 3.11 matrix entry was dropped: ~4 extra minutes for no
+signal between the declared floor (3.10) and production (3.12).
+
+**CI needs no real secrets.** Every client is lazy, so placeholders suffice even for `prisma generate`
+and `next build`:
 
 ```yaml
 env:
   DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
   DIRECT_URL: postgresql://ci:ci@localhost:5432/ci
-  NEON_AUTH_BASE_URL: https://example.invalid/neondb/auth
-  NEON_AUTH_COOKIE_SECRET: ci-placeholder-secret-at-least-32-characters-long
+  DATABASE_URL_UNPOOLED: postgresql://ci:ci@localhost:5432/ci
+  NEXT_PUBLIC_APP_URL: https://www.cosmicsaju.com
 ```
 
-CI does **not** run migrations (no database service).
+Verified locally by running all five webapp steps with exactly those placeholders and nothing else —
+`lint`, `typecheck`, 69 tests and `next build` all pass.
+
+CI does **not** run migrations (no database service), and the **Playwright public tier does not exist
+yet** — that is the outstanding piece, see [13](13-launch-audit.md) §B5 and [12](12-testing.md).
 
 ## Release process
 

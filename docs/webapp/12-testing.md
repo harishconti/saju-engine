@@ -22,9 +22,11 @@ npm run test:e2e             # playwright
 python -m pytest tests/test_engine_service.py -q    # contract test
 ```
 
-> ⚠️ **In practice CI does not run these.** `.github/workflows/ci.yml` triggers on **`main`** while the
-> production branch is **`develop`**, so it never fires for real work — and it runs `pytest` only: no
-> webapp lint, typecheck, vitest or build. Both points are findings in [13](13-launch-audit.md) §B5.
+> ✅ **Fixed 2026-10-16.** The workflow now triggers on **`develop`** and `main` and adds a **webapp**
+> job (`npm ci` → `prisma generate` → lint → typecheck → `vitest run` → `next build`), verified locally
+> with placeholder secrets. It previously triggered on `main` only — so it never ran for real work —
+> and covered `pytest` alone. The Playwright tier below remains **unimplemented**. See
+> [13](13-launch-audit.md) §B5.
 
 **The engine suite must never be allowed to regress** — with 1,909 cases and a
 cited-fixture validation gate, it is the only thing making it safe to touch a working engine while
