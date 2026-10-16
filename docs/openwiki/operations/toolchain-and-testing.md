@@ -143,6 +143,7 @@ assert JIAZI_TO_NAYIN[("甲", "子")] == "海中金"  # Gold in the sea
 - Default since 2026-10-04 for `tools/build-pdf.sh`, the compat PDF tool (`--backend html|reportlab`) and the self-service app.
 - Requires Playwright and its bundled Chromium: `pip install -e .[html]` then `python -m playwright install chromium`. If the bundled Chromium is missing, a system Google Chrome is used with a warning; set `SAJU_ALLOW_SYSTEM_CHROME=0` to require the bundled Chromium (identical output on every machine). A missing browser raises `PdfBackendUnavailable`; the self-service app records that class name as the failure reason.
 - Renders Quick Reference as a card, current-year paragraph as a callout, Lucky Attributes as a grid, and adds an SVG element-balance chart.
+- `--web` writes the standalone **web document** instead of a PDF (no browser involved): one self-contained HTML file with heading anchors, a linked contents list, scrollable tables, an optional `--audio-url` player, and `noindex`. See [products/reports.md](../products/reports.md) § The web document. `tools/qa_client_ready.py --html` gates the artefact.
 - Use `--compact` for the one-page Hook/sample tier. `src/saju_html/chart_input.py` is the shared chart-to-markdown step for `--from-chart`.
 - **No silent fallback:** a missing browser raises. The renderer falls back to ReportLab only with `allow_fallback=True` or env `SAJU_PDF_FALLBACK=reportlab`.
 - Korean/Hanja is translated **and kept**: client copy reads `Direct Officer (正官)`, per the owner's convention (2026-10-16). Unmapped CJK is kept and reported, never deleted. The gloss is the `gloss=True` argument of `translate_inline`, which is why the audio script can stay English-only. Phrase-level Korean glosses live in `_PHRASE_RULES` (`src/saju_html/__init__.py`).
@@ -210,6 +211,8 @@ pytest tests/test_textbook_cases.py::test_park_chung_hee -v
 - `tests/test_nayin.py`
 - `tests/test_pdf.py`
 - `tests/test_pdf_navigation.py`
+- `tests/test_web_report.py`
+- `src/saju_html/theme-web.css`
 - `tests/test_qa_client_ready.py`
 - `tests/test_saju_ai_letter.py`
 - `src/saju_ai/pack.py`

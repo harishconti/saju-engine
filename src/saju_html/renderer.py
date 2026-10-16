@@ -31,6 +31,7 @@ from saju_html import (
     _CJK_RE,
     ELEMENT_EMOJI,
     fix_articles,
+    resolve_toc_target,
     strip_engine_drafts,
     strip_source_citations,
 )
@@ -56,13 +57,16 @@ _DOCUMENT_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ title }}</title>
-<style>
+{% if web_head %}{{ web_head }}
+{% endif %}<style>
 {{ css }}
 </style>
 </head>
 <body class="{{ body_class }}">
-{{ cover }}
+{% if toolbar %}{{ toolbar }}
+{% endif %}{{ cover }}
 {{ body }}
 </body>
 </html>
@@ -72,14 +76,22 @@ _COVER_TEMPLATE = """<div class="cover">
   <div class="watermark">命</div>
   <h1>{{ title }}</h1>
   <p class="subtitle">{{ subtitle }}</p>
-  <div class="meta-block">
+{% if meta_block %}  <div class="meta-block">
 {{ meta_block }}
   </div>
-  <p class="foot">{{ footnote }}</p>
+{% endif %}  <p class="foot">{{ footnote }}</p>
   <p class="date">Generated {{ generation_date }}</p>
 {% if report_id %}  <p class="report-id">Report ID: {{ report_id }} · CosmicSaju · cosmicsaju.com</p>
 {% endif %}</div>
 """
+
+# In web mode the report is a page that happens to be token-gated. `noindex` is
+# belt-and-braces: the link is unguessable and the route is private, but a reader's
+# report must never turn up in a search result.
+_WEB_HEAD = (
+    '<meta name="robots" content="noindex, nofollow">\n'
+    '<meta name="color-scheme" content="light dark">'
+)
 
 _COMPACT_COVER_TEMPLATE = """<div class="compact-cover">
   <h1>{{ title }}</h1>
@@ -123,6 +135,17 @@ def _load_css(css_path: Path | None) -> str:
         return Path(css_path).read_text(encoding="utf-8")
     here = Path(__file__).resolve().parent
     return (here / "theme.css").read_text(encoding="utf-8")
+
+
+def _load_web_css() -> str:
+    """The screen layer, bundled beside `theme.css`.
+
+    `theme.css` is built for A4 (page boxes, running footers, repeated table headers); it
+    renders a document, but a phone would get one squeezed column and tables hanging off
+    the viewport. This layer is appended in web mode only, so the print result is byte-for-
+    byte what it was.
+    """
+    return (Path(__file__).resolve().parent / "theme-web.css").read_text(encoding="utf-8")
 
 
 def _make_md_parser() -> MarkdownIt:
@@ -317,6 +340,123 @@ def _build_compact_cover_html(
     )
 
 
+_HEADING_RE = re.compile(r"<(h[23])([^>]*)>(.*?)</\1>", re.DOTALL)
+_TOC_HEADING_RE = re.compile(r"<h2[^>]*>\s*Table of Contents\s*</h2>", re.IGNORECASE)
+_UL_RE = re.compile(r"<ul>(.*?)</ul>", re.DOTALL)
+_TABLE_RE = re.compile(r"(<table\b.*?</table>)", re.DOTALL)
+_TAG_RE = re.compile(r"<[^>]+>")
+
+
+def _slugify_heading(text: str, seen: dict) -> str:
+    """A readable, unique anchor for a heading.
+
+    Readable rather than hashed because these ids end up in an address a client can share
+    or bookmark (#career-wealth, not #saju-c0737a). Non-ASCII is dropped — the Hanja gloss
+    is a label, not a URL — and a repeated heading gets a numeric suffix, because
+    duplicate ids are invalid HTML and break the second occurrence's link.
+    """
+    plain = html.unescape(_TAG_RE.sub("", text)).strip()
+    slug = re.sub(r"[^a-z0-9]+", "-", plain.casefold()).strip("-")[:60]
+    slug = slug or "section"
+    seen[slug] = seen.get(slug, 0) + 1
+    return slug if seen[slug] == 1 else f"{slug}-{seen[slug]}"
+
+
+def _add_heading_anchors(html_text: str) -> tuple[str, list]:
+    """Give every h2/h3 an id and a tappable anchor. Returns (html, [(text, id)]).
+
+    The HTML report had **no ids at all**, so a twenty-page reading could not be
+    navigated, linked to, or jumped to from its own contents list.
+    """
+    collected: list = []
+    seen: dict = {}
+    out: list = []
+    cursor = 0
+    for match in _HEADING_RE.finditer(html_text):
+        tag, attrs, inner = match.group(1), match.group(2), match.group(3)
+        plain = html.unescape(_TAG_RE.sub("", inner)).strip()
+        slug = _slugify_heading(plain, seen)
+        out.append(html_text[cursor:match.start()])
+        out.append(f'<{tag} id="{slug}"{attrs}>{inner}'
+                   f'<a class="anchor" href="#{slug}" aria-label="Link to this section">#</a>'
+                   f'</{tag}>')
+        cursor = match.end()
+        # The offset of the heading *in the new document*, so the contents pass can look
+        # forward from it. (Re-matching the heading after this rewrite is what failed
+        # first: the h2 now contains its own anchor link.)
+        collected.append((plain, slug, len("".join(out))))
+    out.append(html_text[cursor:])
+    return "".join(out), collected
+
+
+def _link_contents(html_text: str, headings: list) -> str:
+    """Turn the contents list into real links, matching labels the way the PDF does.
+
+    Labels are not always literal headings (see `resolve_toc_target`), and an entry that
+    cannot be resolved stays plain text: a contents list must never ship a link to
+    nowhere.
+    """
+    if not headings:
+        return html_text
+    contents_end = next((end for plain, _slug, end in headings
+                         if plain.casefold() == "table of contents"), None)
+    if contents_end is None:
+        return html_text
+    listed = _UL_RE.search(html_text, contents_end)
+    if not listed:
+        return html_text
+
+    by_heading = {plain: slug for plain, slug, _end in headings}
+
+    def replace_item(item: "re.Match") -> str:
+        inner = item.group(1)
+        label = html.unescape(_TAG_RE.sub("", inner)).strip()
+        target = resolve_toc_target(label, list(by_heading))
+        if not target:
+            return f"<li>{inner}</li>"
+        return f'<li><a href="#{by_heading[target]}">{inner}</a></li>'
+
+    items_html = re.sub(r"<li>(.*?)</li>", replace_item, listed.group(1), flags=re.DOTALL)
+    nav = f'<nav class="toc" aria-label="Contents"><ul>{items_html}</ul></nav>'
+    return html_text[: listed.start()] + nav + html_text[listed.end():]
+
+
+def _wrap_tables_for_web(html_text: str) -> str:
+    """Let wide tables scroll inside their own box instead of the page sideways.
+
+    A six-column ten-god table is wider than a phone; without this the *page* scrolls
+    horizontally, which is the commonest mobile defect. The wrapper is focusable so a
+    keyboard user can scroll it without a pointer.
+    """
+    return _TABLE_RE.sub(
+        lambda m: (f'<div class="table-scroll" tabindex="0" role="region" '
+                   f'aria-label="Table, scrollable">{m.group(1)}</div>'),
+        html_text)
+
+
+def _inject_audio_player(html_text: str, audio_url: str) -> str:
+    """Put the MP3 on the page, where the report says it lives.
+
+    The Deep tier's copy promises the audio "appears on the same page as your reading",
+    which a PDF cannot honour and a web page can. Silent when there is no URL.
+    """
+    if not audio_url:
+        return html_text
+    match = re.search(r"(<h2[^>]*>\s*MP3 Audio Summary[^<]*</h2>)", html_text, re.IGNORECASE)
+    if not match:
+        return html_text
+    url = html.escape(audio_url, quote=True)
+    block = (
+        '<div class="audio-summary">'
+        "<p>Listen to your audio summary</p>"
+        f'<audio controls preload="none" src="{url}">'
+        "Your browser cannot play this audio file. "
+        f'<a href="{url}">Download it instead</a>.'
+        "</audio></div>"
+    )
+    return html_text[: match.end()] + block + html_text[match.end():]
+
+
 def markdown_to_html(
     md_text: str,
     *,
@@ -329,6 +469,9 @@ def markdown_to_html(
     report_id: str = "",
     compact: bool = False,
     tier: str | None = None,
+    web: bool = False,
+    audio_url: str = "",
+    toolbar_html: str = "",
 ) -> str:
     """Render a Saju markdown report into a styled HTML document.
 
@@ -351,6 +494,17 @@ def markdown_to_html(
         Optional tier label (e.g. "sample", "essential", "deep"). When set,
         the body gets a `tier-{tier}` class so theme.css can apply tier-
         specific styles. Default: no class.
+    web : bool
+        Render the **web document** rather than the print one: a screen layer on top of
+        `theme.css`, heading ids, a linked contents list, scrollable tables, and
+        `noindex`. The output stays a single self-contained file (inline CSS and SVG, no
+        external requests), so it can be served *and* downloaded as-is.
+    audio_url : str
+        When given, a player is placed in the MP3 Audio Summary section — the page the
+        Deep tier's copy promises.
+    toolbar_html : str
+        Optional markup injected above the cover. The webapp uses it for the download bar
+        when it serves the report; the downloadable file is rendered without it.
 
     Returns
     -------
@@ -359,6 +513,8 @@ def markdown_to_html(
     """
     generation_date = generation_date or date.today().strftime("%B %d, %Y")
     css = _load_css(css_path)
+    if web:
+        css = f"{css}\n\n/* ---- web layer (screen only; print rules above still apply) ---- */\n{_load_web_css()}"
 
     subtitle = "A Reading in the Korean Four Pillars Tradition"
     footnote = (
@@ -398,18 +554,32 @@ def markdown_to_html(
     # to avoid duplicate headers and blank pages.
     body_html = _drop_title_block(body_html)
 
-    body_class = ""
+    if web:
+        # Order matters. The audio block goes in while the headings are still bare (its
+        # matcher looks for a plain "…</h2>"); the contents list can only link to anchors
+        # that already exist, so it runs after the anchor pass.
+        body_html = _inject_audio_player(body_html, audio_url)
+        body_html, headings = _add_heading_anchors(body_html)
+        body_html = _link_contents(body_html, headings)
+        body_html = _wrap_tables_for_web(body_html)
+
+    classes = []
     if compact:
-        body_class = "compact-mode"
+        classes.append("compact-mode")
     elif tier:
-        body_class = f"tier-{tier}"
+        classes.append(f"tier-{tier}")
+    if web:
+        classes.append("web-mode")
+
     template = _jinja_env().from_string(_DOCUMENT_TEMPLATE)
     return template.render(
         title=html.escape(title),
         css=css,
         cover=cover_html,
         body=body_html,
-        body_class=body_class,
+        body_class=" ".join(classes),
+        web_head=_WEB_HEAD if web else "",
+        toolbar=toolbar_html,
     )
 
 

@@ -53,6 +53,12 @@ def main() -> None:
     ap.add_argument("--css", type=Path, default=None, help="Optional custom CSS file.")
     ap.add_argument("--report-id", default="",
                     help="Unique report ID for cover/footer branding (auto-derived if omitted).")
+    ap.add_argument("--web", action="store_true",
+                    help="Write the standalone web document (HTML) instead of a PDF. "
+                         "Output stays a single self-contained file: inline CSS and SVG, "
+                         "no external requests.")
+    ap.add_argument("--audio-url", default="",
+                    help="With --web, place an audio player in the MP3 Audio Summary section.")
     ap.add_argument("--compact", action="store_true",
                     help="Use a compact in-line header for the free one-page Hook tier.")
     ap.add_argument("--tier", choices=TIER_CHOICES, default=None,
@@ -62,6 +68,49 @@ def main() -> None:
     args = ap.parse_args()
 
     created_md: Path | None = None
+    if args.web:
+        # The web document is written directly: no browser, no PDF step, nothing to
+        # install. It is the same `markdown_to_html` the PDF path uses, in web mode.
+        from saju_html.renderer import markdown_to_html
+
+        out = args.output
+        if out.suffix.lower() not in (".html", ".htm"):
+            ap.error("--web writes HTML; give --output a .html path")
+        created = None
+        if args.from_chart:
+            chart = chart_from_args(ap, args)
+            md_target = intermediate_md_path(out, args.overwrite_report)
+            if not md_target.exists():
+                created = md_target
+            kw = prepare_chart_render(
+                chart, out, title=args.title, client=args.client, dob=args.dob,
+                day_master=args.day_master, overwrite_report=args.overwrite_report,
+                tier=args.tier, report_id=args.report_id)
+            md_path = kw["input_md"]
+        else:
+            if not args.input:
+                ap.error("--input is required (or pass --from-chart with birth data)")
+            md_path = args.input
+        try:
+            document = markdown_to_html(
+                Path(md_path).read_text(encoding="utf-8"),
+                title=args.title, client=args.client, dob=args.dob,
+                day_master=args.day_master, report_id=args.report_id,
+                compact=args.compact, tier=args.tier, web=True,
+                audio_url=args.audio_url,
+            )
+        except Exception as exc:  # noqa: BLE001 - report the cause, drop the sidecar
+            if created is not None:
+                created.unlink(missing_ok=True)
+            print(f"error: {exc}", file=sys.stderr)
+            sys.exit(1)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(document, encoding="utf-8")
+        if created is not None:
+            created.unlink(missing_ok=True)   # the sidecar .md is not wanted here
+        print(f"Wrote {out} ({out.stat().st_size} bytes) [web document]")
+        return
+
     if args.from_chart:
         md_target = intermediate_md_path(args.output, args.overwrite_report)
         if not md_target.exists():

@@ -92,8 +92,10 @@ from saju_html import (  # noqa: E402
     ELEMENT_COLORS,
     ELEMENT_EMOJI,
     fix_articles,
+    resolve_toc_target,
     strip_engine_drafts,
     strip_source_citations,
+    toc_key,
     translate_inline,
 )
 
@@ -263,14 +265,9 @@ BLOCKQUOTE_RE = re.compile(r"^>\s?(.*)$")
 TOC_HEADING_RE = re.compile(r"^table of contents$", re.IGNORECASE)
 
 
-def _toc_key(text: str) -> str:
-    """Lookup key for a heading or TOC entry: markup- and whitespace-insensitive.
-
-    The two sides of a TOC link are written differently in the source (a heading
-    line vs. a bullet), so compare them on the plain text only.
-    """
-    plain = re.sub(r"[*`_#]", "", text or "")
-    return re.sub(r"\s+", " ", plain).strip().casefold()
+# Shared with the HTML renderer so the PDF outline and the HTML anchors agree on which
+# contents entry points at which heading.
+_toc_key = toc_key
 
 
 def _anchor_key(text: str) -> str:
@@ -716,29 +713,14 @@ def _heading_anchor_map(lines, tier) -> dict:
 
 
 def _resolve_toc_anchor(entry_key: str, heading_keys: dict) -> Optional[str]:
-    """Find the heading a contents entry points at, by its lookup key.
+    """Find the heading anchor a contents entry points at, by its lookup key.
 
-    Contents labels are not always literal headings: the engine writes composite
-    ones ("Life Themes by Major Luck Period — incl. Lifetime Decade Roadmap" for
-    the heading "Life Themes by Major Luck Period") and sometimes the heading
-    carries extra words ("MP3 Audio Summary — Included by Default"). So beyond an
-    exact match, accept the closest prefix in either direction and otherwise
-    return None, which leaves the entry as plain text. A contents page must never
-    ship a link to nowhere.
+    A thin adapter over the shared `resolve_toc_target` (which explains the matching);
+    here the "labels" are anchor keys and their values are the lookup keys.
     """
-    if not entry_key:
-        return None
-    lookup_keys = {anchor: key for anchor, key in heading_keys.items()}
-    for anchor, key in lookup_keys.items():
-        if key == entry_key:
-            return anchor
-    best = None
-    for anchor, key in lookup_keys.items():
-        if key.startswith(entry_key) or entry_key.startswith(key):
-            distance = abs(len(key) - len(entry_key))
-            if best is None or distance < best[0]:
-                best = (distance, anchor)
-    return best[1] if best else None
+    by_key = {key: anchor for anchor, key in heading_keys.items()}
+    target = resolve_toc_target(entry_key, list(by_key))
+    return by_key.get(target) if target else None
 
 
 def _toc_flowables(entries, toc_pages, styles, tier, content_width, heading_keys=None) -> list:

@@ -1128,6 +1128,44 @@
     toolchain. Nothing is wired into the webapp yet — the next step is the console's diff/accept flow, which is where
     the reviewer's 30–45-minute routine actually needs it.
 
+  - **2026-10-16 (the HTML workstream, part 1: the web document — and it was already 80% there).** Owner decision:
+    the reviewer approves **both HTML and PDF**, the web document being the reading and the PDF the keepsake.
+    ✅ **The discovery that made this cheap.** `renderer.py` already inlined `theme.css` and the SVG charts, and
+    `theme.css` has no `url()`, `@import` or webfont — so the rendered report was **already a self-contained single
+    file**. The only external-looking strings are the SVG namespace declarations. What was missing was everything a
+    *screen* needs, and one thing a document cannot do without: the HTML had **no ids at all** — no anchors, no
+    working contents list, nothing to link to.
+    ✅ **`--web` in `md_to_saju_html_pdf.py`** now writes that document (no browser involved), from a new screen layer
+    `theme-web.css` appended in web mode only: a readable measure with a paper-like sheet, scrollable wide tables,
+    readable heading ids (`#career-wealth`) plus anchors, a **linked contents list** resolved by the *same* matcher the
+    PDF outline uses (so the two artefacts cannot disagree on which entry points where), an inline audio player where
+    the copy promises it (`--audio-url`), `noindex` + viewport, and a `report-toolbar` slot for the webapp's download
+    links (absent from the downloaded file). Measured on a real report through headless Chrome: **0 px horizontal
+    overflow at 390 / 768 / 1440**, one `h1`, 18 contents links with target-height tap targets, 14 table scrollers,
+    and tapping a contents entry navigates.
+    ⚠️ **Three real defects the browser found, not the tests.** (1) The cover's `.meta-block` rendered as an **empty
+    bordered box** whenever no client/dob/day-master flags were given — the template rendered it unconditionally.
+    (2) The cover's **命 watermark is a CJK glyph** in the print sheet, and the print PDF embeds its fonts; on a device
+    without a Korean font it is a tofu box at 110pt on the front page. The web cover now carries the brand line instead
+    — a document that must render identically everywhere cannot depend on the reader's fonts. (3) The title repeats as
+    the first section heading after the cover (pre-existing, both artefacts; the markdown's own cover block runs to the
+    first `hr`, which is late in the deep report) — **left as is**: it is cosmetic, affects both backends equally, and
+    the reviewer sees it in the preview.
+    ✅ **And the new `--html` gate mode immediately earned its keep.** Gating the *artefact* rather than the source is
+    what surfaced a still-open audit defect on the live chart: the engine writes some terms in both scripts in one gloss
+    ("(합이불화, 合而不化)"), both translated to the same English, and the reader saw it **twice, three times over** —
+    the audit's §2.1 #3. Fixed generally in `translate_inline` (`_dedupe_parenthetical`, only ever inside
+    parentheses), plus the reason it had escaped: the keep-the-Hanja test compared words **with their punctuation
+    attached**, so "transforming," never matched "transforming". Two bugs, one root cause found by a browser. The live
+    chart's markdown **and** HTML are now both CLEAN.
+    Also fixed while looking: the article rule missed markdown emphasis ("a **Earth** chart") because the HTML path
+    runs before the markdown parser — the gap now accepts both `**emphasis**` and `<b>tags</b>`. Goldens regenerated
+    (one added viewport tag, then the render-layer fixes); **print output is otherwise byte-identical by construction**
+    (`tests/test_web_report.py` asserts the print document gains nothing from the web layer). Suite **1,984 → 1,994**.
+    ⚠️ **Not wired yet** — this is the engine half only: `Report.htmlKey` + migration, the report route returning the
+    web document, the download links, and the review console previewing both artefacts. Docs: `reports.md`
+    (§ The web document), toolchain (`--web`), `05` (the two artefacts, and what is not wired), `12` (gate 4).
+
 ### Earlier state (2026-09-26)
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"

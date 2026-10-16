@@ -579,9 +579,13 @@ def _gloss_redundant(parts: List[str], phrase: str) -> bool:
     "Companion" — so a suffix test dropped the Hanja and printed "Companion" twice
     for two different terms. Any of the previous few words counts.
     """
-    preceding = {w for w in re.split(r"[\s-]+", _preceding_text(parts).casefold()) if w}
-    words = [w for w in re.split(r"[\s-]+", phrase.casefold()) if len(w) >= 3]
-    return bool(words) and all(w in preceding for w in words)
+    def words_of(text: str, *, min_length: int) -> set:
+        return {w.strip(",.!?;:()[]\u2019\"'") for w in re.split(r"[\s-]+", text.casefold())
+                if len(w.strip(",.!?;:()[]\u2019\"'")) >= min_length}
+
+    preceding = words_of(_preceding_text(parts), min_length=1)
+    words = words_of(phrase, min_length=3)
+    return bool(words) and words <= preceding
 
 
 def _ends_with(parts: List[str], phrase: str) -> bool:
@@ -590,9 +594,11 @@ def _ends_with(parts: List[str], phrase: str) -> bool:
     Compared on hyphen-split, case-folded words: "major-luck (Major Luck)" is the
     same statement twice, and the hyphen was hiding it.
     """
-    preceding = re.split(r"[\s-]+", _preceding_text(parts).casefold())
-    words = re.split(r"[\s-]+", phrase.casefold())
-    words = [w for w in words if w]
+    strip_chars = ",.!?;:()[]\u2019\"\'"
+    preceding = [w.strip(strip_chars)
+                 for w in re.split(r"[\s-]+", _preceding_text(parts).casefold())]
+    words = [w.strip(strip_chars)
+             for w in re.split(r"[\s-]+", phrase.casefold()) if w.strip(strip_chars)]
     return bool(words) and len(words) <= len(preceding) and preceding[-len(words):] == words
 
 
@@ -864,7 +870,7 @@ def translate_inline(
             continue
         out_parts.append(placeholder)
 
-    out = "".join(out_parts)
+    out = _dedupe_parenthetical("".join(out_parts))
     # Final safety net: CJK the maps missed is dropped only when the caller
     # asked for it (keep_unmapped=False); either way it was reported above.
     if not keep_unmapped:
@@ -892,10 +898,11 @@ def translate_inline(
 # audit, 2026-10-16, grammar row), and the fix belongs at the render layer so it
 # covers every source. "an" before a vowel; exceptions for the words whose
 # pronunciation defies the spelling rule.
-# Markup may sit between the article and its noun. By the time this runs the
-# emphasis has already become a tag ("a <b>Earth</b> chart"), so the gap has to
-# accept tags as well as spaces; it is preserved verbatim.
-_A_AN_RE = re.compile(r"\b(a|an)((?:[ \t]|<[^>]+>)+)([A-Za-z][\w-]*)", re.IGNORECASE)
+# Markup may sit between the article and its noun, and it arrives in two shapes
+# depending on the backend: markdown emphasis (the HTML path runs before the markdown
+# parser) or a converted tag ("a <b>Earth</b> chart", the ReportLab path). Both are
+# allowed in the gap and preserved verbatim.
+_A_AN_RE = re.compile(r"\b(a|an)((?:[ \t*_]|<[^>]+>)+)([A-Za-z][\w-]*)", re.IGNORECASE)
 # "an" is correct before a silent h ("an honest"), "a" before a vowel that sounds
 # like a consonant ("a university"), and before initialisms read letter by letter.
 _AN_EXCEPTIONS = {"honest", "honour", "honor", "hour", "heir", "herb", "honorary"}
@@ -924,6 +931,66 @@ def fix_articles(text: str) -> str:
         return (correct.capitalize() if article[0].isupper() else correct) + gap + word
 
     return _A_AN_RE.sub(replace, text)
+
+
+# ── Contents matching (shared by both renderers) ──────────────────────────────────
+# The engine writes contents labels that are not always literal headings: composite
+# ones ("Life Themes by Major Luck Period — incl. Lifetime Decade Roadmap" for the
+# heading "Life Themes by Major Luck Period"), and some headings carry extra words
+# ("MP3 Audio Summary — Included by Default" for the label "MP3 Audio Summary"). Both
+# renderers resolve them the same way, so the PDF outline and the HTML anchors agree.
+
+def toc_key(text: str) -> str:
+    """Lookup key for a heading or a contents label: markup- and whitespace-insensitive."""
+    plain = re.sub(r"[*`_#]", "", text or "")
+    return re.sub(r"\s+", " ", plain).strip().casefold()
+
+
+def resolve_toc_target(label: str, headings) -> Optional[str]:
+    """The heading a contents label points at, or ``None``.
+
+    Exact match first, then the closest prefix in either direction. ``None`` means the
+    caller should leave the entry as plain text: a contents list must never ship a link
+    to nowhere.
+    """
+    key = toc_key(label)
+    if not key:
+        return None
+    lookup = {h: toc_key(h) for h in headings}
+    for heading, hkey in lookup.items():
+        if hkey == key:
+            return heading
+    best = None
+    for heading, hkey in lookup.items():
+        if hkey.startswith(key) or key.startswith(hkey):
+            distance = abs(len(hkey) - len(key))
+            if best is None or distance < best[0]:
+                best = (distance, heading)
+    return best[1] if best else None
+
+
+def _dedupe_parenthetical(text: str) -> str:
+    """Drop a segment repeated verbatim inside a parenthetical: "(X, X)" -> "(X)".
+
+    The engine sometimes writes one term in both scripts in the same gloss
+    ("(합이불화, 合而不化)"), and both forms translate to the same English, so the reader
+    got it twice — the audit's "binding without transforming, binding without
+    transforming", three times in one delivered report. Applied only inside
+    parentheticals, so it can never rewrite prose.
+    """
+    def dedupe(match: "re.Match") -> str:
+        seen: set = set()
+        kept: List[str] = []
+        for part in re.split(r"\s*,\s*", match.group(1)):
+            stripped = part.strip()
+            key = stripped.casefold()
+            if not stripped or key in seen:
+                continue
+            seen.add(key)
+            kept.append(stripped)
+        return "(" + ", ".join(kept) + ")"
+
+    return re.sub(r"\(([^()]*)\)", dedupe, text)
 
 
 def _strip_sources_section(text: str) -> str:

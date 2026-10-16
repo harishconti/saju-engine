@@ -188,6 +188,21 @@ the reviewer. The design constraints are the whole story:
 Provider: Ollama Cloud (`OLLAMA_API_KEY`, default `deepseek-v4.1-flash`) via an OpenAI-shaped
 call; Anthropic and OpenAI are one flag away. Env and cost: [07](07-services-and-integrations.md).
 
+### The delivered reading: web document + PDF
+
+The engine can now produce **both** artefacts from one markdown source:
+
+| Artefact | Command | Role |
+|---|---|---|
+| Web document | `md_to_saju_html_pdf.py --web --output report.html` | The reading. Self-contained HTML (inline CSS/SVG, no scripts or webfonts), heading anchors, a linked contents list, scrollable tables, an audio slot. Served at `/report/{token}` and **downloadable as one file**. |
+| PDF | `… --output report.pdf` (ReportLab) | The keepsake, and the record of what the reviewer approved. |
+
+**Not yet wired:** storage of the web document (`Report.htmlKey` + migration), the report
+route returning it, the download links, and the review console previewing both. Until that
+lands the web document is an engine capability, exercised from the CLI and gated with
+`qa_client_ready.py --html`. The plan is for the reviewer to approve **both** artefacts, and
+for the email to lead with the link and offer the PDF second.
+
 ### `/chart` — derive without rendering
 
 Called when a profile is created or when anything chart-affecting changes. The webapp stores the

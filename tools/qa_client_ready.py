@@ -286,6 +286,26 @@ def scan(
 
 # ── CLI ──────────────────────────────────────────────────────────────────────────
 
+_SCRIPT_STYLE_RE = re.compile(r"<(script|style)\b.*?</\1>", re.DOTALL | re.IGNORECASE)
+_TAG_RE = re.compile(r"<[^>]+>")
+
+
+def _html_text(document: str) -> str:
+    """Visible text of an HTML report, for the artefact checks.
+
+    Script and style bodies are dropped so a CSS value or a JS string can never be
+    mistaken for client copy, and the remaining tags are stripped to leave block
+    boundaries as newlines — the same shape `pdftotext` gives the PDF path.
+    """
+    import html as _html
+
+    stripped = _SCRIPT_STYLE_RE.sub("\n", document)
+    stripped = re.sub(r"</(p|li|h[1-6]|tr|div|blockquote|nav)>", "\n", stripped,
+                      flags=re.IGNORECASE)
+    stripped = re.sub(r"<br\s*/?>", "\n", stripped, flags=re.IGNORECASE)
+    return _html.unescape(_TAG_RE.sub("", stripped))
+
+
 def _pdf_text(pdf: Path) -> str | None:
     if shutil.which("pdftotext") is None:
         print("pdftotext not installed — artefact not checked (`poppler-utils`).",
@@ -304,6 +324,8 @@ def main() -> int:
     ap.add_argument("report", type=Path, help="report markdown")
     ap.add_argument("--pdf", type=Path, default=None,
                     help="also check the rendered PDF (catches renderer leaks)")
+    ap.add_argument("--html", type=Path, default=None,
+                    help="also check the web document (the HTML the client opens)")
     ap.add_argument("--name", default=None, help="client name, to check its casing")
     ap.add_argument("--tier", default=None,
                     help="tier, so the free sample's price copy is allowed")
@@ -330,13 +352,26 @@ def main() -> int:
             findings.extend(scan(text, source="pdf", rendered=True, name=args.name,
                                  tier=args.tier,
                                  max_sentence_repeats=args.max_sentence_repeats))
+    if args.html is not None:
+        if not args.html.exists():
+            print(f"no such html: {args.html}", file=sys.stderr)
+            return 2
+        findings.extend(scan(_html_text(args.html.read_text(encoding="utf-8")),
+                              source="html", rendered=True, name=args.name,
+                              tier=args.tier,
+                              max_sentence_repeats=args.max_sentence_repeats))
 
     findings.sort(key=lambda f: (f.source, f.line, f.code))
     if args.json:
         print(json.dumps([f._asdict() for f in findings], indent=2))
     else:
         status = "CLEAN" if not findings else "FLAGGED"
-        sources = "markdown + pdf" if args.pdf is not None else "markdown"
+        parts = ["markdown"]
+        if args.pdf is not None:
+            parts.append("pdf")
+        if args.html is not None:
+            parts.append("html")
+        sources = " + ".join(parts)
         print(f"{status}: {args.report.name} ({sources}) — {len(findings)} finding(s)")
         for f in findings:
             where = f"{f.source}:{f.line}" if f.line else f.source

@@ -1,0 +1,251 @@
+/* Web layer for the Saju report — appended after theme.css in web mode only.
+ *
+ * `theme.css` is a *print* stylesheet: A4 page boxes, running footers, table headers
+ * repeated across pages. It renders the report as a document, but on a phone it would
+ * be one A4 column squeezed into 390px with wide tables overflowing the viewport.
+ *
+ * This layer adds what a screen needs and changes nothing about the print result:
+ * a readable measure, a paper-like sheet, scrollable tables, visible heading anchors,
+ * and a highlight on the section a contents link just jumped to. It is deliberately
+ * light-only for the *document* (a reading is a sheet of paper) while the surrounding
+ * page follows the reader's colour scheme.
+ */
+
+/* ── the sheet ──────────────────────────────────────────────────────────────────── */
+html {
+    -webkit-text-size-adjust: 100%;
+}
+body.web-mode {
+    margin: 0;
+    padding: 0 0 4rem;
+    background: #eef1f4;
+    /* System stack: the document must be self-contained, so no web fonts. The
+       bundled report fonts are PDF-only. */
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+                 "Noto Sans", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+    body.web-mode {
+        background: #12161a;
+    }
+}
+body.web-mode .cover,
+body.web-mode .compact-cover,
+body.web-mode > h2,
+body.web-mode > h3,
+body.web-mode > p,
+body.web-mode > ul,
+body.web-mode > ol,
+body.web-mode > table,
+body.web-mode > .table-scroll,
+body.web-mode > div:not(.report-toolbar):not(.cover):not(.compact-cover),
+body.web-mode > hr,
+body.web-mode > blockquote {
+    box-sizing: border-box;
+    max-width: 46rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+/* The sheet: content blocks sit on white with a hairline, so the document reads as a
+   page rather than as loose text on a coloured background. */
+body.web-mode > h2,
+body.web-mode > h3,
+body.web-mode > p,
+body.web-mode > ul,
+body.web-mode > ol,
+body.web-mode > blockquote,
+body.web-mode > .table-scroll,
+body.web-mode > table,
+body.web-mode > div:not(.report-toolbar):not(.cover):not(.compact-cover) {
+    background: #ffffff;
+    padding: 0.55rem 1.15rem;
+}
+body.web-mode > h2 {
+    padding-top: 1.1rem;
+    padding-bottom: 0.3rem;
+}
+body.web-mode > hr {
+    border: 0;
+    height: 0;
+    margin: 0;
+}
+body.web-mode > h2:first-of-type {
+    margin-top: 1.5rem;
+}
+
+/* The cover watermark is a CJK glyph in the print sheet. A document that must render
+   identically everywhere cannot depend on the reader having a Korean font — on a device
+   without one it is a tofu box at 110pt on the front page. The web cover carries the
+   brand line instead; the PDF keeps the mark (its fonts are embedded). */
+body.web-mode .cover .watermark {
+    display: none;
+}
+
+/* ── reading measure on small screens ───────────────────────────────────────────── */
+@media screen and (max-width: 46rem) {
+    body.web-mode > h2,
+    body.web-mode > h3,
+    body.web-mode > p,
+    body.web-mode > ul,
+    body.web-mode > ol,
+    body.web-mode > blockquote,
+    body.web-mode > .table-scroll,
+    body.web-mode > table,
+    body.web-mode > div:not(.report-toolbar):not(.cover):not(.compact-cover) {
+        padding-left: 0.9rem;
+        padding-right: 0.9rem;
+    }
+}
+
+/* ── wide tables scroll instead of pushing the page sideways ────────────────────── */
+.table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+}
+.table-scroll:focus-visible {
+    outline: 2px solid var(--color-heading);
+    outline-offset: -2px;
+}
+.table-scroll table {
+    width: 100%;
+    min-width: 34rem;   /* keeps columns legible; the wrapper scrolls */
+}
+.table-scroll::after {
+    /* A hint that there is more to the right. */
+    content: "";
+    display: block;
+    height: 0;
+}
+
+/* ── heading anchors ────────────────────────────────────────────────────────────── */
+body.web-mode h2,
+body.web-mode h3 {
+    scroll-margin-top: 1rem;
+}
+.anchor {
+    float: right;
+    margin-left: 0.6rem;
+    color: var(--color-light);
+    text-decoration: none;
+    font-weight: 400;
+    opacity: 0;
+}
+body.web-mode h2:hover .anchor,
+body.web-mode h3:hover .anchor,
+.anchor:focus-visible {
+    opacity: 1;
+}
+@media (hover: none) {
+    .anchor { opacity: 0.5; }   /* touch devices have no hover: keep it reachable */
+}
+:target {
+    background: #fffbe8;        /* which section did the contents link open? */
+}
+
+/* ── linked contents list ────────────────────────────────────────────────────────── */
+body.web-mode nav.toc ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+body.web-mode nav.toc li {
+    padding: 0.28rem 0;
+    border-bottom: 1px solid var(--color-rule);
+    font-size: 1.02rem;
+}
+body.web-mode nav.toc li:last-child {
+    border-bottom: 0;
+}
+body.web-mode nav.toc a {
+    color: var(--color-heading);
+    text-decoration: none;
+    display: block;             /* a comfortable tap target, not just the words */
+    padding: 0.2rem 0;
+}
+body.web-mode nav.toc a:hover,
+body.web-mode nav.toc a:focus-visible {
+    text-decoration: underline;
+}
+
+/* ── the audio summary, in the page ──────────────────────────────────────────────── */
+.audio-summary {
+    max-width: 46rem;
+    margin: 0.4rem auto 1.2rem;
+    background: #fff7e6;
+    border: 1px solid #f0c674;
+    border-radius: 6px;
+    padding: 0.8rem 1rem;
+    box-sizing: border-box;
+}
+.audio-summary p {
+    margin: 0 0 0.6rem;
+    color: #8a5a00;
+    font-weight: 600;
+}
+.audio-summary audio {
+    width: 100%;
+    height: 2.75rem;            /* comfortably above the 44px control target */
+}
+
+/* ── the toolbar the webapp injects when it serves the report ───────────────────── */
+.report-toolbar {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0.75rem 1rem;
+    background: #2a4d6e;
+}
+.report-toolbar a,
+.report-toolbar button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;        /* 44px: the same bar the app's UI is audited against */
+    padding: 0 1rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    background: transparent;
+    color: #ffffff;
+    font: inherit;
+    text-decoration: none;
+}
+.report-toolbar a:hover,
+.report-toolbar a:focus-visible {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* ── printing: hand it back to the print stylesheet ─────────────────────────────── */
+@media print {
+    body.web-mode {
+        background: #ffffff;
+        padding: 0;
+    }
+    body.web-mode > h2,
+    body.web-mode > h3,
+    body.web-mode > p,
+    body.web-mode > ul,
+    body.web-mode > ol,
+    body.web-mode > blockquote,
+    body.web-mode > .table-scroll,
+    body.web-mode > table,
+    body.web-mode > div:not(.report-toolbar):not(.cover):not(.compact-cover) {
+        background: transparent;
+        padding: 0;
+        max-width: none;
+    }
+    .report-toolbar,
+    .anchor {
+        display: none;
+    }
+    .table-scroll {
+        overflow: visible;
+    }
+    .table-scroll table {
+        min-width: 0;
+    }
+    :target {
+        background: transparent;
+    }
+}

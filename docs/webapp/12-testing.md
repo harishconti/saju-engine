@@ -323,3 +323,27 @@ rejects with 401.
 Percentage targets are a poor goal here. The useful question is: *does every invariant in
 [02 — Data model](02-data-model.md) §"Invariants" have a test that fails if it breaks?* Ten
 invariants, ten tests, minimum.
+
+---
+
+## Specialised gate 4 — the web report (`tests/test_web_report.py`)
+
+The web document is served *and* downloaded, so it has to stand on its own. The tests
+assert the properties that make that true, and the same measurements the app's UI bar
+uses were taken on a real report through headless Chrome at 390 / 768 / 1440 px:
+
+| Check | Why |
+|---|---|
+| No external `src`/`href`, no `<script>`, no `<link>`, no `@import`/`@font-face`, no `url(http…)` | One self-contained file: nothing may depend on our origin or the reader's fonts |
+| One inline `<style>`, inline `<svg>` | Styling and charts travel with the file |
+| `noindex` + viewport meta | Private link, never indexable; readable at phone width |
+| Heading ids unique, one anchor each, contents links all resolve | The HTML had **no ids at all** before this; a 20-page reading could not be navigated |
+| Every `<table>` inside a `.table-scroll` (`tabindex="0"`, `role="region"`) | Wide tables must not push the page sideways — verified 0 px overflow at all three widths |
+| `--audio-url` puts the player in the MP3 section; absent without it | The Deep tier's copy promises the audio "on the same page as your reading" |
+| `report-toolbar` element appears only when injected | The downloadable file ships without dead links |
+| The print document gains none of it | `golden_html` snapshots stay the print artefact |
+
+```bash
+python3 -m pytest -q tests/test_web_report.py
+python3 tools/qa_client_ready.py report.md --html report.html   # the artefact, not just the source
+```

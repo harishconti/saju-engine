@@ -59,6 +59,40 @@ PYTHONPATH=src python3 src/saju_html/combine_candidate_report.py sruthi
 python3 src/saju_html/md_to_saju_compat_pdf.py <compat.md> --name-a ... --name-b ... --tier deep
 ```
 
+### The web document (the reading; the PDF is the keepsake)
+
+`markdown_to_html(..., web=True)` produces the artefact the client is meant to *read*:
+one **self-contained** HTML file — inline CSS, inline SVG charts, no scripts, no
+webfonts, no external requests — so the same bytes can be served at the report link *and*
+downloaded and kept. Nothing in it depends on our origin, our build, or the reader's
+installed fonts.
+
+```bash
+python3 src/saju_html/md_to_saju_html_pdf.py --from-chart --web \
+  --name "…" --birth-year … --tier deep --output report.html [--audio-url https://…]
+python3 tools/qa_client_ready.py report.md --html report.html   # gate the artefact
+```
+
+What the web layer adds on top of the print stylesheet (`theme.css` is built for A4):
+
+- **Navigation that works.** Every `h2`/`h3` gets a readable id (`#career-wealth`) and a
+  tappable anchor, and the contents list is rewritten into real links — resolved with the
+  same matcher the PDF outline uses, and left as plain text when a label has no heading.
+  The HTML previously had **no ids at all**.
+- **Wide tables scroll inside their own box** (`tabindex="0"`, `role="region"`), so a
+  six-column ten-god table never pushes the page sideways. Verified: no horizontal
+  overflow at 390 / 768 / 1440 px.
+- **The audio summary where the copy promises it** — an inline player in the MP3 section,
+  which a PDF cannot honour.
+- **`noindex, nofollow`** and a viewport tag. The link is unguessable and the route is
+  private; a reader's report must still never be indexable.
+- **The cover carries the brand line, not the 命 watermark.** The watermark is a CJK glyph
+  and the print sheet embeds its fonts; a web document that must render identically
+  everywhere cannot depend on the reader having a Korean font (without one it is a tofu
+  box at 110pt on the front page).
+- A `report-toolbar` slot the webapp fills with download links when it serves the report.
+  The downloadable file is rendered without it.
+
 ### The PDF artefact (ReportLab backend)
 
 `src/saju_html/md_to_saju_pdf.py` renders the client PDF, and builds the document **twice**:
