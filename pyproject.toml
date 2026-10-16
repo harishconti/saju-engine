@@ -18,13 +18,20 @@ dependencies = [
     "reportlab>=4.1",
     "markdown-it-py>=3.0",
     "jinja2>=3.1",
+    # Main (not just the `web` extra) because Vercel's Python builder installs the
+    # project's main dependencies from pyproject.toml when building the report-engine
+    # function, and ignores `installCommand`. Leaving fastapi in an extra produced a
+    # bare 500 on every request: ModuleNotFoundError at import.
+    "fastapi>=0.110",
 ]
 
 [project.optional-dependencies]
 pdf = ["reportlab>=4.1"]
 html = ["playwright>=1.40", "jinja2>=3.1"]
+# fastapi is deliberately NOT here: it is a main dependency (see above) so that the
+# deployed report-engine function has it. This extra adds only what a *locally served*
+# instance needs on top.
 web = [
-    "fastapi>=0.110",
     "uvicorn>=0.25",
     "python-multipart>=0.0.9",
     "cryptography>=41",
@@ -36,6 +43,12 @@ dev = [
 
 [project.scripts]
 saju-engine = "saju_engine.cli:main"
+
+# The report-engine service. Without this, Vercel treats `api/index.py` as a legacy
+# file-based function mounted at the exact path `/api/index` (sub-paths 404), instead of
+# routing every request to the ASGI app. See docs/webapp/05-report-pipeline.md §1.2.
+[tool.vercel]
+entrypoint = "api.index:app"
 
 [tool.setuptools.packages.find]
 where = ["src"]

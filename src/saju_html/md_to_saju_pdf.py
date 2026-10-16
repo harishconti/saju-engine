@@ -98,19 +98,54 @@ from saju_html import (  # noqa: E402
 # Helvetica lacks the Indian Rupee sign (₹) and many Unicode glyphs. We use
 # DejaVu Sans as the primary typeface because it covers Latin, Greek, Cyrillic,
 # the rupee symbol, and the block characters we need for the visual elements.
-_DEJAVU_DIR = Path("/usr/share/fonts/truetype/dejavu")
+# E1: the engine must render inside a serverless function, where
+# /usr/share/fonts does not exist. Resolution order:
+#   1. $SAJU_FONT_DIR                     — explicit; used by the report-engine service
+#   2. <this package>/fonts/              — faces bundled with the repository
+#   3. /usr/share/fonts/truetype/dejavu   — the system copy on a normal Linux box
+_DEJAVU_FACE_FILES = [
+    ("DejaVuSans", "DejaVuSans.ttf"),
+    ("DejaVuSans-Bold", "DejaVuSans-Bold.ttf"),
+    ("DejaVuSans-Oblique", "DejaVuSans-Oblique.ttf"),
+    ("DejaVuSans-BoldOblique", "DejaVuSans-BoldOblique.ttf"),
+    ("DejaVuSansMono", "DejaVuSansMono.ttf"),
+]
+
+_DEJAVU_CANDIDATES = [
+    Path(os.environ["SAJU_FONT_DIR"]) if os.environ.get("SAJU_FONT_DIR") else None,
+    Path(__file__).resolve().parent / "fonts",
+    Path("/usr/share/fonts/truetype/dejavu"),
+]
+
+
+def _resolve_dejavu_dir() -> Optional[Path]:
+    """First candidate directory that actually holds the DejaVu Sans face."""
+    for candidate in _DEJAVU_CANDIDATES:
+        if candidate and (candidate / "DejaVuSans.ttf").exists():
+            return candidate
+    return None
+
+
+_DEJAVU_DIR = _resolve_dejavu_dir()
 
 
 def _register_dejavu_fonts() -> None:
-    """Register DejaVu Sans faces with reportlab if they are present."""
-    faces = [
-        ("DejaVuSans", "DejaVuSans.ttf"),
-        ("DejaVuSans-Bold", "DejaVuSans-Bold.ttf"),
-        ("DejaVuSans-Oblique", "DejaVuSans-Oblique.ttf"),
-        ("DejaVuSans-BoldOblique", "DejaVuSans-BoldOblique.ttf"),
-        ("DejaVuSansMono", "DejaVuSansMono.ttf"),
-    ]
-    for name, filename in faces:
+    """Register DejaVu Sans faces with reportlab if they are present.
+
+    A missing directory is a warning rather than an error: reportlab then falls back to
+    its built-in fonts, which still render Latin text. The warning names every location
+    that was searched, so a serverless log makes the cause obvious instead of showing a
+    bare "font file not found".
+    """
+    if _DEJAVU_DIR is None:
+        searched = ", ".join(str(c) for c in _DEJAVU_CANDIDATES if c)
+        print(
+            f"Warning: DejaVu fonts not found in any of: {searched}. "
+            "Falling back to reportlab's built-in fonts. Set SAJU_FONT_DIR to override.",
+            file=sys.stderr,
+        )
+        return
+    for name, filename in _DEJAVU_FACE_FILES:
         path = _DEJAVU_DIR / filename
         if path.exists():
             try:
@@ -815,7 +850,8 @@ and each branch's hidden stems (지장간):
 def build_pdf_from_chart(chart, output_pdf: Path, *, title: str = "Saju Reading",
                          client: str = "", dob: str = "", day_master: str = "",
                          overwrite_report: bool = False, tier: Optional[str] = None,
-                         report_id: str = ""):
+                         report_id: str = "",
+                         favorable_override: Optional[str] = None):
     """Render a Chart object directly to a PDF, without a markdown intermediate.
 
     Internally calls chart_to_markdown() or generate_premium_report() then
@@ -832,7 +868,8 @@ def build_pdf_from_chart(chart, output_pdf: Path, *, title: str = "Saju Reading"
     """
     kw = prepare_chart_render(
         chart, output_pdf, title=title, client=client, dob=dob, day_master=day_master,
-        overwrite_report=overwrite_report, tier=tier, report_id=report_id)
+        overwrite_report=overwrite_report, tier=tier, report_id=report_id,
+        favorable_override=favorable_override)
     return build_pdf(kw["input_md"], Path(output_pdf), title, kw["client"], kw["dob"],
                      kw["day_master"], report_id=kw["report_id"], tier=tier)
 

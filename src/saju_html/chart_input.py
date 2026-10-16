@@ -44,12 +44,20 @@ def _slugify(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", name.lower().strip()).strip("-")
 
 
-def chart_markdown(chart, tier: Optional[str] = None, *, title: str = "Saju Reading") -> str:
+def chart_markdown(chart, tier: Optional[str] = None, *, title: str = "Saju Reading",
+                   favorable_override: Optional[str] = None) -> str:
     """Markdown for ``chart``: the premium generator when ``tier`` is given,
-    else the legacy ``chart_to_markdown`` template."""
+    else the legacy ``chart_to_markdown`` template.
+
+    ``favorable_override`` is the reader-argued 용신. It was already accepted by
+    ``generate_premium_report`` and by the compatibility path; E3 threads it through the
+    single-chart web render path too, so the review console can impose a favourable
+    element and regenerate consistently.
+    """
     if tier:
         from saju_engine.premium_report import generate_premium_report
-        return generate_premium_report(chart, tier=tier, generation_date=None)
+        return generate_premium_report(chart, tier=tier, generation_date=None,
+                                       favorable_override=favorable_override)
     from saju_html.md_to_saju_pdf import chart_to_markdown  # lazy: this tier-less legacy path imports reportlab
     return chart_to_markdown(chart, title=title)
 
@@ -68,7 +76,8 @@ def intermediate_md_path(output_pdf: Path, overwrite_report: bool = False) -> Pa
 def prepare_chart_render(chart, output_pdf: Path, *, title: str = "Saju Reading",
                          client: str = "", dob: str = "", day_master: str = "",
                          overwrite_report: bool = False, tier: Optional[str] = None,
-                         report_id: str = "") -> dict:
+                         report_id: str = "",
+                         favorable_override: Optional[str] = None) -> dict:
     """Write the intermediate markdown next to ``output_pdf`` and return the
     kwargs (``input_md``, ``client``, ``dob``, ``day_master``, ``report_id``)
     a backend needs to render it.
@@ -84,7 +93,9 @@ def prepare_chart_render(chart, output_pdf: Path, *, title: str = "Saju Reading"
     day_master = day_master or _format_day_master(chart)
 
     md_path = intermediate_md_path(output_pdf, overwrite_report)
-    md_path.write_text(chart_markdown(chart, tier, title=title), encoding="utf-8")
+    md_path.write_text(chart_markdown(chart, tier, title=title,
+                                      favorable_override=favorable_override),
+                       encoding="utf-8")
 
     if not report_id:
         slug = _slugify(client or chart.name or output_pdf.stem)
