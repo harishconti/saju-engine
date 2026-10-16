@@ -1396,6 +1396,41 @@
     the reviewer sees "this report was generated before the reading existed. Regenerate to add it" rather than a wrong
     claim about compat being PDF-only.
 
+  - **2026-10-17 (the `htmlKey` migration had never been applied to production — report generation was broken).** Found while
+    checking whether the compat reading blocker below affects a live order. It does not; this does.
+    🔴 **What was wrong.** The repo carries `apps/web/prisma/migrations/20261016120000_report_html_key`, and the deployed
+    webapp writes `Report.htmlKey`/`htmlBytes` on **every** report it creates. The production database did not have those
+    columns: `_prisma_migrations` listed only the four earlier migrations, and `SELECT "htmlKey" FROM "Report"` failed with
+    `column r.htmlKey does not exist`. **So the next paid order would have failed at report creation** — and nobody would
+    have seen it, because the last order was placed *before* the reading shipped (`10-16 13:24`, one COMPAT `basic`, two
+    SINGLE, one awaiting payment). This is exactly the failure the `09` runbook's *Prevention* line warns about: **deploy the
+    code change and the migration together.** They went out a deploy apart.
+    ✅ **Confirmed it was the production database before touching it.** The local `apps/web/.env` points at the same Neon
+    endpoint as the Vercel production env (`ep-raspy-morning-a1xq0p8c`) — compared by endpoint id, never by printing the
+    credential — and the rows match this file's production figures (1 user, 4 orders, 3 reports, 2 deliveries).
+    ✅ **Applied** `npx prisma migrate deploy`: `ALTER TABLE "Report" ADD COLUMN "htmlKey" TEXT, ADD COLUMN "htmlBytes"
+    INTEGER` — additive and nullable, so nothing existing could break. Verified afterwards: the columns exist, a
+    `BEGIN … INSERT … ROLLBACK` probe really writes `htmlKey`/`htmlBytes`, `prisma migrate status` says *up to date*, and the
+    counts are unchanged (3 reports, 4 orders, 2 deliveries, 0 probe rows). **The migration file's comment still says compat
+    readings "have no web mode yet" — left alone deliberately: editing an almost-applied migration changes its checksum.**
+    ⚠️ **The pattern, again:** the code and the schema were treated as one deploy when they are two. The `htmlKey` column is
+    now the sixth thing this session that looked done in the repo and was not true in production.
+  - **2026-10-17 (OPEN — the compatibility reading fails the client-ready gate, so compat approvals are blocked).** New, and
+    *not* caused by the reading work — surfaced by it, because nothing had ever run the artefact gate over a compat PDF.
+    ⚠️ **What the gate says.** `approve` scans the intake's markdown and PDF text, and a real compat PDF (ReportLab, production
+    backend) yields **two `DOUBLE_GLOSS`** findings — verified by generating one and running `scan(..., rendered=True)`,
+    which is exactly what `approve` runs:
+      1. `(annual luck)` — the template authors `overlay both partners' 세운 (annual luck)` (`compat_report.py:702`), and the
+         renderer expands `세운` to `Annual Luck (세운)` and appends `— the theme of a single year`, so "annual luck" is
+         already on the page before the parenthetical repeats it.
+      2. `(Unfavorable Element)` — the glossary bullet is `Unfavourable Element (忌神)` (`plain_glossary.py:70`), and the
+         client-copy translation expands the Hanja `忌神` into `Unfavorable Element` (`saju_html/__init__.py:459`), giving
+         `Unfavourable Element (Unfavorable Element)` — a term glossed with itself, in two spellings.
+    ⚠️ **Consequence:** a compatibility report **cannot be approved without `--force`**, so the reviewer is pushed toward the
+    override on the one gate that exists to stop slop reaching a client. Not touched yet: (1) is a one-line prose fix but it
+    regenerates the compat goldens, and (2) wants a rule "never expand a Hanja that already sits inside a parenthetical
+    following its own English" in the translation layer — a change with golden blast radius that deserves its own pass.
+
 ### Earlier state (2026-09-26)
 
   - **2026-10-16 (the reading joins the design system — "the report UI is very ugly").** Owner feedback on the web
