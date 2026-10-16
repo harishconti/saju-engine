@@ -34,9 +34,12 @@ The `saju-engine` Python package lives under `src/saju_engine/` and computes cha
 
 - `knowledge/` — the canonical Saju knowledge base and output template.
 - `src/saju_engine/` — chart derivation, compatibility, luck overlays, report generation.
+- `src/saju_html/` — markdown → PDF renderers (ReportLab and HTML/Playwright backends).
 - `tools/` — PDF renderers, intake forms/servers, report combiner, validation helpers.
 - `candidates_horoscope/` — stored reports, compatibility readings, and intake output.
 - `tests/` — pytest coverage for engine, CLI, PDF, compat, and report layers.
+- `apps/web/` — the Next.js webapp (landing page, accounts, ordering, dashboard, review console). See `docs/webapp/`.
+- `api/index.py` — the stateless FastAPI service that wraps this engine for the webapp. The Vercel project's Root Directory is the **repository root**, so `src/` is inside the function bundle. Deployed and verified — see `docs/webapp/05-report-pipeline.md` §1.1.
 
 ## Notable constraints
 
@@ -51,6 +54,7 @@ The `saju-engine` Python package lives under `src/saju_engine/` and computes cha
 - Change reading rules or wording: [Knowledge and skill map](domain/knowledge-and-skill.md)
 - Change products, report structure, or compat logic: [Products and reports](products/reports.md)
 - Change CLI/PDF/intake/testing behavior: [Operations and toolchain](operations/toolchain-and-testing.md)
+- Change the webapp, hosting, database, or report delivery pipeline: [Webapp documentation](../webapp/README.md)
 
 ## Source anchors
 

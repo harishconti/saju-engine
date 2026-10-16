@@ -27,7 +27,8 @@ saju/
 │   ├── issues_bugs.md                 # Engine issue tracker / decision log (with fix history)
 │   ├── market-research-2026-09.md     # Sourced market research (confidence-flagged)
 │   ├── research/                      # Validation research notes
-│   └── openwiki/                      # Reference docs: quickstart, architecture, domain, products, operations
+│   ├── openwiki/                      # Reference docs: quickstart, architecture, domain, products, operations
+│   └── webapp/                        # ⭐ Webapp docs: architecture, data model, API, auth, pipeline, services, deploy, ops, privacy, build plan, testing
 ├── pyproject.toml                     # Packaging + dependencies
 ├── requirements.txt                   # Runtime dependencies
 ├── requirements-dev.txt               # Development dependencies (pytest, ruff)
@@ -90,8 +91,15 @@ saju/
 │   ├── client_intake_app.py           # FastAPI self-service app that returns tiered PDFs
 │   ├── qa_compliance.py               # Optional compliance QA gate (needs TYPESAFE_API_KEY)
 │   └── client_compat_intake_form.html # Two-chart compat intake form (Partner A × Partner B), served at /compat
-├── apps/landing-page/                 # Next.js marketing site (own git repo; USD/English-global positioning)
-├── tests/                             # pytest suite (1200+ tests)
+├── api/
+│   └── index.py                       # ⭐ Report-engine service: stateless FastAPI wrapping the engine for the webapp
+├── vercel.json                        # Engine project config (framework: fastapi, maxDuration, excludeFiles). The
+│                                      #   engine's Vercel Root Directory is the REPO ROOT so it can import src/;
+│                                      #   the entrypoint is declared in pyproject.toml. See docs/webapp/05 §1.1
+├── apps/
+│   ├── landing-page/                  # ⚠️ LEGACY Next.js marketing site (config only; src/ is NOT in this repo — see docs/MEMORY.md open item A1)
+│   └── web/                           # ⭐ Next.js webapp: landing page + accounts + ordering + dashboard + review console (live — see docs/webapp/)
+├── tests/                             # pytest suite (1,900+ tests)
 ├── misc/market_research/              # ⚠️ SUPERSEDED June-2026 India research — see docs/market-research-2026-09.md
 └── candidates_horoscope/
     ├── README.md                      # Per-candidate folder conventions + index
@@ -135,7 +143,7 @@ Beyond the knowledge base, the project ships two execution paths:
 ### Calculation engine — `src/saju_engine/`
 - **What:** Python module that takes a Gregorian birth date/time/location and returns a fully-derived Saju chart (four pillars + hidden stems + 십신 + 12운성 + major-luck sequence + Day Master + branch relationships + classical stars + Day-Master strength heuristic + special-grid candidates + annual/monthly/daily luck windows).
 - **Built on:** `sajupy` (for solar-term month boundaries + base 60-cycle day math) plus our own Korean-명리 lookup tables.
-- **Validation:** 1,846 pytest cases under `tests/` (incl. byte-exact report snapshots in `tests/golden/` and rendered-HTML snapshots in `tests/golden_html/`) plus the cited-fixture gate `python3 tools/run_validation.py` (315 checks across 10 subsystems). Run `python3 -m pytest tests/ -q` from the project root.
+- **Validation:** 1,909 pytest cases under `tests/` (incl. byte-exact report snapshots in `tests/golden/` and rendered-HTML snapshots in `tests/golden_html/`) plus the cited-fixture gate `python3 tools/run_validation.py` (315 checks across 10 subsystems). Run `python3 -m pytest tests/ -q` from the project root.
 - **Solar-time correction:** Enabled by default for non-standard longitudes. Indian births east or west of the IST meridian (82.5°E) are corrected to true solar time before the hour branch and day pillar are derived.
 - **Korean `야자시` vs Chinese `조자시`:** defaults to `convention="korean"` (23:00 belongs to the *current* day's 子 hour). Use `--convention=chinese` for the Chinese early-Zi rule.
 - **CLI formats:** `table` (default), `json`, `skeleton`, and `premium`. Premium supports `--tier {sample,essential,deep,spark,reading,fullmap}` — the first three are the landing-page products (Hook / Essential Report / Deep Destiny Report), the last three are legacy internal aliases kept for backward compatibility. Skeleton supports `--year`, `--month`, `--day`, `--focus`, and `--no-prose-scaffold`. `--convention` and `--overwrite-report` are available on the PDF wrapper.
@@ -210,6 +218,10 @@ for the strategy and research behind it).
 | — | **Cosmic Companion** (subscription) | $9/mo or $79/yr | 3–4 pages | Monthly timing read; manual billing; off the primary pricing grid. |
 
 Engine usage: `python -m saju_engine --format premium --tier {sample,essential,deep} ...` for single-chart. For Compat (두 분 궁합): `generate_compat_report(chart_a, chart_b, name_a, name_b)` from `src/saju_engine/compat_report.py`, then render via `python3 src/saju_html/md_to_saju_compat_pdf.py <md-path> --name-a ... --name-b ...`.
+
+> **Selling these tiers to clients (accounts, checkout, review, delivery):** see the webapp
+> documentation set in [`docs/webapp/`](docs/webapp/README.md) — architecture, data model, API, auth,
+> report pipeline, services/DNS setup, deployment, operations, privacy, build plan, and testing.
 
 The legacy internal tiers (`spark` $9, `reading` $55, `fullmap` $129) remain engine-supported for backward compatibility, but new client orders should use `sample`, `essential`, `deep`, or the compatibility (`compat`) products (`basic`/`deep`).
 

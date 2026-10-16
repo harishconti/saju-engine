@@ -51,6 +51,33 @@ When the architecture, products, or toolchain change meaningfully, update the co
 - `docs/openwiki/products/reports.md` — tiers, report pipeline, folder conventions.
 - `docs/openwiki/operations/toolchain-and-testing.md` — CLI, PDF backends, tests.
 
+The webapp layer (landing page, accounts, ordering, review, delivery, infrastructure) has its own
+numbered set under `docs/webapp/`. Update it when the webapp, hosting, database, or pipeline change:
+
+- `docs/webapp/00-overview.md` — scope, target flow, locked decisions.
+- `docs/webapp/01-architecture.md` — the two deployables and why.
+- `docs/webapp/02-data-model.md` — Prisma schema, invariants, retention.
+- `docs/webapp/03-api-spec.md` — every route. **Update when adding a route.**
+- `docs/webapp/04-auth-and-roles.md` — Neon Auth wiring and gates.
+- `docs/webapp/05-report-pipeline.md` — engine contract, queue, review console, R2.
+- `docs/webapp/06-frontend-ux.md` — routes, screens, landing-page sections, copy rules.
+- `docs/webapp/07-services-and-integrations.md` — external services, DNS, credentials, cost.
+- `docs/webapp/08-deployment.md` — Vercel projects, env scopes, CI, rollback.
+- `docs/webapp/09-operations.md` — crons, health, runbooks.
+- `docs/webapp/10-privacy-and-compliance.md` — PII, consent, retention, deletion, disclaimers.
+- `docs/webapp/11-build-plan.md` — phases and acceptance criteria.
+- `docs/webapp/12-testing.md` — test strategy and the two specialised gates.
+
+Cross-cutting rules:
+
+- A new API route → update `docs/webapp/03-api-spec.md` **and** the Playwright auth-gate spec.
+- A schema or enum change → update `docs/webapp/02-data-model.md` + add a migration.
+- A new external service or env var → update `docs/webapp/07-services-and-integrations.md` **and**
+  `docs/webapp/08-deployment.md`.
+- A tier or price change → update `docs/webapp/02-data-model.md` (tier map),
+  `docs/webapp/07-services-and-integrations.md` (store config), **and**
+  `docs/openwiki/products/reports.md`.
+
 ## Out of scope
 
 - Tarot, Zi Wei Dou Shu, QMDJ, Western astrology, standalone numerology.

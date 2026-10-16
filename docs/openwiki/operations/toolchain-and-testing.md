@@ -30,7 +30,7 @@ Key scripts:
 pytest
 ```
 
-The suite currently contains ~1,846 cases (as of 2026-10-11). Core coverage includes:
+The suite currently contains ~1,909 cases (as of 2026-10-11). Core coverage includes:
 
 - Foundation tables (HIDDEN_STEMS, STEM_INFO, BRANCH_INFO, SIX_*, THREE_*).
 - Stem/branch operations, 12운성, ten-god lookups, hidden stems, Nayin.

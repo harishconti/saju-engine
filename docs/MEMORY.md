@@ -12,7 +12,7 @@
 - **License:** MIT
 - **Stack:** Python 3.10+, `sajupy==0.2.0` (pinned 2026-09-26 — see N-17 below; was `>=0.2.0`), `reportlab>=4.1`, optional `playwright`, optional `fastapi`/`uvicorn`.
 
-## Current State (last updated 2026-10-11)
+## Current State (last updated 2026-10-16)
 
 - **2026-10-01 audit fully worked through (2026-10-02 → 10-04), all merged to `develop`, not pushed.**
   Suite **1,794 passed / 5 skipped / 14 xfailed**; validation gate **315 checks (PASS 306,
@@ -58,6 +58,488 @@
     design — not wired into the report/web pipeline** (a manual pre-delivery gate, run alongside
     reader review). Suite **1,846 passed / 5 skipped / 13 xfailed**; documented in
     `docs/openwiki/operations/toolchain-and-testing.md` + `AGENTS.md`.
+  - **2026-10-15: webapp architecture + service/integration planning documented.** Added a new
+    numbered documentation set at `docs/webapp/` (14 files: overview, architecture, data model, API
+    spec, auth/roles, report pipeline, frontend/UX, services & integrations, deployment, operations,
+    privacy & compliance, build plan, testing, index) describing how to launch the product as a paid,
+    account-based web app on Vercel. Cross-linked from `README.md`, `AGENTS.md`,
+    `docs/openwiki/README.md`, and `docs/openwiki/quickstart.md`.
+    **Locked decisions (owner, 2026-10-15):** two Vercel projects (`apps/web` Next.js +
+    `services/report-engine` FastAPI/Python); **ReportLab** PDF backend in production (Chromium does
+    not fit a Vercel function — measured here at 0.70 s markdown + 0.62 s PDF for the deep tier,
+    ~130 MB dependency closure vs a 500 MB Python limit); **rebuild** the landing page inside
+    `apps/web` (A1 source still not in this repo); **Lemon Squeezy** as Merchant of Record;
+    **always review before delivery** for every paid tier (so the review console and the
+    `--favorable-override` 용신 workflow are core, not optional); **Resend** for email;
+    **Cloudflare R2** private storage, presigned URLs, **no PII column encryption** (retires the
+    SQLite/Fernet `saju_web/store.py` posture); **no Redis** — rate limits, idempotency, job leases,
+    and the R2 deletion queue are all Postgres tables. Vercel **Pro** is required (Hobby crons are
+    once-daily, max 2). Free sample stays instant and account-free.
+    **Three engine edits identified as prerequisites** (all small, all test-covered, none done yet):
+    E1 `SAJU_FONT_DIR` override + bundled DejaVu (the ReportLab renderer hardcodes
+    `/usr/share/fonts/truetype/dejavu`, absent in a Vercel function); E2 remove runtime Nominatim
+    geocoding from the request path (coordinates resolve once at profile creation — `pillars.py`
+    currently geocodes city names via geopy at request time); E3 thread `favorable_override` through
+    `prepare_chart_render`/`chart_markdown` (the CLI and the compat path already support overrides;
+    the single-chart web render path does not). Also: regenerate the five demo PDFs in
+    `apps/landing-page/public/` with the ReportLab backend so marketing previews match delivered
+    output. **Docs only — no code changed; suite unaffected (1,846 passed).**
+  - **2026-10-15 (later): `apps/web` scaffolded and building.** The Next.js webapp now exists at
+    `apps/web/` — 40 routes, `npm run build` clean, `tsc --noEmit` clean, `eslint` clean, **44 vitest
+    cases passing**. Built: the 9-section landing page + a mobile sticky CTA; `/sample` (free funnel,
+    account-free); `/login` (Google / email+password / magic link, tabbed, consent checkbox);
+    `/auth/complete`; legal pages (privacy, terms, refund policy — all three required for Lemon
+    Squeezy activation); the full authenticated surface (`/dashboard` overview with the derived chart,
+    `/dashboard/reports` + detail, `/dashboard/profiles`, `/dashboard/orders`, `/dashboard/account`
+    with consent + deletion); `/reports/new` order flow; and the `/admin` review console
+    (queue + per-report 용신 override → regenerate → approve/reject, plus manual mark-paid).
+    25 API routes including profiles/orders/reports/account, the engine dispatcher + cleanup crons,
+    both webhooks, and the sample endpoint. Libs: `prisma`, `api` (error envelope + `handle()`),
+    `auth/{server,client,index}`, `roles`, `tiers`, `ratelimit`, `audit`, `idempotency`, `r2`
+    (presign + object-deletion queue), `engine`, `queue` (`FOR UPDATE SKIP LOCKED` + leases),
+    `fulfilment`, `cleanup`, `checkout` (Lemon Squeezy), `email` (Resend), `birth` (city resolution +
+    historical/DST-aware offsets), `cities` (~160-city bundled table), `chart`, `chart-compute`,
+    `validation/schemas`.
+    **Notable correctness findings while building:**
+    - **`auth.middleware()` protects EVERY path it matches** (`shouldProtectRoute()` returns true for
+      anything outside its small skip list). So `src/proxy.ts` matches **only** protected routes —
+      matching `/` would have locked the entire public site behind a login.
+    - **`Order.tier`/`Report.tier` store the ENGINE tier**, so `deep` is ambiguous between the single
+      Deep Destiny tier and Deep Compatibility. Resolution must go through
+      `tierFor(kind, tier)` / `variantIdForOrder(kind, tier)`; a bare id lookup silently charges the
+      wrong Lemon Squeezy variant. Locked in with a regression test.
+    - **Timezone handling is genuinely precise** (verified, now asserted in tests): Asia/Seoul = +8:30
+      in 1910, +10 during 1950 summer DST, +8:30 in the 1954–61 era (+9:30 with DST), +10 for the
+      1987–88 Seoul Olympics DST; Asia/Kolkata = +6:30 during WWII. A hardcoded +9 (or +5:30) gets
+      the hour branch wrong for every pre-1961 Korean and wartime Indian birth.
+    - **The `Essential` tier's engine text promises an "included MP3 audio summary"**
+      (`candidates_horoscope/reports/rm/rm-sample.md`) while `README.md` says the MP3 "is produced
+      separately". Not fixed — changing engine prose would move golden snapshots and needs an owner
+      decision. Flagged because it is a refund/dispute risk the moment someone buys on that promise.
+    - `apps/web/.env` written (gitignored) with the pooled + unpooled Neon URLs, the Neon Auth base
+      URL, and freshly generated `NEON_AUTH_COOKIE_SECRET` / `ENGINE_SERVICE_TOKEN` / `CRON_SECRET`.
+      **The DB password placeholders still need filling in.**
+    - Initial migration generated offline at `apps/web/prisma/migrations/20261015120000_init/`
+      (428 lines incl. CHECK constraints + the one-default-profile partial unique index) — **not yet
+      applied to Neon.**
+    **Still blocking end-to-end use:** `services/report-engine` is not written, so `/api/sample` and
+    generation return a clear 503 and profiles save with `chartJson = null`. Region decision recorded:
+    Neon `ap-southeast-1` (Singapore) → Vercel `sin1` on both projects.
+  - **2026-10-15 (later still): Neon and R2 are live and verified.** Using the authenticated `neon`
+    CLI on this machine (`neon me` → ngharish.conti), the `saju` project was found as
+    **`sparkling-mouse-75978774`** (org `org-curly-sky-98590399`, `aws-ap-southeast-1`), with two
+    branches: `production` (`br-soft-mouse-a1pbgnuq`, default) and **`vercel-dev`**
+    (`br-odd-art-a1xbr1d1`, created by the Neon↔Vercel integration). Connection strings (pooled →
+    `DATABASE_URL`, unpooled → `DIRECT_URL`) were fetched with `neon connection-string` and written
+    straight into `apps/web/.env` — **no secret was printed into the transcript or committed**.
+    **`20261015120000_init` applied to BOTH branches** and verified live: 14 tables, all **13**
+    hand-written CHECK constraints rejecting bad rows by name (probe: negative `RateLimit.count`,
+    COMPAT order with no second profile, SINGLE order with a COMPAT tier value), the partial unique
+    index `profile_one_default_per_user` with the exact predicate, and all 8 enums with correct
+    labels. `vercel-dev` was created *before* the migration and was empty — migrating it prevents a
+    Preview deployment failing with "table does not exist".
+    **Neon Auth** confirmed enabled on `production` (`better_auth`; JWKS reachable, Ed25519 key).
+    **Two gaps found and one fixed:** (a) **zero trusted domains were configured** — the exact cause of
+    "OAuth succeeds but the user never arrives" — now `https://cosmicsaju.com`,
+    `https://www.cosmicsaju.com`, and localhost allowed; (b) the configured Google provider uses
+    **Neon's shared dev-only key** (works, but shows Neon branding and is explicitly not for
+    production) — needs the owner's own Google OAuth client; (c) `vercel-dev` has **no Auth
+    configured**, so Vercel Preview sign-in will fail until it is enabled.
+    **Cloudflare R2 wired and proven:** bucket **`saju-engine-dev`**, account
+    `8b70484a615d5759f6929ef7e4f15f01`; credentials reused from `construction-log/.env` after
+    verifying the existing token reaches both projects' buckets. A new **opt-in integration test**
+    (`apps/web/src/lib/__tests__/r2.integration.test.ts`, `RUN_R2_TESTS=1`) proves the full round-trip
+    — presigned PUT → `HeadObject` verify → presigned GET → delete — plus an unsigned-access probe
+    confirming the bucket is **private**. It self-guards: refuses to run unless the bucket name looks
+    like dev/test, so it can never touch production storage. Default `npm test` → **44 passed,
+    4 skipped**.
+    `/api/health` now reports `{"db":true,"storage":true,"engine":false}` — **the report engine
+    service is the only remaining blocker.** Also fixed while verifying: a database outage used to
+    surface as a generic 500 on every rate-limited route (rate limiting is the first DB touch); Prisma
+    `P1xxx`/`P2024`/`PrismaClientInitializationError` now map to **503 `DATABASE_UNAVAILABLE`**.
+    Docs updated: `docs/webapp/07-services-and-integrations.md` gained a provisioning log, an
+    R2-endpoint-form warning, a cross-project credential-reuse table, and a Neon CLI reference.
+  - **2026-10-15 (final): branch + DNS decisions from the owner.** **(a) Single branch:** the owner
+    decided **only Neon `production` counts**; `vercel-dev` is migrated but deliberately unused, and
+    every Vercel scope points at `production`. Docs updated in `07` §"Branches — production only" and
+    `08` §"Scope discipline" (with an explicit note that the usual Preview-never-gets-prod-credentials
+    rule is relaxed deliberately until a second person has DB access). **(b) The domain's DNS is on
+    CLOUDFLARE, not Hostinger** — verified by lookup: NS = `randy`/`veronica`.ns.cloudflare.com, A =
+    `104.21.77.175`/`172.67.210.158` (Cloudflare proxy IPs, not Vercel's `76.76.21.21`). All DNS
+    instructions in `docs/webapp/07` and `11` were **wrong** and have been corrected: records must be
+    added in the **Cloudflare dashboard**, because editing Hostinger's zone does nothing. The request
+    path is Cloudflare → Vercel, and the proxy caveat (SSL/TLS must be **Full (strict)**; grey-cloud
+    DNS-only is the better-supported option) is now documented. **(c)** The domain is attached in
+    Vercel but `https://cosmicsaju.com` returns `x-vercel-error: DEPLOYMENT_NOT_FOUND` — the project
+    has no successful production build yet, so it will resolve on first deploy. **(d)** The zone has
+    **no MX and no TXT records**, so no mailbox and no Resend verification exist yet. **(e)** The
+    stored Vercel CLI token (`~/.local/share/com.vercel.cli/auth.json`) is **expired** — `vercel whoami`
+    → "The specified token is not valid" — so `npx vercel login` is needed before CLI/API inspection.
+    `dig` is not installed on this machine; `07` now ships a DNS-over-HTTPS helper instead.
+  - **2026-10-15 (Vercel connected and inspected).** `vercel login` was completed by the owner and the
+    project was inspected via CLI + REST API. One project: **`saju-engine`**
+    (`prj_8hvyP1SO0yvYcMrqks4lYtl6DSUA`, team `harishcontis-projects`), Next.js preset, Node 24.x,
+    linked to GitHub with production branch `develop`.
+    **Two blocking misconfigurations found and fixed via the API:**
+    **(1) Root Directory was `apps/landing-page`** — the legacy app whose `src/` is not in this repo,
+    so nothing built and `https://cosmicsaju.com` returned `404 DEPLOYMENT_NOT_FOUND`. Corrected to
+    **`apps/web`**. **(2) Function region was defaulting to `iad1`** while Neon is in
+    `ap-southeast-1`; set to **`sin1`** (both `serverlessFunctionRegion` and
+    `defaultResourceConfig.functionDefaultRegions`). Note the API rejects a bare `regions` property
+    on PATCH — the field is `serverlessFunctionRegion`.
+    **Env vars: 21 set by the owner; two corrected.** `NEXT_PUBLIC_APP_URL` was
+    `http://localhost:3000` (delivery emails would have linked clients to localhost) → set to
+    `https://www.cosmicsaju.com`. `ADMIN_EMAILS` was **missing entirely**, which made `/admin`
+    unreachable by anyone (requireAdmin needs the DB role *and* an email in that list) → added for all
+    three scopes. Domains: `cosmicsaju.com` **redirects to** `www.cosmicsaju.com`, so **www is
+    canonical**. Still missing: `LEMONSQUEEZY_*` (7) and `TURNSTILE_*` (2).
+    **⚠️ Vercel plan is Hobby, which BLOCKS the per-minute dispatcher — the deploy failed with
+    "Hobby accounts are limited to daily cron jobs. This cron expression (`* * * * *`) would run more
+    than once per day."** This is exactly the constraint the plan predicted, now proven at deploy
+    time. Made Hobby-compatible: dispatch cron → daily (`0 4 * * *`); the Lemon Squeezy webhook now
+    triggers generation via **`after()` from `next/server`** (returns the 2xx first, then dispatches);
+    new **`POST /api/jobs/kick`** lets a client nudge their own queued jobs (ownership-scoped +
+    rate-limited) with a "Check for updates" button on `/dashboard/reports`; `kickOwnerJobs()` added
+    to `fulfilment.ts`. Restoring per-minute dispatch on Pro is a **one-line** schedule change with no
+    code change. Also learned: **`vercel.json` is validated against a strict schema** — even a
+    `_note` key fails the deploy — so the reasoning now lives in a new
+    `docs/webapp/08a-vercel-json-notes.md`.
+    **Google OAuth client: deferred by owner decision until the product has >10 users** (recorded with
+    a trigger checklist in `07` §"Deferred until we have more than 10 users"); sign-in keeps working on
+    Neon's shared dev key, which shows Neon branding on the consent screen.
+    **⚠️ R2 production bucket not found.** `ListBuckets` (which the shared token *can* call) returns
+    only `construction-ledger-dev` and `saju-engine-dev`, and 14 plausible prod names all 404 — so the
+    token is bucket-scoped and the new bucket is not visible to it. `R2_BUCKET` in Vercel is still
+    `saju-engine-dev`. **The exact bucket name (or a token covering it) is needed.**
+    Also flagged: `ENGINE_URL` is still `http://localhost:8000` in the production scope (must change
+    once the engine service is deployed), and `RESEND_API_KEY` is set while the DNS zone has **no MX or
+    TXT records at all**, so sending would fail verification.
+    **⚠️ A credential was leaked into the session transcript by a masking bug of mine** — the
+    `DIRECT_URL` password printed in full because the mask only covered `DATABASE_URL`. **Rotation
+    recommended** (cheap now: no users, nothing deployed). Separately, `vercel env pull` wrote
+    `.env.vercel-check`, which the `.gitignore` did **not** cover — the file has been deleted and the
+    pattern added. Nothing sensitive is tracked (`git check-ignore` confirms).
+  - **2026-10-15 (🚀 DEPLOYED — the site is live).** After the root-directory and region fixes, `vercel
+    deploy` **succeeded** and the first deployment was auto-promoted to production. Verified from
+    outside with plain HTTP, no auth:
+    - `https://www.cosmicsaju.com` → **200**, 106 KB, `<title>Cosmic Saju — Korean Four Pillars
+      readings</title>`, contains the hero copy. **Not** behind a Vercel SSO wall.
+    - apex `https://cosmicsaju.com` → **308 → www** (www canonical, as configured).
+    - `/sample`, `/login`, `/privacy`, `/terms`, `/refund-policy` → 200. `/demo/demo-rm-deep.pdf` →
+      200, 139,980 bytes.
+    - Production `/api/health` → **`{"status":"degraded","db":true,"storage":true,"engine":false}`** —
+      the database and R2 are connected **in production**, and only the engine is dark. `version` is
+      the real git SHA (`9a016a1`).
+    - `/dashboard` → **307 → /login**, proving the `src/proxy.ts` auth gate works in production.
+    - All protected API routes → **401 `UNAUTHORIZED`** in production (`/api/profiles`, `/api/orders`,
+      `/api/reports`, `/api/account`, `/api/admin/queue`). `/api/jobs/kick` → 405 on GET (POST-only).
+    Added `src/app/robots.ts` and `src/app/sitemap.ts` (public surface only; the dashboard, admin, and
+    API are disallowed and excluded) — `/sitemap.xml` had been 404 and `robots.txt` was Vercel's
+    platform-injected content-signals file rather than ours. Both now build as static routes.
+    **Remaining gaps to launch a paid product:** (1) `services/report-engine` still unwritten — the
+    only thing between this and end-to-end readings; (2) `LEMONSQUEEZY_*` (7 env vars) absent, so no
+    payment can be taken; (3) Resend's DNS records still absent from the Cloudflare zone, so delivery
+    email cannot send; (4) the R2 production bucket is unidentified (Vercel still points `R2_BUCKET`
+    at `saju-engine-dev`); (5) `ENGINE_URL` still `http://localhost:8000` in the production scope;
+    (6) the leaked Neon password should be rotated.
+  - **2026-10-15 (payments swapped to Dodo; Resend verified; R2 single-bucket confirmed).** Owner
+    decisions: **Dodo Payments replaces Lemon Squeezy** as the merchant of record; **Resend's DNS
+    records are live**; and **`saju-engine-dev` is the one and only R2 bucket** — no separate
+    production bucket.
+    **Resend verified, confirmed via Resend's own API** (not by eyeballing DNS): `cosmicsaju.com`
+    status **verified**, region `ap-northeast-1`, with DKIM `resend._domainkey` and SPF on both `send`
+    and `rsend` (`send.forge.rmta.net`, `rsend-apne1.forge.rmta.net`) all **verified**. (The
+    `forge.rmta.net` hostnames looked suspicious in a DNS lookup and are in fact Resend's.) ⚠️ No
+    `_dmarc` TXT record exists — recommended for deliverability.
+    **Dodo integration implemented and tested.** Researched the real API rather than guessing:
+    `POST /checkouts` with `Bearer` auth, `product_cart` + `customer` + **`metadata`** + `return_url`
+    → `{session_id, checkout_url}`; `test_mode`/`live_mode` select `test.dodopayments.com` /
+    `live.dodopayments.com`; webhooks follow the **Standard Webhooks** spec (HMAC-SHA256 over
+    `{webhook-id}.{webhook-timestamp}.{raw body}`, base64, `whsec_` stripped then base64-decoded, 5-min
+    replay tolerance). New: `src/lib/dodo.ts`, `src/app/api/webhooks/dodo/route.ts`, and
+    `src/lib/webhook-signature.ts` with **13 dedicated unit tests** (tampered body, wrong secret,
+    tampered signature, replay outside tolerance, missing headers, wrong webhook-id, near-miss
+    signature, multi-candidate headers, `whsec_`-less secret). `metadata.order_id` is what lets the
+    webhook find the order again — without it a payment would take money and fulfil nothing. Fulfils on
+    `payment.succeeded` (never the browser redirect, per Dodo's own guidance), audits
+    `payment.failed`/`payment.cancelled` **without** cancelling the order so the customer can retry, and
+    handles `refund.succeeded`. Removed `src/lib/checkout.ts` and the `lemonsqueezy` route; tier map now
+    carries `productEnv: DODO_PRODUCT_*`. **Suite 57 passed / 4 skipped.**
+    **Two of my own bugs caught by tests/build:** a `??` in a test helper silently swallowed an explicit
+    `null`, so the missing-header cases were not actually testing null (fixed with `hasOwnProperty`);
+    and `.checkoutId` needed renaming to `.sessionId` at two call sites.
+    ⚠️ **A SECOND credential leaked into the transcript** — a `sed -n '34,44p' .env` printed the live
+    `RESEND_API_KEY` in full, because only the `grep` in that command was masked. **Rotate both the
+    Resend API key and the Neon password.** The lesson: never `sed`/`cat` an env file to inspect it —
+    list keys and mask values in the same command.
+    Docs updated across all 14 webapp pages: mechanical rename plus **substantive corrections**, because
+    a blind rename had attributed Lemon Squeezy's *policies and fees* to Dodo. The critical-path item now
+    says to confirm Dodo's own onboarding/fees and explicitly refuses to state the ~5% + $0.50 figure;
+    `00` D4 and the cost tables no longer assert an unverified rate; `03` documents the real Standard
+    Webhooks flow; `01`'s sequence diagram says "verify signature (Standard Webhooks)"; and
+    `docs/market-research-2026-09.md` gained a "Superseded 2026-10-15" note preserving its Lemon
+    Squeezy/Paddle findings as historical evidence.
+  - **2026-10-15 (env-var audit).** Audited every Vercel env var and its scope. Two findings.
+    **(1) `DODO_PAYMENTS_API_KEY` is not set anywhere** — not production, preview, or development —
+    despite the owner believing it was added. The only Dodo var present was
+    `DODO_PAYMENTS_ENVIRONMENT` (which I had created). Worth noting the owner's message spelled it
+    `dodo_payements_api_key`; a typo in the **name** field would silently not match, since the code
+    reads `DODO_PAYMENTS_API_KEY` exactly, and no typo'd variable exists either — so it most likely
+    never saved or landed in another project. **(2) Real scope gaps, now fixed:** `DATABASE_URL` was
+    missing from **preview** (it had `DIRECT_URL` but not `DATABASE_URL`, so any Preview deployment
+    would have failed every Prisma query at runtime with no obvious cause) and `DIRECT_URL` was missing
+    from **development** (breaking `vercel env pull --environment=development` + `prisma migrate`).
+    Both now cover all three scopes with the same production-branch connection strings, consistent with
+    the single-branch decision. Documented in `08a` §"Scope gaps found and fixed".
+    **Clarified for the owner:** `DODO_PAYMENTS_WEBHOOK_KEY` takes the endpoint's **signing secret**
+    (`whsec_…`, on the endpoint's Overview tab), **not** the endpoint id — the id authenticates nothing,
+    while the secret is the HMAC key over `{webhook-id}.{webhook-timestamp}.{body}`.
+  - **2026-10-15 (Dodo live and verified end to end).** The owner had put `DODO_PAYMENTS_API_KEY` in
+    `apps/web/.env` **only** — which production never reads. Both secrets were pushed into Vercel for
+    **all three scopes**, and the app redeployed (env changes are not live until the next deployment).
+    Confirmed against **Dodo's own API**: the API key authenticates (`GET /products` → 200, test mode)
+    and a webhook endpoint exists — **`ep_3KjzkirfY0iCcf2AeBt9vK46irc` →
+    `https://www.cosmicsaju.com/api/webhooks/dodo`**, not disabled, subscribing to
+    `payment.succeeded`, `payment.failed`, `payment.cancelled`, `refund.succeeded`. The owner's webhook
+    value **is** a signing secret (`whsec_…`, 38 chars), so that question is settled correctly.
+    **New: `scripts/dodo-webhook-smoke.mjs`** (`npm run smoke:dodo [target]`) — the first test that
+    exercises the payment path with a **real secret against the real deployment**. It asserts: valid
+    signature accepted (200); the same `webhook-id` again returns `{duplicate:true}` (idempotent);
+    tampered body → 401; tampered signature → 401; one-hour-old event → 401 (replay). **Result: 5/5
+    passed against production.** Verified afterwards in the database that exactly **one**
+    `WebhookEvent` row was written and **zero `Order` rows** were touched — the three rejections write
+    nothing, because they are refused before the DB insert. Smoke rows then deleted. The signature is
+    implemented **independently** of `src/lib/webhook-signature.ts` in that script, deliberately, so
+    agreement between the two is real evidence rather than a tautology.
+    ⚠️ **Only remaining payments gap: the four products.** `GET /products` returns an **empty list** in
+    Dodo test mode, so `DODO_PRODUCT_ESSENTIAL` / `_DEEP` / `_COMPAT_BASIC` / `_COMPAT_DEEP` cannot be
+    set yet. Once created, the ids can be fetched straight from the API rather than copied by hand.
+    Also learned and documented: **a Vercel env change needs a redeploy** — `503 WEBHOOK_UNCONFIGURED`
+    almost always means "variable set, deployment not yet made".
+  - **2026-10-16 (🚀 the engine exists — the funnel works end to end).** Built and deployed
+    `services/report-engine` — which, for a reason that took two failed deploys to find, is **not where
+    the docs said**: the Vercel project's Root Directory is the **repository root**, and the ASGI app
+    lives at **`api/index.py`**, declared via `[tool.vercel] entrypoint = "api.index:app"`. See
+    `docs/webapp/05-report-pipeline.md` §1.1/§1.2.
+    **Engine edits landed (all three prerequisites):**
+    - **E1** — `md_to_saju_pdf.py` now resolves fonts as `$SAJU_FONT_DIR` → `<package>/saju_html/fonts/`
+      → `/usr/share/fonts/truetype/dejavu`, and the **five DejaVu faces + their licence are bundled**
+      (3.0 MB) so output is identical on every host. A missing dir warns with every path searched.
+      **Proved in production:** `/health` reports `fontsDir: /var/task/src/saju_html/fonts` — the
+      *bundled* faces, inside the Lambda, where the system path does not exist.
+    - **E2** — turned out **narrower than documented**: `sajupy` geocodes only when `longitude is None`
+      (`sajupy/core.py:406`), and the webapp always supplies one, so our path never geocoded. The
+      residual risk (a profile with `longitude = NULL`) is now a hard `422 MISSING_LONGITUDE` — a
+      refusal is honest, a silent fallback is a wrong chart.
+    - **E3** — `favorable_override` threaded through `chart_markdown` → `prepare_chart_render` →
+      `build_pdf_from_chart` → `generate_premium_report`, so the review console's 용신 override now
+      works for single charts too, not just compatibility readings.
+    **Two deployment traps, both now documented:** (a) a Root Directory of `services/report-engine/`
+    would have hidden `src/` from the function bundle — Vercel only bundles files under the Root
+    Directory; (b) **Vercel's Python builder installs from `pyproject.toml` and ignores
+    `installCommand`**, so `fastapi` had to be promoted out of the `web` extra into main dependencies
+    or the function died with a bare `500`; and (c) a file at `api/index.py` without an entrypoint gets
+    Vercel's **legacy `/api` file-function mode**, mounted at the exact path only — every sub-path
+    404ed until the entrypoint was declared.
+    **Verified in production:** `/chart` returns the reference chart exactly (甲戌 癸酉 辛丑 乙未 ·
+    辛 Metal · Water via `strong-dm-drain` · the real hour-boundary caveat); `/generate` (deep) returned
+    **139,898 bytes in 1,877 ms**, the object landed in R2, and the **downloaded sha256 matched**. Local
+    `pytest` **1866 passed** (1846 + 20 new contract tests in `tests/test_report_engine_service.py`,
+    which call the endpoint functions directly because httpx 0.28 removed the `app=` argument that
+    starlette 0.36's `TestClient` still passes).
+    **The live funnel works.** `POST https://www.cosmicsaju.com/api/sample` → **200**, a 70,899-byte PDF
+    in R2 with a 15-minute presigned URL; the downloaded artefact is a valid PDF with the right cover
+    (`Day Master Im (Water Yang)`) and **zero** citation/draft/reviewer leaks. And `/api/health` is
+    **`{"status":"ok","db":true,"storage":true,"engine":true,"payments":true,"paymentsMode":"test_mode"}`**
+    — green on every probe for the first time. Remaining: the demo-PDF/MP3 decision (D1), a real mailbox
+    (B4), e2e tests and web CI (B5), and the Dodo test→live migration.
+  - **2026-10-16 (the audio summary — the MP3 promise is now kept).** Owner decision: **deliver the
+    MP3**, deriving the script deterministically from the **approved report text** (no LLM), send it to
+    email + profile, and let delivery proceed **without waiting** for the audio while the client's page
+    shows "being prepared".
+    **Engine:** new `src/saju_html/audio_script.py` (in the HTML layer, because it is a *rendering* of
+    the report and must run the same text pipeline the PDF does: `strip_source_citations` →
+    `strip_engine_drafts` → `translate_inline`). Two defects were found and fixed during development:
+    (a) **deleting** Hanja instead of translating it left grammatical husks — "energy is shaped by.",
+    "its theme is." — because the report writes glyphs *with* a Latin gloss; reusing the renderer's
+    translator yields "shaped by Bing O (Indirect Wealth)"; (b) a **single global character budget** let
+    the opening sections consume everything and silently dropped the timing windows and the
+    recommendations — i.e. it would have shipped audio that does not cover what the report promises —
+    fixed with **per-section budgets**. New `POST /script` endpoint; `POST /generate` now accepts
+    `mdUploadUrl` and uploads the source markdown too (closing the long-standing gap where `mdKey` was
+    declared but never written, and making the script a derivation of the *stored approved* artefact
+    rather than a recomputation that an engine deploy could change). **43 new pytest cases**
+    (`tests/test_audio_script.py` 36, service `/script` 7); suite **1909 passed**.
+    **Webapp:** `JobKind` gains `VOICE`; `Report` gains `enginePayload`, `script`, `audioKey`,
+    `audioBytes`, `audioStatus`, `audioError`, `audioReadyAt`; new `AudioStatus` enum; new
+    `src/lib/tts.ts` (ElevenLabs `eleven_flash_v2_5`, sentence-boundary chunking, `previous_text`/
+    `next_text` for prosody across joins, ID3 stripping so the concatenation does not stop early) and
+    `engineScript()` in `engine.ts`; `enqueueAudio()` at approval; `job.kind === 'VOICE'` handling in the
+    dispatcher; `GET/POST /api/reports/{id}/audio`; `POST /api/admin/reports/{id}/audio` (prepare/retry);
+    an audio card on the report page and an audio panel in the review console; a second "audio is ready"
+    email; and the MP3 added to both erasure sweeps.
+    **A real bug was caught by testing end to end:** `enqueueAudio` stored the **report** id in
+    `Job.orderId`, which is a **required FK to `Order`** — every approval would have thrown a 500 at
+    delivery time. Fixed by adding `Job.reportId` (nullable FK to `Report`) with its own migration
+    (`20261016100000_job_report_link`), so a VOICE job now carries both ids.
+    **Verified:** the TTS leg against the live API via `npm run smoke:tts` — **7/7** (model id, voice id,
+    chunking, MP3 validity, ~239 s duration from 3.8 MB, a repeat call, and that the chunk join did not
+    corrupt the stream). An earlier version of that check wrongly *failed* a valid file because
+    ElevenLabs returns `ID3`-tagged MP3 (first bytes ASCII "ID", not a frame sync) — the test was wrong,
+    not the code. Deployed `/script` on the real golden report returns 8,893 chars ≈ **9m31s**, 5 chunks.
+    Voice set to ElevenLabs' *George — Warm, Captivating Storyteller* as a placeholder the owner should
+    replace after listening. Migrations `20261016090000_report_audio_summary` and
+    `20261016100000_job_report_link` applied to Neon. Cost ≈ **$0.32–0.40 per Deep report**.
+    **Still open from the audit:** the copy's window mismatch (the audio note says `current_year … +2`,
+    the upsell says `+5`; the narration now covers the report's full window, so the note under-promises)
+    — harmless, but it moves the golden snapshots so it is its own change.
+  - **2026-10-16 (the free tier — four findings, all fixed).** The owner asked whether the free report
+    needs the review layer; it does not, and that intent was only *accidentally* implemented. Four fixes:
+    **(1) `requiresReview` was dead data** — declared on the tier map and asserted in tests but read by
+    **no application code**; `processClaimedJob` always set `DRAFT_READY`, so any free tier added later
+    would have silently joined the review queue. The rule is now consulted via `autoDelivers()` (in
+    `tiers.ts`): a non-review tier is created `DELIVERED` with a `Delivery(PROFILE)` row and emailed
+    after commit, and an **unknown tier fails safe** (review). Unit-tested in
+    `src/lib/__tests__/keys.test.ts`.
+    **(2) `POST /api/orders` accepted `tier: "sample"`** (price 0 → `PAID` + a job) → a free report in
+    the review queue. Unreachable from the UI, reachable from the API. Now `422 TIER_NOT_ORDERABLE`
+    (422 for consistency with `UNKNOWN_TIER` / `TIER_PROFILE_MISMATCH`).
+    **(3) "Saved to your profile" was half true** — the sample saved a `Profile` but **never a
+    `Report`**, so the PDF never appeared in the library and the link expired after 15 minutes. A
+    signed-in sample is now filed as a delivered `Report` under `reports/{userId}/samples/…` (new
+    `buildSampleKey`, **outside** the swept `reports/anonymous/` prefix) with a `Delivery(PROFILE)` row,
+    reuses a profile for identical birth details, and is **idempotent**: a repeat request returns the
+    stored report (`reused: true`) instead of re-rendering the identical chart.
+    **(4) 🐛 Anonymous samples were never deleted.** The sweep found stale objects by querying `Report`
+    rows with `orderId: null` — but anonymous samples create **no row**, so it matched nothing and ~70 KB
+    per visitor accumulated in R2 forever while `05` claimed a 7-day sweep. The sweep now lists
+    `reports/anonymous/` **by prefix and deletes by object age** (`listObjectsByPrefix`), plus a
+    row-backed pass scoped to never-delivered drafts so it can never touch a sample a user kept.
+    **Verified end to end against production** by signing up through our own auth proxy (the CLI's
+    `neon neon-auth user delete` made this safely reversible): the signed-in sample returned
+    `savedToProfile: true` + `reportId`, the row is `DELIVERED` / `orderId null` / `pdfKey` under
+    `reports/{userId}/samples/`, a repeat run returned `reused: true` with the same report and **no new
+    render**, profile dedupe held at 1 after two runs, and `/api/orders` with `tier: "sample"` returned
+    `422 TIER_NOT_ORDERABLE`. **All probe artefacts removed** — DB rows, audit rows, R2 objects (bucket
+    now empty) and both Neon Auth users deleted.
+    ⚠️ A false alarm worth recording: `curl -c` showed *no* cookies after sign-in, which looked like
+    broken sessions. It writes HttpOnly cookies as `#HttpOnly_…` lines, which a naive `awk` filter skips.
+    Sessions were fine — `__Secure-neon-auth.session_token` with `Path=/; HttpOnly; Secure; SameSite=Lax`.
+    Webapp suite **64 passed**; engine unchanged at 1,909; `/api/health` green on all four probes.
+  - **2026-10-15 (payments fully configured + verified).** The owner created all four Dodo products.
+    They were fetched from the API and matched to tiers **by price, not by name** (names are `saju-19`
+    etc.): 1900→`pdt_0NpoArP13BV3e0QbI18TR` (essential), 5500→`pdt_0NpoB67xwOcTjCoc4Dfbb` (deep),
+    2400→`pdt_0NpoBDXleHNyHVs2KyySb` (compat basic), 4500→`pdt_0NpoBMQhUhs2VRMsBXtI1` (compat deep).
+    **Every one is `price_detail.type = one_time_price`**, so the subscription trap warned about earlier
+    did not occur — no product takes money in a way the `payment.succeeded`-only handler cannot fulfil.
+    All four `DODO_PRODUCT_*` set in Vercel across all three scopes and mirrored into local `.env`; all
+    **7** Dodo variables are now configured. The script refuses to write anything unless every tier
+    resolves to exactly one one-time product, so a half-configured state cannot be introduced.
+    **The checkout path is verified end to end:** replaying the **exact** payload `createCheckout()`
+    sends against `POST /checkouts` returned **HTTP 200 with a real `checkout_url`**
+    (`cks_0NpoBX6HmFxDJSz9EgcCU`), proving both the product id and our request shape are accepted by
+    Dodo. No payment was made; the session expires on its own.
+    **`/api/health` now reports payments**: `payments` (true only when the provider is configured *and*
+    every paid tier has a product id) and `paymentsMode` (`test_mode` | `live_mode`). That turns "are
+    payments configured?" into a verifiable boolean, and `paymentsMode` is how you notice a deployment
+    still pointed at test mode — or one that went live early. Documented in `09` §health checks.
+    **Payments are therefore complete.** The only remaining blocker for a real sale is
+    `services/report-engine`: money can be taken, but nothing can be fulfilled until it exists.
+
+  - **2026-10-16 (contact mail: a real mailbox, and the reply that never landed).** The owner created
+    `hello@cosmicsaju.com` as **one mailbox plus receive-only aliases** in Hostinger webmail. Chasing the
+    dead `privacy@` address surfaced something larger than the legal contact: **three client-facing
+    messages explicitly invite a reply, and all three bounced.** `deliverReportEmail` sent
+    `From: reports@cosmicsaju.com` with **no `Reply-To`**, and with no MX at the apex a reply went
+    nowhere. The invitations: the reject email (*"we'll either fix this or refund you — just reply to
+    this email"*), the report page's `FAILED` state (*"reply to your order email"*), and the audio-failed
+    copy (*"reply to your order email if you'd like us to try again"*).
+    **Address scheme — one mailbox, role-based names, deliberate split:** `hello@` (the mailbox a human
+    reads; general contact + the footer), `privacy@` (alias; **reserved for data-protection requests**, so
+    a DSAR is recognisable on arrival — and still the address the legal pages publish), `reports@` (the
+    transactional From; receives replies too), `dmarc@` (for `rua=`), `postmaster@`. New
+    `apps/web/src/lib/contact.ts` exports `CONTACT_EMAIL` / `PRIVACY_EMAIL` (+ `_HREF`); five files now
+    import from it instead of repeating `process.env.… ?? "privacy@…"` — `site.tsx` (footer) and
+    `refund-policy/page.tsx` move to `hello@`; `privacy/page.tsx` and `dashboard/account/page.tsx` keep
+    `privacy@`; `legal.tsx`'s `LEGAL_CONTACT` re-exports `CONTACT_EMAIL`.
+    **The actual fix for the bounce is `EMAIL_REPLY_TO`.** `sendEmail()` already accepted a `replyTo`
+    that **nothing ever set**; it now defaults to `process.env.EMAIL_REPLY_TO`, so a new sender cannot
+    forget it (there is exactly one `api.resend.com` call site, inside `sendEmail`). `EMAIL_FROM` stays
+    `reports@` — a *sending* role identity, not an inbox.
+    **Verified rather than assumed:** on the live site `/privacy` publishes `privacy@` and the footer
+    publishes `hello@`; and a real send through Resend's API stores
+    `reply_to: ["hello@cosmicsaju.com"]` beside the right `from` (read back via `GET /emails/{id}`).
+    New `src/lib/__tests__/email-reply-to.test.ts` (5 cases) locks the invariant — an explicit caller
+    `replyTo` wins, the header is **omitted rather than sent empty** when unset, and an unconfigured
+    Resend reports `skipped` and sends nothing. That file stubs `global.fetch` and must import
+    `email.ts`, which reaches for the Prisma singleton, so it sets a dummy `DATABASE_URL` first (the
+    client is lazy — nothing connects). Webapp suite **64 → 69 passed**.
+    **⚠️ Then the trap this document predicted fired — and was fixed the same day.** A mail host cannot
+    publish records into a DNS zone it does not host, so Hostinger's panel says *"log in to Cloudflare …
+    and add the records below"*. Until that was done, `MX cosmicsaju.com` read **NONE** and apex TXT was
+    empty while the mailbox was configured — mail went nowhere. The owner then published the records
+    **in Cloudflare**, and the live state is now: `MX → mx1/mx2.hostinger.com`
+    (priority 5/10), **exactly one** apex SPF (`v=spf1 include:_spf.mail.hostinger.com ~all`), and
+    `_dmarc` = `v=DMARC1; p=none`.
+    **Receiving is proven, not assumed:** a real message from the app's own `EMAIL_FROM` to
+    `hello@cosmicsaju.com` came back from Resend's API as **`last_event: delivered`** — where the earlier
+    test against the MX-less zone had only reached `sent`.
+    **The DKIM CNAMEs were then added, the mistyped `c` record corrected, and the final state is: our side
+    is complete.** All three names resolve as CNAME (`hostingermail-a/b/c._domainkey` →
+    `hostingermail-*.dkim.mail.hostinger.com`) and the junk
+    `hostingermail-c.dkim.mail.hostinger.com.cosmicsaju.com` record is gone. But the **keys** are the
+    remaining fault, and it is Hostinger-side: `hostingermail-a.dkim.mail.hostinger.com` serves a **real**
+    key (`v=DKIM1;k=rsa;p=MIIBIjANBgkq…`), while **`hostingermail-b` and `hostingermail-c` serve EMPTY
+    keys** (`v=DKIM1;p=`, no key material) — so those two can never validate however DNS is configured.
+    No further DNS change is possible; it needs Hostinger to (re)issue keys for `b` and `c`.
+    **What actually matters, and one test settles it:** which selector the mail host *signs* with is
+    invisible to DNS. Send from `hello@` in Hostinger webmail to a Gmail address → *Show original* → read
+    `dkim=` and `header.s=`. `dkim=pass … header.s=hostingermail-a` ⇒ the empty selectors are unused and
+    the panel warning is cosmetic; `dkim=fail … header.s=hostingermail-b|-c` ⇒ a *failing* signature, which
+    is worse than none, and Hostinger must issue the keys.
+    ⚠️ **Neither outcome risks delivery:** `_dmarc` is `p=none` and DMARC also passes on **SPF alignment
+    alone** (envelope sender `…@cosmicsaju.com`; the apex SPF authorises Hostinger), so a DKIM failure
+    cannot cause rejection. And the scope is narrow — this affects only mail sent **by hand from Hostinger
+    webmail**; the app's mail goes through **Resend** (`resend._domainkey`, verified), so reports, audio
+    and reject emails are unaffected. `_dmarc` still needs `rua=mailto:dmarc@cosmicsaju.com` (bare `p=none`
+    at present).
+    ⚠️ **Diagnostic gotchas worth keeping.** (1) `dnsq … CNAME` returned `(none)` for names that *are*
+    CNAMEs — Cloudflare's DoH chases the chain; query `TXT` (which chases and returns the target's key,
+    including an empty `v=DKIM1;p=`) or use Google's `dns.google/resolve?type=CNAME`. (2) The Google
+    endpoint is `https://dns.google/resolve`, **not** `https://dns.google/dns-query` (the latter 404s and
+    yields a JSON parse error).
+    **On the earlier false alarm:** the owner's first report of *"cname is already there"* was a false
+    alarm — at that point all three DKIM names were genuinely **empty** (CNAME/TXT/A all `(none)`, no
+    wildcard, no swap), and the existing CNAMEs sit at different names (`send`, `rsend`, `www`).
+    Hostinger's MX does not conflict with Resend because Resend is on `send`/`rsend`.
+    Documented as `07` §Mailbox records plus a `09` runbook — *"Mail is not arriving, or a client's reply
+    bounces"* — which names DNS, not code, as the first suspect. Also recorded: **Neon Auth's magic-link
+    mail bypasses our `Reply-To`** (Neon sends it from its own SMTP configuration), so that From address
+    is Neon's to set, not ours.
+    **Env:** `EMAIL_REPLY_TO` and `NEXT_PUBLIC_CONTACT_EMAIL` (both `hello@cosmicsaju.com`) added to all
+    three Vercel scopes — **32** distinct variables now. `NEXT_PUBLIC_*` is inlined **at build time**, so
+    this needed a redeploy, which is also what confirmed the addresses on the live pages.
+    **Two side discoveries.** (1) The **Cloudflare proxy is now off**: the apex A record points at
+    Vercel's `216.198.79.1` (`server: Vercel`, no `cf-ray`). That is the better-supported setup and it
+    leaves the apex free for the mailbox's MX. Recorded in `07`/`13`. (2) **Cloudflare in front of
+    `api.resend.com` refuses `Python-urllib` with `error code: 1010`** while `curl` passes — so a Resend
+    smoke check must use curl, or it looks like a bot and is blocked.
+    **Deploy note:** the webapp deploys by **CLI from the repository root**, because the project's Root
+    Directory is `apps/web` and the CLI applies it relative to the upload — running `vercel` *inside*
+    `apps/web` fails with *"The specified Root Directory apps/web does not exist"*. That needs a
+    temporary root `.vercel/project.json` (same project id), removed afterwards. `apps/web` is **not
+    tracked by git at all** (0 files), which is why a git-based deploy cannot build it.
+    **Still open:** the three **DKIM CNAMEs** (above), and the two credentials leaked into the transcript
+    (the Neon password and the Resend key `re_Nb6…`) are **not yet rotated** — now the highest-priority
+    item, since a real mailbox exists.
+    Docs updated: `07` (stack table, provisioning log, a rewritten §Mailbox records, DNS-only decision,
+    Resend From guidance, a `no-reply@` entry under "deliberately not used", cost + open decisions),
+    `08` (two new env vars, a Mail subsection, engine root/entrypoint/Node/`excludeFiles`/cron
+    corrections), `10` (correspondence as a processor-held data class, retention, deletion survivors,
+    DSAR intake, checklist), `05` (the `Reply-To` contract), `13` (B4 rewritten with the three bounced
+    invitations, §D2, remediation and open decisions), `12` (what actually exists vs. planned, the new
+    suite), `06` (which address appears where), `11` (Phase-0 rows), `04` (the magic-link From caveat),
+    `00`/`01`/`03`/`09` and `openwiki/quickstart.md`.
 
 ### Earlier state (2026-09-26)
 
@@ -255,11 +737,27 @@ python3 src/saju_html/md_to_saju_compat_pdf.py <compat.md> --name-a ... --name-b
 ## Active Wishes / Open Items
 
 As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P1 items:
-- **Merchant-of-Record checkout** (Lemon Squeezy / Paddle) for paid tiers and the Companion subscription — nothing is charged today.
-- **Real testimonials** on the landing page — the current ones are flagged illustrative and must be replaced or removed before launch (FTC risk).
-- Self-service app hardening: DONE 2026-10-04 (encrypted store, background drafts, review queue, private links). Remaining: D2 email delivery, D3 deploy.
-- Deployment hardening for the landing-page Next.js app and FastAPI calculator.
-- **A1:** recover `apps/landing-page/src/` from the machine that built it (not in this repo).
+- **Merchant-of-Record checkout** — ✅ **Dodo Payments** chosen (replacing Lemon Squeezy/Paddle) and
+  configured; test-mode checkout verified end to end. Remaining: the **test→live migration** — 4 live
+  products, a live webhook endpoint + signing secret, then `DODO_PAYMENTS_ENVIRONMENT=live_mode`.
+- **Real testimonials** on the landing page — the section was **removed** rather than faked, so the
+  documented FTC risk is closed by omission.
+- Self-service app hardening: DONE 2026-10-04 (encrypted store, background drafts, review queue, private
+  links). Deployment: **DONE** — `https://www.cosmicsaju.com` is live, and the engine, review console,
+  and delivery (PDF **and** MP3) all run.
+- **Contact mail** — mailbox `hello@` + aliases, a default `Reply-To`, and the records published in
+  Cloudflare; **receiving verified** (`delivered`, 2026-10-16). All three DKIM CNAMEs now resolve. ⚠️
+  Remaining: Hostinger serves **empty** DKIM keys for selectors `b`/`c` (`v=DKIM1;p=`) — a Hostinger-side
+  fix — and `_dmarc` still wants `rua=mailto:dmarc@cosmicsaju.com`. Neither risks delivery
+  (`p=none`; DMARC passes on SPF alignment). See `docs/webapp/07` §Mailbox records.
+- **Rotate the two credentials leaked into the session transcript** — the Neon password and the Resend
+  API key `re_Nb6…`. Highest priority now that a real mailbox exists.
+- **Webapp CI + end-to-end tests** — still missing (launch-audit B5). `12-testing.md` now marks the
+  Playwright surface as planned rather than present.
+- **A1:** ~~recover `apps/landing-page/src/` from the machine that built it~~ — **closed**: the landing
+  page was rebuilt inside `apps/web`, which is what serves the site.
+- Engine prerequisites E1/E2/E3: **DONE**; the engine is deployed at `api/index.py` (Vercel root = repo
+  root, region `sin1`).
 - Populate the 30×30 Nayin pair table from a published source (currently on the 5-element fallback).
 - Optional additional Korean textbook 만세력 cases if more independent sources are found.
 - **`premium_report.py` "What This Year Means for You" bug — FIXED 2026-09-14.**

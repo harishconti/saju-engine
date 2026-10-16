@@ -289,6 +289,11 @@ content; it gets **zero content effort in Phase 1**.
 - **Fixed cost of the whole operation: < $50/month** — domain (~$12/yr), Cloudflare Pages / free
   hosting, email free tier (Resend 3K/mo), marginal LLM drafting cost. The `<$500` test budget
   covers ~10 months plus small Phase-2 ad tests. `[M]`
+> **Superseded 2026-10-15:** this research recommended Lemon Squeezy or Paddle. The owner chose
+> **Dodo Payments** instead. The findings below are preserved as evidence of what was researched
+> at the time, and the fee figure quoted here belongs to Lemon Squeezy/Paddle — it was **not**
+> verified for Dodo. See `docs/webapp/07-services-and-integrations.md`.
+
 - **Checkout:** Lemon Squeezy (acquired by Stripe in 2024) and Paddle are true Merchants of Record
   (both ~5% + $0.50), **operate from India**, handle US sales tax / EU VAT / 30+ jurisdictions
   automatically, and support region-priced variants without geo-IP plumbing. `[H]`
