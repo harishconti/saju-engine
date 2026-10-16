@@ -26,18 +26,20 @@ __pycache__/
 .ruff_cache/
 tmp/
 
-  # Upload weight is not free: Vercel counts every deployment's *function bundle* against the
-  # account's Functions Storage (Hobby: 10 GB), and a push to `develop` deploys twice — the
-  # webapp and the engine. The engine function is rooted at this repository, so without this
-  # list it carries files it can never read at runtime: the test suite and its manseryeok PNG
-  # evidence, the candidate PDFs, the docs tree, and the whole `apps/` webapp. What it actually
-  # needs is `src/`, `api/`, `knowledge/` and the packaging files.
-  #
-  # (`apps/` here is safe for the webapp: that project's root is `apps/web`, so this file —
-  # which belongs to the root-rooted engine project — never governs its upload.)
+# Upload weight is not free: Vercel counts every deployment's *function bundle* against the
+# account's Functions Storage (Hobby: 10 GB), and a push to `develop` deploys twice — the webapp
+# (project `saju-engine`, root `apps/web`) and the engine (project `saju-report-engine`, root =
+# this repository).
+#
+# WARNING: this file governs BOTH uploads, even though the webapp's root is a subdirectory. A
+# first attempt added `apps/` to save the engine ~4.7 MB and broke the webapp build: its upload
+# lost `apps/web/package.json` and `npm install` exited 254
+# (`[BUILD_UTILS_SPAWN_254]`, deployment `saju-engine-8nmyoxcfn…`). So list only what NEITHER
+# build needs — the engine's test suite with its manseryeok PNG evidence, the candidate PDFs, the
+# docs tree, and the tooling. `src/`, `api/`, `apps/`, `knowledge/` and the packaging files stay,
+# because one of the two builds needs them.
 tests/
 candidates_horoscope/
 docs/
-apps/
 tools/
 .github/

@@ -4,12 +4,16 @@ Two Vercel projects, one repository, one domain.
 
 ## What each project uploads
 
-Upload weight is billed — Functions Storage, per retained deployment — so `.vercelignore` at the repo
-root (which belongs to the **engine** project, because that project's root is the repository) excludes
-what the engine function can never read at runtime: `tests/`, `candidates_horoscope/`, `docs/`,
-`apps/`, `tools/`, `.github/`. It keeps `src/`, `api/`, `knowledge/` and the packaging files. This
-cannot affect the webapp: that project's root is `apps/web`, so the root ignore file never governs its
-upload.
+Upload weight is billed — Functions Storage, per retained deployment — so the root `.vercelignore`
+excludes what **neither** build needs at runtime or at build time: `tests/` (the engine's suite and its
+manseryeok PNG evidence), `candidates_horoscope/`, `docs/`, `tools/`, `.github/`. `src/`, `api/`,
+`apps/`, `knowledge/` and the packaging files stay.
+
+⚠️ **That file governs both uploads, even though the webapp's project root is `apps/web`.** A first
+attempt added `apps/` — reasoning that it belonged to the root-rooted engine project — and broke the
+webapp deployment: its upload lost `apps/web/package.json` and `npm install` exited
+`254 [BUILD_UTILS_SPAWN_254]`. The rule that follows from that: **only list what neither build
+needs.** If in doubt, add nothing — a failed production deploy costs far more than the megabytes.
 
 The dominant cost is not the repository at all — it is the Python dependency closure (~125 MB per
 engine deployment, mostly pandas and numpy via `sajupy`). See

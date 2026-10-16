@@ -333,7 +333,7 @@ not any single artefact:
 
 | | |
 |---|---|
-| Repo upload | ~39 MB (and `.vercelignore` trims the engine's to what it can actually read) |
+| Repo upload | ~39 MB (`.vercelignore` trims both uploads to what either build needs — and note it governs *both*: listing `apps/` there broke the webapp build) |
 | **Engine bundle, per deployment** | **~157 MB** — the Python closure is ~125 MB, of which pandas 65 + numpy 38 come in transitively via `sajupy`; reportlab 8, PIL 6.5 |
 | Webapp bundle, per deployment | ~40–80 MB (Next server output + Prisma engines) |
 | Growth rate | **Every push deploys both projects** — ~220 MB per push |

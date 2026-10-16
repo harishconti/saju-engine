@@ -1239,7 +1239,12 @@
     rather than looking like a failure).
     ✅ **Fixed for the future:** the root `.vercelignore` (which governs the engine's upload, since its root is the repo)
     now excludes `tests/`, `candidates_horoscope/`, `docs/`, `apps/`, `tools/`, `.github/` — files the engine function
-    can never read at runtime. It cannot affect the webapp, whose project root is `apps/web`.
+    can never read at runtime. ⚠️ **That last exclusion was wrong and I stated it confidently: `.vercelignore`
+    governs BOTH uploads, even though the webapp's project root is `apps/web`.** Listing `apps/` stripped
+    `apps/web/package.json` from the webapp's upload and its build died (`npm install` → 254
+    `[BUILD_UTILS_SPAWN_254]`, deployment `saju-engine-8nmyoxcfn…`) — so `d665313` (which had swept in the font
+    work) never reached production, and the live reading stayed on the pre-font build until the next push. The
+    rule is now written into `.vercelignore`, `08` and `09`: **list only what neither build needs.**
     ⚠️ **The cause is retention, and the defaults get *worse* on Pro** (Production 1 year, Pre-Production 180 days,
     versus 30/30 on Hobby). Two places set it: team (Settings → Deployment Retention, with *apply to all existing
     projects*) and per project (Project → Settings → **Security** → Deployment Retention Policy), which overrides the
