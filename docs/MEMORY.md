@@ -1202,6 +1202,37 @@
     review console previews only the PDF, and the auth-gate spec is still unwritten — so the new route is *recorded*
     in `03`/`12` and must be added to that spec when it lands.
 
+### Earlier state (2026-09-26)
+
+  - **2026-10-16 (the reading joins the design system — "the report UI is very ugly").** Owner feedback on the web
+    document: the content is fine, the UI is not, and it should look like the webapp. It now does.
+    ✅ **The fix that mattered was re-pointing the print tokens, not rewriting blocks.** `theme.css` is an A4 sheet, and
+    every block in it — tables, the quick-reference card, callouts, rules — was written against `--color-*`. The web
+    layer now remaps those names to the app's palette (`--color-heading` → `--primary`, `--color-card-bg` →
+    transparent, `--color-accent` → `--muted` for row striping, `--font-serif` → the display face), which brought the
+    whole sheet into the design at once. Patching block by block is what made v1 look like a document with a
+    stylesheet: light stripes, a light quick-ref card and a cream presence bar on a near-black page.
+    ✅ **Then the structure**: sections became **panels** (the app's card idiom, `_group_sections`), each with a
+    monospace ordinal eyebrow; the cover became the app's hero (display serif, gold subtitle, the elemental gradient
+    rule, meta as a key/value grid, and the 22 mm print indent reset); and the tagline/title card that repeated the
+    cover was dropped (`_drop_repeated_title`) — keeping the "Time method" paragraph, which the audit named a strength.
+    ✅ **And the charts**: they are drawn with the print palette inline (`fill="#e74c3c"`, Helvetica) — correct for the
+    PDF, wrong on a dark card (a navy chart title on near-black). The web layer overrides those fills and fonts by
+    attribute selector, so the SVG emission is untouched and **the PDF and its golden snapshots stayed byte-identical**
+    — 97 golden tests passed with no regeneration. The element table's presence bars are block glyphs, coloured per row
+    with `:has()` and the 오방색 palette.
+    ✅ **Guarded**: `test_report_tokens_match_the_webapp` compares the mirror to `globals.css` in both schemes, so a
+    rebrand cannot silently leave reports on the old palette. (That test then caught my own extractor matching the
+    *comment* that mentions the media query instead of the rule.)
+    Verified through headless Chrome: the app's exact values on the page (`rgb(8,8,13)` / `rgb(236,232,223)` dark,
+    `#fbfaf7` / `#1a1a1f` light), 0 px overflow at 390 / 768 / 1440, 21 panels, 18 contents links all resolving.
+    ⚠️ **One honest gap**: the app renders in Cormorant Garamond / Inter / IBM Plex Mono via `next/font`, and a
+    self-contained file cannot fetch them, so the reading uses the tokens' fallbacks (Georgia and the system stack,
+    which the token definitions already name). Embedding subsetted copies (~100–300 KB per report, OFL — and the repo
+    already has the subsetting tool) is the next fidelity step. Suite **1,999 → 2,014**; demo readings regenerated.
+    ⚠️ **And a bookkeeping bug of my own, found while writing this entry:** one of my earlier `rep()` calls replaced
+    the `### Earlier state (2026-09-26)` heading instead of re-appending it, silently deleting the heading from this
+    file. Restored below. Entries here are appended *before* that anchor, so the anchor is load-bearing.
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"
   below. The 2026-09 audit reports that tracked this work were removed in the 2026-10-01 cleanup. **Suite: 1136 passed / 9 xfailed / 0 failed.** Validation gate:
   `python3 tools/run_validation.py` → `206 (PASS 202, INTERPRETATION 4, FAIL 0)`. `ruff check

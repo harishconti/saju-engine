@@ -5,6 +5,20 @@ signed-in client (plus the owner) managing reports. The design system is inherit
 landing page — dark cosmic base, gold accent, Cormorant Garamond for display, IBM Plex Mono for
 numerals and pillar tables, and the 오방색 five-element tokens.
 
+## The reading uses the app's design system
+
+The delivered report is a client-facing surface of this product, so it is held to the same design
+standard as the app it belongs to: the report's web layer (`src/saju_html/theme-web.css`) is written
+against the tokens in `apps/web/src/app/globals.css` — same palette, same type scale, same card and
+callout idioms, same 44 px control bar, dark by default with the OS light palette.
+
+- `tests/test_web_report.py::test_report_tokens_match_the_webapp` compares the mirror to
+  `globals.css` in both schemes, so the two cannot drift.
+- It is a **self-contained** file (inline CSS and SVG, no scripts, no webfonts), so the app's faces
+  are referenced with the token fallbacks. Font embedding is a known fidelity gap, not an oversight.
+- Print is deliberately separate: `theme.css` remains the A4 sheet, and `@media print` in the web
+  layer hands the page back to it, so the PDF and its golden snapshots are unaffected.
+
 ## Route map
 
 ```

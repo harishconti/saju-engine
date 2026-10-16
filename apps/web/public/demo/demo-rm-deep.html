@@ -546,135 +546,643 @@ body.tier-essential h1 {
 
 
 /* ---- web layer (screen only; print rules above still apply) ---- */
-/* Web layer for the Saju report — appended after theme.css in web mode only.
- *
- * `theme.css` is a *print* stylesheet: A4 page boxes, running footers, table headers
- * repeated across pages. It renders the report as a document, but on a phone it would
- * be one A4 column squeezed into 390px with wide tables overflowing the viewport.
- *
- * This layer adds what a screen needs and changes nothing about the print result:
- * a readable measure, a paper-like sheet, scrollable tables, visible heading anchors,
- * and a highlight on the section a contents link just jumped to. It is deliberately
- * light-only for the *document* (a reading is a sheet of paper) while the surrounding
- * page follows the reader's colour scheme.
- */
+/* ─────────────────────────────────────────────────────────────────────────────
+   The reading — web layer.
 
-/* ── the sheet ──────────────────────────────────────────────────────────────────── */
-html {
-    -webkit-text-size-adjust: 100%;
-}
-body.web-mode {
-    margin: 0;
-    padding: 0 0 4rem;
-    background: #eef1f4;
-    /* System stack: the document must be self-contained, so no web fonts. The
-       bundled report fonts are PDF-only. */
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+   This is the *screen* stylesheet for the report, and it is written against the
+   webapp's own design system: the same tokens, the same type scale, the same card
+   and callout idioms (`apps/web/src/app/globals.css`). A client who moves from the
+   product to their reading should not notice they changed surface.
+
+   Two constraints shape everything here:
+
+   1. **`theme.css` is a print stylesheet** — A4 page boxes, running footers, table
+      headers repeated across pages. It renders the PDF. This layer is appended *after*
+      it in web mode only, so the print document and its snapshots are untouched, and a
+      `@media print` block below hands the page back to the A4 flow.
+   2. **The document is self-contained.** No webfonts, no scripts, no external requests,
+      because the same bytes are served *and* downloaded. So the app's faces
+      (Cormorant Garamond, Inter, IBM Plex Mono) are referenced with their token
+      fallbacks — Georgia and the system stack — which is the closest a single file can
+      get without embedding ~200 KB of font per report. The token values below are
+      mirrored from `globals.css`, and `tests/test_web_report.py` asserts they still
+      match, so a rebrand cannot silently leave reports behind.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+:root {
+    color-scheme: dark;
+
+    --background: #08080d;
+    --surface: #0d0d15;
+    --foreground: #ece8df;
+
+    --card: #11111a;
+    --card-foreground: #ece8df;
+
+    --muted: #16161f;
+    --muted-foreground: #a09a8e;
+
+    --primary: #c8a34a;
+    --primary-foreground: #0b0b10;
+
+    --accent: #7f6ad1;
+    --accent-foreground: #f2f0ff;
+
+    --border: #23232f;
+    --ring: #c8a34a;
+
+    --success: #3f9d6b;
+    --warning: #d8a13a;
+    --destructive: #d1553f;
+
+    --el-wood: #4fae7c;
+    --el-fire: #e0674f;
+    --el-earth: #d9b44a;
+    --el-metal: #b9bec7;
+    --el-water: #4f8fd9;
+
+    --radius: 0.625rem;
+
+    --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
                  "Noto Sans", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
-@media (prefers-color-scheme: dark) {
-    body.web-mode {
-        background: #12161a;
+
+/* Light theme, taken from the operating system — the same block as the app. */
+@media (prefers-color-scheme: light) {
+    :root {
+        color-scheme: light;
+
+        --background: #fbfaf7;
+        --surface: #ffffff;
+        --foreground: #1a1a1f;
+
+        --card: #ffffff;
+        --card-foreground: #1a1a1f;
+
+        --muted: #f2f0ea;
+        --muted-foreground: #6b6558;
+
+        --primary: #8a6d1f;
+        --primary-foreground: #ffffff;
+
+        --accent: #5b46a8;
+        --accent-foreground: #ffffff;
+
+        --border: #e2ded4;
+        --ring: #8a6d1f;
+
+        --success: #2f7a52;
+        --warning: #9a6b12;
+        --destructive: #b03a26;
+
+        --el-wood: #2f7d57;
+        --el-fire: #b8442e;
+        --el-earth: #9a7c17;
+        --el-metal: #7b8089;
+        --el-water: #2f68a8;
     }
 }
-body.web-mode .cover,
-body.web-mode .compact-cover,
-body.web-mode > h2,
-body.web-mode > h3,
-body.web-mode > p,
-body.web-mode > ul,
-body.web-mode > ol,
-body.web-mode > table,
-body.web-mode > .table-scroll,
-body.web-mode > div:not(.report-toolbar):not(.cover):not(.compact-cover),
-body.web-mode > hr,
-body.web-mode > blockquote {
+
+/* ── page ─────────────────────────────────────────────────────────────────── */
+
+body.web-mode {
+    margin: 0;
+    padding: 0 0 5rem;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+/* The print sheet's own tokens, remapped to the app's palette.
+   Every block in `theme.css` — tables, the quick-reference card, callouts, rules — was written
+   against these names, so remapping them here brings all of it into the app's design at once,
+   instead of patching each block and missing the ones added later. `--font-serif` too: the report
+   asks for a serif face and should get the display one. */
+body.web-mode {
+    --color-text: var(--foreground);
+    --color-muted: var(--muted-foreground);
+    --color-light: var(--muted-foreground);
+    --color-heading: var(--primary);
+    --color-heading2: var(--foreground);
+    --color-accent: var(--muted);          /* even-row striping */
+    --color-rule: var(--border);
+    --color-table-header: var(--muted);
+    --color-card-bg: transparent;          /* it already sits in a panel */
+    --color-card-border: var(--border);
+    --color-callout-bg: color-mix(in srgb, var(--primary) 8%, transparent);
+    --color-callout-border: color-mix(in srgb, var(--primary) 40%, transparent);
+    --font-serif: var(--font-display);
+}
+
+body.web-mode ::selection {
+    background: color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+/* One readable column, whatever the width. */
+body.web-mode > * {
     box-sizing: border-box;
     max-width: 46rem;
     margin-left: auto;
     margin-right: auto;
+    padding-left: 1.15rem;
+    padding-right: 1.15rem;
 }
-/* The sheet: content blocks sit on white with a hairline, so the document reads as a
-   page rather than as loose text on a coloured background. */
-body.web-mode > h2,
-body.web-mode > h3,
-body.web-mode > p,
-body.web-mode > ul,
-body.web-mode > ol,
-body.web-mode > blockquote,
-body.web-mode > .table-scroll,
-body.web-mode > table,
-body.web-mode > div:not(.report-toolbar):not(.cover):not(.compact-cover) {
-    background: #ffffff;
-    padding: 0.55rem 1.15rem;
+
+/* ── the toolbar the app injects when it serves the report ────────────────── */
+
+.report-toolbar {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: none;
+    padding: 0.7rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 20;
 }
-body.web-mode > h2 {
-    padding-top: 1.1rem;
-    padding-bottom: 0.3rem;
+
+.report-toolbar a,
+.report-toolbar button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;              /* 44px: the app's touch-target bar */
+    padding: 0 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--foreground);
+    font: inherit;
+    font-size: 0.9375rem;
+    text-decoration: none;
 }
-body.web-mode > hr {
+
+.report-toolbar a:hover,
+.report-toolbar a:focus-visible,
+.report-toolbar button:hover {
+    background: color-mix(in srgb, var(--foreground) 8%, transparent);
+}
+
+/* ── cover: the app's hero ────────────────────────────────────────────────── */
+
+body.web-mode .cover,
+body.web-mode .compact-cover {
+    padding-top: 3.5rem;
+    padding-bottom: 2.5rem;
+    text-align: left;
+    background: transparent;
+    min-height: 0;
+    border: 0;
+}
+
+body.web-mode .cover .watermark {
+    /* A CJK glyph in the print sheet. A document that must render identically
+       everywhere cannot depend on the reader having a Korean font — without one it is a
+       tofu box at 110pt on the front page. The app's own watermark is Cormorant, which
+       this file cannot bundle either; the cover carries the brand line instead. */
+    display: none;
+}
+
+body.web-mode .cover h1,
+body.web-mode .compact-cover h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 1.4rem + 3.4vw, 4rem);
+    line-height: 1.05;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
+    margin: 0 0 0.5rem;
+}
+
+body.web-mode .cover .subtitle,
+body.web-mode .compact-cover .subtitle {
+    font-family: var(--font-display);
+    font-style: normal;
+    font-size: 1.25rem;
+    line-height: 1.4;
+    color: var(--primary);
+    text-align: left;
+    margin: 0 0 1.5rem;
+}
+
+/* The elemental rule under the title: wood → fire → earth → metal → water. */
+body.web-mode .cover .subtitle::after {
+    content: "";
+    display: block;
+    width: 5rem;
+    height: 2px;
+    margin-top: 1rem;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, var(--el-wood), var(--el-fire), var(--el-earth),
+                                var(--el-metal), var(--el-water));
+}
+
+body.web-mode .cover .meta-block,
+body.web-mode .compact-cover .meta {
+    display: grid;
+    gap: 0.35rem 1.25rem;
+    grid-template-columns: auto 1fr;
+    padding: 1rem 1.15rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-align: left;
+    margin: 0 0 1.25rem;
+}
+
+body.web-mode .cover .meta,
+body.web-mode .compact-cover .meta {
+    display: contents;
+    font-size: 0.9375rem;
+}
+
+body.web-mode .cover .meta strong {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    font-weight: 400;
+    padding-top: 0.35rem;
+}
+
+body.web-mode .cover .foot,
+body.web-mode .cover .date,
+body.web-mode .cover .report-id,
+body.web-mode .compact-cover .report-line {
+    /* `theme.css` indents the cover footnote by 22mm, which is an A4 measure and reads as a
+       misplaced column on a phone. */
+    padding: 0;
+    margin-top: 1.5rem;
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+    text-align: left;
+    margin: 0 0 0.35rem;
+}
+
+/* ── sections as cards, the way the app lays out a dashboard ──────────────── */
+
+body.web-mode .panel {
+    padding: 1.5rem 1.15rem 1.75rem;
+    margin-bottom: 1rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+body.web-mode .panel > h2 {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin: 0 0 0.75rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.25rem);
+    line-height: 1.12;
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.panel-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--primary);
+    font-weight: 400;
+}
+
+body.web-mode .panel > h2 .anchor {
+    order: -1;
+    align-self: flex-end;
+    float: none;
+    margin: 0 0 -1.6rem;
+}
+
+body.web-mode h3 {
+    margin: 1.75rem 0 0.6rem;
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--foreground);
+}
+
+body.web-mode h3:first-child {
+    margin-top: 0;
+}
+
+body.web-mode p {
+    margin: 0 0 0.9rem;
+    color: color-mix(in srgb, var(--foreground) 88%, transparent);
+}
+
+body.web-mode strong {
+    color: var(--foreground);
+    font-weight: 600;
+}
+
+body.web-mode ul,
+body.web-mode ol {
+    margin: 0 0 1rem;
+    padding-left: 1.1rem;
+}
+
+body.web-mode li {
+    margin-bottom: 0.35rem;
+}
+
+body.web-mode li::marker {
+    color: var(--primary);
+}
+
+body.web-mode hr {
     border: 0;
     height: 0;
     margin: 0;
 }
-body.web-mode > h2:first-of-type {
-    margin-top: 1.5rem;
+
+/* Hanja, pillar names and other glyph columns: mono keeps them aligned, as the app does. */
+body.web-mode .pillar {
+    font-family: var(--font-mono);
+    letter-spacing: 0.06em;
 }
 
-/* The cover watermark is a CJK glyph in the print sheet. A document that must render
-   identically everywhere cannot depend on the reader having a Korean font — on a device
-   without one it is a tofu box at 110pt on the front page. The web cover carries the
-   brand line instead; the PDF keeps the mark (its fonts are embedded). */
-body.web-mode .cover .watermark {
-    display: none;
+/* ── tables: hairlines and tabular numerals, not a grid ──────────────────── */
+
+body.web-mode table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 1.15rem;
+    font-size: 0.9375rem;
 }
 
-/* ── reading measure on small screens ───────────────────────────────────────────── */
-@media screen and (max-width: 46rem) {
-    body.web-mode > h2,
-    body.web-mode > h3,
-    body.web-mode > p,
-    body.web-mode > ul,
-    body.web-mode > ol,
-    body.web-mode > blockquote,
-    body.web-mode > .table-scroll,
-    body.web-mode > table,
-    body.web-mode > div:not(.report-toolbar):not(.cover):not(.compact-cover) {
-        padding-left: 0.9rem;
-        padding-right: 0.9rem;
-    }
+body.web-mode thead th,
+body.web-mode th {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 400;
+    text-align: left;
+    color: var(--muted-foreground);
+    background: var(--muted);
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
 }
 
-/* ── wide tables scroll instead of pushing the page sideways ────────────────────── */
+body.web-mode td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    font-variant-numeric: tabular-nums;
+}
+
+body.web-mode tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+body.web-mode td:first-child {
+    color: var(--foreground);
+}
+
+/* Wide tables scroll inside their own box, focusably, so the page never moves. */
 .table-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
-}
-.table-scroll:focus-visible {
-    outline: 2px solid var(--color-heading);
-    outline-offset: -2px;
-}
-.table-scroll table {
-    width: 100%;
-    min-width: 34rem;   /* keeps columns legible; the wrapper scrolls */
-}
-.table-scroll::after {
-    /* A hint that there is more to the right. */
-    content: "";
-    display: block;
-    height: 0;
+    margin: 0 0 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
 }
 
-/* ── heading anchors ────────────────────────────────────────────────────────────── */
+.table-scroll:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+}
+
+.table-scroll table {
+    margin: 0;
+    min-width: 34rem;
+}
+
+/* ── the semantic blocks the renderer already emits ──────────────────────── */
+
+/* Quick reference: the app's key/value card. */
+.quick-ref-card {
+    margin: 0 0 1.25rem;
+    padding: 0.25rem 0;
+}
+.quick-ref-card .label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    margin-bottom: 0.15rem;
+}
+.quick-ref-card .value {
+    display: block;
+    margin-bottom: 0.85rem;
+    color: var(--foreground);
+}
+
+/* Callouts take the app's Alert tones. */
+.right-now-callout,
+.partner-compat-upsell,
+.audio-included,
+.audio-summary {
+    border-radius: var(--radius);
+    padding: 0.9rem 1.05rem;
+    margin: 0 0 1.25rem;
+}
+
+.right-now-callout {
+    border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+.right-now-callout p:last-child {
+    margin-bottom: 0;
+}
+
+/* The chart signature is the best sentence in the report: set it in the display face. */
+.chart-signature {
+    margin: 0 0 1.35rem;
+    padding: 1rem 1.15rem;
+    border-left: 2px solid var(--accent);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    line-height: 1.45;
+    color: var(--foreground);
+}
+
+.partner-compat-upsell {
+    border: 1px dashed var(--border);
+    background: color-mix(in srgb, var(--foreground) 3%, transparent);
+    color: var(--muted-foreground);
+}
+
+.audio-included,
+.audio-summary {
+    border: 1px solid color-mix(in srgb, var(--primary) 45%, transparent);
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+.audio-included p,
+.audio-summary p {
+    margin: 0 0 0.6rem;
+    color: var(--primary);
+    font-weight: 600;
+}
+.audio-summary audio {
+    width: 100%;
+    height: 2.75rem;                  /* ≥44px, like every control in the app */
+}
+
+/* Lucky attributes: a grid of small stat cards. */
+.lucky-attributes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 0.6rem;
+    margin: 0 0 1.25rem;
+    padding: 0;
+}
+.lucky-attribute-item {
+    padding: 0.7rem 0.85rem;
+    background: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+.lucky-attribute-item .label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    margin-bottom: 0.2rem;
+}
+.lucky-attribute-item .value {
+    display: block;
+    color: var(--foreground);
+}
+
+/* ── inline charts: re-skinned from the app's palette ────────────────────── */
+
+/* The charts are drawn with the *print* palette inline (`fill="#e74c3c"`, Helvetica),
+   which is correct for the PDF and wrong on a dark card — a navy chart title on a
+   near-black panel. Re-skinning by attribute keeps the print output byte-identical and
+   needs no change to the chart code. */
+body.web-mode .element-balance-chart svg text,
+body.web-mode .luck-timeline svg text,
+body.web-mode .decade-roadmap svg text,
+body.web-mode .luck-bars svg text,
+body.web-mode .luck-classes svg text {
+    font-family: var(--font-sans);
+}
+body.web-mode svg text[fill="#2a4d6e"] { fill: var(--foreground); }
+body.web-mode svg text[fill="#444"] { fill: var(--muted-foreground); }
+
+body.web-mode svg rect[fill="#27ae60"] { fill: var(--el-wood); }
+body.web-mode svg rect[fill="#e74c3c"] { fill: var(--el-fire); }
+body.web-mode svg rect[fill="#f39c12"] { fill: var(--el-earth); }
+body.web-mode svg rect[fill="#7f8c8d"] { fill: var(--el-metal); }
+body.web-mode svg rect[fill="#3498db"] { fill: var(--el-water); }
+/* The roadmap's favourable / mixed / challenging lean. */
+body.web-mode svg rect[fill="#c0392b"] { fill: var(--destructive); }
+
+.element-balance-chart,
+.luck-timeline,
+.decade-roadmap,
+.luck-bars,
+.luck-classes {
+    margin: 0 0 1.25rem;
+    padding: 0.5rem 0.25rem;
+}
+
+/* The element table's own rows carry colour classes from the report. */
+body.web-mode .element-wood { color: var(--el-wood); }
+body.web-mode .element-fire { color: var(--el-fire); }
+body.web-mode .element-earth { color: var(--el-earth); }
+body.web-mode .element-metal { color: var(--el-metal); }
+body.web-mode .element-water { color: var(--el-water); }
+
+/* Its "Presence" column is drawn with block glyphs (██████░░░░), so the bar takes its colour
+   from the row's element class. `:has()` keeps the markup untouched — the print sheet keeps the
+   plain characters, which is what the PDF wants. */
+body.web-mode tr:has(.element-wood) td:nth-child(2) { color: var(--el-wood); }
+body.web-mode tr:has(.element-fire) td:nth-child(2) { color: var(--el-fire); }
+body.web-mode tr:has(.element-earth) td:nth-child(2) { color: var(--el-earth); }
+body.web-mode tr:has(.element-metal) td:nth-child(2) { color: var(--el-metal); }
+body.web-mode tr:has(.element-water) td:nth-child(2) { color: var(--el-water); }
+
+/* Inline code and pre from the print sheet are light chips; on a dark card they glare. */
+body.web-mode code,
+body.web-mode pre {
+    background: color-mix(in srgb, var(--foreground) 8%, transparent);
+    color: var(--foreground);
+    border-radius: 4px;
+}
+
+/* ── contents list ───────────────────────────────────────────────────────── */
+
+body.web-mode nav.toc ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+body.web-mode nav.toc li {
+    border-bottom: 1px solid var(--border);
+}
+body.web-mode nav.toc li:last-child {
+    border-bottom: 0;
+}
+body.web-mode nav.toc a {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    padding: 0.7rem 0.15rem;          /* a comfortable tap target */
+    color: var(--foreground);
+    text-decoration: none;
+}
+body.web-mode nav.toc a::before {
+    content: "";
+    width: 0.35rem;
+    height: 0.35rem;
+    border-radius: 9999px;
+    background: var(--primary);
+    flex: none;
+    transform: translateY(-0.15rem);
+}
+body.web-mode nav.toc a:hover,
+body.web-mode nav.toc a:focus-visible {
+    color: var(--primary);
+}
+
+/* ── heading anchors and the section a contents link opened ──────────────── */
+
 body.web-mode h2,
 body.web-mode h3 {
-    scroll-margin-top: 1rem;
+    scroll-margin-top: 4.5rem;
 }
 .anchor {
     float: right;
     margin-left: 0.6rem;
-    color: var(--color-light);
+    color: var(--muted-foreground);
     text-decoration: none;
     font-weight: 400;
     opacity: 0;
@@ -685,116 +1193,69 @@ body.web-mode h3:hover .anchor,
     opacity: 1;
 }
 @media (hover: none) {
-    .anchor { opacity: 0.5; }   /* touch devices have no hover: keep it reachable */
+    .anchor { opacity: 0.45; }
 }
-:target {
-    background: #fffbe8;        /* which section did the contents link open? */
-}
-
-/* ── linked contents list ────────────────────────────────────────────────────────── */
-body.web-mode nav.toc ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-body.web-mode nav.toc li {
-    padding: 0.28rem 0;
-    border-bottom: 1px solid var(--color-rule);
-    font-size: 1.02rem;
-}
-body.web-mode nav.toc li:last-child {
-    border-bottom: 0;
-}
-body.web-mode nav.toc a {
-    color: var(--color-heading);
-    text-decoration: none;
-    display: block;             /* a comfortable tap target, not just the words */
-    padding: 0.2rem 0;
-}
-body.web-mode nav.toc a:hover,
-body.web-mode nav.toc a:focus-visible {
-    text-decoration: underline;
+body.web-mode :target {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 55%, transparent);
 }
 
-/* ── the audio summary, in the page ──────────────────────────────────────────────── */
-.audio-summary {
-    max-width: 46rem;
-    margin: 0.4rem auto 1.2rem;
-    background: #fff7e6;
-    border: 1px solid #f0c674;
-    border-radius: 6px;
-    padding: 0.8rem 1rem;
-    box-sizing: border-box;
-}
-.audio-summary p {
-    margin: 0 0 0.6rem;
-    color: #8a5a00;
-    font-weight: 600;
-}
-.audio-summary audio {
-    width: 100%;
-    height: 2.75rem;            /* comfortably above the 44px control target */
-}
+/* ── printing hands the page back to the A4 stylesheet ───────────────────── */
 
-/* ── the toolbar the webapp injects when it serves the report ───────────────────── */
-.report-toolbar {
-    display: flex;
-    gap: 0.75rem;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 0.75rem 1rem;
-    background: #2a4d6e;
-}
-.report-toolbar a,
-.report-toolbar button {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;        /* 44px: the same bar the app's UI is audited against */
-    padding: 0 1rem;
-    border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.45);
-    background: transparent;
-    color: #ffffff;
-    font: inherit;
-    text-decoration: none;
-}
-.report-toolbar a:hover,
-.report-toolbar a:focus-visible {
-    background: rgba(255, 255, 255, 0.12);
-}
-
-/* ── printing: hand it back to the print stylesheet ─────────────────────────────── */
 @media print {
     body.web-mode {
         background: #ffffff;
+        color: #222222;
         padding: 0;
+        font-size: 11pt;
     }
-    body.web-mode > h2,
-    body.web-mode > h3,
-    body.web-mode > p,
-    body.web-mode > ul,
-    body.web-mode > ol,
-    body.web-mode > blockquote,
-    body.web-mode > .table-scroll,
-    body.web-mode > table,
-    body.web-mode > div:not(.report-toolbar):not(.cover):not(.compact-cover) {
-        background: transparent;
-        padding: 0;
+    body.web-mode > * {
         max-width: none;
+        padding-left: 0;
+        padding-right: 0;
     }
+    body.web-mode .panel,
+    body.web-mode .cover,
+    body.web-mode .compact-cover {
+        padding: 0;
+        margin: 0;
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+    }
+    body.web-mode .panel > h2 {
+        display: block;
+        border-bottom: 0;
+        color: #2a4d6e;
+    }
+    .panel-eyebrow {
+        color: #555555;
+    }
+    body.web-mode .chart-signature,
+    body.web-mode .right-now-callout,
+    body.web-mode .lucky-attribute-item,
+    body.web-mode .table-scroll {
+        background: transparent;
+        border-color: #cccccc;
+    }
+    body.web-mode thead th,
+    body.web-mode th {
+        background: transparent;
+        color: #ffffff;
+    }
+    body.web-mode svg text[fill="#2a4d6e"] { fill: #2a4d6e; }
+    body.web-mode svg text[fill="#444"] { fill: #444444; }
+    body.web-mode svg rect[fill="#27ae60"] { fill: #27ae60; }
+    body.web-mode svg rect[fill="#e74c3c"] { fill: #e74c3c; }
+    body.web-mode svg rect[fill="#f39c12"] { fill: #f39c12; }
+    body.web-mode svg rect[fill="#7f8c8d"] { fill: #7f8c8d; }
+    body.web-mode svg rect[fill="#3498db"] { fill: #3498db; }
+    body.web-mode svg rect[fill="#c0392b"] { fill: #c0392b; }
     .report-toolbar,
     .anchor {
         display: none;
     }
-    .table-scroll {
-        overflow: visible;
-    }
-    .table-scroll table {
-        min-width: 0;
-    }
-    :target {
-        background: transparent;
+    body.web-mode :target {
+        box-shadow: none;
     }
 }
 
@@ -809,9 +1270,6 @@ body.web-mode nav.toc a:focus-visible {
   <p class="date">Generated October 16, 2026</p>
 </div>
 
-
-<h2 id="rm-kim-nam-joon-deep-destiny-report">RM (Kim Nam-joon) — Deep Destiny Report<a class="anchor" href="#rm-kim-nam-joon-deep-destiny-report" aria-label="Link to this section">#</a></h2>
-<p><em>Full natal reading + ten-year year-by-year timing + relationship and business-launch guidance</em></p>
 <p><strong>Born:</strong> 1994-09-12 · 13:28 · Seoul</p>
 <p><strong>Time method:</strong> recorded birth time 13:28 (local clock) corrected to true solar time <strong>13:00</strong> (birthplace 126.978°E vs the 135.0°E zone meridian), -27.7 min (longitude -32.1 min + equation of time +4.4 min). Hour branches follow 2-hour solar windows, so the pillars above use the corrected time.</p>
 <blockquote class="chart-signature">
@@ -823,7 +1281,7 @@ body.web-mode nav.toc a:focus-visible {
 <p><strong>Chart signature:</strong> <em>A honed blade in autumn air — sharp, decisive, and made to cut through clutter.</em></p>
 <p><strong>(Audio summary included)</strong> Your MP3 audio summary is included — it follows this report by email.</p>
 <hr />
-<h2 id="chart-at-a-glance">Chart at a Glance<a class="anchor" href="#chart-at-a-glance" aria-label="Link to this section">#</a></h2>
+<section class="panel"><h2 id="chart-at-a-glance"><span class="panel-eyebrow">01</span>Chart at a Glance<a class="anchor" href="#chart-at-a-glance" aria-label="Link to this section">#</a></h2>
 <h3 id="four-pillars">Four Pillars<a class="anchor" href="#four-pillars" aria-label="Link to this section">#</a></h3>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Table, scrollable"><table>
 <thead>
@@ -931,7 +1389,7 @@ body.web-mode nav.toc a:focus-visible {
 <p>Right now, in October 2026, you are moving through a year whose energy is shaped by <strong>Bing O (丙午)</strong> (Direct Officer (Authority)). This sits inside your broader <strong>Bing Ja (丙子)</strong> major luck period (ages 28–37), whose theme is Direct Officer (Authority). For your chart, the most useful energy to lean into this year is <strong>Water</strong>: look for decisions, environments, and relationships that bring water qualities forward.</p>
 <hr />
 
-</div><h2 id="table-of-contents">Table of Contents<a class="anchor" href="#table-of-contents" aria-label="Link to this section">#</a></h2>
+</div></section><section class="panel"><h2 id="table-of-contents"><span class="panel-eyebrow">02</span>Table of Contents<a class="anchor" href="#table-of-contents" aria-label="Link to this section">#</a></h2>
 <nav class="toc" aria-label="Contents"><ul>
 <li><a href="#chart-at-a-glance">Chart at a Glance</a></li>
 <li><a href="#how-to-use-this-report">How to Use This Report</a></li>
@@ -953,7 +1411,7 @@ body.web-mode nav.toc a:focus-visible {
 <li><a href="#closing-note">Closing Note</a></li>
 </ul></nav>
 <hr />
-<h2 id="how-to-use-this-report">How to Use This Report<a class="anchor" href="#how-to-use-this-report" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="how-to-use-this-report"><span class="panel-eyebrow">03</span>How to Use This Report<a class="anchor" href="#how-to-use-this-report" aria-label="Link to this section">#</a></h2>
 <p>This document is a structured, multi-section reading. It is meant to be returned to, not read once and shelved. A few notes that make it easier to use:</p>
 <ol>
 <li><strong>What does &quot;favorable element&quot; mean in daily life?</strong> It is the element (Wood, Fire, Earth, Metal, or Water) that tends to balance your chart. Bringing it into your environment, schedule, and decisions reduces friction and supports steadier growth.</li>
@@ -966,7 +1424,7 @@ body.web-mode nav.toc a:focus-visible {
 </ol>
 <p>Return to the Practical Guidance Summary whenever you need a reminder. Return to the Major Luck Periods table at every life transition. Return to the Closing Note when you want a single, well-formed paragraph to sit with.</p>
 <hr />
-<h2 id="day-master-portrait">Day Master Portrait<a class="anchor" href="#day-master-portrait" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="day-master-portrait"><span class="panel-eyebrow">04</span>Day Master Portrait<a class="anchor" href="#day-master-portrait" aria-label="Link to this section">#</a></h2>
 <p>With <strong>Sin (辛)</strong> (Sin �32�) as your Day Master — you — the reference point the whole chart is read against, your core self carries the image of the <strong>polished jewel or fine instrument</strong>. Your natural strengths run toward <strong>precision, refinement, and a gift for detail and quality</strong>, while the shadow side can show as <strong>perfectionism, detachment, or being easily bruised by criticism</strong>.</p>
 <p>Born in a <strong>Metal</strong> chart that reads as <strong>strong</strong>, the way you meet the world is shaped by how much Metal energy is available. When balanced, you express the best of Metal; when stressed, the unintegrated side may dominate.</p>
 <p>Your growth edge is to consciously cultivate <strong>Water</strong> energy — the favorable element — so that your Metal nature has the right container and outlet.</p>
@@ -1053,7 +1511,7 @@ When the annual or major luck touches the Mi (未) branch or the Eul (乙) stem,
 <p><strong>In plain words:</strong> At your core you are a refined blade — you cut to the point and value quality. Your chart reads as strong, so the rest of this report is about where that helps and where leaning toward Water keeps you in balance.</p>
 </blockquote>
 <hr />
-<h2 id="career-wealth">Career &amp; Wealth<a class="anchor" href="#career-wealth" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="career-wealth"><span class="panel-eyebrow">05</span>Career &amp; Wealth<a class="anchor" href="#career-wealth" aria-label="Link to this section">#</a></h2>
 <h3 id="career-archetypes">Career Archetypes<a class="anchor" href="#career-archetypes" aria-label="Link to this section">#</a></h3>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Table, scrollable"><table>
 <thead>
@@ -1178,7 +1636,7 @@ When the annual or major luck touches the Mi (未) branch or the Eul (乙) stem,
 <p><strong>In plain words:</strong> Your chart leans toward earning alongside peers — teams, partnerships, independent practice. Fields and decades that carry Water give the cleanest results; the timing tables show when.</p>
 </blockquote>
 <hr />
-<h2 id="relationships">Relationships<a class="anchor" href="#relationships" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="relationships"><span class="panel-eyebrow">06</span>Relationships<a class="anchor" href="#relationships" aria-label="Link to this section">#</a></h2>
 <h3 id="relationship-style">Relationship Style<a class="anchor" href="#relationship-style" aria-label="Link to this section">#</a></h3>
 <p>The spouse palace is <strong>Chuk (丑)</strong> (12-stage: 양), whose main hidden stem relates to your Day Master as <strong>Indirect Resource (偏印)</strong>. In practice, you are drawn to partners who spark your curiosity and bring unexpected insights. No <strong>Peach Blossom (桃花)</strong> star is natally active, so relationship style is more shaped by the spouse palace and ten-god mix than by overt magnetism. By Japyeong-jinjeon (자평진전)'s gendered spouse-star convention, your <strong>wife star (처성) (재성, wife star)</strong> appears at <strong>year stem</strong>, <strong>hour stem</strong>, <strong>hour branch middle</strong>.</p>
 <h3 id="spouse-palace-ten-god">Spouse Palace Ten-God<a class="anchor" href="#spouse-palace-ten-god" aria-label="Link to this section">#</a></h3>
@@ -1292,7 +1750,7 @@ When the annual or major luck touches the Mi (未) branch or the Eul (乙) stem,
 <p><strong>In plain words:</strong> Your partnership area points toward an unusual, insight-driven partner who teaches you things. Treat this as the weather it tends to create, not a description of one person.</p>
 </blockquote>
 <hr />
-<h2 id="health-vitality">Health &amp; Vitality<a class="anchor" href="#health-vitality" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="health-vitality"><span class="panel-eyebrow">07</span>Health &amp; Vitality<a class="anchor" href="#health-vitality" aria-label="Link to this section">#</a></h2>
 <h3 id="primary-watchpoints">Primary Watchpoints<a class="anchor" href="#primary-watchpoints" aria-label="Link to this section">#</a></h3>
 <ul>
 <li><strong>Element excess:</strong> Wood — pay attention to the liver/gall bladder and nervous system.</li>
@@ -1318,7 +1776,7 @@ When the annual or major luck touches the Mi (未) branch or the Eul (乙) stem,
 <p><strong>In plain words:</strong> Your lightest element is Fire, so the heart/small intestine and circulation are the natural place to start gentle, preventive care — through fire-aligned food, rest, and seasons. This is a balance cue, not a diagnosis.</p>
 </blockquote>
 <hr />
-<h2 id="natal-pattern-analysis">Natal Pattern Analysis<a class="anchor" href="#natal-pattern-analysis" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="natal-pattern-analysis"><span class="panel-eyebrow">08</span>Natal Pattern Analysis<a class="anchor" href="#natal-pattern-analysis" aria-label="Link to this section">#</a></h2>
 <p>This section gathers the visible structural signals in your natal chart — combinations, clashes, harmonies, and self-punishments — so the reader can see which branches are speaking to one another. These patterns do not dictate events; they describe recurring themes and pressures that tend to appear across life areas.</p>
 <p><strong>Dominant pattern:</strong> <em>Companion Structure (비견격) / Companion Grid</em></p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Table, scrollable"><table>
@@ -1379,7 +1837,7 @@ When the annual or major luck touches the Mi (未) branch or the Eul (乙) stem,
 <li><strong>Saddle Star (攀鞍)</strong> (at 戌): advancement, promotion — riding a rising wave.</li>
 </ul>
 <hr />
-<h2 id="wealth-investment-timing">Wealth &amp; Investment Timing<a class="anchor" href="#wealth-investment-timing" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="wealth-investment-timing"><span class="panel-eyebrow">09</span>Wealth &amp; Investment Timing<a class="anchor" href="#wealth-investment-timing" aria-label="Link to this section">#</a></h2>
 <p>This section identifies where wealth ten-gods appear in the natal chart and which major-luck and annual windows tend to activate the wealth story. It is not investment advice; it is a Saju lens on when the chart's energy favors planning, negotiation, or conservation.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Table, scrollable"><table>
 <thead>
@@ -1419,7 +1877,7 @@ When the annual or major luck touches the Mi (未) branch or the Eul (乙) stem,
 <h3 id="investment-style-cue">Investment Style Cue<a class="anchor" href="#investment-style-cue" aria-label="Link to this section">#</a></h3>
 <p>Because your favorable element is <strong>Water</strong> and your supporting element is <strong>Wood</strong>, years and months that bring these elements into the annual or monthly pillar are generally more supportive for financial planning and negotiation. Years dominated by your unfavorable element call for conservation, review, and patience rather than expansion.</p>
 <hr />
-<h2 id="relocation-travel-direction-guidance">Relocation, Travel &amp; Direction Guidance<a class="anchor" href="#relocation-travel-direction-guidance" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="relocation-travel-direction-guidance"><span class="panel-eyebrow">10</span>Relocation, Travel &amp; Direction Guidance<a class="anchor" href="#relocation-travel-direction-guidance" aria-label="Link to this section">#</a></h2>
 <p>Classical Saju associates each element with a direction and a quality of space. These notes are directional tendencies, not guarantees about a specific city or property.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Table, scrollable"><table>
 <thead>
@@ -1452,7 +1910,7 @@ When the annual or major luck touches the Mi (未) branch or the Eul (乙) stem,
 <h3 id="travel-move-timing">Travel &amp; Move Timing<a class="anchor" href="#travel-move-timing" aria-label="Link to this section">#</a></h3>
 <p>Travel and relocation are most likely to feel aligned during <strong>Water</strong> (and supporting <strong>Wood</strong>)-element years and months, and especially during these supportive major-luck periods: ages 8-17 (Gap Sul), ages 18-27 (Eul Hae), ages 28-37 (Bing Ja). Relocations outside those windows may bring temporary benefit but require more adjustment; plan for a longer settling-in period rather than expecting instant payoff.</p>
 <hr />
-<h2 id="business-launch-timing">Business &amp; Launch Timing<a class="anchor" href="#business-launch-timing" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="business-launch-timing"><span class="panel-eyebrow">11</span>Business &amp; Launch Timing<a class="anchor" href="#business-launch-timing" aria-label="Link to this section">#</a></h2>
 <p>For a Metal Day Master, the most supportive launch windows tend to come when the annual pillar carries <strong>Water</strong> or <strong>Wood</strong> energy and does not clash the natal day branch.</p>
 <h3 id="your-business-lucky-numbers">Your Business Lucky Numbers<a class="anchor" href="#your-business-lucky-numbers" aria-label="Link to this section">#</a></h3>
 <p>Use <strong>1, 6 (favorable Water) and 3, 8 (supporting Wood)</strong> in pricing, launch dates, seat numbers, and branding choices where practical. These numbers carry the frequency of your favorable element.</p>
@@ -1518,7 +1976,7 @@ When the annual or major luck touches the Mi (未) branch or the Eul (乙) stem,
 <li><strong>A public date chosen without checking your favorable element</strong> — if the launch date can move, place it in a month whose stem matches your favorable <strong>Water</strong> element; the auspicious-dates section lists the candidates.</li>
 </ol>
 <hr />
-<h2 id="timing-major-luck-annual-windows">Timing: Major Luck &amp; Annual Windows<a class="anchor" href="#timing-major-luck-annual-windows" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="timing-major-luck-annual-windows"><span class="panel-eyebrow">12</span>Timing: Major Luck &amp; Annual Windows<a class="anchor" href="#timing-major-luck-annual-windows" aria-label="Link to this section">#</a></h2>
 <p><strong>Luck direction:</strong> forward, advancing from the month pillar — derived from a yang year stem (Gap) and male gender, per the classical rule (yang year + male, or yin year + female → forward; otherwise backward).</p>
 <p><strong>starting age:</strong> ~8.8 (~26.3 days to the qualifying 節氣 ÷ 3, per &quot;3 days = 1 year&quot; rule) — the first major-luck period begins roughly 105 months after birth (≈ Jun 2003), inside the <strong>8-17</strong> decade label shown below, not precisely at its first birthday; each later period changes over at the same point in the year. Korean manseryeok (Korean perpetual calendar) apps round this to a whole <strong>Major Luck Water (대운수) 9</strong> and list decades as 9, 19, 29… (often in Korean age), so their labels can differ from the table below by a year or so while describing the same periods.</p>
 <h3 id="major-luck-periods">Major Luck Periods<a class="anchor" href="#major-luck-periods" aria-label="Link to this section">#</a></h3>
@@ -1717,7 +2175,7 @@ When the annual or major luck touches the Mi (未) branch or the Eul (乙) stem,
 <p><strong>In plain words:</strong> You are currently in a tailwind decade — a good stretch to push on the things that matter. Zoom in with the year and month windows that carry Water.</p>
 </blockquote>
 <hr />
-<h2 id="life-themes-by-major-luck-period">Life Themes by Major Luck Period<a class="anchor" href="#life-themes-by-major-luck-period" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="life-themes-by-major-luck-period"><span class="panel-eyebrow">13</span>Life Themes by Major Luck Period<a class="anchor" href="#life-themes-by-major-luck-period" aria-label="Link to this section">#</a></h2>
 <p>Each 10-year major-luck (대운) period brings a new stem and branch into prominence. The stem shows the outer theme through its Ten Gods (十神) relationship to your Day Master; the branch shows the stage of life and the underlying terrain. Read these as tendencies, not fixed events.</p>
 <p>Within any period, years and months whose stem matches your favorable element are the most reliable for visible wins; the rest are best used for quiet preparation.</p>
 <h3 id="ages-8-17-gap-sul">Ages 8–17: Gap Sul (甲戌)<a class="anchor" href="#ages-8-17-gap-sul" aria-label="Link to this section">#</a></h3>
@@ -1777,7 +2235,7 @@ When the annual or major luck touches the Mi (未) branch or the Eul (乙) stem,
 </ul>
 <p>With a <strong>Companion (比肩)</strong> ten-god over a <strong>Fire</strong> branch (stem element Metal), this is a conserve and consolidate decade. Let the unglamorous work accumulate — it is what the next decade inherits. Relationships in this window carry the same <strong>Companion (比肩)</strong> undertow — themes of peer dynamics, independence, and friendship-based bonds are likely.</p>
 <hr />
-<h2 id="lifetime-decade-roadmap">Lifetime Decade Roadmap<a class="anchor" href="#lifetime-decade-roadmap" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="lifetime-decade-roadmap"><span class="panel-eyebrow">14</span>Lifetime Decade Roadmap<a class="anchor" href="#lifetime-decade-roadmap" aria-label="Link to this section">#</a></h2>
 <p>A single-glance view of all 8 major-luck periods in your life and the favorable lean of each. Green segments are clearly favorable, amber are mixed, red lean toward challenge. Treat this as a rhythm, not a verdict — the supporting-element periods are often where the most important growth quietly happens.</p>
 <!-- decade-roadmap:start -->
 <div class="decade-roadmap no-break">
@@ -1817,7 +2275,7 @@ When the annual or major luck touches the Mi (未) branch or the Eul (乙) stem,
 </div>
 <!-- decade-roadmap:end -->
 <hr />
-<h2 id="auspicious-dates-next-90-days">Auspicious Dates — Next 90 Days<a class="anchor" href="#auspicious-dates-next-90-days" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="auspicious-dates-next-90-days"><span class="panel-eyebrow">15</span>Auspicious Dates — Next 90 Days<a class="anchor" href="#auspicious-dates-next-90-days" aria-label="Link to this section">#</a></h2>
 <blockquote>
 <p>The next 90-day window from October 2026 includes the following candidate dates — each one's day-stem element matches your favorable (Water) or supporting (Wood) element, and its day-branch does not clash, harm, or break your natal day branch (Chuk) or hour branch (Mi). A qualified reader should still cross-check each date against your specific question and local calendar before recommending it.</p>
 </blockquote>
@@ -1926,7 +2384,7 @@ When the annual or major luck touches the Mi (未) branch or the Eul (乙) stem,
 </tbody>
 </table></div>
 <hr />
-<h2 id="health-vitality-deep-dive">Health &amp; Vitality — Deep-Dive<a class="anchor" href="#health-vitality-deep-dive" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="health-vitality-deep-dive"><span class="panel-eyebrow">16</span>Health &amp; Vitality — Deep-Dive<a class="anchor" href="#health-vitality-deep-dive" aria-label="Link to this section">#</a></h2>
 <h3 id="element-story">Element Story<a class="anchor" href="#element-story" aria-label="Link to this section">#</a></h3>
 <p>This chart's element balance shows <strong>Wood (34.1%)</strong> as the most present element and <strong>Fire (3.7%)</strong> as the least. Energy tends to <strong>flow in cycles</strong> in the Wood domain; a balanced day feels like quiet movement between input, processing, and release. The Fire system is the most likely leak point — under-supported and easy to neglect — and the easiest place to begin rebuilding through the favorable element's practices.</p>
 <h3 id="body-system-map">Body-System Map<a class="anchor" href="#body-system-map" aria-label="Link to this section">#</a></h3>
@@ -1950,7 +2408,7 @@ When the annual or major luck touches the Mi (未) branch or the Eul (乙) stem,
 <p><strong>Conservation windows</strong> — the chart asks for gentler practice during: ages 68-77 (Gyeong Jin), ages 78-87 (Sin Sa). Reduce load, deepen recovery, and avoid starting ambitious new regimens in these years.</p>
 <p>Across all periods, the <strong>Water</strong> element's daily practices (its season, foods, colors, and rhythms) are the simplest and most reliable countermeasure — small daily inputs compound more than occasional heroic efforts.</p>
 <hr />
-<h2 id="monthly-lucky-dates">Monthly Lucky Dates<a class="anchor" href="#monthly-lucky-dates" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="monthly-lucky-dates"><span class="panel-eyebrow">17</span>Monthly Lucky Dates<a class="anchor" href="#monthly-lucky-dates" aria-label="Link to this section">#</a></h2>
 <p>The next <strong>12 months</strong> of favorable days, selected when the daily stem element matches your <strong>Water</strong> or <strong>Wood</strong> element and the day branch does not clash, harm, or break your natal day or hour branch.</p>
 <blockquote>
 <p><em>Methodology: each row filters the daily-luck (일운) stems to those whose element matches your favorable or supporting element, then drops any day whose branch clashes, harms, or breaks against your natal day or hour branch.</em></p>
@@ -2033,7 +2491,7 @@ When the annual or major luck touches the Mi (未) branch or the Eul (乙) stem,
 <p><em>For business-critical decisions, confirm the chosen date against the specific action type and consult a qualified reader.</em></p>
 </blockquote>
 <hr />
-<h2 id="practical-guidance-summary">Practical Guidance Summary<a class="anchor" href="#practical-guidance-summary" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="practical-guidance-summary"><span class="panel-eyebrow">18</span>Practical Guidance Summary<a class="anchor" href="#practical-guidance-summary" aria-label="Link to this section">#</a></h2>
 <h3 id="top-5-strengths">Top 5 Strengths<a class="anchor" href="#top-5-strengths" aria-label="Link to this section">#</a></h3>
 <ul>
 <li><strong>Metal Day Master strength</strong> — refined discernment and the ability to notice quality others miss.</li>
@@ -2075,14 +2533,14 @@ When the annual or major luck touches the Mi (未) branch or the Eul (乙) stem,
 <p><em>Direction, colours, season, and numbers above are classical Five Elements (五行) direction (방위) doctrine. Gemstones are a modern popular-astrology convention, not classical destiny principles (命理) — optional, not analytically load-bearing.</em></p>
 </blockquote>
 <hr />
-<h2 id="mp3-audio-summary-included-by-default">MP3 Audio Summary — Included by Default<a class="anchor" href="#mp3-audio-summary-included-by-default" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="mp3-audio-summary-included-by-default"><span class="panel-eyebrow">19</span>MP3 Audio Summary — Included by Default<a class="anchor" href="#mp3-audio-summary-included-by-default" aria-label="Link to this section">#</a></h2>
 <p>🎧 <strong>Audio Summary:</strong> Your MP3 companion to this report is included and follows shortly after it — we email you the moment it is ready, and it appears on the same page as your reading. It covers your Day Master portrait, current major-luck period, key timing windows for 2026–2031, and the top 5 practical recommendations in about ten minutes.</p>
 <p>Listen once in full, then return to the chapters that match the season you are in.</p>
 <hr />
-<h2 id="closing-note">Closing Note<a class="anchor" href="#closing-note" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="closing-note"><span class="panel-eyebrow">20</span>Closing Note<a class="anchor" href="#closing-note" aria-label="Link to this section">#</a></h2>
 <p><strong>Sin (辛) (Sin �241�)</strong> sits at the centre of this chart, with the chart's element balance leaning toward <strong>Wood</strong> and a ten-god distribution dominated by <strong>Companion (4), Wealth (3), Resource (3)</strong>. The favorable <strong>Water</strong> element (with <strong>Wood</strong> as the quiet secondary) is your main lever — not as a rule to follow, but as a rhythm to listen to. The spouse palace <strong>Chuk (丑)</strong> and the chart's relationship dynamics reward the you for showing up consistently rather than performing. The natal clash between <strong>Chuk (丑)</strong> and <strong>Mi (未)</strong> is a recurring pressure; the chart's gift is that you have already learned how to navigate it — and the favorable element makes the navigation gentler. Across a full lifetime, this chart rewards you for studying your own patterns and acts with the favorable element rather than against it. The work is not to fix the chart; it is to use what is already there well.</p>
 <hr />
-<h2 id="what-the-terms-mean">What the Terms Mean<a class="anchor" href="#what-the-terms-mean" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="what-the-terms-mean"><span class="panel-eyebrow">21</span>What the Terms Mean<a class="anchor" href="#what-the-terms-mean" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><strong>Direct Officer (正官):</strong> conventional authority — career structure, rules, status, institutions</li>
 <li><strong>Day Master (日干):</strong> you — the reference point the whole chart is read against</li>
@@ -2092,6 +2550,6 @@ When the annual or major luck touches the Mi (未) branch or the Eul (乙) stem,
 <li><strong>Wealth class (wealth star):</strong> the wealth group — how money and resources come and are held</li>
 <li><strong>Indirect Wealth (偏財):</strong> variable money — deals, commissions, windfalls, higher risk and reward</li>
 </ul>
-
+</section>
 </body>
 </html>

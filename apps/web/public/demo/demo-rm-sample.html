@@ -546,135 +546,643 @@ body.tier-essential h1 {
 
 
 /* ---- web layer (screen only; print rules above still apply) ---- */
-/* Web layer for the Saju report — appended after theme.css in web mode only.
- *
- * `theme.css` is a *print* stylesheet: A4 page boxes, running footers, table headers
- * repeated across pages. It renders the report as a document, but on a phone it would
- * be one A4 column squeezed into 390px with wide tables overflowing the viewport.
- *
- * This layer adds what a screen needs and changes nothing about the print result:
- * a readable measure, a paper-like sheet, scrollable tables, visible heading anchors,
- * and a highlight on the section a contents link just jumped to. It is deliberately
- * light-only for the *document* (a reading is a sheet of paper) while the surrounding
- * page follows the reader's colour scheme.
- */
+/* ─────────────────────────────────────────────────────────────────────────────
+   The reading — web layer.
 
-/* ── the sheet ──────────────────────────────────────────────────────────────────── */
-html {
-    -webkit-text-size-adjust: 100%;
-}
-body.web-mode {
-    margin: 0;
-    padding: 0 0 4rem;
-    background: #eef1f4;
-    /* System stack: the document must be self-contained, so no web fonts. The
-       bundled report fonts are PDF-only. */
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+   This is the *screen* stylesheet for the report, and it is written against the
+   webapp's own design system: the same tokens, the same type scale, the same card
+   and callout idioms (`apps/web/src/app/globals.css`). A client who moves from the
+   product to their reading should not notice they changed surface.
+
+   Two constraints shape everything here:
+
+   1. **`theme.css` is a print stylesheet** — A4 page boxes, running footers, table
+      headers repeated across pages. It renders the PDF. This layer is appended *after*
+      it in web mode only, so the print document and its snapshots are untouched, and a
+      `@media print` block below hands the page back to the A4 flow.
+   2. **The document is self-contained.** No webfonts, no scripts, no external requests,
+      because the same bytes are served *and* downloaded. So the app's faces
+      (Cormorant Garamond, Inter, IBM Plex Mono) are referenced with their token
+      fallbacks — Georgia and the system stack — which is the closest a single file can
+      get without embedding ~200 KB of font per report. The token values below are
+      mirrored from `globals.css`, and `tests/test_web_report.py` asserts they still
+      match, so a rebrand cannot silently leave reports behind.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+:root {
+    color-scheme: dark;
+
+    --background: #08080d;
+    --surface: #0d0d15;
+    --foreground: #ece8df;
+
+    --card: #11111a;
+    --card-foreground: #ece8df;
+
+    --muted: #16161f;
+    --muted-foreground: #a09a8e;
+
+    --primary: #c8a34a;
+    --primary-foreground: #0b0b10;
+
+    --accent: #7f6ad1;
+    --accent-foreground: #f2f0ff;
+
+    --border: #23232f;
+    --ring: #c8a34a;
+
+    --success: #3f9d6b;
+    --warning: #d8a13a;
+    --destructive: #d1553f;
+
+    --el-wood: #4fae7c;
+    --el-fire: #e0674f;
+    --el-earth: #d9b44a;
+    --el-metal: #b9bec7;
+    --el-water: #4f8fd9;
+
+    --radius: 0.625rem;
+
+    --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
                  "Noto Sans", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
-@media (prefers-color-scheme: dark) {
-    body.web-mode {
-        background: #12161a;
+
+/* Light theme, taken from the operating system — the same block as the app. */
+@media (prefers-color-scheme: light) {
+    :root {
+        color-scheme: light;
+
+        --background: #fbfaf7;
+        --surface: #ffffff;
+        --foreground: #1a1a1f;
+
+        --card: #ffffff;
+        --card-foreground: #1a1a1f;
+
+        --muted: #f2f0ea;
+        --muted-foreground: #6b6558;
+
+        --primary: #8a6d1f;
+        --primary-foreground: #ffffff;
+
+        --accent: #5b46a8;
+        --accent-foreground: #ffffff;
+
+        --border: #e2ded4;
+        --ring: #8a6d1f;
+
+        --success: #2f7a52;
+        --warning: #9a6b12;
+        --destructive: #b03a26;
+
+        --el-wood: #2f7d57;
+        --el-fire: #b8442e;
+        --el-earth: #9a7c17;
+        --el-metal: #7b8089;
+        --el-water: #2f68a8;
     }
 }
-body.web-mode .cover,
-body.web-mode .compact-cover,
-body.web-mode > h2,
-body.web-mode > h3,
-body.web-mode > p,
-body.web-mode > ul,
-body.web-mode > ol,
-body.web-mode > table,
-body.web-mode > .table-scroll,
-body.web-mode > div:not(.report-toolbar):not(.cover):not(.compact-cover),
-body.web-mode > hr,
-body.web-mode > blockquote {
+
+/* ── page ─────────────────────────────────────────────────────────────────── */
+
+body.web-mode {
+    margin: 0;
+    padding: 0 0 5rem;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+/* The print sheet's own tokens, remapped to the app's palette.
+   Every block in `theme.css` — tables, the quick-reference card, callouts, rules — was written
+   against these names, so remapping them here brings all of it into the app's design at once,
+   instead of patching each block and missing the ones added later. `--font-serif` too: the report
+   asks for a serif face and should get the display one. */
+body.web-mode {
+    --color-text: var(--foreground);
+    --color-muted: var(--muted-foreground);
+    --color-light: var(--muted-foreground);
+    --color-heading: var(--primary);
+    --color-heading2: var(--foreground);
+    --color-accent: var(--muted);          /* even-row striping */
+    --color-rule: var(--border);
+    --color-table-header: var(--muted);
+    --color-card-bg: transparent;          /* it already sits in a panel */
+    --color-card-border: var(--border);
+    --color-callout-bg: color-mix(in srgb, var(--primary) 8%, transparent);
+    --color-callout-border: color-mix(in srgb, var(--primary) 40%, transparent);
+    --font-serif: var(--font-display);
+}
+
+body.web-mode ::selection {
+    background: color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+/* One readable column, whatever the width. */
+body.web-mode > * {
     box-sizing: border-box;
     max-width: 46rem;
     margin-left: auto;
     margin-right: auto;
+    padding-left: 1.15rem;
+    padding-right: 1.15rem;
 }
-/* The sheet: content blocks sit on white with a hairline, so the document reads as a
-   page rather than as loose text on a coloured background. */
-body.web-mode > h2,
-body.web-mode > h3,
-body.web-mode > p,
-body.web-mode > ul,
-body.web-mode > ol,
-body.web-mode > blockquote,
-body.web-mode > .table-scroll,
-body.web-mode > table,
-body.web-mode > div:not(.report-toolbar):not(.cover):not(.compact-cover) {
-    background: #ffffff;
-    padding: 0.55rem 1.15rem;
+
+/* ── the toolbar the app injects when it serves the report ────────────────── */
+
+.report-toolbar {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: none;
+    padding: 0.7rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 20;
 }
-body.web-mode > h2 {
-    padding-top: 1.1rem;
-    padding-bottom: 0.3rem;
+
+.report-toolbar a,
+.report-toolbar button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;              /* 44px: the app's touch-target bar */
+    padding: 0 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--foreground);
+    font: inherit;
+    font-size: 0.9375rem;
+    text-decoration: none;
 }
-body.web-mode > hr {
+
+.report-toolbar a:hover,
+.report-toolbar a:focus-visible,
+.report-toolbar button:hover {
+    background: color-mix(in srgb, var(--foreground) 8%, transparent);
+}
+
+/* ── cover: the app's hero ────────────────────────────────────────────────── */
+
+body.web-mode .cover,
+body.web-mode .compact-cover {
+    padding-top: 3.5rem;
+    padding-bottom: 2.5rem;
+    text-align: left;
+    background: transparent;
+    min-height: 0;
+    border: 0;
+}
+
+body.web-mode .cover .watermark {
+    /* A CJK glyph in the print sheet. A document that must render identically
+       everywhere cannot depend on the reader having a Korean font — without one it is a
+       tofu box at 110pt on the front page. The app's own watermark is Cormorant, which
+       this file cannot bundle either; the cover carries the brand line instead. */
+    display: none;
+}
+
+body.web-mode .cover h1,
+body.web-mode .compact-cover h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 1.4rem + 3.4vw, 4rem);
+    line-height: 1.05;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
+    margin: 0 0 0.5rem;
+}
+
+body.web-mode .cover .subtitle,
+body.web-mode .compact-cover .subtitle {
+    font-family: var(--font-display);
+    font-style: normal;
+    font-size: 1.25rem;
+    line-height: 1.4;
+    color: var(--primary);
+    text-align: left;
+    margin: 0 0 1.5rem;
+}
+
+/* The elemental rule under the title: wood → fire → earth → metal → water. */
+body.web-mode .cover .subtitle::after {
+    content: "";
+    display: block;
+    width: 5rem;
+    height: 2px;
+    margin-top: 1rem;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, var(--el-wood), var(--el-fire), var(--el-earth),
+                                var(--el-metal), var(--el-water));
+}
+
+body.web-mode .cover .meta-block,
+body.web-mode .compact-cover .meta {
+    display: grid;
+    gap: 0.35rem 1.25rem;
+    grid-template-columns: auto 1fr;
+    padding: 1rem 1.15rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-align: left;
+    margin: 0 0 1.25rem;
+}
+
+body.web-mode .cover .meta,
+body.web-mode .compact-cover .meta {
+    display: contents;
+    font-size: 0.9375rem;
+}
+
+body.web-mode .cover .meta strong {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    font-weight: 400;
+    padding-top: 0.35rem;
+}
+
+body.web-mode .cover .foot,
+body.web-mode .cover .date,
+body.web-mode .cover .report-id,
+body.web-mode .compact-cover .report-line {
+    /* `theme.css` indents the cover footnote by 22mm, which is an A4 measure and reads as a
+       misplaced column on a phone. */
+    padding: 0;
+    margin-top: 1.5rem;
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+    text-align: left;
+    margin: 0 0 0.35rem;
+}
+
+/* ── sections as cards, the way the app lays out a dashboard ──────────────── */
+
+body.web-mode .panel {
+    padding: 1.5rem 1.15rem 1.75rem;
+    margin-bottom: 1rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+body.web-mode .panel > h2 {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin: 0 0 0.75rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.25rem);
+    line-height: 1.12;
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.panel-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--primary);
+    font-weight: 400;
+}
+
+body.web-mode .panel > h2 .anchor {
+    order: -1;
+    align-self: flex-end;
+    float: none;
+    margin: 0 0 -1.6rem;
+}
+
+body.web-mode h3 {
+    margin: 1.75rem 0 0.6rem;
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--foreground);
+}
+
+body.web-mode h3:first-child {
+    margin-top: 0;
+}
+
+body.web-mode p {
+    margin: 0 0 0.9rem;
+    color: color-mix(in srgb, var(--foreground) 88%, transparent);
+}
+
+body.web-mode strong {
+    color: var(--foreground);
+    font-weight: 600;
+}
+
+body.web-mode ul,
+body.web-mode ol {
+    margin: 0 0 1rem;
+    padding-left: 1.1rem;
+}
+
+body.web-mode li {
+    margin-bottom: 0.35rem;
+}
+
+body.web-mode li::marker {
+    color: var(--primary);
+}
+
+body.web-mode hr {
     border: 0;
     height: 0;
     margin: 0;
 }
-body.web-mode > h2:first-of-type {
-    margin-top: 1.5rem;
+
+/* Hanja, pillar names and other glyph columns: mono keeps them aligned, as the app does. */
+body.web-mode .pillar {
+    font-family: var(--font-mono);
+    letter-spacing: 0.06em;
 }
 
-/* The cover watermark is a CJK glyph in the print sheet. A document that must render
-   identically everywhere cannot depend on the reader having a Korean font — on a device
-   without one it is a tofu box at 110pt on the front page. The web cover carries the
-   brand line instead; the PDF keeps the mark (its fonts are embedded). */
-body.web-mode .cover .watermark {
-    display: none;
+/* ── tables: hairlines and tabular numerals, not a grid ──────────────────── */
+
+body.web-mode table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 1.15rem;
+    font-size: 0.9375rem;
 }
 
-/* ── reading measure on small screens ───────────────────────────────────────────── */
-@media screen and (max-width: 46rem) {
-    body.web-mode > h2,
-    body.web-mode > h3,
-    body.web-mode > p,
-    body.web-mode > ul,
-    body.web-mode > ol,
-    body.web-mode > blockquote,
-    body.web-mode > .table-scroll,
-    body.web-mode > table,
-    body.web-mode > div:not(.report-toolbar):not(.cover):not(.compact-cover) {
-        padding-left: 0.9rem;
-        padding-right: 0.9rem;
-    }
+body.web-mode thead th,
+body.web-mode th {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 400;
+    text-align: left;
+    color: var(--muted-foreground);
+    background: var(--muted);
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
 }
 
-/* ── wide tables scroll instead of pushing the page sideways ────────────────────── */
+body.web-mode td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    font-variant-numeric: tabular-nums;
+}
+
+body.web-mode tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+body.web-mode td:first-child {
+    color: var(--foreground);
+}
+
+/* Wide tables scroll inside their own box, focusably, so the page never moves. */
 .table-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
-}
-.table-scroll:focus-visible {
-    outline: 2px solid var(--color-heading);
-    outline-offset: -2px;
-}
-.table-scroll table {
-    width: 100%;
-    min-width: 34rem;   /* keeps columns legible; the wrapper scrolls */
-}
-.table-scroll::after {
-    /* A hint that there is more to the right. */
-    content: "";
-    display: block;
-    height: 0;
+    margin: 0 0 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
 }
 
-/* ── heading anchors ────────────────────────────────────────────────────────────── */
+.table-scroll:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+}
+
+.table-scroll table {
+    margin: 0;
+    min-width: 34rem;
+}
+
+/* ── the semantic blocks the renderer already emits ──────────────────────── */
+
+/* Quick reference: the app's key/value card. */
+.quick-ref-card {
+    margin: 0 0 1.25rem;
+    padding: 0.25rem 0;
+}
+.quick-ref-card .label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    margin-bottom: 0.15rem;
+}
+.quick-ref-card .value {
+    display: block;
+    margin-bottom: 0.85rem;
+    color: var(--foreground);
+}
+
+/* Callouts take the app's Alert tones. */
+.right-now-callout,
+.partner-compat-upsell,
+.audio-included,
+.audio-summary {
+    border-radius: var(--radius);
+    padding: 0.9rem 1.05rem;
+    margin: 0 0 1.25rem;
+}
+
+.right-now-callout {
+    border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+.right-now-callout p:last-child {
+    margin-bottom: 0;
+}
+
+/* The chart signature is the best sentence in the report: set it in the display face. */
+.chart-signature {
+    margin: 0 0 1.35rem;
+    padding: 1rem 1.15rem;
+    border-left: 2px solid var(--accent);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    line-height: 1.45;
+    color: var(--foreground);
+}
+
+.partner-compat-upsell {
+    border: 1px dashed var(--border);
+    background: color-mix(in srgb, var(--foreground) 3%, transparent);
+    color: var(--muted-foreground);
+}
+
+.audio-included,
+.audio-summary {
+    border: 1px solid color-mix(in srgb, var(--primary) 45%, transparent);
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+.audio-included p,
+.audio-summary p {
+    margin: 0 0 0.6rem;
+    color: var(--primary);
+    font-weight: 600;
+}
+.audio-summary audio {
+    width: 100%;
+    height: 2.75rem;                  /* ≥44px, like every control in the app */
+}
+
+/* Lucky attributes: a grid of small stat cards. */
+.lucky-attributes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 0.6rem;
+    margin: 0 0 1.25rem;
+    padding: 0;
+}
+.lucky-attribute-item {
+    padding: 0.7rem 0.85rem;
+    background: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+.lucky-attribute-item .label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    margin-bottom: 0.2rem;
+}
+.lucky-attribute-item .value {
+    display: block;
+    color: var(--foreground);
+}
+
+/* ── inline charts: re-skinned from the app's palette ────────────────────── */
+
+/* The charts are drawn with the *print* palette inline (`fill="#e74c3c"`, Helvetica),
+   which is correct for the PDF and wrong on a dark card — a navy chart title on a
+   near-black panel. Re-skinning by attribute keeps the print output byte-identical and
+   needs no change to the chart code. */
+body.web-mode .element-balance-chart svg text,
+body.web-mode .luck-timeline svg text,
+body.web-mode .decade-roadmap svg text,
+body.web-mode .luck-bars svg text,
+body.web-mode .luck-classes svg text {
+    font-family: var(--font-sans);
+}
+body.web-mode svg text[fill="#2a4d6e"] { fill: var(--foreground); }
+body.web-mode svg text[fill="#444"] { fill: var(--muted-foreground); }
+
+body.web-mode svg rect[fill="#27ae60"] { fill: var(--el-wood); }
+body.web-mode svg rect[fill="#e74c3c"] { fill: var(--el-fire); }
+body.web-mode svg rect[fill="#f39c12"] { fill: var(--el-earth); }
+body.web-mode svg rect[fill="#7f8c8d"] { fill: var(--el-metal); }
+body.web-mode svg rect[fill="#3498db"] { fill: var(--el-water); }
+/* The roadmap's favourable / mixed / challenging lean. */
+body.web-mode svg rect[fill="#c0392b"] { fill: var(--destructive); }
+
+.element-balance-chart,
+.luck-timeline,
+.decade-roadmap,
+.luck-bars,
+.luck-classes {
+    margin: 0 0 1.25rem;
+    padding: 0.5rem 0.25rem;
+}
+
+/* The element table's own rows carry colour classes from the report. */
+body.web-mode .element-wood { color: var(--el-wood); }
+body.web-mode .element-fire { color: var(--el-fire); }
+body.web-mode .element-earth { color: var(--el-earth); }
+body.web-mode .element-metal { color: var(--el-metal); }
+body.web-mode .element-water { color: var(--el-water); }
+
+/* Its "Presence" column is drawn with block glyphs (██████░░░░), so the bar takes its colour
+   from the row's element class. `:has()` keeps the markup untouched — the print sheet keeps the
+   plain characters, which is what the PDF wants. */
+body.web-mode tr:has(.element-wood) td:nth-child(2) { color: var(--el-wood); }
+body.web-mode tr:has(.element-fire) td:nth-child(2) { color: var(--el-fire); }
+body.web-mode tr:has(.element-earth) td:nth-child(2) { color: var(--el-earth); }
+body.web-mode tr:has(.element-metal) td:nth-child(2) { color: var(--el-metal); }
+body.web-mode tr:has(.element-water) td:nth-child(2) { color: var(--el-water); }
+
+/* Inline code and pre from the print sheet are light chips; on a dark card they glare. */
+body.web-mode code,
+body.web-mode pre {
+    background: color-mix(in srgb, var(--foreground) 8%, transparent);
+    color: var(--foreground);
+    border-radius: 4px;
+}
+
+/* ── contents list ───────────────────────────────────────────────────────── */
+
+body.web-mode nav.toc ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+body.web-mode nav.toc li {
+    border-bottom: 1px solid var(--border);
+}
+body.web-mode nav.toc li:last-child {
+    border-bottom: 0;
+}
+body.web-mode nav.toc a {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    padding: 0.7rem 0.15rem;          /* a comfortable tap target */
+    color: var(--foreground);
+    text-decoration: none;
+}
+body.web-mode nav.toc a::before {
+    content: "";
+    width: 0.35rem;
+    height: 0.35rem;
+    border-radius: 9999px;
+    background: var(--primary);
+    flex: none;
+    transform: translateY(-0.15rem);
+}
+body.web-mode nav.toc a:hover,
+body.web-mode nav.toc a:focus-visible {
+    color: var(--primary);
+}
+
+/* ── heading anchors and the section a contents link opened ──────────────── */
+
 body.web-mode h2,
 body.web-mode h3 {
-    scroll-margin-top: 1rem;
+    scroll-margin-top: 4.5rem;
 }
 .anchor {
     float: right;
     margin-left: 0.6rem;
-    color: var(--color-light);
+    color: var(--muted-foreground);
     text-decoration: none;
     font-weight: 400;
     opacity: 0;
@@ -685,116 +1193,69 @@ body.web-mode h3:hover .anchor,
     opacity: 1;
 }
 @media (hover: none) {
-    .anchor { opacity: 0.5; }   /* touch devices have no hover: keep it reachable */
+    .anchor { opacity: 0.45; }
 }
-:target {
-    background: #fffbe8;        /* which section did the contents link open? */
-}
-
-/* ── linked contents list ────────────────────────────────────────────────────────── */
-body.web-mode nav.toc ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-body.web-mode nav.toc li {
-    padding: 0.28rem 0;
-    border-bottom: 1px solid var(--color-rule);
-    font-size: 1.02rem;
-}
-body.web-mode nav.toc li:last-child {
-    border-bottom: 0;
-}
-body.web-mode nav.toc a {
-    color: var(--color-heading);
-    text-decoration: none;
-    display: block;             /* a comfortable tap target, not just the words */
-    padding: 0.2rem 0;
-}
-body.web-mode nav.toc a:hover,
-body.web-mode nav.toc a:focus-visible {
-    text-decoration: underline;
+body.web-mode :target {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 55%, transparent);
 }
 
-/* ── the audio summary, in the page ──────────────────────────────────────────────── */
-.audio-summary {
-    max-width: 46rem;
-    margin: 0.4rem auto 1.2rem;
-    background: #fff7e6;
-    border: 1px solid #f0c674;
-    border-radius: 6px;
-    padding: 0.8rem 1rem;
-    box-sizing: border-box;
-}
-.audio-summary p {
-    margin: 0 0 0.6rem;
-    color: #8a5a00;
-    font-weight: 600;
-}
-.audio-summary audio {
-    width: 100%;
-    height: 2.75rem;            /* comfortably above the 44px control target */
-}
+/* ── printing hands the page back to the A4 stylesheet ───────────────────── */
 
-/* ── the toolbar the webapp injects when it serves the report ───────────────────── */
-.report-toolbar {
-    display: flex;
-    gap: 0.75rem;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 0.75rem 1rem;
-    background: #2a4d6e;
-}
-.report-toolbar a,
-.report-toolbar button {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;        /* 44px: the same bar the app's UI is audited against */
-    padding: 0 1rem;
-    border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.45);
-    background: transparent;
-    color: #ffffff;
-    font: inherit;
-    text-decoration: none;
-}
-.report-toolbar a:hover,
-.report-toolbar a:focus-visible {
-    background: rgba(255, 255, 255, 0.12);
-}
-
-/* ── printing: hand it back to the print stylesheet ─────────────────────────────── */
 @media print {
     body.web-mode {
         background: #ffffff;
+        color: #222222;
         padding: 0;
+        font-size: 11pt;
     }
-    body.web-mode > h2,
-    body.web-mode > h3,
-    body.web-mode > p,
-    body.web-mode > ul,
-    body.web-mode > ol,
-    body.web-mode > blockquote,
-    body.web-mode > .table-scroll,
-    body.web-mode > table,
-    body.web-mode > div:not(.report-toolbar):not(.cover):not(.compact-cover) {
-        background: transparent;
-        padding: 0;
+    body.web-mode > * {
         max-width: none;
+        padding-left: 0;
+        padding-right: 0;
     }
+    body.web-mode .panel,
+    body.web-mode .cover,
+    body.web-mode .compact-cover {
+        padding: 0;
+        margin: 0;
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+    }
+    body.web-mode .panel > h2 {
+        display: block;
+        border-bottom: 0;
+        color: #2a4d6e;
+    }
+    .panel-eyebrow {
+        color: #555555;
+    }
+    body.web-mode .chart-signature,
+    body.web-mode .right-now-callout,
+    body.web-mode .lucky-attribute-item,
+    body.web-mode .table-scroll {
+        background: transparent;
+        border-color: #cccccc;
+    }
+    body.web-mode thead th,
+    body.web-mode th {
+        background: transparent;
+        color: #ffffff;
+    }
+    body.web-mode svg text[fill="#2a4d6e"] { fill: #2a4d6e; }
+    body.web-mode svg text[fill="#444"] { fill: #444444; }
+    body.web-mode svg rect[fill="#27ae60"] { fill: #27ae60; }
+    body.web-mode svg rect[fill="#e74c3c"] { fill: #e74c3c; }
+    body.web-mode svg rect[fill="#f39c12"] { fill: #f39c12; }
+    body.web-mode svg rect[fill="#7f8c8d"] { fill: #7f8c8d; }
+    body.web-mode svg rect[fill="#3498db"] { fill: #3498db; }
+    body.web-mode svg rect[fill="#c0392b"] { fill: #c0392b; }
     .report-toolbar,
     .anchor {
         display: none;
     }
-    .table-scroll {
-        overflow: visible;
-    }
-    .table-scroll table {
-        min-width: 0;
-    }
-    :target {
-        background: transparent;
+    body.web-mode :target {
+        box-shadow: none;
     }
 }
 
@@ -810,7 +1271,7 @@ body.web-mode nav.toc a:focus-visible {
 </div>
 
 
-<h2 id="rm-kim-nam-joon-the-hook">RM (Kim Nam-joon) — The Hook<a class="anchor" href="#rm-kim-nam-joon-the-hook" aria-label="Link to this section">#</a></h2>
+<section class="panel"><h2 id="rm-kim-nam-joon-the-hook"><span class="panel-eyebrow">01</span>RM (Kim Nam-joon) — The Hook<a class="anchor" href="#rm-kim-nam-joon-the-hook" aria-label="Link to this section">#</a></h2>
 <p><em>A one-page taste of your Saju chart — your elemental blueprint, no predictions</em></p>
 <p><strong>Born:</strong> 1994-09-12 · 13:28 · Seoul</p>
 <p><strong>Time method:</strong> recorded birth time 13:28 (local clock) corrected to true solar time <strong>13:00</strong> (birthplace 126.978°E vs the 135.0°E zone meridian), -27.7 min (longitude -32.1 min + equation of time +4.4 min). Hour branches follow 2-hour solar windows, so the pillars above use the corrected time.</p>
@@ -821,7 +1282,7 @@ body.web-mode nav.toc a:focus-visible {
 <p><strong>Report generated:</strong> 2026-10-16 · <strong>Report ID:</strong> CID-rm-kim-nam-joon-20261016-SAMPLE</p>
 <p><em>Delivered by Cosmic Saju · cosmicsaju.com</em></p>
 <hr />
-<h2 id="your-chart-snapshot">Your Chart Snapshot<a class="anchor" href="#your-chart-snapshot" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="your-chart-snapshot"><span class="panel-eyebrow">02</span>Your Chart Snapshot<a class="anchor" href="#your-chart-snapshot" aria-label="Link to this section">#</a></h2>
 <h3 id="four-pillars">Four Pillars<a class="anchor" href="#four-pillars" aria-label="Link to this section">#</a></h3>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Table, scrollable"><table>
 <thead>
@@ -870,9 +1331,9 @@ body.web-mode nav.toc a:focus-visible {
 <hr />
 <h3 id="want-the-full-story">Want the Full Story?<a class="anchor" href="#want-the-full-story" aria-label="Link to this section">#</a></h3>
 <p>This snapshot is just the doorway. The <strong>Essential Report</strong> ($19) explains your career arc, major luck periods, and lucky-element guide; the <strong>Deep Destiny Report</strong> ($55) adds year-by-year 2026–2031 timing, relationship and business-launch guidance, monthly lucky dates, and an included MP3 audio summary.</p>
-<h2 id="closing-note">Closing Note<a class="anchor" href="#closing-note" aria-label="Link to this section">#</a></h2>
+</section><section class="panel"><h2 id="closing-note"><span class="panel-eyebrow">03</span>Closing Note<a class="anchor" href="#closing-note" aria-label="Link to this section">#</a></h2>
 <p>This chart's gift is a strong companion presence that gives you real follow-through; the challenge is staying aware of the chart's pressure points rather than letting them run in the background. The single most useful next step is to weave the favorable <strong>Water</strong> element into daily rhythm — through color, direction, season, or practice — so the chart has somewhere to land. Treat the rest of this report as a starting place; the best readings come from revisiting the same chart across different life phases.</p>
 <hr />
-
+</section>
 </body>
 </html>

@@ -421,6 +421,58 @@ def _link_contents(html_text: str, headings: list) -> str:
     return html_text[: listed.start()] + nav + html_text[listed.end():]
 
 
+def _drop_repeated_title(html_text: str, title: str) -> str:
+    """Drop a leading section heading that only repeats the cover title.
+
+    The markdown's own title block runs to the first `<hr>`, which in the Deep report is well
+    past the title — so the reading opened with a card saying the client's name and the tier
+    again, directly under a cover that already said both. Only the heading and its tagline go:
+    the "Time method" paragraph that follows is real content (and the audit named it a
+    strength), so it stays in the first panel.
+    """
+    from saju_html import toc_key
+
+    match = re.match(r"\s*<h2\b[^>]*>(.*?)</h2>\s*", html_text, re.DOTALL)
+    if not match:
+        return html_text
+    plain = html.unescape(_TAG_RE.sub("", match.group(1))).strip()
+    if not plain or toc_key(plain) != toc_key(title):
+        return html_text
+    rest = html_text[match.end():]
+    # …and the italic tagline that always follows it, if that is what is there.
+    rest = re.sub(r"^\s*<p>\s*<em>.*?</em>\s*</p>\s*", "", rest, count=1, flags=re.DOTALL)
+    return rest
+
+
+def _group_sections(html_text: str) -> str:
+    """Wrap each top-level section in a card, with a numbered eyebrow.
+
+    The app lays out a dashboard as cards on a dark surface; a reading that runs as one
+    undifferentiated column of headings is what made it look like a document rather than
+    the same product. Each `<h2>` — and everything up to the next one — becomes a panel,
+    and the heading gains a monospace ordinal, which is the app's eyebrow idiom.
+
+    Runs *after* the anchor and contents passes on purpose: those compute a heading's slug
+    and match contents labels from the heading's own text, and the eyebrow would otherwise
+    leak a number into both.
+    """
+    parts = re.split(r"(?=<h2\b)", html_text)
+    out: list = []
+    number = 0
+    for part in parts:
+        if not re.match(r"<h2\b", part):
+            out.append(part)          # the cover, and anything before the first section
+            continue
+        number += 1
+        part = re.sub(
+            r"^(<h2\b[^>]*>)",
+            lambda m: f'{m.group(1)}<span class="panel-eyebrow">{number:02d}</span>',
+            part, count=1,
+        )
+        out.append(f'<section class="panel">{part}</section>')
+    return "".join(out)
+
+
 def _wrap_tables_for_web(html_text: str) -> str:
     """Let wide tables scroll inside their own box instead of the page sideways.
 
@@ -558,9 +610,11 @@ def markdown_to_html(
         # Order matters. The audio block goes in while the headings are still bare (its
         # matcher looks for a plain "…</h2>"); the contents list can only link to anchors
         # that already exist, so it runs after the anchor pass.
+        body_html = _drop_repeated_title(body_html, title)
         body_html = _inject_audio_player(body_html, audio_url)
         body_html, headings = _add_heading_anchors(body_html)
         body_html = _link_contents(body_html, headings)
+        body_html = _group_sections(body_html)
         body_html = _wrap_tables_for_web(body_html)
 
     classes = []

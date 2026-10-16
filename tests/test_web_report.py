@@ -165,6 +165,117 @@ def test_print_mode_gains_nothing_from_the_web_layer(print_doc):
     assert 'name="viewport"' in print_doc
 
 
+# ── the app's design system, mirrored ──────────────────────────────────────────────
+
+APP_CSS = REPO_ROOT / "apps" / "web" / "src" / "app" / "globals.css"
+WEB_CSS = REPO_ROOT / "src" / "saju_html" / "theme-web.css"
+
+
+def _vars_in(text: str, start: int) -> dict:
+    """`--name: value;` pairs from the block that begins at ``start``."""
+    depth = 0
+    body = []
+    for ch in text[start:]:
+        if ch == "{":
+            depth += 1
+            continue
+        if ch == "}":
+            depth -= 1
+            if depth == 0:
+                break
+            continue
+        if depth >= 1:
+            body.append(ch)
+    found = {}
+    for match in re.finditer(r"(--[a-z0-9-]+)\s*:\s*([^;]+);", "".join(body)):
+        found[match.group(1)] = match.group(2).strip()
+    return found
+
+
+def _app_tokens(*, light: bool) -> dict:
+    css = APP_CSS.read_text(encoding="utf-8")
+    if light:
+        media = css.index("@media (prefers-color-scheme: light) {")
+        return _vars_in(css, css.index(":root", media))
+    return _vars_in(css, css.index(":root {"))
+
+
+def _report_tokens(*, light: bool) -> dict:
+    css = WEB_CSS.read_text(encoding="utf-8")
+    if light:
+        media = css.index("@media (prefers-color-scheme: light) {")
+        return _vars_in(css, css.index(":root", media))
+    return _vars_in(css, css.index(":root {"))
+
+
+@pytest.mark.parametrize("light", [False, True], ids=["dark", "light"])
+def test_report_tokens_match_the_webapp(light):
+    """The reading is styled from the app's own tokens, and this is what keeps it true.
+
+    A rebrand that updates `globals.css` and forgets the report would ship a reading that
+    looks like a different product — the complaint this redesign fixes. Only the tokens the
+    report actually mirrors are compared, so the app can add its own without failing here.
+    """
+    app = _app_tokens(light=light)
+    report = _report_tokens(light=light)
+    assert report, "no tokens found in the report stylesheet"
+    mismatched = {
+        name: (value, app.get(name))
+        for name, value in report.items()
+        if name in app and app[name] != value
+    }
+    assert not mismatched, mismatched
+    # The palette that matters most: the five elements, which colour every chart.
+    for name in ("--el-wood", "--el-fire", "--el-earth", "--el-metal", "--el-water"):
+        assert name in report and name in app
+        assert report[name] == app[name], name
+
+
+def test_report_remaps_the_print_sheet_tokens(print_doc):
+    """Every block in `theme.css` was written against `--color-*`, so the web layer re-points them.
+
+    Without this, the print sheet's light chips, stripes and card backgrounds leak into a dark
+    reading — a light table on a near-black page, which is exactly how the first version looked.
+    """
+    assert "--color-card-bg: transparent" in WEB_CSS.read_text(encoding="utf-8")
+    for token in ("--color-heading", "--color-rule", "--color-accent", "--color-callout-bg"):
+        assert token in WEB_CSS.read_text(encoding="utf-8")
+    # And the stylesheet is the *web* layer only: the print document carries none of it —
+    # that is what keeps the PDF and its snapshots byte-identical.
+    assert "--color-card-bg: transparent" not in print_doc
+
+
+# ── layout: sections as cards, the way the app is laid out ─────────────────────────
+
+def test_sections_are_grouped_into_panels_with_an_eyebrow(web):
+    panels = re.findall(r'<section class="panel">(.*?)</section>', web, re.DOTALL)
+    assert len(panels) >= 4, f"expected sections as panels, found {len(panels)}"
+    for index, panel in enumerate(panels, start=1):
+        assert f'<span class="panel-eyebrow">{index:02d}</span>' in panel, panel[:120]
+        assert panel.lstrip().startswith("<h2"), "a panel must open with its heading"
+    # Headings outside a panel would render as unstyled text between cards.
+    loose = re.findall(r'(?<!</section>)\s*<h2', web)
+    assert len(loose) <= len(panels)
+
+
+def test_the_markdown_title_block_does_not_repeat_the_cover():
+    """The cover already names the client and the tier.
+
+    The markdown's own title block runs to the first `<hr>`, which in the Deep report is well
+    past the title — so the reading opened with a card repeating both. The heading and its
+    tagline go; the "Time method" paragraph that follows is content and stays.
+    """
+    md = "# Report Title\n\n## A Client — Deep Destiny Report\n\n*A tagline.*\n\n" \
+         "**Born:** 2000-01-01\n\n**Time method:** corrected to 12:59.\n\n---\n\n" \
+         "## Chart at a Glance\n\nBody.\n"
+    web = markdown_to_html(md, title="A Client — Deep Destiny Report", tier="deep", web=True)
+    assert "A tagline" not in web, "the tagline under the repeated title should go too"
+    assert "Time method" in web, "real content must survive"
+    # Once on the cover. (The `<title>` tag is not the body, so count within it.)
+    body = web[web.index("<body"):]
+    assert body.count("A Client — Deep Destiny Report") == 1, "the title appears once"
+
+
 # ── against a real report ──────────────────────────────────────────────────────────
 
 def test_a_real_report_renders_web_clean():

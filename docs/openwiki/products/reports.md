@@ -73,6 +73,31 @@ python3 src/saju_html/md_to_saju_html_pdf.py --from-chart --web \
 python3 tools/qa_client_ready.py report.md --html report.html   # gate the artefact
 ```
 
+**It is styled from the webapp's own design system** — the same tokens, type scale and card
+idioms as `apps/web/src/app/globals.css`, so a client moving from the product to their reading does
+not notice the surface change. Dark cosmic base and gold accent by default, the OS light palette via
+`prefers-color-scheme`, the five-element (오방색) colours driving every chart, `--radius` on cards.
+Two mechanics make that work and are worth knowing before editing it:
+
+- **The print sheet's tokens are re-pointed, not rewritten.** Every block in `theme.css` — tables,
+  the quick-reference card, callouts, rules — was written against `--color-*`, so the web layer
+  remaps those names to the app's palette. That brings the whole sheet into the design at once
+  instead of patching blocks and missing the ones added later. `tests/test_web_report.py` asserts the
+  mirror still matches `globals.css` token-for-token, so a rebrand cannot leave reports behind.
+- **The charts are re-skinned by attribute.** They are drawn with the print palette inline
+  (`fill="#e74c3c"`, Helvetica), which is right for the PDF and wrong on a dark card. The web layer
+  overrides those fills and fonts from the app's palette, so the SVG emission — and therefore the PDF
+  and its snapshots — is untouched. The element table's "Presence" bars are block glyphs, coloured
+  per row with `:has()`.
+
+Sections are laid out as **panels** — the app's card idiom — each with a monospace ordinal eyebrow,
+and the markdown's own title block is dropped when it only repeats the cover.
+
+**Font fidelity, honestly:** the app renders in Cormorant Garamond, Inter and IBM Plex Mono, loaded
+by `next/font`. A self-contained file cannot fetch them, so the reading uses the tokens' fallbacks —
+Georgia and the system stack, which the token definitions already name. Embedding subsetted copies
+(~100–300 KB per report, OFL) is the next fidelity step; the repo already has the subsetting tool.
+
 What the web layer adds on top of the print stylesheet (`theme.css` is built for A4):
 
 - **Navigation that works.** Every `h2`/`h3` gets a readable id (`#career-wealth`) and a
