@@ -83,7 +83,7 @@ profile: run the sample, then offer "keep this — create your account and I'll 
 |---|---|---|---|---|
 | **The Hook** (sample) | `sample` | Free | ~1 | **No** — instant, generated on demand |
 | **The Essential Report** | `essential` | $19 | 6–7 | Yes |
-| **The Deep Destiny Report** | `deep` | $55 | 10–12 | Yes |
+| **The Deep Destiny Report** | `deep` | $55 | 25–30 | Yes |
 | **Compatibility Snapshot** | compat `basic` | $24 | ~4 | Yes |
 | **Deep Compatibility** | compat `deep` | $45 | 9–10 | Yes |
 

@@ -179,6 +179,13 @@ The review console described in [05](05-report-pipeline.md) §5. Layout: PDF vie
 decision panel on the right (override select, regenerate, compliance QA result, approve/reject with
 reason). Keyboard-friendly, because the reviewer may do this repeatedly.
 
+**The audio panel has two routes to an MP3.** `Prepare audio` queues the text-to-speech narration, and is
+offered only where the tier promises one. **`Upload MP3`** is offered wherever the report has an order, so
+a hand-recorded narration — or the audio a compatibility customer asks for under the report's cross-sell —
+can be attached. The upload is **presigned PUT → R2 → confirm**, never a form post: a ten-minute MP3 is
+~10 MB and a Vercel function body is capped near 4.5 MB, which is exactly why the bucket needed the CORS
+rule in [07](07-services-and-integrations.md) §CORS.
+
 ## Component conventions
 
 | Concern | Rule |

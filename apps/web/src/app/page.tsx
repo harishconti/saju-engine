@@ -195,7 +195,7 @@ export default async function LandingPage() {
               {[
                 { file: "demo-rm-sample.pdf", tier: "The Hook", note: "Free · ~1 page" },
                 { file: "demo-rm-essential.pdf", tier: "The Essential Report", note: "$19 · 6–7 pages" },
-                { file: "demo-rm-deep.pdf", tier: "The Deep Destiny Report", note: "$55 · 10–12 pages" },
+                { file: "demo-rm-deep.pdf", tier: "The Deep Destiny Report", note: "$55 · 25–30 pages" },
               ].map((d) => (
                 <Card key={d.file} className="flex flex-col">
                   <CardContent className="flex flex-1 flex-col gap-3 py-5">

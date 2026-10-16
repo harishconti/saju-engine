@@ -380,3 +380,36 @@ def test_pdf_no_camelcase_hanja_pair_transliteration(tmp_path):
 def test_translate_inline_regeneration_gaps(src, expected):
     from saju_html import translate_inline
     assert translate_inline(src) == expected
+
+
+def test_build_pdf_reports_its_page_count(tmp_path):
+    """`pages_out` receives the two-pass page total.
+
+    The engine reports that number to the webapp so the review console can show a real page count
+    instead of an em dash — `Report.pageCount` existed in the schema and was never populated. The count
+    is free: the two-pass build already computes it to print "Page N / total" in the footer.
+
+    Also pins that `build_pdf` still *returns the path*: several callers assign its result.
+    """
+    from saju_html.md_to_saju_pdf import build_pdf
+
+    md = tmp_path / "page-count.md"
+    md.write_text(
+        "# Korean Four Pillars of Destiny · Saju Reading\n\n"
+        "## A report used only to count pages\n\n"
+        "*Short enough to be predictable, long enough to be real.*\n\n"
+        + "\n\n".join(f"### Section {i}\n\nBody text for section {i}." for i in range(1, 6))
+        + "\n",
+        encoding="utf-8",
+    )
+
+    pages: list = []
+    out = build_pdf(md, tmp_path / "page-count.pdf", "T", "C", "DOB", "DM", pages_out=pages)
+
+    assert out == tmp_path / "page-count.pdf", "build_pdf must still return the path it wrote"
+    assert len(pages) == 1, "exactly one count should be recorded"
+    assert isinstance(pages[0], int) and pages[0] >= 1
+
+    # Omitting the parameter must stay valid for every existing caller.
+    again = build_pdf(md, tmp_path / "page-count-2.pdf", "T", "C", "DOB", "DM")
+    assert again.exists()

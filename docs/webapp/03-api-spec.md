@@ -120,7 +120,9 @@ All admin routes require `role = ADMIN` and additionally check that the actor's 
 | `POST` | `/api/admin/reports/{id}/approve` | Approve → deliver (email + profile) |
 | `POST` | `/api/admin/reports/{id}/reject` | Mark failed with a reason; notify the client |
 | `POST` | `/api/admin/orders/{id}/mark-paid` | Manual payment (comps, invoice, MoR fallback) |
-| `POST` | `/api/admin/reports/{id}/audio` | Prepare or retry the audio summary. Normally queued automatically at approval |
+| `POST` | `/api/admin/reports/{id}/audio` | Prepare or retry the audio summary (TTS). Normally queued automatically at approval |
+| `POST` | `/api/admin/reports/{id}/audio/upload` | **Begin a manual audio upload** → `{ uploadUrl, key, expiresIn }`. Presigned because a ~10 MB MP3 is far past a function body limit; the browser PUTs straight to R2. `409 NO_ORDER` for a report with no order |
+| `PATCH` | `/api/admin/reports/{id}/audio/upload` | **Confirm it** — re-derives the key (never trusts the one sent), verifies with `HeadObject`, marks the audio `READY`, and emails the client if the report is already delivered. `403 KEY_MISMATCH`, `409 UPLOAD_NOT_FOUND`, `422 EMPTY_UPLOAD` |
 | `POST` | `/api/admin/orders/{id}/refund` | Record a refund; cancel or leave the report |
 
 ### Webhooks
@@ -309,6 +311,7 @@ Full route reference lives in [05 — Report pipeline](05-report-pipeline.md). S
 |---|---|---|---|
 | `POST` | `/generate` | `Authorization: Bearer $ENGINE_SERVICE_TOKEN` | Compute a chart, render a PDF, PUT it to a presigned URL |
 | `POST` | `/chart` | same | Derive the chart summary only (no render) — stored on `Profile.chartJson` when a profile is created |
+| `POST` | `/generate` | same | Renders and uploads. Returns integrity metadata — **including `pages`**, the two-pass page count the ReportLab renderer already computes for its footer, so the review console can show a real figure. `null` when the backend cannot report one |
 | `POST` | `/script` | same | Derive the spoken-word audio script from an approved report's markdown. Deterministic; returns `{script, chunks, stats}` |
 | `POST` | `/health` | same | Report engine version, dependency readiness, warm-up |
 
@@ -329,7 +332,7 @@ POST /generate
 
 ```jsonc
 // 200
-{ "sha256": "…", "bytes": 142276, "engineVersion": "saju-engine/0.2.0", "durationMs": 1642 }
+{ "sha256": "…", "bytes": 142276, "pages": 7, "engineVersion": "saju-engine/0.2.0", "durationMs": 1642 }
 // 422 { "error": "…", "code": "INVALID_BIRTH_DATA" }
 // 500 { "error": "render failed", "code": "RENDER_FAILED" }   // exception class only, never a message with PII
 ```

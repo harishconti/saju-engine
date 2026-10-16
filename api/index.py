@@ -341,7 +341,7 @@ def _strength_label(chart) -> str:
 
 
 def _render_single(profile: ProfileIn, tier: str, out_pdf: Path,
-                   override: Optional[str]) -> Tuple[Path, Path]:
+                   override: Optional[str]) -> Tuple[Path, Path, Optional[int]]:
     """Mirrors `saju_web/jobs.render_single`, with the tier normalised and the override threaded."""
     data = BirthData(profile)
     chart = data.compute()
@@ -361,14 +361,15 @@ def _render_single(profile: ProfileIn, tier: str, out_pdf: Path,
         tier=resolved,
         favorable_override=override,  # E3
     )
-    pdf = build_pdf(output_pdf=out_pdf, title=title, tier=resolved, **kwargs)
-    return pdf, Path(kwargs["input_md"])
+    pages: list = []
+    pdf = build_pdf(output_pdf=out_pdf, title=title, tier=resolved, pages_out=pages, **kwargs)
+    return pdf, Path(kwargs["input_md"]), (pages[0] if pages else None)
 
 
 def _render_compat(
     profile_a: ProfileIn, profile_b: ProfileIn, tier: str, out_dir: Path,
     override_a: Optional[str], override_b: Optional[str],
-) -> Tuple[Path, Path]:
+) -> Tuple[Path, Path, Optional[int]]:
     """Mirrors `saju_web/jobs.render_compat`."""
     data_a, data_b = BirthData(profile_a), BirthData(profile_b)
     chart_a, chart_b = data_a.compute(), data_b.compute()
@@ -398,6 +399,7 @@ def _render_compat(
         if selected == "deep"
         else f"Compatibility Reading — {data_a.name} × {data_b.name}"
     )
+    pages: list = []
     pdf = build_pdf(
         input_md=out_md,
         output_pdf=out_pdf,
@@ -406,8 +408,9 @@ def _render_compat(
         dob=f"{data_a.dob_label} · {data_b.dob_label}",
         day_master=f"{chart_a.day_master}/{chart_b.day_master}",
         tier="compat",
+        pages_out=pages,
     )
-    return pdf, out_md
+    return pdf, out_md, (pages[0] if pages else None)
 
 
 def _upload(artifact: Path, upload_url: str, *, content_type: str = "application/pdf",
@@ -525,12 +528,12 @@ def generate(request: GenerateRequest, authorization: Optional[str] = Header(Non
         with tempfile.TemporaryDirectory(prefix="saju-render-") as tmp:
             out_dir = Path(tmp)
             if request.kind == "compat":
-                pdf, markdown_path = _render_compat(
+                pdf, markdown_path, page_count = _render_compat(
                     request.profileA, request.profileB, request.tier, out_dir,
                     request.favorableOverrideA, request.favorableOverrideB,
                 )
             else:
-                pdf, markdown_path = _render_single(
+                pdf, markdown_path, page_count = _render_single(
                     request.profileA, request.tier, out_dir / "report.pdf", request.favorableOverrideA
                 )
             digest = hashlib.sha256(pdf.read_bytes()).hexdigest()
@@ -555,6 +558,10 @@ def generate(request: GenerateRequest, authorization: Optional[str] = Header(Non
         {
             "sha256": digest,
             "bytes": size,
+            # The rendered page count, so the review console can show the real figure rather than an
+            # em dash. Null when the backend cannot report it (the HTML/Playwright renderer);
+            # production renders with ReportLab.
+            "pages": page_count,
             "engineVersion": ENGINE_VERSION,
             "durationMs": int((time.monotonic() - started) * 1000),
         }

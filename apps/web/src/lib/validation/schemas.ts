@@ -58,6 +58,11 @@ export const orderSchema = z
     path: ["profileBId"],
   });
 
+/** Confirms a browser-side audio upload. The key is re-derived server-side, never trusted. */
+export const audioUploadCompleteSchema = z.object({
+  key: z.string().trim().min(1).max(400),
+});
+
 export const consentSchema = z.object({
   policyVersion: z.string().trim().min(1).max(40),
   purposes: z.record(z.string(), z.boolean()),

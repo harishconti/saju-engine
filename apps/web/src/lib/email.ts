@@ -180,7 +180,11 @@ export async function deliverReport(reportId: string): Promise<void> {
   const { tierNameFor } = await import("./tiers");
   const { tierPromisesAudio } = await import("./tts");
   const tierName = tierNameFor(report.kind as "SINGLE" | "COMPAT", report.tier);
-  const audioPending = report.order ? tierPromisesAudio(report.order) : false;
+  // ...and false when the audio is *already* there: a reviewer can attach an MP3 before approving
+  // (see the audio upload route), and a delivery email claiming it is "being prepared" would then be
+  // wrong on the client's very first read of it.
+  const audioPending =
+    (report.order ? tierPromisesAudio(report.order) : false) && report.audioStatus !== "READY";
 
   const delivery = await prisma.delivery.create({
     data: {
@@ -228,16 +232,25 @@ export async function deliverAudioReadyEmail(opts: {
   to: string;
   clientName: string;
   reportId: string;
-  seconds: number;
+  /**
+   * Length in seconds, when it is known — a TTS run measures it. **Optional on purpose**: an audio file
+   * attached by hand (see `/api/admin/reports/[id]/audio/upload`) has no length we can vouch for, and
+   * stating one we did not measure is exactly the kind of invented detail the report prose is not
+   * allowed to contain either.
+   */
+  seconds?: number | null;
 }): Promise<SendResult> {
   const link = `${appUrl()}/dashboard/reports/${opts.reportId}`;
   const greeting = opts.clientName?.trim() ? `Hi ${opts.clientName.trim()},` : "Hello,";
-  const minutes = Math.max(1, Math.round(opts.seconds / 60));
+  const lead =
+    typeof opts.seconds === "number" && opts.seconds > 0
+      ? `Your audio summary is ready — about ${Math.max(1, Math.round(opts.seconds / 60))} minutes, read from the same reading you already have.`
+      : "Your audio summary is ready, read from the same reading you already have.";
 
   const text = [
     greeting,
     "",
-    `Your audio summary is ready — about ${minutes} minutes, read from the same reading you already have.`,
+    lead,
     "",
     `Listen here: ${link}`,
     "",
@@ -250,7 +263,7 @@ export async function deliverAudioReadyEmail(opts: {
 
   const html = `<div style="font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.6;color:#111">
   <p>${escapeHtml(greeting)}</p>
-  <p>Your <strong>audio summary</strong> is ready — about ${minutes} minutes, read from the same reading you already have.</p>
+  <p>${escapeHtml(lead)}</p>
   <p><a href="${link}" style="display:inline-block;padding:10px 18px;background:#b8912f;color:#0b0b0f;text-decoration:none;border-radius:6px;font-weight:600">Listen to your summary</a></p>
   <p>It is a reading of the report, so it says nothing the written version does not.</p>
   <hr style="border:none;border-top:1px solid #e5e5e5;margin:20px 0" />

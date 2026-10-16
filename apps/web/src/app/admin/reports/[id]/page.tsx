@@ -265,6 +265,7 @@ export default async function AdminReviewPage({ params }: { params: Promise<{ id
                 audioStatus={report.audioStatus}
                 audioError={report.audioError}
                 audioPromised={report.kind === "SINGLE" && (report.tier === "deep" || report.tier === "fullmap")}
+                canUpload={Boolean(report.orderId)}
                 reportDelivered={report.status === "DELIVERED"}
               />
             </CardContent>

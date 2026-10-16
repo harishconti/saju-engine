@@ -579,7 +579,17 @@ Read & Write**:
 
 ### CORS
 
-Needed so the admin console can preview PDFs and so presigned PUTs work from the browser:
+Needed so a browser can PUT an object straight to R2 — which the manual audio upload requires, because a
+~10 MB MP3 cannot pass through a Vercel function body. **Applied 2026-10-16.** ⚠️ It had been documented
+here for months without ever being set: a preflight against the bucket returned **403**, so any browser
+PUT would have failed. Verify with a real preflight, not by reading this table:
+
+```bash
+curl -s -i -X OPTIONS "$R2_ENDPOINT/$R2_BUCKET/probe.txt" \
+  -H "Origin: https://www.cosmicsaju.com" -H "Access-Control-Request-Method: PUT" \
+  -H "Access-Control-Request-Headers: content-type" | head -6
+# expect 204 + Access-Control-Allow-Origin / -Methods / -Headers. Allow ~a minute to propagate.
+```
 
 - **Allowed origins:** `https://cosmicsaju.com`, `https://www.cosmicsaju.com`, `http://localhost:3000`,
   Vercel preview URLs

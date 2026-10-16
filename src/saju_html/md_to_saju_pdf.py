@@ -680,7 +680,8 @@ def _md_to_story(text: str, title: str, client: str, dob: str, day_master: str,
 # ---------- Main builder ----------
 
 def build_pdf(input_md: Path, output_pdf: Path, title: str, client: str, dob: str,
-              day_master: str, *, report_id: str = "", tier: str | None = None):
+              day_master: str, *, report_id: str = "", tier: str | None = None,
+              pages_out: list | None = None):
     text = strip_source_citations(input_md.read_text(encoding="utf-8"))
     text = strip_engine_drafts(text)
     # ReportLab's fonts do not contain color-emoji glyphs; strip element-circle
@@ -690,11 +691,17 @@ def build_pdf(input_md: Path, output_pdf: Path, title: str, client: str, dob: st
         report_id = f"CID-{output_pdf.stem}-{date.today().strftime('%Y%m%d')}"
 
     # First pass: count pages on a throwaway temporary file.
+    # `pages_out`, when given, receives that count. The two-pass build is already why the footer can
+    # print "Page N / total", so the number is free — the service reports it so the review console can
+    # show a real page count instead of an em dash. (The HTML/Playwright backend never populates it;
+    # production renders with ReportLab.)
     tmp_path = output_pdf.with_suffix('.tmp.pdf')
     try:
         doc1 = SajuDoc(str(tmp_path), report_id=report_id, client=client)
         doc1.build(_md_to_story(text, title, client, dob, day_master, report_id, tier=tier))
         total_pages = doc1.page
+        if pages_out is not None:
+            pages_out.append(total_pages)
     finally:
         try:
             tmp_path.unlink()

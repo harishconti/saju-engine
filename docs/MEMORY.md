@@ -893,6 +893,42 @@
     in one step because a background server started in one step is not guaranteed to survive into the next.
     Webapp suite **112 passed**; the audit reports **0 blocking issues** against production and locally.
 
+  - **2026-10-16 (the review console: a page count it never had, a manual audio route, and a claim that was 2.5× wrong).**
+    Owner feedback on the review page: *"it doesn't know how many pages it has"*, and *"I don't see an option to
+    upload mp3/audio file in the review process"*. Both real.
+    ✅ **`Report.pageCount` existed in the schema and was never populated** — the console rendered
+    `report.pageCount ?? "—"`. Fixed at the source: `build_pdf()` already computes `total_pages` for its
+    two-pass build (that is how the footer prints "Page N / total"), so it now optionally writes that count to
+    a `pages_out` list — an opt-in parameter rather than a changed return type, because several callers assign
+    `build_pdf`'s result. The engine reports `pages` in `/generate`, `fulfilment.ts` stores it, and **verified in
+    production** with a real render (`pages: 7`). The three existing reports were backfilled from their stored
+    PDFs. The HTML/Playwright backend never populates it; production renders with ReportLab.
+    ✅ **Manual audio upload**, as two endpoints — `POST` presigns, `PATCH` confirms — because **a Vercel
+    function body is capped around 4.5 MB and a ten-minute MP3 is ~10 MB**, so the file cannot travel through the
+    route. The browser PUTs straight to R2 (the pattern the engine already uses for the PDF), then the key is
+    **re-derived server-side rather than trusted**, verified with `HeadObject`, and the report marked `READY`.
+    Offered wherever the report has an order, so the audio a compatibility customer asks for under the
+    cross-sell can be attached too; `Prepare audio` (TTS) still appears only where the tier promises one.
+    ⚠️ **A prerequisite was missing: the bucket had no CORS rule.** A preflight returned **403**, so any browser
+    PUT would have failed — and `07` had documented the CORS policy for months as *"needed … so presigned PUTs
+    work from the browser"* without it ever being applied. Applied via the S3 API and verified with a real
+    preflight (204 + the expected headers). **The same class as the light theme and the admin role: prose
+    claiming infrastructure nobody had switched on.**
+    ⚠️ **And the page count exposed a lie in the pricing copy.** With the count finally visible: Essential **7**
+    (claims 6–7 ✓), compat basic **4** (claims ~4 ✓), compat deep **9** (claims 9–10 ✓) — but **Deep renders
+    *28* while every surface advertised "10–12"**. Measured on two independent charts (the real order and the
+    public demo), so it is not a one-off. The figure is customer-facing copy rendered straight from `tiers.ts`,
+    so the pricing page was understating the deliverable by ~2.5×. Corrected to **25–30 pages** across
+    `tiers.ts`, `CLAUDE.md`, `README.md`, `openwiki/products/reports.md` and MEMORY. **If 10–12 was the intent,
+    the deep report has grown and is worth a look** — the claim was moved to reality, not the reverse.
+    Also: the audio-ready email no longer has to state a duration. A TTS run measures one; a hand-attached file
+    has none, and inventing one is the same offence the report prose is not allowed. `seconds` is now optional
+    and the copy omits the figure — with four tests pinning that, plus one for the engine's page count.
+    Webapp suite **112 → 116**; engine **1,909**. Deployed both projects; the landing page now reads
+    "25–30 pages". Docs: `03` (the two upload endpoints, `pages` on `/generate`), `05` (manual attach;
+    `pageCount`), `06` (the audio panel's two routes), `07` (§CORS applied, with a real preflight to run),
+    `12` (the new tests).
+
 ### Earlier state (2026-09-26)
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"
@@ -968,7 +1004,7 @@
 - **Products implemented** (USD, after the 2026-09-07 pivot — see `docs/market-research-2026-09.md`):
   - **The Hook** (`sample`) — free 1-page report.
   - **The Essential Report** (`essential`) — $19, 6–7 pages.
-  - **The Deep Destiny Report** (`deep`) — $55, 10–12 pages.
+  - **The Deep Destiny Report** (`deep`) — $55, 25–30 pages.
   - **Cosmic Companion** (`companion`) — $9/month or $79/year, 3–4 pages; manual-billing subscription (off the primary pricing grid).
   - **두 분 궁합 / Compatibility** (`compat`) — Snapshot ($24) and Deep ($45) tiers, 11 sub-systems, composite 0–100 score. Deep is the hero product.
 - **Intake paths:** self-service FastAPI app (`tools/client_intake_app.py`; `/` single-chart, `/compat` two-chart, saves JSON intake and returns tiered PDFs), and landing-page Next.js app (`apps/landing-page`) wired to the calculator for the free sample tier.
@@ -1063,7 +1099,7 @@ fulfilment: ~$1–3K/month; most likely 12-month outcome is a kill/skip.
 |---|---|---|---|---|
 | The Hook | `sample` | Free | ~1 page | Fully automatable. |
 | The Essential Report | `essential` | $19 | 6–7 pages | Engine draft → review required. |
-| The Deep Destiny Report | `deep` | $55 | 10–12 pages | Includes year-by-year windows; MP3 audio summary wording included by default. |
+| The Deep Destiny Report | `deep` | $55 | 25–30 pages | Includes year-by-year windows; MP3 audio summary wording included by default. |
 | Compatibility Snapshot (두 분 궁합) | `compat_report(..., tier="basic")` | $24 | ~4 pages | Two-chart snapshot: composite 0–100 score + 4-band verdict, four-pillar glance, four decisive sub-systems, condensed Practical Guidance, Closing Note. |
 | Deep Compatibility (두 분 궁합) — hero | `compat_report(..., tier="deep")` | $45 | 9–10 pages | Basic + all 11 sub-system cards, per-partner element balance / Day Master snapshots, major-luck timelines, year-by-year couple timing overlay, full Practical Guidance, Closing Note. |
 | Cosmic Companion | `companion` | $9/mo or $79/yr | 3–4 pages | Manual-billing subscription; off the primary pricing grid. |

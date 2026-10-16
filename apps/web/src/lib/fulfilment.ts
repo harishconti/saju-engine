@@ -177,6 +177,8 @@ export async function processClaimedJob(job: Job): Promise<JobOutcome> {
           enginePayload: JSON.parse(JSON.stringify(payload)) as never,
           sha256: result.sha256 ?? null,
           bytes: result.bytes ?? object.size,
+          // Shown in the review console. Null rather than guessed when the backend cannot report it.
+          pageCount: result.pages ?? null,
           chartHash: hash,
           engineVersion: result.engineVersion ?? null,
         },

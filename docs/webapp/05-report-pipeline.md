@@ -465,7 +465,10 @@ because the report *is* delivered once it is in the profile.
 | Channel | Mechanism |
 |---|---|
 | **Profile** | A `Report` row in `DELIVERED`; appears in `/dashboard/reports` |
-| **Email** | Resend, from `reports@cosmicsaju.com` with **`Reply-To: hello@cosmicsaju.com`**, linking to the report page |
+| **Email** | Resend, from `reports@cosmicsaju.com` with **`Reply-To: hello@cosmicsaju.com`**, linking to the report page. It mentions the audio as "being prepared" only when the tier promises one *and* none is attached yet |
+
+`Report.pageCount` is filled from the engine's `pages` — the two-pass count the ReportLab renderer already
+computes for its footer — so the review console shows a real figure instead of an em dash.
 
 Email shape: short, plain-text-first, one link, no attachment by default. Attaching the PDF (~140 KB)
 is well within Resend's limits and is a reasonable option for the deep tier — but a link is better
@@ -499,6 +502,7 @@ approve ──► Report DELIVERED ──► email + profile (PDF)          ← 
 
 | Step | Where | Note |
 |---|---|---|
+| Manual attach | `/api/admin/reports/{id}/audio/upload` | A reviewer can put an MP3 there by hand — a recorded narration, a better take, or the audio a compatibility customer asks for under the report's cross-sell. Presigned PUT (a ~10 MB file cannot pass through a function body), then a `HeadObject` verify. The email it sends deliberately **omits the duration**, because nobody measured one |
 | Script extraction | `src/saju_html/audio_script.py`, called via `POST /script` | Deterministic; runs the same text pipeline as the PDF renderer (`strip_source_citations` → `strip_engine_drafts` → `translate_inline`) |
 | Its input | the **stored** markdown (`Report.mdKey`) | Not a recomputation. An engine deploy between approval and narration would otherwise change the words a client hears |
 | Voice | `src/lib/tts.ts` → ElevenLabs `eleven_flash_v2_5` | Chunked on sentence boundaries; `previous_text`/`next_text` keep prosody across joins; ID3 tags stripped so the concatenation does not stop early |

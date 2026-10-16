@@ -43,6 +43,11 @@ export interface EngineResult {
   bytes: number;
   engineVersion: string;
   durationMs?: number;
+  /**
+   * Rendered page count. Optional because the HTML/Playwright backend cannot report it — production
+   * renders with ReportLab, which counts pages during its two-pass build and now returns the total.
+   */
+  pages?: number | null;
 }
 
 function engineUrl(): string {

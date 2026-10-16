@@ -75,7 +75,7 @@ export const TIERS: Tier[] = [
     engineTier: "deep",
     priceCents: 5500,
     currency: "USD",
-    pages: "10–12 pages",
+    pages: "25–30 pages",
     tagline: "The full reading, argued from the classical sources",
     includes: [
       "Everything in Essential",

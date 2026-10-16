@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useRef } from "react";
 import { Alert, Button, Field, Select, Textarea } from "@/components/ui";
 
 const ELEMENTS = ["Wood", "Fire", "Earth", "Metal", "Water"] as const;
@@ -22,6 +23,7 @@ export function ReviewConsole({
   audioStatus,
   audioError,
   audioPromised,
+  canUpload,
   reportDelivered,
 }: {
   reportId: string;
@@ -32,6 +34,8 @@ export function ReviewConsole({
   audioStatus: string;
   audioError: string | null;
   audioPromised: boolean;
+  /** True when the report has an order — i.e. an audio file could belong to it. */
+  canUpload: boolean;
   reportDelivered: boolean;
 }) {
   const router = useRouter();
@@ -42,6 +46,9 @@ export function ReviewConsole({
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [rejecting, setRejecting] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadNotice, setUploadNotice] = useState<string | null>(null);
+  const audioFile = useRef<HTMLInputElement>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [downloading, setDownloading] = useState(false);
 
@@ -71,6 +78,60 @@ export function ReviewConsole({
       return false;
     } finally {
       setBusy(null);
+    }
+  }
+
+  /**
+   * Attach an audio file by hand.
+   *
+   * Three steps rather than a form post: a Vercel function body is capped at ~4.5 MB and a ten-minute
+   * MP3 is around 10 MB, so the browser PUTs straight to R2 against a presigned URL. The bucket needs a
+   * CORS rule for that (docs/webapp/07 §CORS).
+   */
+  async function uploadAudio() {
+    const file = audioFile.current?.files?.[0];
+    if (!file) {
+      setError("Choose an MP3 file first.");
+      return;
+    }
+    setUploading(true);
+    setError(null);
+    setUploadNotice(null);
+    try {
+      const begin = await fetch(`/api/admin/reports/${reportId}/audio/upload`, { method: "POST" });
+      const started = (await begin.json().catch(() => ({}))) as { uploadUrl?: string; key?: string; error?: string };
+      if (!begin.ok || !started.uploadUrl || !started.key) {
+        setError(started.error ?? "Couldn't start the upload.");
+        return;
+      }
+
+      const put = await fetch(started.uploadUrl, {
+        method: "PUT",
+        headers: { "content-type": "audio/mpeg" },
+        body: file,
+      });
+      if (!put.ok) {
+        setError(`Storage rejected the file (${put.status}).`);
+        return;
+      }
+
+      const done = await fetch(`/api/admin/reports/${reportId}/audio/upload`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ key: started.key }),
+      });
+      const finished = (await done.json().catch(() => ({}))) as { message?: string; error?: string };
+      if (!done.ok) {
+        setError(finished.error ?? "The upload could not be confirmed.");
+        return;
+      }
+      setUploadNotice(finished.message ?? "Audio attached.");
+      if (audioFile.current) audioFile.current.value = "";
+      router.refresh();
+    } catch {
+      setError("The upload failed. Check your connection and try again.");
+    } finally {
+      setUploading(false);
     }
   }
 
@@ -167,28 +228,47 @@ export function ReviewConsole({
         </p>
       </div>
 
-      {audioPromised ? (
+      {audioPromised || canUpload ? (
         <div className="space-y-2 border-t border-border pt-4">
           <h3 className="font-display text-lg">Audio summary</h3>
           <p className="text-xs text-muted-foreground">
-            Recorded from the approved text, so it says nothing the PDF does not. Queued
-            automatically on approval; delivery never waits for it.
+            {audioPromised
+              ? "Recorded from the approved text, so it says nothing the PDF does not. Queued automatically on approval; delivery never waits for it."
+              : "This tier includes no audio summary, but the compatibility report invites customers to ask for one — attach it here and the client sees it on their page."}
           </p>
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-mono text-xs">{audioStatus}</span>
             {audioError ? <span className="text-xs text-destructive">{audioError}</span> : null}
-            <Button
-              size="sm"
-              variant="outline"
-              loading={busy === "audio"}
-              disabled={audioStatus === "READY" || audioStatus === "PROCESSING" || !reportDelivered}
-              onClick={() => post(`/api/admin/reports/${reportId}/audio`, undefined, "audio")}
-            >
-              {audioStatus === "FAILED" ? "Retry audio" : "Prepare audio"}
+            {audioPromised ? (
+              <Button
+                size="sm"
+                variant="outline"
+                loading={busy === "audio"}
+                disabled={audioStatus === "READY" || audioStatus === "PROCESSING" || !reportDelivered}
+                onClick={() => post(`/api/admin/reports/${reportId}/audio`, undefined, "audio")}
+              >
+                {audioStatus === "FAILED" ? "Retry audio" : "Prepare audio"}
+              </Button>
+            ) : null}
+          </div>
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            <input
+              ref={audioFile}
+              type="file"
+              accept="audio/mpeg,audio/mp3"
+              aria-label="Audio file to attach"
+              className="text-xs text-muted-foreground file:mr-2 file:rounded-md file:border file:border-border file:bg-muted/40 file:px-2 file:py-1 file:text-xs file:text-foreground"
+            />
+            <Button size="sm" variant="outline" loading={uploading} onClick={uploadAudio}>
+              Upload MP3
             </Button>
           </div>
-          {!reportDelivered ? (
-            <p className="text-xs text-muted-foreground">Available once the reading is delivered.</p>
+          {uploadNotice ? <p className="text-xs text-muted-foreground">{uploadNotice}</p> : null}
+          {audioPromised && !reportDelivered ? (
+            <p className="text-xs text-muted-foreground">
+              Generating the recording is available once the reading is delivered; attaching a file works
+              now either way.
+            </p>
           ) : null}
         </div>
       ) : null}
