@@ -91,6 +91,7 @@ def download(url: str, destination: Path) -> Path:
         print(f"  cached {destination.name}")
         return destination
     print(f"  downloading {url.rsplit('/', 1)[-1]}")
+    destination.parent.mkdir(parents=True, exist_ok=True)
     with urllib.request.urlopen(url, timeout=120) as response:  # noqa: S310 - fixed URL
         destination.write_bytes(response.read())
     return destination

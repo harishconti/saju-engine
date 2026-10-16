@@ -22,6 +22,7 @@ from __future__ import annotations
 import re
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -173,9 +174,13 @@ def test_cjk_font_covers_repo_cjk():
     # Compare against the source face, so the check only fails on a genuine
     # subsetting gap: Noto Sans KR is a Korean face and cannot draw every
     # ideograph in the repo, and those are dropped at render time by design.
+    # Reuse the maintenance cache when it is there (fast), otherwise download to a
+    # temp dir so the check still runs on a clean CI checkout.
+    cache = Path("/tmp/opencode")
+    if not cache.is_dir():
+        cache = Path(tempfile.mkdtemp(prefix="saju-cjk-"))
     try:
-        source = builder.download(builder.SOURCE_URL,
-                                  Path("/tmp/opencode") / "NotoSansKR-VF.ttf")
+        source = builder.download(builder.SOURCE_URL, cache / "NotoSansKR-VF.ttf")
         source_cmap = set(TTFont(str(source)).getBestCmap())
     except Exception as exc:  # pragma: no cover - network-dependent
         pytest.skip(f"source font unavailable ({exc}); cannot attribute the gap")
