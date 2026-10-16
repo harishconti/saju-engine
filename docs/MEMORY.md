@@ -1255,6 +1255,31 @@
     faster than the third repair; and the CLI returns its paging cursor as a **number**, which cannot go into an argv
     list, so the first run died inside `subprocess`.
 
+  - **2026-10-17 (the reviewer can now read both artefacts before approving — the last piece of the "approves both"
+    decision).** The console previewed only the PDF, so the reading the owner had just designed and had embedded
+    typefaces in was invisible at the moment of approval.
+    ✅ **The preview route takes a `kind`.** `GET /api/admin/reports/{id}/preview?kind=html` signs the web document
+    (the reading) from R2 for 15 minutes, exactly as `kind=pdf` already signed the PDF — the default stays `pdf`, so
+    existing callers are unaffected. A report with no reading gets `404 NO_WEB_DOCUMENT` with an actionable message
+    ("preview the PDF, or regenerate"); no PDF gets `409 NO_ARTIFACT` as before.
+    ✅ **The console leads with the reading**: "Read the reading" then "Open PDF", plus one sentence stating what
+    Approve actually publishes — and that sentence is the interesting part. *Not every report has both artefacts*:
+    a compatibility reading renders through its own two-chart pipeline (no web mode yet), and anything generated
+    before the reading existed carries only a PDF. Promising "the reading and the PDF" regardless would be the
+    documentation-asserting-a-control-that-does-not-exist bug again, in copy this time.
+    ✅ **So the decision is a tested function, not console prose.** `apps/web/src/lib/report-artifacts.ts` holds
+    `artifactSummary(report, kind)` (what exists, which one to open first, and the sentence for the reviewer) and
+    `previewKeyFor` (which key to sign, or the 403/404 with its reason). Eight unit tests cover the branches,
+    including the two different reasons a reading can be missing — "compatibility readings are PDF-only for now"
+    versus "generated before the reading existed; regenerate to add it" — because the second one is actionable and
+    the first is not. The route stays thin (auth, fetch, presign) and the console renders what the function returns.
+    Webapp suite **116 → 124** across **13** files; typecheck clean. Docs: `03` (the `kind` param), `06` (the result
+    screen), `12` (the pattern to copy for a decision with branches).
+    ⚠️ **Still unverified end to end**: the console preview needs a signed-in browser session, and the Playwright
+    auth-gate spec is still *planned, not implemented* — it is the thing that would also assert the new route's 401.
+    So the route logic is unit-tested and the wiring typechecks, but nobody has clicked "Read the reading" in the
+    deployed console yet. `docs/webapp/12-testing.md` lists the route for that spec.
+
 ### Earlier state (2026-09-26)
 
   - **2026-10-16 (the reading joins the design system — "the report UI is very ugly").** Owner feedback on the web

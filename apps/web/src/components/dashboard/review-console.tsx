@@ -25,6 +25,8 @@ export function ReviewConsole({
   audioPromised,
   canUpload,
   reportDelivered,
+  approvalNote,
+  hasHtml,
 }: {
   reportId: string;
   kind: "SINGLE" | "COMPAT";
@@ -37,6 +39,14 @@ export function ReviewConsole({
   /** True when the report has an order — i.e. an audio file could belong to it. */
   canUpload: boolean;
   reportDelivered: boolean;
+  /**
+   * What pressing Approve will publish, from `lib/report-artifacts.ts` — computed on the server
+   * because that is where the report's keys are, and tested there because the answer is not always
+   * "both" (a compatibility reading, or one made before the reading existed).
+   */
+  approvalNote: string;
+  /** True when the web document exists, so the reading can be previewed as well as the PDF. */
+  hasHtml: boolean;
 }) {
   const router = useRouter();
 
@@ -50,7 +60,7 @@ export function ReviewConsole({
   const [uploadNotice, setUploadNotice] = useState<string | null>(null);
   const audioFile = useRef<HTMLInputElement>(null);
   const [rejectReason, setRejectReason] = useState("");
-  const [downloading, setDownloading] = useState(false);
+  const [previewing, setPreviewing] = useState<"html" | "pdf" | null>(null);
 
   const changed =
     (overrideA || null) !== (initialOverrideA ?? null) || (overrideB || null) !== (initialOverrideB ?? null);
@@ -151,10 +161,10 @@ export function ReviewConsole({
     await post(`/api/admin/reports/${reportId}/regenerate`, undefined, "regenerate");
   }
 
-  async function openPreview() {
-    setDownloading(true);
+  async function openPreview(kind: "html" | "pdf" = "pdf") {
+    setPreviewing(kind);
     try {
-      const res = await fetch(`/api/admin/reports/${reportId}/preview`);
+      const res = await fetch(`/api/admin/reports/${reportId}/preview?kind=${kind}`);
       const data = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
       if (!res.ok || !data.url) {
         setError(data.error ?? "No preview available yet.");
@@ -162,7 +172,7 @@ export function ReviewConsole({
       }
       window.open(data.url, "_blank", "noopener");
     } finally {
-      setDownloading(false);
+      setPreviewing(null);
     }
   }
 
@@ -218,10 +228,29 @@ export function ReviewConsole({
       </div>
 
       <div className="space-y-2 border-t border-border pt-4">
-        <h3 className="font-display text-lg">Artifact</h3>
-        <Button size="sm" variant="outline" loading={downloading} onClick={openPreview}>
-          Open PDF preview
+      <h3 className="font-display text-lg">Artifact</h3>
+      <p className="text-xs text-muted-foreground">{approvalNote}</p>
+      {/* The reading first: it is what the client opens, and where the design work went. */}
+      <div className="flex flex-wrap gap-2">
+        {hasHtml ? (
+          <Button
+            size="sm"
+            variant="outline"
+            loading={previewing === "html"}
+            onClick={() => openPreview("html")}
+          >
+            Read the reading
+          </Button>
+        ) : null}
+        <Button
+          size="sm"
+          variant="outline"
+          loading={previewing === "pdf"}
+          onClick={() => openPreview("pdf")}
+        >
+          Open PDF
         </Button>
+      </div>
         <p className="text-xs text-muted-foreground">
           Compliance QA (predictive language, master claims, sensitive advice, missing hedging) is run by
           hand for now: <code className="font-mono">python3 tools/qa_compliance.py &lt;report.md&gt;</code>

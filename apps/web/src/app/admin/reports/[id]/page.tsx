@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Alert, Card, CardContent, KeyValue, PageHeader, Stat } from "@/components/ui";
 import { ReportStatusBadge } from "@/components/dashboard/report-row";
 import { ReviewConsole } from "@/components/dashboard/review-console";
+import { artifactSummary } from "@/lib/report-artifacts";
 import {
   DayMasterBadge,
   ElementBalanceBars,
@@ -44,6 +45,13 @@ export default async function AdminReviewPage({ params }: { params: Promise<{ id
   });
 
   if (!report) notFound();
+
+  // What approving this will publish, from the tested helper: not every report has both artefacts
+  // (a compatibility reading renders through a separate pipeline, or it predates the reading).
+  const artifacts = artifactSummary(
+    { pdfKey: report.pdfKey, htmlKey: report.htmlKey },
+    report.kind === "COMPAT" ? "COMPAT" : "SINGLE",
+  );
 
   const tier = tierFor(report.kind, report.tier);
   const chartA = parseChartSummary(report.profileA.chartJson);
@@ -267,6 +275,8 @@ export default async function AdminReviewPage({ params }: { params: Promise<{ id
                 audioPromised={report.kind === "SINGLE" && (report.tier === "deep" || report.tier === "fullmap")}
                 canUpload={Boolean(report.orderId)}
                 reportDelivered={report.status === "DELIVERED"}
+                approvalNote={artifacts.approvalNote}
+                hasHtml={artifacts.reading}
               />
             </CardContent>
           </Card>

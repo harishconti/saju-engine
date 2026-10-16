@@ -141,7 +141,7 @@ The funnel, and the only place a visitor does real work before signing up.
 Step 1  Birth data        name · gender · date · time · "I don't know my time" · city
 Step 2  Confirm the chart the derived four pillars are shown for confirmation
                           ← this is a product requirement, not a nicety
-Step 3  Result            PDF preview + download, then:
+Step 3  Result            Reading preview + PDF preview + download, then:
                           "Keep this — create an account and I'll save these details"
 ```
 

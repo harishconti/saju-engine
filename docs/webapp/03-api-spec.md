@@ -115,7 +115,7 @@ All admin routes require `role = ADMIN` and additionally check that the actor's 
 | Method | Path | Purpose |
 |---|---|---|
 | `GET` | `/api/admin/queue` | Orders/reports awaiting review, oldest first |
-| `GET` | `/api/admin/reports/{id}/preview` | Short-lived presigned URL for the inline PDF viewer |
+| `GET` | `/api/admin/reports/{id}/preview` | Short-lived presigned URL for the inline viewer. `?kind=pdf` (default) signs the PDF; `?kind=html` signs the **web document** — the reading. `404 NO_WEB_DOCUMENT` when the report has no reading, `409 NO_ARTIFACT` when there is no PDF |
 | `POST` | `/api/admin/reports/{id}/override` | Set/clear the 용신 override on the order |
 | `POST` | `/api/admin/reports/{id}/regenerate` | Enqueue a `REGENERATE` job with the current overrides |
 | `POST` | `/api/admin/reports/{id}/approve` | Approve → deliver (email + profile) |
