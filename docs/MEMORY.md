@@ -1025,6 +1025,41 @@
     collected and never answered**. The audit also recommends a `tools/qa_client_ready.py` gate wired into
     `approve`; that is the right next step, and it turns this audit into a permanent check.
 
+  - **2026-10-16 (the client-ready gate: the audit turned into a permanent check, and it immediately caught three of
+    my own bugs).** The owner chose the audit's own best recommendation first. `tools/qa_client_ready.py` fails a
+    report carrying: internal jargon (`querent`, `the engine`, `Step N`, `candidate`, raw keys like `year_stem`),
+    template debris (`<!--`, `ENGINE DRAFT`, `[INTERPRET`), **double glosses** (the audit's #3 — its regex, plus a
+    gloss that only repeats the English before it, plus a gloss-of-a-gloss), a **lowercase client name**, an
+    **`a Earth`** article, a repeated word, a sentence appearing **more than twice**, and a price. It runs on the
+    engine markdown *and* (`--pdf`) on text extracted from the artefact — deliberately both, because only in the
+    artefact can a renderer leak appear, and that is the class of bug that reached a client twice (the blockquote
+    marker, the reviewer note). Wired into `intake_admin.py approve`, which now refuses to issue a link unless
+    `--force`; the delivery-mechanics tests pass `--force`, and a new integration test asserts the refusal.
+    ⚠️ **Running it on real output found three regressions of my own**, which is exactly the job:
+    (a) **the gloss pass doubled the audit's double glosses** — 134 of them in the PDF — because translating the
+    Hanja inside a *mixed* parenthetical ("Yin Earth, 己土") glossed it a second time: "Gi (Yin Earth, Gi (Yin
+    Earth, 己土))". Fixed by holding **every** parenthetical aside verbatim when glossing — a mixed one is already
+    English + Hanja, which is the convention, so it needs no translation at all; (b) **my decade-guidance variants
+    repeated 4×** (4 variants, 8 periods, 2 sections), so the gate's own "more than twice" rule flagged the
+    sentence I had just written — fixed by writing 8 favorable variants, one per decade; (c) **articles split by
+    markup** ("a `<b>Earth</b>` chart") were not fixed, because by the time the fixer runs, `**Earth**` is already a
+    tag. Also fixed while it was watching: the **HTML comment** (`<!-- decade-roadmap:start -->`) that ReportLab
+    printed literally, and the **`a Earth` / `a Indirect`** article errors (a shared `fix_articles`, applied in both
+    backends, with the exception list as the single source of truth so the tool and the fixer can never disagree).
+    **It also found the real, still-open items**, which is why it exists: **38 `the querent` / engine-jargon**
+    findings in a deep report (the audit's #4) — deliberately *not* mass-edited in this pass; `per 's '3 days = 1
+    year'` (an erased source name); `(bathe bath)`; and the 궁합 upsell's **`($45)`** price, which is a product
+    decision (the audit's #8 said no price in the reading; the add-on cross-sell is the one deliberate exception,
+    so it is surfaced rather than silently allowed).
+    ✅ **A finding I retracted in this same pass:** the "Peach Blossom" double gloss. Reordering `도화 (Peach
+    Blossom)` into `Peach Blossom (도화)` looked right but re-translated the term through maps that disagree
+    (`七殺` is "Seven Killings" as a phrase and "seven killer" as a bare run), producing "Seven Killings (seven
+    killer)". Reverted to English-only for already-glossed terms and left to the **map cleanup** the audit asked
+    for (대운수, 28수, 冠帶, 沐浴, 七殺 as compounds) — a data fix, not a formatting one. `qa_client_ready.py` is
+    what makes that debt visible instead of invisible.
+    Suite **1,919 → 1,951** (gate tests + the approve integration test); goldens regenerated; ruff `--select F`
+    clean. Verified by rendering: `an Earth` in the PDF, no `<!--`, no reviewer note, no tofu.
+
 ### Earlier state (2026-09-26)
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"

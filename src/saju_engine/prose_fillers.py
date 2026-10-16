@@ -629,22 +629,34 @@ def red_flag_environments(ctx) -> str:
 # periods in a row), and one sentence printed eight times reads as a template
 # rather than a reading. `p.start_age` rotates the variants so adjacent periods
 # never say the same thing; the text stays practical, with no new interpretation.
+# Eight favorable variants, because a report has eight decades and the same
+# sentence printed four times reads as a template (and `qa_client_ready.py` fails
+# any sentence appearing more than twice). `p.start_age // 10` gives the eight
+# periods eight distinct values, so no two decades in one report match. Fewer
+# variants for the other two statuses: they are rarer, and four covers the usual
+# spread.
 _DECADE_GUIDANCE = {
     "favorable": (
         "Plant several seeds at once — the chart can carry more than one initiative in this window.",
         "Move on the opportunities you have already prepared; this window rewards visible effort.",
         "This is a decade to start, publish, and ask — the support is there to be used.",
         "Say yes to the stretch role or the larger scope; capacity is not the constraint here.",
+        "Ask for the introduction, the raise, or the larger budget while the ground is receptive.",
+        "Finish what is already in motion before adding to it; this window rewards completion.",
+        "Put the work in front of an audience rather than refining it privately.",
+        "Take the decision you have been circling — delay, not doubt, is the risk in this window.",
     ),
     "unfavorable": (
         "Protect what already works; defer large bets to a later decade and focus on craft and relationships.",
         "Consolidate rather than expand — keep reserves intact and let the pressure pass.",
         "Hold your position and invest in the skills that will still matter when the cycle turns.",
+        "Say less and document more; this is a decade for written agreements, not verbal ones.",
     ),
     "neutral": (
         "Use the mixed energy to refine skills and reposition rather than to launch new ventures.",
         "Test small before committing: this decade rewards adjustment more than bold moves.",
         "Keep options open and let the strongest signal, not the loudest one, set the direction.",
+        "Treat this as a staging decade — the groundwork laid now is what the next one builds on.",
     ),
 }
 # How to read a favorable-element year, stated once per section rather than in

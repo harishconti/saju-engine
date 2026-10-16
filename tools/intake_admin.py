@@ -69,6 +69,47 @@ def _deliver_link(link: str, row: dict) -> None:
         print(f"intake {row['id']}: email delivery failed; link printed above", file=sys.stderr)
 
 
+def _client_ready_findings(store: IntakeStore, intake_id: int) -> list:
+    """Run the client-ready gate over an intake's draft (markdown + PDF).
+
+    Returns findings (empty when clean, or when there is nothing to check, e.g. a
+    hand-attached PDF whose source markdown is not on disk).
+    """
+    import glob
+    import sys as _sys
+
+    # Works whether this file is run as a script (`python3 tools/intake_admin.py`,
+    # where `tools/` is sys.path[0]) or imported as a module by the tests.
+    _tools = str(Path(__file__).resolve().parent)
+    if _tools not in _sys.path:
+        _sys.path.insert(0, _tools)
+    from qa_client_ready import scan
+
+    root = store.files_root / str(intake_id)
+    findings: list = []
+    for md in sorted(glob.glob(str(root / "*.md"))):
+        if md.endswith("-engine.md"):
+            continue  # a sidecar, not the deliverable
+        findings.extend(scan(Path(md).read_text(encoding="utf-8"), source="markdown"))
+    for pdf in sorted(glob.glob(str(root / "*.pdf"))):
+        text = _pdf_text(Path(pdf))
+        if text:
+            findings.extend(scan(text, source="pdf", rendered=True))
+    return findings
+
+
+def _pdf_text(pdf: Path) -> str | None:
+    """Extract a PDF's text, or None when poppler is unavailable."""
+    import shutil
+    import subprocess
+
+    if shutil.which("pdftotext") is None:
+        return None
+    result = subprocess.run(["pdftotext", "-enc", "UTF-8", str(pdf), "-"],
+                            capture_output=True, text=True)
+    return result.stdout if result.returncode == 0 else None
+
+
 def _attach(store: IntakeStore, row: dict, src: Path) -> int:
     import shutil
     if row["status"] != "draft_ready":
@@ -111,6 +152,8 @@ def main(argv: list[str] | None = None) -> int:
     sp.add_argument("id", type=int)
     sp = sub.add_parser("approve")
     sp.add_argument("id", type=int)
+    sp.add_argument("--force", action="store_true",
+                    help="approve even if the client-ready gate flags the report")
     sp.add_argument("--base-url", default=None)
     sp = sub.add_parser("attach")
     sp.add_argument("id", type=int)
@@ -167,6 +210,23 @@ def main(argv: list[str] | None = None) -> int:
             print(f"error: intake {args.id} is '{row['status']}', must be 'draft_ready' to approve "
                   "(review the draft PDF first; use `regenerate` if it failed)", file=sys.stderr)
             return 1
+        # Client-ready gate. Every check in it came from a defect that reached a
+        # delivered report (docs/analysis/2026-10-16-deep-report-audit.md); the
+        # point of running it here is that a report cannot be approved with one of
+        # them in it. `--force` is the deliberate override.
+        findings = _client_ready_findings(store, args.id)
+        if findings and not args.force:
+            print(f"error: client-ready gate flagged intake {args.id} "
+                  f"({len(findings)} finding(s)); fix them or pass --force", file=sys.stderr)
+            for f in findings[:20]:
+                where = f"{f.source}:{f.line}" if f.line else f.source
+                print(f"  [{f.code}] {where}: {f.note}", file=sys.stderr)
+            if len(findings) > 20:
+                print(f"  ... and {len(findings) - 20} more", file=sys.stderr)
+            return 1
+        if findings:
+            print(f"warning: client-ready gate flagged {len(findings)} finding(s); "
+                  "--force given, approving anyway", file=sys.stderr)
         base = _base_url(args.base_url)
         if base is None:
             return 2

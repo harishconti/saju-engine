@@ -544,10 +544,8 @@ _TRANSLATION_TERMS = sorted(
 _PLACEHOLDER_RE = re.compile(r"\x00(\d+)\x00")
 
 
-# A parenthetical written only in CJK — "(偏官)", "(大運)", "(丙午)". When a report
-# is glossed these are the author's own Hanja notation for the English just
-# written, so they are held aside rather than translated into a duplicate of it.
-_PURE_CJK_PAREN_RE = re.compile(r"\(([^A-Za-z()]*)\)")
+# A parenthetical, outermost-first for the non-nested forms the reports use.
+_ANY_PAREN_RE = re.compile(r"\(([^()]*)\)")
 
 
 def _preceding_text(parts: List[str]) -> str:
@@ -594,8 +592,12 @@ def _protect_parenthetical_english(text: str, gloss: bool = False) -> tuple[str,
         return protect(m)
 
     if gloss:
-        text = _PURE_CJK_PAREN_RE.sub(
-            lambda m: protect(m) if _CJK_RE.search(m.group(1)) else m.group(0), text)
+        # Any parenthetical is held aside when glossing: a pure-ASCII one is
+        # already English, a pure-CJK one is the Hanja gloss, and a *mixed* one
+        # ("Yin Earth, 己土") is already English + Hanja. Translating a mixed
+        # parenthetical was what produced the audit's "Gi (Yin Earth, Gi Earth)"
+        # doubling, because the Hanja inside got glossed a second time.
+        text = _ANY_PAREN_RE.sub(protect, text)
     # Match parentheses that contain at least one ASCII letter (treat as already
     # translated English). This catches "(Direct Officer)", "(Annual Luck)", etc.
     protected = re.sub(r"\([A-Za-z][^\)]*\)", replace, text)
@@ -734,6 +736,12 @@ def translate_inline(
     # could mis-translate (해 "harm" read as the branch 亥 "Hae (Pig)").
     for _rx, _repl in _PRE_RULES:
         text = _rx.sub(_repl, text)
+    # "도화 (Peach Blossom)" — a term the author already glossed in English. The
+    # English is kept and the term dropped; glossing it here instead would print
+    # it twice ("Peach Blossom (도화) (Peach Blossom)"), the audit's double-gloss
+    # defect. Showing the Hanja for *these* terms needs the compound/pair entries
+    # the audit asked for (대운수, 28수, 冠帶, 七殺) — a map cleanup, not a
+    # formatting decision, so it is deliberately left out of the gloss pass.
     text = re.sub(
         r"(\*\*)?([가-힯]+)(\*\*)? \(([A-Za-z][^()]*)\)",
         lambda m: f"{m.group(1) or ''}{m.group(4)}{m.group(3) or ''}",
@@ -780,7 +788,9 @@ def translate_inline(
         placeholder = placeholders[int(m.group(1))]
         # Strip parentheses and normalize whitespace for comparison.
         inner = placeholder[1:-1].strip()
-        if gloss and _CJK_RE.search(placeholder):
+        _gloss_inner = placeholder[1:-1]
+        _pure_cjk = bool(_CJK_RE.search(_gloss_inner)) and not re.search(r"[A-Za-z]", _gloss_inner)
+        if gloss and _pure_cjk:
             # A parenthetical the author wrote only in Hanja/Korean. Translate it
             # *without* glossing, then decide:
             #   "Seven Killings (偏官)" -> the Hanja repeats the English before it,
@@ -827,6 +837,44 @@ def translate_inline(
     # CJK-to-English translation (e.g. "ADay Branch" -> "A Day Branch").
     out = re.sub(r'([a-zA-Z])([A-Z][a-z])', r'\1 \2', out)
     return out.strip()
+
+
+# ── Article agreement ────────────────────────────────────────────────────────────
+# The engine's prose interpolates element names into sentences ("Born in a Earth
+# chart", "a Indirect Resource year"). Those read as machine output (external
+# audit, 2026-10-16, grammar row), and the fix belongs at the render layer so it
+# covers every source. "an" before a vowel; exceptions for the words whose
+# pronunciation defies the spelling rule.
+# Markup may sit between the article and its noun. By the time this runs the
+# emphasis has already become a tag ("a <b>Earth</b> chart"), so the gap has to
+# accept tags as well as spaces; it is preserved verbatim.
+_A_AN_RE = re.compile(r"\b(a|an)((?:[ \t]|<[^>]+>)+)([A-Za-z][\w-]*)", re.IGNORECASE)
+# "an" is correct before a silent h ("an honest"), "a" before a vowel that sounds
+# like a consonant ("a university"), and before initialisms read letter by letter.
+_AN_EXCEPTIONS = {"honest", "honour", "honor", "hour", "heir", "herb", "honorary"}
+_A_EXCEPTIONS = {"university", "university-level", "unique", "unit", "united", "user",
+                 "usual", "utility", "one", "once", "european", "uk", "us", "usa", "eu"}
+
+
+def fix_articles(text: str) -> str:
+    """Correct ``a``/``an`` agreement so interpolated element names read properly."""
+    def replace(m: "re.Match") -> str:
+        article, gap, word = m.group(1), m.group(2), m.group(3)
+        stem = word.casefold()
+        if stem in _AN_EXCEPTIONS:
+            correct = "an"
+        elif stem in _A_EXCEPTIONS or stem.split("-")[0] in _A_EXCEPTIONS:
+            correct = "a"
+        elif stem[:1] in "aeiou":
+            correct = "an"
+        else:
+            correct = "a"
+        if article.casefold() == correct:
+            return m.group(0)
+        # Preserve the original capitalisation of the article.
+        return (correct.capitalize() if article[0].isupper() else correct) + gap + word
+
+    return _A_AN_RE.sub(replace, text)
 
 
 def _strip_sources_section(text: str) -> str:

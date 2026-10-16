@@ -243,19 +243,19 @@ With a **Direct Resource (正印)** ten-god over a **Wood** branch (stem element
 
 **Ages 43-52 — 丁丑**
 
-With a **Seven Killings (偏官)** ten-god over a **Earth** branch (stem element Fire), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window.
+With a **Seven Killings (偏官)** ten-god over a **Earth** branch (stem element Fire), this is a build and rise decade. Ask for the introduction, the raise, or the larger budget while the ground is receptive.
 
 **Ages 53-62 — 丙子**
 
-With a **Direct Officer (正官)** ten-god over a **Water** branch (stem element Fire), this is a build and rise decade. Move on the opportunities you have already prepared; this window rewards visible effort.
+With a **Direct Officer (正官)** ten-god over a **Water** branch (stem element Fire), this is a build and rise decade. Finish what is already in motion before adding to it; this window rewards completion.
 
 **Ages 63-72 — 乙亥**
 
-With a **Indirect Wealth (偏財)** ten-god over a **Water** branch (stem element Wood), this is a build and rise decade. This is a decade to start, publish, and ask — the support is there to be used.
+With a **Indirect Wealth (偏財)** ten-god over a **Water** branch (stem element Wood), this is a build and rise decade. Put the work in front of an audience rather than refining it privately.
 
 **Ages 73-82 — 甲戌**
 
-With a **Direct Wealth (正財)** ten-god over a **Earth** branch (stem element Wood), this is a build and rise decade. Say yes to the stretch role or the larger scope; capacity is not the constraint here.
+With a **Direct Wealth (正財)** ten-god over a **Earth** branch (stem element Wood), this is a build and rise decade. Take the decision you have been circling — delay, not doubt, is the risk in this window.
 
 > **In plain words:** Your chart leans toward earning by making and expressing — creating, teaching, building. Fields and decades that carry Fire give the cleanest results; the timing tables show when.
 
@@ -573,7 +573,7 @@ With a **Direct Resource (正印)** ten-god over a **Wood** branch (stem element
 - **Branch element & 12-stage:** Earth · 양 (養)
 - **Favorable lean:** favorable
 
-With a **Seven Killings (偏官)** ten-god over a **Earth** branch (stem element Fire), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Relationships in this window carry the same **Seven Killings (偏官)** undertow — themes of commitment and visibility are likely.
+With a **Seven Killings (偏官)** ten-god over a **Earth** branch (stem element Fire), this is a build and rise decade. Ask for the introduction, the raise, or the larger budget while the ground is receptive. Relationships in this window carry the same **Seven Killings (偏官)** undertow — themes of commitment and visibility are likely.
 
 ### Ages 53–62: 丙子
 
@@ -581,7 +581,7 @@ With a **Seven Killings (偏官)** ten-god over a **Earth** branch (stem element
 - **Branch element & 12-stage:** Water · 장생 (長生)
 - **Favorable lean:** favorable
 
-With a **Direct Officer (正官)** ten-god over a **Water** branch (stem element Fire), this is a build and rise decade. Move on the opportunities you have already prepared; this window rewards visible effort. Relationships in this window carry the same **Direct Officer (正官)** undertow — themes of commitment and visibility are likely.
+With a **Direct Officer (正官)** ten-god over a **Water** branch (stem element Fire), this is a build and rise decade. Finish what is already in motion before adding to it; this window rewards completion. Relationships in this window carry the same **Direct Officer (正官)** undertow — themes of commitment and visibility are likely.
 
 ### Ages 63–72: 乙亥
 
@@ -589,7 +589,7 @@ With a **Direct Officer (正官)** ten-god over a **Water** branch (stem element
 - **Branch element & 12-stage:** Water · 목욕 (沐浴)
 - **Favorable lean:** favorable
 
-With a **Indirect Wealth (偏財)** ten-god over a **Water** branch (stem element Wood), this is a build and rise decade. This is a decade to start, publish, and ask — the support is there to be used. Relationships in this window carry the same **Indirect Wealth (偏財)** undertow — themes of commitment and visibility are likely.
+With a **Indirect Wealth (偏財)** ten-god over a **Water** branch (stem element Wood), this is a build and rise decade. Put the work in front of an audience rather than refining it privately. Relationships in this window carry the same **Indirect Wealth (偏財)** undertow — themes of commitment and visibility are likely.
 
 ### Ages 73–82: 甲戌
 
@@ -597,7 +597,7 @@ With a **Indirect Wealth (偏財)** ten-god over a **Water** branch (stem elemen
 - **Branch element & 12-stage:** Earth · 관대 (冠帶)
 - **Favorable lean:** favorable
 
-With a **Direct Wealth (正財)** ten-god over a **Earth** branch (stem element Wood), this is a build and rise decade. Say yes to the stretch role or the larger scope; capacity is not the constraint here. Relationships in this window carry the same **Direct Wealth (正財)** undertow — themes of commitment and visibility are likely.
+With a **Direct Wealth (正財)** ten-god over a **Earth** branch (stem element Wood), this is a build and rise decade. Take the decision you have been circling — delay, not doubt, is the risk in this window. Relationships in this window carry the same **Direct Wealth (正財)** undertow — themes of commitment and visibility are likely.
 
 ---
 

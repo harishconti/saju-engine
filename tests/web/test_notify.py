@@ -110,7 +110,7 @@ def _approved_draft(cli):
 def test_approve_prints_link_when_smtp_unconfigured(cli, capsys, monkeypatch):
     monkeypatch.delenv("SAJU_SMTP_HOST", raising=False)
     _, iid = _approved_draft(cli)
-    assert cli.main(["approve", str(iid), "--base-url", "https://x.test"]) == 0
+    assert cli.main(["approve", str(iid), "--base-url", "https://x.test", "--force"]) == 0
     out = capsys.readouterr().out
     assert "https://x.test/report/" in out
     assert "emailed" not in out
@@ -122,7 +122,7 @@ def test_approve_emails_when_configured(cli, capsys, monkeypatch):
     monkeypatch.setenv("SAJU_SMTP_HOST", "smtp.example.com")
     monkeypatch.setenv("SAJU_SMTP_PORT", "587")
     _, iid = _approved_draft(cli)
-    assert cli.main(["approve", str(iid), "--base-url", "https://x.test"]) == 0
+    assert cli.main(["approve", str(iid), "--base-url", "https://x.test", "--force"]) == 0
     out = capsys.readouterr().out
     assert "https://x.test/report/" in out
     assert "emailed the private link" in out

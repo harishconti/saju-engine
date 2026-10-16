@@ -47,7 +47,7 @@ def test_approve_requires_draft_ready(cli, capsys):
 def test_approve_prints_resolving_link(cli, capsys):
     store, iid = _add(cli)
     generate_draft(store, iid, store.files_root)
-    assert cli.main(["approve", str(iid), "--base-url", "https://x.test/"]) == 0
+    assert cli.main(["approve", str(iid), "--base-url", "https://x.test/", "--force"]) == 0
     url = capsys.readouterr().out.strip()
     assert url.startswith("https://x.test/report/")
     assert store.resolve_token(url.rsplit("/", 1)[1])["id"] == iid
@@ -177,7 +177,7 @@ def test_attach_requires_draft_ready_and_a_pdf(cli, tmp_path, capsys):
 
 def test_revoke_and_reissue(cli, capsys):
     store, iid = _draft(cli)
-    assert cli.main(["approve", str(iid), "--base-url", "https://x.test"]) == 0
+    assert cli.main(["approve", str(iid), "--base-url", "https://x.test", "--force"]) == 0
     t1 = capsys.readouterr().out.strip().rsplit("/", 1)[1]
     assert cli.main(["reissue", str(iid), "--base-url", "https://x.test"]) == 0
     t2 = capsys.readouterr().out.strip().rsplit("/", 1)[1]
@@ -187,18 +187,37 @@ def test_revoke_and_reissue(cli, capsys):
     assert store.get_intake(iid)["status"] == "draft_ready"
     assert cli.main(["revoke", str(iid)]) == 1          # not approved any more
     assert cli.main(["reissue", str(iid), "--base-url", "https://x.test"]) == 1
-    assert cli.main(["approve", str(iid), "--base-url", "https://x.test"]) == 0  # can re-approve
+    assert cli.main(["approve", str(iid), "--base-url", "https://x.test", "--force"]) == 0  # can re-approve
 
 
 def test_approve_base_url_env_and_no_localhost_default(cli, monkeypatch, capsys):
     store, iid = _draft(cli)
     monkeypatch.delenv("SAJU_PUBLIC_URL", raising=False)
-    assert cli.main(["approve", str(iid)]) == 2
+    # --force skips the client-ready gate so the base-URL check is what fails here;
+    # the gate is exercised in tests/test_qa_client_ready.py and below.
+    assert cli.main(["approve", str(iid), "--force"]) == 2
     assert "SAJU_PUBLIC_URL" in capsys.readouterr().err
     assert store.get_intake(iid)["status"] == "draft_ready"  # nothing was issued
     monkeypatch.setenv("SAJU_PUBLIC_URL", "https://pub.test/")
-    assert cli.main(["approve", str(iid)]) == 0
+    assert cli.main(["approve", str(iid), "--force"]) == 0
     assert capsys.readouterr().out.startswith("https://pub.test/report/")
+
+
+def test_approve_is_blocked_by_the_client_ready_gate(cli, capsys):
+    """A report that fails the client-ready gate cannot be approved without --force.
+
+    Every check in the gate comes from a defect that reached a delivered report
+    (docs/analysis/2026-10-16-deep-report-audit.md), so the blocking is the point
+    of wiring it here. The fixture's draft contains the audit's "the querent".
+    """
+    store, iid = _draft(cli)
+    assert cli.main(["approve", str(iid), "--base-url", "https://x.test"]) == 1
+    err = capsys.readouterr().err
+    assert "client-ready gate flagged" in err
+    assert "INTERNAL_JARGON" in err or "DOUBLE_GLOSS" in err
+    assert store.get_intake(iid)["status"] == "draft_ready"  # nothing was issued
+    # --force is the deliberate override, and it warns while doing so.
+    assert cli.main(["approve", str(iid), "--base-url", "https://x.test", "--force"]) == 0
 
 
 def test_rotate_reencrypts_with_first_key(cli, monkeypatch, capsys):

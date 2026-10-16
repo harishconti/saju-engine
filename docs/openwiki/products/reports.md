@@ -91,6 +91,7 @@ heading landed on, and the second prints. What the client receives:
   `tests/test_pdf_navigation.py::test_cjk_font_covers_repo_cjk` fails until you do.
 - Markdown **blockquote** notes read as notes (no literal `>` surviving into the page), and
   the body heading carries the tier name only — never the price.
+- **`approve` runs a client-ready gate.** `tools/qa_client_ready.py` fails a draft that still contains the audit's defect classes (internal jargon, template debris, double glosses, a lowercase name, `a Earth`, a repeated word, a sentence repeated more than twice, a price). `intake_admin.py approve` runs it over the draft's markdown and PDF and refuses to issue the link unless you pass `--force`.
 - **The engine's reviewer note never reaches the client.** The markdown the engine writes
   ends with *"Engine-generated premium report draft. Interpretive prose must be reviewed and
   finalized by a qualified reader…"* — a note to the reviewer. It was printing on the last

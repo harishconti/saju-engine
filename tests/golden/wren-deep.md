@@ -243,19 +243,19 @@ With a **Eating God (食神)** ten-god over a **Fire** branch (stem element Meta
 
 **Ages 44-53 — 庚辰**
 
-With a **Hurting Officer (傷官)** ten-god over a **Earth** branch (stem element Metal), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window.
+With a **Hurting Officer (傷官)** ten-god over a **Earth** branch (stem element Metal), this is a build and rise decade. Ask for the introduction, the raise, or the larger budget while the ground is receptive.
 
 **Ages 54-63 — 己卯**
 
-With a **Companion (比肩)** ten-god over a **Wood** branch (stem element Earth), this is a transition and adapt decade. Keep options open and let the strongest signal, not the loudest one, set the direction.
+With a **Companion (比肩)** ten-god over a **Wood** branch (stem element Earth), this is a transition and adapt decade. Test small before committing: this decade rewards adjustment more than bold moves.
 
 **Ages 64-73 — 戊寅**
 
-With a **Robber (劫財)** ten-god over a **Wood** branch (stem element Earth), this is a transition and adapt decade. Use the mixed energy to refine skills and reposition rather than to launch new ventures.
+With a **Robber (劫財)** ten-god over a **Wood** branch (stem element Earth), this is a transition and adapt decade. Keep options open and let the strongest signal, not the loudest one, set the direction.
 
 **Ages 74-83 — 丁丑**
 
-With a **Indirect Resource (偏印)** ten-god over a **Earth** branch (stem element Fire), this is a build and rise decade. Say yes to the stretch role or the larger scope; capacity is not the constraint here.
+With a **Indirect Resource (偏印)** ten-god over a **Earth** branch (stem element Fire), this is a build and rise decade. Take the decision you have been circling — delay, not doubt, is the risk in this window.
 
 > **In plain words:** Your chart leans toward earning inside structure — institutions, management, licensed roles. Fields and decades that carry Fire give the cleanest results; the timing tables show when.
 
@@ -578,7 +578,7 @@ With a **Eating God (食神)** ten-god over a **Fire** branch (stem element Meta
 - **Branch element & 12-stage:** Earth · 쇠 (衰)
 - **Favorable lean:** favorable
 
-With a **Hurting Officer (傷官)** ten-god over a **Earth** branch (stem element Metal), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Relationships in this window carry the same **Hurting Officer (傷官)** undertow — themes of creative exploration are likely.
+With a **Hurting Officer (傷官)** ten-god over a **Earth** branch (stem element Metal), this is a build and rise decade. Ask for the introduction, the raise, or the larger budget while the ground is receptive. Relationships in this window carry the same **Hurting Officer (傷官)** undertow — themes of creative exploration are likely.
 
 ### Ages 54–63: 己卯
 
@@ -586,7 +586,7 @@ With a **Hurting Officer (傷官)** ten-god over a **Earth** branch (stem elemen
 - **Branch element & 12-stage:** Wood · 병 (病)
 - **Favorable lean:** neutral
 
-With a **Companion (比肩)** ten-god over a **Wood** branch (stem element Earth), this is a transition and adapt decade. Keep options open and let the strongest signal, not the loudest one, set the direction. Relationships in this window carry the same **Companion (比肩)** undertow — themes of peer dynamics, independence, and friendship-based bonds are likely.
+With a **Companion (比肩)** ten-god over a **Wood** branch (stem element Earth), this is a transition and adapt decade. Test small before committing: this decade rewards adjustment more than bold moves. Relationships in this window carry the same **Companion (比肩)** undertow — themes of peer dynamics, independence, and friendship-based bonds are likely.
 
 ### Ages 64–73: 戊寅
 
@@ -594,7 +594,7 @@ With a **Companion (比肩)** ten-god over a **Wood** branch (stem element Earth
 - **Branch element & 12-stage:** Wood · 사 (死)
 - **Favorable lean:** neutral
 
-With a **Robber (劫財)** ten-god over a **Wood** branch (stem element Earth), this is a transition and adapt decade. Use the mixed energy to refine skills and reposition rather than to launch new ventures. Relationships in this window carry the same **Robber (劫財)** undertow — themes of peer dynamics, independence, and friendship-based bonds are likely.
+With a **Robber (劫財)** ten-god over a **Wood** branch (stem element Earth), this is a transition and adapt decade. Keep options open and let the strongest signal, not the loudest one, set the direction. Relationships in this window carry the same **Robber (劫財)** undertow — themes of peer dynamics, independence, and friendship-based bonds are likely.
 
 ### Ages 74–83: 丁丑
 
@@ -602,7 +602,7 @@ With a **Robber (劫財)** ten-god over a **Wood** branch (stem element Earth), 
 - **Branch element & 12-stage:** Earth · 묘 (墓)
 - **Favorable lean:** favorable
 
-With a **Indirect Resource (偏印)** ten-god over a **Earth** branch (stem element Fire), this is a build and rise decade. Say yes to the stretch role or the larger scope; capacity is not the constraint here. Relationships in this window carry the same **Indirect Resource (偏印)** undertow — themes of support and study are likely.
+With a **Indirect Resource (偏印)** ten-god over a **Earth** branch (stem element Fire), this is a build and rise decade. Take the decision you have been circling — delay, not doubt, is the risk in this window. Relationships in this window carry the same **Indirect Resource (偏印)** undertow — themes of support and study are likely.
 
 ---
 

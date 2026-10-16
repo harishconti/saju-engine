@@ -91,6 +91,7 @@ from saju_html.chart_input import (  # noqa: E402,F401
 from saju_html import (  # noqa: E402
     ELEMENT_COLORS,
     ELEMENT_EMOJI,
+    fix_articles,
     strip_engine_drafts,
     strip_source_citations,
     translate_inline,
@@ -367,6 +368,7 @@ def md_inline_to_html(text: str, tier: str | None = None) -> str:
     text = ITALIC_RE.sub(r"<i>\1</i>", text)
     text = UNDERSCORE_ITALIC_RE.sub(r"<i>\1</i>", text)
     text = CODE_RE.sub(r"<font face='DejaVuSansMono'>\1</font>", text)
+    text = fix_articles(text)
     # Finally, point the surviving CJK at the bundled Hangul/Hanja face.
     text = _wrap_cjk_font(text)
     # A gloss whose characters the face cannot draw leaves an empty "()" behind
@@ -987,6 +989,11 @@ def build_pdf(input_md: Path, output_pdf: Path, title: str, client: str, dob: st
               pages_out: list | None = None):
     text = strip_source_citations(input_md.read_text(encoding="utf-8"))
     text = strip_engine_drafts(text)
+    # The engine marks its roadmap block with HTML comments for the HTML backend,
+    # which uses them to inject the SVG. ReportLab has no such consumer, so it
+    # printed them literally: "<!-- decade-roadmap:start -->" on the client's page.
+    # (External audit, 2026-10-16, P0 #6.)
+    text = re.sub(r"<!--.*?-->", "", text, flags=re.S)
     # ReportLab's fonts do not contain color-emoji glyphs; strip element-circle
     # emoji globally before layout so the client PDF never shows tofu boxes.
     text = _strip_element_emoji(text)
