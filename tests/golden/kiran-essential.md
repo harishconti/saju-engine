@@ -43,9 +43,9 @@
 ### Quick Reference
 
 - **Day Master:** Im (Yang Water, 壬水)
-- **Strength:** Very Strong — the month branch **子** gives the Day Master a **seasonally supported baseline** by element relation (per knowledge/09-interpretation-method.md Step 2); its 12운성 stage there is **제왕 (帝旺)** — the Day Master reaches maximum presence early; the challenge is not starting but learning to modulate intensity (knowledge/06-twelve-stages.md). Peer and resource support (visible and hidden stems) outweighs the output/wealth/authority drain.
+- **Strength:** Very Strong — the month branch **子** gives the Day Master a **seasonally supported baseline** by element relation (per knowledge/09-interpretation-method.md); its 12운성 stage there is **제왕 (帝旺)** — the Day Master reaches maximum presence early; the challenge is not starting but learning to modulate intensity (knowledge/06-twelve-stages.md). Peer and resource support (visible and hidden stems) outweighs the output/wealth/authority drain.
 - **Favorable Element:** Fire — The Day Master reads as strong, but the classical 조후 (climate-balance) check takes priority ahead of 억부 (strength-balance) here, because the chart's climate is extreme rather than mild: this chart peaks in cold winter conditions, and the classical remedy is Fire. This takes priority over the strength-balance (억부) pick (Wood).
-- **Why this element:** two classical checks apply here — the strength-balance (억부) reading points one way, while the climate-balance (조후) reading points to **Fire** for a cold-season chart. In this chart the climate reading takes priority because the chart leans clearly seasonal; the engine has weighed both.
+- **Why this element:** two classical checks apply here — the strength-balance (억부) reading points one way, while the climate-balance (조후) reading points to **Fire** for a cold-season chart. In this chart the climate reading takes priority because the chart leans clearly seasonal; the classical priority rule decides between them.
 - **Supporting Element:** Wood
 - **Avoid / Watch:** Metal (기신, watch) · Water (구신, restrains Fire) · Earth (한신, drains Fire)
 - **Current Major Luck:** 戊申 (ages 39-48)
@@ -77,25 +77,25 @@ With **壬** (Im (Yang Water, 壬水)) as your Day Master — you — the refere
 
 #### Year Pillar — 壬戌 (Im (Yang Water, 壬水))
 
-The 壬戌 pillar pairs the **壬** stem (Im (Yang Water, 壬水)) with the **戌** branch, together shaping **ancestral and social-root energy — the wider world you were born into**. Its stem reads as **Companion (比肩)** relative to your Day Master, so this area of life tends to carry that dynamic.
+The 壬戌 pillar pairs the **壬** stem (Im (Yang Water, 壬水)) with the **戌** branch, together shaping **ancestral and social-root energy — the wider world you were born into**. Read as **Companion (比肩)** relative to your Day Master, the year pillar tends to carry that dynamic.
 
 The **Earth** branch is the container for this area and the **Water** stem is its driver — read the two together when weighing how year-pillar matters unfold.
 
 #### Month Pillar — 壬子 (Im (Yang Water, 壬水))
 
-The 壬子 pillar pairs the **壬** stem (Im (Yang Water, 壬水)) with the **子** branch, together shaping **career and immediate environment — how you show up at work and in daily life**. Its stem reads as **Companion (比肩)** relative to your Day Master, so this area of life tends to carry that dynamic.
+The 壬子 pillar pairs the **壬** stem (Im (Yang Water, 壬水)) with the **子** branch, together shaping **career and immediate environment — how you show up at work and in daily life**. Read as **Companion (比肩)** relative to your Day Master, the month pillar tends to carry that dynamic.
 
 The **Water** branch is the container for this area and the **Water** stem is its driver — read the two together when weighing how month-pillar matters unfold.
 
 #### Day Pillar — 壬辰 (Im (Yang Water, 壬水))
 
-The 壬辰 pillar pairs the **壬** stem (Im (Yang Water, 壬水)) with the **辰** branch, together shaping **spouse palace and the inner self — the partner you choose and the self behind the choices**. Its stem reads as **Companion (比肩)** relative to your Day Master, so this area of life tends to carry that dynamic.
+The 壬辰 pillar pairs the **壬** stem (Im (Yang Water, 壬水)) with the **辰** branch, together shaping **spouse palace and the inner self — the partner you choose and the self behind the choices**. Read as **Companion (比肩)** relative to your Day Master, the day pillar tends to carry that dynamic.
 
 The **Earth** branch is the container for this area and the **Water** stem is its driver — read the two together when weighing how day-pillar matters unfold.
 
 #### Hour Pillar — 癸卯 (Gye (Yin Water, 癸水))
 
-The 癸卯 pillar pairs the **癸** stem (Gye (Yin Water, 癸水)) with the **卯** branch, together shaping **later life and children — what you build toward and what you pass on**. Its stem reads as **Robber (劫財)** relative to your Day Master, so this area of life tends to carry that dynamic.
+The 癸卯 pillar pairs the **癸** stem (Gye (Yin Water, 癸水)) with the **卯** branch, together shaping **later life and children — what you build toward and what you pass on**. Read as **Robber (劫財)** relative to your Day Master, the hour pillar tends to carry that dynamic.
 
 The **Wood** branch is the container for this area and the **Water** stem is its driver — read the two together when weighing how hour-pillar matters unfold.
 
@@ -128,7 +128,7 @@ Wealth timing is read from where 재성 (Wealth) ten-gods appear and are support
 
 ### Wealth Preservation Note
 
-For a **Water** Day Master with a **Very Strong** reading, wealth preservation starts with diversification — never concentrate more than your chart can comfortably hold. Liquidity buffers aligned with the **Fire** element (its colors, foods, and rhythms) help the querent stay flexible across unfavorable 대운 periods. Lean on **Fire**-aligned custodians and instruments rather than chasing growth alone.
+For a **Water** Day Master with a **Very Strong** reading, wealth preservation starts with diversification — never concentrate more than your chart can comfortably hold. Liquidity buffers aligned with the **Fire** element (its colors, foods, and rhythms) help the you stay flexible across unfavorable 대운 periods. Lean on **Fire**-aligned custodians and instruments rather than chasing growth alone.
 
 > **In plain words:** Your chart leans toward earning alongside peers — teams, partnerships, independent practice. Fields and decades that carry Fire give the cleanest results; the timing tables show when.
 
@@ -155,7 +155,7 @@ For a **Water** Day Master with a **Very Strong** reading, wealth preservation s
 
 ### Current Period Deep-Dive
 
-This decade carries a **Seven Killings (偏官)** ten-god over a **Metal** branch — a mixed window that asks for measured moves rather than bold ones. The stem ten-god is the *outer theme* — what the world sees and asks of the querent — while the branch element is the *underlying terrain* — the quieter emotional and circumstantial backdrop. Read them together rather than separately; mismatches between outer theme and inner terrain are where this decade is most likely to surprise.
+This decade carries a **Seven Killings (偏官)** ten-god over a **Metal** branch — a mixed window that asks for measured moves rather than bold ones. The stem ten-god is the *outer theme* — what the world sees and asks of you — while the branch element is the *underlying terrain* — the quieter emotional and circumstantial backdrop. Read them together rather than separately; mismatches between outer theme and inner terrain are where this decade is most likely to surprise.
 
 Specifically: **do** conserve, refine, and protect the foundation; **avoid** long commitments whose payoff is years away. Within this decade, years and months whose stem element matches the favorable **Fire** energy are the cleanest moments for major commitments; the annual windows table below shows them. Years dominated by the unfavorable element are best used for rest, review, and quiet preparation.
 
@@ -194,7 +194,7 @@ A short, focused cycle designed to bring more **Fire** energy into your daily rh
 
 ## Closing Note
 
-This chart's gift is a strong companion presence that gives the querent real follow-through; the challenge is staying aware of the chart's pressure points rather than letting them run in the background. The single most useful next step is to weave the favorable **Fire** element into daily rhythm — through color, direction, season, or practice — so the chart has somewhere to land. Treat the rest of this report as a starting place; the best readings come from revisiting the same chart across different life phases.
+This chart's gift is a strong companion presence that gives you real follow-through; the challenge is staying aware of the chart's pressure points rather than letting them run in the background. The single most useful next step is to weave the favorable **Fire** element into daily rhythm — through color, direction, season, or practice — so the chart has somewhere to land. Treat the rest of this report as a starting place; the best readings come from revisiting the same chart across different life phases.
 
 ---
 
@@ -210,4 +210,4 @@ This chart's gift is a strong companion presence that gives the querent real fol
 - Classical framework: 적천수 (滴天髓), 연해자평 (淵海子平), 궁통보감 (窮通寶鑑), 명리정종, 자평진전 — as compiled in `knowledge/`.
 - Method: `knowledge/09-interpretation-method.md` (9-step procedure).
 - This reading describes tendencies, not fixed outcomes; it is for reflection and entertainment — not medical, legal, or financial advice.
-- The engine's heuristic verdicts (strength, 용신) are marked provisional where the classical sources disagree; a qualified reader confirms the final reading.
+- The chart's heuristic verdicts (strength, 용신) are marked provisional where the classical sources disagree; a qualified reader confirms the final reading.

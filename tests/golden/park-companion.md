@@ -43,9 +43,9 @@
 ### Quick Reference
 
 - **Day Master:** Gyeong (Yang Metal, 庚金)
-- **Strength:** Balanced — the month branch **亥** gives the Day Master a **seasonally weak baseline** by element relation (per knowledge/09-interpretation-method.md Step 2); its 12운성 stage there is **병 (病)** — early momentum is depleted; the querent often builds strength through recovery and patience (knowledge/06-twelve-stages.md). Peer/resource support and the output/wealth/authority drain sit close to even.
+- **Strength:** Balanced — the month branch **亥** gives the Day Master a **seasonally weak baseline** by element relation (per knowledge/09-interpretation-method.md); its 12운성 stage there is **병 (病)** — early momentum is depleted; you often build strength through recovery and patience (knowledge/06-twelve-stages.md). Peer/resource support and the output/wealth/authority drain sit close to even.
 - **Favorable Element:** Earth *(provisional — requires reader confirmation)* — The chart is close to balanced, so the least-represented element is offered as a starting point only — it is a folk heuristic, not a classical ruling, and the final 용신 (用神) requires the reader's argument from temperature, season, and blockage. Born in a non-temperate month, but the chart as a whole leans the other way, so the classical 조후 check is set aside and the strength-balance (억부) reading governs.
-- **Why this element:** two classical checks apply here — the strength-balance (억부) reading points one way, while the climate-balance (조후) reading points to **Fire** for a cold-season chart. In this chart the strength reading takes priority because the chart is not extreme enough for the climate override; the engine has weighed both.
+- **Why this element:** two classical checks apply here — the strength-balance (억부) reading points one way, while the climate-balance (조후) reading points to **Fire** for a cold-season chart. In this chart the strength reading takes priority because the chart is not extreme enough for the climate override; the classical priority rule decides between them.
 - **Supporting Element:** Fire
 - **Avoid / Watch:** Water (기신, watch) · Wood (구신, restrains Earth) · Metal (한신, drains Earth)
 - **Current Major Luck:** 癸卯 (ages 72-81)
@@ -79,7 +79,7 @@ Right now, in June 2026, you are moving through a year whose energy is shaped by
 
 ### Current Period Deep-Dive
 
-This decade carries a **Hurting Officer (傷官)** ten-god over a **Wood** branch — a mixed window that asks for measured moves rather than bold ones. The stem ten-god is the *outer theme* — what the world sees and asks of the querent — while the branch element is the *underlying terrain* — the quieter emotional and circumstantial backdrop. Read them together rather than separately; mismatches between outer theme and inner terrain are where this decade is most likely to surprise.
+This decade carries a **Hurting Officer (傷官)** ten-god over a **Wood** branch — a mixed window that asks for measured moves rather than bold ones. The stem ten-god is the *outer theme* — what the world sees and asks of you — while the branch element is the *underlying terrain* — the quieter emotional and circumstantial backdrop. Read them together rather than separately; mismatches between outer theme and inner terrain are where this decade is most likely to surprise.
 
 Specifically: **do** conserve, refine, and protect the foundation; **avoid** long commitments whose payoff is years away. Within this decade, years and months whose stem element matches the favorable **Earth** energy are the cleanest moments for major commitments; the annual windows table below shows them. Years dominated by the unfavorable element are best used for rest, review, and quiet preparation.
 
@@ -149,7 +149,7 @@ A quick reading of each year's energy relative to your Day Master and favorable 
 
 ## Closing Note
 
-This chart's gift is a strong companion presence that gives the querent real follow-through; the challenge is staying aware of the chart's pressure points rather than letting them run in the background. The single most useful next step is to weave the favorable **Earth** element into daily rhythm — through color, direction, season, or practice — so the chart has somewhere to land. Treat the rest of this report as a starting place; the best readings come from revisiting the same chart across different life phases.
+This chart's gift is a strong companion presence that gives you real follow-through; the challenge is staying aware of the chart's pressure points rather than letting them run in the background. The single most useful next step is to weave the favorable **Earth** element into daily rhythm — through color, direction, season, or practice — so the chart has somewhere to land. Treat the rest of this report as a starting place; the best readings come from revisiting the same chart across different life phases.
 
 ---
 
@@ -164,4 +164,4 @@ This chart's gift is a strong companion presence that gives the querent real fol
 - Classical framework: 적천수 (滴天髓), 연해자평 (淵海子平), 궁통보감 (窮通寶鑑), 명리정종, 자평진전 — as compiled in `knowledge/`.
 - Method: `knowledge/09-interpretation-method.md` (9-step procedure).
 - This reading describes tendencies, not fixed outcomes; it is for reflection and entertainment — not medical, legal, or financial advice.
-- The engine's heuristic verdicts (strength, 용신) are marked provisional where the classical sources disagree; a qualified reader confirms the final reading.
+- The chart's heuristic verdicts (strength, 용신) are marked provisional where the classical sources disagree; a qualified reader confirms the final reading.

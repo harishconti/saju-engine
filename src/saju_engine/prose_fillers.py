@@ -188,12 +188,12 @@ def _element_pct(chart) -> Dict[str, float]:
 _STAGE_TENDENCY: Dict[str, Tuple[str, str]] = {
     "장생": ("early momentum", "the chart tends to begin things with fresh, supported energy"),
     "목욕": ("exposed emergence", "early life may feel vivid and visible, with lessons learned through contact with others"),
-    "관대": ("coming-of-age energy", "the querent grows into form gradually; adolescence and early adulthood often bring ambition"),
+    "관대": ("coming-of-age energy", "you grow into form gradually; adolescence and early adulthood often bring ambition"),
     "건록": ("steady prime", "the Day Master is already strong in the month branch, so competence arrives without much fanfare"),
     "제왕": ("peak self-presence", "the Day Master reaches maximum presence early; the challenge is not starting but learning to modulate intensity"),
     "쇠": ("post-peak adjustment", "the chart's first major chapter may ask for rest and recalibration before the next rise"),
-    "병": ("recessive start", "early momentum is depleted; the querent often builds strength through recovery and patience"),
-    "사": ("phase-ending start", "one cycle is completing as the querent enters the world, so early identity may feel transitional"),
+    "병": ("recessive start", "early momentum is depleted; you often build strength through recovery and patience"),
+    "사": ("phase-ending start", "one cycle is completing as you enter the world, so early identity may feel transitional"),
     "묘": ("contained start", "energy is stored in the month branch; the chart ripens slowly and reveals depth over time"),
     "절": ("severed start", "the lowest point of the cycle touches the month branch — a clean-slate tendency rather than a deficit"),
     "태": ("gestational start", "new potential is forming; early life may feel preparatory rather than openly productive"),
@@ -259,7 +259,7 @@ def dm_arrival_narrative(ctx) -> str:
     return (
         f"Your Day Master **{chart.day_master}** meets the month branch **{chart.month.branch}** "
         f"at the **{stage} ({label})** twelve-stage — {description}. "
-        f"This is read as a {season_signal} arrival: a tendency in how the querent's core energy "
+        f"This is read as a {season_signal} arrival: a tendency in how your core energy "
         f"first enters the world, not a fixed early-life outcome."
     )
 
@@ -323,7 +323,7 @@ def strength_reasoning(ctx) -> str:
     offset_note = offset_note[0].upper() + offset_note[1:]
     return (
         f"the month branch **{chart.month.branch}** gives the Day Master a **{season_note}** by "
-        f"element relation (per knowledge/09-interpretation-method.md Step 2); its 12운성 stage "
+        f"element relation (per knowledge/09-interpretation-method.md); its 12운성 stage "
         f"there is **{stage}** — {description} (knowledge/06-twelve-stages.md). {offset_note}{reconcile}."
     )
 
@@ -366,7 +366,7 @@ def wealth_preservation_short(ctx) -> str:
         f"For a **{dm_elem}** Day Master with a **{verdict_label}** reading, wealth preservation starts with "
         f"diversification — never concentrate more than your chart can comfortably hold. "
         f"Liquidity buffers aligned with the **{fav}** element (its colors, foods, and rhythms) help the "
-        f"querent stay flexible across unfavorable 대운 periods. "
+        f"you stay flexible across unfavorable 대운 periods. "
         f"Lean on **{fav}**-aligned custodians and instruments rather than chasing growth alone."
     )
 
@@ -384,7 +384,7 @@ def employment_vs_entrepreneurship(ctx) -> str:
     if verdict in ("strong", "extreme") and (wealth >= 1 or output >= 1):
         parts.append(
             "The Day Master reads as **strong** with visible Output or Wealth stems, which favours "
-            "independent paths once the querent has built enough foundation to hold the variability."
+            "independent paths once you have built enough foundation to hold the variability."
         )
     elif verdict == "weak" and authority >= 2:
         parts.append(
@@ -400,7 +400,7 @@ def employment_vs_entrepreneurship(ctx) -> str:
     else:
         parts.append(
             "The Authority and Wealth pulls are present but balanced, so either path is workable — "
-            "the deciding factor will be which environment the querent can sustain emotionally for a decade."
+            "the deciding factor will be which environment you can sustain emotionally for a decade."
         )
     parts.append(
         "Treat this as a tendency reading, not a verdict; the 대운 and annual luck tables below show when "
@@ -529,7 +529,7 @@ def wealth_preservation_long(ctx) -> str:
         f"For a **{dm_elem}** Day Master with a **{verdict_label}** reading, wealth preservation starts with "
         f"diversification — never concentrate more than your chart can comfortably hold. "
         f"Liquidity buffers aligned with the **{fav}** element (its colors, foods, and rhythms) help the "
-        f"querent stay flexible across unfavorable 대운 periods. "
+        f"you stay flexible across unfavorable 대운 periods. "
         f"Partnerships and joint ventures work well when the partner's element supports {fav}; avoid "
         f"partners whose chart emphasizes the unfavorable element, since their decisions tend to amplify "
         f"the chart's existing pressure. "
@@ -555,13 +555,13 @@ def company_type_fit(ctx) -> str:
     if direct_officer >= 1 and seven_killings == 0:
         return (
             "**Large institutions and mid-size specialists** are the most likely fit. The Direct Officer influence "
-            "values hierarchy, credential, and a clear chain of accountability — the querent is most "
+            "values hierarchy, credential, and a clear chain of accountability — you are most "
             "productive when the structure around them is unambiguous."
         )
     if direct_officer >= 1 and seven_killings >= 1:
         return (
             "A **mid-size specialist firm with strong leadership visibility** is the most likely fit. Both "
-            "Direct Officer and Seven Killings are present, so the querent needs a credible structure but "
+            "Direct Officer and Seven Killings are present, so you need a credible structure but "
             "also room to push back when needed."
         )
     return (
@@ -597,7 +597,7 @@ def boss_team_dynamics(ctx) -> str:
     }.get(dm_elem, "environments that ignore the Day Master's nature")
     return (
         f"The ideal manager profile is a **{complement}** — someone who carries your favorable **{fav}** "
-        f"element, supplying what the chart needs rather than competing with your Day Master. Watch for {warning}; this is the most common way the querent's "
+        f"element, supplying what the chart needs rather than competing with your Day Master. Watch for {warning}; this is the most common way your "
         f"energy gets drained in a team setting."
     )
 
@@ -610,13 +610,13 @@ def red_flag_environments(ctx) -> str:
     verdict = sa.get("verdict", "balanced")
     items = []
     if verdict == "weak":
-        items.append("environments with unclear accountability — the querent absorbs other people's work")
+        items.append("environments with unclear accountability — you absorb other people's work")
         items.append("constant crisis mode with no recovery windows")
         items.append("isolated creative demands with no peer feedback")
     elif verdict in ("strong", "extreme"):
-        items.append("slow bureaucratic processes that the querent's energy quickly overruns")
+        items.append("slow bureaucratic processes that your energy quickly overruns")
         items.append("unclear decision rights — strong Day Masters struggle without ownership")
-        items.append("teams that refuse to challenge the querent's ideas")
+        items.append("teams that refuse to challenge your ideas")
     else:
         items.append(f"long stretches of {unfav}-heavy work that drain the Day Master")
         items.append("either-or framing that forces a single dominant choice")
@@ -651,12 +651,20 @@ _DECADE_GUIDANCE = {
         "Consolidate rather than expand — keep reserves intact and let the pressure pass.",
         "Hold your position and invest in the skills that will still matter when the cycle turns.",
         "Say less and document more; this is a decade for written agreements, not verbal ones.",
+        "Renegotiate existing commitments rather than taking on new ones.",
+        "Spend on maintenance and reserves, not on growth; the return comes in the next cycle.",
+        "Reduce the number of open fronts so the ones that matter get your full attention.",
+        "Let the unglamorous work accumulate — it is what the next decade inherits.",
     ),
     "neutral": (
         "Use the mixed energy to refine skills and reposition rather than to launch new ventures.",
         "Test small before committing: this decade rewards adjustment more than bold moves.",
         "Keep options open and let the strongest signal, not the loudest one, set the direction.",
         "Treat this as a staging decade — the groundwork laid now is what the next one builds on.",
+        "Choose one experiment and run it properly rather than spreading across several.",
+        "Deepen the relationships and skills you already have; additions are optional.",
+        "Reassess what you are carrying — a mixed decade is a good time to drop something.",
+        "Set the direction now and let the next decade supply the momentum.",
     ),
 }
 # How to read a favorable-element year, stated once per section rather than in
@@ -808,7 +816,7 @@ def spouse_palace_tengod(ctx) -> str:
         stage = "—"
     domain = {
         "Companion": "a peer-like partnership where independence and togetherness stay in balance",
-        "Robber": "a lively, sometimes competitive partnership that keeps the querent sharp",
+        "Robber": "a lively, sometimes competitive partnership that keeps you sharp",
         "Eating God": "a creative, doing-oriented partnership; shared projects and quiet craft matter more than convention",
         "Hurting Officer": "a candid, expressive partnership; direct conversation and shared creative output matter more than convention",
         "Direct Wealth": "a stable, materially grounded partnership where practical care reads as love",
@@ -816,7 +824,7 @@ def spouse_palace_tengod(ctx) -> str:
         "Direct Officer": "a structured, respectful partnership with clear roles and reliability",
         "Seven Killings": "an intense, direct partnership; the spouse palace can attract strong, forceful figures",
         "Direct Resource": "a protective, grounding partnership that offers rest and steady support",
-        "Indirect Resource": "an unusual or insight-driven partnership — the spouse domain teaches the querent things",
+        "Indirect Resource": "an unusual or insight-driven partnership — the spouse domain teaches you things",
     }.get(spouse_tg_en, "a partnership shaped by the chart's full ten-god mix")
     return (
         f"The spouse palace **{spouse_branch}** (12-stage: {stage}) carries a main hidden stem that "
@@ -947,7 +955,7 @@ def friendship_social_energy(ctx) -> str:
         "Earth": "people who are grounded, practical, and steady",
         "Metal": "people who are precise, principled, and disciplined",
         "Water": "people who are reflective, listening, and emotionally present",
-    }.get(fav, "people whose element resonates with the querent's growth edge")
+    }.get(fav, "people whose element resonates with your growth edge")
     drains = {
         "Wood": "people who refuse to grow or change",
         "Fire": "people who demand constant attention without reciprocity",
@@ -957,7 +965,7 @@ def friendship_social_energy(ctx) -> str:
     }.get(unfav, "people who drain rather than nourish")
     return (
         f"Friend and social energy is shaped by the chart's dominant classes — **{dom_classes}** — so the "
-        f"querent tends to give and receive in those modes. The querent is naturally drawn to {attracts}, "
+        f"you tend to give and receive in those modes. You are naturally drawn to {attracts}, "
         f"and tends to feel drained by {drains}. Social settings where the favorable **{fav}** element is "
         f"present (a community garden for Wood, a quiet studio for Water, a workshop for Metal) tend to "
         f"feel more nourishing than large unstructured gatherings."
@@ -973,10 +981,10 @@ def _spouse_stage_clause(stage: str) -> str:
     strong = {"장생", "목욕", "관대", "건록", "제왕"}
     weak = {"쇠", "병", "사", "묘", "절"}
     if stage in strong:
-        return (f"The **{stage}** stage is one of the supported (strong) stages, so the querent tends to "
+        return (f"The **{stage}** stage is one of the supported (strong) stages, so you tend to "
                 f"bring energy and presence into the bond.")
     if stage in weak:
-        return (f"The **{stage}** stage is one of the unsupported (weak) stages, so the querent tends to "
+        return (f"The **{stage}** stage is one of the unsupported (weak) stages, so you tend to "
                 f"lean toward reserve and selectivity in the bond.")
     if stage in {"태", "양"}:
         return (f"The **{stage}** stage is a transitional (mixed) stage — neither peak nor decline — so the "
@@ -1004,11 +1012,11 @@ def attachment_patterns(ctx) -> str:
     hidden_summary = ", ".join(hidden_tgs) if hidden_tgs else "—"
     return (
         f"With the spouse palace **{spouse_branch}** sitting in the **{stage}** 12-stage and carrying "
-        f"hidden-stem ten-gods of **{hidden_summary}**, the querent bonds through a mix of presence "
+        f"hidden-stem ten-gods of **{hidden_summary}**, you bond through a mix of presence "
         f"and discernment. {_spouse_stage_clause(stage)} The hidden-stem "
         f"ten-gods colour the undercurrent — Resource leans into safety, Output into creative play, "
         f"Wealth into stability. Read this as the emotional baseline; the 대운/세운 overlays show when "
-        f"the querent's bond patterns shift most."
+        f"your bond patterns shift most."
     )
 
 
@@ -1179,14 +1187,14 @@ def family_dynamics(ctx) -> str:
     travel = chart.stars.get("travelling_star", []) if chart.stars else []
     parts = [
         f"The year pillar **{year_branch}** carries ancestral and parental themes; its main hidden stem "
-        f"shapes how the querent absorbs (or pushes back on) family-of-origin patterns.",
+        f"shapes how you absorb (or pushes back on) family-of-origin patterns.",
         f"The month pillar **{month_branch}** is the career and sibling palace — its dynamics surface in "
-        f"how the querent shows up among peers and early mentors.",
+        f"how you show up among peers and early mentors.",
     ]
     if hour_branch:
         parts.append(
             f"The hour pillar **{hour_branch}** speaks to children and later life — its hidden stems "
-            f"indicate what the querent is likely to pass on, and what they will need to consciously teach."
+            f"indicate what you are likely to pass on, and what they will need to consciously teach."
         )
     stars: List[str] = []
     if peach:
@@ -1264,7 +1272,7 @@ def seasonal_daily_rhythms(ctx) -> str:
     dm_season = {
         "Wood": "spring", "Fire": "summer", "Earth": "late summer / transitions",
         "Metal": "autumn", "Water": "winter",
-    }.get(dm_elem, "the querent's own season")
+    }.get(dm_elem, "your own season")
     fav_season = {
         "Wood": "spring (the rising Wood energy)", "Fire": "summer (the peak Fire energy)",
         "Earth": "the transitions between seasons", "Metal": "autumn (the harvest, the refinement)",
@@ -1473,7 +1481,7 @@ def current_period_deep_dive(ctx) -> str:
     return (
         f"This decade carries a **{tg}** ten-god over a **{branch_elem}** branch — "
         f"{'a clearly favorable window for visible wins.' if favorable else 'a mixed window that asks for measured moves rather than bold ones.'} "
-        f"The stem ten-god is the *outer theme* — what the world sees and asks of the querent — "
+        f"The stem ten-god is the *outer theme* — what the world sees and asks of you — "
         f"while the branch element is the *underlying terrain* — the quieter emotional and circumstantial backdrop. "
         f"Read them together rather than separately; mismatches between outer theme and inner terrain are where "
         f"this decade is most likely to surprise.\n\n"
@@ -1793,7 +1801,7 @@ def _pattern_candidate_label(kind: str, val) -> str:
 
 
 def pattern_story(ctx) -> str:
-    """3–5 sentences summarizing the dominant pattern candidate."""
+    """3–5 sentences summarizing the dominant pattern reading."""
     chart = _ctx_get(ctx, "chart")
     fav = _ctx_get(ctx, "favorable", "—")
     parts = []
@@ -1802,7 +1810,7 @@ def pattern_story(ctx) -> str:
         top_label = _pattern_candidate_label(top_kind, top_val)
         if top_label:
             parts.append(
-                f"The chart's dominant pattern candidate is **{top_label}**."
+                f"The chart's dominant pattern is **{top_label}**."
             )
     if chart.combinations_6:
         a, c, elem, pa, pb = chart.combinations_6[0]
@@ -1818,7 +1826,7 @@ def pattern_story(ctx) -> str:
     if chart.clashes:
         a, c = chart.clashes[0]
         parts.append(
-            f"A natal clash between **{a}** and **{c}** brings recurring pressure and asks the querent "
+            f"A natal clash between **{a}** and **{c}** brings recurring pressure and asks you "
             f"to make conscious choices between the two palaces involved."
         )
     if chart.three_punishments:
@@ -1843,7 +1851,7 @@ def pattern_story(ctx) -> str:
         )
     parts.append(
         f"Together, these patterns point to a recurring life theme rather than a single event. "
-        f"The favorable **{fav}** element is the querent's lever for working with — rather than against — "
+        f"The favorable **{fav}** element is your lever for working with — rather than against — "
         f"the chart's structure."
     )
     return " ".join(parts)
@@ -1917,7 +1925,7 @@ def regular_grid_narrative(ctx) -> str:
             f"a caveat: {candidate.note} When intact, this grid points toward a life theme shaped by {theme}."
         )
     return (
-        f"The engine flags a likely **{candidate.name_ko} ({candidate.name_en})** as the regular grid. "
+        f"The chart shows a likely **{candidate.name_ko} ({candidate.name_en})** as the regular grid. "
         f"This points toward a life theme shaped by {theme}. "
         + (f"{candidate.note} " if candidate.note else "")
         + "It is a structural tendency, not a career verdict; the ten-god distribution and timing tables refine how it expresses."
@@ -1949,7 +1957,7 @@ def special_grid_note(ctx) -> str:
         return ""
     body = "; ".join(candidates)
     return (
-        "The engine flags a special-grid candidate: "
+        "A special grid is indicated: "
         f"{body}. This reading carries an asterisk: special-grid rulings are strict, and the final "
         "verdict requires a reader to verify that all classical preconditions "
         "(Day Master isolation, 득령/in-season support, and absence of breaking stems) are truly met. "
@@ -2003,7 +2011,7 @@ def branch_relationship_snapshot(ctx) -> str:
         domains_str = " and ".join(domains) if len(domains) == 2 else (domains[0] if domains else "two life palaces")
         return (
             f"The most prominent natal branch signal is a **육충 (Six Clash)** between **{a}** and **{c}**, "
-            f"linking the {domains_str}. This brings recurring tension that asks the querent to adjust, "
+            f"linking the {domains_str}. This brings recurring tension that asks you to adjust, "
             f"release, or choose between the two areas rather than hold both in full force."
         )
     if chart.self_punishments:
@@ -2063,7 +2071,7 @@ def closing_note_short(ctx) -> str:
     if cls:
         names = [c.lower() for c, _ in cls]
         joined = names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
-        gift = f"a strong {joined} presence that gives the querent real follow-through"
+        gift = f"a strong {joined} presence that gives you real follow-through"
     else:
         gift = "a clear and workable Day Master foundation"
     return (
@@ -2101,25 +2109,25 @@ def closing_note_long(ctx) -> str:
     parts = [
         f"**{dm} ({dm_en})** sits at the centre of this chart, with the chart's element balance leaning "
         f"toward **{balance_elem}** and a ten-god distribution dominated by **{dom_summary}**.",
-        f"The favorable **{fav}** element (with **{sup}** as the quiet secondary) is the querent's main "
+        f"The favorable **{fav}** element (with **{sup}** as the quiet secondary) is your main "
         f"lever — not as a rule to follow, but as a rhythm to listen to.",
         f"The spouse palace **{spouse_branch}** and the chart's relationship dynamics reward the "
-        f"querent for showing up consistently rather than performing.",
+        f"you for showing up consistently rather than performing.",
     ]
     if chart.clashes:
         a, c = chart.clashes[0]
         parts.append(
             f"The natal clash between **{a}** and **{c}** is a recurring pressure; the chart's gift is that "
-            f"the querent has already learned how to navigate it — and the favorable element makes the navigation gentler."
+            f"you have already learned how to navigate it — and the favorable element makes the navigation gentler."
         )
     if chart.combinations_6:
         a, c, elem, pa, pb = chart.combinations_6[0]
         parts.append(
             f"The six-combination between **{a}** and **{c}** is a quiet asset — partnerships or projects "
-            f"that bring two palaces into harmony, with the querent's role often as the connector."
+            f"that bring two palaces into harmony, with your role often as the connector."
         )
     parts.append(
-        "Across a full lifetime, this chart rewards the querent who studies their own patterns and "
+        "Across a full lifetime, this chart rewards you for studying your own patterns and "
         "acts with the favorable element rather than against it. The work is not to fix the chart; "
         "it is to use what is already there well."
     )
@@ -2276,7 +2284,7 @@ def business_launch_format(ctx) -> str:
         return (
             "**A partnership or co-launch with one credible counterparty** is the most likely fit. "
             "The Authority ten-god gives the launch a stamp of legitimacy, and a partner carries the "
-            "parts the querent's chart cannot carry alone."
+            "parts your chart cannot carry alone."
         )
     if output >= 1:
         return (
@@ -2527,12 +2535,12 @@ def plain_words_pattern(ctx) -> str:
     if name.startswith("종격"):
         return RP.plain(
             "Your chart may be a 'follower' type — it works best by going fully with its strongest "
-            "element rather than fighting it. This is a candidate reading, not a settled one."
+            "element rather than fighting it. Treat this as a reading, not a settled verdict."
         )
     if name.startswith("화격"):
         return RP.plain(
             "Your chart may be a 'transformation' type — two parts combine and shift its centre of "
-            "gravity. This is a candidate reading, not a settled one."
+            "gravity. Treat this as a reading, not a settled verdict."
         )
     ko = name.split(" / ")[0].strip()
     theme = _REGULAR_GRID_THEME.get(ko)

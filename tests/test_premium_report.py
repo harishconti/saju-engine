@@ -985,7 +985,7 @@ def test_daeun_direction_absent_gender_is_disclosed_not_hidden():
     assert chart.daeun == []
     report = generate_premium_report(chart, tier="deep")
     assert "Luck direction:** not computed" in report
-    assert "requires the querent's gender" in report
+    assert "requires your gender" in report
 
 
 def test_element_balance_has_methodology_footnote():

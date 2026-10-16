@@ -730,5 +730,5 @@ _STAR_MEANING: Dict[str, str] = {
     "white_tiger": "intensity and sudden force — surgical or martial precision; can bring accidents or conflict if unchecked, alongside a real capacity for decisive action.",
     "sky_hero": "strong will, charisma, and leadership — with a tendency toward extremity or conflict if the chart is not balanced.",
     "heavenly_virtue": "virtue, protection, and honorable character — help arriving in times of need; often read as one of the most favorable stars.",
-    "monthly_virtue": "monthly/quarterly support, popularity, and smooth assistance from people around the querent.",
+    "monthly_virtue": "monthly/quarterly support, popularity, and smooth assistance from people around you.",
 }

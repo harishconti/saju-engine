@@ -130,6 +130,25 @@ _CLIENT_TIERS = {"sample", "essential", "deep", "spark", "reading", "fullmap", "
                  "career", "luck-cycle"}
 
 
+_POSITION_LABELS = {
+    "year_stem": "Year stem", "month_stem": "Month stem",
+    "day_stem": "Day Master", "hour_stem": "Hour stem",
+    "year_branch_main": "Year branch", "month_branch_main": "Month branch",
+    "day_branch_main": "Day branch", "hour_branch_main": "Hour branch",
+}
+
+
+def _position_label(position: str) -> str:
+    """Human label for a chart position key.
+
+    The wealth table printed the raw key ("month_stem") straight from the chart —
+    internal-looking machinery on a client page (external audit, 2026-10-16, #4).
+    """
+    if position in _POSITION_LABELS:
+        return _POSITION_LABELS[position]
+    return position.replace("_", " ").capitalize()
+
+
 def _strip_leading_title_block(md: str) -> List[str]:
     """Drop a standalone report's own h1 title + Born/… header + first `---`.
 
@@ -268,9 +287,9 @@ class _ReportContext:
         pattern_name = "Standard chart"
         if chart.patterns:
             if chart.patterns.get("special_forms"):
-                pattern_name = "종격 (Follower Grid) candidate"
+                pattern_name = "종격 (Follower Grid)"
             elif chart.patterns.get("transformation_grid"):
-                pattern_name = "화격 (Transformation Grid) candidate"
+                pattern_name = "화격 (Transformation Grid)"
             elif chart.patterns.get("regular_grid"):
                 regular = chart.patterns["regular_grid"]
                 if regular:
@@ -393,13 +412,13 @@ def _year_month_correction_note(chart) -> List[str]:
 def _daeun_direction_note(chart) -> str:
     """Disclose the major-luck (대운) direction and its gender input.
 
-    대운 direction is derived from the year-stem polarity and the querent's
+    대운 direction is derived from the year-stem polarity and your
     gender; the calculation is correct but was previously invisible in the
     report (external-review feedback, 2026-09-07).
     """
     gender = getattr(chart, "gender", None)
     if gender not in ("M", "F") or not getattr(chart, "daeun", []):
-        return "**Luck direction:** not computed — major-luck (대운) direction requires the querent's gender; provide it to complete the timing tables."
+        return "**Luck direction:** not computed — major-luck (대운) direction requires your gender; provide it to complete the timing tables."
     from .lookup import daeun_direction, STEM_INFO
 
     direction = daeun_direction(chart.year.stem, gender)
@@ -667,7 +686,7 @@ def _section_chart_at_a_glance(ctx: _ReportContext) -> List[str]:
         # did not have. The provenance is already tracked (fe.confidence); only
         # say "the reader has weighed both" when a human actually confirmed it.
         weighed = ("the reader has weighed both." if ctx.fe.confidence == "reader-confirmed"
-                   else "the engine has weighed both.")
+                   else "the classical priority rule decides between them.")
         lines.append(
             f"- **Why this element:** two classical checks apply here — the strength-balance "
             f"(억부) reading points one way, while the climate-balance (조후) reading points to "
@@ -716,7 +735,7 @@ def _section_day_master_portrait(ctx: _ReportContext, short: bool = False) -> Li
 
     if not short:
         lines += [
-            f"Born in a **{ctx.dm_element}** chart with the engine reading as **{ctx.strength_label.lower()}**, the way you meet the world is shaped by how much {ctx.dm_element} energy is available. "
+            f"Born in a **{ctx.dm_element}** chart that reads as **{ctx.strength_label.lower()}**, the way you meet the world is shaped by how much {ctx.dm_element} energy is available. "
             f"When balanced, you express the best of {ctx.dm_element}; when stressed, the unintegrated side may dominate.",
             "",
             f"Your growth edge is to consciously cultivate **{ctx.favorable}** energy — the favorable element — so that your {ctx.dm_element} nature has the right container and outlet.",
@@ -777,8 +796,8 @@ def _four_pillars_one_by_one(ctx: _ReportContext, sentences: int = 2) -> List[st
             )
             if tengod:
                 first += (
-                    f" Its stem reads as **{tengod}** relative to your Day Master, so "
-                    f"this area of life tends to carry that dynamic."
+                    f" Read as **{tengod}** relative to your Day Master, the "
+                    f"{p.position} pillar tends to carry that dynamic."
                 )
             lines.append(first)
             lines.append("")
@@ -791,10 +810,10 @@ def _four_pillars_one_by_one(ctx: _ReportContext, sentences: int = 2) -> List[st
         if sentences >= 4:
             lines.append(
                 f"Because the stem belongs to the **{stem_elem}** element, it tends to bring {stem_elem.lower()}-flavoured themes "
-                f"into this life area — qualities of motion, structure, or feeling that quietly shape how the querent relates to {p.position}-pillar matters."
+                f"into this life area — qualities of motion, structure, or feeling that quietly shape how you relate to {p.position}-pillar matters."
             )
             lines.append(
-                f"Hidden stems within the {p.branch} branch add layers: any mid- or residual-stem ten-god the querent carries here will surface as a recurring sub-theme when this life area activates."
+                f"Hidden stems within the {p.branch} branch add layers: any mid- or residual-stem ten-god you carry here will surface as a recurring sub-theme when this life area activates."
             )
             lines.append(
                 f"When the annual or major luck touches the {p.branch} branch or the {p.stem} stem, "
@@ -1061,7 +1080,7 @@ def _section_relationships(ctx: _ReportContext, mode: str = "standard") -> List[
         lines += [
             "#### Partner Chart Add-On",
             "",
-            "*Curious about a specific person? Add a compatibility reading — the Deep Compatibility report ($45) — by replying with their birth details.*",
+            "*Curious about a specific person? Add a compatibility reading — the Deep Compatibility report — by replying with their birth details.*",
             "",
         ]
 
@@ -1140,7 +1159,9 @@ def _section_health_vitality(ctx: _ReportContext) -> List[str]:
         "Chart-derived first draft — review against `knowledge/03-five-elements.md` "
         "organ mapping. Not a medical diagnosis.",
     )
-    excess_line = f"- **Element excess:** {excess} — pay attention to the {_ELEMENT_ORGANS.get(excess, 'associated')} system."
+    # `_ELEMENT_ORGANS["Wood"]` already ends in "system" ("…and nervous
+    # system"), so appending another produced "nervous system system".
+    excess_line = f"- **Element excess:** {excess} — pay attention to the {_ELEMENT_ORGANS.get(excess, 'associated organs')}."
     if excess == ctx.favorable:
         # Bug found 2026-09-19 (external report review, 2nd pass): the raw
         # numeric-abundance "excess" read (knowledge/15-health-and-body.md
@@ -1165,8 +1186,10 @@ def _section_health_vitality(ctx: _ReportContext) -> List[str]:
             "recommend leaning into."
         )
     deficient_line = (
-        f"- **Element deficiency:** {deficient} — the {_ELEMENT_ORGANS.get(deficient, 'associated')} "
-        f"system may need gentle support."
+        # `_ELEMENT_ORGANS["Wood"]` already ends in "system", so a second "system"
+        # here read "…nervous system system" (external audit, 2026-10-16, #2.3).
+        f"- **Element deficiency:** {deficient} — the "
+        f"{_ELEMENT_ORGANS.get(deficient, 'associated organs')} may need gentle support."
     ) + _deficient_is_gisin_note(ctx, deficient)
     lines += [
         "### Primary Watchpoints",
@@ -1247,9 +1270,9 @@ def _section_natal_patterns(ctx: _ReportContext) -> List[str]:
         "",
     ]
 
-    # Dominant pattern candidate (engine aid, not classical ruling)
+    # Dominant pattern (engine aid, not classical ruling)
     if ctx.chart.patterns:
-        lines.append(f"**Dominant pattern candidate:** *{ctx.pattern_name}*")
+        lines.append(f"**Dominant pattern:** *{ctx.pattern_name}*")
         lines.append("")
 
     rels = []
@@ -1467,7 +1490,10 @@ def _section_wealth_timing(ctx: _ReportContext) -> List[str]:
     if wealth_hits:
         lines += ["| Position | Stem | Ten-God | Note |", "|---|---|---|---|"]
         for h in wealth_hits:
-            lines.append(f"| {h.position} | {h.stem} | {h.tengod_en} | Natal wealth signal visible here. |")
+            lines.append(
+                f"| {_position_label(h.position)} | {h.stem} | {h.tengod_en} | "
+                "Natal wealth signal visible here. |"
+            )
         lines.append("")
     else:
         lines.append("_No direct wealth ten-god appears on a visible stem in this chart. Wealth may arrive through resource, output, or authority channels instead — the reader should trace the money path through the hidden stems and the timing tables._")
@@ -1808,9 +1834,9 @@ def _section_auspicious_dates(ctx: _ReportContext, window_days: int = 90) -> Lis
         "",
         f"> The next {window_days}-day window from {ref.strftime('%B %Y')} includes the following candidate dates — each one's day-stem element matches your favorable ({ctx.favorable}) or supporting ({ctx.supporting}) element, and its day-branch does not clash, harm, or break your natal day branch ({day_branch})"
         + (f" or hour branch ({hour_branch})" if hour_branch else "")
-        + ". A qualified reader should still cross-check each date against the querent's specific question and local calendar before recommending it.",
+        + ". A qualified reader should still cross-check each date against your specific question and local calendar before recommending it.",
         "",
-        "> **Almanac caveat:** this is a chart-relative shortlist, not a finished 택일 (auspicious-date selection) — a full 택일 also weighs the day's own 건제십이신/28수 almanac assignment, the specific event type, and local custom, none of which this engine computes *(see knowledge/16-date-selection.md)*.",
+        "> **Almanac caveat:** this is a chart-relative shortlist, not a finished 택일 (auspicious-date selection) — a full 택일 also weighs the day's own 건제십이신/28수 almanac assignment, the specific event type, and local custom, none of which a chart-relative shortlist can compute *(see knowledge/16-date-selection.md)*.",
         "",
         "| Date | Day Pillar | Suggested Use / Reader Note |",
         "|---|---|---|",
@@ -2494,6 +2520,6 @@ def generate_premium_report(
             "- Classical framework: 적천수 (滴天髓), 연해자평 (淵海子平), 궁통보감 (窮通寶鑑), 명리정종, 자평진전 — as compiled in `knowledge/`.",
             "- Method: `knowledge/09-interpretation-method.md` (9-step procedure).",
             "- This reading describes tendencies, not fixed outcomes; it is for reflection and entertainment — not medical, legal, or financial advice.",
-            "- The engine's heuristic verdicts (strength, 용신) are marked provisional where the classical sources disagree; a qualified reader confirms the final reading.",
+            "- The chart's heuristic verdicts (strength, 용신) are marked provisional where the classical sources disagree; a qualified reader confirms the final reading.",
         ])
     return doc

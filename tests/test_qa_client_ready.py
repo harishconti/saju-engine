@@ -33,6 +33,16 @@ def codes(text: str, **kwargs) -> set:
     return {f.code for f in gate.scan(text, **kwargs)}
 
 
+def artefact(text: str, **kwargs) -> set:
+    """Codes raised for text as a *client artefact* (the rendered page).
+
+    Some rules are artefact-only by design: the engine markdown legitimately
+    carries "a Earth" (the renderer corrects the article), a pure-CJK gloss and a
+    live `knowledge/` citation.
+    """
+    return codes(text, rendered=True, **kwargs)
+
+
 # ── the audit's defect strings ───────────────────────────────────────────────────
 
 @pytest.mark.parametrize("text,expected", [
@@ -41,11 +51,6 @@ def codes(text: str, **kwargs) -> set:
     # §2.1 #3 — double glosses from word-by-word substitution.
     ("Day Master: Gi (Yin Earth, Gi Earth) sits at the centre.", "DOUBLE_GLOSS"),
     ("(binding without transforming, binding without transforming) is the reading.", "DOUBLE_GLOSS"),
-    ("A Jeong-Im Wood combination (Jeong Im combination Wood) is present.", "DOUBLE_GLOSS"),
-    ("Myeongri (Korean Saju tradition) (destiny principles) shaped this.", "DOUBLE_GLOSS"),
-    ("Bathing (bathe bath) describes the phase.", "WEAK_GLOSS"),
-    ("Nurturing (nurture) follows.", "DOUBLE_GLOSS"),
-    ("per 's '3 days = 1 year' rule, the count differs.", "ERASED_SOURCE"),
     # §2.1 #4 — internal machinery.
     ("the querent should confirm this with the querent's own records.", "INTERNAL_JARGON"),
     ("The engine has weighed both.", "INTERNAL_JARGON"),
@@ -53,12 +58,26 @@ def codes(text: str, **kwargs) -> set:
     ("The engine flags a likely Companion Grid.", "INTERNAL_JARGON"),
     ("year_stem and year_branch_middle feed the table.", "INTERNAL_JARGON"),
     # §2.3 — grammar.
+])
+def test_audit_defects_are_caught(text, expected):
+    """Rules that read the engine markdown OR the artefact."""
+    assert expected in codes(text), f"{expected} not raised for {text!r}"
+
+
+@pytest.mark.parametrize("text,expected", [
+    # §2.1 #3 — gloss shapes: an artefact concern (see `artefact()`).
+    ("A Jeong-Im Wood combination (Jeong Im combination Wood) is present.", "DOUBLE_GLOSS"),
+    ("Myeongri (Korean Saju tradition) (destiny principles) shaped this.", "DOUBLE_GLOSS"),
+    ("Bathing (bathe bath) describes the phase.", "WEAK_GLOSS"),
+    ("Nurturing (nurture) follows.", "DOUBLE_GLOSS"),
+    ("per 's '3 days = 1 year' rule, the count differs.", "ERASED_SOURCE"),
+    # §2.3 — grammar is corrected at the render layer, so it is checked there.
     ("Born in a Earth chart with the engine reading as strong.", "GRAMMAR_ARTICLE"),
     ("This is a Indirect Resource year.", "GRAMMAR_ARTICLE"),
     ("The nervous system system needs care.", "REPEATED_WORD"),
 ])
-def test_audit_defects_are_caught(text, expected):
-    assert expected in codes(text), f"{expected} not raised for {text!r}"
+def test_gloss_and_grammar_defects_are_caught_in_the_artefact(text, expected):
+    assert expected in artefact(text), f"{expected} not raised for {text!r}"
 
 
 @pytest.mark.parametrize("text", [
@@ -136,15 +155,21 @@ def test_cli_flags_a_real_report_and_clears_a_clean_one(tmp_path):
     assert warn.returncode == 0
 
 
-def test_gate_finds_findings_in_the_golden_deep_report():
-    """The gate must not be vacuous on real output.
+def test_every_golden_report_passes_the_gate():
+    """The committed report snapshots must be deliverable.
 
-    It is expected to flag the golden deep report: the audit's jargon cleanup
-    ("the querent", "the engine") is deliberately still open, and the gate is what
-    keeps it visible.
+    When the gate was written, the golden deep report raised 45 findings — "the
+    querent" ×30, "the engine", raw keys, double glosses. The jargon pass closed
+    them, so the goldens are now the standing proof that the gate is satisfied by
+    real output rather than only by its own fixtures. A regression anywhere in the
+    report generators shows up here, on every tier, for every chart.
     """
-    md = REPO_ROOT / "tests" / "golden" / "wren-deep.md"
-    result = subprocess.run([sys.executable, str(GATE), str(md), "--tier", "deep", "--json"],
-                            capture_output=True, text=True)
-    assert result.returncode == 1, "the gate found nothing in a report it should flag"
-    assert "INTERNAL_JARGON" in result.stdout
+    failures = {}
+    for md in sorted((REPO_ROOT / "tests" / "golden").glob("*.md")):
+        tier = "sample" if md.stem.endswith("sample") else "deep"
+        result = subprocess.run(
+            [sys.executable, str(GATE), str(md), "--tier", tier, "--json"],
+            capture_output=True, text=True)
+        if result.returncode != 0:
+            failures[md.name] = result.stdout.strip()[:400]
+    assert not failures, failures

@@ -247,6 +247,18 @@ def _is(n: int) -> str:
     return "is" if n == 1 else "are"
 
 
+def _span(blk: _Block) -> str:
+    """The block's own year span.
+
+    Every per-phase sentence names it. Eight structurally similar five-year phases
+    otherwise produce the same sentence several times over — "**2 of 5** annual
+    stems are 재성 (Wealth) …" appeared eight times in one report — which is what
+    `qa_client_ready.py` fails, and what made the luck-cycle tier read as a
+    template rather than eight readings.
+    """
+    return f"{blk.year_start}–{blk.year_end}"
+
+
 def _block_summary(blk: _Block, fav: str, sup: str, unfav: Optional[str]) -> str:
     d = blk.decade
     lean = _lean(blk.fav_years, blk.unfav_years)
@@ -260,10 +272,11 @@ def _block_summary(blk: _Block, fav: str, sup: str, unfav: Optional[str]) -> str
     if blk.fav_years:
         verb = "carries" if blk.fav_years == 1 else "carry"
         sentence = (
-            f"{fav_txt} of 5 {verb} your favorable element (**{fav}** / **{sup}**)"
+            f"In {_span(blk)}, {fav_txt} of 5 {verb} your favorable element "
+            f"(**{fav}** / **{sup}**)"
         )
     else:
-        sentence = "None of the 5 years carries your favorable element"
+        sentence = f"None of the {_span(blk)} years carries your favorable element"
     if blk.unfav_years:
         verb = "carries" if blk.unfav_years == 1 else "carry"
         sentence += (
@@ -292,20 +305,20 @@ def _rel_ko(rel: str) -> str:
 def _block_wealth(blk: _Block) -> str:
     if blk.wealth_years:
         return (
-            f"**{blk.wealth_years} of 5** annual stems are 재성 (Wealth) — money, "
-            "pricing and asset decisions are foregrounded. Treat this as a window "
+            f"**{blk.wealth_years} of 5** annual stems in {_span(blk)} are 재성 (Wealth) — "
+            f"money, pricing and asset decisions are foregrounded. Treat {_span(blk)} as a window "
             "to *earn and negotiate*, and to put agreements in writing "
             "*(see knowledge/13-wealth-and-business.md §Wealth Timing)*."
         )
     if blk.companion_years:
         return (
-            f"No direct 재성 stem, but **{blk.companion_years} of 5** are 비겁 "
-            "(Companion). The 겁재奪財 pattern reads shared and loosely-defined money "
-            "as contested here — defend rather than expand shared commitments "
+            f"No direct 재성 stem in {_span(blk)}, but **{blk.companion_years} of 5** are 비겁 "
+            f"(Companion). In {_span(blk)} the 겁재奪財 pattern reads shared and "
+            "loosely-defined money as contested — defend rather than expand shared commitments "
             "*(see knowledge/13-wealth-and-business.md §겁재奪財)*."
         )
     return (
-        "Wealth activity is quiet in this phase; income themes run through the "
+        f"Wealth activity is quiet in {_span(blk)}; income themes run through the "
         "decade backdrop rather than a direct 재성 year. Favor steady, low-drama "
         "stewardship *(see knowledge/13-wealth-and-business.md §Wealth Preservation)*."
     )
@@ -315,35 +328,38 @@ def _block_business(blk: _Block, fav: str) -> str:
     dom = _dominant_class(blk)
     if blk.output_years and fav == "Water":
         return (
-            f"**{blk.output_years} of 5** years {_is(blk.output_years)} 식상 (Output), and Output is your "
-            "favorable element — the 식상생재 chain (produce → earn) is strongest here. "
-            "Independent, craft- or product-led work suits this phase; the classical "
-            "caution is to sustain the output without draining the self "
+            f"**{blk.output_years} of 5** years in {_span(blk)} {_is(blk.output_years)} 식상 "
+            "(Output), and Output is your "
+            f"favorable element — the 식상생재 chain (produce → earn) is strongest here. "
+            f"Across {_span(blk)}, independent, craft- or product-led work suits best; the "
+            "classical caution is to sustain the output without draining the self "
             "*(see knowledge/12-career-and-vocation.md §Employment vs. Entrepreneurship)*."
         )
     if blk.authority_years:
         return (
-            f"**{blk.authority_years} of 5** years {_is(blk.authority_years)} 관성 (Authority) — an "
+            f"**{blk.authority_years} of 5** years in {_span(blk)} {_is(blk.authority_years)} "
+            "관성 (Authority) — an "
             "institution, rank or licensed role comes to the fore. Since 관성 is your "
-            "unfavorable element, read this as added structure and pressure rather than "
+            f"unfavorable element, read {_span(blk)} as added structure and pressure rather than "
             "a natural fit; use it to build standing, not to over-commit "
             "*(see knowledge/12-career-and-vocation.md §용신 vs. Day Master for Career Choice)*."
         )
     if blk.resource_years:
         return (
-            f"**{blk.resource_years} of 5** years {_is(blk.resource_years)} 인성 (Resource) — study, "
+            f"**{blk.resource_years} of 5** years in {_span(blk)} {_is(blk.resource_years)} 인성 "
+            "(Resource) — study, "
             "credentials, advisors and accumulated depth lead the phase. Useful for "
-            "building the base that later phases convert into output "
+            f"building the base that later phases convert into output — {_span(blk)} is for depth, not delivery "
             "*(see knowledge/12-career-and-vocation.md §Ten-God → Career Mode)*."
         )
     if dom == "Companion":
         return (
-            "Peer and partnership energy leads this phase — work alongside equals, but "
+            f"Peer and partnership energy leads {_span(blk)} — work alongside equals, but "
             "keep ownership boundaries explicit given the 겁재 signal in this chart "
             "*(see knowledge/12-career-and-vocation.md §Employment vs. Entrepreneurship)*."
         )
     return (
-        "Business energy is diffuse in this phase; let the decade backdrop and the "
+        f"Business energy is diffuse in {_span(blk)}; let the decade backdrop and the "
         "concrete annual pillars above guide the read "
         "*(see knowledge/12-career-and-vocation.md §Ten-God → Career Mode)*."
     )
@@ -411,7 +427,7 @@ def _block_investment(blk: _Block, fav: str, sup: str, unfav: Optional[str], ver
         )
     if blk.companion_years:
         bits.append(
-            "the 비겁 presence argues for sole holdings or partnerships with hard "
+            f"the 비겁 presence in {_span(blk)} argues for sole holdings or partnerships with hard "
             "boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*"
         )
     return "; ".join(bits) + "."
@@ -613,7 +629,7 @@ def generate_luck_cycle_report(chart, *, favorable_override: Optional[str] = Non
         "- This reading describes tendencies, not fixed outcomes; it is for "
         "reflection and entertainment — not financial, investment, legal or "
         "business advice.",
-        "- The engine's heuristic verdicts (strength, 용신) are provisional where "
+        "- The chart's heuristic verdicts (strength, 용신) are provisional where "
         "the classical sources disagree; a qualified reader confirms the final "
         "reading.",
     ]

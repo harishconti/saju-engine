@@ -180,9 +180,9 @@ def _dominant_classes_for(c) -> List[str]:
 def _pairwise(members, names) -> List[str]:
     lines = ["## 2. Pairwise Partnership Compatibility", ""]
     lines += [
-        "Each pair is scored by the engine's 11 궁합 sub-systems "
-        "*(see knowledge/11-gunghap.md §Composite Weight)*. This is the engine's "
-        "own compatibility engine; a high score means the two charts interact "
+        "Each pair is scored against 11 classical 궁합 sub-systems "
+          "*(see knowledge/11-gunghap.md §Composite Weight)*. A high score means the two "
+        "charts interact "
         "smoothly, **not** that they should marry or partner — trust and friction "
         "are read from the day-branch (spouse/palace) and the luck-pillar "
         "synchrony in particular. **In every pair, A = the first name in the "

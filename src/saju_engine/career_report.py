@@ -209,24 +209,31 @@ def _domain_detail_section(chart, override, rows) -> List[str]:
         # The practical tone is keyed on the ACTUAL ranked tier, so the prose can
         # never contradict the table above (the tier is score-based; element
         # equality alone does not determine it).
+        # Each field names the domain, so the template reads as a reading of *this*
+        # row rather than the same sentence repeated: three domains in one tier used
+        # to produce three identical "How to use it" lines, and interchangeable
+        # paragraphs are what `qa_client_ready.py` fails (a sentence appearing more
+        # than twice).
+        role_or_domain = role if role != "—" else domain
         if "Best" in tier:
-            fit = f"This is a **Best Fit**: {why_elem}."
-            use = ("Lean into it deliberately — this is where effort compounds fastest "
-                   "and friction is lowest.")
+            fit = f"This is a **Best Fit** for {domain}: {why_elem}."
+            use = (f"Lean into it deliberately — {domain} is where effort compounds "
+                   "fastest and friction is lowest.")
             caveat = ("Even a favorable element can be overrun if pursued to excess; keep "
-                      "other tracks alive so the chart stays balanced.")
+                      f"other tracks alive alongside {role_or_domain} so the chart stays balanced.")
         elif "Good" in tier:
-            fit = (f"A **Good Fit**: {why_elem}. It is well resourced by the chart, just "
-                   "not at the very top of the ranking.")
-            use = "Treat it as a lead second track, or a strong complement to your Best-Fit work."
-            caveat = ("Strong but not primary — pick it deliberately rather than by default, "
-                      "and keep the favorable element in play alongside it.")
+            fit = (f"A **Good Fit** for {domain}: {why_elem}. It is well resourced for "
+                   f"{domain}, just not at the very top of the ranking.")
+            use = (f"Treat {domain} as a lead second track, or a strong complement to your "
+                   "Best-Fit work.")
+            caveat = (f"Strong but not primary — pick {domain} deliberately rather than by "
+                      "default, and keep the favorable element in play alongside it.")
         else:
-            fit = f"A **Possible** fit: {why_elem}."
-            use = ("Use it only inside a supporting structure, with the favorable element "
-                   "present to offset it; do not make it the core identity of the work.")
+            fit = f"A **Possible** fit for {domain}: {why_elem}."
+            use = (f"Use {domain} only inside a supporting structure, with the favorable "
+                   "element present to offset it; do not make it the core identity of the work.")
             caveat = ("The chart is not strongly resourced for this family — do not "
-                      "over-invest career capital here without a reader's check.")
+                      f"over-invest career capital in {domain} without a reader's check.")
         lines += [
             f"### {domain} ({tier})",
             "",

@@ -1060,6 +1060,41 @@
     Suite **1,919 → 1,951** (gate tests + the approve integration test); goldens regenerated; ruff `--select F`
     clean. Verified by rendering: `an Earth` in the PDF, no `<!--`, no reviewer note, no tofu.
 
+  - **2026-10-16 (the jargon pass: every golden report now passes the gate, and the gate caught four more of my own
+    bugs doing it).** The owner said continue, so the 45 findings the gate raised on the deep report were worked
+    down to zero — and the same for all 46 goldens on every tier and chart. The audit's #4 is closed: **"the
+    querent" went from 32 occurrences to 0**, replaced phrase-by-phrase rather than by blanket substitution so the
+    verb agreement stays second person ("the querent carries" → "you carry", "the querent's" → "your"). The engine
+    stopped narrating itself: "the engine reading as X" → "that reads as X", "the engine flags" → "the chart shows",
+    "this engine computes" → "a chart-relative shortlist can compute", "The engine's heuristic verdicts" → "The
+    chart's", "scored by the engine's 11 sub-systems" → "against 11 classical sub-systems". Raw chart keys became
+    labels (`month_stem` → "Month stem", with a `_position_label` helper), "candidate" is gone from the hedging
+    spots, and the reviewer's own step reference (`per knowledge/09… Step 2`) no longer strands "Step 2" in client
+    copy — the citation stripper now takes a trailing `'s`/`Step N` with the path.
+    ✅ **Template repetition closed by naming the row.** The luck-cycle tier printed the same "**2 of 5** annual
+    stems are 재성 (Wealth)…" sentence **eight times**, and five more advice sentences with it; every per-phase
+    sentence now names its own year span ("in **2011–2015**"). The career tier printed three identical "How to use
+    it" lines; each field now names its domain. The per-pillar ten-god sentence repeated three times across four
+    pillars; it now names the pillar. The 12-Stage Cycle gained **compound** map entries (長生/沐浴/冠帶/臨官/帝旺)
+    so 沐浴 reads "Bathing (沐浴)" rather than the per-character "bathe bath", and the two organ lists no longer
+    print "nervous system system". **Page count: Deep 26 → 25** — still inside the corrected 25–30 claim, but at the
+    floor; if it drops below, the claim moves with it or the copy does.
+    ⚠️ **Four more of my own bugs, all caught by running the gate rather than by reasoning about it.** (a) The
+    gloss-shape checks were skipped in markdown mode by an early `continue`, which also skipped **every later rule**
+    — the article, repeated-word and price checks silently stopped running (the tool's own tests caught it).
+    (b) "Resource class (印星)" was rendered "Resource class (Resource)", losing the Hanja, because the
+    keep-the-Hanja test was a *suffix* match and the preceding text ended in "class"; it now looks across the last
+    few words. (c) Two map values that gloss themselves ("manseryoek (Korean perpetual calendar)", "Direct Officer
+    (Authority)") got a second gloss appended. (d) The sentence splitter broke on "release vs. scatter", inventing a
+    phantom sentence that looked like an 8× repeat. Fixing (b) also *improved* the artefact: 비견 and 비겁 both
+    translate to "Companion", so keeping the Hanja is what distinguishes them — "its ten-god is Companion (비견), a
+    peer/rival (비겁) type".
+    Tests: `test_every_golden_report_passes_the_gate` replaces the test that asserted the deep report was flagged —
+    the 46 committed snapshots are now the standing proof, on every tier and chart. Artefact-only rules (gloss
+    shapes, articles, a live `knowledge/` citation) are documented as such and exercised in `rendered=True` mode.
+    Suite **1,951 passed** (unchanged count: assertions updated, one test repurposed); goldens regenerated; demos
+    rebuilt; ruff `--select F` clean. Verified on the artefact: `an Earth` (9×), 0 defects, 0 findings from the gate.
+
 ### Earlier state (2026-09-26)
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"

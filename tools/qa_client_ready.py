@@ -45,8 +45,10 @@ _JARGON = [
     (r"\bengine flags\b", "internal: 'the engine flags'"),
     (r"\bengine reads\b", "internal: 'the engine reads'"),
     (r"\bStep \d+\b", "internal step reference"),
-    (r"\bcandidate\b", "engine hedging: 'candidate'"),
-    (r"\bdominant pattern\b", "engine jargon: 'dominant pattern'"),
+    # "candidate dates" is ordinary English; the hedging is what reads as
+    # machinery ("a pattern candidate", "a candidate reading").
+    (r"\b(?:pattern|grid|formation|structure) candidate\b", "engine hedging: 'pattern candidate'"),
+    (r"\bcandidate reading\b", "engine hedging: 'candidate reading'"),
     (r"\b[a-z]+_(?:stem|branch|middle|element|tengod|class)\b", "raw engine key"),
 ]
 
@@ -120,7 +122,11 @@ from saju_html import _A_EXCEPTIONS, _AN_EXCEPTIONS  # noqa: E402
 _REPEATED_WORD = re.compile(r"(?<![\w-])(\w{3,})\s+\1(?![\w-])", re.IGNORECASE)
 _DOUBLE_WORD_OK = {"had", "that", "very", "no", "so", "bye", "well", "she", "he", "the"}
 
-_SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+")
+# Split on sentence-ending punctuation followed by something that can start a
+# sentence. The lookahead matters: "release vs. scatter" is one sentence, and
+# splitting at the abbreviation produced a phantom sentence made of a
+# paragraph's constant tail — reported as repeated eight times.
+_SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+(?=[A-Z0-9\"'\u2018\u201c])")
 _TITLE_RE = re.compile(r"^##\s+(.+?)\s*$", re.M)
 
 MIN_SENTENCE_CHARS = 40
@@ -202,53 +208,6 @@ def scan(
             if m:
                 findings.append(Finding("DOUBLE_GLOSS", source, n,
                                         m.group(0)[:110], note))
-        for m in _ADJACENT_PARENS.finditer(line):
-            first, second = m.group(1), m.group(2)
-            if _CJK.search(first) and not re.search(r"[A-Za-z]", first):
-                continue  # "Gyeong (庚) (main)": English, Hanja, then a Korean gloss
-            findings.append(Finding("DOUBLE_GLOSS", source, n, m.group(0)[:110],
-                                    "a gloss of a gloss"))
-        for m in _PAREN.finditer(line):
-            gloss = m.group(1)
-            if _CJK.search(gloss):
-                continue  # English + Hanja: the intended notation
-            # Hyphens split too, so "Jeong-Im ... (Jeong Im ...)" is seen as the
-            # repetition it is.
-            before = {w.casefold().strip(",.") for w in
-                      line[:m.start()].replace("-", " ").split()}
-            words = [w.casefold().strip(",.") for w in gloss.replace("-", " ").split()]
-
-            def _already_written(word: str) -> bool:
-                # Prefix-matched, so "Nurturing (nurture)" is caught as well as an
-                # exact repeat; five characters is enough to mean the same term.
-                return any(word == b or (len(word) >= 5 and b.startswith(word[:5]))
-                           for b in before)
-
-            if len(words) >= 1 and len(gloss) >= 5 and all(_already_written(w) for w in words):
-                findings.append(Finding("DOUBLE_GLOSS", source, n, m.group(0)[:110],
-                                        "gloss only repeats the English before it"))
-        for m in _WEAK_GLOSS.finditer(line):
-            first, second = m.group(1).casefold(), m.group(2).casefold()
-            if first in _WEAK_GLOSS_OK or second in _WEAK_GLOSS_OK:
-                continue
-            if second.startswith(first[:4]) and first != second:
-                findings.append(Finding("WEAK_GLOSS", source, n, m.group(0),
-                                        "a gloss that adds no information"))
-        for m in _STRANDED_POSSESSIVE.finditer(line):
-            findings.append(Finding("ERASED_SOURCE", source, n, m.group(0),
-                                    "a quoted source's name was erased"))
-        for m in _A_AN.finditer(line):
-            article, word = m.group(1), m.group(2)
-            stem = word.casefold()
-            if (article.casefold() == "a" and stem[:1] in "aeiou"
-                    and stem not in _A_EXCEPTIONS
-                    and stem.split("-")[0] not in _A_EXCEPTIONS):
-                findings.append(Finding("GRAMMAR_ARTICLE", source, n,
-                                        m.group(0), f"'a' before a vowel -> 'an {word}'"))
-            if (article.casefold() == "an" and stem[:1] not in "aeiou"
-                    and stem not in _AN_EXCEPTIONS):
-                findings.append(Finding("GRAMMAR_ARTICLE", source, n,
-                                        m.group(0), f"'an' before a consonant -> 'a {word}'"))
         for m in _REPEATED_WORD.finditer(line):
             if m.group(1).casefold() not in _DOUBLE_WORD_OK:
                 findings.append(Finding("REPEATED_WORD", source, n,
@@ -257,6 +216,60 @@ def scan(
             findings.append(Finding("PRICE_IN_COPY", source, n,
                                     line.strip()[:110], "a price in the reading"))
 
+        # The gloss-*shape* checks and the stranded possessive run on the artefact
+        # only. In the engine markdown "재성 (Wealth)" is the author's own notation
+        # and "per knowledge/08's …" is a live citation — the renderer decides what
+        # survives — so a redundancy is a defect only once it is on the page. The
+        # exact-repeat check above is different: "X (Y, X)" can only come from the
+        # translator, so it fails in both.
+        if rendered:
+            for m in _ADJACENT_PARENS.finditer(line):
+                first, second = m.group(1), m.group(2)
+                if _CJK.search(first) and not re.search(r"[A-Za-z]", first):
+                    continue  # "Gyeong (庚) (main)": English, Hanja, then a Korean gloss
+                findings.append(Finding("DOUBLE_GLOSS", source, n, m.group(0)[:110],
+                                        "a gloss of a gloss"))
+            for m in _PAREN.finditer(line):
+                gloss = m.group(1)
+                if _CJK.search(gloss):
+                    continue  # English + Hanja: the intended notation
+                # Hyphens split too, so "Jeong-Im ... (Jeong Im ...)" is seen as the
+                # repetition it is.
+                before = {w.casefold().strip(",.") for w in
+                          line[:m.start()].replace("-", " ").split()}
+                words = [w.casefold().strip(",.") for w in gloss.replace("-", " ").split()]
+
+                def _already_written(word: str) -> bool:
+                    # Prefix-matched, so "Nurturing (nurture)" is caught as well as an
+                    # exact repeat; five characters is enough to mean the same term.
+                    return any(word == b or (len(word) >= 5 and b.startswith(word[:5]))
+                               for b in before)
+
+                if len(words) >= 1 and len(gloss) >= 5 and all(_already_written(w) for w in words):
+                    findings.append(Finding("DOUBLE_GLOSS", source, n, m.group(0)[:110],
+                                            "gloss only repeats the English before it"))
+            for m in _WEAK_GLOSS.finditer(line):
+                first, second = m.group(1).casefold(), m.group(2).casefold()
+                if first in _WEAK_GLOSS_OK or second in _WEAK_GLOSS_OK:
+                    continue
+                if second.startswith(first[:4]) and first != second:
+                    findings.append(Finding("WEAK_GLOSS", source, n, m.group(0),
+                                            "a gloss that adds no information"))
+            for m in _STRANDED_POSSESSIVE.finditer(line):
+                findings.append(Finding("ERASED_SOURCE", source, n, m.group(0),
+                                        "a quoted source's name was erased"))
+            for m in _A_AN.finditer(line):
+                article, word = m.group(1), m.group(2)
+                stem = word.casefold()
+                if (article.casefold() == "a" and stem[:1] in "aeiou"
+                        and stem not in _A_EXCEPTIONS
+                        and stem.split("-")[0] not in _A_EXCEPTIONS):
+                    findings.append(Finding("GRAMMAR_ARTICLE", source, n,
+                                            m.group(0), f"'a' before a vowel -> 'an {word}'"))
+                if (article.casefold() == "an" and stem[:1] not in "aeiou"
+                        and stem not in _AN_EXCEPTIONS):
+                    findings.append(Finding("GRAMMAR_ARTICLE", source, n,
+                                            m.group(0), f"'an' before a consonant -> 'a {word}'"))
     # The client's name is the first thing on the cover; it must not be raw input.
     m = _TITLE_RE.search(text)
     if m:

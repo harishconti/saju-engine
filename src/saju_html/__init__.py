@@ -75,7 +75,7 @@ KOR_REPL = {
     "십이운성": "Twelve Life Stages", "12운성": "Twelve Life Stages",
     "정관": "Direct Officer", "편관": "Seven Killings",
     "비겁": "Companion", "식상": "Output", "재성": "Wealth", "관성": "Authority",
-    "인성": "Resource", "장생": "Long Life", "목욕": "Bathing",
+    "인성": "Resource", "장생": "Long Life", "임관": "Officer", "목욕": "Bathing",
     "관대": "Coming of Age", "건록": "Strong / Earning", "제왕": "Peak",
     # 12운성 stage names (병/사/묘/양) collide with single-syllable
     # stem/branch Korean names. Engine emits stage names in every pillar
@@ -496,6 +496,12 @@ HANJA_MAP = {
     "命理正宗": "Myeongri-jeongjong", "子平眞詮": "Japyeong-jinjeon",
     # Five Element Hanja (often appear after stem names like 辛金)
     "金": "Metal", "木": "Wood", "水": "Water", "火": "Fire", "土": "Earth",
+    # 12-Stage Cycle names as *compounds*: without these the single characters
+    # won the longest-match race and the stage read as "bathe bath" (沐浴) or
+    # "crown belt" (冠帶) — the audit's double-gloss defect. Longer keys take
+    # precedence in _TRANSLATION_TERMS, so the singles stay usable elsewhere.
+    "長生": "Long Life", "沐浴": "Bathing", "冠帶": "Coming of Age",
+    "臨官": "Officer", "帝旺": "Peak",
 }
 
 
@@ -527,7 +533,7 @@ _SOURCE_SEE_RE = re.compile(r"\*see [^*\n]*(?:§|knowledge)[^*\n]*\*")
 # optionally followed by a `§Section` citation clause up to the closing backtick.
 _SOURCE_PATH_RE = re.compile(
     r"`?knowledge/\d{1,2}(?:[A-Za-z0-9_\-./]*\.md)?"
-    r"(?: *§[^`)\n]*)?`?"
+    r"(?: *§[^`)\n]*)?(?: *Step \d+)?(?:['\u2019]s)?`?"
 )
 
 
@@ -549,18 +555,44 @@ _ANY_PAREN_RE = re.compile(r"\(([^()]*)\)")
 
 
 def _preceding_text(parts: List[str]) -> str:
-    """The last non-empty piece already emitted, for duplicate detection."""
+    """The last non-empty piece already emitted, for duplicate detection.
+
+    Tags and emphasis are stripped, because the check runs after bold/italic have
+    been converted: the text before a gloss may still be "</b>" or "**", and either
+    defeats the comparison (that is how "**Void (공망) (Void)**" doubled).
+    """
+    collected: List[str] = []
     for prev in reversed(parts):
-        stripped = prev.strip()
-        if stripped:
-            return stripped
-    return ""
+        cleaned = re.sub(r"<[^>]+>", "", prev).replace("*", "").strip()
+        if cleaned:
+            collected.append(cleaned)
+            if len(collected) >= 3:
+                break
+    return " ".join(reversed(collected))
+
+
+def _gloss_redundant(parts: List[str], phrase: str) -> bool:
+    """Does the translation repeat something just written?
+
+    Broader than a suffix match on purpose: "Resource class (印星)" glosses a
+    phrase whose head noun is not its last word, and 비견/비겁 both translate to
+    "Companion" — so a suffix test dropped the Hanja and printed "Companion" twice
+    for two different terms. Any of the previous few words counts.
+    """
+    preceding = {w for w in re.split(r"[\s-]+", _preceding_text(parts).casefold()) if w}
+    words = [w for w in re.split(r"[\s-]+", phrase.casefold()) if len(w) >= 3]
+    return bool(words) and all(w in preceding for w in words)
 
 
 def _ends_with(parts: List[str], phrase: str) -> bool:
-    """Does the text already emitted end with ``phrase``?"""
-    preceding = _preceding_text(parts).split()
-    words = phrase.split()
+    """Does the text already emitted end with ``phrase``?
+
+    Compared on hyphen-split, case-folded words: "major-luck (Major Luck)" is the
+    same statement twice, and the hyphen was hiding it.
+    """
+    preceding = re.split(r"[\s-]+", _preceding_text(parts).casefold())
+    words = re.split(r"[\s-]+", phrase.casefold())
+    words = [w for w in words if w]
     return bool(words) and len(words) <= len(preceding) and preceding[-len(words):] == words
 
 
@@ -698,7 +730,10 @@ def _translate_cjk_run(
     # Join translated tokens with a single space so adjacent Hanja pairs like
     # 丙午 do not collapse into "BingO".
     translated = " ".join(tokens)
-    if gloss and translated and not unmapped_tokens:
+    # A map value that already glosses itself ("manseryeok (Korean perpetual
+    # calendar)", "Direct Officer (Authority)") needs no second gloss: appending
+    # the term printed "… (Korean perpetual calendar) (만세력)".
+    if gloss and translated and not unmapped_tokens and "(" not in translated:
         # `gloss` is the owner's convention for *client PDFs*: English with the
         # Hanja the report is about beside it ("Direct Officer (正官)", "Gye Mi
         # (癸未)"). One gloss per run, so a two-character pillar reads as
@@ -736,17 +771,29 @@ def translate_inline(
     # could mis-translate (해 "harm" read as the branch 亥 "Hae (Pig)").
     for _rx, _repl in _PRE_RULES:
         text = _rx.sub(_repl, text)
-    # "도화 (Peach Blossom)" — a term the author already glossed in English. The
-    # English is kept and the term dropped; glossing it here instead would print
-    # it twice ("Peach Blossom (도화) (Peach Blossom)"), the audit's double-gloss
-    # defect. Showing the Hanja for *these* terms needs the compound/pair entries
-    # the audit asked for (대운수, 28수, 冠帶, 七殺) — a map cleanup, not a
-    # formatting decision, so it is deliberately left out of the gloss pass.
+    # Two "the author already glossed this term" shapes. Getting these wrong is
+    # what produced the audit's double glosses ("Peach Blossom (도화) (Peach
+    # Blossom)", "seven killer (七殺) (Seven Killings)").
+    #
+    # 1. CJK + English gloss — "도화 (Peach Blossom)", "七殺 (Seven Killings)".
+    #    Keep the English, drop the term. (Hanja as well as Hangul: the class used
+    #    to be Hangul-only, so a Hanja term fell through and doubled.)
     text = re.sub(
-        r"(\*\*)?([가-힯]+)(\*\*)? \(([A-Za-z][^()]*)\)",
+        r"(\*\*)?([\u3400-\u9fff\uac00-\ud7af]+)(\*\*)? \(([A-Za-z][^()]*)\)",
         lambda m: f"{m.group(1) or ''}{m.group(4)}{m.group(3) or ''}",
         text,
     )
+    # 2. Hangul + its own Hanja — "공망 (空亡)". The Hanja *is* the notation, so
+    #    hand the run to the gloss pass (which prints "Void (空亡)") rather than
+    #    translating the Hangul and leaving the Hanja as a second gloss:
+    #    "Void (공망) (空亡)". Only when glossing — for the spoken script the bare
+    #    Hanja would be stripped and the word would vanish.
+    if gloss:
+        text = re.sub(
+            r"(\*\*)?[가-힯]+(\*\*)? \(([\u3400-\u9fff]+)\)",
+            lambda m: f"{m.group(1) or ''}{m.group(3)}{m.group(2) or ''}",
+            text,
+        )
     for _rx, _repl in _PHRASE_RULES:
         text = _rx.sub(_repl, text)
     protected, placeholders = _protect_parenthetical_english(text, gloss)
@@ -805,7 +852,7 @@ def translate_inline(
             # report those spaces and commas as unmapped CJK.
             inner_en = translate_inline(
                 inner, keep_unmapped=keep_unmapped, unmapped=unmapped, gloss=False).strip()
-            if inner_en and _ends_with(out_parts, inner_en):
+            if inner_en and _gloss_redundant(out_parts, inner_en):
                 out_parts.append(placeholder)
             elif inner_en:
                 out_parts.append(f"({inner_en})")
@@ -853,7 +900,9 @@ _A_AN_RE = re.compile(r"\b(a|an)((?:[ \t]|<[^>]+>)+)([A-Za-z][\w-]*)", re.IGNORE
 # like a consonant ("a university"), and before initialisms read letter by letter.
 _AN_EXCEPTIONS = {"honest", "honour", "honor", "hour", "heir", "herb", "honorary"}
 _A_EXCEPTIONS = {"university", "university-level", "unique", "unit", "united", "user",
-                 "usual", "utility", "one", "once", "european", "uk", "us", "usa", "eu"}
+                 "usual", "utility", "one", "once", "european", "uk", "us", "usa", "eu",
+                 # 'u' pronounced 'yoo': "a union", "a useful year", "a euphemism".
+                 "union", "useful", "use", "usefulness", "euphemism", "eulogy"}
 
 
 def fix_articles(text: str) -> str:

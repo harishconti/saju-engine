@@ -43,9 +43,9 @@
 ### Quick Reference
 
 - **Day Master:** Sin (Yin Metal, 辛金)
-- **Strength:** Balanced — the month branch **午** gives the Day Master a **seasonally weak baseline** by element relation (per knowledge/09-interpretation-method.md Step 2); its 12운성 stage there is **병 (病)** — early momentum is depleted; the querent often builds strength through recovery and patience (knowledge/06-twelve-stages.md). The output/wealth/authority drain outweighs the peer and resource support — the element-relation season above (weighted more heavily in the overall formula) is what pulls the total back into the balanced range despite that skew.
+- **Strength:** Balanced — the month branch **午** gives the Day Master a **seasonally weak baseline** by element relation (per knowledge/09-interpretation-method.md); its 12운성 stage there is **병 (病)** — early momentum is depleted; you often build strength through recovery and patience (knowledge/06-twelve-stages.md). The output/wealth/authority drain outweighs the peer and resource support — the element-relation season above (weighted more heavily in the overall formula) is what pulls the total back into the balanced range despite that skew.
 - **Favorable Element:** Wood *(provisional — requires reader confirmation)* — The chart is close to balanced, so the least-represented element is offered as a starting point only — it is a folk heuristic, not a classical ruling, and the final 용신 (用神) requires the reader's argument from temperature, season, and blockage. The Water that 조후 would add is already this chart's most abundant element, so it cannot balance the chart and the strength-balance (억부) reading governs.
-- **Why this element:** two classical checks apply here — the strength-balance (억부) reading points one way, while the climate-balance (조후) reading points to **Water** for a hot-season chart. In this chart the strength reading takes priority because the chart is not extreme enough for the climate override; the engine has weighed both.
+- **Why this element:** two classical checks apply here — the strength-balance (억부) reading points one way, while the climate-balance (조후) reading points to **Water** for a hot-season chart. In this chart the strength reading takes priority because the chart is not extreme enough for the climate override; the classical priority rule decides between them.
 - **Supporting Element:** Water
 - **Avoid / Watch:** Earth (기신, watch) · Metal (구신, restrains Wood) · Fire (한신, drains Wood)
 - **Current Major Luck:** 戊寅 (ages 33-42)
@@ -77,25 +77,25 @@ With **辛** (Sin (Yin Metal, 辛金)) as your Day Master — you — the refere
 
 #### Year Pillar — 庚午 (Gyeong (Yang Metal, 庚金))
 
-The 庚午 pillar pairs the **庚** stem (Gyeong (Yang Metal, 庚金)) with the **午** branch, together shaping **ancestral and social-root energy — the wider world you were born into**. Its stem reads as **Robber (劫財)** relative to your Day Master, so this area of life tends to carry that dynamic.
+The 庚午 pillar pairs the **庚** stem (Gyeong (Yang Metal, 庚金)) with the **午** branch, together shaping **ancestral and social-root energy — the wider world you were born into**. Read as **Robber (劫財)** relative to your Day Master, the year pillar tends to carry that dynamic.
 
 The **Fire** branch is the container for this area and the **Metal** stem is its driver — read the two together when weighing how year-pillar matters unfold.
 
 #### Month Pillar — 壬午 (Im (Yang Water, 壬水))
 
-The 壬午 pillar pairs the **壬** stem (Im (Yang Water, 壬水)) with the **午** branch, together shaping **career and immediate environment — how you show up at work and in daily life**. Its stem reads as **Hurting Officer (傷官)** relative to your Day Master, so this area of life tends to carry that dynamic.
+The 壬午 pillar pairs the **壬** stem (Im (Yang Water, 壬水)) with the **午** branch, together shaping **career and immediate environment — how you show up at work and in daily life**. Read as **Hurting Officer (傷官)** relative to your Day Master, the month pillar tends to carry that dynamic.
 
 The **Fire** branch is the container for this area and the **Water** stem is its driver — read the two together when weighing how month-pillar matters unfold.
 
 #### Day Pillar — 辛亥 (Sin (Yin Metal, 辛金))
 
-The 辛亥 pillar pairs the **辛** stem (Sin (Yin Metal, 辛金)) with the **亥** branch, together shaping **spouse palace and the inner self — the partner you choose and the self behind the choices**. Its stem reads as **Companion (比肩)** relative to your Day Master, so this area of life tends to carry that dynamic.
+The 辛亥 pillar pairs the **辛** stem (Sin (Yin Metal, 辛金)) with the **亥** branch, together shaping **spouse palace and the inner self — the partner you choose and the self behind the choices**. Read as **Companion (比肩)** relative to your Day Master, the day pillar tends to carry that dynamic.
 
 The **Water** branch is the container for this area and the **Metal** stem is its driver — read the two together when weighing how day-pillar matters unfold.
 
 #### Hour Pillar — 癸巳 (Gye (Yin Water, 癸水))
 
-The 癸巳 pillar pairs the **癸** stem (Gye (Yin Water, 癸水)) with the **巳** branch, together shaping **later life and children — what you build toward and what you pass on**. Its stem reads as **Eating God (食神)** relative to your Day Master, so this area of life tends to carry that dynamic.
+The 癸巳 pillar pairs the **癸** stem (Gye (Yin Water, 癸水)) with the **巳** branch, together shaping **later life and children — what you build toward and what you pass on**. Read as **Eating God (食神)** relative to your Day Master, the hour pillar tends to carry that dynamic.
 
 The **Fire** branch is the container for this area and the **Water** stem is its driver — read the two together when weighing how hour-pillar matters unfold.
 
@@ -128,7 +128,7 @@ Wealth timing is read from where 재성 (Wealth) ten-gods appear and are support
 
 ### Wealth Preservation Note
 
-For a **Metal** Day Master with a **Balanced** reading, wealth preservation starts with diversification — never concentrate more than your chart can comfortably hold. Liquidity buffers aligned with the **Wood** element (its colors, foods, and rhythms) help the querent stay flexible across unfavorable 대운 periods. Lean on **Wood**-aligned custodians and instruments rather than chasing growth alone.
+For a **Metal** Day Master with a **Balanced** reading, wealth preservation starts with diversification — never concentrate more than your chart can comfortably hold. Liquidity buffers aligned with the **Wood** element (its colors, foods, and rhythms) help the you stay flexible across unfavorable 대운 periods. Lean on **Wood**-aligned custodians and instruments rather than chasing growth alone.
 
 > **In plain words:** Your chart leans toward earning by making and expressing — creating, teaching, building. Fields and decades that carry Wood give the cleanest results; the timing tables show when.
 
@@ -155,7 +155,7 @@ For a **Metal** Day Master with a **Balanced** reading, wealth preservation star
 
 ### Current Period Deep-Dive
 
-This decade carries a **Direct Resource (正印)** ten-god over a **Wood** branch — a mixed window that asks for measured moves rather than bold ones. The stem ten-god is the *outer theme* — what the world sees and asks of the querent — while the branch element is the *underlying terrain* — the quieter emotional and circumstantial backdrop. Read them together rather than separately; mismatches between outer theme and inner terrain are where this decade is most likely to surprise.
+This decade carries a **Direct Resource (正印)** ten-god over a **Wood** branch — a mixed window that asks for measured moves rather than bold ones. The stem ten-god is the *outer theme* — what the world sees and asks of you — while the branch element is the *underlying terrain* — the quieter emotional and circumstantial backdrop. Read them together rather than separately; mismatches between outer theme and inner terrain are where this decade is most likely to surprise.
 
 Specifically: **do** conserve, refine, and protect the foundation; **avoid** long commitments whose payoff is years away. Within this decade, years and months whose stem element matches the favorable **Wood** energy are the cleanest moments for major commitments; the annual windows table below shows them. Years dominated by the unfavorable element are best used for rest, review, and quiet preparation.
 
@@ -194,7 +194,7 @@ A short, focused cycle designed to bring more **Wood** energy into your daily rh
 
 ## Closing Note
 
-This chart's gift is a strong companion, authority, resource and output presence that gives the querent real follow-through; the challenge is staying aware of the chart's pressure points rather than letting them run in the background. The single most useful next step is to weave the favorable **Wood** element into daily rhythm — through color, direction, season, or practice — so the chart has somewhere to land. Treat the rest of this report as a starting place; the best readings come from revisiting the same chart across different life phases.
+This chart's gift is a strong companion, authority, resource and output presence that gives you real follow-through; the challenge is staying aware of the chart's pressure points rather than letting them run in the background. The single most useful next step is to weave the favorable **Wood** element into daily rhythm — through color, direction, season, or practice — so the chart has somewhere to land. Treat the rest of this report as a starting place; the best readings come from revisiting the same chart across different life phases.
 
 ---
 
@@ -210,4 +210,4 @@ This chart's gift is a strong companion, authority, resource and output presence
 - Classical framework: 적천수 (滴天髓), 연해자평 (淵海子平), 궁통보감 (窮通寶鑑), 명리정종, 자평진전 — as compiled in `knowledge/`.
 - Method: `knowledge/09-interpretation-method.md` (9-step procedure).
 - This reading describes tendencies, not fixed outcomes; it is for reflection and entertainment — not medical, legal, or financial advice.
-- The engine's heuristic verdicts (strength, 용신) are marked provisional where the classical sources disagree; a qualified reader confirms the final reading.
+- The chart's heuristic verdicts (strength, 용신) are marked provisional where the classical sources disagree; a qualified reader confirms the final reading.

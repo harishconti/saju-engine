@@ -22,7 +22,7 @@ The Day Master is the reference point; the 용신 (favorable element) is what ea
 
 ## 2. Pairwise Partnership Compatibility
 
-Each pair is scored by the engine's 11 궁합 sub-systems *(see knowledge/11-gunghap.md §Composite Weight)*. This is the engine's own compatibility engine; a high score means the two charts interact smoothly, **not** that they should marry or partner — trust and friction are read from the day-branch (spouse/palace) and the luck-pillar synchrony in particular. **In every pair, A = the first name in the heading (the reference chart) and B = the second.**
+Each pair is scored against 11 classical 궁합 sub-systems *(see knowledge/11-gunghap.md §Composite Weight)*. A high score means the two charts interact smoothly, **not** that they should marry or partner — trust and friction are read from the day-branch (spouse/palace) and the luck-pillar synchrony in particular. **In every pair, A = the first name in the heading (the reference chart) and B = the second.**
 
 ### 2.1. Park × Seo — 78/100 (Strong)
 
