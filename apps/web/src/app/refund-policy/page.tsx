@@ -48,7 +48,7 @@ export default function RefundPolicyPage() {
 
       <h2>How refunds are processed</h2>
       <p>
-        Payments are handled by Lemon Squeezy as merchant of record, so refunds are issued through them to
+        Payments are handled by Dodo Payments as merchant of record, so refunds are issued through them to
         your original payment method. It usually lands within 5–10 business days depending on your bank.
         Refunds are always issued in the currency you paid in; small exchange-rate differences are outside
         our control.

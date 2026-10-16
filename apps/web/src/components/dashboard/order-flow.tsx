@@ -239,7 +239,7 @@ export function OrderFlow({ profiles, initialTier }: { profiles: OrderProfile[];
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                Payment is handled by Lemon Squeezy, our merchant of record, who manages sales tax and VAT.
+                Payment is handled by Dodo Payments, our merchant of record, who manages sales tax and VAT.
               </p>
             </CardContent>
           </Card>

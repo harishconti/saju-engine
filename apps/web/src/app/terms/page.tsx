@@ -56,7 +56,7 @@ export default function TermsPage() {
 
       <h2>Payment</h2>
       <p>
-        Payments are processed by Lemon Squeezy, who act as merchant of record. That means your purchase
+        Payments are processed by Dodo Payments, who act as merchant of record. That means your purchase
         contract for payment and tax purposes is with them, and they handle sales tax and VAT. Prices are in
         US dollars.
       </p>

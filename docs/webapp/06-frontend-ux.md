@@ -62,12 +62,24 @@ know. Reported by the owner right after signing up.
   page keeps producing.
 
 **Every authenticated page shares one shell.** The sidebar/mobile-nav/footer/padding markup lives in
-`components/dashboard/shell-frame.tsx` and is used by both `dashboard/layout.tsx` and
-`admin/layout.tsx`. `/admin` previously had **no layout at all**, so the review console rendered
-straight into `<body>`: no navigation, no sign-out, no route back to the dashboard and no padding — one
-missing file, reported as three separate problems ("no back button", "no dashboard button", "padding is
-not good"). The nav is what supplies the way back (`Overview` → `/dashboard`), and the queue page also
-carries an explicit `← Dashboard` action in its header.
+`components/dashboard/shell-frame.tsx`, used by **three** layouts: `dashboard/`, `admin/` and `reports/`.
+Two of those existed only because the missing one was reported as a cosmetic complaint:
+
+- `/admin` had **no layout at all**, so the review console rendered straight into `<body>` — no
+  navigation, no sign-out, no route back to the dashboard, no padding. Reported as three separate
+  problems ("no back button", "no dashboard button", "padding is not good"); it was one missing file.
+- `/reports/new` (the ordering flow) had the same gap for the same reason, and looked broken for it —
+  the wizard inside it was perfectly well structured, which is the tell: **when a page looks wrong
+  "however you arrange the contents", suspect the shell.**
+
+⚠️ **Rule: a top-level route with UI needs a layout.** Only `src/app/layout.tsx` (root) plus these three
+provide one. Anything else renders into the bare `<body>` with no padding. The audit that catches this is
+one pass over `src/app/**/page.tsx` checking each page for a shell, its own container, or a delegated one
+(`LegalLayout`, `SiteHeader`).
+
+**The ordering page itself.** `ProfileForm`-style tidiness: the inline `← Dashboard` link was removed
+once the shell supplied the nav (it was duplicated navigation rendered directly under the header), and
+the sample-report link moved from a trailing orphan paragraph into the page header's action slot.
 
 **Consent is asked for where it bites.** `ProfileForm` takes `hasConsent`; when the account holds no
 active `service` consent the form shows the privacy-policy checkbox **inline**, above the save button,

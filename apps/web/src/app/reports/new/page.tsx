@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { PageHeader } from "@/components/ui";
+import { PageHeader, buttonClasses } from "@/components/ui";
 import { OrderFlow } from "@/components/dashboard/order-flow";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -33,27 +32,23 @@ export default async function NewOrderPage({
 
   return (
     <>
-      <div className="text-sm">
-        <Link href="/dashboard" className="text-muted-foreground hover:text-foreground">
-          ← Dashboard
-        </Link>
-      </div>
-
       <PageHeader
         eyebrow="New order"
         title="Order a reading"
         description="Pick a reading, choose who it's for, and we'll take it from there. Your chart is derived from the birth details you've already saved."
+        actions={
+          <a
+            href="/demo/demo-rm-deep.pdf"
+            target="_blank"
+            rel="noreferrer"
+            className={buttonClasses("outline", "sm")}
+          >
+            See a sample report
+          </a>
+        }
       />
 
       <OrderFlow profiles={orderProfiles} initialTier={requested} />
-
-      <p className="text-xs text-muted-foreground">
-        Want to see the format first?{" "}
-        <a href="/demo/demo-rm-deep.pdf" target="_blank" rel="noreferrer" className="underline hover:text-foreground">
-          Open a sample Deep Destiny report
-        </a>
-        .
-      </p>
     </>
   );
 }

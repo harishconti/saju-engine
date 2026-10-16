@@ -12,7 +12,7 @@ const schema = z.object({ note: z.string().trim().max(200).optional() });
 
 /**
  * Manual payment. Covers three real cases: comps, invoices paid outside the MoR, and the fallback
- * when Lemon Squeezy rejects or stalls the store.
+ * when Dodo Payments rejects or stalls the store.
  *
  * Marks the order paid and queues generation — exactly what the webhook does, minus the signature.
  */

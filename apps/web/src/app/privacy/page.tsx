@@ -39,7 +39,7 @@ export default function PrivacyPage() {
           re-download and so we can answer &ldquo;what did we actually send you?&rdquo;.
         </li>
         <li>
-          <strong>Payment records:</strong> our payment provider, Lemon Squeezy, is the merchant of record.
+          <strong>Payment records:</strong> our payment provider, Dodo Payments, is the merchant of record.
           They hold your card details — we never see or store them. We keep only an order reference,
           amount, currency, and date.
         </li>
@@ -52,7 +52,7 @@ export default function PrivacyPage() {
       <h2>What we never hold</h2>
       <p>
         Card numbers, CVVs, passwords, OAuth tokens, and session tokens. Passwords and sessions are managed
-        by our authentication provider; card data is managed by Lemon Squeezy.
+        by our authentication provider; card data is managed by Dodo Payments.
       </p>
 
       <h2>Who processes data for us</h2>
@@ -70,8 +70,13 @@ export default function PrivacyPage() {
           <strong>Resend</strong> — transactional email, to tell you your report is ready.
         </li>
         <li>
-          <strong>Lemon Squeezy</strong> — payments and tax. They are the merchant of record for your
+          <strong>Dodo Payments</strong> — payments and tax. They are the merchant of record for your
           purchase.
+        </li>
+        <li>
+          <strong>Hostinger</strong> — the mailbox that receives email sent to us and to{" "}
+          {PRIVACY_EMAIL}. It holds correspondence
+          only; nothing from your account is stored there.
         </li>
         <li>
           <strong>Google</strong> — only if you choose &ldquo;Continue with Google&rdquo;, for sign-in.
@@ -89,7 +94,7 @@ export default function PrivacyPage() {
         </li>
         <li>
           Order records (amount, date, reference — no birth data): kept as long as tax and accounting rules
-          require. In practice these live with Lemon Squeezy as merchant of record.
+          require. In practice these live with Dodo Payments as merchant of record.
         </li>
       </ul>
 

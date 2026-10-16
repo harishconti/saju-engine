@@ -818,6 +818,34 @@
     look like a dead end). Webapp suite **99 → 103**. Docs: `06` (the shared shell + inline consent), `13`
     (§D2 gains both findings).
 
+  - **2026-10-16 (`/reports/new` had no shell either, and the checkout named the wrong payment company).**
+    Reported as "the /reports/new page is bad UI/UX like the previous admin page" — which was the right
+    diagnosis of the *cause*.
+    ⚠️ **The same missing file.** There is no `reports/layout.tsx`, so the ordering flow rendered into the
+    bare `<body>`: no navigation, no sign-out, no padding. Same one-file cause as `/admin`, same three
+    symptoms. The tell is worth remembering: **the wizard inside was perfectly well structured** —
+    steps indicator, clear sections, a confirm summary with a total — so when a page looks wrong *however
+    you arrange the contents*, suspect the shell. Fixed with `reports/layout.tsx` using the shared
+    `DashboardShell`; there are now **three** layouts (`dashboard/`, `admin/`, `reports/`).
+    ⚠️ **A routine audit found a much worse bug in the same pass.** Running over every `page.tsx` to see
+    which had a shell, I checked the *contents* of the ordering page too and found the checkout saying
+    *"Payment is handled by Lemon Squeezy, our merchant of record"*. The MoR is **Dodo Payments** — and it
+    was not just the checkout: the **privacy policy (four times), the terms and the refund policy** all
+    named Lemon Squeezy, and **none of them named Dodo at all**. The code (`dodo.ts`) and the documentation
+    had both been migrated correctly; the *customer-facing prose* was missed. That is the worst place to
+    be wrong — the privacy policy is where we name our sub-processors, and the checkout is where someone
+    is told who is taking their money. The privacy page also never named **Hostinger**, which holds
+    customer correspondence and is a processor under our own checklist.
+    Fixed all eight occurrences, added Hostinger to the processor list, and added
+    `src/lib/__tests__/vendor-naming.test.ts` — a deliberately lint-like guard (9 cases) asserting the
+    legal pages and the checkout name Dodo Payments, name no retired processor, and list every processor
+    we actually use. No amount of runtime testing would have caught a rename that missed files.
+    Also tidied the ordering page: the inline `← Dashboard` link went (the shell's nav made it duplicated
+    navigation right under the header) and the sample-report link moved from a trailing orphan paragraph
+    into the page header's action slot.
+    Tests: **103 → 112**. Docs: `06` (three shells + the "top-level route with UI needs a layout" rule),
+    `10` (sub-processors now named on the page, checklist item closed), `13` (§D2 gains both findings).
+
 ### Earlier state (2026-09-26)
 
 - **Two 2026-09-26 audit passes closed 22 + 16 findings, 26 of 38 fixed.** See "Recent Changes"
