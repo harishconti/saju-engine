@@ -22,6 +22,7 @@ Key scripts:
 | `src/saju_html/combine_candidate_report.py` | Merges base report + topic follow-ups into a single client deliverable. |
 | `tools/client_intake_app.html` + `tools/client_intake_app.py` | Self-service FastAPI app: `/` single-chart, `/compat` two-chart; sample tier returns a PDF instantly; paid tiers are stored in an encrypted SQLite queue (`src/saju_web/store.py`, `SAJU_INTAKE_KEY`), drafted in the background and approved by the owner. |
 | `tools/intake_admin.py` | Owner CLI: `genkey`, `list [--status]`, `show <id>`, `approve <id> --base-url`, `regenerate <id>`, `purge --days 180`. `approve` prints the private `/report/{token}` link to email. |
+| `tools/audit-ui.py` | **UI/UX audit and CI gate** for the deployed webapp: real Chrome at 390/768/1440 px in both colour schemes, reporting horizontal overflow, axe-core violations, hydration warnings, `<h1>` count, missing shells and sub-44 px controls. `--strict` fails on any of them; wired into CI as the `ui` job. See `docs/webapp/12-testing.md`. |
 | `tools/qa_compliance.py` | Optional compliance QA gate for a report markdown file (ground-rule check on generated prose). Requires `TYPESAFE_API_KEY`. |
 
 ## Running the test suite
@@ -31,6 +32,10 @@ pytest
 ```
 
 The suite currently contains ~1,909 cases (as of 2026-10-11). Core coverage includes:
+
+> **Two suites, not one.** This page covers the **Python engine**. The webapp (`apps/web`) has its own
+> Vitest suite (**112 passed / 4 skipped**) plus the UI audit above, and all three run in CI — see
+> `docs/webapp/12-testing.md`.
 
 - Foundation tables (HIDDEN_STEMS, STEM_INFO, BRANCH_INFO, SIX_*, THREE_*).
 - Stem/branch operations, 12운성, ten-god lookups, hidden stems, Nayin.

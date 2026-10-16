@@ -63,8 +63,8 @@ latency-adding regression that no assertion would otherwise catch.
 
 ## Surface 2 — Webapp unit and integration (Vitest)
 
-> **Status (2026-10-16): implemented and green — 69 passed / 4 skipped across 7 files.** No CI job runs
-> them yet, so today they only protect a developer who remembers to run `npm test`. See
+> **Status (2026-10-16): implemented and green — 112 passed / 4 skipped across 11 files, run in CI by
+the `webapp` job.** See
 > §"What actually exists" below.
 
 Node environment, Prisma mocked. The pattern that works:

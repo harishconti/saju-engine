@@ -8,7 +8,7 @@ This is a human-review product, so "operations" starts with a person.
 
 ```
 Morning (~10 min)
-  1. /admin/queue — how many reports are waiting, and how old is the oldest?
+  1. `/admin` — how many reports are waiting, and how old is the oldest?
   2. For each: preview the PDF, check the compliance QA flags,
      optionally set the 용신 override and regenerate, then approve or reject.
   3. /api/health — green?
@@ -24,7 +24,7 @@ Weekly (~15 min)
      not an engineering one.
 ```
 
-**The oldest-item age in `/admin/queue` is the single most important operational number.** It is the
+**The oldest-item age on `/admin` is the single most important operational number.** It is the
 direct measure of the promise ("reviewed and delivered within N hours") and of whether the business
 can take on more volume.
 
@@ -105,7 +105,8 @@ in ~1–2 s. Health-checking every minute would pin Neon's compute awake and bur
 | `/api/health` | uptime monitor | Any 503 for 2 consecutive checks |
 | Jobs stuck `QUEUED` | SQL on `Job` | > 5 for 15 minutes → the dispatcher is broken |
 | Jobs `FAILED` | SQL on `Job` | Any in a 24 h window → look immediately |
-| Oldest review backlog | `/admin/queue` | > 24 h → the promise is at risk |
+| Oldest review backlog | `/admin` | > 24 h → the promise is at risk |
+| UI/UX bar | `tools/audit-ui.py --strict` (CI `ui` job) | any overflow, axe violation, hydration warning or sub-44 px control — a new page or component regressing the shell is the usual cause |
 | Delivery failures | `Delivery` where `status IN ('failed','bounced')` | Any → a client is waiting and doesn't know |
 | Un-processed webhooks | `WebhookEvent` | > 0 older than 5 min → reconciliation is masking a real problem |
 | Engine latency | `durationMs` per job | p95 > 10 s → investigate cold starts or a heavier tier |
@@ -172,7 +173,7 @@ prefer explicit column lists in raw SQL over `*`.
 
 ### A report is stuck "In review" and the client is asking
 
-1. Check `/admin/queue` — is it there, or did it vanish?
+1. Check `/admin` — is the report there, or did it vanish?
 2. Check its `Job` rows: `state`, `attempts`, `lastError`.
 3. If `FAILED`, the fix is usually a profile data problem (bad city, missing gender). Correct it, then
    regenerate — do not edit the report.

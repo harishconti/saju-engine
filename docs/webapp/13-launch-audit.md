@@ -6,11 +6,12 @@ broken, and what is promised but not kept.
 Everything here was verified against the running system, not inferred from the other docs. Where a
 claim is evidence-backed, the command or response is quoted.
 
-> **Status: live, engine working — held back by a short checklist.** `https://www.cosmicsaju.com` serves
-> the real site; the database, storage, auth, payments, the report engine, and (since 2026-10-16) the
-> audio summary all work, and the contact mailbox now receives mail. What remains is the mailbox's
-> **DKIM** records, webapp CI and end-to-end tests, the Dodo test→live migration, and rotating two leaked
-> credentials. See §4.
+> **Status: live, engine working, CI gating — held back by a short checklist.** `https://www.cosmicsaju.com`
+> serves the real site; the database, storage, auth, payments, the report engine, the audio summary and the
+> contact mailbox all work. CI runs four jobs (engine ×2, webapp, and the UI/UX audit). What remains is the
+> mailbox's **DKIM** records, the Neon password rotation, a Playwright end-to-end tier, and the Dodo
+> test→live migration. **The paid path has still never run** — 0 orders, 0 jobs, 0 reports, 0 deliveries.
+> See §4.
 >
 > *Revised 2026-10-16: §B4, §D2, and the service table reflect the mailbox/contact work; `13` is a
 > point-in-time document, so dates in the evidence are kept.*
@@ -303,9 +304,13 @@ login unless it is run deliberately.
 
 **Trust and safety net:**
 
-6. A webapp CI job (lint / typecheck / vitest / build)
-7. Playwright public tier: every protected route 401s, both themes render, the sample flow completes
-8. Uptime monitor on `/api/health` (10 s timeout); wire Turnstile properly or drop the claim
+6. ~~A webapp CI job (lint / typecheck / vitest / build)~~ — **done.** Triggers on `develop`, with a
+   `webapp` job and a `ui` job that gates axe/overflow/targets at three viewports in both colour schemes
+7. Playwright public tier: every protected route 401s, and the sample flow completes end to end. ⚠️
+   Turnstile is now **deployed at `TURNSTILE_MODE=log`**, so the sample completes without solving a
+   challenge
+8. Uptime monitor on `/api/health` (10 s timeout). ⚠️ Note `GET /health` on the *engine* is a 405 — it is
+   POST-only, so a naive monitor pointed at that URL will false-alarm
 
 **Nice to have:**
 

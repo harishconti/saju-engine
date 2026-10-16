@@ -411,7 +411,7 @@ This is not an admin panel bolted on. Given decision **D5 (always review)**, it 
 that delivers the promise *"an accurate engine and an honest interpreter."*
 
 ```
-/admin/queue                 oldest-first list: tier, client, age, status
+/admin                       oldest-first list: tier, client, age, status
    │
    ▼
 /admin/reports/{id}          inline PDF preview (presigned, 15 min)
@@ -569,7 +569,7 @@ Rules:
 |---|---|
 | `/api/health` | DB (`SELECT 1`), R2 (head a known-zero-byte sentinel or list one key), engine (`POST /health`) |
 | Job health | `Job` grouped by `state`; a growing `QUEUED` count means the dispatcher is not keeping up |
-| Review backlog | `/admin/queue` age of the oldest item — the number that tells you if review is the bottleneck |
+| Review backlog | `/admin` — age of the oldest item — the number that tells you if review is the bottleneck |
 | Delivery health | `Delivery` grouped by `status` |
 | Engine latency | `durationMs` logged per job (ids only, no PII) |
 | Webhook health | Count of un-processed `WebhookEvent` rows older than 5 minutes |

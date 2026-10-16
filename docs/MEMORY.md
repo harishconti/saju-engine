@@ -1017,11 +1017,27 @@ fulfilment: ~$1–3K/month; most likely 12-month outcome is a kill/skip.
 | PDF builders | `src/saju_html/md_to_saju_pdf.py`, `src/saju_html/md_to_saju_html_pdf.py`, `src/saju_html/md_to_saju_compat_pdf.py`, `tools/build-pdf.sh` |
 | Report combiner | `src/saju_html/combine_candidate_report.py` |
 | Tests (includes cross-validation cases) | `tests/` |
+| **Webapp documentation set** | `docs/webapp/` (16 pages — start at `00-overview.md`; `06` is the UI/UX bar, `12` the test strategy) |
+| **Webapp** (Next.js, deployed to Vercel) | `apps/web/` — tokens in `src/app/globals.css`, primitives in `src/components/ui.tsx`, the shared authenticated shell in `src/components/dashboard/shell-frame.tsx` |
+| **Report-engine service** (FastAPI) | `api/index.py` at the **repo root** (Vercel project #2, root = repository root) |
+| **UI/UX audit + CI gate** | `tools/audit-ui.py` (`--strict` fails on overflow, axe, hydration or sub-44 px controls) |
+| Engine deployment config | `vercel.json` (repo root), `[tool.vercel]` in `pyproject.toml` |
+| **Deploy exclusion list** | `.vercelignore` (repo root) — keeps `.env` out of CLI uploads |
 | Per-candidate readings | `candidates_horoscope/reports/{slug}/` |
 | Client intake records (gitignored — may hold PII) | `candidates_horoscope/intake/` |
 | Slash commands | `.claude/commands/saju.md`, `.claude/commands/saju-client.md` |
 
 ## Conventions
+
+### The webapp shell (Next.js)
+- **A top-level route with UI needs a layout.** Only `src/app/layout.tsx` (root) plus `dashboard/`,
+  `admin/` and `reports/` render the shared `DashboardShell` (`src/components/dashboard/shell-frame.tsx`).
+  A page outside them renders into the bare `<body>` — no nav, no sign-out, no padding. `/admin` and
+  `/reports/new` each cost a separate bug report for exactly this.
+- **Design tokens only** (`globals.css`): the only permitted raw hex are the metadata `themeColor` and
+  Google's brand-mark SVG. `card-surface` is a real utility — what `Card` itself renders.
+- **`06-frontend-ux.md` holds the measurable bar**, and `tools/audit-ui.py --strict` is what asserts it.
+  Adding to the bar means adding to the checker and stating what the checker still does not cover.
 
 ### Report tables and golden snapshots
 - **Report primitives:** All shared report helper tables, enums, and formatting functions live in a single `src/saju_engine/report_primitives.py` module. Never re-declare a copy in another module (e.g., `prose_fillers`, `compat_report`, etc.). If you need a table or function, import it from `report_primitives`.
@@ -1084,6 +1100,26 @@ PYTHONPATH=src python3 -m saju_engine \
 
 # Build a compatibility PDF
 python3 src/saju_html/md_to_saju_compat_pdf.py <compat.md> --name-a ... --name-b ...
+
+# ── Webapp (apps/web) ──────────────────────────────────────────────────────────
+cd apps/web
+npm run dev                 # local dev server
+npm test                    # Vitest (112 cases)
+npm run lint && npm run typecheck && npm run build
+                            # the same three gates CI runs on every push
+
+# ── UI/UX audit (repo root) ────────────────────────────────────────────────────
+python3 tools/audit-ui.py --strict
+                            # real Chrome at 390/768/1440 in BOTH colour schemes: horizontal
+                            # overflow, axe-core, hydration warnings, <h1> count, shells, and
+                            # sub-44 px controls. 0 issues is the current state.
+AUDIT_EMAIL=… AUDIT_PASSWORD=… python3 tools/audit-ui.py
+                            # also the pages behind the login — use a THROWAWAY account and delete
+                            # it afterwards (neon neon-auth user delete <id> + the User row)
+
+# ── Deploying the webapp (CLI, from the repo root) ──────────────────────────────
+# The Vercel project's Root Directory is apps/web, and the CLI applies it relative to the upload,
+# so deploying from inside apps/web fails. From the repo root: a temporary .vercel/project.json.
 ```
 
 ## Active Wishes / Open Items

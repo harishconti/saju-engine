@@ -8,21 +8,27 @@ numerals and pillar tables, and the 오방색 five-element tokens.
 ## Route map
 
 ```
-PUBLIC                                 AUTHENTICATED                    ADMIN
-────────────────────────────────       ────────────────────────────     ──────────────────────
-/                  landing             /dashboard        overview       /admin               
-/sample            free sample flow    /dashboard/reports  library       /admin/queue
-/pricing           (anchor on /)       /dashboard/profiles profiles      /admin/reports/{id}
-/about             (anchor on /)       /dashboard/orders   purchases     /admin/orders
-/faq               (anchor on /)       /dashboard/account  settings
-/privacy           legal               /reports/new        order flow
-/terms             legal               /reports/{id}       report detail
-/refund-policy     legal (required by
-                    Dodo Payments)
-/login             sign in / sign up
+PUBLIC                                 AUTHENTICATED                        ADMIN
+────────────────────────────────       ──────────────────────────────       ──────────────────────
+/                  landing + sections  /dashboard          overview          /admin
+/sample            free sample flow    /dashboard/reports  library           /admin/reports/{id}
+/privacy           legal               /dashboard/reports/{id}  one report
+/terms             legal               /dashboard/profiles people
+/refund-policy     legal (required by  /dashboard/orders   purchases
+                    Dodo Payments)     /dashboard/account  settings + consent + deletion
+/login             sign in / sign up   /reports/new        order flow
 /auth/complete     OAuth / magic-link landing
-/consent           consent management
 ```
+
+This map is the build output, not an intention — it was corrected on 2026-10-16 because it listed
+`/admin/queue`, `/admin/orders`, `/consent` and `/reports/{id}`, **none of which exist**. `/pricing`,
+`/about` and `/faq` are anchors on `/`, not routes; the review queue *is* `/admin`; consent is managed on
+`/dashboard/account`; and a single report is `/dashboard/reports/{id}`.
+
+**Every authenticated and admin route sits inside a layout that renders `DashboardShell`**
+(`dashboard/`, `admin/`, `reports/`). A top-level route with UI that is not inside one renders straight
+into the bare `<body>` — no nav, no padding — which is what made `/admin` and `/reports/new` look broken.
+The audit tool reports such a page as `NO SHELL`.
 
 The landing page is **one route with anchored sections**, not eight routes. That matches the existing
 9-section narrative arc, keeps internal links cheap, and means the marketing content is one Server

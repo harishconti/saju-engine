@@ -44,7 +44,8 @@ additive.
 | 0.9 | Create both Vercel projects with root directories | ✅ `saju-engine` (root `apps/web`) and `saju-report-engine` (root = repo root) |
 | 0.10 | Domain: A/CNAME in **Cloudflare**, domain attached in Vercel | ✅ Domain card **Valid Configuration**; apex 308 → www; `https://www.cosmicsaju.com` serves the app |
 | 0.11 | **Mailbox + aliases, records published in Cloudflare** | ✅ `hello@` + aliases live; MX/SPF/DMARC published **in Cloudflare** (a mail host cannot write to a zone it does not host) and **receiving verified** (`delivered`); published contact split and `EMAIL_REPLY_TO` wired. ⚠️ The DKIM CNAMEs are still to add ([07](07-services-and-integrations.md) §Mailbox records) |
-| 0.12 | Password manager entry with every credential | Inventory complete; nothing only in a chat window |
+| 0.12 | **Cloudflare Turnstile** widget + keys, deployed at **`TURNSTILE_MODE=log`** | Built and deployed; it verifies and records but never refuses, because an unrendered widget plus an enforcing server took the funnel down on 2026-10-16. Flip to `enforce` only after a **real browser** is seen completing the challenge ([09](09-operations.md)) |
+| 0.13 | Password manager entry with every credential | Inventory complete; nothing only in a chat window |
 
 **Exit:** all `dig` checks in [07](07-services-and-integrations.md) pass; both Vercel projects deploy.
 
@@ -147,7 +148,7 @@ mid-run leaves the job reclaimable; a forced engine `500` retries then fails cle
 | # | Task | Notes |
 |---|---|---|
 | 5.1 | `/admin` gate: `role = ADMIN` **and** email in `ADMIN_EMAILS` | Two independent conditions |
-| 5.2 | `/admin/queue` — oldest-first, age, tier, client | The oldest-item age is the key operational metric |
+| 5.2 | `/admin` — oldest-first, age, tier, client | The oldest-item age is the key operational metric |
 | 5.3 | Inline PDF preview (presigned, 15 min) | Keyboard-navigable |
 | 5.4 | **용신 override** control + `POST /override` | The headline feature |
 | 5.5 | Regenerate → `Job(REGENERATE)` → new `Report.version`, old → `SUPERSEDED` | `chartHash` short-circuits no-op regens |
@@ -196,7 +197,8 @@ signature is rejected; the reconciliation query returns zero rows.
 | 7.2 | Design tokens: 오방색 `--el-*`, Cormorant + IBM Plex Mono, elemental rule motif | Inherited, not reinvented |
 | 7.3 | `src/components/viz/*` SVG set | FourPillarsChart, ElementBalance, LuckTimeline, DayMasterBadge, SealMark, KoreanWatermark |
 | 7.4 | `/sample` flow: birth data → confirm pillars → result → "keep this" | **Do not gate behind sign-up** |
-| 7.5 | Turnstile on the sample endpoint | |
+| 7.5 | Turnstile on the sample endpoint | ✅ Deployed at `TURNSTILE_MODE=log`; enforcement is opt-in until the widget is confirmed in a real browser |
+| 7.6 | UI/UX audit gate (`tools/audit-ui.py --strict`) | ✅ In CI as the `ui` job — axe, horizontal overflow, hydration and sub-44 px controls, at three viewports in both colour schemes |
 | 7.6 | Save-sample-to-profile path | Creates `Profile` + `Report` so it appears in the dashboard |
 | 7.7 | **Replace or remove the fabricated testimonials** | Documented FTC risk (LP3) |
 | 7.8 | Delivery-window copy matching the review workflow | |

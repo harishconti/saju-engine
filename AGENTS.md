@@ -77,6 +77,15 @@ Cross-cutting rules:
 - A tier or price change → update `docs/webapp/02-data-model.md` (tier map),
   `docs/webapp/07-services-and-integrations.md` (store config), **and**
   `docs/openwiki/products/reports.md`.
+- **A new top-level route with UI → give it a layout.** Only `src/app/layout.tsx` (root) plus
+  `dashboard/`, `admin/` and `reports/` render the shared `DashboardShell`. A page outside them renders
+  into the bare `<body>`: no nav, no sign-out, no padding — which is what made `/admin` and
+  `/reports/new` look broken, and was reported as *three* separate cosmetic bugs each time. The audit
+  reports such a page as `NO SHELL`, but the fix is the layout, not the page.
+- **Before claiming a frontend bar is met, run `python3 tools/audit-ui.py --strict`.** `06-frontend-ux.md`
+  states a measurable bar; four of this project's bugs were documentation asserting a control the code did
+  not have (`requiresReview`, `turnstileToken`, the admin role, the light theme). If you add to that bar,
+  add it to the checker and say what the checker still does not cover.
 
 ## Out of scope
 

@@ -246,6 +246,7 @@ the GitHub link).
 
 | Job | Steps |
 |---|---|
+| **ui** — the `tools/audit-ui.py` gate | builds, serves on `localhost:3000`, installs a Playwright browser, then runs the audit with `--strict` — axe (§ [12](12-testing.md)), horizontal overflow, hydration warnings and sub-44 px controls, at 390/768/1440 in **both colour schemes**. Build, serve and audit are one step, because a background server started in one step is not guaranteed to survive into the next |
 | **engine** — Python 3.10 and 3.12 | `pip install -e ".[dev,html,web]"` plus `-r requirements.txt` → Playwright **chromium** → `ruff check --select F src tools tests api` → `pytest -q` → `tools/run_validation.py` (the cited-fixture gate) |
 | **webapp** — Node 24.x | `npm ci` → **`prisma generate`** → `lint` → `typecheck` → `vitest run` → `next build` |
 
@@ -269,7 +270,7 @@ env:
 ```
 
 Verified locally by running all five webapp steps with exactly those placeholders and nothing else —
-`lint`, `typecheck`, 80 tests and `next build` all pass.
+`lint`, `typecheck`, 112 tests and `next build` all pass.
 
 ### ⚠️ `vercel deploy` uploads the working tree — keep `.env` out of it
 

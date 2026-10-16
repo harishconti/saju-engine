@@ -89,6 +89,7 @@ saju/
 │   ├── build-pdf.sh                   # Wrapper script (sets up PYTHONPATH, forwards flags)
 │   ├── client_intake_app.html         # Self-service form with PDF download
 │   ├── client_intake_app.py           # FastAPI self-service app that returns tiered PDFs
+│   ├── audit-ui.py                    # ⭐ UI/UX audit + CI gate (real Chrome, axe-core, both colour schemes)
 │   ├── qa_compliance.py               # Optional compliance QA gate (needs TYPESAFE_API_KEY)
 │   └── client_compat_intake_form.html # Two-chart compat intake form (Partner A × Partner B), served at /compat
 ├── api/
