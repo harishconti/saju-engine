@@ -1,0 +1,277 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────
+   Cosmic Saju design tokens
+
+   Dark cosmic base + gold accent, the five-element (오방색) palette as
+   data-viz colors. Dark is the DEFAULT brand surface: base values live in
+   :root so there is no flash and no theme script. `.theme-light` on <html>
+   swaps to the light surface.
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  color-scheme: dark;
+
+  --background: #08080d;
+  --surface: #0d0d15;
+  --foreground: #ece8df;
+
+  --card: #11111a;
+  --card-foreground: #ece8df;
+
+  --muted: #16161f;
+  --muted-foreground: #a09a8e;
+
+  --primary: #c8a34a;
+  --primary-foreground: #0b0b10;
+
+  --accent: #7f6ad1;
+  --accent-foreground: #f2f0ff;
+
+  --border: #23232f;
+  --input: #23232f;
+  --ring: #c8a34a;
+
+  --destructive: #d1553f;
+  --success: #3f9d6b;
+  --warning: #d8a13a;
+
+  /* 오방색 — five elements */
+  --el-wood: #4fae7c;
+  --el-fire: #e0674f;
+  --el-earth: #d9b44a;
+  --el-metal: #b9bec7;
+  --el-water: #4f8fd9;
+
+  --radius: 0.625rem;
+}
+
+.theme-light {
+  color-scheme: light;
+
+  --background: #fbfaf7;
+  --surface: #ffffff;
+  --foreground: #1a1a1f;
+
+  --card: #ffffff;
+  --card-foreground: #1a1a1f;
+
+  --muted: #f2f0ea;
+  --muted-foreground: #6b6558;
+
+  --primary: #8a6d1f;
+  --primary-foreground: #ffffff;
+
+  --accent: #5b46a8;
+  --accent-foreground: #ffffff;
+
+  --border: #e2ded4;
+  --input: #e2ded4;
+  --ring: #8a6d1f;
+
+  --destructive: #b03a26;
+  --success: #2f7a52;
+  --warning: #9a6b12;
+
+  --el-wood: #2f7d57;
+  --el-fire: #b8442e;
+  --el-earth: #9a7c17;
+  --el-metal: #7b8089;
+  --el-water: #2f68a8;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-wood: var(--el-wood);
+  --color-fire: var(--el-fire);
+  --color-earth: var(--el-earth);
+  --color-metal: var(--el-metal);
+  --color-water: var(--el-water);
+
+  --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+/* ── Typography helpers ─────────────────────────────────────── */
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 1.4rem + 3.4vw, 4rem);
+  line-height: 1.05;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.5rem);
+  line-height: 1.12;
+  font-weight: 600;
+}
+
+.lede {
+  font-size: clamp(1rem, 0.96rem + 0.3vw, 1.1875rem);
+  line-height: 1.7;
+  color: var(--muted-foreground);
+}
+
+/* Pillar / Hanja display: monospace keeps the glyph columns aligned */
+.pillar {
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+}
+
+/* ── Motifs ─────────────────────────────────────────────────── */
+
+/* Elemental gradient rule: wood → fire → earth → metal → water */
+.el-rule {
+  height: 2px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    90deg,
+    var(--el-wood),
+    var(--el-fire),
+    var(--el-earth),
+    var(--el-metal),
+    var(--el-water)
+  );
+}
+
+/* 四柱 watermark */
+.kr-watermark {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  font-family: var(--font-display);
+  font-size: clamp(6rem, 22vw, 18rem);
+  line-height: 1;
+  color: var(--foreground);
+  opacity: 0.035;
+  user-select: none;
+}
+
+.seal-mark {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--primary);
+  border-radius: 0.375rem;
+  color: var(--primary);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.card-surface {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.grid-noise {
+  background-image:
+    radial-gradient(circle at 20% 15%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 45%),
+    radial-gradient(circle at 82% 8%, color-mix(in srgb, var(--primary) 10%, transparent), transparent 40%);
+}
+
+/* ── Motion ─────────────────────────────────────────────────── */
+
+@keyframes stamp-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(1.06);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-stamp {
+  animation: stamp-in 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-reveal {
+  animation: reveal 260ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-stamp,
+  .animate-reveal {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Focus visibility — keyboard users must see it, everywhere. */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}

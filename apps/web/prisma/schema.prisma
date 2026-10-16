@@ -1,0 +1,375 @@
+// Cosmic Saju webapp — data model.
+// Normative reference: docs/webapp/02-data-model.md
+//
+// Rules:
+//  - Birth data lives on `Profile` ONLY. Orders reference profiles; never duplicate birth data.
+//  - Reports are immutable once DELIVERED. A change creates a new `version`.
+//  - All operational state is a table (rate limits, idempotency, job leases, R2 deletion queue).
+//  - Never touch the `neon_auth` schema — Neon Auth owns it.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // pooled — runtime traffic
+  directUrl = env("DIRECT_URL") // direct/unpooled — migrations only
+}
+
+// ─────────────────────────────── Identity ───────────────────────────────
+
+model User {
+  id        String    @id // = Neon Auth user id. No default.
+  email     String    @unique
+  name      String
+  role      Role      @default(USER)
+  locale    String    @default("en")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // set on erasure: account anonymised, retained for records
+
+  profiles        Profile[]
+  orders          Order[]
+  reports         Report[]
+  reviewedReports Report[]          @relation("ReportReviewer")
+  deliveries      Delivery[]
+  consents        ConsentRecord[]
+  deletions       DeletionRequest[]
+  auditLogs       AuditLog[]
+  idempotency     IdempotencyKey[]
+
+  @@index([deletedAt])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// ─────────────────────────────── Birth data ───────────────────────────────
+
+model Profile {
+  id              String    @id @default(cuid())
+  userId          String
+  label           String // "Me", "Partner — Jisoo"
+  fullName        String
+  gender          Gender // required: 대운 direction is undefined without it
+  birthDate       DateTime  @db.Date
+  birthTime       String // "HH:MM", 24h, local wall clock at the birthplace
+  timezone        String? // IANA, e.g. "Asia/Seoul". Preferred over utcOffset.
+  utcOffset       Decimal?  @db.Decimal(4, 2) // fallback when the zone is unknown; [-12, 14]
+  city            String
+  country         String
+  latitude        Decimal?  @db.Decimal(9, 6)
+  longitude       Decimal?  @db.Decimal(9, 6) // drives solar-time correction
+  timeKnown       Boolean   @default(true) // false => hour pillar is uncertain; surface a caveat
+  isDefault       Boolean   @default(false)
+  // Derived chart summary, computed ONCE when the profile is created (never at read time).
+  // Lets the dashboard and the order flow show the four pillars for confirmation before payment —
+  // a project ground rule (CLAUDE.md: no silent auto-calculated pillars).
+  // Shape: { pillars: [{stem,branch,label}], dayMaster: {...}, elementBalance: {...}, ... }
+  chartJson       Json?
+  chartComputedAt DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ordersAsA  Order[]  @relation("OrderProfileA")
+  ordersAsB  Order[]  @relation("OrderProfileB")
+  reportsAsA Report[] @relation("ReportProfileA")
+  reportsAsB Report[] @relation("ReportProfileB")
+
+  @@index([userId, deletedAt])
+}
+
+enum Gender {
+  M
+  F
+}
+
+// ─────────────────────────────── Commerce ───────────────────────────────
+
+model Order {
+  id     String      @id @default(cuid())
+  userId String
+  kind   OrderKind
+  tier   String // engine tier — see src/lib/tiers.ts
+  status OrderStatus @default(AWAITING_PAYMENT)
+
+  priceCents Int // resolved server-side. Never taken from the client.
+  currency   String @default("USD")
+
+  provider           String? // "lemonsqueezy" | "manual"
+  providerOrderId    String?   @unique
+  providerCheckoutId String?
+  paidAt             DateTime?
+
+  profileAId         String
+  profileBId         String? // required when kind = COMPAT
+  favorableOverrideA String? // reader-argued 용신; set by a reviewer, never by the client
+  favorableOverrideB String?
+
+  idempotencyKey String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profileA Profile  @relation("OrderProfileA", fields: [profileAId], references: [id])
+  profileB Profile? @relation("OrderProfileB", fields: [profileBId], references: [id])
+  jobs     Job[]
+  reports  Report[]
+
+  @@unique([userId, idempotencyKey])
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+
+enum OrderKind {
+  SINGLE
+  COMPAT
+}
+
+enum OrderStatus {
+  AWAITING_PAYMENT
+  PAID
+  CANCELLED // abandoned or refunded
+  REFUNDED
+}
+
+// ─────────────────────────────── Work ───────────────────────────────
+
+model Job {
+  id       String   @id @default(cuid())
+  orderId  String
+  // VOICE jobs produce the audio for one report, so they carry the report id as well.
+  // `orderId` is a required FK to Order, so both are set — the report's order is known.
+  reportId String?
+  kind     JobKind  @default(GENERATE)
+  state    JobState @default(QUEUED)
+
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(3)
+  leaseUntil  DateTime? // claimed until this instant
+  worker      String? // dispatcher invocation id, for forensics
+
+  payload    Json? // the exact engine request, including overrides
+  lastError  String? // exception class / code only. Never PII.
+  startedAt  DateTime?
+  finishedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  order  Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  report Report? @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([state, createdAt])
+  @@index([leaseUntil])
+  @@index([reportId])
+}
+
+enum JobKind {
+  GENERATE
+  REGENERATE
+  VOICE
+}
+
+enum JobState {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+model Report {
+  id      String       @id @default(cuid())
+  orderId String? // null for a saved free sample
+  userId  String
+  kind    OrderKind
+  tier    String
+  version Int          @default(1)
+  status  ReportStatus @default(DRAFT_READY)
+
+  profileAId String
+  profileBId String?
+
+  pdfKey    String? // R2 object key
+  mdKey     String? // source markdown, kept for audit/re-render
+  sha256    String? // integrity check on download
+  bytes     Int?
+  pageCount Int?
+
+  chartHash     String? // hash of (chart inputs + overrides); skips no-op regens
+  engineVersion String?
+
+  // The exact engine request that produced this report. Stored so the audio script can be
+  // derived from what was actually approved rather than recomputed later — an engine
+  // deploy in between could otherwise change the words a client hears.
+  enginePayload Json?
+
+  // The spoken-word audio summary (deep single-chart tier only).
+  // `script` is the deterministic narration derived from `mdKey`; the MP3 is its voice.
+  script       String?     @db.Text
+  audioKey     String? // R2 object key for the .mp3
+  audioBytes   Int?
+  audioStatus  AudioStatus @default(NONE)
+  audioError   String? // class name / short code only, never PII
+  audioReadyAt DateTime?
+
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  deliveredAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  order      Order?     @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewer   User?      @relation("ReportReviewer", fields: [reviewedBy], references: [id])
+  profileA   Profile    @relation("ReportProfileA", fields: [profileAId], references: [id])
+  profileB   Profile?   @relation("ReportProfileB", fields: [profileBId], references: [id])
+  deliveries Delivery[]
+  jobs       Job[]
+
+  @@unique([orderId, version])
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+
+enum AudioStatus {
+  NONE // no audio is promised for this report (compatibility, or a tier without a summary)
+  PENDING // approved, waiting for a dispatcher tick
+  PROCESSING // text-to-speech in flight
+  READY
+  FAILED // retryable from the admin console
+}
+
+enum ReportStatus {
+  DRAFT_READY
+  IN_REVIEW
+  APPROVED
+  DELIVERED
+  SUPERSEDED
+  FAILED
+}
+
+model Delivery {
+  id                String    @id @default(cuid())
+  reportId          String
+  userId            String
+  /// Which message this is. A Deep report produces two: the reading, then the audio.
+  kind              String    @default("report")
+  channel           Channel
+  to                String?
+  provider          String? // "resend"
+  providerMessageId String?
+  status            String // queued|sent|bounced|complained|failed
+  error             String?
+  sentAt            DateTime?
+  createdAt         DateTime  @default(now())
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
+  @@index([userId, createdAt])
+}
+
+enum Channel {
+  EMAIL
+  PROFILE
+}
+
+// ─────────────────────────────── Operations ───────────────────────────────
+
+model WebhookEvent {
+  id          String    @id @default(cuid())
+  provider    String // "lemonsqueezy" | "resend"
+  eventId     String
+  type        String
+  payload     Json
+  receivedAt  DateTime  @default(now())
+  processedAt DateTime?
+  error       String?
+
+  @@unique([provider, eventId]) // the idempotency guarantee that matters most
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  entity    String // "order" | "report" | "profile" | "user" | "consent" | "deletion" | "webhook"
+  entityId  String
+  action    String // "create" | "update" | "approve" | "regenerate" | "deliver" | "delete" | "role_change" | "override"
+  actorId   String? // null = system (cron, webhook)
+  before    Json?
+  after     Json?
+  ip        String?
+  ua        String?
+  createdAt DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id])
+
+  @@index([entity, entityId])
+  @@index([actorId, createdAt])
+  @@index([createdAt])
+}
+
+model RateLimit {
+  bucket      String
+  windowStart DateTime
+  count       Int      @default(0)
+
+  @@id([bucket, windowStart])
+}
+
+model IdempotencyKey {
+  id          String   @id @default(cuid())
+  userId      String
+  key         String
+  requestHash String
+  response    Json?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key])
+}
+
+model ObjectDeletion {
+  id        String   @id @default(cuid())
+  fileKey   String
+  attempts  Int      @default(0)
+  lastError String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+// ─────────────────────────────── Privacy ───────────────────────────────
+
+model ConsentRecord {
+  id            String    @id @default(cuid())
+  userId        String
+  policyVersion String
+  purposes      Json // { "service": true, "service_messages": false }
+  grantedAt     DateTime  @default(now())
+  withdrawnAt   DateTime?
+  ip            String?
+  ua            String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, grantedAt])
+}
+
+model DeletionRequest {
+  id           String    @id @default(cuid())
+  userId       String
+  status       String    @default("pending") // pending | cancelled | completed
+  reason       String?
+  requestedAt  DateTime  @default(now())
+  scheduledFor DateTime
+  completedAt  DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status, scheduledFor])
+}

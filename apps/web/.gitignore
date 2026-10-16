@@ -1,0 +1,45 @@
+# dependencies
+node_modules
+/.pnp
+.pnp.*
+
+# next.js
+/.next/
+/out/
+/build
+
+# testing
+/coverage
+/playwright-report
+/test-results
+
+# misc
+.DS_Store
+*.pem
+Thumbs.db
+*.log
+
+# env — never commit real values.
+# Catch-all, then re-allow the committed template only. This covers .env.local,
+# .env.production, and any scratch copy (e.g. `vercel env pull .env.vchk`).
+.env
+.env.*
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# prisma
+/prisma/*.db
+/prisma/*.db-journal
+
+# env — these rules MUST come last. A later `.env*` match beats an earlier `!.env.example`
+# negation, so putting the re-allow anywhere above a `.env*` line silently drops the committed
+# template from the repo. `.env*` here covers .env, .env.local, .env.production and any scratch
+# copy (e.g. `vercel env pull .env.vchk`).
+.env*
+!.env.example
