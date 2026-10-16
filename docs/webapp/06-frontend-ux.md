@@ -223,7 +223,16 @@ rule in [07](07-services-and-integrations.md) §CORS.
 The acceptance bar carried over from the previous redesign, and still the bar:
 
 - Lighthouse ≥ the pre-redesign baseline.
-- No horizontal body scroll at 390 / 768 / 1440.
+- No horizontal body scroll at **360** / 390 / 768 / 1440, and **no element extending past the
+  viewport** at those widths. 360 is the default logical width of most Android phones — the smallest
+  width this bar claims — and it is checked because a 390-only audit missed a real defect: the landing
+  header's CTA ran 27px past a 360dp viewport and was **clipped**, so nothing scrolled to reveal it and
+  a page-level scroll check saw nothing. Only an element-level check at the real width could see it
+  (2026-10-17).
+- **What the checker still does not cover**, so it is not read as more than it is: 320dp (the smallest
+  devices), text clipped *inside* an element that is itself within the viewport (a squeezed button or
+  an ellipsised label), and whether a horizontally scrollable table is *discoverable* as swipeable on a
+  phone. The wide tier-comparison table is exempt on purpose — it sits in an `overflow-x-auto` box.
 - Zero hydration warnings.
 - `prefers-reduced-motion` leaves all content visible.
 - Light and dark both render on every screen.

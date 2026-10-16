@@ -189,7 +189,7 @@ test is the reason it cannot happen again.
 ## Specialised gate 3 — the UI/UX audit (`tools/audit-ui.py`)
 
 `06-frontend-ux.md` states an acceptance bar of measurable things — no horizontal body scroll at
-390 / 768 / 1440, zero hydration warnings, axe clean on every screen, ≥44 px touch targets, one `<h1>`
+360 / 390 / 768 / 1440, zero hydration warnings, axe clean on every screen, ≥44 px touch targets, one `<h1>`
 per page, both themes — so none of it should be a matter of opinion. This runs the measurements in a
 real Chrome against a deployed URL:
 
@@ -337,7 +337,7 @@ invariants, ten tests, minimum.
 
 The web document is served *and* downloaded, so it has to stand on its own. The tests
 assert the properties that make that true, and the same measurements the app's UI bar
-uses were taken on a real report through headless Chrome at 390 / 768 / 1440 px:
+uses were taken on a real report through headless Chrome at 360 / 390 / 768 / 1440 px:
 
 | Check | Why |
 |---|---|

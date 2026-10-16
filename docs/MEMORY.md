@@ -1285,6 +1285,29 @@
     So the route logic is unit-tested and the wiring typechecks, but nobody has clicked "Read the reading" in the
     deployed console yet. `docs/webapp/12-testing.md` lists the route for that spec.
 
+  - **2026-10-17 (the mobile header was clipped at 360dp — and the UI audit had been looking at 390).** Owner sent a
+    phone screenshot: "top screen from mobile still not well padded" and "screen seems left aligned instead of centre
+    aligned". Both symptoms were one defect, and neither was padding.
+    ✅ **What it was.** At 360dp — the default logical width of most Android phones, and **the smallest width the bar
+    claims** — the header could not fit the wordmark, a sign-in link and a full-length CTA. The CTA's rect ran to
+    **387px on a 360px viewport**, so its right 27px was clipped; nothing scrolled to reveal it, because the overflow
+    was clipped by the layout rather than expanding the document. That is why the page read as left-shifted with uneven
+    "padding" — the whole row was simply wider than the phone.
+    ✅ **Fixed in the header** (`components/site.tsx`): below `sm` the brand shows the seal mark alone (the link keeps
+    its accessible name via `aria-label`), the CTA shortens to "Free snapshot", the actions group is `shrink-0`, and the
+    row is `flex-wrap` + `min-h-16` so 320dp wraps instead of clipping. Measured after: CTA right edge **304 / 344 /
+    374** at 320 / 360 / 390 — inside the viewport at every width, `scrollWidth == innerWidth`, header height 67px.
+    ✅ **And the checker was taught to look there.** `tools/audit-ui.py` now includes a **360dp `phone` viewport**
+    alongside 390 / 768 / 1440. It already had the right *kind* of check (any element whose rect passes the viewport
+    fails, exemptions for genuinely swipeable ancestors) — it was simply measuring 390, where the header happens to
+    fit. This is the third time this session that the gap was the checker's scope rather than its logic, so `06` now
+    states, in the bar itself, what it still does **not** cover: **320dp, text clipped inside an element that is
+    itself within the viewport, and whether a scrollable table is discoverable as swipeable.** (The wide tier
+    comparison table is exempt on purpose — it sits in an `overflow-x-auto` box, verified.)
+    ⚠️ **Honest note about the "centre aligned" half:** the hero is left-aligned by design, and the content containers
+    are symmetric (16px each side, verified). The asymmetry the owner saw was the clipped row. If they want the *hero*
+    centred on mobile that is a separate design choice, not a bug — offered, not assumed.
+
 ### Earlier state (2026-09-26)
 
   - **2026-10-16 (the reading joins the design system — "the report UI is very ugly").** Owner feedback on the web

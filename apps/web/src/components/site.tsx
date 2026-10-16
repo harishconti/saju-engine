@@ -34,10 +34,14 @@ export function SiteHeader({
 }) {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-3">
+      {/* At 360dp — a normal Android phone — the wordmark, a sign-in link and a full CTA cannot share
+          one row: the CTA used to run 27px past the viewport and be clipped, with nothing scrolling to
+          reveal it. Below `sm` the mark stands alone (the link keeps its accessible name), the CTA
+          shortens, and the row may wrap rather than clip at 320dp. */}
+      <div className="mx-auto flex min-h-16 max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-2 sm:h-16 sm:flex-nowrap sm:py-0 sm:px-6">
+        <Link href="/" aria-label="Cosmic Saju — home" className="flex min-w-0 shrink-0 items-center gap-3">
           <SealMark char="四" />
-          <span className="font-display text-xl leading-none">
+          <span className="hidden font-display text-xl leading-none sm:inline">
             Cosmic Saju
             <span className="ml-2 hidden align-middle font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground sm:inline">
               사주
@@ -53,7 +57,7 @@ export function SiteHeader({
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           {user ? (
             <Link href="/dashboard" className={buttonClasses("primary", "sm")}>
               Dashboard
@@ -65,7 +69,8 @@ export function SiteHeader({
           )}
           {cta ? (
             <Link href="/sample" className={buttonClasses(user ? "outline" : "primary", "sm")}>
-              Free chart snapshot
+                <span className="sm:hidden">Free snapshot</span>
+                <span className="hidden sm:inline">Free chart snapshot</span>
             </Link>
           ) : null}
         </div>

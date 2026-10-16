@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """UI/UX audit — measures every page against the bar stated in docs/webapp/06-frontend-ux.md.
 
-Why it exists: that page sets an explicit acceptance bar — no horizontal body scroll at 390 / 768 /
+Why it exists: that page sets an explicit acceptance bar — no horizontal body scroll at 360 / 390 / 768 /
 1440, zero hydration warnings, axe clean on every screen, ≥44 px touch targets, one `<h1>`, both themes.
 Every one of those is *measurable*, so none of them should be a matter of opinion. This runs the
 measurements in a real browser instead of reading the markup and guessing.
