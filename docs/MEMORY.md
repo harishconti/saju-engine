@@ -1648,6 +1648,43 @@
     Docs: `02` (the model + retention), `03` (the route, `sampleId`), `06` (the corrected flow and the email step),
     `10` (data table, retention, §Email) and the privacy page. Webapp **145 → 149**; `share_card` and
     `sample_email_captured` join the analytics funnel.
+
+  - **2026-10-17 (the birthplace picker could not spell the birthplaces this product was built for).**
+    Owner: *"place of birth has very few places, in india have even fewer."* Worse than it sounds — it was a
+    wall, not a short list. `/sample` refuses to submit unless the typed place resolves, and the table held
+    **156 cities, 12 of them Indian**. **Every birthplace this repository's own reports use was missing**:
+    Pallipattu (the owner's), Vellore, Ambur, Tirupati, Kolar, Mysore. The picker could not express the charts
+    the engine had already produced.
+    ✅ **A real index.** `tools/build-cities.py` builds `apps/web/public/city-index.json` from GeoNames
+    `cities5000` — **69,818 places** (2.6 MB, **0.83 MB gzipped**), fetched in the background on mount because
+    typing a birthplace is not optional on that screen. It is a *static asset*, so coordinates still resolve
+    once from data we ship and the engine still receives explicit values (E2); nothing is geocoded at request
+    time and no birthplace guess leaves our origin.
+    ✅ **Size was a design constraint, not an afterthought.** The first attempt shipped alternate names for
+    every row and came to **5.44 MB / 1.68 MB gzipped** — minutes on the connections this feature exists to
+    serve. Dropping them and indexing the 371 distinct timezones (rather than repeating a zone string 70,000
+    times) took it to 0.83 MB. The handful of exonyms that matter live in a curated alias map instead.
+    ✅ **Three silent-wrong-chart bugs found and fixed while doing it, all now under test.**
+      (1) **`resolveBirthLocation` silently substituted another city.** An unresolved birthplace fell back to
+      the *first city of the given country* — for India, **Mumbai**. From Pallipattu that is 6.5° of longitude,
+      about half an hour of solar time, enough to move the hour pillar. It now refuses (`422 CITY_NOT_RESOLVED`).
+      This is precisely the "a refusal is honest, a silent fallback is a wrong chart" rule E2 states.
+      (2) **70,000 places made bare names ambiguous.** There are Cambridges in four countries, in four
+      timezones (CA/NZ/GB/US). An option carrying only the name made them unselectable and could resolve a UK
+      birth to Canada. Options now carry `"Name, Country"` and an ambiguous bare name is refused rather than
+      guessed.
+      (3) **The alias map was mostly dead.** The first hand-written version had **15 dead targets out of 45**,
+      because GeoNames uses the English exonym for some cities ("Munich", "The Hague") and a transliteration for
+      others ("Koeln", "Zuerich"). The map is now generated and the build **fails on a dead target**.
+    ⚠️ **A wrong fixture caught by the change.** `birth.test.ts` used "Atlantis" as its fictional city — it is a
+    real town in South Africa, and it started resolving. Replaced with a name that cannot exist. (And the
+    `cities5000` set is why "Pallipattu" is present at all: it is in `cities5000` and **not** in `cities15000`.)
+    ✅ **Licence honoured:** GeoNames is CC BY 4.0, so the footer attributes it — a condition of use, not a
+    courtesy. `next.config.ts` gains `outputFileTracingIncludes` for the JSON, because a file read through
+    `cwd` is invisible to Next's tracing and would have shipped a build that failed at request time with ENOENT.
+    Docs: `06` (the picker's three rules), `10` (it is not personal data, and nothing is disclosed to a
+    geocoder), the openwiki toolchain, and the footer. Webapp **149 → 156**. Verified in a real browser:
+    "Pallipattu" → *Pallipattu, India*, "Mysore" → *Mysuru, India*, "Cambridge" → four countries.
     Docs: `07` (the service row), `10` (sub-processors + the privacy page copy). No env var and no `08` change —
     the toggle is a dashboard setting, not configuration in the repo.
 

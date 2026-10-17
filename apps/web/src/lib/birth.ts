@@ -10,7 +10,10 @@
  * historical and DST aware for the birth date.
  */
 
-import { CITIES, findCity, type City } from "./cities";
+import { findCity, type City } from "./cities";
+// Side effect: hydrate the world place index from the shipped data, so a birthplace the browser could
+// resolve is also resolvable here. Without it the two halves would disagree about which places exist.
+import "./city-data.server";
 import { ApiError } from "./api";
 
 export interface ResolvedLocation {
@@ -52,14 +55,14 @@ export function resolveBirthLocation(input: {
   countryCode?: string | null;
   country?: string | null;
 }): ResolvedLocation {
-  const byName = findCity(input.city, input.countryCode ?? null);
-  const city: City | null =
-    byName ??
-    (input.countryCode
-      ? CITIES.find((c) => c.countryCode.toLowerCase() === input.countryCode!.toLowerCase()) ?? null
-      : null);
+  const city = findCity(input.city, input.countryCode ?? null);
 
   if (!city) {
+    // **Deliberately no fallback.** This used to fall back to the *first city of the given country* when
+    // the name did not match — so an unresolved Indian birthplace silently became **Mumbai**, 6.5° of
+    // longitude away, which is about half an hour of solar time and enough to move the hour pillar.
+    // A refusal is honest; a silent substitute is a wrong chart, which is the rule engine change E2
+    // states and the reason this function exists at all.
     throw new ApiError(
       422,
       "CITY_NOT_RESOLVED",

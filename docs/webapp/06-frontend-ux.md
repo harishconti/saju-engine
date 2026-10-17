@@ -176,8 +176,26 @@ instead; see the rationale in the route.
 - **Gender is required** and the form must say why (major-luck direction is undefined without it).
 - **"I don't know my birth time"** is a first-class path: it sets `timeKnown: false` and the UI
   explains that the hour pillar becomes uncertain and the report will say so.
-- **City** is a typeahead against the bundled city table; it resolves coordinates without any
-  network geocoding.
+- **Birthplace is a typeahead over a shipped index, never a request-time geocode.** Since 2026-10-17 the
+  index is GeoNames `cities5000` (**69,818 places**) shipped as `public/city-index.json` and fetched in
+  the background on mount; before that it was a hand-written table of **156**, twelve of them in India,
+  which could not express a single one of the birthplaces this repository's own reports use — and the
+  form refuses to submit an unresolved place, so that was a wall, not a short list. Three rules follow
+  from it, and each has a test:
+  - **The country travels with the name.** Options carry `"Name, Country"` because a bare name is
+    routinely ambiguous at this scale — there are Cambridges in four countries, in four timezones — and
+    picking one of them for the wrong row changes the UTC offset *and* the solar-time correction. A bare,
+    ambiguous name is **refused**, not guessed.
+  - **No silent substitute, anywhere.** `resolveBirthLocation` used to fall back to the first city of the
+    given country, so an unresolved Indian place silently became Mumbai — 6.5° of longitude, about half
+    an hour of solar time. It now refuses (`422 CITY_NOT_RESOLVED`). A refusal is honest; a substitute is
+    a wrong chart.
+  - **Renames still work.** "Mysore" finds Mysuru, "Munchen" finds Munich. That alias map is *generated
+    and verified* by `tools/build-cities.py`, which fails the build on a dead target — the first
+    hand-written version had 15 dead entries out of 45, because the source uses the English exonym for
+    some cities and a transliteration for others.
+  - GeoNames is **CC BY 4.0**, so the footer carries the attribution. It is a licence condition, not a
+    courtesy.
 - Solar-term and hour-boundary knife-edges surface as a confirmation, not a silent guess.
 - Turnstile is invisible; it only appears if it challenges.
 - The whole flow is usable without an account, and the "keep this" step is where the account is

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Alert, Button, Card, CardContent, Field, Input, Select, Steps, buttonClasses } from "@/components/ui";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 import { findCity, searchCities } from "@/lib/cities";
+import { useCityIndex } from "@/lib/use-city-index";
 import { ElementalRule, SealMark } from "@/components/viz";
 
 const STEPS = ["Your birth details", "Check your chart", "Your snapshot"];
@@ -44,8 +45,9 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileReset, setTurnstileReset] = useState(0);
 
-  const cityOptions = useMemo(() => searchCities(city, 8), [city]);
-  const resolved = useMemo(() => findCity(city), [city]);
+  const cityIndexReady = useCityIndex();
+  const cityOptions = useMemo(() => searchCities(city, 8), [city, cityIndexReady]);
+  const resolved = useMemo(() => findCity(city), [city, cityIndexReady]);
 
   async function generate() {
     setError(null);
@@ -257,9 +259,9 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
                 />
                 <datalist id="sample-city-options">
                   {cityOptions.map((c) => (
-                    <option key={`${c.name}-${c.countryCode}`} value={c.name}>
-                      {c.name}, {c.country}
-                    </option>
+                    // The label the visitor sees is the value that gets stored, so a duplicated name is
+                    // selectable at all — see `findCity`. A bare name would be ambiguous.
+                    <option key={`${c.name}-${c.countryCode}`} value={`${c.name}, ${c.country}`} />
                   ))}
                 </datalist>
               </Field>

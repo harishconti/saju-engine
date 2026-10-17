@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Alert, Button, Card, CardContent, Field, Input, Select } from "@/components/ui";
 import { findCity, searchCities } from "@/lib/cities";
+import { useCityIndex } from "@/lib/use-city-index";
 import { POLICY_VERSION } from "@/lib/consent";
 
 export interface ProfileFormValues {
@@ -63,13 +64,19 @@ export function ProfileForm({
   const [consentNeeded, setConsentNeeded] = useState(!hasConsent);
   const [agreed, setAgreed] = useState(hasConsent);
 
+  // Mounting this fetch is what makes the picker offer more than the curated 156 places.
+  const cityIndexReady = useCityIndex();
+
   const cityOptions = useMemo(() => {
     const q = values.city?.trim() ?? "";
     const list = q.length >= 2 ? searchCities(q, 8) : [];
-    return list.map((c) => ({ label: `${c.name}, ${c.country}`, value: c.name, cc: c.countryCode }));
-  }, [values.city]);
+    return list.map((c) => ({ label: `${c.name}, ${c.country}`, value: `${c.name}, ${c.country}`, cc: c.countryCode }));
+  }, [values.city, cityIndexReady]);
 
-  const resolvedCity = useMemo(() => findCity(values.city ?? "", values.countryCode ?? null), [values.city, values.countryCode]);
+  const resolvedCity = useMemo(
+    () => findCity(values.city ?? "", values.countryCode ?? null),
+    [values.city, values.countryCode, cityIndexReady],
+  );
 
   function set<K extends keyof ProfileFormValues>(key: K, value: ProfileFormValues[K]) {
     setValues((v) => ({ ...v, [key]: value }));

@@ -60,6 +60,15 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  /**
+   * `src/lib/city-data.server.ts` reads `public/city-index.json` at import time, so every function that
+   * resolves a birthplace needs the file beside it. A `readFileSync(path.join(process.cwd(), …))` is
+   * invisible to Next's output tracing — the build succeeds and the *deploy* fails at request time with
+   * ENOENT, which is the worst place to find out. Listed explicitly instead.
+   */
+  outputFileTracingIncludes: {
+    "/**/*": ["./public/city-index.json"],
+  },
   // Pin the workspace root so Next does not climb to a parent directory that has a stray lockfile.
   turbopack: {
     root: path.resolve(process.cwd()),

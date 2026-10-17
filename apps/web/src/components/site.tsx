@@ -169,6 +169,21 @@ export function SiteFooter() {
             rather than silently resolved.
           </p>
           <p className="text-xs text-muted-foreground">© {year} Cosmic Saju. All rights reserved.</p>
+          {/* Required, not decorative. The birthplace picker's index is GeoNames' `cities5000`, which is
+              CC BY 4.0 — attribution is a condition of the licence, and the share-alike-free terms are why
+              we can ship it at all. Kept next to the copyright line where attribution belongs. */}
+          <p className="text-xs text-muted-foreground">
+            Place data from{" "}
+            <a
+              href="https://www.geonames.org/"
+              target="_blank"
+              rel="noreferrer"
+              className="underline hover:text-foreground"
+            >
+              GeoNames
+            </a>{" "}
+            (CC BY 4.0).
+          </p>
         </div>
       </div>
     </footer>

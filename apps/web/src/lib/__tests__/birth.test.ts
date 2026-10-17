@@ -71,14 +71,53 @@ describe("city resolution", () => {
     expect(resolveBirthLocation({ city: "  sEOul " }).city).toBe("Seoul");
   });
 
+  it("resolves the places this repository's own reports were built from", () => {
+    // Every one of these was missing from the original 156-city table, which is what made the picker a
+    // wall for the very people the product was built for: `/sample` refuses to submit an unresolved
+    // place. A dataset swap that broke one of them would be a regression, not a fix.
+    for (const city of ["Pallipattu", "Tiruvallur", "Vellore", "Ambur", "Tirupati", "Kolar"]) {
+      expect(resolveBirthLocation({ city }).city, city).toBe(city);
+    }
+    // "Mysore" is the pre-rename spelling; GeoNames ships "Mysuru", so this only works through the
+    // generated alias map.
+    expect(resolveBirthLocation({ city: "Mysore" }).city).toBe("Mysuru");
+  });
+
   it("fails loudly rather than silently dropping solar-time correction", () => {
-    expect(() => resolveBirthLocation({ city: "Atlantis" })).toThrowError(/couldn't find/i);
+    // NOT "Atlantis": that is a real town in South Africa, so it resolves now — the old fixture was
+    // fictional only because the old table was tiny. Use a place that cannot exist.
+    const nowhere = "Zzznowhereville";
+    expect(() => resolveBirthLocation({ city: nowhere })).toThrowError(/couldn't find/i);
     try {
-      resolveBirthLocation({ city: "Atlantis" });
+      resolveBirthLocation({ city: nowhere });
     } catch (err) {
       expect((err as { code?: string }).code).toBe("CITY_NOT_RESOLVED");
       expect((err as { status?: number }).status).toBe(422);
     }
+  });
+
+  it("never substitutes another city in the same country", () => {
+    // The regression that matters. This used to fall back to the *first* city of the given country, so a
+    // misspelled Indian birthplace silently resolved to **Mumbai** — 6.5° of longitude, about half an
+    // hour of solar time, enough to move the hour pillar. A silent substitute is a wrong chart; E2's
+    // whole point is that a refusal is the honest answer.
+    expect(() => resolveBirthLocation({ city: "Zzznowhereville", countryCode: "IN" })).toThrowError(
+      /couldn't find/i,
+    );
+  });
+
+  it("refuses an ambiguous bare name, and resolves it once the country is known", () => {
+    // "Cambridge" exists in Canada, the United Kingdom, New Zealand and the United States — four
+    // different timezones. Picking one of them for someone who typed the bare name would move their
+    // chart, so the bare name is refused and the picker's own label ("Name, Country") is what resolves.
+    expect(() => resolveBirthLocation({ city: "Cambridge" })).toThrowError(/couldn't find/i);
+
+    const picked = resolveBirthLocation({ city: "Cambridge, United Kingdom" });
+    expect(picked.countryCode).toBe("GB");
+    expect(picked.timezone).toBe("Europe/London");
+
+    const canada = resolveBirthLocation({ city: "Cambridge", countryCode: "CA" });
+    expect(canada.timezone).toBe("America/Toronto");
   });
 });
 

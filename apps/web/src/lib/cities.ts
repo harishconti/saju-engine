@@ -211,41 +211,211 @@ export const CITIES: City[] = ROWS.map(([name, country, countryCode, latitude, l
   timezone,
 }));
 
-const norm = (s: string) => s.trim().toLowerCase();
+/**
+ * Names people type that are *not* the name we ship — "Mysore" for Mysuru, "Munchen" for Munich.
+ *
+ * This map is **generated and verified** by `tools/build-cities.py`, which refuses to build if an
+ * alias points at a place that is not in the index. That check is not ceremony: the first hand-written
+ * version of the list had **15 dead entries out of 45**, because GeoNames' ascii name is the English
+ * exonym for most cities ("Munich", "Vienna", "The Hague") but a transliteration for others ("Koeln",
+ * "Zuerich") — so guessing which is which is how you ship an alias that never matches. Someone born in
+ * a renamed city does not necessarily know it was renamed, and "that is not a real place" is both wrong
+ * and insulting.
+ */
+let aliases = new Map<string, { name: string; countryCode: string }>();
+
+/** Resolve a typed name through the alias map, then to the spelling the index carries. */
+function dealias(name: string): string {
+  const hit = aliases.get(name.trim().toLowerCase());
+  return hit ? hit.name : name.trim();
+}
+
+interface Entry {
+  city: City;
+  /** Pre-computed lower-cased name, because scoring runs over ~70k rows per keystroke. */
+  key: string;
+}
+
+/** Country display names for the GeoNames rows, which ship a code and no name. Cached per code. */
+const regionNames = (() => {
+  try {
+    return new Intl.DisplayNames(["en"], { type: "region" });
+  } catch {
+    return null;
+  }
+})();
+const countryCache = new Map<string, string>();
+function countryFor(code: string): string {
+  const cached = countryCache.get(code);
+  if (cached) return cached;
+  let name = code;
+  try {
+    name = regionNames?.of(code) ?? code;
+  } catch {
+    name = code;
+  }
+  countryCache.set(code, name);
+  return name;
+}
+
+function entryOf(city: City): Entry {
+  return { city, key: city.name.trim().toLowerCase() };
+}
+
+/**
+ * The searchable index: the curated table first (so a hand-checked entry always wins over a
+ * machine-derived one), then everything else. Starts as the curated 156 and grows once the asset
+ * loads, so the picker works immediately and offline.
+ */
+let index: Entry[] = CITIES.map(entryOf);
+let loaded = false;
+let loading: Promise<void> | null = null;
+const listeners = new Set<() => void>();
+
+export function isCityIndexLoaded(): boolean {
+  return loaded;
+}
+
+export function subscribeCityIndex(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+/** The full list, for a caller that wants to render all of it (tests, and the country filter). */
+export function allCities(): City[] {
+  return index.map((e) => e.city);
+}
+
+/**
+ * Merge places into the live index. Called by the browser loader (which fetches `/api/cities`) and by
+ * `city-data.server.ts` (which reads the same file from disk), so both sides resolve the same world
+ * from one source of truth. Idempotent per row.
+ */
+export function hydrateCityIndex(cities: City[], incoming?: Record<string, [string, string]>): void {
+  for (const [alias, [name, countryCode]] of Object.entries(incoming ?? {})) {
+    aliases.set(alias.toLowerCase(), { name, countryCode });
+  }
+  if (cities.length === 0) return;
+
+  const seen = new Set(index.map((e) => `${e.key}|${e.city.countryCode}`));
+  const merged = index.slice();
+  for (const city of cities) {
+    const key = city.name.trim().toLowerCase();
+    const dedupe = `${key}|${city.countryCode}`;
+    if (seen.has(dedupe)) continue;
+    seen.add(dedupe);
+    merged.push({ city, key });
+  }
+  index = merged;
+  loaded = true;
+  for (const listener of listeners) listener();
+}
+
+/** Decode the shipped index payload. Shared so the two loaders cannot drift. */
+export function decodeCityIndex(payload: unknown): {
+  cities: City[];
+  aliases: Record<string, [string, string]>;
+} {
+  const p = payload as {
+    zones?: string[];
+    places?: [string, string, number, number, number][];
+    aliases?: Record<string, [string, string]>;
+  };
+  const zones = p?.zones ?? [];
+  const cities = (p?.places ?? []).map(([name, countryCode, latitude, longitude, zone]) => ({
+    name,
+    country: countryFor(countryCode),
+    countryCode,
+    latitude,
+    longitude,
+    timezone: zones[zone] ?? "UTC",
+  }));
+  return { cities, aliases: p?.aliases ?? {} };
+}
+
+/**
+ * Fetch and merge the world index. Idempotent, and safe to call before anyone types: same-origin, and
+ * it resolves to the curated table alone if the fetch fails, so a failure degrades to the *old*
+ * behaviour rather than to a broken picker.
+ */
+export async function loadCityIndex(): Promise<void> {
+  if (loaded) return;
+  if (loading) return loading;
+
+  loading = (async () => {
+    try {
+      const res = await fetch("/city-index.json", { cache: "force-cache" });
+      if (!res.ok) return;
+      const { cities, aliases: incoming } = decodeCityIndex(await res.json());
+      hydrateCityIndex(cities, incoming);
+    } catch {
+      // Offline, blocked, or malformed: keep the curated table. The picker still works.
+    } finally {
+      loading = null;
+    }
+  })();
+
+  return loading;
+}
 
 export function findCity(name: string, countryCode?: string | null): City | null {
-  const target = norm(name);
-  const cc = countryCode ? norm(countryCode) : null;
-  const pool = cc ? CITIES.filter((c) => norm(c.countryCode) === cc) : CITIES;
-  return (
-    pool.find((c) => norm(c.name) === target) ??
-    CITIES.find((c) => norm(c.name) === target) ??
-    null
-  );
+  const raw = name.trim();
+  if (!raw) return null;
+
+  // A picked option arrives as "Name, Country". That is deliberate: with ~70,000 places a bare name is
+  // routinely ambiguous — there are several Cambridges, three Napless — and an option that carried only
+  // the name would make them indistinguishable. Picking "Cambridge, Canada" and getting Cambridge,
+  // United Kingdom is not a cosmetic error: the two are in different timezones, so the UTC offset and
+  // the solar-time correction both change, silently.
+  let place = raw;
+  let country: string | null = countryCode?.trim() || null;
+  const comma = raw.lastIndexOf(", ");
+  if (comma > 0) {
+    place = raw.slice(0, comma).trim();
+    country = country ?? raw.slice(comma + 2).trim();
+  }
+
+  const target = dealias(place).toLowerCase();
+  const matches = index.filter((e) => e.key === target);
+  if (matches.length === 0) return null;
+
+  if (country) {
+    const wanted = country.toLowerCase();
+    return (
+      matches.find(
+        (e) =>
+          e.city.country.toLowerCase() === wanted || e.city.countryCode.toLowerCase() === wanted,
+      )?.city ?? null
+    );
+  }
+
+  // No country given, so the name must be unambiguous. Deliberately not "whichever comes first": a
+  // near-miss that resolves is a *different* place's coordinates, which is the failure this module and
+  // `birth.ts` both exist to prevent. The caller shows "pick from the list" instead.
+  const distinct = new Set(matches.map((e) => e.city.countryCode));
+  return distinct.size === 1 ? matches[0].city : null;
 }
 
 /** Prefix/substring search for the typeahead. Deterministic ordering, no network. */
 export function searchCities(query: string, limit = 8): City[] {
-  const q = norm(query);
+  const q = dealias(query).toLowerCase();
   if (q.length < 1) return [];
-  const scored = CITIES.map((c) => {
-    const name = norm(c.name);
-    const country = norm(c.country);
+  const scored: { c: City; score: number }[] = [];
+  for (const { city, key } of index) {
     let score = -1;
-    if (name.startsWith(q)) score = 0;
-    else if (name.includes(q)) score = 1;
-    else if (country.startsWith(q)) score = 2;
-    else if (`${name}, ${country}`.includes(q)) score = 3;
-    return { c, score };
-  })
-    .filter((s) => s.score >= 0)
-    .sort((a, b) => a.score - b.score || a.c.name.localeCompare(b.c.name));
+    if (key.startsWith(q)) score = 0;
+    else if (key.includes(q)) score = 1;
+    else if (city.countryCode.toLowerCase().startsWith(q)) score = 2;
+    else if (city.country.toLowerCase().startsWith(q)) score = 2;
+    if (score >= 0) scored.push({ c: city, score });
+  }
+  scored.sort((a, b) => a.score - b.score || a.c.name.localeCompare(b.c.name));
   return scored.slice(0, limit).map((s) => s.c);
 }
 
 export function listCountries(): { country: string; countryCode: string }[] {
   const seen = new Map<string, string>();
-  for (const c of CITIES) if (!seen.has(c.country)) seen.set(c.country, c.countryCode);
+  for (const { city } of index) if (!seen.has(city.country)) seen.set(city.country, city.countryCode);
   return [...seen.entries()]
     .map(([country, countryCode]) => ({ country, countryCode }))
     .sort((a, b) => a.country.localeCompare(b.country));

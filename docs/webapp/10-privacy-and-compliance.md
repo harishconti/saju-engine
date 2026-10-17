@@ -15,6 +15,7 @@ state privacy laws for the US) and **the product's own ground rules** about what
 |---|---|---|---|
 | Email, name | Neon (`User`) + Neon Auth | Personal data | Contract (account, delivery) |
 | **Birth date, time, place, coordinates** | Neon (`Profile`) | **Sensitive / special-category-adjacent** | Explicit consent at sign-up and at profile creation |
+| The **place index** behind the birthplace picker | `public/city-index.json`, served from our own origin | **Not personal data** — a static gazetteer | CC BY 4.0 (GeoNames); attribution in the footer. **No birthplace guess is ever sent to a geocoder**, so typing a place does not disclose it to a third party, and the coordinates stored at profile creation come from this file rather than from Nominatim |
 | Report PDF + source markdown | Cloudflare R2 (private) | Personal data (derived) | Contract (the product itself) |
 | Payment records | Dodo Payments (MoR) holds card data; we hold an order id, amount, status | Personal + financial | Contract, legal obligation (tax) |
 | Audit log (actor, action, ip, ua) | Neon (`AuditLog`) | Personal data | Legitimate interest (security, dispute resolution) |
