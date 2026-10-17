@@ -46,6 +46,7 @@ export const POST = handle(async (req: Request) => {
 | `GET` | `/api/health` | DB + R2 + engine probe. No secrets. 200 `{status:'ok',…}` / 503 `{status:'degraded',…}` | none |
 | `POST` | `/api/sample` | Generate a free sample PDF. No account required | 5 / min / IP |
 | `POST` | `/api/share-card` | The reader's own Day Master card, a 1080×1920 PNG. No account required — it is the free snapshot's growth loop. Carries no birth data (built from `shareCardFields()`), stores nothing | 5 / min / IP |
+| `POST` | `/api/sample/email` | Email the free snapshot, and record the lead (`SampleLead`). No account required. Stores no birth data — only the address and the marketing choice | 5 / min / IP |
 
 > **There is no `/api/contact` route, deliberately.** An earlier draft specified one; it was never built.
 > Contact is a `mailto:` to a monitored address (`hello@`, or `privacy@` for data-protection requests —
@@ -172,6 +173,8 @@ The funnel. Deliberately account-free.
 // 200
 {
   "ok": true,
+  "sampleId": "5d3f…",          // random; the email step's handle. Only NAMES an object — every read
+                                //   re-derives the key server-side, so it cannot point at anyone else's
   "downloadUrl": "https://…r2.cloudflarestorage.com/…&X-Amz-Expires=900",
   "expiresIn": 900,
   "bytes": 71234,
@@ -248,6 +251,36 @@ result.
 reused, and mounting a second challenge for a cosmetic image is real friction. The exposure (an
 unauthenticated engine call) is bounded by the rate limit instead. Errors: `422 VALIDATION_FAILED`,
 `429 RATE_LIMITED`, `503 ENGINE_UNAVAILABLE`.
+
+### `POST /api/sample/email`
+
+The one thing the free snapshot was missing: a way to be contacted again. Optional, and taken **after**
+the result is on screen — never a wall in front of it (see [06](06-frontend-ux.md) §Free sample).
+
+```jsonc
+{
+  "sampleId": "5d3f…",
+  "email": "Someone@Example.com",   // lower-cased and validated
+  "marketingOptIn": false           // defaults to false; omitted ≠ consent
+}
+```
+
+```jsonc
+// 201
+{ "ok": true, "emailed": true, "expiresInDays": 7 }
+```
+
+- **The key is re-derived server-side from `sampleId`** (anonymous prefix, or the owner's prefix if
+  signed in) and confirmed with a `HEAD` before anything is sent. The caller never supplies a key or a
+  URL, so there is nothing here to point at someone else's file; `sampleEmailSchema` has no such field,
+  and a test asserts unknown keys are stripped.
+- **The lead is written before the send.** The address is the point of the exercise and the mail is the
+  side effect, so a Resend outage must not lose it. If email is unconfigured, the response still
+  `201 {emailed:false}` rather than pretending it sent.
+- **The link lasts 7 days**, not 900 s: the anonymous object is R2-swept at 7 days, so this is the
+  longest a link can usefully be. A longer URL would outlive its object.
+- Errors: `422 VALIDATION_FAILED`, `404 SAMPLE_EXPIRED` (past the sweep — the UI offers a fresh
+  snapshot), `429 RATE_LIMITED`, `502` when the send failed though the lead was kept.
 
 ### `POST /api/profiles`
 

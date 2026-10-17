@@ -39,6 +39,12 @@ export default function PrivacyPage() {
           re-download and so we can answer &ldquo;what did we actually send you?&rdquo;.
         </li>
         <li>
+          <strong>The email you give for a free snapshot:</strong> if you ask us to email your snapshot, we
+          keep the address so we can send it and so we can send the course you opted into. We keep no birth
+          details for an anonymous snapshot — only the address and your marketing choice. Replying to any
+          email we send unsubscribes you.
+        </li>
+        <li>
           <strong>Payment records:</strong> our payment provider, Dodo Payments, is the merchant of record.
           They hold your card details — we never see or store them. We keep only an order reference,
           amount, currency, and date.

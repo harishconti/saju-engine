@@ -1614,6 +1614,40 @@
     (two clicks before a free result) that belongs with the email-capture phase, which needs the same chart data.
     Docs: `03` (the new route, and the `/api/sample` response corrected), `06` (the corrected free-sample flow, the
     card), `12` (why this route must *not* be added to the auth-gate spec). Webapp **138 → 145**.
+
+  - **2026-10-17 (the funnel can finally keep someone: the snapshot is emailable).** The audit's #1 finding was
+    *"the free snapshot collects no email … every free user leaves without a way to be contacted again. The lead
+    magnet builds no list."* Now, after the result is on screen, an optional step emails it and records the lead.
+    ✅ **The rule it had to respect, and did.** `06` says *"do not gate the sample behind sign-up — it is the only
+    proof the product works."* So the email is a **second, optional action after the result**, never a wall: the
+    snapshot renders whether or not a single address is ever typed. The audit's literal fix ("require an email to
+    receive the free snapshot") was rejected for exactly this reason and adapted.
+    ✅ **`SampleLead`, not `ConsentRecord`.** `ConsentRecord` is keyed to `userId` and proves the basis for holding
+    *birth data*; an anonymous visitor has no `User` row and we keep no birth data for them — they gave us an
+    address. `marketingOptIn` defaults **false at the DB level as well as in the form**, so an omitted field cannot
+    read as consent; that matters most here, because for an anonymous visitor this row is the only record of their
+    wishes. `policyVersion` is stored for the same reason it is on `ConsentRecord`.
+    ✅ **No key or URL from the client.** `/api/sample/email` takes `{sampleId, email, marketingOptIn}` and
+    re-derives the object key server-side (anonymous prefix, or the owner's prefix when signed in), confirming it
+    with a `HEAD`. `sampleEmailSchema` has no field for a key or a URL, and a test asserts unknown keys are
+    stripped — otherwise the endpoint would be an open presigner.
+    ✅ **Why the link is 7 days, not 15 minutes.** The anonymous object is R2-swept at 7 days, so this is the longest
+    a link can *usefully* be; a longer URL would outlive its object and 404. The **lead is written before the send** —
+    the address is the point, the mail is the side effect, so a Resend outage must not lose it — and an unconfigured
+    mailer answers `201 {emailed:false}` rather than pretending.
+    ⚠️ **A promise I had to make true rather than leave dangling.** The checkbox copy originally said "you can
+    unsubscribe from any email", which no mechanism backed. Changed to "replying to any email unsubscribes you",
+    which the monitored `Reply-To` actually delivers — adequate while only the *requested* snapshot is sent.
+    Recorded in `10` §Email as an open item: **add a one-click tokenised unsubscribe and an `unsubscribedAt` column
+    before the first marketing send**, because a course is a marketing list where withdrawal must be as easy as
+    consent was given.
+    🔴 **NOT DEPLOYED, and it needs a migration.** `20261017120000_sample_lead` adds the table (additive, all
+    defaults, nothing dropped) and **has not been applied to production** — run `npx prisma migrate deploy` with the
+    code. This is the same shape as the `htmlKey` incident earlier the same day, where the code shipped a deploy
+    ahead of its migration and the next order would have failed. Do not repeat it.
+    Docs: `02` (the model + retention), `03` (the route, `sampleId`), `06` (the corrected flow and the email step),
+    `10` (data table, retention, §Email) and the privacy page. Webapp **145 → 149**; `share_card` and
+    `sample_email_captured` join the analytics funnel.
     Docs: `07` (the service row), `10` (sub-processors + the privacy page copy). No env var and no `08` change —
     the toggle is a dashboard setting, not configuration in the repo.
 
@@ -1935,6 +1969,14 @@ As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P1 items:
   this is a gap on the free path. **Not fixed yet, deliberately:** adding the step makes the free funnel
   two clicks instead of one, and it should land with the email-capture phase, which needs the same chart
   data in the browser. Docs corrected so nothing claims otherwise in the meantime.
+- ⚠️ **OPEN — the `SampleLead` migration is not applied to production, and a one-click unsubscribe does not
+  exist yet.** Both from the email-capture work (2026-10-17). (a) `prisma/migrations/20261017120000_sample_lead`
+  is additive and safe, but until `npx prisma migrate deploy` runs against `production`, `/api/sample/email`
+  will fail on `prisma.sampleLead.upsert` — the same code-a-deploy-ahead-of-its-migration mistake as the
+  `htmlKey` incident the same day. (b) Opt-out today is "reply to any email", which the monitored `Reply-To`
+  makes real, and which is adequate while only the *requested* snapshot is sent. **Before the first marketing
+  send** (the five-part course), add a tokenised one-click unsubscribe route and an `unsubscribedAt` column —
+  a course is a marketing list, where withdrawal has to be as easy as consent was given.
 - Engine prerequisites E1/E2/E3: **DONE**; the engine is deployed at `api/index.py` (Vercel root = repo
   root, region `sin1`).
 - Populate the 30×30 Nayin pair table from a published source (currently on the 5-element fallback).

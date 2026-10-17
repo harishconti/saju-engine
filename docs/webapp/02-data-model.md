@@ -374,6 +374,23 @@ model DeletionRequest {
 
   @@index([status, scheduledFor])
 }
+
+/// An address left by an anonymous visitor who asked for their free snapshot by email.
+///
+/// Deliberately NOT a `ConsentRecord`: that table is keyed to `userId` and records the lawful basis for
+/// holding *birth data*. An anonymous visitor has no `User` row and we keep no birth data for them —
+/// they gave us an address. Two different things, two different tables.
+model SampleLead {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  marketingOptIn Boolean  @default(false)   // false at the DB level as well as in the form
+  policyVersion  String
+  source         String   @default("sample")
+  ip             String?
+  createdAt      DateTime @default(now())
+
+  @@index([createdAt])
+}
 ```
 
 ## Tier map
@@ -444,6 +461,7 @@ npx prisma migrate deploy
 |---|---|---|
 | Anonymous sample PDFs | 7 days | Daily cleanup cron sweeps `reports/anonymous/…` |
 | Anonymous sample rows | none (never persisted) | The sample flow is stateless until "save to profile" |
+| `SampleLead` (an emailed address) | until erasure is requested | **Kept on purpose** — a lead that expires is not a lead. No daily sweep; `email` is unique so a repeat opt-in updates the preference instead of duplicating. `marketingOptIn: false` rows are kept too (they are the record that someone *declined*) |
 | Profile birth data | until the user deletes it, or 24 months after last activity | `Profile.deletedAt` + a periodic sweep |
 | Reports + PDFs | until deletion is requested | `Report` rows + R2 objects, deleted together via `ObjectDeletion` |
 | `Job`, `WebhookEvent` | 90 days | Daily cleanup cron |

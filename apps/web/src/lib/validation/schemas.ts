@@ -46,6 +46,19 @@ export const sampleRequestSchema = birthDataSchema.extend({
   turnstileToken: z.string().trim().max(4096).optional(),
 });
 
+/**
+ * "Email me my snapshot" — the funnel's lead capture.
+ *
+ * `marketingOptIn` defaults to **false**, and that default is load-bearing: for an anonymous visitor
+ * this row is the only record of their wishes, so an omitted field must never read as consent. Nothing
+ * beyond the snapshot they asked for may be sent unless this is explicitly true.
+ */
+export const sampleEmailSchema = z.object({
+  sampleId: z.string().trim().min(8).max(64),
+  email: z.string().trim().toLowerCase().pipe(z.email("That email doesn't look right")),
+  marketingOptIn: z.boolean().default(false),
+});
+
 export const orderSchema = z
   .object({
     tier: z.string().trim().min(1),

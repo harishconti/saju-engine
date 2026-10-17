@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { orderSchema, profileSchema, sampleRequestSchema } from "../validation/schemas";
+import { orderSchema, profileSchema, sampleEmailSchema, sampleRequestSchema } from "../validation/schemas";
 import { formatUSD, timeAgo, REPORT_STATUS_HELP } from "../format";
 import { isAdminEmail, hasMinRole, roleForEmail, ROLE_RANK } from "../roles";
 import { parseChartSummary, elementCountsFrom } from "../chart";
@@ -62,6 +62,39 @@ describe("order validation", () => {
     for (const falsy of [false, undefined, null, 0, ""]) {
       expect(orderSchema.safeParse({ ...base, adultConfirmed: falsy }).success).toBe(false);
     }
+  });
+});
+
+describe("sample email capture", () => {
+  const base = { sampleId: "01234567-89ab-cdef-0123-456789abcdef", email: "Someone@Example.com" };
+
+  it("accepts a request and normalises the address", () => {
+    const res = sampleEmailSchema.safeParse(base);
+    expect(res.success).toBe(true);
+    if (res.success) expect(res.data.email).toBe("someone@example.com");
+  });
+
+  it("defaults the marketing choice to false — an absent field is not consent", () => {
+    const res = sampleEmailSchema.safeParse(base);
+    expect(res.success && res.data.marketingOptIn).toBe(false);
+  });
+
+  it("refuses a missing, malformed or absent address", () => {
+    expect(sampleEmailSchema.safeParse({ ...base, email: "" }).success).toBe(false);
+    expect(sampleEmailSchema.safeParse({ ...base, email: "not-an-email" }).success).toBe(false);
+    expect(sampleEmailSchema.safeParse({ sampleId: base.sampleId }).success).toBe(false);
+  });
+
+  it("has no field for a storage key or a URL, so a caller cannot point at someone else's snapshot", () => {
+    // Unknown keys are stripped, not carried: the route re-derives the object key from `sampleId`
+    // alone, and this is the assertion that keeps it that way.
+    const res = sampleEmailSchema.safeParse({
+      ...base,
+      key: "reports/someone-else/order/report.pdf",
+      url: "https://example.invalid/x.pdf",
+    });
+    expect(res.success).toBe(true);
+    if (res.success) expect(Object.keys(res.data).sort()).toEqual(["email", "marketingOptIn", "sampleId"]);
   });
 });
 

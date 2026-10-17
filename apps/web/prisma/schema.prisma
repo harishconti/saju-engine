@@ -380,3 +380,26 @@ model DeletionRequest {
 
   @@index([status, scheduledFor])
 }
+
+/// An email left by an anonymous visitor who asked for their free snapshot to be emailed.
+///
+/// Why this is not a `ConsentRecord`: that table is keyed to `userId` and records the *lawful basis*
+/// for holding birth data. A visitor who has not signed up has no `User` row and gave us no birth data
+/// to keep — they gave us an address. Two different things, deliberately two different tables.
+///
+/// `policyVersion` is recorded for the same reason it is on `ConsentRecord`: the evidence has to say
+/// *which* privacy text the person agreed to. `marketingOptIn` is the only basis on which anything
+/// beyond the requested snapshot may be sent, and it defaults to false at the database level as well as
+/// in the form — an absent field must never read as consent.
+model SampleLead {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  marketingOptIn Boolean  @default(false)
+  policyVersion  String
+  /// Which surface captured it, so a later channel can be judged. Currently always "sample".
+  source         String   @default("sample")
+  ip             String?
+  createdAt      DateTime @default(now())
+
+  @@index([createdAt])
+}

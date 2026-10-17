@@ -151,9 +151,15 @@ The funnel, and the only place a visitor does real work before signing up.
 ```
 Step 1  Birth data        name · gender · date · time · "I don't know my time" · city
 Step 2  Result            Snapshot ready → Open / Download the PDF, then the shareable
-                          Day Master card, then "Keep this — create an account and
-                          I'll save these details"
+                          Day Master card, then "Email me this snapshot", then
+                          "Keep this — create an account and I'll save these details"
 ```
+
+**The email step is optional and comes after the result** — never a wall in front of it. The rule in
+`06` ("do not gate the sample behind sign-up") applies to the address too: the snapshot works whether or
+not anyone ever types one. What it buys is the list the funnel had none of, plus a 7-day link instead of
+the 15-minute one. `marketingOptIn` is a separate checkbox and defaults off; the row records the
+`policyVersion` so the evidence says which text was agreed to.
 
 ⚠️ **Corrected 2026-10-17: there is no separate "confirm the chart" step here.** The `Steps` component
 renders three labels, but the flow goes `0 → 2` — `STEPS` names a step that is never shown. The derived

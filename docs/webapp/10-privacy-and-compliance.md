@@ -22,6 +22,7 @@ state privacy laws for the US) and **the product's own ground rules** about what
 | Delivery log (email address, provider message id) | Neon (`Delivery`) | Personal data | Contract |
 | **Correspondence** — support mail, refund requests, DSARs | **Hostinger email** (`hello@`, with the `privacy@` alias) | Personal data | Legitimate interest / legal obligation (answering the request). Lives in the mail provider's mailbox, **not** in our database |
 | Anonymous sample objects | R2 `reports/anonymous/…` | Personal data until unlinked | Consent; **swept after 7 days** |
+| Emailed sample address | Neon (`SampleLead`) | Personal data | **Consent** for the course; legitimate interest for the snapshot the person asked for. Deliberately holds **no birth data** — the visitor is anonymous |
 | Webhook payloads | Neon (`WebhookEvent`) | May contain name/email from the MoR | Legitimate interest; purged at 90 days |
 
 **We never hold:** card numbers, CVVs, passwords, OAuth tokens, or session tokens. Those are
@@ -62,6 +63,34 @@ Rules:
 plainly, what is collected, what it is used for, and that it is stored to produce and re-deliver the
 report. A generic "we value your privacy" paragraph does not meet the bar for this category of data.
 
+### Email
+
+Two different things are being captured on the free-snapshot screen, and they must not be conflated:
+
+- **The snapshot itself** is sent because the person asked for it — a requested message, not marketing.
+  It needs no opt-in, and the form does not gate it: the result is on screen before the address is ever
+  asked for (`06-frontend-ux.md`).
+- **The five-part course, and anything else** is marketing. It is a **separate, unticked** checkbox, and
+  `SampleLead.marketingOptIn` defaults to `false` **at the database level** as well as in the form, so an
+  omitted field cannot be read as consent — which is the failure mode that matters, because for an
+  anonymous visitor this row is the only record of their wishes.
+
+Why `SampleLead` and not `ConsentRecord`: `ConsentRecord` is keyed to `userId` and its job is to prove
+the lawful basis for holding **birth data**. An anonymous visitor has no `User` row and we hold no birth
+data for them; they gave us an address. Recording an address as if it were birth-data consent would
+overstate what was agreed to, in the direction that looks thorough and is actually wrong.
+
+The address is stored with the `policyVersion` in force at the time, the IP it came from, and a `source`
+of `sample`. Erasure requests are honoured against this table like any other, and the row is what makes
+"we never emailed anyone who did not ask" checkable rather than asserted.
+
+**Opt-out.** The transactional `Reply-To` points at a monitored mailbox, and the form's copy says
+replying unsubscribes — so the promise has a working mechanism today rather than a hoped-for one. That is
+adequate while nothing but the *requested* snapshot is sent. ⚠️ **Before the first marketing send**, add a
+one-click unsubscribe (a tokenised route, not "reply and we'll do it") and a `unsubscribedAt` column:
+reply-to is a courtesy, and a course is a marketing list, where consent withdrawal has to be as easy as
+consent was given. Recorded as an open item rather than left implicit.
+
 ---
 
 ## 3. Retention
@@ -79,6 +108,7 @@ report. A generic "we value your privacy" paragraph does not meet the bar for th
 | Mail in the mailbox | Kept while useful for support — **not a system of record** | Manual. The `Reply-To` routes client replies to `hello@`, so this is where a reply lands; nothing in the app depends on it |
 | `AuditLog` | 24 months | Kept for dispute resolution |
 | `ConsentRecord` | As long as the account, plus 24 months after deletion | Proof of consent |
+| `SampleLead` (an emailed address from the free snapshot) | Until erasure is requested | **Kept on purpose — a lead that expires is not a lead.** No sweep. `marketingOptIn: false` rows are kept too: they are the record that someone *declined*, which is what makes the opt-in rows meaningful |
 | Payment/financial records | As long as tax law requires (typically 7–8 years) | **Held by Dodo Payments (MoR), not by us** |
 
 The financial-records retention is a genuine reason the MoR is the right choice: tax-retention

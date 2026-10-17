@@ -14,6 +14,8 @@ interface SampleResult {
   downloadUrl: string;
   bytes?: number;
   savedToProfile?: boolean;
+  /** The handle the email step uses. Random, and only *names* an object — the key is re-derived. */
+  sampleId?: string;
 }
 
 export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engineReady: boolean }) {
@@ -26,6 +28,12 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
   const [cardUrl, setCardUrl] = useState<string | null>(null);
   const [cardBusy, setCardBusy] = useState(false);
   const [cardError, setCardError] = useState<string | null>(null);
+  // Email capture. `optIn` starts false and the server defaults it false too — an absent field must
+  // never read as consent.
+  const [leadEmail, setLeadEmail] = useState("");
+  const [leadOptIn, setLeadOptIn] = useState(false);
+  const [leadState, setLeadState] = useState<"idle" | "sending" | "sent">("idle");
+  const [leadError, setLeadError] = useState<string | null>(null);
 
   const [fullName, setFullName] = useState("");
   const [gender, setGender] = useState<"M" | "F">("F");
@@ -81,6 +89,39 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
       setTurnstileReset((n) => n + 1);
     } finally {
       setBusy(false);
+    }
+  }
+
+  /** Email the snapshot, and record the lead. Never blocks the snapshot itself. */
+  async function emailSnapshot() {
+    if (!result?.sampleId) return;
+    setLeadError(null);
+    if (!leadEmail.trim()) {
+      setLeadError("Add an email address.");
+      return;
+    }
+    setLeadState("sending");
+    try {
+      const res = await fetch("/api/sample/email", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          sampleId: result.sampleId,
+          email: leadEmail.trim(),
+          marketingOptIn: leadOptIn,
+        }),
+      });
+      const body = (await res.json().catch(() => ({}))) as { emailed?: boolean; error?: string };
+      if (!res.ok) {
+        setLeadError(body.error ?? "We couldn't send that. Try again.");
+        setLeadState("idle");
+        return;
+      }
+      setLeadState("sent");
+      track("sample_email_captured");
+    } catch {
+      setLeadError("Network problem. Please try again.");
+      setLeadState("idle");
     }
   }
 
@@ -322,6 +363,51 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
               It expires in 15 minutes. Create an account and we&apos;ll keep the chart in your profile —
               along with everything a full reading adds.
             </Alert>
+
+            {/* Lead capture — the funnel's missing piece (external audit, 2026-10-17: "every free user
+                leaves without a way to be contacted again"). Deliberately a *second*, optional action
+                after the result is on screen: 06-frontend-ux.md forbids gating the sample behind
+                sign-up, and a wall here would trade proof for a list. */}
+            <div className="border-t border-border pt-5">
+              {leadState === "sent" ? (
+                <Alert tone="success" title="On its way">
+                  Sent to {leadEmail}. The link works for 7 days — longer than the one above.
+                </Alert>
+              ) : (
+                <div className="space-y-3">
+                  <p className="text-sm font-medium">Email me this snapshot</p>
+                  <Field
+                    label="Your email"
+                    htmlFor="leadEmail"
+                    hint="So you can open it on your phone, or keep it past today."
+                  >
+                    <Input
+                      id="leadEmail"
+                      type="email"
+                      autoComplete="email"
+                      value={leadEmail}
+                      onChange={(e) => setLeadEmail(e.target.value)}
+                    />
+                  </Field>
+                  <label className="flex items-start gap-3 text-sm">
+                    <input
+                      type="checkbox"
+                      className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--primary)]"
+                      checked={leadOptIn}
+                      onChange={(e) => setLeadOptIn(e.target.checked)}
+                    />
+                    <span className="text-muted-foreground">
+                      Also send me the free five-part &ldquo;read your own chart&rdquo; course. No other
+                      marketing, and replying to any email unsubscribes you.
+                    </span>
+                  </label>
+                  {leadError ? <p className="text-sm text-danger">{leadError}</p> : null}
+                  <Button variant="outline" loading={leadState === "sending"} onClick={emailSnapshot}>
+                    Email it to me
+                  </Button>
+                </div>
+              )}
+            </div>
 
             <div className="flex flex-wrap justify-center gap-3 border-t border-border pt-5">
               {signedIn ? (

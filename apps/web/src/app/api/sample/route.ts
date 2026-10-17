@@ -238,6 +238,9 @@ export const POST = handle(async (req) => {
 
   return json({
     ok: true,
+    // The handle the "email me my snapshot" step uses to ask for a fresh link later. Safe to expose:
+    // it is a random UUID that only *names* an object, and every read re-derives the key server-side.
+    sampleId,
     downloadUrl,
     expiresIn: 900,
     bytes: result.bytes,
