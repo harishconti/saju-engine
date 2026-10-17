@@ -1580,6 +1580,40 @@
     size, that the OG fonts are real sfnt (not `wOF2`), that the fallback description stays benefit-led, and that
     the large-card directive survives. Webapp **134 → 138**. Docs: `06` (the snippet and card rules, and both
     font constraints) and the openwiki toolchain page (the new tool).
+
+  - **2026-10-17 (the shareable Day Master card — the growth loop, and a gap it exposed).** The external audit's
+    "biggest gap" was that nothing in the English market turns a Saju result into something two people send each
+    other. The free snapshot now produces a **1080×1920 Day Master card**: `POST /api/share-card`, rendered by
+    Satori from the engine's `/chart`, previewed in the browser, saveable and shareable via the Web Share API.
+    Verified by rendering it and looking at it, not by asserting a 200.
+    ✅ **It costs no new engine surface.** The engine already exposes `POST /chart` (summary only, no render) for the
+    order flow's pillar confirmation; `engineChart()` in `lib/engine.ts` is a thin typed client for it. Nothing is
+    stored — no R2 object, no row — so there is nothing to sweep.
+    ✅ **The privacy rule is the design.** `shareCardFields()` is the only input, and it returns a *new* object of
+    derived values, so a future change cannot widen the card by passing a profile through. No date, time, place or
+    name can reach it; asserted behaviourally (a summary polluted with profile fields leaks nothing) and at source
+    level (the renderer never names a birth field). The reader publishes this image.
+    ✅ **A POST, deliberately.** Birth details must not travel in a query string — that is where they end up in access
+    logs and referrers.
+    ✅ **Three Satori traps, all hit and all now covered by a test.** (1) `{e.percent}%` is **two children**, so
+    Satori refused the div with its "explicit display: flex" error; (2) a missing `'self'`-adjacent gap collapsed the
+    bars into the footer; and (3) the Latin faces carry **no CJK**, so the four pillars would have rendered as
+    nothing — `tools/build-og-fonts.py` now also subsets the repo's own `SajuCJK-Regular.ttf` down to the 23 glyphs a
+    card can print (**5.6 KB**). `share-card.test.ts` renders the real PNG and asserts 1080×1920, so a font
+    regression fails the suite rather than silently producing an empty card.
+    ⚠️ **No Turnstile on this route, and it says so.** A token is single-use, so the sample's cannot be reused, and a
+    second challenge for a cosmetic image is real friction; the exposure is bounded by the 5/min rate limit. The
+    route comment names the fix if it is ever abused.
+    🔴 **A real gap this work exposed, now written down rather than papered over.** `06` and `03` both described the
+    free sample as **confirming the derived four pillars** before the snapshot — and `CLAUDE.md` forbids silent
+    auto-calculated pillars. **The free flow has no such step**, and `/api/sample` never returned the
+    `dayMaster`/`chartPreview` fields `03` documented. The `Steps` component renders a "Check your chart" label the
+    flow jumps over (`0 → 2`). The ground rule *is* enforced where money changes hands — the order flow shows
+    `Profile.chartJson` pillars before payment — so this is a gap on the free path, not a violation of the paid one.
+    Corrected in `06` and `03`; recorded as an open item below. Not fixed here: adding the step is a funnel change
+    (two clicks before a free result) that belongs with the email-capture phase, which needs the same chart data.
+    Docs: `03` (the new route, and the `/api/sample` response corrected), `06` (the corrected free-sample flow, the
+    card), `12` (why this route must *not* be added to the auth-gate spec). Webapp **138 → 145**.
     Docs: `07` (the service row), `10` (sub-processors + the privacy page copy). No env var and no `08` change —
     the toggle is a dashboard setting, not configuration in the repo.
 
@@ -1892,6 +1926,15 @@ As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P1 items:
 
 - **A1:** ~~recover `apps/landing-page/src/` from the machine that built it~~ — **closed**: the landing
   page was rebuilt inside `apps/web`, which is what serves the site.
+- ⚠️ **OPEN — the free snapshot does not confirm the derived pillars, and the docs said it did.** Found
+  2026-10-17 while building the share card. `CLAUDE.md`'s ground rule is "no silent auto-calculated four
+  pillars"; `06` and `03` both described `/sample` as showing them for confirmation, and `03` documented
+  a `chartPreview` the route never returned. In fact `/sample` jumps `step 0 → 2` (the `Steps` component
+  renders a "Check your chart" label it never shows) and returns `{ok, downloadUrl, …}` only. The rule
+  **is** honoured where payment happens — `/reports/new` shows `Profile.chartJson` pillars first — so
+  this is a gap on the free path. **Not fixed yet, deliberately:** adding the step makes the free funnel
+  two clicks instead of one, and it should land with the email-capture phase, which needs the same chart
+  data in the browser. Docs corrected so nothing claims otherwise in the meantime.
 - Engine prerequisites E1/E2/E3: **DONE**; the engine is deployed at `api/index.py` (Vercel root = repo
   root, region `sin1`).
 - Populate the 30×30 Nayin pair table from a published source (currently on the 5-element fallback).

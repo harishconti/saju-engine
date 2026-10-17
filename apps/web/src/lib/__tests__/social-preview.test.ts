@@ -26,8 +26,8 @@ describe("social preview", () => {
   });
 
   it("gives Satori a static TTF, never the woff2 the web uses", () => {
-    for (const face of ["CormorantGaramond-og.ttf", "Inter-og.ttf"]) {
-      const head = readBytes(`src/app/_og-fonts/${face}`).subarray(0, 4);
+    for (const face of ["CormorantGaramond-og.ttf", "Inter-og.ttf", "SajuCJK-og.ttf"]) {
+      const head = readBytes(`src/lib/og-fonts/${face}`).subarray(0, 4);
       // 'wOF2' would be a woff2, which Satori refuses; 0x00010000 / 'OTTO' are real sfnt headers.
       expect(head.toString("latin1"), face).not.toBe("wOF2");
       const sfnt = head.equals(Buffer.from([0x00, 0x01, 0x00, 0x00])) || head.toString("latin1") === "OTTO";

@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import type { Order, Profile } from "@prisma/client";
 import { ApiError } from "./api";
+import { parseChartSummary, type ChartSummary } from "./chart";
 
 /**
  * Client for the report engine service (Vercel project #2).
@@ -157,6 +158,49 @@ export async function engineHealth(): Promise<{ ok: boolean; detail?: string }> 
     return { ok: res.ok, detail: res.ok ? undefined : `HTTP ${res.status}` };
   } catch {
     return { ok: false, detail: "unreachable" };
+  }
+}
+
+/**
+ * Derive a chart summary only — no render, no storage.
+ *
+ * The cheap half of the engine contract (`POST /chart`). Used by the shareable card, which needs the
+ * pillars, Day Master and element balance but no PDF. Unlike `callEngine` this returns the parsed
+ * summary directly and throws a typed error, because every caller here is rendering something for a
+ * visitor and needs to tell "engine down" apart from "bad birth data".
+ */
+export async function engineChart(profile: EngineProfile, timeoutMs = 20_000): Promise<ChartSummary> {
+  const token = process.env.ENGINE_SERVICE_TOKEN?.trim();
+  if (!token) throw ApiError.unavailable("Report engine token is not configured", "ENGINE_UNAVAILABLE");
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(`${engineUrl()}/chart`, {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
+      body: JSON.stringify({ contractVersion: ENGINE_CONTRACT_VERSION, ...profile }),
+      signal: controller.signal,
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      const body = (await res.json().catch(() => ({}))) as { error?: string; code?: string };
+      throw new ApiError(
+        res.status === 422 ? 422 : 503,
+        body.code ?? "CHART_FAILED",
+        body.error ?? "The chart could not be derived.",
+      );
+    }
+
+    const summary = parseChartSummary(await res.json());
+    if (!summary) throw ApiError.unavailable("The engine returned an unusable chart", "CHART_UNUSABLE");
+    return summary;
+  } catch (err) {
+    if (err instanceof ApiError) throw err;
+    throw ApiError.unavailable("The chart engine is unreachable", "ENGINE_UNAVAILABLE");
+  } finally {
+    clearTimeout(timer);
   }
 }
 

@@ -361,6 +361,14 @@ uses were taken on a real report through headless Chrome at 360 / 390 / 768 / 14
 `GET /api/reports/{id}/html` belongs in it beside `/api/reports/{id}/download`, and both must return
 `401 UNAUTHORIZED` when signed out.
 
+⚠️ **`POST /api/share-card` must NOT be added to the auth-gate spec** — and that is the point of listing
+it here. It is deliberately *public* (it is the growth loop for the account-free free snapshot), so the
+spec's rule ("every protected route returns 401") does not apply to it. A future author extending that
+spec by grepping route files would otherwise add it and then "fix" the resulting failure by making the
+route require a session, quietly killing the feature. What it does need is the other side of the
+contract: it is rate-limited (5/min/IP, like `/api/sample`) and returns an `image/png` body, asserted in
+`src/lib/__tests__/share-card.test.ts`.
+
 ```bash
 python3 -m pytest -q tests/test_web_report.py
 python3 tools/qa_client_ready.py report.md --html report.html   # the artefact, not just the source

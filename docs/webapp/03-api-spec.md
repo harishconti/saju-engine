@@ -45,6 +45,7 @@ export const POST = handle(async (req: Request) => {
 |---|---|---|---|
 | `GET` | `/api/health` | DB + R2 + engine probe. No secrets. 200 `{status:'ok',…}` / 503 `{status:'degraded',…}` | none |
 | `POST` | `/api/sample` | Generate a free sample PDF. No account required | 5 / min / IP |
+| `POST` | `/api/share-card` | The reader's own Day Master card, a 1080×1920 PNG. No account required — it is the free snapshot's growth loop. Carries no birth data (built from `shareCardFields()`), stores nothing | 5 / min / IP |
 
 > **There is no `/api/contact` route, deliberately.** An earlier draft specified one; it was never built.
 > Contact is a `mailto:` to a monitored address (`hello@`, or `privacy@` for data-protection requests —
@@ -170,13 +171,20 @@ The funnel. Deliberately account-free.
 ```jsonc
 // 200
 {
-  "sampleId": "cuid",
+  "ok": true,
   "downloadUrl": "https://…r2.cloudflarestorage.com/…&X-Amz-Expires=900",
   "expiresIn": 900,
-  "dayMaster": "辛 Yin Metal",
-  "chartPreview": { "pillars": ["甲戌","癸酉","辛丑","乙未"] }
+  "bytes": 71234,
+  "engineVersion": "0.2.0",
+  "savedToProfile": false
 }
 ```
+
+⚠️ **The response carries no chart.** An earlier version of this page documented `dayMaster` and
+`chartPreview.pillars` here; the route has never returned them. That matters, because the same page
+described the free flow as confirming the derived pillars before the snapshot — it does not (see
+[06](06-frontend-ux.md) §Free sample, and the open item in `MEMORY.md`). Pillars are confirmed in the
+**order flow**, from `Profile.chartJson`, which is populated by the engine's `/chart`.
 
 **Signed in?** The snapshot is *kept*: a `Report` is filed as `DELIVERED` under
 `reports/{userId}/samples/…` and a link to it appears in the dashboard library. A repeat request for the
@@ -204,8 +212,42 @@ site key alone renders, and only both together protect anything. Note the site k
 (it is rendered into the HTML) and must be added to Vercel with an explicit `--type config`; Vercel's CLI
 otherwise refuses any `NEXT_PUBLIC_*` name that looks like a credential.
 
-The response includes `chartPreview` on purpose: **the four pillars are shown to the user before we
-ask for money.** See the ground rule in [`CLAUDE.md`](../../CLAUDE.md) — no silent auto-calculation.
+The ground rule it serves is real — **no silent auto-calculation of the four pillars** — but it is
+enforced in the **order flow**, not here: `Profile.chartJson` is populated from the engine's `/chart`
+when a profile is created, and `/reports/new` shows those pillars before payment. See
+[06](06-frontend-ux.md) §Free sample for the corrected account of the free path.
+
+### `POST /api/share-card`
+
+The reader's own **Day Master card** — a 1080×1920 PNG they can post. Public on purpose: it is the
+growth loop for the account-free free snapshot, so gating it behind sign-up would defeat it.
+
+```jsonc
+// request — the same shape as /api/sample (birth fields are required, turnstile/idempotency are not)
+{
+  "fullName": "Jisoo K.",
+  "gender": "F",
+  "birthDate": "1994-09-12",
+  "birthTime": "13:28",
+  "timeKnown": true,
+  "city": "Seoul",
+  "countryCode": "KR"
+}
+```
+
+Returns `200` with `content-type: image/png` and `cache-control: private, no-store` plus
+`x-robots-tag: noindex`. It is a **POST** deliberately: birth details must not travel in a query
+string, where they would land in access logs and referrers.
+
+Nothing is stored — no R2 object, no row — so there is nothing to sweep. The card is built from
+`shareCardFields()`, which returns only derived values, so it cannot carry a birth date, time, place or
+name; that is asserted in `src/lib/__tests__/share-card.test.ts`, and the reader is about to publish the
+result.
+
+**No Turnstile here, deliberately.** A token is single-use, so the one spent on `/api/sample` cannot be
+reused, and mounting a second challenge for a cosmetic image is real friction. The exposure (an
+unauthenticated engine call) is bounded by the rate limit instead. Errors: `422 VALIDATION_FAILED`,
+`429 RATE_LIMITED`, `503 ENGINE_UNAVAILABLE`.
 
 ### `POST /api/profiles`
 

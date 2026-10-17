@@ -150,11 +150,22 @@ The funnel, and the only place a visitor does real work before signing up.
 
 ```
 Step 1  Birth data        name · gender · date · time · "I don't know my time" · city
-Step 2  Confirm the chart the derived four pillars are shown for confirmation
-                          ← this is a product requirement, not a nicety
-Step 3  Result            Reading preview + PDF preview + download, then:
-                          "Keep this — create an account and I'll save these details"
+Step 2  Result            Snapshot ready → Open / Download the PDF, then the shareable
+                          Day Master card, then "Keep this — create an account and
+                          I'll save these details"
 ```
+
+⚠️ **Corrected 2026-10-17: there is no separate "confirm the chart" step here.** The `Steps` component
+renders three labels, but the flow goes `0 → 2` — `STEPS` names a step that is never shown. The derived
+pillars are confirmed elsewhere: the **order flow** shows them before payment, which is where the
+CLAUDE.md ground rule ("no silent auto-calculated pillars") is actually enforced, because that is where
+money changes hands. The free path does not confirm them. That is a **known gap, not a decision** — see
+the open item in `MEMORY.md`; do not describe this screen as confirming the chart.
+
+The result step also offers the **shareable Day Master card** (`POST /api/share-card`, 1080×1920). It is
+built only from `shareCardFields()`, so it cannot carry a birth date, time, place or name — the reader
+publishes it. A Turnstile token cannot be reused for it (they are single-use), so it is rate-limited
+instead; see the rationale in the route.
 
 - **Gender is required** and the form must say why (major-luck direction is undefined without it).
 - **"I don't know my birth time"** is a first-class path: it sets `timeKnown: false` and the UI
