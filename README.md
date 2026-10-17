@@ -98,7 +98,6 @@ saju/
 │                                      #   engine's Vercel Root Directory is the REPO ROOT so it can import src/;
 │                                      #   the entrypoint is declared in pyproject.toml. See docs/webapp/05 §1.1
 ├── apps/
-│   ├── landing-page/                  # ⚠️ LEGACY Next.js marketing site (config only; src/ is NOT in this repo — see docs/MEMORY.md open item A1)
 │   └── web/                           # ⭐ Next.js webapp: landing page + accounts + ordering + dashboard + review console (live — see docs/webapp/)
 ├── tests/                             # pytest suite (1,900+ tests)
 ├── misc/market_research/              # ⚠️ SUPERSEDED June-2026 India research — see docs/market-research-2026-09.md

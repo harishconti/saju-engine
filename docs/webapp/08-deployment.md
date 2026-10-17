@@ -24,7 +24,6 @@ engine deployment, mostly pandas and numpy via `sajupy`). See
 ```
 saju-engine/
 ├── apps/
-│   ├── landing-page/               # ⚠️ LEGACY — config only, src/ is not in this repo (A1)
 │   └── web/                        # ← Vercel project #1 (Root Directory = apps/web)
 │       ├── src/app/
 │       │   ├── (public)/           # /, /sample, /pricing, /privacy, /terms, /refund-policy

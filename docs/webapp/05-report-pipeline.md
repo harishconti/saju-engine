@@ -142,8 +142,8 @@ Against Vercel's **500 MB** Python bundle limit that is comfortable, and against
 duration it is two orders of magnitude of headroom. Cold start adds ~1–2 s for the pandas import;
 `/health` can be hit on a warm-up schedule if that ever matters.
 
-**Consequence accepted:** delivered PDFs will differ slightly from the demo PDFs already in
-`apps/landing-page/public/`. **Regenerate those demos with `SAJU_PDF_BACKEND=reportlab`** so the
+**Consequence accepted:** delivered PDFs will differ slightly from the demo PDFs already served from
+`apps/web/public/demo/`. **Regenerate those demos with `SAJU_PDF_BACKEND=reportlab`** so the
 marketing preview matches the delivered artefact. Shipping a sample that looks different from the
 product is a refund request waiting to happen.
 

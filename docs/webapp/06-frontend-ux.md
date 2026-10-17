@@ -54,8 +54,9 @@ Component tree rather than eight route boundaries.
 
 ## Landing page sections
 
-Rebuilt from the section inventory preserved in `apps/landing-page/worklog.md` and the archived
-static prototype at `misc/landing-page/archive/cosmicsaju_landing.html`.
+Rebuilt from the archived static prototype at `misc/landing-page/archive/cosmicsaju_landing.html`. (The
+legacy `apps/landing-page/` scaffold — whose `src/` was never in this repo — was deleted 2026-10-17;
+its section inventory in `worklog.md` remains in git history at `fa2eab0`.)
 
 | # | Section | Job | Notes |
 |---|---|---|---|

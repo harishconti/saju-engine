@@ -55,7 +55,7 @@ Thumbs.db
 .pytest_cache/
 .ruff_cache/
 
-# Node / Next.js (apps/landing-page)
+# Node / Next.js (apps/web)
 node_modules/
 .next/
 *.tsbuildinfo
