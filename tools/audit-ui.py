@@ -2,7 +2,8 @@
 """UI/UX audit — measures every page against the bar stated in docs/webapp/06-frontend-ux.md.
 
 Why it exists: that page sets an explicit acceptance bar — no horizontal body scroll at 360 / 390 / 768 /
-1440, zero hydration warnings, axe clean on every screen, ≥44 px touch targets, one `<h1>`, both themes.
+1440, zero hydration warnings, axe clean on every screen, ≥44 px touch targets, one `<h1>`, a declared tab
+icon, both themes.
 Every one of those is *measurable*, so none of them should be a matter of opinion. This runs the
 measurements in a real browser instead of reading the markup and guessing.
 
@@ -36,7 +37,8 @@ from playwright.sync_api import sync_playwright
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 AXE = ROOT / "apps/web/node_modules/axe-core/axe.min.js"
 BASE = os.environ.get("AUDIT_BASE_URL", "https://www.cosmicsaju.com")
-# `--strict` turns the audit into a gate: overflow, axe, hydration and sub-44px *controls* fail it.
+# `--strict` turns the audit into a gate: overflow, axe, hydration, sub-44px *controls* and a missing
+# tab icon fail it.
 # Text links and the deliberately bare /login are not failures — see docs/webapp/06.
 STRICT = "--strict" in sys.argv
 
@@ -147,6 +149,10 @@ def measure(pg, path, label):
         "targets": _targets(pg),
         "h1": pg.evaluate("document.querySelectorAll('h1').length"),
         "shell": pg.evaluate("!!document.querySelector('header, nav, [aria-label=Dashboard]')"),
+        # The tab icon. It was missing for weeks while `public/favicon.svg` sat unreferenced, so every
+        # tab showed a generic globe — invisible in review, obvious to a user. One declaration is
+        # enough; the formats behind it are `tools/build-icons.py`'s business.
+        "icon": pg.evaluate("!!document.querySelector('link[rel~=\"icon\"]')"),
         "hydration": [c for c in real if "hydrat" in c.lower() or "did not match" in c.lower()][:2],
         "errors": real[:4],
         "noise": len(noise),
@@ -232,7 +238,7 @@ def main() -> int:
         browser.close()
 
     print(f"\n=== {BASE} — {'public + authenticated' if cookies else 'public pages only'} ===")
-    print(f"  {'page':28s} {'vp':8s} {'st':4s} {'ovf':4s} {'<44px':6s} {'h1':3s} {'shell':6s} {'hyd':4s} {'axe':4s}")
+    print(f"  {'page':28s} {'vp':8s} {'st':4s} {'ovf':4s} {'<44px':6s} {'h1':3s} {'shell':6s} {'ico':4s} {'hyd':4s} {'axe':4s}")
     for r in rows:
         if "error" in r:
             print(f"  {r['path']:28s} {r['vp']:8s} ERROR {r['error'][:56]}")
@@ -240,7 +246,7 @@ def main() -> int:
         print(
             f"  {r['path']:28s} {r['vp']:8s} {r['status']:<4d} {len(r['ovf']):<4d} "
             f"{len(r['targets']):<6d} {r['h1']:<3d} {('y' if r['shell'] else 'NO'):6s} "
-            f"{len(r['hydration']):<4d} {len(r['axe']):<4d}"
+            f"{('y' if r['icon'] else 'NO'):4s} {len(r['hydration']):<4d} {len(r['axe']):<4d}"
         )
 
     print("\n=== FINDINGS ===")
@@ -266,6 +272,9 @@ def main() -> int:
         if not r["shell"] and (path, "shell") not in seen:
             seen.add((path, "shell"))
             print(f"  NO SHELL  {path} @{vp}")
+        if not r["icon"] and (path, "icon") not in seen:
+            seen.add((path, "icon"))
+            print(f"  NO ICON   {path}")
         if r["hydration"] and (path, "hyd") not in seen:
             seen.add((path, "hyd"))
             print(f"  HYDRATION {path}: {json.dumps(r['hydration'])}")
@@ -276,11 +285,17 @@ def main() -> int:
                 print(f"  AXE       {path} @{vp}: {a['id']} ({a['impact']}, {a['n']}) — {a['target']}")
 
     failures: list[str] = []
+    # Reported per page, not per viewport: every page shares one root layout, so a missing icon is one
+    # mistake repeated 8 times, and 8 identical lines is noise rather than signal.
+    icon_reported: set[str] = set()
     for r in rows:
         if "error" in r:
             failures.append(f"{r['path']} @{r['vp']}: could not be measured — {r['error']}")
             continue
         where = f"{r['path']} @{r['vp']}"
+        if not r["icon"] and r["path"] not in icon_reported:
+            icon_reported.add(r["path"])
+            failures.append(f"{r['path']}: no <link rel=\"icon\"> — the tab shows a generic globe")
         if r["ovf"]:
             failures.append(f"{where}: horizontal scroll ({len(r['ovf'])} element(s))")
         for a in r["axe"]:

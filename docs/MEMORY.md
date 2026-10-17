@@ -1748,6 +1748,37 @@
     ⚠️ **Recommended, not applied:** add an R2 lifecycle rule expiring `reports/anonymous/` after 3 days as a
     backstop. The cron is a single point of failure — a lapsed secret or a broken deploy silently turns a 3-day
     retention promise into "forever", and nothing would report it.
+
+  - **2026-10-17 (the tab had no icon, and the analytics were switched on for the wrong project).** Two findings
+    from one screenshot, both invisible in code review.
+    ✅ **The icons.** The site declared **no icon at all**: `public/favicon.svg` existed but nothing linked to it,
+    so browsers fell back to their default request for `/favicon.ico` — which 404'd — and every tab showed a
+    generic globe. Measured on production before the fix: `/favicon.svg` 200 (unreferenced), `/favicon.ico` 404,
+    `<link rel="icon">` absent. New `tools/build-icons.py` renders the mark into the App Router's conventions
+    (`favicon.ico` at 16/24/32/48/64, `icon.png` 256, `apple-icon.png` 180), and the file convention is what
+    declares them — the page now emits three `<link>` tags. Two design notes: the letter is set in **Cormorant
+    Garamond**, the brand display face, rather than the old SVG's `font-family="Georgia,serif"` (a favicon must not
+    depend on which serif the viewer has), and `apple-icon.png` is drawn **square** because iOS applies its own
+    corner mask. `apple-icon`/`icon` are rendered 4x and downsampled, because a 16px glyph drawn directly is a
+    smear.
+    ✅ **It is now a blocking check in `tools/audit-ui.py`** — the repo's rule is that anything added to the frontend
+    bar goes into the checker. Reported once per *page*, not per viewport: one root layout means one mistake, and
+    eight identical lines is noise. The audit's header and the `06` bar both say so, and `06` records what the
+    checker still does not cover.
+    ⚠️ **My own `--check` was wrong twice before it was right.** First it measured the *mean* colour of the opaque
+    pixels and failed a perfectly good icon — the tile is ~15x the letter's area, so a correct icon averages
+    rgb(18,17,19). It now counts gold pixels. (Third time today that a too-broad or too-naive check caught correct
+    code: "Atlantis", the 23-month cutoff, and this.)
+    🔴 **Analytics was enabled on the wrong project.** The owner enabled Web Analytics for **`saju-report-engine`**
+    — the Python FastAPI engine at `api/index.py`, which serves no HTML and mounts no `<Analytics />`. The website is
+    the **`saju-engine`** project (root `apps/web`). Verified rather than assumed: `/_vercel/insights/script.js` is
+    **still 404** on www.cosmicsaju.com, so the funnel currently records nothing. This is the second time the
+    two-project split has caused a mis-targeted change (the first was the Root Directory), and it is the reason
+    `00-overview.md` D1 leads with "two Vercel projects".
+    Also removed: `public/favicon.svg` and — flagged, not touched — `public/logo.svg`, both unreferenced orphans
+    carried over from the old landing page.
+    Docs: `06` (the bar + the icon rule), the openwiki toolchain (the new tool). Webapp **161** vitest; audit
+    `--strict` 0 blocking across 48 runs, with the new `ico` column reading `y`.
     Docs: `07` (the service row), `10` (sub-processors + the privacy page copy). No env var and no `08` change —
     the toggle is a dashboard setting, not configuration in the repo.
 
