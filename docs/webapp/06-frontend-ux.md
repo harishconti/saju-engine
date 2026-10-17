@@ -192,6 +192,19 @@ Chart summary, tier, status timeline (ordered → generated → reviewed → del
 download, and — if superseded — an explicit "a newer version exists" notice. Never silently swap the
 file under a client.
 
+**This is where the reading lives**, so it is the only screen with per-format actions: **Read your
+reading** (primary) → **Save** → **PDF**. It reads them from `report.htmlKey`, so a report rendered
+before the web document existed offers the PDF alone rather than a dead "read" link.
+
+### `/dashboard/reports`
+
+The library: one row per report, **one action per row — `Details`**. No download button, and
+deliberately no per-format buttons: the row used to carry a `Download PDF` that called the download
+route with no `kind`, which resolves to the **web document** by default — so the button labelled "PDF"
+handed back the reading. A row is a pointer, not a download manager. The reading, the Save and the PDF
+all live one click away on `/dashboard/reports/{id}` (above), which is also the only place that can
+explain *why* an older report has no reading ("regenerate to add it").
+
 ### `/admin/reports/{id}`
 
 The review console described in [05](05-report-pipeline.md) §5. Layout: PDF viewer on the left,

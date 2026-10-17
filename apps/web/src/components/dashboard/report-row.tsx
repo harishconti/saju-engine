@@ -58,19 +58,15 @@ export function ReportRow({ report, showHelp = false }: { report: ReportRowData;
         ) : null}
       </div>
 
+      {/* One action per row: the list is a library, not a download manager. "Details" opens the
+          report, and that page is where the reading lives (Read your reading → Save → PDF). The old
+          per-format button here was also wrong — it asked the download route with no `kind`, which
+          defaults to the web document, so it handed back the reading labelled as the PDF. */}
       <div className="flex shrink-0 items-center gap-2">
         <Link href={`/dashboard/reports/${report.id}`} className={buttonClasses("ghost", "sm")}>
           Details
         </Link>
-        {canDownload ? (
-          <a
-            href={`/api/reports/${report.id}/download`}
-            className={buttonClasses("outline", "sm")}
-            download
-          >
-            Download PDF
-          </a>
-        ) : (
+        {canDownload ? null : (
           <span className="text-xs text-muted-foreground" title={REPORT_STATUS_HELP[report.status]}>
             {timeAgo(report.deliveredAt ?? report.createdAt)}
           </span>

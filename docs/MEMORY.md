@@ -1431,6 +1431,64 @@
     regenerates the compat goldens, and (2) wants a rule "never expand a Hanja that already sits inside a parenthetical
     following its own English" in the translation layer — a change with golden blast radius that deserves its own pass.
 
+  - **2026-10-17 (housekeeping: the dead `apps/landing-page` scaffold is gone).** Owner: "if unused delete it."
+    Verified unused first: no build, runtime, CI or npm-workspace role (there is no root `package.json`), git was
+    clean, and `www.cosmicsaju.com` is served by `apps/web` (Vercel Root Directory = `apps/web`, corrected there on
+    2026-10-15). The directory held only a config shell — its `src/` was never in this repo — plus `worklog.md`
+    (the pre-rebuild section inventory, whose content is archived in `misc/landing-page/`), `DEPLOY.md`, and the
+    orphaned `public/demo-rm-*.pdf` copies (stale by design; the served demos live in `apps/web/public/demo/`, and
+    the compat pair there is byte-identical). Deleted the whole directory with `git rm -r`; every file remains in
+    git history at `fa2eab0`. Live references updated: `README.md` tree, `candidates_horoscope/README.md` (dropped
+    the stale landing-page demo links), `docs/openwiki/operations/toolchain-and-testing.md`,
+    `docs/webapp/08-deployment.md` tree, `docs/webapp/06-frontend-ux.md` (rebuild provenance),
+    `docs/webapp/05-report-pipeline.md` (demo path) and the `.gitignore` comment. Historical notes in `07`/`08a`/`13`
+    and the older `MEMORY.md` log entries are left as written.
+
+  - **2026-10-17 (the two compatibility demos get their reading — the same withheld capability, this time on the
+    marketing page).** Owner, before committing: *"the essential and deep sample reports i see html-reports, but i
+    don't see any for both compatability reports."* Exactly right, and it was the **demo-page instance** of the
+    product bug fixed earlier the same day (see the "a compatibility order now gets the reading" entry above):
+    the pipeline had been fixed, but the public demo artefacts had not.
+    ✅ **Root cause: the compat renderer had no web mode CLI.** `md_to_saju_compat_pdf.py` could only emit a PDF,
+    while the single-chart tool (`md_to_saju_html_pdf.py`) had `--web`. `tools/regen/pdfs.sh` therefore `cp`-ed the
+    two compat PDFs into `apps/web/public/demo/` and never produced an `.html`, and `page.tsx`'s compat cards
+    offered a single "Open the PDF" button instead of the reading-first `Read it` / Save / PDF the RM cards have.
+    ✅ **The fix is one flag, because the renderer was already tier-agnostic.** Added `--web` to the compat tool: it
+    calls the same `markdown_to_html(web=True)` the PDF path uses, with `tier="compat"`, and the default output
+    becomes `…_compatibility.html`. No browser needed (unlike the PDF path). Generated
+    `apps/web/public/demo/demo-compat-{basic,deep}.html` from the same `pawan_sruthi` pair markdown the PDFs come
+    from — 280 KB / 304 KB self-contained, `tier-compat web-mode` body class, both partners present, **zero
+    `knowledge/` citations leaked**, and the only URL is the inline SVG namespace (verified). `page.tsx` now has
+    **one** demo array (`html`/`pdf`/`tier`/`note`/`desc`) covering all five cards — the JSX duplication that let
+    the two card shapes drift apart is gone.
+    ✅ **Tests that fail when the bug is present.** `tests/test_compat_pdf_cli.py` gains three: the web document is
+    self-contained with the compat body class and no leaked citations; `--web` with no `--output` writes `.html`
+    (not `.pdf`) beside the pair; `--web --output x.pdf` fails with exit 2 instead of silently writing HTML to a
+    `.pdf` name. Suite **2,013 passed / 5 skipped / 13 xfailed**; `apps/web` typecheck + eslint clean, **128 vitest
+    passed**, `npm run build` clean.
+    ⚠️ **The UI audit needed a caveat, not a clean bill.** `tools/audit-ui.py --strict` against a local `next start`
+    built with the real `apps/web/.env` reported **38 blocking issues** on `/sample` and `/login` (sub-44 px
+    controls, `landmark-one-main`/`region` axe, an `/h1` count of 0, a "Try again" button) — the global
+    `src/app/error.tsx` boundary was rendering, because with the real env those pages reach the auth/DB path and
+    fail, while CI (placeholder DB URLs, `getCurrentUser()` returns null) and production do not. **Against
+    production, the same audit is 0 blocking issues**, and the page this change touches (`/`) measured clean in
+    both runs (axe 0, no overflow, no hydration, one `<h1>`). So the failures are an artefact of auditing a
+    real-env build locally — a pre-existing gotcha in the local reproduction, not this change.
+
+  - **2026-10-17 (the reports library loses its download button — and a mislabelled one at that).** Owner, from the
+    screen: *"or don't add anything in the screen remove the download pdf as well keep only details, so user will
+    click on the tab and go to reading. that way it looks elegant."* The ask was a simplification, but the button
+    being removed was also **wrong**: the row's `Download PDF` called `/api/reports/{id}/download` with **no `kind`**,
+    and that route's default is `kind=html` — so for any report that had a reading, the button labelled "PDF"
+    handed back the **web document**. (The detail page gets this right: `?kind=html` for the reading, `?kind=pdf`
+    for the PDF.) Deleting it removes the lie rather than papering over it.
+    ✅ **Now one action per row — `Details`** (`src/components/dashboard/report-row.tsx`). The row is a pointer; the
+    reading, Save and PDF all live on `/dashboard/reports/{id}`, which is also the only screen that can explain why
+    an older report has no reading. Undelivered rows still show the `timeAgo` note. `ReportRow` is shared with
+    `/dashboard`, so both lists agree.
+    ✅ `apps/web` typecheck + eslint clean, **128 vitest passed**, `npm run build` clean. Docs: `06` gains a
+    `/dashboard/reports` section stating the rule (one action per row) and why the old button was wrong.
+
 ### Earlier state (2026-09-26)
 
   - **2026-10-16 (the reading joins the design system — "the report UI is very ugly").** Owner feedback on the web
@@ -1548,8 +1606,9 @@
   - **The Deep Destiny Report** (`deep`) — $55, 25–30 pages.
   - **Cosmic Companion** (`companion`) — $9/month or $79/year, 3–4 pages; manual-billing subscription (off the primary pricing grid).
   - **두 분 궁합 / Compatibility** (`compat`) — Snapshot ($24) and Deep ($45) tiers, 11 sub-systems, composite 0–100 score. Deep is the hero product.
-- **Intake paths:** self-service FastAPI app (`tools/client_intake_app.py`; `/` single-chart, `/compat` two-chart, saves JSON intake and returns tiered PDFs), and landing-page Next.js app (`apps/landing-page`) wired to the calculator for the free sample tier.
+- **Intake paths:** self-service FastAPI app (`tools/client_intake_app.py`; `/` single-chart, `/compat` two-chart, saves JSON intake and returns tiered PDFs), and the Next.js webapp (`apps/web`) wired to the calculator for the free sample tier. (The legacy `apps/landing-page` Next.js app was deleted 2026-10-17.)
 - **PDF backends:** reportlab (default) and HTML/Playwright (`--html`).
+- **2026-10-17:** Added the **Harish × Keerthana** compat pair — `candidates_horoscope/marriage_compatibility/harish_keerthana/` (basic + deep `.md`/`.pdf`, **59/100 Mixed**), wired into `tools/regen/{compat.py,pdfs.sh}` and indexed in `candidates_horoscope/README.md`. Keerthana: **3 October 1996, 09:35 IST, Coimbatore** (lon 76.9558) — the client form's `03/10/1996` was confirmed DD/MM before charting; Day Master **癸 (Yin Water)**, pillars 丙子/丁酉/癸酉/丁巳, 용신 Wood / 희신 Water. She has no base report (compat pair only).
 - **Major recent additions (2026-06-21 through 2026-07-12):** daily-luck (일운) overlay, engine-driven prose scaffold, premium report generator, landing-page tiered products, major-luck activation overlay, marriage-compatibility engine + report + PDF renderer, 30×30 Nayin pair table, Korean textbook 만세력 validation cases, repo-root documentation consolidation into `docs/`, Cosmic Companion subscription tier, deeper special-formations validation tests, richer engine-drafted prose fillers, landing-page/free-sample integration, complete `docs/openwiki/` reference site (README + quickstart + architecture + domain + products + operations), and landing-page demo reports generated from RM (Kim Nam-joon, BTS) birth data for all three single-chart tiers.
 
 ## Strategy (2026-09-07 pivot)
