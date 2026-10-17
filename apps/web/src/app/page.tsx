@@ -3,7 +3,7 @@ import { Alert, Badge, Button, buttonClasses, Card, CardContent, SectionHeading 
 import { MobileStickyCta, SiteFooter, SiteHeader } from "@/components/site";
 import { getCurrentUser } from "@/lib/auth";
 import { ElementBalanceBars, ElementBalanceWheel, ElementLegend, FourPillarsChart, KoreanWatermark, SealMark, type PillarCell } from "@/components/viz";
-import { PAID_TIERS, TIERS } from "@/lib/tiers";
+import { PAID_TIERS, COMPAT_TIERS, SINGLE_TIERS, type Tier } from "@/lib/tiers";
 import { formatUSD } from "@/lib/format";
 
 export const metadata = {
@@ -60,6 +60,48 @@ const FAQ = [
  *  a signed-in visitor must not be invited to sign in, and the header cannot know otherwise from HTML
  *  that was baked at build time. Revisit only with a client-side upgrade that cannot fail silently. */
 export const dynamic = "force-dynamic";
+
+/**
+ * One pricing card. Shared by the single-chart grid and the "For two people" row so the two
+ * surfaces cannot drift — the same reason the demo grid was collapsed into one array
+ * (docs/webapp/06-frontend-ux.md).
+ */
+function TierCard({ tier, badge = "Most complete" }: { tier: Tier; badge?: string }) {
+  const free = tier.priceCents === 0;
+  return (
+    <Card className={tier.highlight ? "border-primary/50 relative" : undefined}>
+      {tier.highlight ? (
+        <span className="absolute -top-2.5 left-5">
+          <Badge tone="primary">{badge}</Badge>
+        </span>
+      ) : null}
+      <CardContent className="space-y-4 py-6">
+        <div className="space-y-1">
+          <p className="eyebrow">{tier.pages}</p>
+          <h3 className="font-display text-2xl">{tier.name}</h3>
+          <p className="text-sm text-muted-foreground">{tier.tagline}</p>
+        </div>
+        <p className="font-display text-3xl">{free ? "Free" : formatUSD(tier.priceCents)}</p>
+        <ul className="space-y-1.5 text-sm text-muted-foreground">
+          {tier.includes.map((line) => (
+            <li key={line} className="flex gap-2">
+              <span className="text-primary" aria-hidden>
+                ·
+              </span>
+              <span>{line}</span>
+            </li>
+          ))}
+        </ul>
+        <Link
+          href={free ? "/sample" : `/reports/new?tier=${tier.id}`}
+          className={buttonClasses(tier.highlight ? "primary" : "outline", "md", "w-full")}
+        >
+          {free ? "Start free" : `Choose ${tier.name}`}
+        </Link>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default async function LandingPage() {
   const user = await getCurrentUser();
@@ -249,44 +291,31 @@ export default async function LandingPage() {
             />
 
             <div className="grid gap-4 lg:grid-cols-3">
-              {TIERS.filter((t) => t.kind === "SINGLE").map((tier) => (
-                <Card
-                  key={tier.id}
-                  className={tier.highlight ? "border-primary/50 relative" : undefined}
-                >
-                  {tier.highlight ? (
-                    <span className="absolute -top-2.5 left-5">
-                      <Badge tone="primary">Most complete</Badge>
-                    </span>
-                  ) : null}
-                  <CardContent className="space-y-4 py-6">
-                    <div className="space-y-1">
-                      <p className="eyebrow">{tier.pages}</p>
-                      <h3 className="font-display text-2xl">{tier.name}</h3>
-                      <p className="text-sm text-muted-foreground">{tier.tagline}</p>
-                    </div>
-                    <p className="font-display text-3xl">
-                      {tier.priceCents === 0 ? "Free" : formatUSD(tier.priceCents)}
-                    </p>
-                    <ul className="space-y-1.5 text-sm text-muted-foreground">
-                      {tier.includes.map((line) => (
-                        <li key={line} className="flex gap-2">
-                          <span className="text-primary" aria-hidden>
-                            ·
-                          </span>
-                          <span>{line}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <Link
-                      href={tier.priceCents === 0 ? "/sample" : `/reports/new?tier=${tier.id}`}
-                      className={buttonClasses(tier.highlight ? "primary" : "outline", "md", "w-full")}
-                    >
-                      {tier.priceCents === 0 ? "Start free" : `Choose ${tier.name}`}
-                    </Link>
-                  </CardContent>
-                </Card>
+              {SINGLE_TIERS.map((tier) => (
+                <TierCard key={tier.id} tier={tier} />
               ))}
+            </div>
+
+            {/* For two people. Both compatibility tiers already existed and were buyable, but this
+                grid filtered them out (`kind === "SINGLE"`), so the sharpest differentiator was
+                reachable only from inside the dashboard. Same card and same CTA pattern as the
+                single-chart tiers — `/reports/new?tier=…` already handles COMPAT (two profiles,
+                one order, one review). */}
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <p className="eyebrow">For two people</p>
+                <h3 className="font-display text-xl">Read the relationship, not just one chart</h3>
+                <p className="text-sm text-muted-foreground">
+                  Both charts, compared across eleven classical sub-systems and given a composite
+                  score. The Snapshot is the verdict; the Deep reading works through every
+                  sub-system and overlays both people&apos;s timing.
+                </p>
+              </div>
+              <div className="grid gap-4 lg:grid-cols-2">
+                {COMPAT_TIERS.map((tier) => (
+                  <TierCard key={tier.id} tier={tier} badge="Most complete 궁합" />
+                ))}
+              </div>
             </div>
 
             {/* Compare tiers */}
@@ -297,14 +326,14 @@ export default async function LandingPage() {
               className="overflow-x-auto"
               tabIndex={0}
               role="region"
-              aria-label="Comparison of report tiers"
+              aria-label="Comparison of single-chart report tiers"
             >
               <table className="w-full min-w-[640px] border-collapse text-sm">
-                <caption className="sr-only">Comparison of report tiers</caption>
+                <caption className="sr-only">Comparison of single-chart report tiers</caption>
                 <thead>
                   <tr className="border-b border-border text-left">
                     <th scope="col" className="py-3 pr-4 font-medium">Includes</th>
-                    {TIERS.filter((t) => t.kind === "SINGLE").map((t) => (
+                    {SINGLE_TIERS.map((t) => (
                       <th scope="col" key={t.id} className="px-3 py-3 font-display text-base">
                         {t.name}
                       </th>

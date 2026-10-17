@@ -63,8 +63,8 @@ its section inventory in `worklog.md` remains in git history at `fa2eab0`.)
 | 1 | **Hero** | Answer "what is this?" in five seconds | Live four-pillars chart that draws itself, element wheel, seal mark, 四柱 watermark. The single animated flourish |
 | 2 | **Why Saju** | Frame the category and the honest positioning | Merged from the former WhatIsSaju + WhySaju |
 | 3 | **Demo reports** | Show the actual artefact | Real RM demo **readings** and PDFs, plus the two compatibility demos — each tier offers the web document first ("Read it"), then Save and PDF, mirroring the product's download order. Also the `FourPillarsChart` / `ElementBalance` / `LuckTimeline` visuals built from RM's real chart data |
-| 4 | **Pricing** | Price, after trust is established | Four tiers + the free sample as the entry CTA. `CompareTiers` follows |
-| 5 | **Compare tiers** | Remove choice paralysis | Table across tiers, one canonical primary CTA: *"Get your free chart snapshot"* |
+| 4 | **Pricing** | Price, after trust is established | All five tiers: the three single-chart cards, then a labelled **For two people** block with both compatibility readings. Prices come from `lib/tiers.ts`, never prose. The free sample is the entry CTA |
+| 5 | **Compare tiers** | Remove choice paralysis | The table is **scoped to the single-chart tiers** and says so in its caption/`aria-label` — its rows (Day Master, 대운 table, relationships, year-by-year timing) are single-chart concepts, so two-chart columns would misrepresent them. One canonical primary CTA: *"Get your free chart snapshot"* |
 | 6 | **How it's built** | Justify the price against a $9.99 competitor | The engine-and-honest-interpreter story: cited classical principles, the human review step, what we will not claim |
 | 7 | **About the reader** | Put a human behind it | The honest "engine + human, not a Korean master" line |
 | 8 | **FAQ** | Handle the real objections | Grouped. Must include "Are you a Korean master?" and "Do you offer a guarantee?" |

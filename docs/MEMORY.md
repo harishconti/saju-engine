@@ -1466,14 +1466,14 @@
     (not `.pdf`) beside the pair; `--web --output x.pdf` fails with exit 2 instead of silently writing HTML to a
     `.pdf` name. Suite **2,013 passed / 5 skipped / 13 xfailed**; `apps/web` typecheck + eslint clean, **128 vitest
     passed**, `npm run build` clean.
-    ⚠️ **The UI audit needed a caveat, not a clean bill.** `tools/audit-ui.py --strict` against a local `next start`
-    built with the real `apps/web/.env` reported **38 blocking issues** on `/sample` and `/login` (sub-44 px
-    controls, `landmark-one-main`/`region` axe, an `/h1` count of 0, a "Try again" button) — the global
-    `src/app/error.tsx` boundary was rendering, because with the real env those pages reach the auth/DB path and
-    fail, while CI (placeholder DB URLs, `getCurrentUser()` returns null) and production do not. **Against
-    production, the same audit is 0 blocking issues**, and the page this change touches (`/`) measured clean in
-    both runs (axe 0, no overflow, no hydration, one `<h1>`). So the failures are an artefact of auditing a
-    real-env build locally — a pre-existing gotcha in the local reproduction, not this change.
+    ⚠️ **A UI-audit scare that did not survive re-testing — corrected here.** The first `tools/audit-ui.py --strict`
+    run against a local `next start` reported **38 blocking issues** on `/sample` and `/login` (sub-44 px controls,
+    `landmark-one-main`/`region` axe, an `<h1>` count of 0, a "Try again" button) — the signature of the global
+    `src/app/error.tsx` boundary rendering. A first draft of this note blamed "auditing a real-env build"; that was
+    wrong and is withdrawn. Re-running the identical setup after a rebuild was **exit 0 — 48 page/viewport runs, 0
+    blocking issues**, and production is 0 too. The cause was never established and does not reproduce, so nothing
+    here should be read as a property of the local reproduction. (Lesson, matching this file's recurring theme: one
+    failing observation is not a diagnosis — re-run before writing the cause down.)
 
   - **2026-10-17 (the reports library loses its download button — and a mislabelled one at that).** Owner, from the
     screen: *"or don't add anything in the screen remove the download pdf as well keep only details, so user will
@@ -1488,6 +1488,29 @@
     `/dashboard`, so both lists agree.
     ✅ `apps/web` typecheck + eslint clean, **128 vitest passed**, `npm run build` clean. Docs: `06` gains a
     `/dashboard/reports` section stating the rule (one action per row) and why the old button was wrong.
+
+  - **2026-10-17 (the compatibility tiers reach the pricing grid — the audit's #1 opportunity was a filter).** From an
+    external product audit: *"Compatibility missing from the pricing grid … your own research names 궁합 the sharpest
+    differentiator, but the grid shows only single-chart tiers."* Correct, and cheap to fix, because nothing was
+    missing but the surface.
+    ✅ **Both compat tiers were already fully buyable.** `lib/tiers.ts` carries `compat-basic` ($24) and
+    `compat-deep` ($45) with prices, page counts and Dodo products; `components/dashboard/order-flow.tsx` renders
+    `[...SINGLE_TIERS, ...COMPAT_TIERS]` and handles the second profile; and `/reports/new?tier=compat-deep`
+    already works end to end. The landing page filtered them out in two places — `app/page.tsx`'s
+    `TIERS.filter((t) => t.kind === "SINGLE")` in the card grid and again in the comparison table. So this is a
+    landing-page edit, not a feature build.
+    ✅ **What changed.** The pricing card became a local `TierCard` used by both grids, so they cannot drift (the
+    same de-duplication as the demo grid), and a labelled **For two people** block now shows both compatibility
+    tiers with the same CTA pattern (`/reports/new?tier=…`) as the single-chart cards. The `compat-deep` badge reads
+    "Most complete 궁합", so two identical "Most complete" badges never appear on one page.
+    ✅ **The comparison table is deliberately left single-chart, and now says so.** Its caption/`aria-label` became
+    "Comparison of single-chart report tiers": the rows (Day Master and strength, Career & wealth, 대운 table,
+    Relationships, Health, Year-by-year timing) are single-chart concepts and the mark arrays are positional, so
+    two-chart columns would misrepresent rather than inform. Recorded in `06`.
+    ✅ No tier or price changed, so the `AGENTS.md` triggers for `02` (tier map), `07` (store config) and
+    `openwiki/products/reports.md` do **not** fire — only `06`. Verified by rendering (both
+    `/reports/new?tier=compat-*` CTAs present) and by `tools/audit-ui.py --strict` locally: **0 blocking issues,
+    48 runs**. typecheck + eslint clean, 128 vitest, `npm run build` clean.
 
 ### Earlier state (2026-09-26)
 
