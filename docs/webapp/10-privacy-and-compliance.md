@@ -192,6 +192,25 @@ These come from [`CLAUDE.md`](../../CLAUDE.md) and apply to the site copy as muc
 | **No auto-calculated pillars presented as fact** | The user sees the derived pillars and confirms them before paying |
 | **Citations stay internal** | A citation or reviewer note must never reach a client deliverable. Enforced by a `pdftotext` leak test, not by care |
 
+### Minors
+
+Paid readings cover relationship and health guidance, so they are sold to adults only.
+
+- **Enforced server-side, not only in the form.** `orderSchema`
+  (`apps/web/src/lib/validation/schemas.ts`) requires `adultConfirmed: true` — an absent or falsy
+  field is a refusal, not a default — so a direct `POST /api/orders` cannot skip it. The order flow
+  shows the checkbox and disables the pay button until it is ticked.
+- **Why it exists.** The Hallyu / K-pop-adjacent audience this product can reach skews young. A paid
+  report carrying health and relationship content sold to a 15-year-old is a reputational and
+  payment-dispute risk, and merchant-of-record expectations assume an adult buyer.
+- **The evidence is the order's audit row.** `POST /api/orders` records
+  `adultConfirmed: true` on the `order.create` audit entry alongside the actor and timestamp. It is
+  deliberately *not* a `ConsentRecord`: it is a per-purchase affirmation, not reusable consent, so it
+  belongs with the order rather than in the consent history.
+- **Not yet covered: the free snapshot.** `/sample` is deliberately account-free and un-gated (see
+  [06](06-frontend-ux.md)), takes no payment and stores no row for an anonymous caller, so it asks
+  for no age affirmation today. Revisit if that path ever collects contactable details.
+
 A short, honest footer disclaimer is required on the site: entertainment/self-reflection framing,
 not prediction of outcomes, no professional advice. It is not a legal shield — it is the same honesty
 the product claims as its differentiator.

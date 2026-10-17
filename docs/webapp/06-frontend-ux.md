@@ -178,7 +178,9 @@ That third state is load-bearing: because every paid report is reviewed, `DRAFT_
 ```
 1  Choose a reading     tier cards with price, page count, and contents
 2  Choose profiles      A (required) · B (compat only, required for compat tiers)
-3  Confirm              chart shown again for both profiles (for compat: the pair)
+3  Confirm              chart shown again for both profiles (for compat: the pair), plus the
+                        required "I'm 18 or over" affirmation — the pay button stays disabled until
+                        it is ticked, and the server re-requires it (see 10 §Minors)
 4  Pay                  → Dodo Payments hosted checkout (off-site)
 5  Return               /dashboard/reports with the order in "awaiting review"
 ```

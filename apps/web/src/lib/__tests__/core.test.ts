@@ -39,7 +39,7 @@ describe("profile validation", () => {
 });
 
 describe("order validation", () => {
-  const base = { tier: "deep", profileAId: "a" };
+  const base = { tier: "deep", profileAId: "a", adultConfirmed: true };
 
   it("accepts a single-chart order without a second profile", () => {
     expect(orderSchema.safeParse(base).success).toBe(true);
@@ -52,6 +52,16 @@ describe("order validation", () => {
   it("refuses a compat order that names the same person twice", () => {
     const res = orderSchema.safeParse({ ...base, profileBId: "a" });
     expect(res.success).toBe(false);
+  });
+
+  it("refuses an order with no 18+ affirmation — absent is a refusal, not a default", () => {
+    expect(orderSchema.safeParse({ tier: "deep", profileAId: "a" }).success).toBe(false);
+  });
+
+  it("refuses an order where the affirmation is falsy, not merely untrue-typed", () => {
+    for (const falsy of [false, undefined, null, 0, ""]) {
+      expect(orderSchema.safeParse({ ...base, adultConfirmed: falsy }).success).toBe(false);
+    }
   });
 });
 

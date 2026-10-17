@@ -93,7 +93,15 @@ export const POST = handle(async (req) => {
         entityId: created.id,
         action: "create",
         actorId: user.id,
-        after: { tier: created.tier, kind: created.kind, priceCents: created.priceCents },
+        after: {
+          tier: created.tier,
+          kind: created.kind,
+          priceCents: created.priceCents,
+          // Recorded explicitly: the buyer affirmed 18+ at this moment, and `orderSchema` will not
+          // accept an order without it. This row is the evidence (there is no separate record, as
+          // the affirmation is not a reusable consent like ConsentRecord).
+          adultConfirmed: true,
+        },
       });
 
       return {

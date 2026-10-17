@@ -52,6 +52,17 @@ export const orderSchema = z
     profileAId: z.string().trim().min(1, "Choose who this reading is for"),
     profileBId: z.string().trim().min(1).nullable().optional(),
     idempotencyKey: z.string().trim().min(8).max(100).optional(),
+    /**
+     * The buyer affirms they are 18 or over. Required, and required to be `true`: an absent or
+     * falsy field is a refusal, not a default. Enforced here rather than only in the form, so a
+     * direct `POST /api/orders` cannot skip it.
+     *
+     * Why: paid readings cover relationship and health content, and the Hallyu-adjacent audience
+     * this product reaches skews young — see docs/webapp/10-privacy-and-compliance.md §Minors.
+     */
+    adultConfirmed: z.boolean().refine((v) => v === true, {
+      message: "Confirm you are 18 or over — paid readings cover relationship and health content",
+    }),
   })
   .refine((v) => !(v.profileBId && v.profileBId === v.profileAId), {
     message: "A compatibility reading needs two different people",

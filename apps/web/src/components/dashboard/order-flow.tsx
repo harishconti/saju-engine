@@ -27,6 +27,9 @@ export function OrderFlow({ profiles, initialTier }: { profiles: OrderProfile[];
   const [profileBId, setProfileBId] = useState<string>("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Not persisted anywhere client-side: it is an affirmation made at submission, and the server
+  // re-requires it (lib/validation/schemas.ts) so this state is only a convenience.
+  const [adultConfirmed, setAdultConfirmed] = useState(false);
 
   // One key per submission attempt; reused across retries of the same submission.
   const [idempotencyKey] = useState(() =>
@@ -53,6 +56,7 @@ export function OrderFlow({ profiles, initialTier }: { profiles: OrderProfile[];
           profileAId,
           profileBId: tier.kind === "COMPAT" ? profileBId || null : null,
           idempotencyKey,
+          adultConfirmed,
         }),
       });
 
@@ -223,8 +227,33 @@ export function OrderFlow({ profiles, initialTier }: { profiles: OrderProfile[];
                 can change your mind about the birth details right up until delivery.
               </Alert>
 
+              {/* An affirmation, not a marketing prompt: the tier covers relationship and health
+                  content, and the Hallyu-adjacent audience skews young (docs/webapp/10 §Minors).
+                  The server requires this too, so it is enforcement rather than decoration. */}
+              {tier.priceCents > 0 ? (
+                <label className="flex items-start gap-3 rounded-md border border-border bg-muted/30 p-3 text-sm">
+                  <input
+                    type="checkbox"
+                    className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--primary)]"
+                    checked={adultConfirmed}
+                    onChange={(e) => setAdultConfirmed(e.target.checked)}
+                  />
+                  <span>
+                    <span className="font-medium text-foreground">I&apos;m 18 or over</span>
+                    <span className="ml-1 text-muted-foreground">
+                      These readings include relationship and health guidance, so we sell them to adults
+                      only.
+                    </span>
+                  </span>
+                </label>
+              ) : null}
+
               <div className="flex flex-wrap items-center gap-3">
-                <Button loading={busy} onClick={submit}>
+                <Button
+                  loading={busy}
+                  disabled={tier.priceCents > 0 && !adultConfirmed}
+                  onClick={submit}
+                >
                   {tier.priceCents === 0 ? "Confirm" : `Pay ${formatUSD(tier.priceCents)}`}
                 </Button>
                 <Button

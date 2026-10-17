@@ -1512,6 +1512,25 @@
     `/reports/new?tier=compat-*` CTAs present) and by `tools/audit-ui.py --strict` locally: **0 blocking issues,
     48 runs**. typecheck + eslint clean, 128 vitest, `npm run build` clean.
 
+  - **2026-10-17 (paid checkout now asks for an adult — enforced on the server, not in the form).** From the
+    external product audit's fit risks: *"K-pop audiences skew young … a paid report with health and relationship
+    content sold to a 15-year-old is a reputational and payment-dispute risk. Add an 18+ checkbox to paid
+    checkout."*
+    ✅ **Where it lives.** `orderSchema` (`lib/validation/schemas.ts`) now requires `adultConfirmed: true` — an
+    absent or falsy field is a *refusal*, not a default — so a direct `POST /api/orders` cannot skip it. The order
+    flow renders the checkbox and keeps the pay button disabled until it is ticked. Two new cases in
+    `core.test.ts` (missing → refused; `false`/`undefined`/`null`/`0`/`""` → refused); webapp **128 → 130**.
+    ✅ **The evidence is the order's own audit row**, not a new table: `POST /api/orders` writes
+    `adultConfirmed: true` onto the `order.create` audit entry with the actor and timestamp. Deliberately **not** a
+    `ConsentRecord` — a per-purchase affirmation is not reusable consent, so it belongs with the order rather than
+    in the consent history.
+    ⚠️ **Deliberately NOT applied to the free snapshot.** `/sample` is account-free, un-gated and stores nothing
+    for an anonymous caller (`06`), takes no payment, and so still asks for no age affirmation. That gap is
+    recorded in `10` §Minors rather than left implicit — and it is exactly what the audit plan's email-capture
+    phase would change, since that makes the free path collect contactable details.
+    Docs: `03` (route row + payload example), `06` (order-flow step 3), and a new `10` §Minors section — added
+    because a code comment now cites it, and this repo has been burned by citing a section that did not exist.
+
 ### Earlier state (2026-09-26)
 
   - **2026-10-16 (the reading joins the design system — "the report UI is very ugly").** Owner feedback on the web

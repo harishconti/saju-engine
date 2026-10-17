@@ -83,7 +83,7 @@ export const POST = handle(async (req: Request) => {
 
 | Method | Path | Auth | Purpose |
 |---|---|---|---|
-| `POST` | `/api/orders` | user | Create an order. Returns a checkout URL for paid tiers. **Rejects the free tier** with `422 TIER_NOT_ORDERABLE` — the snapshot has its own path. Requires `Idempotency-Key` |
+| `POST` | `/api/orders` | user | Create an order. Returns a checkout URL for paid tiers. **Rejects the free tier** with `422 TIER_NOT_ORDERABLE` — the snapshot has its own path. Requires `Idempotency-Key`, and requires `adultConfirmed: true` (an absent field is a refusal — see [10](10-privacy-and-compliance.md) §Minors) |
 | `GET` | `/api/orders` | user | List own orders |
 | `GET` | `/api/orders/{id}` | user | Read one |
 | `POST` | `/api/orders/{id}/checkout` | user | Re-issue a hosted checkout for an unpaid order (abandoned first attempt) |
@@ -237,7 +237,8 @@ Returns `201 { profile }`. The first profile created for a user is automatically
   "tier": "deep",              // "essential" | "deep" | "compat-basic" | "compat-deep"
   "profileAId": "cuid",
   "profileBId": null,          // required for compat tiers
-  "idempotencyKey": "…"
+  "idempotencyKey": "…",
+  "adultConfirmed": true       // required; must be true. Absent is refused, not defaulted
 }
 ```
 
