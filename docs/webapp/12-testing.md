@@ -161,7 +161,7 @@ These map 1:1 onto the product-level definition of done in
 
 | # | Acceptance test |
 |---|---|
-| 1 | A new visitor gets a sample PDF in one flow, signed out |
+| 1 | A new visitor gets a sample **reading** in one flow, signed out |
 | 2 | Creating an account preserves that sample in `/dashboard/reports` |
 | 3 | A purchase (test mode) creates exactly one job |
 | 4 | The job produces a PDF in R2 with no human action |

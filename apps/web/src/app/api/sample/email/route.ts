@@ -5,16 +5,20 @@ import { prisma } from "@/lib/prisma";
 import { buildAnonymousKey, buildSampleKey, headObject, isR2Configured, presignGetUrl } from "@/lib/r2";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { POLICY_VERSION } from "@/lib/consent";
+import { ANONYMOUS_SAMPLE_RETENTION_DAYS } from "@/lib/retention";
 import { sampleEmailSchema } from "@/lib/validation/schemas";
 
 export const dynamic = "force-dynamic";
 
 /**
- * The emailed link's lifetime. The anonymous object is R2-swept at 7 days, so this is the longest a
- * link can *usefully* be — a longer URL would outlive the object it points at and 404. Seven days is
- * also the standard ceiling for a presigned S3/R2 GET.
+ * The emailed link's lifetime — **the same as the object's**, deliberately.
+ *
+ * The reading it points at is swept by the daily cleanup cron after
+ * `ANONYMOUS_SAMPLE_RETENTION_DAYS`, and there is no R2 lifecycle rule to fall back on, so a longer
+ * link would 404 for part of its promised life. One constant, two readers:
+ * `src/lib/__tests__/retention.test.ts` fails if they drift.
  */
-const LINK_SECONDS = 7 * 24 * 60 * 60;
+const LINK_SECONDS = ANONYMOUS_SAMPLE_RETENTION_DAYS * 24 * 60 * 60;
 
 /**
  * `POST /api/sample/email` — send the free snapshot to an address, and record the lead.
@@ -49,10 +53,11 @@ export const POST = handle(async (req) => {
 
   // Re-derive the object key server-side from the id — the client never supplies a key or a URL, so
   // there is nothing here to point at someone else's file. Two shapes are possible for the same id:
-  // anonymous (the funnel case) and a kept sample under the owner's prefix.
+  // anonymous (the funnel case) and a kept sample under the owner's prefix. Both are the **reading**
+  // (`.html`): the free tier has no PDF, so a `pdf` candidate would never match.
   const user = await getCurrentUser();
-  const candidates = [buildAnonymousKey(input.sampleId)];
-  if (user) candidates.push(buildSampleKey(user.id, input.sampleId));
+  const candidates = [buildAnonymousKey(input.sampleId, "html")];
+  if (user) candidates.push(buildSampleKey(user.id, input.sampleId, "html"));
 
   let key: string | null = null;
   for (const candidate of candidates) {
@@ -87,7 +92,7 @@ export const POST = handle(async (req) => {
 
   if (!isEmailConfigured()) {
     // The lead is safe; say plainly that the mail could not be sent rather than pretending.
-    return json({ ok: true, emailed: false, expiresInDays: 7 }, 201);
+    return json({ ok: true, emailed: false, expiresInDays: ANONYMOUS_SAMPLE_RETENTION_DAYS }, 201);
   }
 
   const sent = await sendEmail({
@@ -98,7 +103,7 @@ export const POST = handle(async (req) => {
       "",
       url,
       "",
-      "The link works for 7 days. Nothing is stored about your birth details — create an account and",
+      `The link works for ${ANONYMOUS_SAMPLE_RETENTION_DAYS} days. Nothing is stored about your birth details — create an account and`,
       "we'll keep the chart for you: https://www.cosmicsaju.com/sample",
       "",
       "Reply to this email if anything looks wrong.",
@@ -106,7 +111,7 @@ export const POST = handle(async (req) => {
   });
 
   return json(
-    { ok: true, emailed: sent.ok, expiresInDays: sent.ok ? 7 : undefined },
+    { ok: true, emailed: sent.ok, expiresInDays: sent.ok ? ANONYMOUS_SAMPLE_RETENTION_DAYS : undefined },
     sent.ok ? 201 : 502,
   );
 });

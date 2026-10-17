@@ -7,12 +7,14 @@ import { Alert, Button, Card, CardContent, Field, Input, Select, Steps, buttonCl
 import { TurnstileWidget } from "@/components/turnstile-widget";
 import { findCity, searchCities } from "@/lib/cities";
 import { useCityIndex } from "@/lib/use-city-index";
+import { ANONYMOUS_SAMPLE_RETENTION_LABEL } from "@/lib/retention";
 import { ElementalRule, SealMark } from "@/components/viz";
 
 const STEPS = ["Your birth details", "Check your chart", "Your snapshot"];
 
 interface SampleResult {
-  downloadUrl: string;
+  /** The reading — a self-contained web document. The free tier has no PDF. */
+  readUrl: string;
   bytes?: number;
   savedToProfile?: boolean;
   /** The handle the email step uses. Random, and only *names* an object — the key is re-derived. */
@@ -74,7 +76,7 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
       });
 
       const body = (await res.json().catch(() => ({}))) as SampleResult & { error?: string; code?: string };
-      if (!res.ok || !body.downloadUrl) {
+      if (!res.ok || !body.readUrl) {
         setError(body.error ?? "We couldn't generate your snapshot. Please try again.");
         // A Turnstile token is single-use, so any retry needs a fresh challenge.
         setTurnstileReset((n) => n + 1);
@@ -313,15 +315,17 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
             </div>
 
             <div className="flex flex-wrap justify-center gap-3">
-              <a href={result.downloadUrl} target="_blank" rel="noreferrer" className={buttonClasses("primary", "lg")}>
-                Open my snapshot
+              {/* Read first, Save second — the same order and the same two actions a paid client gets.
+                  The free tier is the *reading*; there is no PDF to download (see the route). */}
+              <a href={result.readUrl} target="_blank" rel="noreferrer" className={buttonClasses("primary", "lg")}>
+                Read it
               </a>
               <a
-                href={result.downloadUrl}
-                download="cosmic-saju-snapshot.pdf"
+                href={result.readUrl}
+                download="cosmic-saju-snapshot.html"
                 className={buttonClasses("outline", "lg")}
               >
-                Download the PDF
+                Save it
               </a>
             </div>
 
@@ -373,7 +377,8 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
             <div className="border-t border-border pt-5">
               {leadState === "sent" ? (
                 <Alert tone="success" title="On its way">
-                  Sent to {leadEmail}. The link works for 7 days — longer than the one above.
+                  Sent to {leadEmail}. The link works for {ANONYMOUS_SAMPLE_RETENTION_LABEL} — longer than
+                  the one above.
                 </Alert>
               ) : (
                 <div className="space-y-3">

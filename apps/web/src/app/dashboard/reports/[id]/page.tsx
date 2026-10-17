@@ -104,14 +104,18 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ i
                     Save
                   </a>
                 ) : null}
-                <a
-                  href={`/api/reports/${report.id}/download?kind=pdf`}
-                  download
-                  title="The PDF, for printing or keeping"
-                  className={buttonClasses(report.htmlKey ? "outline" : "primary", "md")}
-                >
-                  PDF
-                </a>
+                {/* Gated on a PDF actually existing. A saved free sample has none — its artefact is the
+                    reading — so an unconditional link would render a dead button. */}
+                {report.pdfKey ? (
+                  <a
+                    href={`/api/reports/${report.id}/download?kind=pdf`}
+                    download
+                    title="The PDF, for printing or keeping"
+                    className={buttonClasses(report.htmlKey ? "outline" : "primary", "md")}
+                  >
+                    PDF
+                  </a>
+                ) : null}
               </>
             ) : null}
           </>

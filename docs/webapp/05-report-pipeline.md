@@ -329,7 +329,7 @@ after a check.
 
 | Key pattern | Contents | Lifetime |
 |---|---|---|
-| `reports/anonymous/{uuid}/sample.pdf` | Free samples not yet claimed | Swept after 7 days, **by object age** (see [09](09-operations.md)) — an anonymous sample creates no row to track, so a row-driven sweep found nothing |
+| `reports/anonymous/{uuid}/sample.pdf` | Free samples not yet claimed | Swept after 3 days, **by object age** (see [09](09-operations.md)) — an anonymous sample creates no row to track, so a row-driven sweep found nothing |
 | `reports/{userId}/samples/{uuid}.pdf` | A sample a signed-in user kept | Until the user deletes it. Deliberately **outside** the swept prefix |
 | `reports/{userId}/{orderId}/{reportId}.pdf` | Delivered report | Until deletion is requested |
 | `reports/{userId}/{orderId}/{reportId}.md` | Source markdown — the audit trail **and** the input the audio script is derived from | Same |
@@ -469,6 +469,13 @@ because the dangerous default would be delivering something nobody has looked at
 The free snapshot has its own synchronous path (`POST /api/sample`) and is not orderable through
 `/api/orders`, which rejects it with `TIER_NOT_ORDERABLE`: it needs no account, no order and no job, and
 routing it through the paid flow would only duplicate that machinery.
+
+**Its artefact is the reading, not a PDF** (since 2026-10-17), so `Report.pdfKey` is null for a sample and
+its `htmlKey` is what the library and the detail page serve. The engine's contract still requires a PDF
+upload target, so the route presigns one under the **swept** `reports/anonymous/` prefix and never records
+it — a deliberate, documented waste (one PDF render and roughly 100 KB per free snapshot, swept in 3 days)
+that buys avoiding a contract change across two deployables. The honest fix, if the volume ever justifies
+it, is to make `uploadUrl` optional so the sample skips the PDF render entirely.
 
 This is not an admin panel bolted on. Given decision **D5 (always review)**, it is the component
 that delivers the promise *"an accurate engine and an honest interpreter."*

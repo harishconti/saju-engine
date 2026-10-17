@@ -3,13 +3,20 @@ import { drainObjectDeletions, deleteObjects, isR2Configured, listObjectsByPrefi
 import { purgeOldIdempotencyKeys } from "./idempotency";
 import { purgeOldRateLimits } from "./ratelimit";
 import { purgeOldJobs, reclaimStaleJobs } from "./queue";
+import { ANONYMOUS_SAMPLE_RETENTION_DAYS } from "./retention";
 
 /**
  * The daily maintenance sweep.
  *
  * Every step is a bounded delete/update, so the whole job is safe to run twice concurrently.
  * Contract: docs/webapp/09-operations.md §"What cleanup does"
+ *
+ * ⚠️ **Nothing else expires the free snapshots.** No R2 lifecycle rule covers `reports/anonymous/`
+ * (verified 2026-10-17: the bucket's only rule is Cloudflare's default multipart abort), so this cron
+ * is the whole retention mechanism for them. See `retention.ts`.
  */
+
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 export interface CleanupReport {
   leasesRequeued: number;
@@ -52,7 +59,7 @@ export async function runCleanup(now = new Date()): Promise<CleanupReport> {
     report.objectsFailed = drained.failed;
     report.objectsAbandoned = drained.abandoned;
 
-    // 3. Sweep unclaimed anonymous samples older than 7 days.
+    // 3. Sweep unclaimed anonymous samples older than ANONYMOUS_SAMPLE_RETENTION_DAYS.
     report.anonymousSwept = await sweepAnonymousSamples(now);
   }
 
@@ -79,7 +86,7 @@ export async function runCleanup(now = new Date()): Promise<CleanupReport> {
  * deletes by prefix when R2 listing is available.
  */
 async function sweepAnonymousSamples(now: Date): Promise<number> {
-  const cutoff = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const cutoff = new Date(now.getTime() - ANONYMOUS_SAMPLE_RETENTION_DAYS * DAY_MS);
   let deleted = 0;
 
   // (a) Objects, by age, under the anonymous prefix.

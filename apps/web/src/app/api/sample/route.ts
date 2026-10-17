@@ -27,8 +27,11 @@ export const maxDuration = 60;
  * Deliberately account-free: it is the only proof the product works, so gating it behind sign-up would
  * gut it. If the caller IS signed in we also save a profile, which is what makes "keep this" work.
  *
- * Nothing is persisted for anonymous callers. The object lands under reports/anonymous/… and is swept
- * by an R2 lifecycle rule (7 days) — there is no row to track it by.
+ * Nothing is persisted for anonymous callers. The reading lands under reports/anonymous/… and is swept
+ * by the **daily cleanup cron** after `ANONYMOUS_SAMPLE_RETENTION_DAYS` — there is no row to track it by.
+ * (This used to claim "an R2 lifecycle rule". The bucket has no such rule — its only rule is
+ * Cloudflare's default multipart abort — so believing that comment would have meant shipping a retention
+ * promise nothing enforced.)
  */
 export const POST = handle(async (req) => {
   const ip = clientIp(req);
@@ -102,17 +105,19 @@ export const POST = handle(async (req) => {
           profileAId: profileId,
           tier: "sample",
           status: "DELIVERED",
-          pdfKey: { not: null },
+          // The reading is what a sample offers — since 2026-10-17 it has no PDF at all, so `pdfKey`
+          // is null and a `pdfKey: { not: null }` filter would never match a freshly saved sample.
+          htmlKey: { not: null },
         },
         orderBy: { createdAt: "desc" },
-        select: { id: true, pdfKey: true, bytes: true, engineVersion: true },
+        select: { id: true, htmlKey: true, htmlBytes: true, engineVersion: true },
       });
-      if (kept?.pdfKey) {
+      if (kept?.htmlKey) {
         return json({
           ok: true,
-          downloadUrl: await presignGetUrl(kept.pdfKey, 900),
+          readUrl: await presignGetUrl(kept.htmlKey, 900),
           expiresIn: 900,
-          bytes: kept.bytes ?? undefined,
+          bytes: kept.htmlBytes ?? undefined,
           engineVersion: kept.engineVersion ?? undefined,
           savedToProfile: true,
           reportId: kept.id,
@@ -122,16 +127,26 @@ export const POST = handle(async (req) => {
     }
   }
 
-  // Decide where the artefact lives *before* presigning. A signed-in snapshot is kept under the
-  // user's own prefix, because `reports/anonymous/` is swept by age and a kept sample must not be.
+  // Decide where the artefact lives *before* presigning.
   const sampleId = randomUUID();
-  const key = user ? buildSampleKey(user.id, sampleId) : buildAnonymousKey(sampleId, "pdf");
+  // **The reading is the free artefact.** A sample is one page of chart: it exists to prove the product
+  // works, and a PDF download is the worst way to show that — it leaves the site, cannot be read on the
+  // phone it was requested from, and looks nothing like what a paid client gets. So the sample is
+  // delivered as the same self-contained web document every paid tier is, and the free tier offers **no
+  // PDF at all**.
+  //
+  // The engine still requires an upload target for a PDF (that is the contract), so one is presigned —
+  // but always under the **swept** prefix and never recorded on the row, so it cannot become dead
+  // storage that nobody can reach. When signed in, the *reading* is the copy that is kept.
+  const readKey = user ? buildSampleKey(user.id, sampleId, "html") : buildAnonymousKey(sampleId, "html");
+  const discardedPdfKey = buildAnonymousKey(sampleId, "pdf");
 
   const result = await callEngine({
     contractVersion: ENGINE_CONTRACT_VERSION,
     kind: "single",
     tier: "sample",
-    uploadUrl: await presignPutUrl(key, "application/pdf"),
+    uploadUrl: await presignPutUrl(discardedPdfKey, "application/pdf"),
+    htmlUploadUrl: await presignPutUrl(readKey, "text/html"),
     profileA: {
       fullName: input.fullName,
       gender: input.gender,
@@ -146,7 +161,7 @@ export const POST = handle(async (req) => {
     },
   });
 
-  const object = await headObject(key);
+  const object = await headObject(readKey);
   if (!object) throw ApiError.unavailable("The snapshot did not upload correctly", "UPLOAD_NOT_VERIFIED");
 
   // If the visitor is signed in, keep it — and make the copy true. Previously only the Profile was
@@ -201,9 +216,13 @@ export const POST = handle(async (req) => {
           version: 1,
           status: "DELIVERED",
           profileAId: resolvedProfileId,
-          pdfKey: key,
-          sha256: result.sha256 ?? null,
-          bytes: result.bytes ?? object.size,
+          // No PDF is kept for a sample: the reading is the artefact, and the PDF the engine produced
+          // on the way is under the swept prefix. `pdfKey: null` is therefore correct, not missing.
+          pdfKey: null,
+          htmlKey: readKey,
+          sha256: null,
+          bytes: result.htmlBytes ?? object.size,
+          htmlBytes: result.htmlBytes ?? object.size,
           engineVersion: result.engineVersion ?? null,
           deliveredAt: new Date(),
         },
@@ -234,16 +253,17 @@ export const POST = handle(async (req) => {
     await computeAndStoreChart(resolvedProfileId);
   }
 
-  const downloadUrl = await presignGetUrl(key, 900);
+  const readUrl = await presignGetUrl(readKey, 900);
 
   return json({
     ok: true,
     // The handle the "email me my snapshot" step uses to ask for a fresh link later. Safe to expose:
     // it is a random UUID that only *names* an object, and every read re-derives the key server-side.
     sampleId,
-    downloadUrl,
+    // The reading. There is deliberately no PDF URL: the free tier offers the web document only.
+    readUrl,
     expiresIn: 900,
-    bytes: result.bytes,
+    bytes: result.htmlBytes ?? object.size,
     engineVersion: result.engineVersion,
     savedToProfile: Boolean(user),
     // Present when signed in, so the UI can link straight to the library entry.

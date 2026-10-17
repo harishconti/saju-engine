@@ -22,7 +22,7 @@ state privacy laws for the US) and **the product's own ground rules** about what
 | Consent records | Neon (`ConsentRecord`) | Personal data | Legal obligation (proving consent) |
 | Delivery log (email address, provider message id) | Neon (`Delivery`) | Personal data | Contract |
 | **Correspondence** — support mail, refund requests, DSARs | **Hostinger email** (`hello@`, with the `privacy@` alias) | Personal data | Legitimate interest / legal obligation (answering the request). Lives in the mail provider's mailbox, **not** in our database |
-| Anonymous sample objects | R2 `reports/anonymous/…` | Personal data until unlinked | Consent; **swept after 7 days** |
+| Anonymous sample objects | R2 `reports/anonymous/…` | Personal data until unlinked | Consent; **swept after 3 days** |
 | Emailed sample address | Neon (`SampleLead`) | Personal data | **Consent** for the course; legitimate interest for the snapshot the person asked for. Deliberately holds **no birth data** — the visitor is anonymous |
 | Webhook payloads | Neon (`WebhookEvent`) | May contain name/email from the MoR | Legitimate interest; purged at 90 days |
 
@@ -98,7 +98,7 @@ consent was given. Recorded as an open item rather than left implicit.
 
 | Data | Retention | Mechanism |
 |---|---|---|
-| Anonymous samples (R2 + any row) | 7 days | Cleanup cron |
+| Anonymous samples (R2 + any row) | **3 days** | Cleanup cron — the *only* thing that deletes them: there is no R2 lifecycle rule on `reports/anonymous/` |
 | Profiles / birth data | Until the user deletes it, or 24 months of inactivity | Warning at 23 months, sweep at 24 |
 | Reports + PDFs | Until deletion is requested | Deleted together with the `Report` row |
 | Account after a deletion request | Deleted, with `Order`/`Report` rows anonymised | 30-day grace, then cleanup cron |
@@ -293,7 +293,7 @@ document the reasoning for *not* notifying — the reasoning is what an auditor 
       server-side** at the profile write, not merely displayed (`403 CONSENT_REQUIRED`)
 - [ ] Birth-data consent wording reviewed specifically for the sensitive category
 - [ ] Deletion path works end to end and is cancellable
-- [ ] Retention sweep and 7-day anonymous-sample purge are running
+- [ ] Retention sweep and the 3-day anonymous-sample purge are running
 - [ ] Disclaimer on the site and in the report footer
 - [ ] Testimonials are real and permissioned, or the section is removed
 - [ ] Delivery-time promise in the copy matches the review workflow

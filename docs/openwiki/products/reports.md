@@ -29,7 +29,7 @@ reader-argued 용신 from the hand-crafted natal reading so the natal and compat
 | **Compatibility Snapshot (두 분 궁합)** | `generate_compat_report(..., tier="basic")` | $24 | ~4 | Composite 0–100 score + 4-band verdict, four-pillar glance, four decisive sub-systems, condensed practical guidance, closing note. |
 | **Deep Compatibility (두 분 궁합)** — hero | `generate_compat_report(..., tier="deep")` | $45 | 9–10 | Basic + all 11 sub-system cards, per-partner element balance / Day Master snapshots, major-luck timelines, year-by-year couple timing overlay, full practical guidance, closing note. |
 
-**Delivery (P4):** via the self-service app the free sample PDF is instant; every paid tier (single-chart and compat) is queued as an engine draft and delivered only after the owner reviews it and runs `tools/intake_admin.py approve <id> --base-url https://<host>`, which prints a private download link (no email sending yet). PII is encrypted with `SAJU_INTAKE_KEY`; retention default 180 days.
+**Delivery (P4):** via the self-service app the free sample reading is instant (the free tier has no PDF — see `docs/webapp/03-api-spec.md` §`POST /api/sample`); every paid tier (single-chart and compat) is queued as an engine draft and delivered only after the owner reviews it and runs `tools/intake_admin.py approve <id> --base-url https://<host>`, which prints a private download link (no email sending yet). PII is encrypted with `SAJU_INTAKE_KEY`; retention default 180 days.
 
 The 11 sub-systems are defined in `knowledge/11-gunghap.md` and implemented in `src/saju_engine/compat.py`.
 

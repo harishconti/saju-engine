@@ -44,7 +44,7 @@ export const POST = handle(async (req: Request) => {
 | Method | Path | Purpose | Rate limit |
 |---|---|---|---|
 | `GET` | `/api/health` | DB + R2 + engine probe. No secrets. 200 `{status:'ok',…}` / 503 `{status:'degraded',…}` | none |
-| `POST` | `/api/sample` | Generate a free sample PDF. No account required | 5 / min / IP |
+| `POST` | `/api/sample` | Generate a free sample **reading** (the web document). No account required, and no PDF — see the response below | 5 / min / IP |
 | `POST` | `/api/share-card` | The reader's own Day Master card, a 1080×1920 PNG. No account required — it is the free snapshot's growth loop. Carries no birth data (built from `shareCardFields()`), stores nothing | 5 / min / IP |
 | `POST` | `/api/sample/email` | Email the free snapshot, and record the lead (`SampleLead`). No account required. Stores no birth data — only the address and the marketing choice | 5 / min / IP |
 
@@ -175,13 +175,22 @@ The funnel. Deliberately account-free.
   "ok": true,
   "sampleId": "5d3f…",          // random; the email step's handle. Only NAMES an object — every read
                                 //   re-derives the key server-side, so it cannot point at anyone else's
-  "downloadUrl": "https://…r2.cloudflarestorage.com/…&X-Amz-Expires=900",
+  "readUrl": "https://…r2.cloudflarestorage.com/…&X-Amz-Expires=900",
   "expiresIn": 900,
-  "bytes": 71234,
+  "bytes": 273689,             // the READING's size — there is no PDF to report on
   "engineVersion": "0.2.0",
   "savedToProfile": false
 }
 ```
+
+**The free tier is the reading, with no PDF** (since 2026-10-17). A sample is one page of chart, so the
+PDF was the worst way to present it: it leaves the site, cannot be read on the phone that requested it,
+and looks nothing like what a paid client receives. The engine still *requires* an upload target for a
+PDF (that is the contract), so one is presigned — always under the **swept** `reports/anonymous/` prefix
+and never recorded on a row, so it cannot become dead storage nobody can reach. For a signed-in visitor
+the *reading* is what is kept. Consequently `Report.pdfKey` is **null** for a sample, and the reused-sample
+lookup filters on `htmlKey`; a sample saved before this change has no reading and is superseded by a
+fresh render rather than reused.
 
 ⚠️ **The response carries no chart.** An earlier version of this page documented `dayMaster` and
 `chartPreview.pillars` here; the route has never returned them. That matters, because the same page
@@ -194,7 +203,7 @@ described the free flow as confirming the derived pillars before the snapshot �
 same birth details returns the **stored** report (`reused: true`, same `reportId`) rather than rendering
 the identical chart again — so the free endpoint is idempotent per person and the library does not fill
 with duplicates. Signed out, nothing is persisted and the object lives under `reports/anonymous/…`,
-which is swept after 7 days.
+which is swept after 3 days.
 
 Errors: `422 VALIDATION_FAILED` (bad or missing birth fields), `409 BIRTH_DATA_AMBIGUOUS`
 (the engine flagged a solar-term or hour-boundary knife-edge and wants confirmation), `429
@@ -277,7 +286,10 @@ the result is on screen — never a wall in front of it (see [06](06-frontend-ux
 - **The lead is written before the send.** The address is the point of the exercise and the mail is the
   side effect, so a Resend outage must not lose it. If email is unconfigured, the response still
   `201 {emailed:false}` rather than pretending it sent.
-- **The link lasts 7 days**, not 900 s: the anonymous object is R2-swept at 7 days, so this is the
+- **The link lasts 3 days**, not 900 s, and that number comes from `ANONYMOUS_SAMPLE_RETENTION_DAYS`
+  (`lib/retention.ts`) rather than being written twice — the anonymous object is swept at 3 days, and a
+  link that outlives its object is a 404 sent to someone who asked for their chart. `retention.test.ts`
+  fails if the two ever drift. This is the longest a link can **usefully** be:
   longest a link can usefully be. A longer URL would outlive its object.
 - Errors: `422 VALIDATION_FAILED`, `404 SAMPLE_EXPIRED` (past the sweep — the UI offers a fresh
   snapshot), `429 RATE_LIMITED`, `502` when the send failed though the lead was kept.

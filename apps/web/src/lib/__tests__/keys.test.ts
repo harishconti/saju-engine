@@ -21,12 +21,16 @@ describe("R2 key scheme", () => {
   it("keeps anonymous samples in their own prefix", () => {
     // That prefix is swept by age, which is only safe because nothing a user keeps lives there.
     expect(buildAnonymousKey("abc", "pdf")).toBe("reports/anonymous/abc/sample.pdf");
+    // The free tier's artefact is the reading, and the PDF the engine is contractually required to
+    // produce is deliberately left in this swept prefix rather than recorded anywhere.
+    expect(buildAnonymousKey("abc", "html")).toBe("reports/anonymous/abc/sample.html");
   });
 
   it("keeps a user's saved sample OUT of the swept prefix", () => {
     const key = buildSampleKey("user_1", "sample_1");
     expect(key).toBe("reports/user_1/samples/sample_1.pdf");
     expect(key.startsWith("reports/anonymous/")).toBe(false);
+    expect(buildSampleKey("user_1", "sample_1", "html")).toBe("reports/user_1/samples/sample_1.html");
   });
 
   it("does not let a user id escape its own prefix", () => {

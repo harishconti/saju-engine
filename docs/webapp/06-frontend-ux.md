@@ -150,14 +150,22 @@ The funnel, and the only place a visitor does real work before signing up.
 
 ```
 Step 1  Birth data        name · gender · date · time · "I don't know my time" · city
-Step 2  Result            Snapshot ready → Open / Download the PDF, then the shareable
-                          Day Master card, then "Email me this snapshot", then
+Step 2  Result            Reading ready → **Read it** → **Save it** (the .html), then the
+                          shareable Day Master card, then "Email me this snapshot", then
                           "Keep this — create an account and I'll save these details"
 ```
 
+**The free artefact is the reading, and there is no PDF.** Same two actions in the same order as a paid
+tier offers, because a free report that looks nothing like the paid one is a poor advertisement for it —
+and a PDF download leaves the site, cannot be read on the phone that requested it, and invites a
+comparison of page counts that the free tier would lose. `POST /api/sample` therefore returns a
+`readUrl` and no download URL; the reading is ~273 KB, self-contained, one `<h1>`, three panels. The
+engine's contractual PDF is presigned to the swept prefix and never recorded (see
+[03](03-api-spec.md) §`POST /api/sample` for why that is deliberate rather than an oversight).
+
 **The email step is optional and comes after the result** — never a wall in front of it. The rule in
 `06` ("do not gate the sample behind sign-up") applies to the address too: the snapshot works whether or
-not anyone ever types one. What it buys is the list the funnel had none of, plus a 7-day link instead of
+not anyone ever types one. What it buys is the list the funnel had none of, plus a 3-day link instead of
 the 15-minute one. `marketingOptIn` is a separate checkbox and defaults off; the row records the
 `policyVersion` so the evidence says which text was agreed to.
 

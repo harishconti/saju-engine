@@ -56,7 +56,9 @@ function s3(): S3Client {
 
 /**
  * Key scheme leads with userId so a deletion request is one list + one batch delete.
- *   reports/anonymous/{uuid}/sample.pdf      — unclaimed free samples (swept after 7 days)
+ *   reports/anonymous/{uuid}/sample.{html,pdf} — unclaimed free snapshots (swept after 3 days by the
+ *                                                cleanup cron; see lib/retention.ts — nothing else
+ *                                                deletes them)
  *   reports/{userId}/{orderId}/{reportId}.pdf
  *   reports/{userId}/{orderId}/{reportId}.md
  */
@@ -70,7 +72,7 @@ export function buildReportKey(
   return `reports/${userId}/${orderId}/${reportId}.${ext}`;
 }
 
-export function buildAnonymousKey(uuid: string, ext: "pdf" | "md" = "pdf"): string {
+export function buildAnonymousKey(uuid: string, ext: "pdf" | "md" | "html" = "pdf"): string {
   return `reports/anonymous/${uuid}/sample.${ext}`;
 }
 
@@ -80,7 +82,7 @@ export function buildAnonymousKey(uuid: string, ext: "pdf" | "md" = "pdf"): stri
  * Deliberately NOT under `reports/anonymous/`: that prefix is swept by age, and a saved sample
  * belongs to its owner until they delete it.
  */
-export function buildSampleKey(userId: string, uuid: string, ext: "pdf" | "md" = "pdf"): string {
+export function buildSampleKey(userId: string, uuid: string, ext: "pdf" | "md" | "html" = "pdf"): string {
   return `reports/${userId}/samples/${uuid}.${ext}`;
 }
 

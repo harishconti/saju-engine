@@ -1,5 +1,6 @@
 import { LegalLayout } from "@/components/legal";
 import { PRIVACY_EMAIL, PRIVACY_HREF } from "@/lib/contact";
+import { ANONYMOUS_SAMPLE_RETENTION_LABEL } from "@/lib/retention";
 
 export const metadata = { title: "Privacy policy" };
 
@@ -93,7 +94,7 @@ export default function PrivacyPage() {
       <h2>How long we keep it</h2>
       <ul>
         <li>Birth details and reports: until you delete them, or after 24 months of inactivity.</li>
-        <li>Anonymous free snapshots that were never saved to an account: 7 days.</li>
+        <li>Anonymous free snapshots that were never saved to an account: {ANONYMOUS_SAMPLE_RETENTION_LABEL}.</li>
         <li>Delivery records: 24 months. Audit logs: 24 months.</li>
         <li>
           Consent records: while your account exists, and 24 months afterwards — we need to be able to show

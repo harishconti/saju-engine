@@ -41,9 +41,9 @@ alternative header so they can be triggered manually during an incident.
 ### What cleanup does
 
 1. **Reap anonymous samples.** Two passes, because an anonymous sample has no row to track:
-   (a) **list `reports/anonymous/` by prefix and delete by object age** (older than 7 days) — the
+   (a) **list `reports/anonymous/` by prefix and delete by object age** (older than `ANONYMOUS_SAMPLE_RETENTION_DAYS`, currently 3) — the
    documented promise, and the only version of it that works; (b) a row-backed sweep for reports with
-   no order that were never delivered (`DRAFT_READY` / `FAILED`, older than 7 days). Delivered rows are
+   no order that were never delivered (`DRAFT_READY` / `FAILED`, older than the same 3-day cutoff). Delivered rows are
    deliberately excluded, since a sample a signed-in user kept also has no order but is theirs.
 2. **Reclaim dead leases.** `Job` rows `RUNNING` with `leaseUntil < now() - 15 min` → `QUEUED`
    (or `FAILED` if `attempts >= maxAttempts`).

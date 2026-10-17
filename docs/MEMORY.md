@@ -1685,6 +1685,69 @@
     Docs: `06` (the picker's three rules), `10` (it is not personal data, and nothing is disclosed to a
     geocoder), the openwiki toolchain, and the footer. Webapp **149 → 156**. Verified in a real browser:
     "Pallipattu" → *Pallipattu, India*, "Mysore" → *Mysuru, India*, "Cambridge" → four countries.
+
+  - **2026-10-17 (the free snapshot gets a reading, and loses its PDF).** Owner: *"the free snapshot does not
+    have html-report. i suggest we only provide html-report and no pdf report only paid reports."* Right on both
+    counts, and the first half was an omission rather than a decision: the paid path presigns `htmlUploadUrl`
+    (`fulfilment.ts`) and the free path only ever presigned a PDF.
+    ✅ **The free tier is now the reading, with no PDF.** A sample is one page of chart, so the PDF was the worst
+    way to present it — it leaves the site, cannot be read on the phone that requested it, and looks nothing like
+    what a paid client gets. `POST /api/sample` returns `readUrl` and no download URL; the client offers
+    **Read it** / **Save it**, the same two actions in the same order as a paid tier.
+    ✅ **The engine's contractual PDF goes to the swept prefix and is never recorded.** `uploadUrl` is a required
+    field of `/generate`, so a target must be presigned; it is always `reports/anonymous/{id}/sample.pdf`, which the
+    cron sweeps by prefix and age with no rows needed. Not recording it is what stops it becoming dead storage a
+    signed-in user can never reach — and the storage-growth lesson in this file is why that mattered. The signed-in
+    *reading* is the copy that is kept (`reports/{userId}/samples/{id}.html`).
+    ⚠️ **The waste is documented, not hidden:** each free snapshot still renders a PDF nobody sees (~100 KB, one
+    ReportLab render, swept in 7 days). That buys avoiding a contract change to two deployables in the same push.
+    The honest fix, if volume justifies it, is an optional `uploadUrl` so the sample skips the PDF render entirely.
+    ✅ **Two things that would have been dead buttons.** `Report.pdfKey` is now null for a sample, so the reused-
+    sample lookup filters on `htmlKey` (a `pdfKey` filter would never match a fresh sample), and the report detail
+    page gates its **PDF** link on `pdfKey` existing — it was unconditional and would have rendered a dead link on
+    every sample. Same fix in the email step, which re-derives the key and was looking for `sample.pdf`.
+    ✅ **Verified end to end, against the real engine**, not by reading the diff: ran `api/index.py` locally and
+    POSTed to `/api/sample` with RM's birth data — HTTP 200, `readUrl` present, `downloadUrl` absent, `bytes`
+    273,689 (the reading, where the PDF was ~100 KB). Fetched the reading back: `text/html`, 272 KB, one `<h1>`,
+    3 panels, four pillars and the element balance present, **zero `knowledge/` citations leaked**, and **no
+    external references at all**. The layout itself was checked visually on the committed demo reading (same
+    renderer, same tier) — inline header, no giant cover page.
+    Docs: `03` (route row + response, and why the PDF is discarded), `05` (the same, with the honest fix named),
+    `06` (the flow), `02` (retention), `12`, and `openwiki/products/reports.md`.
+
+  - **2026-10-17 (the free snapshot's lifetime is 3 days, and it turns out nothing else was deleting them).**
+    Owner: *"what is the lifetime like when it gets auto delete … i suggest 3 days. is the purge process needed or
+    by default it happens?"*
+    🔴 **The purge is not a platform default — it is our own code on a cron, and it was the only thing deleting
+    them.** `runCleanup()` → `sweepAnonymousSamples()`, reached only via `GET/POST /api/cron/cleanup`, scheduled
+    daily at 03:00 by `apps/web/vercel.json`, and gated on `CRON_SECRET`/`MAINTENANCE_SECRET`. There is **no R2
+    lifecycle rule** on `reports/anonymous/`: `GetBucketLifecycleConfiguration` returns exactly one rule, Cloudflare's
+    default **"Default Multipart Abort Rule"**. So the docstring in `sample/route.ts` that said these objects are
+    "swept by an R2 lifecycle rule" was **false**, and had been for weeks — believing it would have meant relying on
+    a retention promise nothing enforced. Corrected in the code and in `10`.
+    ✅ **3 days, down from 7**, and stated **once**: new `lib/retention.ts`
+    (`ANONYMOUS_SAMPLE_RETENTION_DAYS` + a label), read by the sweep, the emailed link and the client copy. The
+    saving in storage is negligible — the argument is that this is the personal data of someone who never became a
+    customer, so the shorter window is the easier one to defend. The cost is the returning visitor's window, and it
+    is bounded: the *browser* link is 15 minutes either way, so only the **emailed** link changes, and 3 days still
+    means "come back tomorrow".
+    ✅ **The coupling that would have shipped a broken promise.** The emailed link's presign lifetime was
+    `7 * 24 * 60 * 60` — *equal* to the object's life, so shortening the sweep alone would have emailed a link that
+    404s from day 4 to day 7 while the message still said "works for 7 days". Now derived from the same constant,
+    with `src/lib/__tests__/retention.test.ts` failing if the sweep, the link or the copy drift apart — and checking
+    the published privacy page too, since that is a retention statement in a legal document.
+    ⚠️ **My first version of that test was wrong**, and the failure was informative: it banned any numeric
+    `cutoff =` in `cleanup.ts` and immediately caught the **23-month profile-inactivity** window, which is
+    perfectly legitimate. Scoped to the expression instead. (Twice today a too-broad guard caught real, correct
+    code — the same thing happened with "Atlantis".)
+    ✅ **Verified in production, not assumed:** the bucket holds exactly one lifecycle rule and it is the multipart
+    abort; the `reports/anonymous/` prefix held only the two objects my own end-to-end test had just created, which
+    I then deleted (prefix is empty again). So the sweep is working, and the only thing that makes it work is the cron.
+    Docs: `retention.ts`, `cleanup.ts`, `r2.ts`, `sample/route.ts` (the false claim), `sample/email/route.ts`,
+    `sample-flow.tsx`, the privacy page, and `02`/`03`/`05`/`06`/`09`/`10`. Webapp **156 → 161**.
+    ⚠️ **Recommended, not applied:** add an R2 lifecycle rule expiring `reports/anonymous/` after 3 days as a
+    backstop. The cron is a single point of failure — a lapsed secret or a broken deploy silently turns a 3-day
+    retention promise into "forever", and nothing would report it.
     Docs: `07` (the service row), `10` (sub-processors + the privacy page copy). No env var and no `08` change —
     the toggle is a dashboard setting, not configuration in the repo.
 

@@ -459,7 +459,7 @@ npx prisma migrate deploy
 
 | Data | Retention | Mechanism |
 |---|---|---|
-| Anonymous sample PDFs | 7 days | Daily cleanup cron sweeps `reports/anonymous/…` |
+| Anonymous sample objects | 3 days | Daily cleanup cron sweeps `reports/anonymous/…`, by prefix and age, needing no rows — which is why the free tier's discarded PDF is safe there |
 | Anonymous sample rows | none (never persisted) | The sample flow is stateless until "save to profile" |
 | `SampleLead` (an emailed address) | until erasure is requested | **Kept on purpose** — a lead that expires is not a lead. No daily sweep; `email` is unique so a repeat opt-in updates the preference instead of duplicating. `marketingOptIn: false` rows are kept too (they are the record that someone *declined*) |
 | Profile birth data | until the user deletes it, or 24 months after last activity | `Profile.deletedAt` + a periodic sweep |
