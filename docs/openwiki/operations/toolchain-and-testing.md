@@ -160,12 +160,13 @@ assert JIAZI_TO_NAYIN[("甲", "子")] == "海中金"  # Gold in the sea
 
 ### Compat PDF
 - Separate tool in `src/saju_html/md_to_saju_compat_pdf.py` (HTML/Chromium default; `--backend reportlab` uses a Korean CID font).
+- `--web` writes the compat **reading** — the same self-contained screen document the single-chart tiers get (`markdown_to_html(web=True)`, tier-agnostic apart from the `tier-compat` body class). Give `--output` an `.html` path; the default output becomes `…_compatibility.html` beside the pair. No browser is needed.
 - Tier-aware translation skip keeps couple names and verdicts intact.
 
 ## Continuous development checklist
 
 - Run `pytest` before committing.
-- Run `npm test` / `npm run lint` / `npm run build` for landing-page changes.
+- Run `npm test` / `npm run lint` / `npm run build` in `apps/web/` for landing-page or webapp changes.
 - Keep citations in `.md` files; client PDFs strip them automatically (leak-checked via pdftotext in tests).
 - Rendered-HTML snapshots: `tests/golden_html/` (46 files), regenerate with `python tools/regen_golden.py --html`. Snapshots embed the full CSS, so any CSS change rewrites them all; regenerate deliberately.
 - Store every candidate report in `candidates_horoscope/reports/{slug}/`.

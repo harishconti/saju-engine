@@ -17,6 +17,12 @@ Usage:
         --output path/to/compat-with-{name}.pdf
 
 Default output (no --output): candidates_horoscope/marriage_compatibility/{name_a}_{name_b}/{name_a}_{name_b}_compatibility.pdf for basic, or ..._compatibility_deep.pdf for deep.
+
+Web document (the "reading" a client reads on screen, same as the single-chart tiers):
+    python3 src/saju_html/md_to_saju_compat_pdf.py path/to/compat.md \\
+        --name-a "Pawan" --name-b "Sruthi" \\
+        --dob-a "3 October 1991, 23:45 IST" --dob-b "11 December 1993, 02:45 IST" \\
+        --day-master-a "丙" --day-master-b "丙" --web --output out.html
 (storage convention: all two-chart 궁합 readings live in a per-pair subfolder under
 `marriage_compatibility/`, named with the partners' slugified actual names. Basic
 reports use the unsuffixed name; deep reports append "_deep".)
@@ -64,6 +70,11 @@ def main() -> int:
                    ))
     p.add_argument("--backend", default="html", choices=("html", "reportlab"),
                    help="PDF backend: html (default, Chromium) or reportlab (legacy).")
+    p.add_argument("--web", action="store_true",
+                   help="Write the standalone web document (HTML) instead of a PDF — the same "
+                        "'reading' the single-chart tiers get, rendered from the same compat "
+                        "markdown. Output stays a single self-contained file (inline CSS and SVG, "
+                        "no external requests). Give --output an .html path.")
     args = p.parse_args()
 
     input_md: Path = args.input_md.resolve()
@@ -88,7 +99,8 @@ def main() -> int:
         pair_dir = repo_root / "candidates_horoscope" / "marriage_compatibility" / f"{slug_a}_{slug_b}"
         pair_dir.mkdir(parents=True, exist_ok=True)
         suffix = "_deep" if args.tier == "deep" else ""
-        default_name = f"{slug_a}_{slug_b}_compatibility{suffix}.pdf"
+        ext = "html" if args.web else "pdf"
+        default_name = f"{slug_a}_{slug_b}_compatibility{suffix}.{ext}"
         output_pdf = pair_dir / default_name
 
     if args.tier == "deep":
@@ -108,6 +120,30 @@ def main() -> int:
         from saju_html.md_to_saju_pdf import build_pdf  # type: ignore
     else:
         from saju_html.renderer import build_pdf  # type: ignore
+
+    if args.web:
+        # The web document is the screen artefact a client reads; it is the *same*
+        # `markdown_to_html(web=True)` the PDF path uses, tier-agnostic apart from the
+        # `tier-compat` body class. Rendered straight to HTML: no browser, no PDF step.
+        from saju_html.renderer import markdown_to_html  # type: ignore
+
+        if output_pdf.suffix.lower() not in (".html", ".htm"):
+            print(f"--web writes HTML; give --output an .html path (got {output_pdf.name})", file=sys.stderr)
+            return 2
+        document = markdown_to_html(
+            input_md.read_text(encoding="utf-8"),
+            title=title,
+            client=client,
+            dob=dob,
+            day_master=day_master,
+            report_id=report_id,
+            tier=build_tier,
+            web=True,
+        )
+        output_pdf.write_text(document, encoding="utf-8")
+        print(f"Wrote: {output_pdf} [web document]")
+        return 0
+
     try:
         build_pdf(
             input_md=input_md,

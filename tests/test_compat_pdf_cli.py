@@ -13,6 +13,7 @@ already used by ``combine_candidate_report.PROJECT_ROOT``).
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -101,3 +102,85 @@ def test_compat_pdf_default_output_lands_under_repo_root_not_src(tmp_path, backe
     finally:
         shutil.rmtree(pair_dir, ignore_errors=True)
         shutil.rmtree(stray_dir, ignore_errors=True)
+
+
+def _run_compat_cli(input_md: Path, *extra: str) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [
+            "python3",
+            str(PROJECT_ROOT / "src" / "saju_html" / "md_to_saju_compat_pdf.py"),
+            str(input_md),
+            "--name-a", "Test Pair A",
+            "--name-b", "Test Pair B",
+            "--dob-a", "1 January 1990",
+            "--dob-b", "1 January 1990",
+            "--day-master-a", "丙",
+            "--day-master-b", "丙",
+            "--tier", "basic",
+            *extra,
+        ],
+        cwd=PROJECT_ROOT,
+        env=ENV,
+        capture_output=True,
+        text=True,
+    )
+
+
+def test_compat_web_document_is_a_self_contained_reading(tmp_path):
+    """`--web` renders the compat *reading* — the screen artefact, not a PDF.
+
+    Regression (2026-10-17): the compat tool had no web mode, so the two compatibility demos
+    on the marketing page were PDF-only while every single-chart tier offered a reading — a
+    withheld capability that never errored. The reading must be the same self-contained
+    artefact the single-chart tiers get: the compat body class, no leaked ``knowledge/``
+    citations, and no external request beyond the inline SVG XML namespace.
+    """
+    input_md = tmp_path / "pawan_sruthi_compatibility.md"
+    input_md.write_text(MINIMAL_COMPAT_MD, encoding="utf-8")
+    out_html = tmp_path / "demo-compat-basic.html"
+
+    result = _run_compat_cli(input_md, "--web", "--output", str(out_html))
+    assert result.returncode == 0, result.stderr
+    assert out_html.exists(), result.stdout
+
+    doc = out_html.read_text(encoding="utf-8")
+    assert '<body class="tier-compat web-mode">' in doc
+    assert "knowledge/" not in doc, "the reading must not leak knowledge/ citations"
+    external = {
+        url
+        for url in re.findall(r"https?://[^\s\"')<>]+", doc)
+        if not url.startswith("http://www.w3.org/")
+    }
+    assert external == set(), f"reading must make no external requests, found: {external}"
+
+
+def test_compat_web_default_output_is_html_not_pdf(tmp_path):
+    """`--web` with no --output writes an .html beside the pair, never a .pdf."""
+    input_md = tmp_path / "test-pair-a_test-pair-b_compatibility.md"
+    input_md.write_text(MINIMAL_COMPAT_MD, encoding="utf-8")
+    pair_dir = (
+        PROJECT_ROOT
+        / "candidates_horoscope"
+        / "marriage_compatibility"
+        / "test-pair-a_test-pair-b"
+    )
+    assert not pair_dir.exists(), f"test fixture dir already exists: {pair_dir}"
+    try:
+        result = _run_compat_cli(input_md, "--web")
+        assert result.returncode == 0, result.stderr
+        assert (pair_dir / "test-pair-a_test-pair-b_compatibility.html").exists(), result.stdout
+        assert not (pair_dir / "test-pair-a_test-pair-b_compatibility.pdf").exists()
+    finally:
+        shutil.rmtree(pair_dir, ignore_errors=True)
+
+
+def test_compat_web_rejects_a_pdf_output_path(tmp_path):
+    """`--web --output x.pdf` fails loudly rather than silently writing HTML to a .pdf."""
+    input_md = tmp_path / "pawan_sruthi_compatibility.md"
+    input_md.write_text(MINIMAL_COMPAT_MD, encoding="utf-8")
+    not_a_pdf = tmp_path / "oops.pdf"
+
+    result = _run_compat_cli(input_md, "--web", "--output", str(not_a_pdf))
+    assert result.returncode == 2
+    assert "give --output an .html path" in result.stderr
+    assert not not_a_pdf.exists()

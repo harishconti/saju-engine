@@ -61,6 +61,7 @@ for t in basic deep; do
   compat harish_srinidhi Harish Srinidhi "4 June 1992, 03:10 IST" "9 April 1994, 20:47 IST" 辛 乙 $t
   compat harish_priyanka Harish Priyanka "4 June 1992, 03:10 IST" "3 June 1996, 10:20 IST" 辛 辛 $t
   compat harish_priyanka_1998 Harish Priyanka "4 June 1992, 03:10 IST" "12 July 1998, 21:43 IST" 辛 庚 $t
+  compat harish_keerthana Harish Keerthana "4 June 1992, 03:10 IST" "3 October 1996, 09:35 IST" 辛 癸 $t
 done
 # ── Public demo PDFs ──────────────────────────────────────────────────────────────
 # These are served by the WEBAPP (apps/web/public/demo/), not by the legacy landing page,
@@ -107,4 +108,21 @@ demo_rm deep
 # with `md_to_saju_compat_pdf.py … --backend reportlab` rather than copying a Chromium render.
 cp $C/pawan_sruthi/pawan_sruthi_compatibility.pdf      $DEMO/demo-compat-basic.pdf
 cp $C/pawan_sruthi/pawan_sruthi_compatibility_deep.pdf $DEMO/demo-compat-deep.pdf
-echo "copied webapp demos into $DEMO"
+
+# The compatibility tiers now ship a reading too, like every other tier: `--web` renders the
+# same self-contained screen document a compat client reads, from the very pair markdown the
+# PDFs above come from, with `tier=compat` giving it the compat body class. Before this the two
+# compat demos were PDF-only — a withheld capability on the marketing page, not a missing one.
+demo_compat() { # tier
+  local t=$1 sfx=""
+  [ "$t" = deep ] && sfx=_deep
+  python3 src/saju_html/md_to_saju_compat_pdf.py "$C/pawan_sruthi/pawan_sruthi_compatibility$sfx.md" \
+    --name-a Pawan --name-b Sruthi \
+    --dob-a "3 October 1991, 23:45 IST" --dob-b "11 December 1993, 02:45 IST" \
+    --day-master-a 丙 --day-master-b 丙 --tier "$t" --web \
+    --output "$DEMO/demo-compat-$t.html" >/dev/null \
+    && echo "built $DEMO/demo-compat-$t.html  (the reading)"
+}
+demo_compat basic
+demo_compat deep
+echo "built webapp demos into $DEMO"

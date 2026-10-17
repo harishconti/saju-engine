@@ -62,7 +62,7 @@ its section inventory in `worklog.md` remains in git history at `fa2eab0`.)
 |---|---|---|---|
 | 1 | **Hero** | Answer "what is this?" in five seconds | Live four-pillars chart that draws itself, element wheel, seal mark, 四柱 watermark. The single animated flourish |
 | 2 | **Why Saju** | Frame the category and the honest positioning | Merged from the former WhatIsSaju + WhySaju |
-| 3 | **Demo reports** | Show the actual artefact | Real RM demo PDFs (regenerated with ReportLab — see [05](05-report-pipeline.md) §1), plus the `FourPillarsChart` / `ElementBalance` / `LuckTimeline` visuals built from RM's real chart data |
+| 3 | **Demo reports** | Show the actual artefact | Real RM demo **readings** and PDFs, plus the two compatibility demos — each tier offers the web document first ("Read it"), then Save and PDF, mirroring the product's download order. Also the `FourPillarsChart` / `ElementBalance` / `LuckTimeline` visuals built from RM's real chart data |
 | 4 | **Pricing** | Price, after trust is established | Four tiers + the free sample as the entry CTA. `CompareTiers` follows |
 | 5 | **Compare tiers** | Remove choice paralysis | Table across tiers, one canonical primary CTA: *"Get your free chart snapshot"* |
 | 6 | **How it's built** | Justify the price against a $9.99 competitor | The engine-and-honest-interpreter story: cited classical principles, the human review step, what we will not claim |

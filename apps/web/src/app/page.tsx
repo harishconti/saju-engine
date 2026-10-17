@@ -193,19 +193,20 @@ export default async function LandingPage() {
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {[
-                { html: "demo-rm-sample.html", pdf: "demo-rm-sample.pdf", tier: "The Hook", note: "Free · ~1 page" },
-                { html: "demo-rm-essential.html", pdf: "demo-rm-essential.pdf", tier: "The Essential Report", note: "$19 · 6–7 pages" },
-                { html: "demo-rm-deep.html", pdf: "demo-rm-deep.pdf", tier: "The Deep Destiny Report", note: "$55 · 25–30 pages" },
+                { html: "demo-rm-sample.html", pdf: "demo-rm-sample.pdf", tier: "The Hook", note: "Free · ~1 page", desc: "Single-chart reading for Kim Nam-joon." },
+                { html: "demo-rm-essential.html", pdf: "demo-rm-essential.pdf", tier: "The Essential Report", note: "$19 · 6–7 pages", desc: "Single-chart reading for Kim Nam-joon." },
+                { html: "demo-rm-deep.html", pdf: "demo-rm-deep.pdf", tier: "The Deep Destiny Report", note: "$55 · 25–30 pages", desc: "Single-chart reading for Kim Nam-joon." },
+                { html: "demo-compat-basic.html", pdf: "demo-compat-basic.pdf", tier: "Compatibility Snapshot", note: "$24 · ~4 pages", desc: "Two-chart 궁합 reading across the eleven sub-systems." },
+                { html: "demo-compat-deep.html", pdf: "demo-compat-deep.pdf", tier: "Deep Compatibility", note: "$45 · 9–10 pages", desc: "Two-chart 궁합 reading across the eleven sub-systems." },
               ].map((d) => (
                 <Card key={d.html} className="flex flex-col">
                   <CardContent className="flex flex-1 flex-col gap-3 py-5">
                     <p className="eyebrow">{d.note}</p>
                     <h3 className="font-display text-xl">{d.tier}</h3>
-                    <p className="flex-1 text-sm text-muted-foreground">
-                      Single-chart reading for Kim Nam-joon.
-                    </p>
+                    <p className="flex-1 text-sm text-muted-foreground">{d.desc}</p>
                     {/* The web document is what a client reads; the PDF is the
-                        keepsake. Same order here, so the marketing matches the product. */}
+                        keepsake. Same order here, so the marketing matches the product —
+                        for the compatibility tiers too. */}
                     <a
                       href={`/demo/${d.html}`}
                       className={buttonClasses("primary", "sm", "w-full")}
@@ -231,29 +232,6 @@ export default async function LandingPage() {
                         PDF
                       </a>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-
-              {[
-                { file: "demo-compat-basic.pdf", tier: "Compatibility Snapshot", note: "$24 · ~4 pages" },
-                { file: "demo-compat-deep.pdf", tier: "Deep Compatibility", note: "$45 · 9–10 pages" },
-              ].map((d) => (
-                <Card key={d.file} className="flex flex-col">
-                  <CardContent className="flex flex-1 flex-col gap-3 py-5">
-                    <p className="eyebrow">{d.note}</p>
-                    <h3 className="font-display text-xl">{d.tier}</h3>
-                    <p className="flex-1 text-sm text-muted-foreground">
-                      Two-chart 궁합 reading across the eleven sub-systems.
-                    </p>
-                    <a
-                      href={`/demo/${d.file}`}
-                      className={buttonClasses("outline", "sm", "w-full")}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Open the PDF
-                    </a>
                   </CardContent>
                 </Card>
               ))}
