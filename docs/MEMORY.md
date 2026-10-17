@@ -1531,6 +1531,35 @@
     Docs: `03` (route row + payload example), `06` (order-flow step 3), and a new `10` §Minors section — added
     because a code comment now cites it, and this repo has been burned by citing a section that did not exist.
 
+  - **2026-10-17 (analytics, wired but deliberately not claimed as done).** From the external product audit:
+    *"No analytics or conversion tracking … you cannot tell which channel or section converts, so every later
+    decision is a guess."* Chose **Vercel Web Analytics** (cookieless, no consent banner, no new vendor — it is
+    the Vercel account already paying for hosting; the audit's cheaper-effort options were Plausible or PostHog,
+    and PostHog would have dragged in a real consent/banner workstream).
+    ✅ **What is wired.** `<Analytics />` mounted in the root layout; three events — `snapshot_complete` fired only
+    on a rendered result in `sample-flow.tsx` (so "starts" and "completions" differ by exactly the failures),
+    `checkout_start` as the buyer leaves for the hosted checkout, and **`purchase` server-side from the Dodo
+    webhook** on the first transition to PAID. Server-side on purpose: it fires on the provider's confirmation
+    rather than a browser redirect the buyer may never complete, it cannot be lost to an ad blocker, and the
+    existing replay guard means a duplicate webhook cannot double-count revenue.
+    ✅ **No CSP change was needed — verified, not assumed.** The client is served same-origin
+    (`/_vercel/insights/script`, checked in the installed package), so `script-src 'self'` and `connect-src 'self'`
+    already cover it. That mattered because a CSP-blocked script fails silently: `13-launch-audit.md` already
+    records three typefaces that never loaded for any visitor for exactly this reason.
+    ✅ **A guard test, because every failure mode here is silent.** `src/lib/__tests__/analytics.test.ts` asserts
+    the mount, the three events and their locations, and that `'self'` survives in both CSP directives. Webapp
+    **130 → 134**.
+    ⚠️ **NOT DONE, and recorded as such:** Web Analytics must still be **switched on in the Vercel project**. Until
+    then the script 404s and nothing is recorded, with no error anywhere. The `07` row says so rather than marking
+    this complete, and `10` gained the sub-processor line plus the privacy page names the analytics purpose
+    (Vercel, cookieless, no identifiers).
+    ✅ **One "not a bug" worth writing down**: `<Analytics />` returns `null` server-side and injects its tag in a
+    client effect, so `curl`-ing the page and grepping for the script shows nothing (checked: the served HTML has
+    no `_vercel/insights` reference). The next audit will read that as "analytics missing". It is not; the proof is
+    the dashboard, and the comment in `layout.tsx` says so.
+    Docs: `07` (the service row), `10` (sub-processors + the privacy page copy). No env var and no `08` change —
+    the toggle is a dashboard setting, not configuration in the repo.
+
 ### Earlier state (2026-09-26)
 
   - **2026-10-16 (the reading joins the design system — "the report UI is very ugly").** Owner feedback on the web

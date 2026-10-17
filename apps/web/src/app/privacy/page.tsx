@@ -64,7 +64,8 @@ export default function PrivacyPage() {
           <strong>Cloudflare</strong> — R2 object storage, holding your report PDFs in a private bucket.
         </li>
         <li>
-          <strong>Vercel</strong> — application hosting.
+          <strong>Vercel</strong> — application hosting, and Web Analytics: aggregate page-view counts
+          with no cookies, no cross-site tracking and no personal identifiers.
         </li>
         <li>
           <strong>Resend</strong> — transactional email, to tell you your report is ready.

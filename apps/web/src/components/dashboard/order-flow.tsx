@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { track } from "@vercel/analytics";
 import { Alert, Badge, Button, Card, CardContent, Field, Select, Steps, buttonClasses } from "@/components/ui";
 import { COMPAT_TIERS, SINGLE_TIERS, TIERS, type Tier } from "@/lib/tiers";
 import { formatUSD } from "@/lib/format";
@@ -72,6 +73,10 @@ export function OrderFlow({ profiles, initialTier }: { profiles: OrderProfile[];
       }
 
       if (body.checkoutUrl) {
+        // Fired as the buyer leaves for the hosted checkout — the closest client-side proxy for
+        // "intent to pay". The authoritative purchase event is server-side, from the provider's
+        // webhook. Values are strings only: the analytics client rejects nested or object props.
+        track("checkout_start", { tier: tier.id });
         window.location.href = body.checkoutUrl;
         return;
       }

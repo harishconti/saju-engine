@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { track } from "@vercel/analytics";
 import Link from "next/link";
 import { Alert, Button, Card, CardContent, Field, Input, Select, Steps, buttonClasses } from "@/components/ui";
 import { TurnstileWidget } from "@/components/turnstile-widget";
@@ -66,6 +67,10 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
       }
       setResult(body);
       setStep(2);
+      // The funnel's north-star event. Fired only on a real rendered result, never on submit, so
+      // "starts" and "completions" differ by exactly the failures. Carries no personal data and no
+      // birth details — only the fact that a snapshot was produced.
+      track("snapshot_complete");
     } catch {
       setError("Network problem. Please try again.");
       setTurnstileReset((n) => n + 1);

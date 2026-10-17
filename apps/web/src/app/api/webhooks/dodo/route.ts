@@ -4,6 +4,7 @@ import { audit, writeAudit } from "@/lib/audit";
 import { runDispatchTick } from "@/lib/fulfilment";
 import { verifyStandardWebhook } from "@/lib/webhook-signature";
 import { after } from "next/server";
+import { track } from "@vercel/analytics/server";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -115,6 +116,17 @@ export async function POST(req: Request): Promise<Response> {
             after: { provider: "dodo", paymentId, tier: order.tier },
           });
         });
+
+        // Revenue event, server-side on purpose: it fires on the provider's confirmation rather than
+        // on a browser redirect the buyer may never complete, and it cannot be lost to an ad blocker.
+        // Only reachable on the first transition to PAID (the guard above skips replays), so a
+        // duplicate webhook cannot double-count revenue. Wrapped because analytics must never be able
+        // to break fulfilment — and the client rejects non-primitive property values by throwing.
+        try {
+          await track("purchase", { tier: order.tier, provider: "dodo" });
+        } catch {
+          // Fulfilment already committed; a lost analytics event is acceptable.
+        }
 
         // Dispatch without blocking the provider's 2xx. On Vercel Hobby there is no per-minute cron,
         // so this is the primary generation trigger.

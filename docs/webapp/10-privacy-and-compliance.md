@@ -241,7 +241,8 @@ document the reasoning for *not* notifying — the reasoning is what an auditor 
 - [ ] Privacy policy published: what we collect, why, lawful basis, retention periods, **what survives
       account deletion**, sub-processors listed by name
 - [x] Sub-processors named: Neon (database + auth), Cloudflare (storage + DNS + **Turnstile bot
-      protection**), Vercel (hosting), Resend (transactional email), **Hostinger (mailbox — holds
+      protection**), Vercel (hosting + **Web Analytics** — cookieless, same-origin, so no cookie
+      banner is required), Resend (transactional email), **Hostinger (mailbox — holds
       customer correspondence)**, Dodo Payments (payments, MoR), Google (OAuth)
       — listed on the published privacy page, and kept honest by `vendor-naming.test.ts`. The page had
       been naming **Lemon Squeezy** as the merchant of record long after Dodo Payments replaced it

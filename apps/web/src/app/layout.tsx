@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -38,7 +39,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen antialiased">{children}</body>
+      <body className="min-h-screen antialiased">
+        {children}
+        {/* Vercel Web Analytics: cookieless, aggregate page views. Served same-origin
+            (`/_vercel/insights/script`), so the CSP's `script-src 'self'` already covers it and no
+            `next.config.ts` change is needed — verified against the installed package rather than
+            assumed, because a blocked script fails *silently* (see the Google Fonts incident in
+            docs/webapp/13-launch-audit.md).
+
+            NOTE: this component returns null on the server and injects its tag in a client effect,
+            so it never appears in the page source. Do not "fix" its absence there. */}
+        <Analytics />
+      </body>
     </html>
   );
 }
