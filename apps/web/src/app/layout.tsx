@@ -9,14 +9,22 @@ export const metadata: Metadata = {
     template: "%s · Cosmic Saju",
   },
   description:
-    "Korean Saju (Four Pillars) readings grounded in classical principles. An accurate engine and an honest interpreter — not a Korean master.",
+    "Korean Four Pillars (Saju) readings grounded in classical principles and reviewed by a person before delivery. Start with a free chart snapshot.",
   applicationName: "Cosmic Saju",
   openGraph: {
     title: "Cosmic Saju — Korean Four Pillars readings",
     description:
-      "An accurate engine and an honest interpreter — not a Korean master. Start with a free chart snapshot.",
+      "Your Korean birth chart, read properly — then reviewed by a person before it reaches you. Start with a free snapshot.",
     type: "website",
     siteName: "Cosmic Saju",
+  },
+  // X/Twitter reads `twitter` before it falls back to `openGraph`. `summary_large_image` makes it
+  // use the opengraph-image route rather than a small square thumbnail.
+  twitter: {
+    card: "summary_large_image",
+    title: "Cosmic Saju — Korean Four Pillars readings",
+    description:
+      "Your Korean birth chart, read properly — then reviewed by a person before it reaches you. Start with a free snapshot.",
   },
   robots: { index: true, follow: true },
 };

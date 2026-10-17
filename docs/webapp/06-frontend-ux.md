@@ -131,6 +131,16 @@ then, rather than reading as a save that silently did nothing.
   (`NEXT_PUBLIC_LEGAL_CONTACT_EMAIL`) appears **only** where someone is exercising a data right — the
   privacy policy's DSAR paragraph and the account page — so those requests are recognisable on arrival.
   Both resolve from `apps/web/src/lib/contact.ts`; never inline an address in a component.
+- **The search/social snippet leads with the benefit, not the disavowal.** The root `description` in
+  `layout.tsx` (the fallback for every page without its own) must not open on *"not a Korean master"* —
+  that line belongs in the FAQ and About, where it reads as candour rather than as the first thing a
+  stranger learns about the product. The landing page overrides this with its own benefit-led
+  description; keep both that way.
+- **A shared link must preview.** `src/app/opengraph-image.tsx` renders the 1200×630 brand card, and
+  `twitter.card` is `summary_large_image`. Two constraints hold it together: Satori needs
+  **ttf/otf/woff — not woff2** (`tools/build-og-fonts.py` derives the TTFs from the committed woff2
+  subsets, instancing the variable fonts to a static weight first), and the Latin subsets carry **no
+  CJK**, so no Hanja may appear in that image. The element dots carry the brand instead.
 
 ## Key screens
 

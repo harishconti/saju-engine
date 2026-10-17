@@ -1557,6 +1557,29 @@
     client effect, so `curl`-ing the page and grepping for the script shows nothing (checked: the served HTML has
     no `_vercel/insights` reference). The next audit will read that as "analytics missing". It is not; the proof is
     the dashboard, and the comment in `layout.tsx` says so.
+
+  - **2026-10-17 (a link now previews: the Open Graph card, and the snippet stops leading with a denial).**
+    Two external-audit findings, both about how the product is *seen* before it is visited: *"No Open Graph image —
+    links shared on Instagram, X, WhatsApp or Reddit show no preview, which hurts a social-led strategy"* and
+    *"the meta description opens on a negative"*.
+    ✅ **The card.** `src/app/opengraph-image.tsx` renders a 1200×630 brand image — Cormorant headline, the
+    elemental gradient rule, the five element dots, `cosmicsaju.com` — and it prerenders to a **static** 59 KB PNG
+    (`○ /opengraph-image`). Verified by looking at the rendered image, not just at a 200.
+    ✅ **The font trap, twice.** Satori (`next/og`) rejects **woff2** (no woff2 handling in the bundled runtime —
+    Next ships its own `.ttf` default) and also cannot read a **variable** font (it dies mid-prerender with
+    "Cannot read properties of undefined"). The brand faces are woff2 *and* variable. New
+    `tools/build-og-fonts.py` derives TTFs from the committed woff2 subsets, instancing each to a static weight
+    first — 100 KB total, and no network at build time. First attempts: `fetch(new URL(...))` on a `file:` URL
+    throws "not implemented... yet..." in this Node, so it reads via `fs` + `fileURLToPath(new URL(…))`, which
+    output tracing still follows. **No Hanja on the card**: the Latin subsets carry no CJK, so a four-pillars
+    motif would be tofu — the element dots carry the brand instead.
+    ✅ **The snippet.** The root `description` (the fallback for every page without its own) no longer opens on
+    "not a Korean master"; that line stays in the FAQ and About, where it reads as candour. `twitter.card =
+    summary_large_image` was added so X uses the card rather than a square thumbnail.
+    ✅ **Guarded where it fails quietly.** `src/lib/__tests__/social-preview.test.ts` asserts the route and its
+    size, that the OG fonts are real sfnt (not `wOF2`), that the fallback description stays benefit-led, and that
+    the large-card directive survives. Webapp **134 → 138**. Docs: `06` (the snippet and card rules, and both
+    font constraints) and the openwiki toolchain page (the new tool).
     Docs: `07` (the service row), `10` (sub-processors + the privacy page copy). No env var and no `08` change —
     the toggle is a dashboard setting, not configuration in the repo.
 
