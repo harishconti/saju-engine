@@ -54,97 +54,97 @@ Each ranked archetype below is read for *this* chart: what the element family is
 ### Strategy & Consulting (**Best Fit**)
 
 - **Element family:** Water — this family moves information, goods or people — it connects separated things and runs below the surface (*Water the element that flows around obstacles and connects*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** This is a **Best Fit**: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it.
-- **How to use it:** Lean into it deliberately — this is where effort compounds fastest and friction is lowest.
-- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive so the chart stays balanced.
+- **Why it fits your chart:** This is a **Best Fit** for Strategy & Consulting: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it.
+- **How to use it:** Lean into it deliberately — Strategy & Consulting is where effort compounds fastest and friction is lowest.
+- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive alongside consultant, strategist, advisor, research lead so the chart stays balanced.
 - **Roles:** consultant, strategist, advisor, research lead
 
 ### Diplomacy & International Business (**Best Fit**)
 
 - **Element family:** Water — this family moves information, goods or people — it connects separated things and runs below the surface (*Water the element that flows around obstacles and connects*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** This is a **Best Fit**: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it.
-- **How to use it:** Lean into it deliberately — this is where effort compounds fastest and friction is lowest.
-- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive so the chart stays balanced.
+- **Why it fits your chart:** This is a **Best Fit** for Diplomacy & International Business: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it.
+- **How to use it:** Lean into it deliberately — Diplomacy & International Business is where effort compounds fastest and friction is lowest.
+- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive alongside diplomat, trade lead, global BD manager so the chart stays balanced.
 - **Roles:** diplomat, trade lead, global BD manager
 
 ### Arts & Curation (**Best Fit**)
 
 - **Element family:** Water — this family moves information, goods or people — it connects separated things and runs below the surface (*Water the element that flows around obstacles and connects*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** This is a **Best Fit**: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it.
-- **How to use it:** Lean into it deliberately — this is where effort compounds fastest and friction is lowest.
-- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive so the chart stays balanced.
+- **Why it fits your chart:** This is a **Best Fit** for Arts & Curation: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it.
+- **How to use it:** Lean into it deliberately — Arts & Curation is where effort compounds fastest and friction is lowest.
+- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive alongside curator, art dealer, creative researcher, museum lead so the chart stays balanced.
 - **Roles:** curator, art dealer, creative researcher, museum lead
 
 ### Journalism & Investigation (**Best Fit**)
 
 - **Element family:** Water — this family moves information, goods or people — it connects separated things and runs below the surface (*Water the element that flows around obstacles and connects*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** This is a **Best Fit**: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it.
-- **How to use it:** Lean into it deliberately — this is where effort compounds fastest and friction is lowest.
-- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive so the chart stays balanced.
+- **Why it fits your chart:** This is a **Best Fit** for Journalism & Investigation: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it.
+- **How to use it:** Lean into it deliberately — Journalism & Investigation is where effort compounds fastest and friction is lowest.
+- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive alongside reporter, investigative journalist, editor so the chart stays balanced.
 - **Roles:** reporter, investigative journalist, editor
 
 ### Logistics & Shipping (**Good Fit**)
 
 - **Element family:** Water — this family moves information, goods or people — it connects separated things and runs below the surface (*Water the element that flows around obstacles and connects*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Good Fit**: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it. It is well resourced by the chart, just not at the very top of the ranking.
-- **How to use it:** Treat it as a lead second track, or a strong complement to your Best-Fit work.
-- **Caveat:** Strong but not primary — pick it deliberately rather than by default, and keep the favorable element in play alongside it.
+- **Why it fits your chart:** A **Good Fit** for Logistics & Shipping: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it. It is well resourced for Logistics & Shipping, just not at the very top of the ranking.
+- **How to use it:** Treat Logistics & Shipping as a lead second track, or a strong complement to your Best-Fit work.
+- **Caveat:** Strong but not primary — pick Logistics & Shipping deliberately rather than by default, and keep the favorable element in play alongside it.
 - **Roles:** supply-chain lead, freight manager, mobility operator
 
 ### Psychology & Counseling (**Good Fit**)
 
 - **Element family:** Earth — this family holds, stores and mediates — it stabilises assets and provides the base others rely on (*Earth the element that contains and stands between*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Good Fit**: the family runs on **Earth**, a neutral element for this chart — neither favorable nor unfavorable on its own. It is well resourced by the chart, just not at the very top of the ranking.
-- **How to use it:** Treat it as a lead second track, or a strong complement to your Best-Fit work.
-- **Caveat:** Strong but not primary — pick it deliberately rather than by default, and keep the favorable element in play alongside it.
+- **Why it fits your chart:** A **Good Fit** for Psychology & Counseling: the family runs on **Earth**, a neutral element for this chart — neither favorable nor unfavorable on its own. It is well resourced for Psychology & Counseling, just not at the very top of the ranking.
+- **How to use it:** Treat Psychology & Counseling as a lead second track, or a strong complement to your Best-Fit work.
+- **Caveat:** Strong but not primary — pick Psychology & Counseling deliberately rather than by default, and keep the favorable element in play alongside it.
 - **Roles:** clinical psychologist, counsellor, therapist
 
 ### Education & Training (**Good Fit**)
 
 - **Element family:** Wood — this family grows something over time — it develops people, ideas or structures and keeps extending (*Wood nourished into being and then feeding the next stage*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Good Fit**: the family runs on **Wood**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master. It is well resourced by the chart, just not at the very top of the ranking.
-- **How to use it:** Treat it as a lead second track, or a strong complement to your Best-Fit work.
-- **Caveat:** Strong but not primary — pick it deliberately rather than by default, and keep the favorable element in play alongside it.
+- **Why it fits your chart:** A **Good Fit** for Education & Training: the family runs on **Wood**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master. It is well resourced for Education & Training, just not at the very top of the ranking.
+- **How to use it:** Treat Education & Training as a lead second track, or a strong complement to your Best-Fit work.
+- **Caveat:** Strong but not primary — pick Education & Training deliberately rather than by default, and keep the favorable element in play alongside it.
 - **Roles:** teacher, lecturer, curriculum lead, L&D manager
 
 ### Healthcare & Wellness (**Possible**)
 
 - **Element family:** Wood — this family grows something over time — it develops people, ideas or structures and keeps extending (*Wood nourished into being and then feeding the next stage*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Possible** fit: the family runs on **Wood**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
-- **How to use it:** Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
-- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.
+- **Why it fits your chart:** A **Possible** fit for Healthcare & Wellness: the family runs on **Wood**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
+- **How to use it:** Use Healthcare & Wellness only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
+- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital in Healthcare & Wellness without a reader's check.
 - **Roles:** practitioner, therapist, clinic lead, wellness director
 
 ### Design & Publishing (**Possible**)
 
 - **Element family:** Wood — this family grows something over time — it develops people, ideas or structures and keeps extending (*Wood nourished into being and then feeding the next stage*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Possible** fit: the family runs on **Wood**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
-- **How to use it:** Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
-- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.
+- **Why it fits your chart:** A **Possible** fit for Design & Publishing: the family runs on **Wood**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
+- **How to use it:** Use Design & Publishing only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
+- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital in Design & Publishing without a reader's check.
 - **Roles:** designer, editor, author, creative lead
 
 ### Social & Environmental Work (**Possible**)
 
 - **Element family:** Wood — this family grows something over time — it develops people, ideas or structures and keeps extending (*Wood nourished into being and then feeding the next stage*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Possible** fit: the family runs on **Wood**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
-- **How to use it:** Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
-- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.
+- **Why it fits your chart:** A **Possible** fit for Social & Environmental Work: the family runs on **Wood**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
+- **How to use it:** Use Social & Environmental Work only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
+- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital in Social & Environmental Work without a reader's check.
 - **Roles:** program officer, advocate, NGO lead, sustainability lead
 
 ### People Development & Culture (**Possible**)
 
 - **Element family:** None — this family has its own character (*None its elemental nature*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Possible** fit: the family runs on **None**, a neutral element for this chart — neither favorable nor unfavorable on its own.
-- **How to use it:** Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
-- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.
+- **Why it fits your chart:** A **Possible** fit for People Development & Culture: the family runs on **None**, a neutral element for this chart — neither favorable nor unfavorable on its own.
+- **How to use it:** Use People Development & Culture only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
+- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital in People Development & Culture without a reader's check.
 - **Roles:** HR business partner, coach, talent lead, culture head
 
 ### Creative Direction (**Possible**)
 
 - **Element family:** Wood — this family grows something over time — it develops people, ideas or structures and keeps extending (*Wood nourished into being and then feeding the next stage*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Possible** fit: the family runs on **Wood**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
-- **How to use it:** Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
-- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.
+- **Why it fits your chart:** A **Possible** fit for Creative Direction: the family runs on **Wood**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
+- **How to use it:** Use Creative Direction only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
+- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital in Creative Direction without a reader's check.
 - **Roles:** art director, brand storyteller, content strategist
 
 ---
@@ -179,11 +179,11 @@ A **boutique firm or solo practice** is the most likely fit. The Seven Killings 
 
 ### Boss / Team Dynamics
 
-The ideal manager profile is a **patient, perceptive Water advisor** — someone who carries your favorable **Water** element, supplying what the chart needs rather than competing with your Day Master. Watch for vague goals that blunt Metal's precision; this is the most common way the querent's energy gets drained in a team setting.
+The ideal manager profile is a **patient, perceptive Water advisor** — someone who carries your favorable **Water** element, supplying what the chart needs rather than competing with your Day Master. Watch for vague goals that blunt Metal's precision; this is the most common way your energy gets drained in a team setting.
 
 ### Red-Flag Environments
 
-Look out for: slow bureaucratic processes that the querent's energy quickly overruns; unclear decision rights — strong Day Masters struggle without ownership; teams that refuse to challenge the querent's ideas.
+Look out for: slow bureaucratic processes that your energy quickly overruns; unclear decision rights — strong Day Masters struggle without ownership; teams that refuse to challenge your ideas.
 
 ---
 

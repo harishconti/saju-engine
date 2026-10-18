@@ -192,8 +192,11 @@ Each person receiving a reading gets a dedicated subfolder:
 ```
 candidates_horoscope/reports/{name-slug}/
 ├── {name-slug}-report.md          # base natal reading
+├── {name-slug}-report.pdf         # the keepsake (PDF)
+├── {name-slug}-report.html        # the reading (web document)
 ├── {name-slug}-combined.md        # base + follow-ups (optional)
 ├── {name-slug}-combined.pdf
+├── {name-slug}-combined.html
 ├── career.md                      # follow-up topic files
 ├── relationships.md
 ├── health.md
@@ -202,6 +205,7 @@ candidates_horoscope/reports/{name-slug}/
 
 Rules:
 - Slug style: lowercase, hyphenated.
+- Every canonical deliverable (base, combined, `career`, luck-cycle, tiers, compat pair) ships **three** siblings: the `.md` source, the `.pdf` keepsake and the `.html` reading. `tools/regen/pdfs.sh` writes the PDFs and `tools/regen/html.sh` writes the readings; both are run by `tools/regen_client_reports.sh`.
 - Base report follows the 9-section premium scaffold from `knowledge/10-output-template.md`.
 - Overlapping follow-ups append to the existing topic file with a dated heading (`## YYYY-MM-DD — summary`) rather than creating duplicates.
 - Update the index table at the bottom of `candidates_horoscope/README.md` for every new candidate.
@@ -214,8 +218,10 @@ Each pair gets its own subfolder:
 candidates_horoscope/marriage_compatibility/{name_a}_{name_b}/
 ├── {name_a}_{name_b}_compatibility.md        # basic tier
 ├── {name_a}_{name_b}_compatibility.pdf
+├── {name_a}_{name_b}_compatibility.html      # the reading (web document)
 ├── {name_a}_{name_b}_compatibility_deep.md   # deep tier
-└── {name_a}_{name_b}_compatibility_deep.pdf
+├── {name_a}_{name_b}_compatibility_deep.pdf
+└── {name_a}_{name_b}_compatibility_deep.html
 ```
 
 Partner A is listed first; for heterosexual pairs Partner A is the male. Update the **Compatibility (궁합) readings** table at the bottom of `candidates_horoscope/README.md`.

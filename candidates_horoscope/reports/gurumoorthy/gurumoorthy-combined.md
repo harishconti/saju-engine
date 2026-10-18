@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Gurumoorthy — Deep Destiny Report · $55
+## Gurumoorthy — Deep Destiny Report
 
 *Full natal reading + ten-year year-by-year timing + relationship and business-launch guidance*
 
@@ -16,7 +16,7 @@
 
 **Chart signature:** *A broad plateau at harvest — steady, sustaining, and made to bear weight.*
 
-**(Audio summary included)** Your MP3 audio summary is included — delivered with this report.
+**(Audio summary included)** Your MP3 audio summary is included — it follows this report by email.
 
 ---
 
@@ -45,7 +45,7 @@
 ### Quick Reference
 
 - **Day Master:** Gi (Yin Earth, 己土)
-- **Strength:** Strong — the month branch **未** gives the Day Master a **seasonally supported baseline** by element relation (per knowledge/09-interpretation-method.md Step 2); its 12운성 stage there is **관대 (冠帶)** — the querent grows into form gradually; adolescence and early adulthood often bring ambition (knowledge/06-twelve-stages.md). Peer/resource support and the output/wealth/authority drain sit close to even.
+- **Strength:** Strong — the month branch **未** gives the Day Master a **seasonally supported baseline** by element relation *(see knowledge/09-interpretation-method.md)*; its 12운성 stage there is **관대 (冠帶)** — you grow into form gradually; adolescence and early adulthood often bring ambition (knowledge/06-twelve-stages.md). Peer/resource support and the output/wealth/authority drain sit close to even.
 - **Favorable Element:** Metal — Favorable element confirmed by the reader from the full classical analysis. *Confirmed by a human reader from the full classical analysis.*
 - **Supporting Element:** Water
 - **Avoid / Watch:** Earth
@@ -102,52 +102,52 @@ Return to the Practical Guidance Summary whenever you need a reminder. Return to
 
 With **己** (Gi (Yin Earth, 己土)) as your Day Master — you — the reference point the whole chart is read against *(see knowledge/09-interpretation-method.md)*, your core self carries the image of the **rich garden soil nurturing many seeds**. Your natural strengths run toward **patience, service, and quiet organizational skill**, while the shadow side can show as **over-giving, worry, or losing boundaries**.
 
-Born in a **Earth** chart with the engine reading as **strong**, the way you meet the world is shaped by how much Earth energy is available. When balanced, you express the best of Earth; when stressed, the unintegrated side may dominate.
+Born in a **Earth** chart that reads as **strong**, the way you meet the world is shaped by how much Earth energy is available. When balanced, you express the best of Earth; when stressed, the unintegrated side may dominate.
 
 Your growth edge is to consciously cultivate **Metal** energy — the favorable element — so that your Earth nature has the right container and outlet.
 
-Your Day Master **己** meets the month branch **未** at the **관대 (coming-of-age energy)** twelve-stage — the querent grows into form gradually; adolescence and early adulthood often bring ambition. This is read as a seasonally supported arrival: a tendency in how the querent's core energy first enters the world, not a fixed early-life outcome.
+Your Day Master **己** meets the month branch **未** at the **관대 (coming-of-age energy)** twelve-stage — you grow into form gradually; adolescence and early adulthood often bring ambition. This is read as a seasonally supported arrival: a tendency in how your core energy first enters the world, not a fixed early-life outcome.
 
 ### Four Pillars, One by One
 
 #### Year Pillar — 甲辰 (Gap (Yang Wood, 甲木))
 
-The 甲辰 pillar pairs the **甲** stem (Gap (Yang Wood, 甲木)) with the **辰** branch, together shaping **ancestral and social-root energy — the wider world you were born into**. Its stem reads as **Direct Officer (正官)** relative to your Day Master, so this area of life tends to carry that dynamic.
+The 甲辰 pillar pairs the **甲** stem (Gap (Yang Wood, 甲木)) with the **辰** branch, together shaping **ancestral and social-root energy — the wider world you were born into**. Read as **Direct Officer (正官)** relative to your Day Master, the year pillar tends to carry that dynamic.
 
 The **Earth** branch is the container for this area and the **Wood** stem is its driver — read the two together when weighing how year-pillar matters unfold.
 
-Because the stem belongs to the **Wood** element, it tends to bring wood-flavoured themes into this life area — qualities of motion, structure, or feeling that quietly shape how the querent relates to year-pillar matters.
-Hidden stems within the 辰 branch add layers: any mid- or residual-stem ten-god the querent carries here will surface as a recurring sub-theme when this life area activates.
+Because the stem belongs to the **Wood** element, it tends to bring wood-flavoured themes into this life area — qualities of motion, structure, or feeling that quietly shape how you relate to year-pillar matters.
+Hidden stems within the 辰 branch add layers: any mid- or residual-stem ten-god you carry here will surface as a recurring sub-theme when this life area activates.
 When the annual or major luck touches the 辰 branch or the 甲 stem, expect year-pillar themes to move to the foreground for that window.
 
 #### Month Pillar — 辛未 (Sin (Yin Metal, 辛金))
 
-The 辛未 pillar pairs the **辛** stem (Sin (Yin Metal, 辛金)) with the **未** branch, together shaping **career and immediate environment — how you show up at work and in daily life**. Its stem reads as **Eating God (食神)** relative to your Day Master, so this area of life tends to carry that dynamic.
+The 辛未 pillar pairs the **辛** stem (Sin (Yin Metal, 辛金)) with the **未** branch, together shaping **career and immediate environment — how you show up at work and in daily life**. Read as **Eating God (食神)** relative to your Day Master, the month pillar tends to carry that dynamic.
 
 The **Earth** branch is the container for this area and the **Metal** stem is its driver — read the two together when weighing how month-pillar matters unfold.
 
-Because the stem belongs to the **Metal** element, it tends to bring metal-flavoured themes into this life area — qualities of motion, structure, or feeling that quietly shape how the querent relates to month-pillar matters.
-Hidden stems within the 未 branch add layers: any mid- or residual-stem ten-god the querent carries here will surface as a recurring sub-theme when this life area activates.
+Because the stem belongs to the **Metal** element, it tends to bring metal-flavoured themes into this life area — qualities of motion, structure, or feeling that quietly shape how you relate to month-pillar matters.
+Hidden stems within the 未 branch add layers: any mid- or residual-stem ten-god you carry here will surface as a recurring sub-theme when this life area activates.
 When the annual or major luck touches the 未 branch or the 辛 stem, expect month-pillar themes to move to the foreground for that window.
 
 #### Day Pillar — 己巳 (Gi (Yin Earth, 己土))
 
-The 己巳 pillar pairs the **己** stem (Gi (Yin Earth, 己土)) with the **巳** branch, together shaping **spouse palace and the inner self — the partner you choose and the self behind the choices**. Its stem reads as **Companion (比肩)** relative to your Day Master, so this area of life tends to carry that dynamic.
+The 己巳 pillar pairs the **己** stem (Gi (Yin Earth, 己土)) with the **巳** branch, together shaping **spouse palace and the inner self — the partner you choose and the self behind the choices**. Read as **Companion (比肩)** relative to your Day Master, the day pillar tends to carry that dynamic.
 
 The **Fire** branch is the container for this area and the **Earth** stem is its driver — read the two together when weighing how day-pillar matters unfold.
 
-Because the stem belongs to the **Earth** element, it tends to bring earth-flavoured themes into this life area — qualities of motion, structure, or feeling that quietly shape how the querent relates to day-pillar matters.
-Hidden stems within the 巳 branch add layers: any mid- or residual-stem ten-god the querent carries here will surface as a recurring sub-theme when this life area activates.
+Because the stem belongs to the **Earth** element, it tends to bring earth-flavoured themes into this life area — qualities of motion, structure, or feeling that quietly shape how you relate to day-pillar matters.
+Hidden stems within the 巳 branch add layers: any mid- or residual-stem ten-god you carry here will surface as a recurring sub-theme when this life area activates.
 When the annual or major luck touches the 巳 branch or the 己 stem, expect day-pillar themes to move to the foreground for that window.
 
 #### Hour Pillar — 戊辰 (Mu (Yang Earth, 戊土))
 
-The 戊辰 pillar pairs the **戊** stem (Mu (Yang Earth, 戊土)) with the **辰** branch, together shaping **later life and children — what you build toward and what you pass on**. Its stem reads as **Robber (劫財)** relative to your Day Master, so this area of life tends to carry that dynamic.
+The 戊辰 pillar pairs the **戊** stem (Mu (Yang Earth, 戊土)) with the **辰** branch, together shaping **later life and children — what you build toward and what you pass on**. Read as **Robber (劫財)** relative to your Day Master, the hour pillar tends to carry that dynamic.
 
 The **Earth** branch is the container for this area and the **Earth** stem is its driver — read the two together when weighing how hour-pillar matters unfold.
 
-Because the stem belongs to the **Earth** element, it tends to bring earth-flavoured themes into this life area — qualities of motion, structure, or feeling that quietly shape how the querent relates to hour-pillar matters.
-Hidden stems within the 辰 branch add layers: any mid- or residual-stem ten-god the querent carries here will surface as a recurring sub-theme when this life area activates.
+Because the stem belongs to the **Earth** element, it tends to bring earth-flavoured themes into this life area — qualities of motion, structure, or feeling that quietly shape how you relate to hour-pillar matters.
+Hidden stems within the 辰 branch add layers: any mid- or residual-stem ten-god you carry here will surface as a recurring sub-theme when this life area activates.
 When the annual or major luck touches the 辰 branch or the 戊 stem, expect hour-pillar themes to move to the foreground for that window.
 
 ### Ten-God Distribution Table
@@ -183,7 +183,7 @@ Wealth timing is read from where 재성 (Wealth) ten-gods appear and are support
 
 ### Employment vs. Entrepreneurship
 
-The Day Master reads as **strong** with visible Output or Wealth stems, which favours independent paths once the querent has built enough foundation to hold the variability. Treat this as a tendency reading, not a verdict; the 대운 and annual luck tables below show when each path is more likely to land cleanly.
+The Day Master reads as **strong** with visible Output or Wealth stems, which favours independent paths once you have built enough foundation to hold the variability. Treat this as a tendency reading, not a verdict; the 대운 and annual luck tables below show when each path is more likely to land cleanly.
 
 ### Income Rhythm
 
@@ -195,52 +195,54 @@ Income arrives in **project-based bursts** — commissions, deals, or ventures t
 
 ### Wealth Preservation Note
 
-For a **Earth** Day Master with a **Strong** reading, wealth preservation starts with diversification — never concentrate more than your chart can comfortably hold. Liquidity buffers aligned with the **Metal** element (its colors, foods, and rhythms) help the querent stay flexible across unfavorable 대운 periods. Partnerships and joint ventures work well when the partner's element supports Metal; avoid partners whose chart emphasizes the unfavorable element, since their decisions tend to amplify the chart's existing pressure. Across a full lifetime, the disciplined saver with Metal-aligned custodians outperforms the aggressive investor whose chart cannot hold the volatility.
+For a **Earth** Day Master with a **Strong** reading, wealth preservation starts with diversification — never concentrate more than your chart can comfortably hold. Liquidity buffers aligned with the **Metal** element (its colors, foods, and rhythms) help the you stay flexible across unfavorable 대운 periods. Partnerships and joint ventures work well when the partner's element supports Metal; avoid partners whose chart emphasizes the unfavorable element, since their decisions tend to amplify the chart's existing pressure. Across a full lifetime, the disciplined saver with Metal-aligned custodians outperforms the aggressive investor whose chart cannot hold the volatility.
 
 ### Career Deep-Dive
 
 #### Company-Type Fit
-A **mid-size specialist firm with strong leadership visibility** is the most likely fit. Both Direct Officer and Seven Killings are present, so the querent needs a credible structure but also room to push back when needed.
+A **mid-size specialist firm with strong leadership visibility** is the most likely fit. Both Direct Officer and Seven Killings are present, so you need a credible structure but also room to push back when needed.
 
 #### Boss / Team Dynamics
-The ideal manager profile is a **structured, precise Metal manager** — someone who carries your favorable **Metal** element, supplying what the chart needs rather than competing with your Day Master. Watch for rapid change that erodes Earth's stability; this is the most common way the querent's energy gets drained in a team setting.
+The ideal manager profile is a **structured, precise Metal manager** — someone who carries your favorable **Metal** element, supplying what the chart needs rather than competing with your Day Master. Watch for rapid change that erodes Earth's stability; this is the most common way your energy gets drained in a team setting.
 
 #### Red-Flag Environments
-Look out for: slow bureaucratic processes that the querent's energy quickly overruns; unclear decision rights — strong Day Masters struggle without ownership; teams that refuse to challenge the querent's ideas.
+Look out for: slow bureaucratic processes that your energy quickly overruns; unclear decision rights — strong Day Masters struggle without ownership; teams that refuse to challenge your ideas.
 
 #### Decade-by-Decade Career Strategy
 
+Within any period, years and months whose stem matches your favorable element are the most reliable for visible wins; the rest are best used for quiet preparation.
+
 **Ages 6-15 — 壬申**
 
-With a **Direct Wealth (正財)** ten-god over a **Metal** branch (stem element Water), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Metal** energy are the most reliable for visible wins; the others are best used for quiet preparation.
+With a **Direct Wealth (正財)** ten-god over a **Metal** branch (stem element Water), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window.
 
 **Ages 16-25 — 癸酉**
 
-With a **Indirect Wealth (偏財)** ten-god over a **Metal** branch (stem element Water), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Metal** energy are the most reliable for visible wins; the others are best used for quiet preparation.
+With a **Indirect Wealth (偏財)** ten-god over a **Metal** branch (stem element Water), this is a build and rise decade. Move on the opportunities you have already prepared; this window rewards visible effort.
 
 **Ages 26-35 — 甲戌**
 
-With a **Direct Officer (正官)** ten-god over a **Earth** branch (stem element Wood), this is a conserve and consolidate decade. Protect what already works; defer large bets and focus on craft and relationships. Years where the stem element matches the favorable **Metal** energy are the most reliable for visible wins; the others are best used for quiet preparation.
+With a **Direct Officer (正官)** ten-god over a **Earth** branch (stem element Wood), this is a conserve and consolidate decade. Hold your position and invest in the skills that will still matter when the cycle turns.
 
 **Ages 36-45 — 乙亥**
 
-With a **Seven Killings (偏官)** ten-god over a **Water** branch (stem element Wood), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Metal** energy are the most reliable for visible wins; the others are best used for quiet preparation.
+With a **Seven Killings (偏官)** ten-god over a **Water** branch (stem element Wood), this is a build and rise decade. Say yes to the stretch role or the larger scope; capacity is not the constraint here.
 
 **Ages 46-55 — 丙子**
 
-With a **Direct Resource (正印)** ten-god over a **Water** branch (stem element Fire), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Metal** energy are the most reliable for visible wins; the others are best used for quiet preparation.
+With a **Direct Resource (正印)** ten-god over a **Water** branch (stem element Fire), this is a build and rise decade. Ask for the introduction, the raise, or the larger budget while the ground is receptive.
 
 **Ages 56-65 — 丁丑**
 
-With a **Indirect Resource (偏印)** ten-god over a **Earth** branch (stem element Fire), this is a conserve and consolidate decade. Protect what already works; defer large bets and focus on craft and relationships. Years where the stem element matches the favorable **Metal** energy are the most reliable for visible wins; the others are best used for quiet preparation.
+With a **Indirect Resource (偏印)** ten-god over a **Earth** branch (stem element Fire), this is a conserve and consolidate decade. Spend on maintenance and reserves, not on growth; the return comes in the next cycle.
 
 **Ages 66-75 — 戊寅**
 
-With a **Robber (劫財)** ten-god over a **Wood** branch (stem element Earth), this is a conserve and consolidate decade. Protect what already works; defer large bets and focus on craft and relationships. Years where the stem element matches the favorable **Metal** energy are the most reliable for visible wins; the others are best used for quiet preparation.
+With a **Robber (劫財)** ten-god over a **Wood** branch (stem element Earth), this is a conserve and consolidate decade. Reduce the number of open fronts so the ones that matter get your full attention.
 
 **Ages 76-85 — 己卯**
 
-With a **Companion (比肩)** ten-god over a **Wood** branch (stem element Earth), this is a conserve and consolidate decade. Protect what already works; defer large bets and focus on craft and relationships. Years where the stem element matches the favorable **Metal** energy are the most reliable for visible wins; the others are best used for quiet preparation.
+With a **Companion (比肩)** ten-god over a **Wood** branch (stem element Earth), this is a conserve and consolidate decade. Let the unglamorous work accumulate — it is what the next decade inherits.
 
 > **In plain words:** Your chart leans toward earning alongside peers — teams, partnerships, independent practice. Fields and decades that carry Metal give the cleanest results; the timing tables show when.
 
@@ -287,22 +289,22 @@ The spouse palace **巳** (12-stage: 제왕) carries a main hidden stem that rel
 
 ### Friendship & Social Energy
 
-Friend and social energy is shaped by the chart's dominant classes — **Companion (6), Authority (4)** — so the querent tends to give and receive in those modes. The querent is naturally drawn to people who are precise, principled, and disciplined, and tends to feel drained by people who are chaotic and directionless. Social settings where the favorable **Metal** element is present (a community garden for Wood, a quiet studio for Water, a workshop for Metal) tend to feel more nourishing than large unstructured gatherings.
+Friend and social energy is shaped by the chart's dominant classes — **Companion (6), Authority (4)** — so the you tend to give and receive in those modes. You are naturally drawn to people who are precise, principled, and disciplined, and tends to feel drained by people who are chaotic and directionless. Social settings where the favorable **Metal** element is present (a community garden for Wood, a quiet studio for Water, a workshop for Metal) tend to feel more nourishing than large unstructured gatherings.
 
 ### Relationship Deep-Dive
 
 #### Attachment Patterns from Chart Structure
-With the spouse palace **巳** sitting in the **제왕** 12-stage and carrying hidden-stem ten-gods of **정인, 상관, 겁재**, the querent bonds through a mix of presence and discernment. The **제왕** stage is one of the supported (strong) stages, so the querent tends to bring energy and presence into the bond. The hidden-stem ten-gods colour the undercurrent — Resource leans into safety, Output into creative play, Wealth into stability. Read this as the emotional baseline; the 대운/세운 overlays show when the querent's bond patterns shift most.
+With the spouse palace **巳** sitting in the **제왕** 12-stage and carrying hidden-stem ten-gods of **정인, 상관, 겁재**, you bond through a mix of presence and discernment. The **제왕** stage is one of the supported (strong) stages, so you tend to bring energy and presence into the bond. The hidden-stem ten-gods colour the undercurrent — Resource leans into safety, Output into creative play, Wealth into stability. Read this as the emotional baseline; the 대운/세운 overlays show when your bond patterns shift most.
 
 #### Marriage Timing Windows
 Commitment timing is read from your **재성 (wife star)** and your spouse palace **巳** (the day branch) *(see knowledge/08-luck-pillars.md Part 5b)*. Neither the current nor the next major-luck period carries the spouse star or binds the spouse palace, so the annual years below carry more of the weight. The years where the most signals converge: **2033 癸丑** (편재 spouse-star year, 巳酉丑 삼합 through the spouse palace); **2032 壬子** (정재 spouse-star year). Years better suited to deepening privately than to formalising: 2030 (a void (empty) year, so gains may feel less solid); 2031 (亥巳 충 on the spouse palace, a void (empty) year, so gains may feel less solid); 2034 (寅巳 형 on the spouse palace). These are tendencies for when the theme is most active — not predictions of an event.
 
 #### Family Dynamics
-The year pillar **辰** carries ancestral and parental themes; its main hidden stem shapes how the querent absorbs (or pushes back on) family-of-origin patterns. The month pillar **未** is the career and sibling palace — its dynamics surface in how the querent shows up among peers and early mentors. The hour pillar **辰** speaks to children and later life — its hidden stems indicate what the querent is likely to pass on, and what they will need to consciously teach.
+The year pillar **辰** carries ancestral and parental themes; its main hidden stem shapes how you absorb (or pushes back on) family-of-origin patterns. The month pillar **未** is the career and sibling palace — its dynamics surface in how you show up among peers and early mentors. The hour pillar **辰** speaks to children and later life — its hidden stems indicate what you are likely to pass on, and what they will need to consciously teach.
 
 #### Partner Chart Add-On
 
-*Curious about a specific person? Add a compatibility reading — the Deep Compatibility report ($45) — by replying with their birth details.*
+*Curious about a specific person? Add a compatibility reading — the Deep Compatibility report — by replying with their birth details.*
 
 > **In plain words:** Your partnership area points toward a protective, grounding partner who offers rest. Treat this as the weather it tends to create, not a description of one person.
 
@@ -312,8 +314,8 @@ The year pillar **辰** carries ancestral and parental themes; its main hidden s
 
 ### Primary Watchpoints
 
-- **Element excess:** Earth — pay attention to the spleen/stomach and digestive metabolism system.
-- **Element deficiency:** Water — the kidney/bladder and hormonal/endocrine reserves system may need gentle support.
+- **Element excess:** Earth — pay attention to the spleen/stomach and digestive metabolism.
+- **Element deficiency:** Water — the kidney/bladder and hormonal/endocrine reserves may need gentle support.
 - The chart's lightest weighted element is **Water (5.6%)**, which in classical Five-Element mapping is paired with the **kidney/bladder and hormonal/endocrine reserves**. This is not a diagnosis; it is the least natally emphasized system, making it the natural place to begin gentle, preventive support through water-aligned foods, seasons, and rhythms.
 
 ### Grounding Practices
@@ -342,7 +344,7 @@ The **Earth** Day Master is most at home in **late summer / transitions**; that 
 
 This section gathers the visible structural signals in your natal chart — combinations, clashes, harmonies, and self-punishments — so the reader can see which branches are speaking to one another. These patterns do not dictate events; they describe recurring themes and pressures that tend to appear across life areas.
 
-**Dominant pattern candidate:** *비견격 / Companion Grid*
+**Dominant pattern:** *비견격 / Companion Grid*
 
 | Pattern | Branches | Classical Note |
 |---|---|---|
@@ -351,13 +353,13 @@ This section gathers the visible structural signals in your natal chart — comb
 
 ### Pattern Narratives
 
-The engine flags a likely **비견격 (Companion Grid)** as the regular grid. This points toward a life theme shaped by self-reliance and peer dynamics — the chart learns most through equal relationships and independent effort. It is a structural tendency, not a career verdict; the ten-god distribution and timing tables refine how it expresses.
+The chart shows a likely **비견격 (Companion Grid)** as the regular grid. This points toward a life theme shaped by self-reliance and peer dynamics — the chart learns most through equal relationships and independent effort. It is a structural tendency, not a career verdict; the ten-god distribution and timing tables refine how it expresses.
 
 The most prominent natal branch signal is a **자형 (Self-Punishment)** of **辰**, appearing more than once in the ancestral and social-root energy — the wider world you were born into. This points to an inner pattern that repeats until self-awareness reframes it; it is structural, not a character flaw.
 
 ### What This Means in Plain Language
 
-The chart's dominant pattern candidate is **비견격 (Companion Grid)**. Together, these patterns point to a recurring life theme rather than a single event. The favorable **Metal** element is the querent's lever for working with — rather than against — the chart's structure.
+The chart's dominant pattern is **비견격 (Companion Grid)**. Together, these patterns point to a recurring life theme rather than a single event. The favorable **Metal** element is your lever for working with — rather than against — the chart's structure.
 
 > **In plain words:** The chart's organising theme is self-reliance and peer dynamics — the chart learns most through equal relationships and independent effort.
 
@@ -369,7 +371,7 @@ The chart's dominant pattern candidate is **비견격 (Companion Grid)**. Togeth
 - **지살 (地煞)** (at 巳): a movement/departure marker — relocation, travel, job or residence changes; a milder, more passive sibling of the travel star (역마).
 - **월살 (月煞)** (at 未): also called 고초살 — a drying-up/stagnation marker: slow development and effort that needs patience before it bears fruit.
 - **천덕귀인 (天德貴人)** (at 甲): virtue, protection, and honorable character — help arriving in times of need; often read as one of the most favorable stars.
-- **월덕귀인 (月德貴人)** (at 甲): monthly/quarterly support, popularity, and smooth assistance from people around the querent.
+- **월덕귀인 (月德貴人)** (at 甲): monthly/quarterly support, popularity, and smooth assistance from people around you.
 
 ---
 
@@ -379,8 +381,8 @@ This section identifies where wealth ten-gods appear in the natal chart and whic
 
 | Position | Stem | Ten-God | Note |
 |---|---|---|---|
-| year_branch_middle | 癸 | Indirect Wealth (偏財) | Natal wealth signal visible here. |
-| hour_branch_middle | 癸 | Indirect Wealth (偏財) | Natal wealth signal visible here. |
+| Year branch middle | 癸 | Indirect Wealth (偏財) | Natal wealth signal visible here. |
+| Hour branch middle | 癸 | Indirect Wealth (偏財) | Natal wealth signal visible here. |
 
 **Major-luck periods that carry wealth or favorable-element energy:**
 
@@ -444,7 +446,7 @@ With **Metal** as the favorable element, the most aligned launch window is **aut
 2. **Annual pillars dominated by the unfavorable element** — favour audits, refinements, and quiet product work over big announcements.
 3. **A major-luck shift into a heavier stem (strong 정관 / 편관)** — use the first 1–2 years to set up systems rather than scale headcount.
 4. **Activated chart-punishment or self-punishment patterns during the launch year** — keep partnerships small and written, not verbal.
-5. **Conjunction of new-moon or full-moon eclipses falling on spouse-palace or wealth-stem branches** — defer the launch by 30–45 days if it lands on the public date.
+5. **A public date chosen without checking your favorable element** — if the launch date can move, place it in a month whose stem matches your favorable **Metal** element; the auspicious-dates section lists the candidates.
 
 ---
 
@@ -469,7 +471,7 @@ With **Metal** as the favorable element, the most aligned launch window is **aut
 
 ### Current Period Deep-Dive
 
-This decade carries a **Indirect Resource (偏印)** ten-god over a **Earth** branch — a mixed window that asks for measured moves rather than bold ones. The stem ten-god is the *outer theme* — what the world sees and asks of the querent — while the branch element is the *underlying terrain* — the quieter emotional and circumstantial backdrop. Read them together rather than separately; mismatches between outer theme and inner terrain are where this decade is most likely to surprise.
+This decade carries a **Indirect Resource (偏印)** ten-god over a **Earth** branch — a mixed window that asks for measured moves rather than bold ones. The stem ten-god is the *outer theme* — what the world sees and asks of you — while the branch element is the *underlying terrain* — the quieter emotional and circumstantial backdrop. Read them together rather than separately; mismatches between outer theme and inner terrain are where this decade is most likely to surprise.
 
 Specifically: **do** conserve, refine, and protect the foundation; **avoid** long commitments whose payoff is years away. Within this decade, years and months whose stem element matches the favorable **Metal** energy are the cleanest moments for major commitments; the annual windows table below shows them. Years dominated by the unfavorable element are best used for rest, review, and quiet preparation.
 
@@ -513,13 +515,15 @@ A quick reading of each year's energy relative to your Day Master and favorable 
 
 Each 10-year major-luck (대운) period brings a new stem and branch into prominence. The stem shows the outer theme through its 십신 (十神) relationship to your Day Master; the branch shows the stage of life and the underlying terrain. Read these as tendencies, not fixed events.
 
+Within any period, years and months whose stem matches your favorable element are the most reliable for visible wins; the rest are best used for quiet preparation.
+
 ### Ages 6–15: 壬申
 
 - **Ten-God theme:** Direct Wealth (正財)
 - **Branch element & 12-stage:** Metal · 목욕 (沐浴)
 - **Favorable lean:** favorable
 
-With a **Direct Wealth (正財)** ten-god over a **Metal** branch (stem element Water), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Metal** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Direct Wealth (正財)** undertow — themes of commitment and visibility are likely. The favorable **Metal** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
+With a **Direct Wealth (正財)** ten-god over a **Metal** branch (stem element Water), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Relationships in this window carry the same **Direct Wealth (正財)** undertow — themes of commitment and visibility are likely.
 
 ### Ages 16–25: 癸酉
 
@@ -527,7 +531,7 @@ With a **Direct Wealth (正財)** ten-god over a **Metal** branch (stem element 
 - **Branch element & 12-stage:** Metal · 장생 (長生)
 - **Favorable lean:** favorable
 
-With a **Indirect Wealth (偏財)** ten-god over a **Metal** branch (stem element Water), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Metal** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Indirect Wealth (偏財)** undertow — themes of commitment and visibility are likely. The favorable **Metal** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
+With a **Indirect Wealth (偏財)** ten-god over a **Metal** branch (stem element Water), this is a build and rise decade. Move on the opportunities you have already prepared; this window rewards visible effort. Relationships in this window carry the same **Indirect Wealth (偏財)** undertow — themes of commitment and visibility are likely.
 
 ### Ages 26–35: 甲戌
 
@@ -535,7 +539,7 @@ With a **Indirect Wealth (偏財)** ten-god over a **Metal** branch (stem elemen
 - **Branch element & 12-stage:** Earth · 양 (養)
 - **Favorable lean:** unfavorable
 
-With a **Direct Officer (正官)** ten-god over a **Earth** branch (stem element Wood), this is a conserve and consolidate decade. Protect what already works; defer large bets and focus on craft and relationships. Years where the stem element matches the favorable **Metal** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Direct Officer (正官)** undertow — themes of commitment and visibility are likely. The favorable **Metal** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
+With a **Direct Officer (正官)** ten-god over a **Earth** branch (stem element Wood), this is a conserve and consolidate decade. Hold your position and invest in the skills that will still matter when the cycle turns. Relationships in this window carry the same **Direct Officer (正官)** undertow — themes of commitment and visibility are likely.
 
 ### Ages 36–45: 乙亥
 
@@ -543,7 +547,7 @@ With a **Direct Officer (正官)** ten-god over a **Earth** branch (stem element
 - **Branch element & 12-stage:** Water · 태 (胎)
 - **Favorable lean:** favorable
 
-With a **Seven Killings (偏官)** ten-god over a **Water** branch (stem element Wood), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Metal** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Seven Killings (偏官)** undertow — themes of commitment and visibility are likely. The favorable **Metal** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
+With a **Seven Killings (偏官)** ten-god over a **Water** branch (stem element Wood), this is a build and rise decade. Say yes to the stretch role or the larger scope; capacity is not the constraint here. Relationships in this window carry the same **Seven Killings (偏官)** undertow — themes of commitment and visibility are likely.
 
 ### Ages 46–55: 丙子
 
@@ -551,7 +555,7 @@ With a **Seven Killings (偏官)** ten-god over a **Water** branch (stem element
 - **Branch element & 12-stage:** Water · 절 (絶)
 - **Favorable lean:** favorable
 
-With a **Direct Resource (正印)** ten-god over a **Water** branch (stem element Fire), this is a build and rise decade. Plant several seeds at once — the chart can carry more than one initiative in this window. Years where the stem element matches the favorable **Metal** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Direct Resource (正印)** undertow — themes of support and study are likely. The favorable **Metal** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
+With a **Direct Resource (正印)** ten-god over a **Water** branch (stem element Fire), this is a build and rise decade. Ask for the introduction, the raise, or the larger budget while the ground is receptive. Relationships in this window carry the same **Direct Resource (正印)** undertow — themes of support and study are likely.
 
 ### Ages 56–65: 丁丑
 
@@ -559,7 +563,7 @@ With a **Direct Resource (正印)** ten-god over a **Water** branch (stem elemen
 - **Branch element & 12-stage:** Earth · 묘 (墓)
 - **Favorable lean:** unfavorable
 
-With a **Indirect Resource (偏印)** ten-god over a **Earth** branch (stem element Fire), this is a conserve and consolidate decade. Protect what already works; defer large bets and focus on craft and relationships. Years where the stem element matches the favorable **Metal** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Indirect Resource (偏印)** undertow — themes of support and study are likely. The favorable **Metal** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
+With a **Indirect Resource (偏印)** ten-god over a **Earth** branch (stem element Fire), this is a conserve and consolidate decade. Spend on maintenance and reserves, not on growth; the return comes in the next cycle. Relationships in this window carry the same **Indirect Resource (偏印)** undertow — themes of support and study are likely.
 
 ### Ages 66–75: 戊寅
 
@@ -567,7 +571,7 @@ With a **Indirect Resource (偏印)** ten-god over a **Earth** branch (stem elem
 - **Branch element & 12-stage:** Wood · 사 (死)
 - **Favorable lean:** unfavorable
 
-With a **Robber (劫財)** ten-god over a **Wood** branch (stem element Earth), this is a conserve and consolidate decade. Protect what already works; defer large bets and focus on craft and relationships. Years where the stem element matches the favorable **Metal** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Robber (劫財)** undertow — themes of peer dynamics, independence, and friendship-based bonds are likely. The favorable **Metal** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
+With a **Robber (劫財)** ten-god over a **Wood** branch (stem element Earth), this is a conserve and consolidate decade. Reduce the number of open fronts so the ones that matter get your full attention. Relationships in this window carry the same **Robber (劫財)** undertow — themes of peer dynamics, independence, and friendship-based bonds are likely.
 
 ### Ages 76–85: 己卯
 
@@ -575,7 +579,7 @@ With a **Robber (劫財)** ten-god over a **Wood** branch (stem element Earth), 
 - **Branch element & 12-stage:** Wood · 병 (病)
 - **Favorable lean:** unfavorable
 
-With a **Companion (比肩)** ten-god over a **Wood** branch (stem element Earth), this is a conserve and consolidate decade. Protect what already works; defer large bets and focus on craft and relationships. Years where the stem element matches the favorable **Metal** energy are the most reliable for visible wins; the others are best used for quiet preparation. Relationships in this window carry the same **Companion (比肩)** undertow — themes of peer dynamics, independence, and friendship-based bonds are likely. The favorable **Metal** element shows up most clearly in years and months whose stem matches it — these are the periods to lean in.
+With a **Companion (比肩)** ten-god over a **Wood** branch (stem element Earth), this is a conserve and consolidate decade. Let the unglamorous work accumulate — it is what the next decade inherits. Relationships in this window carry the same **Companion (比肩)** undertow — themes of peer dynamics, independence, and friendship-based bonds are likely.
 
 ---
 
@@ -602,27 +606,27 @@ A single-glance view of all 8 major-luck periods in your life and the favorable 
 
 ## Auspicious Dates — Next 90 Days
 
-> The next 90-day window from September 2026 includes the following candidate dates — each one's day-stem element matches your favorable (Metal) or supporting (Water) element, and its day-branch does not clash, harm, or break your natal day branch (巳) or hour branch (辰). A qualified reader should still cross-check each date against the querent's specific question and local calendar before recommending it.
+> The next 90-day window from September 2026 includes the following candidate dates — each one's day-stem element matches your favorable (Metal) or supporting (Water) element, and its day-branch does not clash, harm, or break your natal day branch (巳) or hour branch (辰). A qualified reader should still cross-check each date against your specific question and local calendar before recommending it.
 
-> **Almanac caveat:** this is a chart-relative shortlist, not a finished 택일 (auspicious-date selection) — a full 택일 also weighs the day's own 건제십이신/28수 almanac assignment, the specific event type, and local custom, none of which this engine computes *(see knowledge/16-date-selection.md)*.
+> **Almanac caveat:** this is a chart-relative shortlist, not a finished 택일 (auspicious-date selection) — a full 택일 also weighs the day's own 건제십이신/28수 almanac assignment, the specific event type, and local custom, none of which a chart-relative shortlist can compute *(see knowledge/16-date-selection.md)*.
 
 | Date | Day Pillar | Suggested Use / Reader Note |
 |---|---|---|
-| 2026-10-05 (Monday) | 壬子 (Direct Wealth) | A reasonable candidate — the day-stem carries your supporting element (Water) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-10-14 (Wednesday) | 辛酉 (Eating God) | A reasonable candidate — the day-stem carries your favorable element (Metal) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-10-23 (Friday) | 庚午 (Hurting Officer) | A reasonable candidate — the day-stem carries your favorable element (Metal) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-10-24 (Saturday) | 辛未 (Eating God) | A reasonable candidate — the day-stem carries your favorable element (Metal) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-10-26 (Monday) | 癸酉 (Indirect Wealth) | A reasonable candidate — the day-stem carries your supporting element (Water) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-11-03 (Tuesday) | 辛巳 (Eating God) | A reasonable candidate — the day-stem carries your favorable element (Metal) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-11-04 (Wednesday) | 壬午 (Direct Wealth) | A reasonable candidate — the day-stem carries your supporting element (Water) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-11-05 (Thursday) | 癸未 (Indirect Wealth) | A reasonable candidate — the day-stem carries your supporting element (Water) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-11-15 (Sunday) | 癸巳 (Indirect Wealth) | A reasonable candidate — the day-stem carries your supporting element (Water) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-11-22 (Sunday) | 庚子 (Hurting Officer) | A reasonable candidate — the day-stem carries your favorable element (Metal) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-12-04 (Friday) | 壬子 (Direct Wealth) | A reasonable candidate — the day-stem carries your supporting element (Water) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-12-13 (Sunday) | 辛酉 (Eating God) | A reasonable candidate — the day-stem carries your favorable element (Metal) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-12-22 (Tuesday) | 庚午 (Hurting Officer) | A reasonable candidate — the day-stem carries your favorable element (Metal) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-12-23 (Wednesday) | 辛未 (Eating God) | A reasonable candidate — the day-stem carries your favorable element (Metal) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
-| 2026-12-25 (Friday) | 癸酉 (Indirect Wealth) | A reasonable candidate — the day-stem carries your supporting element (Water) and its branch does not clash, harm, or break your natal day/hour branch; confirm against the querent's specific question before booking. |
+| 2026-10-05 (Monday) | 壬子 (Direct Wealth) | Water — your supporting element |
+| 2026-10-14 (Wednesday) | 辛酉 (Eating God) | Metal — your favorable element |
+| 2026-10-23 (Friday) | 庚午 (Hurting Officer) | Metal — your favorable element |
+| 2026-10-24 (Saturday) | 辛未 (Eating God) | Metal — your favorable element |
+| 2026-10-26 (Monday) | 癸酉 (Indirect Wealth) | Water — your supporting element |
+| 2026-11-03 (Tuesday) | 辛巳 (Eating God) | Metal — your favorable element |
+| 2026-11-04 (Wednesday) | 壬午 (Direct Wealth) | Water — your supporting element |
+| 2026-11-05 (Thursday) | 癸未 (Indirect Wealth) | Water — your supporting element |
+| 2026-11-15 (Sunday) | 癸巳 (Indirect Wealth) | Water — your supporting element |
+| 2026-11-22 (Sunday) | 庚子 (Hurting Officer) | Metal — your favorable element |
+| 2026-12-04 (Friday) | 壬子 (Direct Wealth) | Water — your supporting element |
+| 2026-12-13 (Sunday) | 辛酉 (Eating God) | Metal — your favorable element |
+| 2026-12-22 (Tuesday) | 庚午 (Hurting Officer) | Metal — your favorable element |
+| 2026-12-23 (Wednesday) | 辛未 (Eating God) | Metal — your favorable element |
+| 2026-12-25 (Friday) | 癸酉 (Indirect Wealth) | Water — your supporting element |
 
 ---
 
@@ -732,7 +736,7 @@ The next **12 months** of favorable days, selected when the daily stem element m
 
 ## MP3 Audio Summary — Included by Default
 
-🎧 **Audio Summary:** Your MP3 companion to this report will be delivered alongside this PDF. It covers your Day Master portrait, current major-luck period, key timing windows for 2026–2028, and the top 5 practical recommendations in approximately 8–10 minutes.
+🎧 **Audio Summary:** Your MP3 companion to this report is included and follows shortly after it — we email you the moment it is ready, and it appears on the same page as your reading. It covers your Day Master portrait, current major-luck period, key timing windows for 2026–2031, and the top 5 practical recommendations in about ten minutes.
 
 Listen once in full, then return to the chapters that match the season you are in.
 
@@ -1067,7 +1071,7 @@ The principal health watch is **Earth-excess and Water-deficit** — keep the ki
 
 ## Closing Note
 
-**己 (Gi (Yin Earth, 己土))** sits at the centre of this chart, with the chart's element balance leaning toward **Earth** and a ten-god distribution dominated by **Companion (6), Authority (4)**. The favorable **Metal** element (with **Water** as the quiet secondary) is the querent's main lever — not as a rule to follow, but as a rhythm to listen to. The spouse palace **巳** and the chart's relationship dynamics reward the querent for showing up consistently rather than performing. Across a full lifetime, this chart rewards the querent who studies their own patterns and acts with the favorable element rather than against it. The work is not to fix the chart; it is to use what is already there well.
+**己 (Gi (Yin Earth, 己土))** sits at the centre of this chart, with the chart's element balance leaning toward **Earth** and a ten-god distribution dominated by **Companion (6), Authority (4)**. The favorable **Metal** element (with **Water** as the quiet secondary) is your main lever — not as a rule to follow, but as a rhythm to listen to. The spouse palace **巳** and the chart's relationship dynamics reward the you for showing up consistently rather than performing. Across a full lifetime, this chart rewards you for studying your own patterns and acts with the favorable element rather than against it. The work is not to fix the chart; it is to use what is already there well.
 
 ---
 

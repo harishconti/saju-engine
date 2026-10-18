@@ -54,97 +54,97 @@ Each ranked archetype below is read for *this* chart: what the element family is
 ### Leadership & Executive Roles (**Best Fit**)
 
 - **Element family:** Fire — this family is public-facing and expressive — it makes things seen and energises an audience (*Fire maximum outward radiance that cannot act in private*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** This is a **Best Fit**: the family runs on **Fire**, your favorable element, so the work moves *with* the chart's grain instead of against it.
-- **How to use it:** Lean into it deliberately — this is where effort compounds fastest and friction is lowest.
-- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive so the chart stays balanced.
+- **Why it fits your chart:** This is a **Best Fit** for Leadership & Executive Roles: the family runs on **Fire**, your favorable element, so the work moves *with* the chart's grain instead of against it.
+- **How to use it:** Lean into it deliberately — Leadership & Executive Roles is where effort compounds fastest and friction is lowest.
+- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive alongside team lead, director, general manager, founder-CEO so the chart stays balanced.
 - **Roles:** team lead, director, general manager, founder-CEO
 
 ### Media & Performing Arts (**Best Fit**)
 
 - **Element family:** Fire — this family is public-facing and expressive — it makes things seen and energises an audience (*Fire maximum outward radiance that cannot act in private*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** This is a **Best Fit**: the family runs on **Fire**, your favorable element, so the work moves *with* the chart's grain instead of against it.
-- **How to use it:** Lean into it deliberately — this is where effort compounds fastest and friction is lowest.
-- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive so the chart stays balanced.
+- **Why it fits your chart:** This is a **Best Fit** for Media & Performing Arts: the family runs on **Fire**, your favorable element, so the work moves *with* the chart's grain instead of against it.
+- **How to use it:** Lean into it deliberately — Media & Performing Arts is where effort compounds fastest and friction is lowest.
+- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive alongside broadcaster, performer, host, producer so the chart stays balanced.
 - **Roles:** broadcaster, performer, host, producer
 
 ### Marketing & Public Relations (**Best Fit**)
 
 - **Element family:** Fire — this family is public-facing and expressive — it makes things seen and energises an audience (*Fire maximum outward radiance that cannot act in private*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** This is a **Best Fit**: the family runs on **Fire**, your favorable element, so the work moves *with* the chart's grain instead of against it.
-- **How to use it:** Lean into it deliberately — this is where effort compounds fastest and friction is lowest.
-- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive so the chart stays balanced.
+- **Why it fits your chart:** This is a **Best Fit** for Marketing & Public Relations: the family runs on **Fire**, your favorable element, so the work moves *with* the chart's grain instead of against it.
+- **How to use it:** Lean into it deliberately — Marketing & Public Relations is where effort compounds fastest and friction is lowest.
+- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive alongside marketer, PR lead, brand manager, growth lead so the chart stays balanced.
 - **Roles:** marketer, PR lead, brand manager, growth lead
 
 ### Teaching & Coaching (**Best Fit**)
 
 - **Element family:** Fire — this family is public-facing and expressive — it makes things seen and energises an audience (*Fire maximum outward radiance that cannot act in private*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** This is a **Best Fit**: the family runs on **Fire**, your favorable element, so the work moves *with* the chart's grain instead of against it.
-- **How to use it:** Lean into it deliberately — this is where effort compounds fastest and friction is lowest.
-- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive so the chart stays balanced.
+- **Why it fits your chart:** This is a **Best Fit** for Teaching & Coaching: the family runs on **Fire**, your favorable element, so the work moves *with* the chart's grain instead of against it.
+- **How to use it:** Lean into it deliberately — Teaching & Coaching is where effort compounds fastest and friction is lowest.
+- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive alongside trainer, speaker, coach, program facilitator so the chart stays balanced.
 - **Roles:** trainer, speaker, coach, program facilitator
 
 ### Entrepreneurship (**Good Fit**)
 
 - **Element family:** Fire — this family is public-facing and expressive — it makes things seen and energises an audience (*Fire maximum outward radiance that cannot act in private*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Good Fit**: the family runs on **Fire**, your favorable element, so the work moves *with* the chart's grain instead of against it. It is well resourced by the chart, just not at the very top of the ranking.
-- **How to use it:** Treat it as a lead second track, or a strong complement to your Best-Fit work.
-- **Caveat:** Strong but not primary — pick it deliberately rather than by default, and keep the favorable element in play alongside it.
+- **Why it fits your chart:** A **Good Fit** for Entrepreneurship: the family runs on **Fire**, your favorable element, so the work moves *with* the chart's grain instead of against it. It is well resourced for Entrepreneurship, just not at the very top of the ranking.
+- **How to use it:** Treat Entrepreneurship as a lead second track, or a strong complement to your Best-Fit work.
+- **Caveat:** Strong but not primary — pick Entrepreneurship deliberately rather than by default, and keep the favorable element in play alongside it.
 - **Roles:** founder, product owner, venture operator
 
 ### Mediation & Counselling (**Good Fit**)
 
 - **Element family:** Fire — this family is public-facing and expressive — it makes things seen and energises an audience (*Fire maximum outward radiance that cannot act in private*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Good Fit**: the family runs on **Fire**, your favorable element, so the work moves *with* the chart's grain instead of against it. It is well resourced by the chart, just not at the very top of the ranking.
-- **How to use it:** Treat it as a lead second track, or a strong complement to your Best-Fit work.
-- **Caveat:** Strong but not primary — pick it deliberately rather than by default, and keep the favorable element in play alongside it.
+- **Why it fits your chart:** A **Good Fit** for Mediation & Counselling: the family runs on **Fire**, your favorable element, so the work moves *with* the chart's grain instead of against it. It is well resourced for Mediation & Counselling, just not at the very top of the ranking.
+- **How to use it:** Treat Mediation & Counselling as a lead second track, or a strong complement to your Best-Fit work.
+- **Caveat:** Strong but not primary — pick Mediation & Counselling deliberately rather than by default, and keep the favorable element in play alongside it.
 - **Roles:** mediator, counsellor, life coach, pastoral lead
 
 ### Public Affairs & Advocacy (**Good Fit**)
 
 - **Element family:** None — this family has its own character (*None its elemental nature*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Good Fit**: the family runs on **None**, a neutral element for this chart — neither favorable nor unfavorable on its own. It is well resourced by the chart, just not at the very top of the ranking.
-- **How to use it:** Treat it as a lead second track, or a strong complement to your Best-Fit work.
-- **Caveat:** Strong but not primary — pick it deliberately rather than by default, and keep the favorable element in play alongside it.
+- **Why it fits your chart:** A **Good Fit** for Public Affairs & Advocacy: the family runs on **None**, a neutral element for this chart — neither favorable nor unfavorable on its own. It is well resourced for Public Affairs & Advocacy, just not at the very top of the ranking.
+- **How to use it:** Treat Public Affairs & Advocacy as a lead second track, or a strong complement to your Best-Fit work.
+- **Caveat:** Strong but not primary — pick Public Affairs & Advocacy deliberately rather than by default, and keep the favorable element in play alongside it.
 - **Roles:** campaigner, policy analyst, public advocate
 
 ### Real Estate & Property (**Possible**)
 
 - **Element family:** Earth — this family holds, stores and mediates — it stabilises assets and provides the base others rely on (*Earth the element that contains and stands between*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Possible** fit: the family runs on **Earth**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
-- **How to use it:** Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
-- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.
+- **Why it fits your chart:** A **Possible** fit for Real Estate & Property: the family runs on **Earth**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
+- **How to use it:** Use Real Estate & Property only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
+- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital in Real Estate & Property without a reader's check.
 - **Roles:** agent, developer, property manager, investor-operator
 
 ### Hospitality & Food (**Possible**)
 
 - **Element family:** Earth — this family holds, stores and mediates — it stabilises assets and provides the base others rely on (*Earth the element that contains and stands between*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Possible** fit: the family runs on **Earth**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
-- **How to use it:** Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
-- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.
+- **Why it fits your chart:** A **Possible** fit for Hospitality & Food: the family runs on **Earth**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
+- **How to use it:** Use Hospitality & Food only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
+- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital in Hospitality & Food without a reader's check.
 - **Roles:** operator, chef-owner, hotel/events manager
 
 ### Finance & Accounting (**Possible**)
 
 - **Element family:** Earth — this family holds, stores and mediates — it stabilises assets and provides the base others rely on (*Earth the element that contains and stands between*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Possible** fit: the family runs on **Earth**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
-- **How to use it:** Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
-- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.
+- **Why it fits your chart:** A **Possible** fit for Finance & Accounting: the family runs on **Earth**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
+- **How to use it:** Use Finance & Accounting only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
+- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital in Finance & Accounting without a reader's check.
 - **Roles:** accountant, controller, wealth manager, CFO-track
 
 ### Project Management (**Possible**)
 
 - **Element family:** Earth — this family holds, stores and mediates — it stabilises assets and provides the base others rely on (*Earth the element that contains and stands between*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Possible** fit: the family runs on **Earth**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
-- **How to use it:** Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
-- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.
+- **Why it fits your chart:** A **Possible** fit for Project Management: the family runs on **Earth**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
+- **How to use it:** Use Project Management only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
+- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital in Project Management without a reader's check.
 - **Roles:** project manager, operations lead, program director
 
 ### Agriculture & Land (**Possible**)
 
 - **Element family:** Earth — this family holds, stores and mediates — it stabilises assets and provides the base others rely on (*Earth the element that contains and stands between*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Possible** fit: the family runs on **Earth**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
-- **How to use it:** Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
-- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.
+- **Why it fits your chart:** A **Possible** fit for Agriculture & Land: the family runs on **Earth**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
+- **How to use it:** Use Agriculture & Land only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
+- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital in Agriculture & Land without a reader's check.
 - **Roles:** farm operator, agribusiness manager, land steward
 
 ---
@@ -179,11 +179,11 @@ A **boutique firm or solo practice** is the most likely fit. The Seven Killings 
 
 ### Boss / Team Dynamics
 
-The ideal manager profile is a **warm Fire motivator** — someone who carries your favorable **Fire** element, supplying what the chart needs rather than competing with your Day Master. Watch for constant crisis mode that fragments Wood's growth; this is the most common way the querent's energy gets drained in a team setting.
+The ideal manager profile is a **warm Fire motivator** — someone who carries your favorable **Fire** element, supplying what the chart needs rather than competing with your Day Master. Watch for constant crisis mode that fragments Wood's growth; this is the most common way your energy gets drained in a team setting.
 
 ### Red-Flag Environments
 
-Look out for: slow bureaucratic processes that the querent's energy quickly overruns; unclear decision rights — strong Day Masters struggle without ownership; teams that refuse to challenge the querent's ideas.
+Look out for: slow bureaucratic processes that your energy quickly overruns; unclear decision rights — strong Day Masters struggle without ownership; teams that refuse to challenge your ideas.
 
 ---
 

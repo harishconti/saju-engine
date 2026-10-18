@@ -129,7 +129,7 @@ Which elements dominate the annual stems and branches of each block.
 
 ### 1. 2000–2004 (Ages 4–8) — 庚辰
 
-The decade backdrop is **庚辰** (Seven Killings (偏官), 관성 (官星)), with the opening five years led by **관성 (官星)** annual energy. 4 years of 5 carry your favorable element (**Fire** / **Earth**), and 1 year carries the unfavorable element (**Wood**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2001 해 (harm), 2001 형 (punishment), 2004 충 (clash), 2004 형 (punishment) — relationship, home, or partnership themes are more likely to surface.
+The decade backdrop is **庚辰** (Seven Killings (偏官), 관성 (官星)), with the opening five years led by **관성 (官星)** annual energy. In 2000–2004, 4 years of 5 carry your favorable element (**Fire** / **Earth**), and 1 year carries the unfavorable element (**Wood**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2001 해 (harm), 2001 형 (punishment), 2004 충 (clash), 2004 형 (punishment) — relationship, home, or partnership themes are more likely to surface.
 
 | Year | Pillar | Ten-God | Class | Favorable? |
 |---|---|---|---|---|
@@ -139,16 +139,16 @@ The decade backdrop is **庚辰** (Seven Killings (偏官), 관성 (官星)), wi
 | 2003 | 癸未 | Direct Resource | 인성 (印星) | ✅ |
 | 2004 | 甲申 | Companion | 비겁 (比劫) | ⚠️ |
 
-- **Wealth:** No direct 재성 stem, but **1 of 5** are 비겁 (Companion). The 겁재奪財 pattern reads shared and loosely-defined money as contested here — defend rather than expand shared commitments *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
-- **Business:** **2 of 5** years are 관성 (Authority) — an institution, rank or licensed role comes to the fore. Since 관성 is your unfavorable element, read this as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit *(see knowledge/12-career-and-vocation.md §용신 vs. Day Master for Career Choice)*.
+- **Wealth:** No direct 재성 stem in 2000–2004, but **1 of 5** are 비겁 (Companion). In 2000–2004 the 겁재奪財 pattern reads shared and loosely-defined money as contested — defend rather than expand shared commitments *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Business:** **2 of 5** years in 2000–2004 are 관성 (Authority) — an institution, rank or licensed role comes to the fore. Since 관성 is your unfavorable element, read 2000–2004 as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit *(see knowledge/12-career-and-vocation.md §용신 vs. Day Master for Career Choice)*.
 - **Family:** The spouse palace is struck or unsettled (2001 해 (harm), 2001 형 (punishment), 2004 충 (clash), 2004 형 (punishment)) — better for deepening privately than for formalising commitments this phase *(see knowledge/08-luck-pillars.md Part 5b)*.
-- **Investment pattern:** A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Investment pattern:** A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence in 2000–2004 argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
 
 ---
 
 ### 2. 2005–2009 (Ages 9–13) — 庚辰
 
-The decade backdrop is **庚辰** (Seven Killings (偏官), 관성 (官星)), with the closing five years led by **식상 (食傷) · 재성 (財星)** annual energy. 4 years of 5 carry your favorable element (**Fire** / **Earth**), and 1 year carries the unfavorable element (**Wood**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2007 육합 (binding), 2007 파 (break) — relationship, home, or partnership themes are more likely to surface.
+The decade backdrop is **庚辰** (Seven Killings (偏官), 관성 (官星)), with the closing five years led by **식상 (食傷) · 재성 (財星)** annual energy. In 2005–2009, 4 years of 5 carry your favorable element (**Fire** / **Earth**), and 1 year carries the unfavorable element (**Wood**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2007 육합 (binding), 2007 파 (break) — relationship, home, or partnership themes are more likely to surface.
 
 | Year | Pillar | Ten-God | Class | Favorable? |
 |---|---|---|---|---|
@@ -158,16 +158,16 @@ The decade backdrop is **庚辰** (Seven Killings (偏官), 관성 (官星)), wi
 | 2008 | 戊子 | Indirect Wealth | 재성 (財星) | ✅ |
 | 2009 | 己丑 | Direct Wealth | 재성 (財星) | ✅ |
 
-- **Wealth:** **2 of 5** annual stems are 재성 (Wealth) — money, pricing and asset decisions are foregrounded. Treat this as a window to *earn and negotiate*, and to put agreements in writing *(see knowledge/13-wealth-and-business.md §Wealth Timing)*.
-- **Business:** Business energy is diffuse in this phase; let the decade backdrop and the concrete annual pillars above guide the read *(see knowledge/12-career-and-vocation.md §Ten-God → Career Mode)*.
+- **Wealth:** **2 of 5** annual stems in 2005–2009 are 재성 (Wealth) — money, pricing and asset decisions are foregrounded. Treat 2005–2009 as a window to *earn and negotiate*, and to put agreements in writing *(see knowledge/13-wealth-and-business.md §Wealth Timing)*.
+- **Business:** Business energy is diffuse in 2005–2009; let the decade backdrop and the concrete annual pillars above guide the read *(see knowledge/12-career-and-vocation.md §Ten-God → Career Mode)*.
 - **Family:** The spouse palace is both **bound and unsettled** (2007 육합 (binding), 2007 파 (break)) — a phase where a bond can deepen or formalise, but with friction or change around it; read it as a window, not a guarantee *(see knowledge/08-luck-pillars.md Part 5b)*.
-- **Investment pattern:** A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Investment pattern:** A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence in 2005–2009 argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
 
 ---
 
 ### 3. 2010–2014 (Ages 14–18) — 辛巳
 
-The decade backdrop is **辛巳** (Direct Officer (正官), 관성 (官星)), with the opening five years led by **관성 (官星)** annual energy. 2 years of 5 carry your favorable element (**Fire** / **Earth**), and 2 years carry the unfavorable element (**Wood**) — an overall **mixed** phase. The spouse palace (day branch **寅**) is activated in 2013 해 (harm), 2013 형 (punishment) — relationship, home, or partnership themes are more likely to surface.
+The decade backdrop is **辛巳** (Direct Officer (正官), 관성 (官星)), with the opening five years led by **관성 (官星)** annual energy. In 2010–2014, 2 years of 5 carry your favorable element (**Fire** / **Earth**), and 2 years carry the unfavorable element (**Wood**) — an overall **mixed** phase. The spouse palace (day branch **寅**) is activated in 2013 해 (harm), 2013 형 (punishment) — relationship, home, or partnership themes are more likely to surface.
 
 | Year | Pillar | Ten-God | Class | Favorable? |
 |---|---|---|---|---|
@@ -177,16 +177,16 @@ The decade backdrop is **辛巳** (Direct Officer (正官), 관성 (官星)), wi
 | 2013 | 癸巳 | Direct Resource | 인성 (印星) | ✅ |
 | 2014 | 甲午 | Companion | 비겁 (比劫) | — |
 
-- **Wealth:** No direct 재성 stem, but **1 of 5** are 비겁 (Companion). The 겁재奪財 pattern reads shared and loosely-defined money as contested here — defend rather than expand shared commitments *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
-- **Business:** **2 of 5** years are 관성 (Authority) — an institution, rank or licensed role comes to the fore. Since 관성 is your unfavorable element, read this as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit *(see knowledge/12-career-and-vocation.md §용신 vs. Day Master for Career Choice)*.
+- **Wealth:** No direct 재성 stem in 2010–2014, but **1 of 5** are 비겁 (Companion). In 2010–2014 the 겁재奪財 pattern reads shared and loosely-defined money as contested — defend rather than expand shared commitments *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Business:** **2 of 5** years in 2010–2014 are 관성 (Authority) — an institution, rank or licensed role comes to the fore. Since 관성 is your unfavorable element, read 2010–2014 as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit *(see knowledge/12-career-and-vocation.md §용신 vs. Day Master for Career Choice)*.
 - **Family:** The spouse palace is struck or unsettled (2013 해 (harm), 2013 형 (punishment)) — better for deepening privately than for formalising commitments this phase *(see knowledge/08-luck-pillars.md Part 5b)*.
-- **Investment pattern:** A mixed phase — keep positions simple and liquidity available; the 비겁 presence argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Investment pattern:** A mixed phase — keep positions simple and liquidity available; the 비겁 presence in 2010–2014 argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
 
 ---
 
 ### 4. 2015–2019 (Ages 19–23) — 辛巳
 
-The decade backdrop is **辛巳** (Direct Officer (正官), 관성 (官星)), with the closing five years led by **식상 (食傷) · 재성 (財星)** annual energy. 4 years of 5 carry your favorable element (**Fire** / **Earth**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2016 충 (clash), 2016 형 (punishment), 2019 육합 (binding), 2019 파 (break) — relationship, home, or partnership themes are more likely to surface.
+The decade backdrop is **辛巳** (Direct Officer (正官), 관성 (官星)), with the closing five years led by **식상 (食傷) · 재성 (財星)** annual energy. In 2015–2019, 4 years of 5 carry your favorable element (**Fire** / **Earth**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2016 충 (clash), 2016 형 (punishment), 2019 육합 (binding), 2019 파 (break) — relationship, home, or partnership themes are more likely to surface.
 
 | Year | Pillar | Ten-God | Class | Favorable? |
 |---|---|---|---|---|
@@ -196,16 +196,16 @@ The decade backdrop is **辛巳** (Direct Officer (正官), 관성 (官星)), wi
 | 2018 | 戊戌 | Indirect Wealth | 재성 (財星) | ✅ |
 | 2019 | 己亥 | Direct Wealth | 재성 (財星) | ✅ |
 
-- **Wealth:** **2 of 5** annual stems are 재성 (Wealth) — money, pricing and asset decisions are foregrounded. Treat this as a window to *earn and negotiate*, and to put agreements in writing *(see knowledge/13-wealth-and-business.md §Wealth Timing)*.
-- **Business:** Business energy is diffuse in this phase; let the decade backdrop and the concrete annual pillars above guide the read *(see knowledge/12-career-and-vocation.md §Ten-God → Career Mode)*.
+- **Wealth:** **2 of 5** annual stems in 2015–2019 are 재성 (Wealth) — money, pricing and asset decisions are foregrounded. Treat 2015–2019 as a window to *earn and negotiate*, and to put agreements in writing *(see knowledge/13-wealth-and-business.md §Wealth Timing)*.
+- **Business:** Business energy is diffuse in 2015–2019; let the decade backdrop and the concrete annual pillars above guide the read *(see knowledge/12-career-and-vocation.md §Ten-God → Career Mode)*.
 - **Family:** The spouse palace is both **bound and unsettled** (2016 충 (clash), 2016 형 (punishment), 2019 육합 (binding), 2019 파 (break)) — a phase where a bond can deepen or formalise, but with friction or change around it; read it as a window, not a guarantee *(see knowledge/08-luck-pillars.md Part 5b)*.
-- **Investment pattern:** A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Investment pattern:** A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence in 2015–2019 argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
 
 ---
 
 ### 5. 2020–2024 (Ages 24–28) — 壬午
 
-The decade backdrop is **壬午** (Indirect Resource (偏印), 인성 (印星)), with the opening five years led by **인성 (印星)** annual energy. 1 year of 5 carries your favorable element (**Fire** / **Earth**), and 2 years carry the unfavorable element (**Wood**) — an overall **mixed** phase.
+The decade backdrop is **壬午** (Indirect Resource (偏印), 인성 (印星)), with the opening five years led by **인성 (印星)** annual energy. In 2020–2024, 1 year of 5 carries your favorable element (**Fire** / **Earth**), and 2 years carry the unfavorable element (**Wood**) — an overall **mixed** phase.
 
 | Year | Pillar | Ten-God | Class | Favorable? |
 |---|---|---|---|---|
@@ -215,16 +215,16 @@ The decade backdrop is **壬午** (Indirect Resource (偏印), 인성 (印星)),
 | 2023 | 癸卯 | Direct Resource | 인성 (印星) | ⚠️ |
 | 2024 | 甲辰 | Companion | 비겁 (比劫) | — |
 
-- **Wealth:** No direct 재성 stem, but **1 of 5** are 비겁 (Companion). The 겁재奪財 pattern reads shared and loosely-defined money as contested here — defend rather than expand shared commitments *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
-- **Business:** **2 of 5** years are 관성 (Authority) — an institution, rank or licensed role comes to the fore. Since 관성 is your unfavorable element, read this as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit *(see knowledge/12-career-and-vocation.md §용신 vs. Day Master for Career Choice)*.
+- **Wealth:** No direct 재성 stem in 2020–2024, but **1 of 5** are 비겁 (Companion). In 2020–2024 the 겁재奪財 pattern reads shared and loosely-defined money as contested — defend rather than expand shared commitments *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Business:** **2 of 5** years in 2020–2024 are 관성 (Authority) — an institution, rank or licensed role comes to the fore. Since 관성 is your unfavorable element, read 2020–2024 as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit *(see knowledge/12-career-and-vocation.md §용신 vs. Day Master for Career Choice)*.
 - **Family:** Family and support themes are steady: 인성 years point to parental/mentor backing and 비겁 years to siblings and peers *(see knowledge/05-ten-gods.md §인성생신)*.
-- **Investment pattern:** A mixed phase — keep positions simple and liquidity available; the 비겁 presence argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Investment pattern:** A mixed phase — keep positions simple and liquidity available; the 비겁 presence in 2020–2024 argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
 
 ---
 
 ### 6. 2025–2029 (Ages 29–33) — 壬午 · **current**
 
-The decade backdrop is **壬午** (Indirect Resource (偏印), 인성 (印星)), with the closing five years led by **식상 (食傷) · 재성 (財星)** annual energy. 4 years of 5 carry your favorable element (**Fire** / **Earth**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2025 해 (harm), 2025 형 (punishment), 2028 충 (clash), 2028 형 (punishment) — relationship, home, or partnership themes are more likely to surface.
+The decade backdrop is **壬午** (Indirect Resource (偏印), 인성 (印星)), with the closing five years led by **식상 (食傷) · 재성 (財星)** annual energy. In 2025–2029, 4 years of 5 carry your favorable element (**Fire** / **Earth**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2025 해 (harm), 2025 형 (punishment), 2028 충 (clash), 2028 형 (punishment) — relationship, home, or partnership themes are more likely to surface.
 
 | Year | Pillar | Ten-God | Class | Favorable? |
 |---|---|---|---|---|
@@ -234,16 +234,16 @@ The decade backdrop is **壬午** (Indirect Resource (偏印), 인성 (印星)),
 | 2028 | 戊申 | Indirect Wealth | 재성 (財星) | ✅ |
 | 2029 | 己酉 | Direct Wealth | 재성 (財星) | ✅ |
 
-- **Wealth:** **2 of 5** annual stems are 재성 (Wealth) — money, pricing and asset decisions are foregrounded. Treat this as a window to *earn and negotiate*, and to put agreements in writing *(see knowledge/13-wealth-and-business.md §Wealth Timing)*.
-- **Business:** Business energy is diffuse in this phase; let the decade backdrop and the concrete annual pillars above guide the read *(see knowledge/12-career-and-vocation.md §Ten-God → Career Mode)*.
+- **Wealth:** **2 of 5** annual stems in 2025–2029 are 재성 (Wealth) — money, pricing and asset decisions are foregrounded. Treat 2025–2029 as a window to *earn and negotiate*, and to put agreements in writing *(see knowledge/13-wealth-and-business.md §Wealth Timing)*.
+- **Business:** Business energy is diffuse in 2025–2029; let the decade backdrop and the concrete annual pillars above guide the read *(see knowledge/12-career-and-vocation.md §Ten-God → Career Mode)*.
 - **Family:** The spouse palace is struck or unsettled (2025 해 (harm), 2025 형 (punishment), 2028 충 (clash), 2028 형 (punishment)) — better for deepening privately than for formalising commitments this phase *(see knowledge/08-luck-pillars.md Part 5b)*.
-- **Investment pattern:** A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Investment pattern:** A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence in 2025–2029 argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
 
 ---
 
 ### 7. 2030–2034 (Ages 34–38) — 癸未
 
-The decade backdrop is **癸未** (Direct Resource (正印), 인성 (印星)), with the opening five years led by **인성 (印星)** annual energy. 2 years of 5 carry your favorable element (**Fire** / **Earth**), and 1 year carries the unfavorable element (**Wood**) — an overall **mixed** phase. The spouse palace (day branch **寅**) is activated in 2031 육합 (binding), 2031 파 (break) — relationship, home, or partnership themes are more likely to surface.
+The decade backdrop is **癸未** (Direct Resource (正印), 인성 (印星)), with the opening five years led by **인성 (印星)** annual energy. In 2030–2034, 2 years of 5 carry your favorable element (**Fire** / **Earth**), and 1 year carries the unfavorable element (**Wood**) — an overall **mixed** phase. The spouse palace (day branch **寅**) is activated in 2031 육합 (binding), 2031 파 (break) — relationship, home, or partnership themes are more likely to surface.
 
 | Year | Pillar | Ten-God | Class | Favorable? |
 |---|---|---|---|---|
@@ -253,16 +253,16 @@ The decade backdrop is **癸未** (Direct Resource (正印), 인성 (印星)), w
 | 2033 | 癸丑 | Direct Resource | 인성 (印星) | ✅ |
 | 2034 | 甲寅 | Companion | 비겁 (比劫) | ⚠️ |
 
-- **Wealth:** No direct 재성 stem, but **1 of 5** are 비겁 (Companion). The 겁재奪財 pattern reads shared and loosely-defined money as contested here — defend rather than expand shared commitments *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
-- **Business:** **2 of 5** years are 관성 (Authority) — an institution, rank or licensed role comes to the fore. Since 관성 is your unfavorable element, read this as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit *(see knowledge/12-career-and-vocation.md §용신 vs. Day Master for Career Choice)*.
+- **Wealth:** No direct 재성 stem in 2030–2034, but **1 of 5** are 비겁 (Companion). In 2030–2034 the 겁재奪財 pattern reads shared and loosely-defined money as contested — defend rather than expand shared commitments *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Business:** **2 of 5** years in 2030–2034 are 관성 (Authority) — an institution, rank or licensed role comes to the fore. Since 관성 is your unfavorable element, read 2030–2034 as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit *(see knowledge/12-career-and-vocation.md §용신 vs. Day Master for Career Choice)*.
 - **Family:** The spouse palace is both **bound and unsettled** (2031 육합 (binding), 2031 파 (break)) — a phase where a bond can deepen or formalise, but with friction or change around it; read it as a window, not a guarantee *(see knowledge/08-luck-pillars.md Part 5b)*.
-- **Investment pattern:** A mixed phase — keep positions simple and liquidity available; the 비겁 presence argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Investment pattern:** A mixed phase — keep positions simple and liquidity available; the 비겁 presence in 2030–2034 argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
 
 ---
 
 ### 8. 2035–2039 (Ages 39–43) — 癸未
 
-The decade backdrop is **癸未** (Direct Resource (正印), 인성 (印星)), with the closing five years led by **식상 (食傷) · 재성 (財星)** annual energy. 4 years of 5 carry your favorable element (**Fire** / **Earth**), and 1 year carries the unfavorable element (**Wood**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2037 해 (harm), 2037 형 (punishment) — relationship, home, or partnership themes are more likely to surface.
+The decade backdrop is **癸未** (Direct Resource (正印), 인성 (印星)), with the closing five years led by **식상 (食傷) · 재성 (財星)** annual energy. In 2035–2039, 4 years of 5 carry your favorable element (**Fire** / **Earth**), and 1 year carries the unfavorable element (**Wood**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2037 해 (harm), 2037 형 (punishment) — relationship, home, or partnership themes are more likely to surface.
 
 | Year | Pillar | Ten-God | Class | Favorable? |
 |---|---|---|---|---|
@@ -272,16 +272,16 @@ The decade backdrop is **癸未** (Direct Resource (正印), 인성 (印星)), w
 | 2038 | 戊午 | Indirect Wealth | 재성 (財星) | ✅ |
 | 2039 | 己未 | Direct Wealth | 재성 (財星) | ✅ |
 
-- **Wealth:** **2 of 5** annual stems are 재성 (Wealth) — money, pricing and asset decisions are foregrounded. Treat this as a window to *earn and negotiate*, and to put agreements in writing *(see knowledge/13-wealth-and-business.md §Wealth Timing)*.
-- **Business:** Business energy is diffuse in this phase; let the decade backdrop and the concrete annual pillars above guide the read *(see knowledge/12-career-and-vocation.md §Ten-God → Career Mode)*.
+- **Wealth:** **2 of 5** annual stems in 2035–2039 are 재성 (Wealth) — money, pricing and asset decisions are foregrounded. Treat 2035–2039 as a window to *earn and negotiate*, and to put agreements in writing *(see knowledge/13-wealth-and-business.md §Wealth Timing)*.
+- **Business:** Business energy is diffuse in 2035–2039; let the decade backdrop and the concrete annual pillars above guide the read *(see knowledge/12-career-and-vocation.md §Ten-God → Career Mode)*.
 - **Family:** The spouse palace is struck or unsettled (2037 해 (harm), 2037 형 (punishment)) — better for deepening privately than for formalising commitments this phase *(see knowledge/08-luck-pillars.md Part 5b)*.
-- **Investment pattern:** A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Investment pattern:** A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence in 2035–2039 argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
 
 ---
 
 ### 9. 2040–2044 (Ages 44–48) — 甲申
 
-The decade backdrop is **甲申** (Companion (比肩), 비겁 (比劫)), with the opening five years led by **비겁 (比劫) · 관성 (官星) · 인성 (印星)** annual energy. 1 year of 5 carries your favorable element (**Fire** / **Earth**), and 1 year carries the unfavorable element (**Wood**) — an overall **mixed** phase. The spouse palace (day branch **寅**) is activated in 2040 충 (clash), 2040 형 (punishment), 2043 육합 (binding), 2043 파 (break) — relationship, home, or partnership themes are more likely to surface.
+The decade backdrop is **甲申** (Companion (比肩), 비겁 (比劫)), with the opening five years led by **비겁 (比劫) · 관성 (官星) · 인성 (印星)** annual energy. In 2040–2044, 1 year of 5 carries your favorable element (**Fire** / **Earth**), and 1 year carries the unfavorable element (**Wood**) — an overall **mixed** phase. The spouse palace (day branch **寅**) is activated in 2040 충 (clash), 2040 형 (punishment), 2043 육합 (binding), 2043 파 (break) — relationship, home, or partnership themes are more likely to surface.
 
 | Year | Pillar | Ten-God | Class | Favorable? |
 |---|---|---|---|---|
@@ -291,16 +291,16 @@ The decade backdrop is **甲申** (Companion (比肩), 비겁 (比劫)), with th
 | 2043 | 癸亥 | Direct Resource | 인성 (印星) | — |
 | 2044 | 甲子 | Companion | 비겁 (比劫) | ⚠️ |
 
-- **Wealth:** No direct 재성 stem, but **1 of 5** are 비겁 (Companion). The 겁재奪財 pattern reads shared and loosely-defined money as contested here — defend rather than expand shared commitments *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
-- **Business:** **2 of 5** years are 관성 (Authority) — an institution, rank or licensed role comes to the fore. Since 관성 is your unfavorable element, read this as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit *(see knowledge/12-career-and-vocation.md §용신 vs. Day Master for Career Choice)*.
+- **Wealth:** No direct 재성 stem in 2040–2044, but **1 of 5** are 비겁 (Companion). In 2040–2044 the 겁재奪財 pattern reads shared and loosely-defined money as contested — defend rather than expand shared commitments *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Business:** **2 of 5** years in 2040–2044 are 관성 (Authority) — an institution, rank or licensed role comes to the fore. Since 관성 is your unfavorable element, read 2040–2044 as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit *(see knowledge/12-career-and-vocation.md §용신 vs. Day Master for Career Choice)*.
 - **Family:** The spouse palace is both **bound and unsettled** (2040 충 (clash), 2040 형 (punishment), 2043 육합 (binding), 2043 파 (break)) — a phase where a bond can deepen or formalise, but with friction or change around it; read it as a window, not a guarantee *(see knowledge/08-luck-pillars.md Part 5b)*.
-- **Investment pattern:** A mixed phase — keep positions simple and liquidity available; the 비겁 presence argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Investment pattern:** A mixed phase — keep positions simple and liquidity available; the 비겁 presence in 2040–2044 argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
 
 ---
 
 ### 10. 2045–2049 (Ages 49–53) — 甲申
 
-The decade backdrop is **甲申** (Companion (比肩), 비겁 (比劫)), with the closing five years led by **비겁 (比劫) · 식상 (食傷) · 재성 (財星)** annual energy. 2 years of 5 carry your favorable element (**Fire** / **Earth**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2049 해 (harm), 2049 형 (punishment) — relationship, home, or partnership themes are more likely to surface.
+The decade backdrop is **甲申** (Companion (比肩), 비겁 (比劫)), with the closing five years led by **비겁 (比劫) · 식상 (食傷) · 재성 (財星)** annual energy. In 2045–2049, 2 years of 5 carry your favorable element (**Fire** / **Earth**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2049 해 (harm), 2049 형 (punishment) — relationship, home, or partnership themes are more likely to surface.
 
 | Year | Pillar | Ten-God | Class | Favorable? |
 |---|---|---|---|---|
@@ -310,16 +310,16 @@ The decade backdrop is **甲申** (Companion (比肩), 비겁 (比劫)), with th
 | 2048 | 戊辰 | Indirect Wealth | 재성 (財星) | ✅ |
 | 2049 | 己巳 | Direct Wealth | 재성 (財星) | ✅ |
 
-- **Wealth:** **2 of 5** annual stems are 재성 (Wealth) — money, pricing and asset decisions are foregrounded. Treat this as a window to *earn and negotiate*, and to put agreements in writing *(see knowledge/13-wealth-and-business.md §Wealth Timing)*.
-- **Business:** Peer and partnership energy leads this phase — work alongside equals, but keep ownership boundaries explicit given the 겁재 signal in this chart *(see knowledge/12-career-and-vocation.md §Employment vs. Entrepreneurship)*.
+- **Wealth:** **2 of 5** annual stems in 2045–2049 are 재성 (Wealth) — money, pricing and asset decisions are foregrounded. Treat 2045–2049 as a window to *earn and negotiate*, and to put agreements in writing *(see knowledge/13-wealth-and-business.md §Wealth Timing)*.
+- **Business:** Peer and partnership energy leads 2045–2049 — work alongside equals, but keep ownership boundaries explicit given the 겁재 signal in this chart *(see knowledge/12-career-and-vocation.md §Employment vs. Entrepreneurship)*.
 - **Family:** The spouse palace is struck or unsettled (2049 해 (harm), 2049 형 (punishment)) — better for deepening privately than for formalising commitments this phase *(see knowledge/08-luck-pillars.md Part 5b)*.
-- **Investment pattern:** A favorable-element phase (2/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Investment pattern:** A favorable-element phase (2/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence in 2045–2049 argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
 
 ---
 
 ### 11. 2050–2054 (Ages 54–58) — 乙酉
 
-The decade backdrop is **乙酉** (Robber (劫財), 비겁 (比劫)), with the opening five years led by **비겁 (比劫) · 관성 (官星) · 인성 (印星)** annual energy. 2 years of 5 carry your favorable element (**Fire** / **Earth**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2052 충 (clash), 2052 형 (punishment) — relationship, home, or partnership themes are more likely to surface.
+The decade backdrop is **乙酉** (Robber (劫財), 비겁 (比劫)), with the opening five years led by **비겁 (比劫) · 관성 (官星) · 인성 (印星)** annual energy. In 2050–2054, 2 years of 5 carry your favorable element (**Fire** / **Earth**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2052 충 (clash), 2052 형 (punishment) — relationship, home, or partnership themes are more likely to surface.
 
 | Year | Pillar | Ten-God | Class | Favorable? |
 |---|---|---|---|---|
@@ -329,16 +329,16 @@ The decade backdrop is **乙酉** (Robber (劫財), 비겁 (比劫)), with the o
 | 2053 | 癸酉 | Direct Resource | 인성 (印星) | — |
 | 2054 | 甲戌 | Companion | 비겁 (比劫) | — |
 
-- **Wealth:** No direct 재성 stem, but **1 of 5** are 비겁 (Companion). The 겁재奪財 pattern reads shared and loosely-defined money as contested here — defend rather than expand shared commitments *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
-- **Business:** **2 of 5** years are 관성 (Authority) — an institution, rank or licensed role comes to the fore. Since 관성 is your unfavorable element, read this as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit *(see knowledge/12-career-and-vocation.md §용신 vs. Day Master for Career Choice)*.
+- **Wealth:** No direct 재성 stem in 2050–2054, but **1 of 5** are 비겁 (Companion). In 2050–2054 the 겁재奪財 pattern reads shared and loosely-defined money as contested — defend rather than expand shared commitments *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Business:** **2 of 5** years in 2050–2054 are 관성 (Authority) — an institution, rank or licensed role comes to the fore. Since 관성 is your unfavorable element, read 2050–2054 as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit *(see knowledge/12-career-and-vocation.md §용신 vs. Day Master for Career Choice)*.
 - **Family:** The spouse palace is struck or unsettled (2052 충 (clash), 2052 형 (punishment)) — better for deepening privately than for formalising commitments this phase *(see knowledge/08-luck-pillars.md Part 5b)*.
-- **Investment pattern:** A favorable-element phase (2/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Investment pattern:** A favorable-element phase (2/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence in 2050–2054 argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
 
 ---
 
 ### 12. 2055–2059 (Ages 59–63) — 乙酉
 
-The decade backdrop is **乙酉** (Robber (劫財), 비겁 (比劫)), with the closing five years led by **비겁 (比劫) · 식상 (食傷) · 재성 (財星)** annual energy. 2 years of 5 carry your favorable element (**Fire** / **Earth**), and 1 year carries the unfavorable element (**Wood**) — an overall **mixed** phase. The spouse palace (day branch **寅**) is activated in 2055 육합 (binding), 2055 파 (break) — relationship, home, or partnership themes are more likely to surface.
+The decade backdrop is **乙酉** (Robber (劫財), 비겁 (比劫)), with the closing five years led by **비겁 (比劫) · 식상 (食傷) · 재성 (財星)** annual energy. In 2055–2059, 2 years of 5 carry your favorable element (**Fire** / **Earth**), and 1 year carries the unfavorable element (**Wood**) — an overall **mixed** phase. The spouse palace (day branch **寅**) is activated in 2055 육합 (binding), 2055 파 (break) — relationship, home, or partnership themes are more likely to surface.
 
 | Year | Pillar | Ten-God | Class | Favorable? |
 |---|---|---|---|---|
@@ -348,16 +348,16 @@ The decade backdrop is **乙酉** (Robber (劫財), 비겁 (比劫)), with the c
 | 2058 | 戊寅 | Indirect Wealth | 재성 (財星) | — |
 | 2059 | 己卯 | Direct Wealth | 재성 (財星) | — |
 
-- **Wealth:** **2 of 5** annual stems are 재성 (Wealth) — money, pricing and asset decisions are foregrounded. Treat this as a window to *earn and negotiate*, and to put agreements in writing *(see knowledge/13-wealth-and-business.md §Wealth Timing)*.
-- **Business:** Peer and partnership energy leads this phase — work alongside equals, but keep ownership boundaries explicit given the 겁재 signal in this chart *(see knowledge/12-career-and-vocation.md §Employment vs. Entrepreneurship)*.
+- **Wealth:** **2 of 5** annual stems in 2055–2059 are 재성 (Wealth) — money, pricing and asset decisions are foregrounded. Treat 2055–2059 as a window to *earn and negotiate*, and to put agreements in writing *(see knowledge/13-wealth-and-business.md §Wealth Timing)*.
+- **Business:** Peer and partnership energy leads 2055–2059 — work alongside equals, but keep ownership boundaries explicit given the 겁재 signal in this chart *(see knowledge/12-career-and-vocation.md §Employment vs. Entrepreneurship)*.
 - **Family:** The spouse palace is both **bound and unsettled** (2055 육합 (binding), 2055 파 (break)) — a phase where a bond can deepen or formalise, but with friction or change around it; read it as a window, not a guarantee *(see knowledge/08-luck-pillars.md Part 5b)*.
-- **Investment pattern:** A mixed phase — keep positions simple and liquidity available; the 비겁 presence argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Investment pattern:** A mixed phase — keep positions simple and liquidity available; the 비겁 presence in 2055–2059 argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
 
 ---
 
 ### 13. 2060–2064 (Ages 64–68) — 丙戌
 
-The decade backdrop is **丙戌** (Eating God (食神), 식상 (食傷)), with the opening five years led by **관성 (官星) · 인성 (印星)** annual energy. 4 years of 5 carry your favorable element (**Fire** / **Earth**), and 1 year carries the unfavorable element (**Wood**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2061 해 (harm), 2061 형 (punishment), 2064 충 (clash), 2064 형 (punishment) — relationship, home, or partnership themes are more likely to surface.
+The decade backdrop is **丙戌** (Eating God (食神), 식상 (食傷)), with the opening five years led by **관성 (官星) · 인성 (印星)** annual energy. In 2060–2064, 4 years of 5 carry your favorable element (**Fire** / **Earth**), and 1 year carries the unfavorable element (**Wood**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2061 해 (harm), 2061 형 (punishment), 2064 충 (clash), 2064 형 (punishment) — relationship, home, or partnership themes are more likely to surface.
 
 | Year | Pillar | Ten-God | Class | Favorable? |
 |---|---|---|---|---|
@@ -367,16 +367,16 @@ The decade backdrop is **丙戌** (Eating God (食神), 식상 (食傷)), with t
 | 2063 | 癸未 | Direct Resource | 인성 (印星) | ✅ |
 | 2064 | 甲申 | Companion | 비겁 (比劫) | ⚠️ |
 
-- **Wealth:** No direct 재성 stem, but **1 of 5** are 비겁 (Companion). The 겁재奪財 pattern reads shared and loosely-defined money as contested here — defend rather than expand shared commitments *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
-- **Business:** **2 of 5** years are 관성 (Authority) — an institution, rank or licensed role comes to the fore. Since 관성 is your unfavorable element, read this as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit *(see knowledge/12-career-and-vocation.md §용신 vs. Day Master for Career Choice)*.
+- **Wealth:** No direct 재성 stem in 2060–2064, but **1 of 5** are 비겁 (Companion). In 2060–2064 the 겁재奪財 pattern reads shared and loosely-defined money as contested — defend rather than expand shared commitments *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Business:** **2 of 5** years in 2060–2064 are 관성 (Authority) — an institution, rank or licensed role comes to the fore. Since 관성 is your unfavorable element, read 2060–2064 as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit *(see knowledge/12-career-and-vocation.md §용신 vs. Day Master for Career Choice)*.
 - **Family:** The spouse palace is struck or unsettled (2061 해 (harm), 2061 형 (punishment), 2064 충 (clash), 2064 형 (punishment)) — better for deepening privately than for formalising commitments this phase *(see knowledge/08-luck-pillars.md Part 5b)*.
-- **Investment pattern:** A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Investment pattern:** A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence in 2060–2064 argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
 
 ---
 
 ### 14. 2065–2069 (Ages 69–73) — 丙戌
 
-The decade backdrop is **丙戌** (Eating God (食神), 식상 (食傷)), with the closing five years led by **식상 (食傷)** annual energy. 4 years of 5 carry your favorable element (**Fire** / **Earth**), and 1 year carries the unfavorable element (**Wood**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2067 육합 (binding), 2067 파 (break) — relationship, home, or partnership themes are more likely to surface.
+The decade backdrop is **丙戌** (Eating God (食神), 식상 (食傷)), with the closing five years led by **식상 (食傷)** annual energy. In 2065–2069, 4 years of 5 carry your favorable element (**Fire** / **Earth**), and 1 year carries the unfavorable element (**Wood**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2067 육합 (binding), 2067 파 (break) — relationship, home, or partnership themes are more likely to surface.
 
 | Year | Pillar | Ten-God | Class | Favorable? |
 |---|---|---|---|---|
@@ -386,16 +386,16 @@ The decade backdrop is **丙戌** (Eating God (食神), 식상 (食傷)), with t
 | 2068 | 戊子 | Indirect Wealth | 재성 (財星) | ✅ |
 | 2069 | 己丑 | Direct Wealth | 재성 (財星) | ✅ |
 
-- **Wealth:** **2 of 5** annual stems are 재성 (Wealth) — money, pricing and asset decisions are foregrounded. Treat this as a window to *earn and negotiate*, and to put agreements in writing *(see knowledge/13-wealth-and-business.md §Wealth Timing)*.
-- **Business:** Business energy is diffuse in this phase; let the decade backdrop and the concrete annual pillars above guide the read *(see knowledge/12-career-and-vocation.md §Ten-God → Career Mode)*.
+- **Wealth:** **2 of 5** annual stems in 2065–2069 are 재성 (Wealth) — money, pricing and asset decisions are foregrounded. Treat 2065–2069 as a window to *earn and negotiate*, and to put agreements in writing *(see knowledge/13-wealth-and-business.md §Wealth Timing)*.
+- **Business:** Business energy is diffuse in 2065–2069; let the decade backdrop and the concrete annual pillars above guide the read *(see knowledge/12-career-and-vocation.md §Ten-God → Career Mode)*.
 - **Family:** The spouse palace is both **bound and unsettled** (2067 육합 (binding), 2067 파 (break)) — a phase where a bond can deepen or formalise, but with friction or change around it; read it as a window, not a guarantee *(see knowledge/08-luck-pillars.md Part 5b)*.
-- **Investment pattern:** A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Investment pattern:** A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence in 2065–2069 argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
 
 ---
 
 ### 15. 2070–2074 (Ages 74–78) — 丁亥
 
-The decade backdrop is **丁亥** (Hurting Officer (傷官), 식상 (食傷)), with the opening five years led by **관성 (官星) · 인성 (印星)** annual energy. 2 years of 5 carry your favorable element (**Fire** / **Earth**), and 2 years carry the unfavorable element (**Wood**) — an overall **mixed** phase. The spouse palace (day branch **寅**) is activated in 2073 해 (harm), 2073 형 (punishment) — relationship, home, or partnership themes are more likely to surface.
+The decade backdrop is **丁亥** (Hurting Officer (傷官), 식상 (食傷)), with the opening five years led by **관성 (官星) · 인성 (印星)** annual energy. In 2070–2074, 2 years of 5 carry your favorable element (**Fire** / **Earth**), and 2 years carry the unfavorable element (**Wood**) — an overall **mixed** phase. The spouse palace (day branch **寅**) is activated in 2073 해 (harm), 2073 형 (punishment) — relationship, home, or partnership themes are more likely to surface.
 
 | Year | Pillar | Ten-God | Class | Favorable? |
 |---|---|---|---|---|
@@ -405,16 +405,16 @@ The decade backdrop is **丁亥** (Hurting Officer (傷官), 식상 (食傷)), w
 | 2073 | 癸巳 | Direct Resource | 인성 (印星) | ✅ |
 | 2074 | 甲午 | Companion | 비겁 (比劫) | — |
 
-- **Wealth:** No direct 재성 stem, but **1 of 5** are 비겁 (Companion). The 겁재奪財 pattern reads shared and loosely-defined money as contested here — defend rather than expand shared commitments *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
-- **Business:** **2 of 5** years are 관성 (Authority) — an institution, rank or licensed role comes to the fore. Since 관성 is your unfavorable element, read this as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit *(see knowledge/12-career-and-vocation.md §용신 vs. Day Master for Career Choice)*.
+- **Wealth:** No direct 재성 stem in 2070–2074, but **1 of 5** are 비겁 (Companion). In 2070–2074 the 겁재奪財 pattern reads shared and loosely-defined money as contested — defend rather than expand shared commitments *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Business:** **2 of 5** years in 2070–2074 are 관성 (Authority) — an institution, rank or licensed role comes to the fore. Since 관성 is your unfavorable element, read 2070–2074 as added structure and pressure rather than a natural fit; use it to build standing, not to over-commit *(see knowledge/12-career-and-vocation.md §용신 vs. Day Master for Career Choice)*.
 - **Family:** The spouse palace is struck or unsettled (2073 해 (harm), 2073 형 (punishment)) — better for deepening privately than for formalising commitments this phase *(see knowledge/08-luck-pillars.md Part 5b)*.
-- **Investment pattern:** A mixed phase — keep positions simple and liquidity available; the 비겁 presence argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Investment pattern:** A mixed phase — keep positions simple and liquidity available; the 비겁 presence in 2070–2074 argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
 
 ---
 
 ### 16. 2075–2079 (Ages 79–83) — 丁亥
 
-The decade backdrop is **丁亥** (Hurting Officer (傷官), 식상 (食傷)), with the closing five years led by **식상 (食傷)** annual energy. 4 years of 5 carry your favorable element (**Fire** / **Earth**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2076 충 (clash), 2076 형 (punishment), 2079 육합 (binding), 2079 파 (break) — relationship, home, or partnership themes are more likely to surface.
+The decade backdrop is **丁亥** (Hurting Officer (傷官), 식상 (食傷)), with the closing five years led by **식상 (食傷)** annual energy. In 2075–2079, 4 years of 5 carry your favorable element (**Fire** / **Earth**) — an overall **favorable** phase. The spouse palace (day branch **寅**) is activated in 2076 충 (clash), 2076 형 (punishment), 2079 육합 (binding), 2079 파 (break) — relationship, home, or partnership themes are more likely to surface.
 
 | Year | Pillar | Ten-God | Class | Favorable? |
 |---|---|---|---|---|
@@ -424,10 +424,10 @@ The decade backdrop is **丁亥** (Hurting Officer (傷官), 식상 (食傷)), w
 | 2078 | 戊戌 | Indirect Wealth | 재성 (財星) | ✅ |
 | 2079 | 己亥 | Direct Wealth | 재성 (財星) | ✅ |
 
-- **Wealth:** **2 of 5** annual stems are 재성 (Wealth) — money, pricing and asset decisions are foregrounded. Treat this as a window to *earn and negotiate*, and to put agreements in writing *(see knowledge/13-wealth-and-business.md §Wealth Timing)*.
-- **Business:** Business energy is diffuse in this phase; let the decade backdrop and the concrete annual pillars above guide the read *(see knowledge/12-career-and-vocation.md §Ten-God → Career Mode)*.
+- **Wealth:** **2 of 5** annual stems in 2075–2079 are 재성 (Wealth) — money, pricing and asset decisions are foregrounded. Treat 2075–2079 as a window to *earn and negotiate*, and to put agreements in writing *(see knowledge/13-wealth-and-business.md §Wealth Timing)*.
+- **Business:** Business energy is diffuse in 2075–2079; let the decade backdrop and the concrete annual pillars above guide the read *(see knowledge/12-career-and-vocation.md §Ten-God → Career Mode)*.
 - **Family:** The spouse palace is both **bound and unsettled** (2076 충 (clash), 2076 형 (punishment), 2079 육합 (binding), 2079 파 (break)) — a phase where a bond can deepen or formalise, but with friction or change around it; read it as a window, not a guarantee *(see knowledge/08-luck-pillars.md Part 5b)*.
-- **Investment pattern:** A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
+- **Investment pattern:** A favorable-element phase (4/5) — the chart is in better balance, which supports planning and negotiation; the 비겁 presence in 2075–2079 argues for sole holdings or partnerships with hard boundaries *(see knowledge/13-wealth-and-business.md §겁재奪財)*.
 
 ---
 
@@ -435,4 +435,4 @@ The decade backdrop is **丁亥** (Hurting Officer (傷官), 식상 (食傷)), w
 
 - Method: `knowledge/08-luck-pillars.md` (대운/세운 layers, Part 5b relationship timing), `knowledge/13-wealth-and-business.md` (wealth timing, 겁재奪財, 재고), `knowledge/12-career-and-vocation.md` (career mode and earning vehicle).
 - This reading describes tendencies, not fixed outcomes; it is for reflection and entertainment — not financial, investment, legal or business advice.
-- The engine's heuristic verdicts (strength, 용신) are provisional where the classical sources disagree; a qualified reader confirms the final reading.
+- The chart's heuristic verdicts (strength, 용신) are provisional where the classical sources disagree; a qualified reader confirms the final reading.

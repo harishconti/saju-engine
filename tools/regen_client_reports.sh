@@ -13,3 +13,6 @@ bash tools/regen/markdown.sh
 python3 tools/regen/compat.py
 for n in harish mahesh gurumoorthy vishnu-priya; do python3 src/saju_html/combine_candidate_report.py "$n"; done
 bash tools/regen/pdfs.sh
+# The web document (the reading) beside every canonical report. Rendering only —
+# the markdown/PDF above is what it is built from, so it runs last.
+bash tools/regen/html.sh

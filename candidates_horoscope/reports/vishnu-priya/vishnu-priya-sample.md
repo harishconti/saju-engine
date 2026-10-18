@@ -1,6 +1,6 @@
 # Korean Four Pillars of Destiny · Saju Reading
 
-## Vishnu Priya — The Hook · Complimentary
+## Vishnu Priya — The Hook
 
 *A one-page taste of your Saju chart — your elemental blueprint, no predictions*
 
@@ -60,7 +60,7 @@ This snapshot is just the doorway. The **Essential Report** ($19) explains your 
 
 ## Closing Note
 
-This chart's gift is a strong companion presence that gives the querent real follow-through; the challenge is staying aware of the chart's pressure points rather than letting them run in the background. The single most useful next step is to weave the favorable **Water** element into daily rhythm — through color, direction, season, or practice — so the chart has somewhere to land. Treat the rest of this report as a starting place; the best readings come from revisiting the same chart across different life phases.
+This chart's gift is a strong companion presence that gives you real follow-through; the challenge is staying aware of the chart's pressure points rather than letting them run in the background. The single most useful next step is to weave the favorable **Water** element into daily rhythm — through color, direction, season, or practice — so the chart has somewhere to land. Treat the rest of this report as a starting place; the best readings come from revisiting the same chart across different life phases.
 
 ---
 

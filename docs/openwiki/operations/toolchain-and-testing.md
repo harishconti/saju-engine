@@ -166,6 +166,21 @@ assert JIAZI_TO_NAYIN[("甲", "子")] == "海中金"  # Gold in the sea
 - `--web` writes the compat **reading** — the same self-contained screen document the single-chart tiers get (`markdown_to_html(web=True)`, tier-agnostic apart from the `tier-compat` body class). Give `--output` an `.html` path; the default output becomes `…_compatibility.html` beside the pair. No browser is needed.
 - Tier-aware translation skip keeps couple names and verdicts intact.
 
+## Regenerating client reports
+
+`tools/regen_client_reports.sh` rebuilds every engine-generated client artefact from a fixed
+reference date (`REF` in `tools/regen/markdown.sh`; edit it for a new date):
+
+1. `tools/regen/markdown.sh` — base reports, engine `career`/`luck-cycle`, tier files.
+2. `tools/regen/compat.py` — the compatibility pairs (basic + deep).
+3. `src/saju_html/combine_candidate_report.py` — the combined single-chart reports.
+4. `tools/regen/pdfs.sh` — the PDF keepsakes (HTML/Chromium backend; also rewrites the public demo PDFs/readings).
+5. `tools/regen/html.sh` — the **web documents** (readings), one beside each canonical `.md` (`--web`, no browser needed).
+
+Hand-authored files are excluded deliberately: `harish`/`gurumoorthy`/`mahesh`/`vishnu-priya`
+`career.md` (and `vishnu-priya/relationships.md`), the `*-legacy.md` and engine-draft
+(`*-engine*.md`) files, and `harish_vinothini` (no birth data on record).
+
 ## Continuous development checklist
 
 - Run `pytest` before committing.

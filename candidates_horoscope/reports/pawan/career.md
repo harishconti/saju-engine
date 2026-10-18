@@ -54,97 +54,97 @@ Each ranked archetype below is read for *this* chart: what the element family is
 ### Strategy & Consulting (**Best Fit**)
 
 - **Element family:** Water — this family moves information, goods or people — it connects separated things and runs below the surface (*Water the element that flows around obstacles and connects*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** This is a **Best Fit**: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it.
-- **How to use it:** Lean into it deliberately — this is where effort compounds fastest and friction is lowest.
-- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive so the chart stays balanced.
+- **Why it fits your chart:** This is a **Best Fit** for Strategy & Consulting: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it.
+- **How to use it:** Lean into it deliberately — Strategy & Consulting is where effort compounds fastest and friction is lowest.
+- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive alongside consultant, strategist, advisor, research lead so the chart stays balanced.
 - **Roles:** consultant, strategist, advisor, research lead
 
 ### Diplomacy & International Business (**Best Fit**)
 
 - **Element family:** Water — this family moves information, goods or people — it connects separated things and runs below the surface (*Water the element that flows around obstacles and connects*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** This is a **Best Fit**: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it.
-- **How to use it:** Lean into it deliberately — this is where effort compounds fastest and friction is lowest.
-- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive so the chart stays balanced.
+- **Why it fits your chart:** This is a **Best Fit** for Diplomacy & International Business: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it.
+- **How to use it:** Lean into it deliberately — Diplomacy & International Business is where effort compounds fastest and friction is lowest.
+- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive alongside diplomat, trade lead, global BD manager so the chart stays balanced.
 - **Roles:** diplomat, trade lead, global BD manager
 
 ### Arts & Curation (**Best Fit**)
 
 - **Element family:** Water — this family moves information, goods or people — it connects separated things and runs below the surface (*Water the element that flows around obstacles and connects*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** This is a **Best Fit**: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it.
-- **How to use it:** Lean into it deliberately — this is where effort compounds fastest and friction is lowest.
-- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive so the chart stays balanced.
+- **Why it fits your chart:** This is a **Best Fit** for Arts & Curation: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it.
+- **How to use it:** Lean into it deliberately — Arts & Curation is where effort compounds fastest and friction is lowest.
+- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive alongside curator, art dealer, creative researcher, museum lead so the chart stays balanced.
 - **Roles:** curator, art dealer, creative researcher, museum lead
 
 ### Journalism & Investigation (**Best Fit**)
 
 - **Element family:** Water — this family moves information, goods or people — it connects separated things and runs below the surface (*Water the element that flows around obstacles and connects*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** This is a **Best Fit**: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it.
-- **How to use it:** Lean into it deliberately — this is where effort compounds fastest and friction is lowest.
-- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive so the chart stays balanced.
+- **Why it fits your chart:** This is a **Best Fit** for Journalism & Investigation: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it.
+- **How to use it:** Lean into it deliberately — Journalism & Investigation is where effort compounds fastest and friction is lowest.
+- **Caveat:** Even a favorable element can be overrun if pursued to excess; keep other tracks alive alongside reporter, investigative journalist, editor so the chart stays balanced.
 - **Roles:** reporter, investigative journalist, editor
 
 ### Logistics & Shipping (**Good Fit**)
 
 - **Element family:** Water — this family moves information, goods or people — it connects separated things and runs below the surface (*Water the element that flows around obstacles and connects*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Good Fit**: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it. It is well resourced by the chart, just not at the very top of the ranking.
-- **How to use it:** Treat it as a lead second track, or a strong complement to your Best-Fit work.
-- **Caveat:** Strong but not primary — pick it deliberately rather than by default, and keep the favorable element in play alongside it.
+- **Why it fits your chart:** A **Good Fit** for Logistics & Shipping: the family runs on **Water**, your favorable element, so the work moves *with* the chart's grain instead of against it. It is well resourced for Logistics & Shipping, just not at the very top of the ranking.
+- **How to use it:** Treat Logistics & Shipping as a lead second track, or a strong complement to your Best-Fit work.
+- **Caveat:** Strong but not primary — pick Logistics & Shipping deliberately rather than by default, and keep the favorable element in play alongside it.
 - **Roles:** supply-chain lead, freight manager, mobility operator
 
 ### Psychology & Counseling (**Good Fit**)
 
 - **Element family:** Earth — this family holds, stores and mediates — it stabilises assets and provides the base others rely on (*Earth the element that contains and stands between*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Good Fit**: the family runs on **Earth**, a neutral element for this chart — neither favorable nor unfavorable on its own. It is well resourced by the chart, just not at the very top of the ranking.
-- **How to use it:** Treat it as a lead second track, or a strong complement to your Best-Fit work.
-- **Caveat:** Strong but not primary — pick it deliberately rather than by default, and keep the favorable element in play alongside it.
+- **Why it fits your chart:** A **Good Fit** for Psychology & Counseling: the family runs on **Earth**, a neutral element for this chart — neither favorable nor unfavorable on its own. It is well resourced for Psychology & Counseling, just not at the very top of the ranking.
+- **How to use it:** Treat Psychology & Counseling as a lead second track, or a strong complement to your Best-Fit work.
+- **Caveat:** Strong but not primary — pick Psychology & Counseling deliberately rather than by default, and keep the favorable element in play alongside it.
 - **Roles:** clinical psychologist, counsellor, therapist
 
 ### Law & Governance (**Good Fit**)
 
 - **Element family:** Metal — this family demands precision, standards and clean boundaries — it refines raw material into a finished thing (*Metal the element that cuts, separates and finishes*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Good Fit**: the family runs on **Metal**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master. It is well resourced by the chart, just not at the very top of the ranking.
-- **How to use it:** Treat it as a lead second track, or a strong complement to your Best-Fit work.
-- **Caveat:** Strong but not primary — pick it deliberately rather than by default, and keep the favorable element in play alongside it.
+- **Why it fits your chart:** A **Good Fit** for Law & Governance: the family runs on **Metal**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master. It is well resourced for Law & Governance, just not at the very top of the ranking.
+- **How to use it:** Treat Law & Governance as a lead second track, or a strong complement to your Best-Fit work.
+- **Caveat:** Strong but not primary — pick Law & Governance deliberately rather than by default, and keep the favorable element in play alongside it.
 - **Roles:** lawyer, compliance officer, policy lead, judge-track
 
 ### Engineering & Technology (**Possible**)
 
 - **Element family:** Metal — this family demands precision, standards and clean boundaries — it refines raw material into a finished thing (*Metal the element that cuts, separates and finishes*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Possible** fit: the family runs on **Metal**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
-- **How to use it:** Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
-- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.
+- **Why it fits your chart:** A **Possible** fit for Engineering & Technology: the family runs on **Metal**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
+- **How to use it:** Use Engineering & Technology only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
+- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital in Engineering & Technology without a reader's check.
 - **Roles:** engineer, architect, tech lead, CTO-track
 
 ### Medicine & Surgery (**Possible**)
 
 - **Element family:** Metal — this family demands precision, standards and clean boundaries — it refines raw material into a finished thing (*Metal the element that cuts, separates and finishes*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Possible** fit: the family runs on **Metal**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
-- **How to use it:** Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
-- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.
+- **Why it fits your chart:** A **Possible** fit for Medicine & Surgery: the family runs on **Metal**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
+- **How to use it:** Use Medicine & Surgery only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
+- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital in Medicine & Surgery without a reader's check.
 - **Roles:** physician, surgeon, diagnostics lead, researcher
 
 ### Finance & Investment (**Possible**)
 
 - **Element family:** Earth — this family holds, stores and mediates — it stabilises assets and provides the base others rely on (*Earth the element that contains and stands between*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Possible** fit: the family runs on **Earth**, a neutral element for this chart — neither favorable nor unfavorable on its own.
-- **How to use it:** Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
-- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.
+- **Why it fits your chart:** A **Possible** fit for Finance & Investment: the family runs on **Earth**, a neutral element for this chart — neither favorable nor unfavorable on its own.
+- **How to use it:** Use Finance & Investment only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
+- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital in Finance & Investment without a reader's check.
 - **Roles:** analyst, trader, risk manager, portfolio lead
 
 ### Quality & Audit (**Possible**)
 
 - **Element family:** Metal — this family demands precision, standards and clean boundaries — it refines raw material into a finished thing (*Metal the element that cuts, separates and finishes*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Possible** fit: the family runs on **Metal**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
-- **How to use it:** Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
-- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.
+- **Why it fits your chart:** A **Possible** fit for Quality & Audit: the family runs on **Metal**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
+- **How to use it:** Use Quality & Audit only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
+- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital in Quality & Audit without a reader's check.
 - **Roles:** auditor, QA lead, forensic analyst, due-diligence lead
 
 ### Security & Military (**Possible**)
 
 - **Element family:** Metal — this family demands precision, standards and clean boundaries — it refines raw material into a finished thing (*Metal the element that cuts, separates and finishes*, knowledge/12 §Element → Industry Families).
-- **Why it fits your chart:** A **Possible** fit: the family runs on **Metal**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
-- **How to use it:** Use it only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
-- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital here without a reader's check.
+- **Why it fits your chart:** A **Possible** fit for Security & Military: the family runs on **Metal**, your 희신, which strengthens the chart's balance rather than draining or feeding the Day Master.
+- **How to use it:** Use Security & Military only inside a supporting structure, with the favorable element present to offset it; do not make it the core identity of the work.
+- **Caveat:** The chart is not strongly resourced for this family — do not over-invest career capital in Security & Military without a reader's check.
 - **Roles:** security lead, intelligence analyst, defence consultant
 
 ---
@@ -175,11 +175,11 @@ Income tends to arrive in **steady increments** — a salaried baseline, retaine
 
 ### Company-Type Fit
 
-**Large institutions and mid-size specialists** are the most likely fit. The Direct Officer influence values hierarchy, credential, and a clear chain of accountability — the querent is most productive when the structure around them is unambiguous.
+**Large institutions and mid-size specialists** are the most likely fit. The Direct Officer influence values hierarchy, credential, and a clear chain of accountability — you are most productive when the structure around them is unambiguous.
 
 ### Boss / Team Dynamics
 
-The ideal manager profile is a **patient, perceptive Water advisor** — someone who carries your favorable **Water** element, supplying what the chart needs rather than competing with your Day Master. Watch for cold isolation that starves Fire's warmth; this is the most common way the querent's energy gets drained in a team setting.
+The ideal manager profile is a **patient, perceptive Water advisor** — someone who carries your favorable **Water** element, supplying what the chart needs rather than competing with your Day Master. Watch for cold isolation that starves Fire's warmth; this is the most common way your energy gets drained in a team setting.
 
 ### Red-Flag Environments
 
