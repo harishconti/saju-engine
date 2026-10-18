@@ -40,6 +40,7 @@ from api.index import (  # noqa: E402
     ChartRequest,
     GenerateRequest,
     ScriptRequest,
+    _validate_upload_url,
     chart,
     generate,
     health,
@@ -66,6 +67,11 @@ RM = {
 @pytest.fixture(autouse=True)
 def _token(monkeypatch):
     monkeypatch.setenv("ENGINE_SERVICE_TOKEN", TOKEN)
+    # The upload allowlist fails closed. Give the suite a small, explicit one; tests that
+    # exercise the missing-allowlist path delete it themselves.
+    monkeypatch.setenv("SAJU_UPLOAD_HOSTS", "pdf.test,md.test,html.test,127.0.0.1")
+    monkeypatch.delenv("R2_ENDPOINT", raising=False)
+    monkeypatch.delenv("SAJU_UPLOAD_BUCKET", raising=False)
 
 
 def body_of(response) -> dict:
@@ -255,16 +261,16 @@ def test_generate_renders_the_reading_when_asked(monkeypatch):
 
     monkeypatch.setattr(svc, "_upload", fake_upload)
     response = generate(
-        generate_request(uploadUrl="http://pdf.test/put", mdUploadUrl="http://md.test/put",
-                         htmlUploadUrl="http://html.test/put"),
+        generate_request(uploadUrl="https://pdf.test/put", mdUploadUrl="https://md.test/put",
+                         htmlUploadUrl="https://html.test/put"),
         authorization=AUTH,
     )
     assert response.status_code == 200, body_of(response)
 
     body = body_of(response)
-    assert set(uploaded) == {"http://pdf.test/put", "http://md.test/put", "http://html.test/put"}
+    assert set(uploaded) == {"https://pdf.test/put", "https://md.test/put", "https://html.test/put"}
 
-    document, content_type = uploaded["http://html.test/put"]
+    document, content_type = uploaded["https://html.test/put"]
     assert content_type.startswith("text/html")
     assert document.startswith(b"<!DOCTYPE html")
     # Self-contained and private, which is what makes it safe to serve and to download.
@@ -298,15 +304,15 @@ def test_generate_renders_the_reading_for_a_compatibility_report(monkeypatch):
         generate_request(kind="compat", tier="basic",
                          profileB={**RM, "fullName": "Arun", "gender": "F",
                                    "birthDate": "1992-03-20", "birthTime": "14:00"},
-                         uploadUrl="http://pdf.test/put",
-                         htmlUploadUrl="http://html.test/put"),
+                         uploadUrl="https://pdf.test/put",
+                         htmlUploadUrl="https://html.test/put"),
         authorization=AUTH,
     )
     assert response.status_code == 200, body_of(response)
 
     body = body_of(response)
-    assert set(uploaded) == {"http://pdf.test/put", "http://html.test/put"}
-    document, content_type = uploaded["http://html.test/put"]
+    assert set(uploaded) == {"https://pdf.test/put", "https://html.test/put"}
+    document, content_type = uploaded["https://html.test/put"]
     assert content_type.startswith("text/html")
     assert document.startswith(b"<!DOCTYPE html")
     # Self-contained and private, exactly like the single-chart reading.
@@ -337,7 +343,7 @@ def test_a_failed_web_document_upload_still_delivers_the_report(monkeypatch):
 
     monkeypatch.setattr(svc, "_upload", fake_upload)
     response = generate(
-        generate_request(uploadUrl="http://pdf.test/put", htmlUploadUrl="http://html.test/put"),
+        generate_request(uploadUrl="https://pdf.test/put", htmlUploadUrl="https://html.test/put"),
         authorization=AUTH,
     )
     assert response.status_code == 200, body_of(response)
@@ -356,9 +362,9 @@ def test_no_web_document_is_rendered_unless_asked_for(monkeypatch):
         uploaded[str(url)] = content_type
 
     monkeypatch.setattr(svc, "_upload", fake_upload)
-    response = generate(generate_request(uploadUrl="http://pdf.test/put"), authorization=AUTH)
+    response = generate(generate_request(uploadUrl="https://pdf.test/put"), authorization=AUTH)
     assert response.status_code == 200, body_of(response)
-    assert list(uploaded) == ["http://pdf.test/put"]
+    assert list(uploaded) == ["https://pdf.test/put"]
     assert body_of(response)["htmlSha256"] is None
 
 
@@ -369,6 +375,141 @@ def test_generate_surfaces_an_upload_failure_without_leaking_the_url():
     payload = body_of(response)
     assert payload["code"] in ("UPLOAD_FAILED", "RENDER_FAILED")
     assert "never-listens" not in payload["error"], "the presigned URL leaked into the error message"
+
+
+# ─────────────────────── upload allowlist (SSRF guard) ───────────────────────
+
+
+def test_generate_refuses_an_upload_url_on_an_unlisted_host():
+    response = generate(generate_request(uploadUrl="https://evil.example/put"), authorization=AUTH)
+    assert response.status_code == 422
+    payload = body_of(response)
+    assert payload["code"] == "UPLOAD_URL_NOT_ALLOWED"
+    assert "evil.example" not in payload["error"], "the target host leaked into the error"
+
+
+def test_generate_refuses_plain_http_to_a_remote_host():
+    response = generate(generate_request(uploadUrl="http://pdf.test/put"), authorization=AUTH)
+    assert response.status_code == 422
+    assert body_of(response)["code"] == "UPLOAD_URL_INSECURE"
+
+
+def test_generate_refuses_an_upload_url_with_embedded_credentials():
+    response = generate(
+        generate_request(uploadUrl="https://user:pass@pdf.test/put"), authorization=AUTH
+    )
+    assert response.status_code == 422
+    assert body_of(response)["code"] == "UPLOAD_URL_INVALID"
+
+
+def test_generate_refuses_a_markdown_upload_to_an_unlisted_host():
+    response = generate(
+        generate_request(mdUploadUrl="https://evil.example/put"), authorization=AUTH
+    )
+    assert response.status_code == 422
+    assert body_of(response)["code"] == "UPLOAD_URL_NOT_ALLOWED"
+
+
+def test_generate_fails_closed_without_an_upload_allowlist(monkeypatch):
+    monkeypatch.delenv("SAJU_UPLOAD_HOSTS", raising=False)
+    monkeypatch.delenv("R2_ENDPOINT", raising=False)
+    response = generate(generate_request(uploadUrl="https://pdf.test/put"), authorization=AUTH)
+    assert response.status_code == 503
+    assert body_of(response)["code"] == "UPLOAD_HOSTS_UNCONFIGURED"
+
+
+def test_the_r2_endpoint_is_itself_an_allowlist(monkeypatch):
+    monkeypatch.delenv("SAJU_UPLOAD_HOSTS", raising=False)
+    monkeypatch.setenv("R2_ENDPOINT", "https://account.r2.cloudflarestorage.com")
+    assert _validate_upload_url("https://account.r2.cloudflarestorage.com/bucket/x.pdf") is None
+    assert _validate_upload_url("https://other.r2.cloudflarestorage.com/bucket/x.pdf") == (
+        "UPLOAD_URL_NOT_ALLOWED"
+    )
+
+
+def test_generate_scopes_uploads_to_the_configured_bucket(monkeypatch):
+    monkeypatch.setenv("SAJU_UPLOAD_BUCKET", "saju-engine-dev")
+    assert _validate_upload_url("https://pdf.test/saju-engine-dev/reports/x.pdf") is None
+    assert _validate_upload_url("https://pdf.test/other-bucket/x.pdf") == "UPLOAD_PATH_NOT_ALLOWED"
+
+
+# ─────────────────────── request-size and field bounds ───────────────────────
+
+
+def test_script_request_caps_markdown_length():
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError):
+        ScriptRequest(markdown="x" * 1_000_001)
+
+
+def test_profile_rejects_out_of_range_coordinates():
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError):
+        ChartRequest(**{**RM, "longitude": 200})
+    with pytest.raises(ValidationError):
+        ChartRequest(**{**RM, "latitude": -91})
+
+
+def test_body_size_middleware_rejects_an_oversized_content_length():
+    import asyncio
+
+    from api.index import DEFAULT_MAX_REQUEST_BYTES, MaxBodySizeMiddleware
+
+    seen = {"ran": False}
+    sent = []
+
+    async def app(scope, receive, send):  # pragma: no cover - must not be reached
+        seen["ran"] = True
+
+    async def receive():  # pragma: no cover - must not be reached
+        return {"type": "http.request", "body": b"", "more_body": False}
+
+    async def send(message):
+        sent.append(message)
+
+    scope = {
+        "type": "http",
+        "headers": [(b"content-length", str(DEFAULT_MAX_REQUEST_BYTES + 1).encode())],
+    }
+    asyncio.run(MaxBodySizeMiddleware(app)(scope, receive, send))
+
+    assert seen["ran"] is False
+    assert sent[0]["status"] == 413
+    assert json.loads(sent[1]["body"])["code"] == "REQUEST_TOO_LARGE"
+
+
+def test_body_size_middleware_counts_a_chunked_body():
+    import asyncio
+
+    from api.index import DEFAULT_MAX_REQUEST_BYTES, MaxBodySizeMiddleware
+
+    seen = {"ran": False}
+    sent = []
+
+    async def app(scope, receive, send):  # pragma: no cover - must not be reached
+        seen["ran"] = True
+        await receive()
+
+    async def receive():
+        return {
+            "type": "http.request",
+            "body": b"x" * (DEFAULT_MAX_REQUEST_BYTES + 1),
+            "more_body": False,
+        }
+
+    async def send(message):
+        sent.append(message)
+
+    asyncio.run(MaxBodySizeMiddleware(app)({"type": "http", "headers": []}, receive, send))
+
+    # No content-length, so the app is entered and the limit is enforced while it reads:
+    # that is the path this test exists for.
+    assert seen["ran"] is True
+    assert sent[0]["status"] == 413
+    assert json.loads(sent[1]["body"])["code"] == "REQUEST_TOO_LARGE"
+
 
 
 # ─────────────────────────────── /script (the audio summary) ───────────────────────────────

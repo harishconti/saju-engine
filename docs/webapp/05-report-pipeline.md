@@ -286,6 +286,23 @@ Authorization: Bearer $ENGINE_SERVICE_TOKEN
 deployed independently: a webapp that ships a new field before the engine understands it must fail
 loudly, not silently produce a wrong report. The CI contract test runs on both sides.
 
+### Upload targets (the engine's only write capability)
+
+The engine holds no storage credentials — `uploadUrl` (and the optional `mdUploadUrl` /
+`htmlUploadUrl`) are the only places it can write. They are **allowlisted**, because a leaked service
+token would otherwise turn the service into an arbitrary-URL PUT primitive:
+
+- allowlist from `SAJU_UPLOAD_HOSTS` (comma-separated) and/or the host of `R2_ENDPOINT`;
+  **empty means fail closed** (`503 UPLOAD_HOSTS_UNCONFIGURED`);
+- https required (http is allowed only to loopback, for local development), no embedded
+  credentials, no fragment;
+- optional `SAJU_UPLOAD_BUCKET` pins the path to `/<bucket>/…`;
+- a body cap (`SAJU_MAX_REQUEST_BYTES`, default 2 MB) and pydantic bounds on every field.
+
+Errors: `422 UPLOAD_URL_NOT_ALLOWED` / `UPLOAD_URL_INSECURE` / `UPLOAD_URL_INVALID` /
+`UPLOAD_PATH_NOT_ALLOWED`, `503 UPLOAD_HOSTS_UNCONFIGURED`. The error never echoes the URL, which
+carries a signature. See [14 — Security](14-security.md) §3.
+
 ### Required engine changes — status
 
 | # | Change | Status |
@@ -295,7 +312,7 @@ loudly, not silently produce a wrong report. The CI contract test runs on both s
 | **E3** | Thread `favorable_override` through the single-chart path | ✅ **done.** Added to `chart_markdown()`, `prepare_chart_render()` and `build_pdf_from_chart()`, forwarded to `generate_premium_report(..., favorable_override=…)`. This is what makes the review console's 용신 override work for single charts, not just compatibility readings. |
 | **E4** | FastAPI entry with presigned upload, PII-safe errors | ✅ **done** — `api/index.py`, three endpoints, bearer auth, `HEAD`-style contract version check, class-name-only logging |
 | **E5** | Regenerate `apps/web/public/demo-*.pdf` with ReportLab | ⬜ **still open** — and now it also carries the MP3 decision (see [13 — Launch audit](13-launch-audit.md) D1) |
-| **E6** | Contract tests | ✅ **done** — `tests/test_report_engine_service.py`, **20 cases**, no network and no storage. They call the endpoint functions directly rather than through `TestClient`, because the local httpx 0.28 dropped the `app=` argument that starlette 0.36's `TestClient` still passes; testing the functions is faster and version-proof. |
+| **E6** | Contract tests | ✅ **done** — `tests/test_report_engine_service.py` (no network, no storage), now including the upload-allowlist, request-size and field-bound cases. They call the endpoint functions directly rather than through `TestClient`, because the local httpx 0.28 dropped the `app=` argument that starlette 0.36's `TestClient` still passes; testing the functions is faster and version-proof. |
 
 **Verified end to end** (real presigned PUT into R2, then download and compare):
 

@@ -16,10 +16,10 @@ npm run lint
 npm run typecheck
 npm test                     # vitest
 npm run build                # proves the no-secrets build works
-npm run test:e2e             # playwright
+# npm run test:e2e — planned; no specs exist yet (see Surface 3)
 
 # Engine service (new)
-python -m pytest tests/test_engine_service.py -q    # contract test
+python -m pytest tests/test_report_engine_service.py -q    # contract + security tests
 ```
 
 > ✅ **Fixed 2026-10-16.** The workflow now triggers on **`develop`** and `main` and adds a **webapp**
@@ -28,7 +28,7 @@ python -m pytest tests/test_engine_service.py -q    # contract test
 > and covered `pytest` alone. The Playwright tier below remains **unimplemented**. See
 > [13](13-launch-audit.md) §B5.
 
-**The engine suite must never be allowed to regress** — with 1,909 cases and a
+**The engine suite must never be allowed to regress** — with 2,000+ cases and a
 cited-fixture validation gate, it is the only thing making it safe to touch a working engine while
 building a product around it.
 
@@ -373,3 +373,21 @@ contract: it is rate-limited (5/min/IP, like `/api/sample`) and returns an `imag
 python3 -m pytest -q tests/test_web_report.py
 python3 tools/qa_client_ready.py report.md --html report.html   # the artefact, not just the source
 ```
+
+## Surface 5 — Security controls
+
+The bar is [14 — Security](14-security.md). A control without a test is a claim, so these fail when the
+control is removed:
+
+| Control | Test |
+|---|---|
+| Engine upload allowlist / SSRF guard | `tests/test_report_engine_service.py::test_generate_refuses_an_upload_url_on_an_unlisted_host` (plus fail-closed, insecure-http, embedded-credentials and bucket-prefix cases) |
+| Engine request-size cap | `…::test_body_size_middleware_rejects_an_oversized_content_length`, `…::test_body_size_middleware_counts_a_chunked_body` |
+| Engine field bounds | `…::test_script_request_caps_markdown_length`, `…::test_profile_rejects_out_of_range_coordinates` |
+| Trusted client IP (the rate-limit key) | `src/lib/__tests__/client-ip.test.ts` |
+| Webhook signatures | `src/lib/__tests__/webhook-signature.test.ts` |
+| Turnstile modes | `src/lib/__tests__/turnstile.test.ts` |
+
+⚠️ **Not covered by a test yet:** the per-recipient email cap, CSRF/cookie attributes, the CSP header
+values, and the auth-gate Playwright spec. They are listed as residual risk in [14](14-security.md) §5
+rather than implied to be tested.

@@ -141,7 +141,7 @@ ADMIN_EMAILS=«your login email»
 CRON_SECRET=«openssl rand -base64 32»    # Vercel Cron sends this as a bearer token
 
 # ── Optional ──
-TURNSTILE_MODE=off                                        # off (default) | log (verify, never block) | enforce
+TURNSTILE_MODE=«off in dev; log → enforce in production»    # off | log (verify, never block) | enforce
 TURNSTILE_SECRET_KEY=«from the Turnstile widget»            # server verification; only bites in `enforce`
 
 # ⚠️ Adding the site key needs an explicit type, or Vercel's CLI refuses it:
@@ -176,6 +176,13 @@ SAJU_PDF_BACKEND=reportlab
 SAJU_FONT_DIR=«usually omit»   # E1 auto-resolves <package>/saju_html/fonts, which inside the
                                # function is /var/task/src/saju_html/fonts (verified: /health
                                # reports `fontsDir`). The system path does not exist there
+
+# Upload-target allowlist. REQUIRED: the engine fails closed (503 UPLOAD_HOSTS_UNCONFIGURED)
+# without one, because a presigned URL is its only write capability. Use the same R2 origin
+# the webapp has; optionally pin the bucket and the request-size ceiling.
+R2_ENDPOINT=https://«account_id».r2.cloudflarestorage.com
+SAJU_UPLOAD_BUCKET=«optional: saju-engine-dev»
+SAJU_MAX_REQUEST_BYTES=«optional: default 2097152 (2 MB)»
 ```
 
 **Deliberately absent:** no database URL, no R2 keys, no Resend key, no payment keys. See

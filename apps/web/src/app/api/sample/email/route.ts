@@ -47,6 +47,13 @@ export const POST = handle(async (req) => {
 
   const input = await parseJson(req, sampleEmailSchema);
 
+  // Abuse guard, two dimensions. This route sends mail **from our domain** to an address
+  // the caller chooses, so a per-IP limit alone is not enough: an attacker rotating IPs
+  // could still bomb one inbox. The recipient bucket caps that; the hourly per-IP bucket
+  // bounds one sender's total volume.
+  await rateLimit(`sample-email-ip:${ip}`, 20, WINDOW.hour);
+  await rateLimit(`sample-email-to:${input.email}`, 2, WINDOW.hour);
+
   if (!isR2Configured()) {
     throw ApiError.unavailable("Report storage is not configured", "STORAGE_UNAVAILABLE");
   }

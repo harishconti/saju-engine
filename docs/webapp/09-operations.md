@@ -74,6 +74,10 @@ Every step writes a summary line to the log with counts only — never ids of us
   "db": true,
   "storage": true,
   "engine": true,
+  "payments": true,
+  "paymentsMode": "live_mode",
+  "botProtection": "enforce",        // off | log | enforce — see 14
+  "botProtectionConfigured": true,
   "version": "«git sha»",
   "checkedAt": "2026-10-15T10:00:00Z"
 }
@@ -89,6 +93,11 @@ Every step writes a summary line to the log with counts only — never ids of us
 The response also reports `paymentsMode` (`test_mode` / `live_mode`). That single word is worth watching:
 it is how you notice that a real deployment is still pointed at test mode — or, worse, that it went live
 before you meant it to.
+
+**`botProtection` is the live Turnstile rollout mode.** `log` records verification but **never blocks**,
+so it is not protection yet; production must read `enforce` (see [14](14-security.md) §4). It is reported
+separately from `status` on purpose — a deliberate rollout state is not an outage, but it must be visible
+in an ops review rather than mistaken for "protected".
 
 Returns **503** with `status: "degraded"` if any probe fails, so an uptime monitor can alert on
 status code alone. A degraded engine is not fatal for the site (the sample flow is the only

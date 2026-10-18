@@ -24,6 +24,8 @@ This set describes the **webapp layer**. The Saju engine itself is documented se
 | 10 | [Privacy and compliance](10-privacy-and-compliance.md) | PII handling, consent, retention, deletion, disclaimers. |
 | 11 | [Build plan](11-build-plan.md) | Phases, tasks, acceptance criteria, sequencing. |
 | 12 | [Testing](12-testing.md) | Test strategy across JS, Python, and end-to-end. |
+| 13 | [Launch audit](13-launch-audit.md) | Point-in-time live-service audit and remediation. |
+| 14 | [Security and hardening](14-security.md) | Threat boundaries, every control and where it lives, residual risks, deploy steps. |
 
 ## Reading order
 
@@ -62,5 +64,7 @@ When any of these change, update the page in the same change:
 - A new API route → [03](03-api-spec.md) **and** the Playwright auth-gate spec (see [12](12-testing.md)).
 - A schema or enum change → [02](02-data-model.md) + a migration + the zod enum.
 - A new external service or env var → [07](07-services-and-integrations.md) + [08](08-deployment.md).
+- A new control, or a change to one → [14](14-security.md) (the bar) **and** a test that fails when
+  the control is removed.
 - A tier or price change → [07](07-services-and-integrations.md) (Dodo Payments map) **and**
   [`openwiki/products/reports.md`](../openwiki/products/reports.md).

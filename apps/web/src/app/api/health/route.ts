@@ -4,6 +4,7 @@ import { isR2Configured } from "@/lib/r2";
 import { engineHealth } from "@/lib/engine";
 import { isDodoConfigured, isDodoLiveMode } from "@/lib/dodo";
 import { productIdForTier } from "@/lib/tiers";
+import { isTurnstileConfigured, turnstileMode } from "@/lib/turnstile";
 
 export const dynamic = "force-dynamic";
 
@@ -44,6 +45,14 @@ export async function GET() {
       payments,
       /** `test_mode` means nothing can be charged for real — a useful thing to see in one glance. */
       paymentsMode: liveMode ? "live_mode" : "test_mode",
+      /**
+       * Bot protection is a rollout switch, not a boolean: `off` (no verification),
+       * `log` (verify + record, **never block**) and `enforce` (refuse). Surfacing it
+       * here is deliberate — in an ops review, "log" must not look like "protected".
+       * It does not affect `ok`: a rollout state is a known posture, not an outage.
+       */
+      botProtection: turnstileMode(),
+      botProtectionConfigured: isTurnstileConfigured(),
       ...(missingProducts.length ? { missingProducts } : {}),
       version: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "dev",
       checkedAt: new Date().toISOString(),

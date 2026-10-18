@@ -2,7 +2,7 @@
 
 > Started as a consolidated audit (2026-06-28); reviewer deep-dive findings added 2026-07-01;
 > client-launch blockers G1–G6 added and fixed 2026-09-07.
-> Current test status: **590 passing** (`python3 -m pytest` from the repo root).
+> Current test status: **2,024 passing** (`python3 -m pytest` from the repo root).
 > This file is the engine issue tracker with fix history. For go-to-market / product / landing-page
 > issues, see `MEMORY.md`.
 >
@@ -876,3 +876,4 @@ Source: `research-engine/output/2026-10-01/saju-engine-audit-2026-10-01.md`. Fix
 | 2026-10-04 | P4 final-review fix wave: see P4-review (FIXED) and P4-ratelimit (OPEN). |
 | 2026-10-04 | P5 HTML-first reports: C1 (PDF backend default flip; f2a7e15 + 3645ea8 + a839244) and C5 (6401cd4 + 560e1fb) FIXED; C1-templates and P5-hangul-tokens OPEN; reportlab removal planned after one release. |
 | 2026-10-07 | Engine fixes: P3-bangham, P3-yangin, tests-geocoder, P3-golden, P3-reader-claim, P2-F, P5-hangul-tokens all FIXED; P3-isolated/P3-geonrok reclassified OPEN→DOCUMENTED. Web/infra: P4-ratelimit FIXED (in-app limiter + body cap), D2 FIXED (optional SMTP link delivery), C1-templates FIXED (Jinja2 document/cover templates, byte-identical output). D1/D3 remain OPEN (external); reportlab removal still deferred. Gate 315→316 (PASS 308, INTERPRETATION 8, FAIL 0); suite 1794→1839 passed / 13 xfailed; ruff clean. Regenerated 6 compat pairs for S2/S3/P2 + P2-F and added the Harish×Priyanka namesake pairs (1996 + 1998). |
+| 2026-10-18 | Web/engine security hardening (5 P1s, docs in `docs/webapp/14-security.md`): engine upload-target allowlist (SSRF), request-size + field caps, trusted client IP (rate-limit key), per-recipient email cap, bot-protection visibility in `/api/health`. Suite 2,013 → 2,024 passed / 5 skipped / 13 xfailed; webapp typecheck + lint + 165 vitest clean; `npm audit --omit=dev` 0. Residual (documented): Turnstile still `log`, app-level tenancy, CSP `'unsafe-inline'`, implicit CSRF, no CI security scan, no e2e auth-gate. |

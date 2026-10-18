@@ -580,6 +580,12 @@ Read & Write**:
 | `R2_REGION` | `auto` |
 | `R2_ENDPOINT` | `https://{R2_ACCOUNT_ID}.r2.cloudflarestorage.com` |
 
+**The engine also reads `R2_ENDPOINT`** — not for credentials (it has none) but as its
+**upload-target allowlist**: a presigned URL may only point at that host. `SAJU_UPLOAD_BUCKET`
+(optional) additionally pins the path to `/<bucket>/`, and `SAJU_MAX_REQUEST_BYTES` caps the body
+(default 2 MB). Set `R2_ENDPOINT` on the `saju-report-engine` project too, or `/generate` fails
+closed with `503 UPLOAD_HOSTS_UNCONFIGURED`. See [14 — Security](14-security.md) §3–4.
+
 ### CORS
 
 Needed so a browser can PUT an object straight to R2 — which the manual audio upload requires, because a

@@ -1489,6 +1489,57 @@
     ✅ `apps/web` typecheck + eslint clean, **128 vitest passed**, `npm run build` clean. Docs: `06` gains a
     `/dashboard/reports` section stating the rule (one action per row) and why the old button was wrong.
 
+  - **2026-10-17 (every stored client report rebuilt from scratch — and every one now ships an HTML reading).** Owner:
+    *"recreate all local candidate reports and also create an html reports for each."*
+    ✅ **Regenerated everything** with `tools/regen_client_reports.sh`: all 8 base reports, the engine `career`/`luck-cycle`
+    reports, the `vishnu-priya` and `rm` tier files, the 4 combined reports, and the 7 compat pairs (basic + deep) — markdown
+    + PDFs through the HTML/Chromium backend. The stored markdown was **stale**: the cover still carried the price
+    (`… · $55`), body prose still said `querent`/`the engine`, citations used the old `(per knowledge/…)` form, and the
+    audio line read "delivered with this report". After the regen the bindu base report goes **61 findings → 0** on
+    `qa_client_ready`; favorable elements / verdicts are unchanged (checked for all six single-chart candidates).
+    ✅ **New `tools/regen/html.sh`** writes the web document (`.html`, `md_to_saju_html_pdf.py --web`, no browser) beside
+    every canonical report, mirroring `pdfs.sh`'s deliverable list, and is wired into `tools/regen_client_reports.sh`
+    after `pdfs.sh`. **45 readings** produced (base 8 · combined 4 · career 6 · tiers 3+2 · luck-cycle 8 · compat 14), each
+    self-contained — the only URL is the inline SVG namespace. Names: `{name}-report.html`, `career.html`,
+    `{name}-luck-cycle.html`, `{name}-combined.html`, `{name}-{tier}.html`, `{pair}_compatibility[_deep].html`.
+    ⚠️ **Gate note (not a regression).** Many readings trip `qa_client_ready.py --html` with `DOUBLE_GLOSS` shape-checks —
+    the known-open compat issue logged above, on a freshly regenerated pair, plus engine copy such as `one of the
+    supported (strong) stages`. The engine **markdown** is clean; the gloss-shape checks run on the rendered page only.
+    The hand-authored `harish`/`gurumoorthy`/`mahesh`/`vishnu-priya` `career.md` (and `*-legacy`/`*-engine*` files) are
+    deliberately excluded from the engine regen, so their HTML still carries `querent`/`the engine`; follow-up topic
+    files that have no PDF (`mahesh/relationships.md`, `vishnu-priya/{career,relationships}.md`) get no reading.
+    Docs updated: `candidates_horoscope/README.md` (folder conventions + index banner), `docs/openwiki/products/reports.md`
+    (folder trees gain the `.html` sibling), `docs/openwiki/operations/toolchain-and-testing.md` (new "Regenerating client
+    reports" section). Suite unchanged at **2,013 passed / 5 skipped / 13 xfailed** (rendering only, no engine change).
+
+  - **2026-10-18 (backend hardening: the five P1s from the security review, closed in code).** Owner asked whether the
+    backend was attack-hardened; the audit found the posture strong but five concrete gaps. Closed, with tests:
+    1. **Engine SSRF via `uploadUrl`.** `api/index.py` gains `_validate_upload_url` / `_reject_unsafe_uploads`: https
+       only (http is loopback-only, for dev), no embedded credentials or fragment, host must be `R2_ENDPOINT` or
+       `SAJU_UPLOAD_HOSTS`, optional `SAJU_UPLOAD_BUCKET` path pin. **Empty allowlist = 503**; `_upload` re-checks as
+       defence in depth. ⚠️ Deploy step: set `R2_ENDPOINT` on `saju-report-engine` before/with the deploy or every
+       `/generate` fails closed.
+    2. **Unbounded request bodies.** `MaxBodySizeMiddleware` (content-length **and** streamed-byte count, default 2 MB,
+       `SAJU_MAX_REQUEST_BYTES`) plus pydantic `max_length`/`ge`/`le` on every engine field (`ScriptRequest.markdown`
+       ≤ 1 M chars).
+    3. **Spoofable rate-limit key.** New `apps/web/src/lib/client-ip.ts`: prefer `x-vercel-forwarded-for` / `x-real-ip`,
+       else the **rightmost** `x-forwarded-for` hop — it was the client-controlled leftmost. `api.ts` re-exports it;
+       `client-ip.test.ts` pins the spoof case.
+    4. **Open mail relay.** `/api/sample/email` gains a per-recipient bucket (2/h) and an hourly per-IP bucket (20/h) on
+       top of 5/min/IP.
+    5. **Invisible bot protection.** `/api/health` now reports `botProtection: off|log|enforce` and
+       `botProtectionConfigured`. Still **`log` in production until the env flip** — a known, visible state; enforcing
+       before the widget is proven would refuse every visitor (2026-10-16).
+    ✅ **Docs:** new `docs/webapp/14-security.md` (trust boundaries, control table with regression guards, the five
+    fixes, deliberate residual risks, deploy/verify steps); `03` (health fields, email limits, Turnstile visibility),
+    `05` (upload-target contract), `07`/`08` (engine env), `README` index + maintenance rule. **Tests:** full pytest
+    **2,024 passed / 5 skipped / 13 xfailed** (+11 new engine cases); the engine contract file is 42 passed; webapp
+    typecheck + lint clean, `npm test` 165 passed / 4 skipped; `npm audit --omit=dev` 0.
+    **Residual (documented, not fixed):** Turnstile still `log`; tenant isolation is app-level (no RLS); CSP
+    `'unsafe-inline'`; CSRF implicit; no security scanning in CI; Python deps `>=`; no WAF/uptime; no e2e auth-gate;
+    credential rotation and `ADMIN_EMAILS` confirmation remain.
+
+
   - **2026-10-17 (the compatibility tiers reach the pricing grid — the audit's #1 opportunity was a filter).** From an
     external product audit: *"Compatibility missing from the pricing grid … your own research names 궁합 the sharpest
     differentiator, but the grid shows only single-chart tiers."* Correct, and cheap to fix, because nothing was

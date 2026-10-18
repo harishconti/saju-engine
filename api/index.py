@@ -39,10 +39,11 @@ import urllib.request
 from datetime import date
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+from urllib.parse import urlsplit
 
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 # Make the repository's src/ tree importable — the same convention tools/*.py uses.
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -94,6 +95,100 @@ _COMPAT_TIERS = ("basic", "deep")
 app = FastAPI(title="Cosmic Saju report engine", version=ENGINE_VERSION)
 
 
+# ─────────────────────────── request size limit ───────────────────────────
+
+#: Hard ceiling on a request body. A `/generate` payload is a few KB and the largest
+#: `/script` body is an approved report (~150 KB); 2 MB leaves generous headroom. The
+#: cap exists because FastAPI/Starlette do not impose one, so a leaked service token
+#: could otherwise make the function read an unbounded body into memory.
+DEFAULT_MAX_REQUEST_BYTES = 2 * 1024 * 1024
+
+
+class _BodyTooLarge(Exception):
+    """Raised from the receive wrapper when the streamed body crosses the ceiling."""
+
+
+async def _send_json(send: Any, status: int, error: str, code: str) -> None:
+    import json as _json
+
+    body = _json.dumps({"error": error, "code": code}).encode("utf-8")
+    await send(
+        {
+            "type": "http.response.start",
+            "status": status,
+            "headers": [
+                (b"content-type", b"application/json"),
+                (b"content-length", str(len(body)).encode("ascii")),
+            ],
+        }
+    )
+    await send({"type": "http.response.body", "body": body})
+
+
+class MaxBodySizeMiddleware:
+    """Reject an oversized request before it can be buffered.
+
+    Checks `content-length` first (the common case) and then counts the bytes actually
+    received, because a chunked request has no length header. Pure ASGI so it applies to
+    every route without pulling in a dependency.
+    """
+
+    def __init__(self, app: Any) -> None:
+        self.app = app
+
+    def _limit(self) -> int:
+        raw = os.environ.get("SAJU_MAX_REQUEST_BYTES")
+        try:
+            value = int(raw) if raw else DEFAULT_MAX_REQUEST_BYTES
+        except ValueError:
+            value = DEFAULT_MAX_REQUEST_BYTES
+        return value if value > 0 else DEFAULT_MAX_REQUEST_BYTES
+
+    async def __call__(self, scope: Dict[str, Any], receive: Any, send: Any) -> None:
+        if scope.get("type") != "http":
+            await self.app(scope, receive, send)
+            return
+
+        limit = self._limit()
+        for name, value in scope.get("headers") or []:
+            if name.lower() == b"content-length":
+                try:
+                    if int(value) > limit:
+                        await _send_json(send, 413, "Request body is too large.", "REQUEST_TOO_LARGE")
+                        return
+                except ValueError:
+                    pass
+
+        received = 0
+        started = False
+
+        async def counting_receive() -> Any:
+            nonlocal received
+            message = await receive()
+            if message.get("type") == "http.request":
+                received += len(message.get("body") or b"")
+                if received > limit:
+                    raise _BodyTooLarge()
+            return message
+
+        async def tracking_send(message: Any) -> None:
+            nonlocal started
+            if message.get("type") == "http.response.start":
+                started = True
+            await send(message)
+
+        try:
+            await self.app(scope, counting_receive, tracking_send)
+        except _BodyTooLarge:
+            if not started:
+                await _send_json(send, 413, "Request body is too large.", "REQUEST_TOO_LARGE")
+            else:  # pragma: no cover - the app already committed a status
+                raise
+
+
+app.add_middleware(MaxBodySizeMiddleware)
+
+
 # ─────────────────────────────── errors ───────────────────────────────
 
 
@@ -117,22 +212,113 @@ def _authorize(authorization: Optional[str]) -> None:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
 
+# ─────────────────────────── upload-target allowlist ───────────────────────────
+
+
+def _allowed_upload_hosts() -> List[str]:
+    """Hostnames the engine may PUT to.
+
+    Read from `SAJU_UPLOAD_HOSTS` (comma-separated) and, when present, the host of
+    `R2_ENDPOINT`. The webapp always presigns into the configured R2 bucket, so that
+    endpoint is the natural allowlist; `SAJU_UPLOAD_HOSTS` exists for a proxy or a
+    second bucket. **Empty means fail closed** — an engine that will PUT anywhere is
+    an SSRF gadget if its token ever leaks.
+    """
+    hosts = [
+        h.strip().lower()
+        for h in (os.environ.get("SAJU_UPLOAD_HOSTS") or "").split(",")
+        if h.strip()
+    ]
+    endpoint = (os.environ.get("R2_ENDPOINT") or "").strip()
+    if endpoint:
+        try:
+            host = urlsplit(endpoint).hostname
+        except ValueError:
+            host = None
+        if host:
+            hosts.append(host.lower())
+    return list(dict.fromkeys(hosts))
+
+
+_LOOPBACK_HOSTS = {"localhost", "127.0.0.1", "::1"}
+
+
+def _validate_upload_url(url: str) -> Optional[str]:
+    """Return a stable error code when `url` is not a safe PUT target, else None.
+
+    Deliberately strict: https (or http to loopback, for local development), no
+    embedded credentials, no fragment, a hostname on the allowlist, and — when
+    `SAJU_UPLOAD_BUCKET` is set — a path scoped to that bucket. The error never
+    echoes the URL, which may carry a presigned signature.
+    """
+    hosts = _allowed_upload_hosts()
+    if not hosts:
+        return "UPLOAD_HOSTS_UNCONFIGURED"
+
+    try:
+        parts = urlsplit(url)
+        host = (parts.hostname or "").lower()
+    except ValueError:
+        return "UPLOAD_URL_INVALID"
+
+    if parts.scheme not in ("http", "https") or not host:
+        return "UPLOAD_URL_INVALID"
+    if parts.username or parts.password or parts.fragment:
+        return "UPLOAD_URL_INVALID"
+
+    if parts.scheme == "http" and host not in _LOOPBACK_HOSTS:
+        return "UPLOAD_URL_INSECURE"
+    if host not in hosts:
+        return "UPLOAD_URL_NOT_ALLOWED"
+
+    bucket = (os.environ.get("SAJU_UPLOAD_BUCKET") or "").strip()
+    if bucket and not parts.path.startswith(f"/{bucket}/"):
+        return "UPLOAD_PATH_NOT_ALLOWED"
+    return None
+
+
+def _reject_unsafe_uploads(request: "GenerateRequest") -> Optional[JSONResponse]:
+    """Validate every upload target before any rendering or network work."""
+    for label, url in (
+        ("uploadUrl", request.uploadUrl),
+        ("mdUploadUrl", request.mdUploadUrl),
+        ("htmlUploadUrl", request.htmlUploadUrl),
+    ):
+        if not url:
+            continue
+        code = _validate_upload_url(url)
+        if not code:
+            continue
+        if code == "UPLOAD_HOSTS_UNCONFIGURED":
+            return _fail(
+                503,
+                code,
+                "The engine has no upload-host allowlist configured (set R2_ENDPOINT or "
+                "SAJU_UPLOAD_HOSTS), so it will not write to an arbitrary URL.",
+            )
+        return _fail(422, code, f"{label} is not an allowed storage target.")
+    return None
+
+
 # ─────────────────────────────── request models ───────────────────────────────
 
 
 class ProfileIn(BaseModel):
     """Birth data. Mirrors `EngineProfile` in apps/web/src/lib/engine.ts."""
 
-    fullName: str = ""
-    gender: str
-    birthDate: str
-    birthTime: str = "12:00"
+    fullName: str = Field(default="", max_length=120)
+    gender: str = Field(max_length=8)
+    # Coarse length bounds only; the exact format is validated in `BirthData`, so a
+    # malformed-but-short value still gets its specific error code rather than a
+    # generic pydantic 422.
+    birthDate: str = Field(max_length=16)
+    birthTime: str = Field(default="12:00", max_length=16)
     timeKnown: bool = True
-    timezone: Optional[str] = None
-    utcOffset: Optional[float] = None
-    city: Optional[str] = None
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
+    timezone: Optional[str] = Field(default=None, max_length=64)
+    utcOffset: Optional[float] = Field(default=None, ge=-14, le=14)
+    city: Optional[str] = Field(default=None, max_length=200)
+    latitude: Optional[float] = Field(default=None, ge=-90, le=90)
+    longitude: Optional[float] = Field(default=None, ge=-180, le=180)
 
 
 class ChartRequest(ProfileIn):
@@ -145,21 +331,21 @@ class GenerateRequest(BaseModel):
     """`POST /generate` — mirrors `EnginePayload` in apps/web/src/lib/engine.ts."""
 
     contractVersion: int = CONTRACT_VERSION
-    kind: str
-    tier: str
-    uploadUrl: str
+    kind: str = Field(max_length=16)
+    tier: str = Field(max_length=16)
+    uploadUrl: str = Field(max_length=2048)
     # Optional: where to PUT the source markdown. Storing it is what lets the audio
     # script be derived from the artefact that was actually approved, instead of being
     # recomputed later (an engine deploy in between could change the words).
-    mdUploadUrl: Optional[str] = None
+    mdUploadUrl: Optional[str] = Field(default=None, max_length=2048)
     # Optional: where to PUT the **web document** — the reading the client opens, as one
     # self-contained HTML file. Rendered from the same markdown as the PDF, so the two can
     # never disagree. Single-chart only for now (the compat reading has its own renderer).
-    htmlUploadUrl: Optional[str] = None
+    htmlUploadUrl: Optional[str] = Field(default=None, max_length=2048)
     profileA: ProfileIn
     profileB: Optional[ProfileIn] = None
-    favorableOverrideA: Optional[str] = None
-    favorableOverrideB: Optional[str] = None
+    favorableOverrideA: Optional[str] = Field(default=None, max_length=16)
+    favorableOverrideB: Optional[str] = Field(default=None, max_length=16)
 
 
 class ScriptRequest(BaseModel):
@@ -171,7 +357,7 @@ class ScriptRequest(BaseModel):
     """
 
     contractVersion: int = CONTRACT_VERSION
-    markdown: str
+    markdown: str = Field(max_length=1_000_000)
 
 
 # ─────────────────────────────── validation ───────────────────────────────
@@ -465,15 +651,38 @@ def _render_compat(
     return pdf, out_md, (pages[0] if pages else None), html_path
 
 
+class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """Refuse redirects on the upload path.
+
+    The allowlist names one host; a redirect is a second, unchecked destination, which is
+    exactly the hop an SSRF guard must not hand back to the remote end.
+    """
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # noqa: ANN001
+        raise urllib.error.HTTPError(req.full_url, code, "redirect refused", headers, fp)
+
+
+_UPLOAD_OPENER = urllib.request.build_opener(_NoRedirectHandler())
+
+
 def _upload(artifact: Path, upload_url: str, *, content_type: str = "application/pdf",
             timeout: float = 60.0) -> None:
     """PUT a rendered artefact to the caller's presigned URL. Stdlib only."""
+    # Defence in depth: `generate()` validates every target first, but a future caller
+    # must not be able to turn this helper into an SSRF primitive by forgetting to.
+    code = _validate_upload_url(upload_url)
+    if code:
+        raise _http(
+            503 if code == "UPLOAD_HOSTS_UNCONFIGURED" else 422,
+            code,
+            "The upload target is not allowed.",
+        )
     body = artifact.read_bytes()
     request = urllib.request.Request(
         upload_url, data=body, method="PUT", headers={"Content-Type": content_type}
     )
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
+        with _UPLOAD_OPENER.open(request, timeout=timeout) as response:
             if response.status not in (200, 201, 204):
                 raise _http(502, "UPLOAD_FAILED", "The rendered PDF could not be stored.")
     except urllib.error.HTTPError as exc:
@@ -574,6 +783,12 @@ def generate(request: GenerateRequest, authorization: Optional[str] = Header(Non
         return _fail(422, "INVALID_TIER", f"Unknown single-chart tier {request.tier!r}.")
     if request.kind == "compat" and request.tier not in _COMPAT_TIERS:
         return _fail(422, "INVALID_TIER", f"Unknown compatibility tier {request.tier!r}.")
+
+    # SSRF guard: the engine has no storage credentials, so the presigned URL *is* its
+    # only write capability. Never let the caller point it at an arbitrary host.
+    unsafe = _reject_unsafe_uploads(request)
+    if unsafe is not None:
+        return unsafe
 
     started = time.monotonic()
     html_digest: Optional[str] = None

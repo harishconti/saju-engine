@@ -144,8 +144,6 @@ export function providedSecret(req: Request): string | null {
   return null;
 }
 
-export function clientIp(req: Request): string {
-  const fwd = req.headers.get("x-forwarded-for");
-  if (fwd) return fwd.split(",")[0]!.trim();
-  return req.headers.get("x-real-ip") ?? "unknown";
-}
+// Re-exported so every route keeps importing it from `@/lib/api`; the trusted-header
+// logic lives in its own module so it can be unit-tested without Prisma/zod.
+export { clientIp } from "./client-ip";

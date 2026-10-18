@@ -43,10 +43,10 @@ export const POST = handle(async (req: Request) => {
 
 | Method | Path | Purpose | Rate limit |
 |---|---|---|---|
-| `GET` | `/api/health` | DB + R2 + engine probe. No secrets. 200 `{status:'ok',…}` / 503 `{status:'degraded',…}` | none |
+| `GET` | `/api/health` | DB + R2 + engine probe. No secrets. Also reports `botProtection: off\|log\|enforce` and `botProtectionConfigured`. 200 `{status:'ok',…}` / 503 `{status:'degraded',…}` | none |
 | `POST` | `/api/sample` | Generate a free sample **reading** (the web document). No account required, and no PDF — see the response below | 5 / min / IP |
 | `POST` | `/api/share-card` | The reader's own Day Master card, a 1080×1920 PNG. No account required — it is the free snapshot's growth loop. Carries no birth data (built from `shareCardFields()`), stores nothing | 5 / min / IP |
-| `POST` | `/api/sample/email` | Email the free snapshot, and record the lead (`SampleLead`). No account required. Stores no birth data — only the address and the marketing choice | 5 / min / IP |
+| `POST` | `/api/sample/email` | Email the free snapshot, and record the lead (`SampleLead`). No account required. Stores no birth data — only the address and the marketing choice | 5 / min / IP **and** 20 / h / IP **and** 2 / h / recipient |
 
 > **There is no `/api/contact` route, deliberately.** An earlier draft specified one; it was never built.
 > Contact is a `mailto:` to a monitored address (`hello@`, or `privacy@` for data-protection requests —
@@ -217,7 +217,9 @@ RATE_LIMITED`, `403 TURNSTILE_FAILED` (bot check not satisfied — see below), `
 records but **never refuses**, and `enforce` returns `403 TURNSTILE_FAILED` on an absent or invalid token.
 **Deploy new keys at `log`**, confirm real visitors actually receive tokens, then move to `enforce`. The
 switch exists because this control can take the whole funnel down: a widget that fails to render produces
-no token, and an enforcing server then refuses *everybody* — which happened on 2026-10-16.
+no token, and an enforcing server then refuses *everybody* — which happened on 2026-10-16. `/api/health`
+reports the live mode as `botProtection`, so a `log` rollout is visible rather than mistaken for
+`enforce`; see [14](14-security.md) §4 for the flip.
 
 `TURNSTILE_SECRET_KEY` and the public site key must be deployed as a pair — the secret alone verifies, the
 site key alone renders, and only both together protect anything. Note the site key is public by design
