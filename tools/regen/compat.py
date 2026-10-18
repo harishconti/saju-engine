@@ -21,6 +21,9 @@ priyanka = compute_chart(name="Priyanka", gender="F", year=1996, month=6, day=3,
 # (12 Jul 1998, Pallipattu) — kept distinct from `harish_priyanka` (3 Jun 1996).
 priyanka_1998 = compute_chart(name="Priyanka", gender="F", year=1998, month=7, day=12, hour=21, minute=43,
                               longitude=79.4408, utc_offset=5.5, **REF)
+# Keerthana — 3 Oct 1996, 09:35 IST, Coimbatore (DD/MM/1996 per the client form).
+keerthana = compute_chart(name="Keerthana", gender="F", year=1996, month=10, day=3, hour=9, minute=35,
+                          longitude=76.9558, utc_offset=5.5, **REF)
 # NOTE: harish_vinothini is intentionally absent — Vinothini's birth date, time
 # and place are not on record (only her four pillars), so the engine cannot
 # rebuild her chart. Her existing .md is left as-is (see docs/issues_bugs.md).
@@ -33,6 +36,7 @@ jobs = [
     ("harish_srinidhi", harish, srinidhi, "Harish", "Srinidhi", {}, "2026-09-30"),
     ("harish_priyanka", harish, priyanka, "Harish", "Priyanka", {}, "2026-10-03"),
     ("harish_priyanka_1998", harish, priyanka_1998, "Harish", "Priyanka", {}, "2026-10-07"),
+    ("harish_keerthana", harish, keerthana, "Harish", "Keerthana", {}, "2026-10-17"),
 ]
 for slug, a, b, na, nb, ov, gd in jobs:
     for tier, suffix in (("basic", ""), ("deep", "_deep")):
