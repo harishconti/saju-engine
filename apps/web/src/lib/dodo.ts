@@ -1,6 +1,6 @@
 import type { Order } from "@prisma/client";
 import { ApiError } from "./api";
-import { productIdForOrder } from "./tiers";
+import { productIdForOrderPrice } from "./pricing";
 
 /**
  * Dodo Payments — checkout sessions.
@@ -59,7 +59,11 @@ export async function createCheckout(
   customerName?: string,
 ): Promise<{ url: string; sessionId: string }> {
   // `order.tier` holds the ENGINE tier; 'deep' is ambiguous without the kind.
-  const productId = productIdForOrder(order.kind, order.tier);
+  //
+  // The product is chosen from the price ALREADY RECORDED on the order, so the product always
+  // matches what the customer was quoted: a promotional price is charged through the
+  // promotional product, anything else through the standard one (see `pricing.ts`).
+  const productId = productIdForOrderPrice(order.kind, order.tier, order.priceCents);
 
   if (!productId) {
     throw ApiError.unavailable(

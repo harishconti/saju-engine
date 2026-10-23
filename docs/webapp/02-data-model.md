@@ -398,16 +398,41 @@ model SampleLead {
 One table, referenced from the API layer, the store config, and the engine contract. Keep it in one
 module (`src/lib/tiers.ts`) so a price change is a one-file change.
 
-| UI name | `kind` | `tier` (engine) | Price | Dodo Payments variant env |
-|---|---|---|---|---|
-| The Hook (sample) | `SINGLE` | `sample` | $0 | — (not a product) |
-| Essential Report | `SINGLE` | `essential` | $19 | `DODO_PRODUCT_ESSENTIAL` |
-| Deep Destiny Report | `SINGLE` | `deep` | $55 | `DODO_PRODUCT_DEEP` |
-| Compatibility Snapshot | `COMPAT` | `basic` | $24 | `DODO_PRODUCT_COMPAT_BASIC` |
-| Deep Compatibility | `COMPAT` | `deep` (compat) | $45 | `DODO_PRODUCT_COMPAT_DEEP` |
+| UI name | `kind` | `tier` (engine) | List price | Dodo Payments product env | Promotional product env |
+|---|---|---|---|---|---|
+| The Hook (sample) | `SINGLE` | `sample` | $0 | — (not a product) | — |
+| Essential Report | `SINGLE` | `essential` | $19 | `DODO_PRODUCT_ESSENTIAL` | `DODO_PRODUCT_ESSENTIAL_PROMO` |
+| Deep Destiny Report | `SINGLE` | `deep` | $55 | `DODO_PRODUCT_DEEP` | `DODO_PRODUCT_DEEP_PROMO` |
+| Compatibility Snapshot | `COMPAT` | `basic` | $24 | `DODO_PRODUCT_COMPAT_BASIC` | `DODO_PRODUCT_COMPAT_BASIC_PROMO` |
+| Deep Compatibility | `COMPAT` | `deep` (compat) | $45 | `DODO_PRODUCT_COMPAT_DEEP` | `DODO_PRODUCT_COMPAT_DEEP_PROMO` |
 
 Engine legacy aliases accepted but never surfaced: `spark` → `essential`, `reading` → `deep`,
 `fullmap` → `deep`. `companion` exists in the engine and is **not offered**.
+
+### The launch promotion (20% off, ends 2026-11-30)
+
+The tier map holds the **list price**. A promotion is not a second number in the table — it is
+*derived* from the list price in `src/lib/promo.ts` (`PROMO.percentOff = 20`) and charged through a
+**separate Dodo product**, because a Dodo product carries exactly one price.
+
+| | List price | Charged during the offer | Charged after 2026-11-30 |
+|---|---|---|---|
+| Essential Report | $19 | **$15.20** | $19 |
+| Deep Destiny Report | $55 | **$44** | $55 |
+| Compatibility Snapshot | $24 | **$19.20** | $24 |
+| Deep Compatibility | $45 | **$36** | $45 |
+
+Rules the code enforces (`src/lib/pricing.ts`, tested in `src/lib/__tests__/pricing.test.ts`):
+
+- **Fail closed.** The offer is advertised only when *every* paid tier's promotional product is
+  configured. A missing env var loses the promotion; it never produces a claim we cannot charge.
+- **The store product is chosen from the price recorded on the order**, not from the clock, so a
+  customer who started checkout before the window closed keeps the price they were shown.
+- **The offer ends by itself.** After `PROMO.endsOn` the site shows the list price and checkout
+  uses the standard products. No code change is needed on the day it ends — but the 20% discount
+  still set on the four *standard* Dodo products must be removed in the Dodo dashboard (see
+  [09 — Operations](09-operations.md)).
+- The free snapshot is never discounted. There is nothing to discount.
 
 ## Invariants worth asserting in code
 
@@ -416,14 +441,13 @@ Engine legacy aliases accepted but never surfaced: `spark` → `essential`, `rea
 | 1 | `kind = COMPAT` ⟺ `profileBId IS NOT NULL` | CHECK constraint + zod refine |
 | 2 | `profileAId <> profileBId` for compat | CHECK constraint + zod refine |
 | 3 | A profile can only be referenced by an order owned by its own user | Application check, inside the transaction |
-| 4 | `priceCents` matches the tier map at order creation | Server-side resolution; the client's price is discarded |
+| 4 | `priceCents` matches the tier map at order creation — the list price, or the offer price while a promotion runs | Server-side resolution (`lib/pricing.ts`); the client's price is discarded. The recorded price also selects the Dodo product, so the quote and the charge cannot differ |
 | 5 | `tier` is one of the allowed values for `kind` | CHECK constraint |
 | 6 | `Report.version` is unique per order | `@@unique([orderId, version])` |
 | 7 | A `DELIVERED` report is never mutated | Application rule; the only legal transition out is to `SUPERSEDED` via a new version |
 | 8 | `Job.state = RUNNING` implies `leaseUntil IS NOT NULL` | Application rule |
 | 9 | `Delivery` exists only for an `APPROVED`+ report | Application rule; nothing emails a draft |
 | 10 | `gender` is present on every profile used by an order | zod at intake + engine guard |
-
 ## Indexing notes
 
 The indexes above are chosen for the three queries that will run constantly:

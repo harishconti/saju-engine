@@ -3,6 +3,7 @@ import { OrderFlow } from "@/components/dashboard/order-flow";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { parseChartSummary } from "@/lib/chart";
+import { promoIsLive } from "@/lib/pricing";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Order a reading" };
@@ -48,7 +49,7 @@ export default async function NewOrderPage({
         }
       />
 
-      <OrderFlow profiles={orderProfiles} initialTier={requested} />
+      <OrderFlow profiles={orderProfiles} initialTier={requested} promoOn={promoIsLive()} />
     </>
   );
 }

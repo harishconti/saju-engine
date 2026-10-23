@@ -132,7 +132,14 @@ DODO_PRODUCT_ESSENTIAL=«variant_id»
 DODO_PRODUCT_DEEP=«variant_id»
 DODO_PRODUCT_COMPAT_BASIC=«variant_id»
 DODO_PRODUCT_COMPAT_DEEP=«variant_id»
-
+# Promotional products for the 20% launch offer (ends 2026-11-30). Same list price as the
+# standard products, with a 20% Dodo-level discount applied — a Dodo product carries exactly
+# one price, so a discount needs its own product. `lib/pricing.ts` uses these only while the
+# offer is running, and falls back to the standard products (and the list price) after.
+DODO_PRODUCT_ESSENTIAL_PROMO=«variant_id»
+DODO_PRODUCT_DEEP_PROMO=«variant_id»
+DODO_PRODUCT_COMPAT_BASIC_PROMO=«variant_id»
+DODO_PRODUCT_COMPAT_DEEP_PROMO=«variant_id»
 # ── App ──
 NEXT_PUBLIC_APP_URL=https://www.cosmicsaju.com          # www is canonical; the apex 308s to it
 NEXT_PUBLIC_LEGAL_CONTACT_EMAIL=privacy@cosmicsaju.com  # data-protection requests only

@@ -5,6 +5,7 @@ import { rateLimit, WINDOW } from "@/lib/ratelimit";
 import { writeAudit } from "@/lib/audit";
 import { withIdempotency } from "@/lib/idempotency";
 import { getTierById } from "@/lib/tiers";
+import { offerPriceCents } from "@/lib/pricing";
 import { createCheckout, isDodoConfigured } from "@/lib/dodo";
 import { orderSchema } from "@/lib/validation/schemas";
 
@@ -48,6 +49,11 @@ export const POST = handle(async (req) => {
     );
   }
 
+  // The price the customer is charged: the promotional price while the offer runs, the list
+  // price otherwise. Resolved here, server-side, from the same source the landing page shows —
+  // the client's own number is discarded (docs/webapp/02 §invariants, #4).
+  const priceCents = offerPriceCents(tier);
+
   const compat = tier.kind === "COMPAT";
   if (compat && !input.profileBId) {
     throw ApiError.unprocessable("A compatibility reading needs two people", "TIER_PROFILE_MISMATCH");
@@ -75,7 +81,7 @@ export const POST = handle(async (req) => {
           kind: tier.kind,
           tier: tier.engineTier, // stored as the ENGINE tier; `kind` disambiguates
           status: tier.priceCents === 0 ? "PAID" : "AWAITING_PAYMENT",
-          priceCents: tier.priceCents,
+          priceCents,
           currency: tier.currency,
           profileAId: input.profileAId,
           profileBId: input.profileBId ?? null,

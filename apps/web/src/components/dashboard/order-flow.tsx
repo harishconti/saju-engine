@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { track } from "@vercel/analytics";
 import { Alert, Badge, Button, Card, CardContent, Field, Select, Steps, buttonClasses } from "@/components/ui";
 import { COMPAT_TIERS, SINGLE_TIERS, TIERS, type Tier } from "@/lib/tiers";
+import { promoPriceCents } from "@/lib/promo";
 import { formatUSD } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +20,21 @@ export interface OrderProfile {
 
 const STEPS = ["Choose a reading", "Who it's for", "Confirm"];
 
-export function OrderFlow({ profiles, initialTier }: { profiles: OrderProfile[]; initialTier?: string | null }) {
+/**
+ * `promoOn` is decided by the SERVER (it knows whether the promotional products are configured,
+ * so the offer can fail closed) and passed in. The client only does the arithmetic — it never
+ * decides for itself that a discount exists, and the price the server records on the order is
+ * the price that is charged.
+ */
+export function OrderFlow({
+  profiles,
+  initialTier,
+  promoOn = false,
+}: {
+  profiles: OrderProfile[];
+  initialTier?: string | null;
+  promoOn?: boolean;
+}) {
   const router = useRouter();
 
   const initial = TIERS.find((t) => t.id === initialTier) ?? null;
@@ -31,6 +46,10 @@ export function OrderFlow({ profiles, initialTier }: { profiles: OrderProfile[];
   // Not persisted anywhere client-side: it is an affirmation made at submission, and the server
   // re-requires it (lib/validation/schemas.ts) so this state is only a convenience.
   const [adultConfirmed, setAdultConfirmed] = useState(false);
+  // Set only if the server prices the order differently from what was displayed here (the offer
+  // ended between page render and submission). The server is authoritative; the customer is told
+  // the new number before paying it.
+  const [priceNote, setPriceNote] = useState<string | null>(null);
 
   // One key per submission attempt; reused across retries of the same submission.
   const [idempotencyKey] = useState(() =>
@@ -38,6 +57,10 @@ export function OrderFlow({ profiles, initialTier }: { profiles: OrderProfile[];
   );
 
   const step = tier === null ? 0 : tier.kind === "COMPAT" && !profileBId ? 1 : tier ? 2 : 1;
+
+  /** The price shown for a tier: the offer price while the promotion runs, the list price after. */
+  const priceOf = (t: Tier): number =>
+    promoOn && t.priceCents > 0 ? promoPriceCents(t.priceCents) : t.priceCents;
 
   const profileA = useMemo(() => profiles.find((p) => p.id === profileAId) ?? null, [profiles, profileAId]);
   const profileB = useMemo(() => profiles.find((p) => p.id === profileBId) ?? null, [profiles, profileBId]);
@@ -64,11 +87,22 @@ export function OrderFlow({ profiles, initialTier }: { profiles: OrderProfile[];
       const body = (await res.json().catch(() => ({}))) as {
         checkoutUrl?: string;
         error?: string;
-        order?: { id: string };
+        order?: { id: string; priceCents?: number };
       };
 
       if (!res.ok) {
         setError(body.error ?? "Couldn't create that order. Try again.");
+        return;
+      }
+
+      // The server priced the order. If that differs from what was on screen, say so plainly
+      // rather than letting the customer discover it at the payment page.
+      const serverPrice = body.order?.priceCents;
+      if (serverPrice != null && tier && serverPrice !== priceOf(tier)) {
+        setPriceNote(
+          `The launch offer ended while you were choosing, so this order is now ${formatUSD(serverPrice)} — the standard price. Nothing has been charged yet.`,
+        );
+        setBusy(false);
         return;
       }
 
@@ -114,6 +148,7 @@ export function OrderFlow({ profiles, initialTier }: { profiles: OrderProfile[];
       <Steps steps={STEPS} current={step} />
 
       {error ? <Alert tone="danger">{error}</Alert> : null}
+      {priceNote ? <Alert tone="warning">{priceNote}</Alert> : null}
 
       {/* Step 1 — tier */}
       <section aria-label="Choose a reading" className="space-y-3">
@@ -137,7 +172,14 @@ export function OrderFlow({ profiles, initialTier }: { profiles: OrderProfile[];
               >
                 <div className="flex items-start justify-between gap-3">
                   <span className="font-display text-lg">{t.name}</span>
-                  <span className="font-display text-lg">{formatUSD(t.priceCents)}</span>
+                  <span className="text-right">
+                    <span className="block font-display text-lg">{formatUSD(priceOf(t))}</span>
+                    {promoOn && t.priceCents > 0 ? (
+                      <span className="block text-xs text-muted-foreground line-through">
+                        {formatUSD(t.priceCents)}
+                      </span>
+                    ) : null}
+                  </span>
                 </div>
                 <span className="text-xs text-muted-foreground">{t.pages}</span>
                 <span className="text-sm text-muted-foreground">{t.tagline}</span>
@@ -223,7 +265,14 @@ export function OrderFlow({ profiles, initialTier }: { profiles: OrderProfile[];
                 </div>
                 <div className="flex justify-between gap-4 border-t border-border pt-2">
                   <dt className="text-muted-foreground">Total</dt>
-                  <dd className="font-display text-xl">{formatUSD(tier.priceCents)}</dd>
+                  <dd className="font-display text-xl">
+                    {formatUSD(priceOf(tier))}
+                    {promoOn && tier.priceCents > 0 ? (
+                      <span className="ml-2 text-sm font-normal text-muted-foreground line-through">
+                        {formatUSD(tier.priceCents)}
+                      </span>
+                    ) : null}
+                  </dd>
                 </div>
               </dl>
 
@@ -259,7 +308,7 @@ export function OrderFlow({ profiles, initialTier }: { profiles: OrderProfile[];
                   disabled={tier.priceCents > 0 && !adultConfirmed}
                   onClick={submit}
                 >
-                  {tier.priceCents === 0 ? "Confirm" : `Pay ${formatUSD(tier.priceCents)}`}
+                  {tier.priceCents === 0 ? "Confirm" : `Pay ${formatUSD(priceOf(tier))}`}
                 </Button>
                 <Button
                   variant="ghost"

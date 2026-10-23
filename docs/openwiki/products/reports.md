@@ -9,13 +9,6 @@
 Legacy internal names are still accepted by the engine but should not be advertised to new clients.
 Prices are USD launch prices — see `docs/market-research-2026-09.md` for ranges and the pricing risk.
 
-| Client-facing name | Engine tier | Price | Pages | Contents |
-|---|---:|---:|---:|---|
-| **The Hook** | `sample` | Free | ~1 | Compact cover, four pillars, element balance, Day Master, lucky colors/directions/numbers, upgrade CTA. |
-| **The Essential Report** | `essential` | $19 | 6–7 | Cover, four pillars, element balance, quick reference, short Day Master portrait, career & wealth overview, major-luck table, abbreviated lucky attributes, short closing note. |
-| **The Deep Destiny Report** | `deep` | $55 | 25–30 | Everything in Essential + full Day Master portrait, relationships, health & vitality, business & launch timing, year-by-year windows, full practical guidance, full closing note. |
-| **Cosmic Companion** | `companion` | $9/mo or $79/yr | 3–4 | Focused timing read for the current month/quarter; manual-billing subscription (off the primary pricing grid). |
-
 Legacy aliases: `spark` → `essential`, `reading` → `deep`, `fullmap` → `deep`.
 
 ## Compatibility (궁합) products
@@ -23,6 +16,12 @@ Legacy aliases: `spark` → `essential`, `reading` → `deep`, `fullmap` → `de
 `generate_compat_report` accepts `favorable_element_a` / `favorable_element_b` — pass the
 reader-argued 용신 from the hand-crafted natal reading so the natal and compat products agree
 (`src/saju_engine/yongsin.py`).
+
+> **Launch offer (2026-10-22 → 2026-11-30): 20% off every paid report.** The *list* prices in the
+> table below are unchanged; the offer price is derived from them and charged through separate store
+> products — $19 → **$15.20**, $55 → **$44**, $24 → **$19.20**, $45 → **$36**. The offer is a
+> webapp concern only (the store and the landing page); **a report never prints a price**, and the
+> engine's tier metadata is untouched. See `docs/webapp/02-data-model.md` §"The launch promotion".
 
 | Client-facing name | Engine call | Price | Pages | Contents |
 |---|---:|---:|---:|---|

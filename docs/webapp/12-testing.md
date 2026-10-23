@@ -108,6 +108,7 @@ mock half the app, the module boundary is wrong.
 | `core.test.ts` | Validation primitives, tiers, roles, rate-limit windows, idempotency, R2 keys, auth mirroring, deletion, consent, chart hash |
 | `keys.test.ts` | `autoDelivers()` / `requiresReview`, including that an **unknown** tier fails safe toward review |
 | `tiers.test.ts` | Price resolution and the tier map |
+| `promo.test.ts` | The launch offer: 20% off every paid tier with no rounding drift, the prices matching the promotional Dodo products, the window opening and closing, and the free snapshot never being discounted |
 | `birth.test.ts` | City resolution and the birth-time fallback |
 | `webhook-signature.test.ts` | Standard Webhooks verification — 12 cases, including tampered body, wrong secret, replay outside the window, and missing headers |
 | `email-reply-to.test.ts` | The `Reply-To` invariant — that a client's reply has somewhere real to land |

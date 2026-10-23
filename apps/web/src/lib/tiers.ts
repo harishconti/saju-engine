@@ -17,6 +17,12 @@ export interface Tier {
   kind: TierKind;
   /** The tier string the engine expects. */
   engineTier: string;
+  /**
+   * The LIST price — what the customer pays when no promotion is running.
+   *
+   * A promotion is not a different number in this map: the offer price is DERIVED from this one
+   * (see `promo.ts`) and charged through a separate Dodo product, so the two can never drift.
+   */
   priceCents: number;
   currency: "USD";
   pages: string;
@@ -25,6 +31,14 @@ export interface Tier {
   includes: string[];
   /** Env var holding the Dodo Payments product id. Absent for the free sample. */
   productEnv?: string;
+  /**
+   * Env var holding the Dodo Payments product id for the PROMOTIONAL price of this tier.
+   *
+   * A Dodo product carries exactly one price, so a discount needs its own product. While the
+   * promotion runs, checkout uses this product and charges the discounted price; after it, the
+   * standard product and the list price are used again — no code change on the day it ends.
+   */
+  promoProductEnv?: string;
   /** Paid tiers are reviewed before delivery (decision D5). */
   requiresReview: boolean;
   /** Marketing emphasis. */
@@ -66,6 +80,7 @@ export const TIERS: Tier[] = [
       "Lucky attributes reference card",
     ],
     productEnv: "DODO_PRODUCT_ESSENTIAL",
+    promoProductEnv: "DODO_PRODUCT_ESSENTIAL_PROMO",
     requiresReview: true,
   },
   {
@@ -87,6 +102,7 @@ export const TIERS: Tier[] = [
       "Full practical guidance",
     ],
     productEnv: "DODO_PRODUCT_DEEP",
+    promoProductEnv: "DODO_PRODUCT_DEEP_PROMO",
     requiresReview: true,
     highlight: true,
   },
@@ -106,6 +122,7 @@ export const TIERS: Tier[] = [
       "Condensed practical guidance",
     ],
     productEnv: "DODO_PRODUCT_COMPAT_BASIC",
+    promoProductEnv: "DODO_PRODUCT_COMPAT_BASIC_PROMO",
     requiresReview: true,
   },
   {
@@ -125,6 +142,7 @@ export const TIERS: Tier[] = [
       "Year-by-year couple timing overlay",
     ],
     productEnv: "DODO_PRODUCT_COMPAT_DEEP",
+    promoProductEnv: "DODO_PRODUCT_COMPAT_DEEP_PROMO",
     requiresReview: true,
     highlight: true,
   },
