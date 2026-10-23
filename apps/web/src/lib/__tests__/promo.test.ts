@@ -1,5 +1,5 @@
 /**
- * The launch promotion (20% off every paid report, ends 2026-11-30).
+ * The launch promotion (20% off every paid report, ends 2026-12-31).
  *
  * The rule these tests protect is the one the whole feature rests on: **the number the site
  * advertises is the number the store charges.** A Dodo product carries exactly one price, so
@@ -42,12 +42,12 @@ describe("promo arithmetic", () => {
 describe("the offer window", () => {
   it("is open before the end date and closed after it", () => {
     expect(promoActive(new Date("2026-10-22T12:00:00Z"))).toBe(true);
-    expect(promoActive(new Date("2026-11-30T23:59:59Z"))).toBe(true);
-    expect(promoActive(new Date("2026-12-01T00:00:00Z"))).toBe(false);
+    expect(promoActive(new Date("2026-12-31T23:59:59Z"))).toBe(true);
+    expect(promoActive(new Date("2027-01-01T00:00:00Z"))).toBe(false);
   });
 
   it("states the end date in copy", () => {
-    expect(promoEndsLabel()).toBe("30 November 2026");
+    expect(promoEndsLabel()).toBe("31 December 2026");
     expect(promoBadgeLabel()).toBe("20% off");
   });
 });

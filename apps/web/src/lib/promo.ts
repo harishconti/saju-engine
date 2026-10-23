@@ -21,8 +21,13 @@
 export const PROMO = {
   id: "launch-20",
   percentOff: 20,
-  /** Inclusive, UTC date. After this the offer is simply gone — no code change, no stale claim. */
-  endsOn: "2026-11-30",
+  /**
+   * Inclusive, UTC date. After this the offer is simply gone — no code change, no stale claim.
+   *
+   * A year-end offer: it runs to the last day of 2026, so the discount is what a customer sees
+   * when they decide, and it needs no last-minute extension.
+   */
+  endsOn: "2026-12-31",
 } as const;
 
 /** "20% off" — the badge wording. Derived so it can never disagree with the discount. */
@@ -49,7 +54,7 @@ export function promoPriceCents(listCents: number): number {
   return Math.round((listCents * (100 - PROMO.percentOff)) / 100);
 }
 
-/** "30 November 2026" — the end date, for copy that states it. */
+/** "31 December 2026" — the end date, for copy that states it. */
 export function promoEndsLabel(): string {
   return new Date(`${PROMO.endsOn}T00:00:00Z`).toLocaleDateString("en-GB", {
     day: "numeric",

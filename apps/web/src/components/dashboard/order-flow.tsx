@@ -100,7 +100,7 @@ export function OrderFlow({
       const serverPrice = body.order?.priceCents;
       if (serverPrice != null && tier && serverPrice !== priceOf(tier)) {
         setPriceNote(
-          `The launch offer ended while you were choosing, so this order is now ${formatUSD(serverPrice)} — the standard price. Nothing has been charged yet.`,
+          `The year-end offer ended while you were choosing, so this order is now ${formatUSD(serverPrice)} — the standard price. Nothing has been charged yet.`,
         );
         setBusy(false);
         return;

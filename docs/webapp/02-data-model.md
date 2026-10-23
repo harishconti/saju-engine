@@ -415,13 +415,13 @@ module (`src/lib/tiers.ts`) so a price change is a one-file change.
 Engine legacy aliases accepted but never surfaced: `spark` → `essential`, `reading` → `deep`,
 `fullmap` → `deep`. `companion` exists in the engine and is **not offered**.
 
-### The launch promotion (20% off, ends 2026-11-30)
+### The year-end promotion (20% off, ends 2026-12-31)
 
 The tier map holds the **list price**. A promotion is not a second number in the table — it is
 *derived* from the list price in `src/lib/promo.ts` (`PROMO.percentOff = 20`) and charged through a
 **separate Dodo product**, because a Dodo product carries exactly one price.
 
-| | List price | Charged during the offer | Charged after 2026-11-30 |
+| | List price | Charged during the offer | Charged after 2026-12-31 |
 |---|---|---|---|
 | Essential Report | $19 | **$15.20** | $19 |
 | Deep Destiny Report | $55 | **$44** | $55 |

@@ -108,7 +108,7 @@ mock half the app, the module boundary is wrong.
 | `core.test.ts` | Validation primitives, tiers, roles, rate-limit windows, idempotency, R2 keys, auth mirroring, deletion, consent, chart hash |
 | `keys.test.ts` | `autoDelivers()` / `requiresReview`, including that an **unknown** tier fails safe toward review |
 | `tiers.test.ts` | Price resolution and the tier map |
-| `promo.test.ts` | The launch offer: 20% off every paid tier with no rounding drift, the prices matching the promotional Dodo products, the window opening and closing, and the free snapshot never being discounted |
+| `promo.test.ts` | The year-end offer: 20% off every paid tier with no rounding drift, the prices matching the promotional Dodo products, the window opening and closing, and the free snapshot never being discounted |
 | `birth-date.test.ts` | The one-year minimum age (exactly one year ago is allowed, today is not, 29 February clamps to the 28th) and the typed-date parser (`DD/MM/YYYY`, `M/D/YYYY`, `YYYY-MM-DD`, and a date that does not exist) |
 | `birth-time.test.ts` | The typed-time parser (`14:30`, `2:30 pm`, `2pm`, `1430`, and a time that does not exist) |
 | `sla.test.ts` | The 10-hour rule: an overdue reading is released, a reading a person is already on is left alone, an unpaid order is not delivered, a second run delivers nothing, and a held email is released when the audio never arrives |

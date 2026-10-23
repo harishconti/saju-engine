@@ -265,8 +265,8 @@ export default async function LandingPage() {
                   {promoBadgeLabel()} {promoScopeLabel()}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  A launch offer through {promoEndsLabel()} — {offerPairs.join(" · ")}. The same readings,
-                  the same human review; only the price changes.
+                  A year-end offer through {promoEndsLabel()} — {offerPairs.join(" · ")}. The same readings,
+                  the same 10-hour delivery promise; only the price changes.
                 </p>
               </div>
               <Link href="#pricing" className={buttonClasses("primary", "md", "shrink-0")}>

@@ -664,21 +664,21 @@ to keep in sync, because the checkout `return_url` comes from `NEXT_PUBLIC_APP_U
 | Deep Compatibility | `compat-deep` | `COMPAT` `deep` | $45 | `DODO_PRODUCT_COMPAT_DEEP` |
 | The Hook | — | `sample` | free | **not** a Dodo product |
 
-**Promotional products (the 20% launch offer, ends 2026-11-30).** A Dodo product carries exactly one
+**Promotional products (the 20% year-end offer, ends 2026-12-31).** A Dodo product carries exactly one
 price, so the offer needs its own four products. They carry the **same list price** with a 20%
 Dodo-level discount applied, so the customer is charged $15.20 / $44 / $19.20 / $36 and the checkout
 line shows the discount.
 
 | Product | Tier | Charged | Env |
 |---|---|---|---|
-| The Essential Report — 20% launch offer | `essential` | $15.20 | `DODO_PRODUCT_ESSENTIAL_PROMO` |
-| The Deep Destiny Report — 20% launch offer | `deep` | $44 | `DODO_PRODUCT_DEEP_PROMO` |
-| Compatibility Snapshot — 20% launch offer | `compat-basic` | $19.20 | `DODO_PRODUCT_COMPAT_BASIC_PROMO` |
-| Deep Compatibility — 20% launch offer | `compat-deep` | $36 | `DODO_PRODUCT_COMPAT_DEEP_PROMO` |
+| The Essential Report — 20% year-end offer | `essential` | $15.20 | `DODO_PRODUCT_ESSENTIAL_PROMO` |
+| The Deep Destiny Report — 20% year-end offer | `deep` | $44 | `DODO_PRODUCT_DEEP_PROMO` |
+| Compatibility Snapshot — 20% year-end offer | `compat-basic` | $19.20 | `DODO_PRODUCT_COMPAT_BASIC_PROMO` |
+| Deep Compatibility — 20% year-end offer | `compat-deep` | $36 | `DODO_PRODUCT_COMPAT_DEEP_PROMO` |
 
 > ⚠️ **The four STANDARD products still carry a 20% Dodo-level discount** (set in the dashboard,
 > 2026-10-22). During the offer that is invisible — the same amount is charged either way. **On
-> 2026-12-01 it must be removed**, or the site will say $19 while the store keeps charging $15.20.
+> 2027-01-01 it must be removed**, or the site will say $19 while the store keeps charging $15.20.
 > Dodo's API refuses product updates (`PUT`/`POST /products/{id}` → **403**), so this is a dashboard
 > action: Products → open each `saju-19` / `saju-24` / `saju-45` / `saju-55` → set *Discount
 > Applicable (%)* to 0. See [09 — Operations](09-operations.md).

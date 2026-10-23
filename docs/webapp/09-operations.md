@@ -185,14 +185,14 @@ audit action `sla_deliver`) so it can be counted, and the client is told the rea
 prose of an auto-delivered reading is ever wrong, the fix is the same as for a reviewed one —
 regenerate, and the old version is superseded.
 
-### The 20% launch offer ends (2026-12-01)
+### The 20% year-end offer ends (2027-01-01)
 
 **What happens on its own.** `PROMO.endsOn` in `apps/web/src/lib/promo.ts` is an inclusive UTC date.
 After it, the landing page stops advertising the discount, the FAQ entry disappears, the tier cards
 show the list price again, and checkout charges the standard product at the list price. **No deploy
 is needed on the day it ends.**
 
-**What does need a human — on 2026-12-01.** The four *standard* Dodo products (`saju-19`,
+**What does need a human — on 2027-01-01.** The four *standard* Dodo products (`saju-19`,
 `saju-24`, `saju-45`, `saju-55`) still carry a 20% Dodo-level discount from 2026-10-22. While the
 offer runs that is invisible — the same amount is charged either way — but afterwards the site
 would say $19 while the store kept charging $15.20. Dodo's API refuses product updates
@@ -202,7 +202,7 @@ would say $19 while the store kept charging $15.20. Dodo's API refuses product u
 2. Set **Discount Applicable (%)** to `0` on each. (The API reports the same value as
    `discount_bps` — 20% is `2000`.)
 3. Confirm with `GET /products` that each now shows `"discount": 0`.
-4. The four `… — 20% launch offer` products can be left in place (unused) or deleted.
+4. The four `… — 20% year-end offer` products can be left in place (unused) or deleted.
 
 **To extend the offer instead:** change `PROMO.endsOn` (and `PROMO.percentOff`, if the discount
 changes) in `apps/web/src/lib/promo.ts`, and set the same discount on the four promotional

@@ -1950,7 +1950,7 @@
   - **Cosmic Companion** (`companion`) — $9/month or $79/year, 3–4 pages; manual-billing subscription (off the primary pricing grid).
   - **두 분 궁합 / Compatibility** (`compat`) — Snapshot ($24) and Deep ($45) tiers, 11 sub-systems, composite 0–100 score. Deep is the hero product.
 - **2026-10-22:** Added the **Harish × Prethivika** compat pair — `candidates_horoscope/marriage_compatibility/harish_prethivika/` (basic + deep `.md`/`.pdf`/`.html`, **48/100 Mixed**, the lowest pair on file), wired into `tools/regen/{compat.py,pdfs.sh,html.sh}` and indexed in `candidates_horoscope/README.md`. Prethivika (from a bio-data image): **19 March 1993, 03:17 IST, Pondicherry** (lon 79.8083), date read as DD/MM; Day Master **己 (Yin Earth)**, pillars 癸酉/乙卯/己亥/乙丑, 용신 Fire / 희신 Earth. Structure: both day branches are 亥 → **일지 자형 亥亥 (−12/30)** and the day-pillar Nayin tones clash (釵釧金 vs 平地木, −5/5), offset by **+9/12 용신 cross-supply** and **+5/5 대운 synchrony**. Hour pillar is **low-confidence**: corrected solar time 02:57 is 3 minutes from the 寅 boundary (alternate 丙寅) — same caveat as Harish's own chart. She has no base report (compat pair only). Also fixed a renderer defect this pair surfaced: a doubled branch (亥亥) rendered "Hae Hae" and tripped `qa_client_ready`'s repeated-word check; `_translate_cjk_run` now hyphenates a two-token identical run → "Hae–Hae (亥亥)" (`tests/test_pdf.py`), leaving all 7 previously delivered pairs byte-identical. And the compat generator now carries the natal products' **hour-boundary disclosure** (`compat_report._hour_boundary_note`, basic + deep): a knife-edge hour pillar is no longer presented as certain in a compatibility reading. Both partners are flagged in this pair; the 7 earlier pairs gain Harish's note on the next full regen.
-- **2026-10-22 (later): the 20% launch offer, live on the landing page.** The owner started a 20%
+- **2026-10-22 (later): the 20% offer, live on the landing page.** The owner started a 20%
   discount on every paid report and wanted the site to say so. Implemented as a **real** discount, not
   a claim: `apps/web/src/lib/promo.ts` (pure: the offer's dates and arithmetic) + `apps/web/src/lib/pricing.ts`
   (server-only: what is charged, and through which store product). The tier map keeps the **list**
@@ -1962,9 +1962,10 @@
   promotional product is configured — a missing env var loses the promotion, never a promise we
   cannot keep. The order's recorded `priceCents` also selects the product, so the quote and the charge
   cannot differ, and a customer who started checkout before the window closed keeps the price they
-  were shown. **Ends 2026-11-30**, after which the site reverts to the list price by itself — but the
+  were shown. **Ends 2026-12-31** (a year-end offer), after which the site reverts to the list price by
+  itself — but the
   20% discount still set on the four *standard* Dodo products (the owner's dashboard change of
-  2026-10-22) must be removed on 2026-12-01, because Dodo's API refuses product updates
+  2026-10-22) must be removed on 2027-01-01, because Dodo's API refuses product updates
   (`PUT`/`POST /products/{id}` → 403) and only a dashboard action can clear it. Runbook in
   `docs/webapp/09-operations.md`; tier map in `docs/webapp/02-data-model.md`; copy rules in
   `docs/webapp/06-frontend-ux.md`; store config in `docs/webapp/07-services-and-integrations.md`;

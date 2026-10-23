@@ -17,7 +17,7 @@ Legacy aliases: `spark` → `essential`, `reading` → `deep`, `fullmap` → `de
 reader-argued 용신 from the hand-crafted natal reading so the natal and compat products agree
 (`src/saju_engine/yongsin.py`).
 
-> **Launch offer (2026-10-22 → 2026-11-30): 20% off every paid report.** The *list* prices in the
+> **Year-end offer (2026-10-22 → 2026-12-31): 20% off every paid report.** The *list* prices in the
 > table below are unchanged; the offer price is derived from them and charged through separate store
 > products — $19 → **$15.20**, $55 → **$44**, $24 → **$19.20**, $45 → **$36**. The offer is a
 > webapp concern only (the store and the landing page); **a report never prints a price**, and the

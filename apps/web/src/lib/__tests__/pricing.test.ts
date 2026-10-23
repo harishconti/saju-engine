@@ -61,7 +61,7 @@ describe("promoIsLive", () => {
 
   it("is false after the window closes, even with everything configured", () => {
     for (const [k, v] of Object.entries(PROMO)) process.env[k] = v;
-    expect(promoIsLive(new Date("2026-12-01T00:00:00Z"))).toBe(false);
+    expect(promoIsLive(new Date("2027-01-01T00:00:00Z"))).toBe(false);
   });
 });
 
@@ -75,7 +75,7 @@ describe("offerPriceCents", () => {
   it("charges the list price after the offer ends", () => {
     for (const [k, v] of Object.entries(PROMO)) process.env[k] = v;
     const essential = getTierById("essential")!;
-    expect(offerPriceCents(essential, new Date("2026-12-01T00:00:00Z"))).toBe(1900);
+    expect(offerPriceCents(essential, new Date("2027-01-01T00:00:00Z"))).toBe(1900);
   });
 
   it("charges the list price when the store cannot charge the offer", () => {
