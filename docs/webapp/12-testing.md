@@ -109,6 +109,9 @@ mock half the app, the module boundary is wrong.
 | `keys.test.ts` | `autoDelivers()` / `requiresReview`, including that an **unknown** tier fails safe toward review |
 | `tiers.test.ts` | Price resolution and the tier map |
 | `promo.test.ts` | The launch offer: 20% off every paid tier with no rounding drift, the prices matching the promotional Dodo products, the window opening and closing, and the free snapshot never being discounted |
+| `birth-date.test.ts` | The one-year minimum age (exactly one year ago is allowed, today is not, 29 February clamps to the 28th) and the typed-date parser (`DD/MM/YYYY`, `M/D/YYYY`, `YYYY-MM-DD`, and a date that does not exist) |
+| `birth-time.test.ts` | The typed-time parser (`14:30`, `2:30 pm`, `2pm`, `1430`, and a time that does not exist) |
+| `components/__tests__/date-of-birth-field.test.tsx` | The fields themselves: a typed date is parsed and echoed, a date inside the last year is refused with the one-year message, and the native picker is still reachable | the offer **fails closed** when a promotional product is missing (or only partly configured), the offer price while it runs and the list price after, and the store product being chosen from the price recorded on the order |
 | `birth.test.ts` | City resolution and the birth-time fallback |
 | `webhook-signature.test.ts` | Standard Webhooks verification — 12 cases, including tampered body, wrong secret, replay outside the window, and missing headers |
 | `email-reply-to.test.ts` | The `Reply-To` invariant — that a client's reply has somewhere real to land |

@@ -6,6 +6,8 @@ import Link from "next/link";
 import { Alert, Button, Card, CardContent, Field, Input, Select, Steps, buttonClasses } from "@/components/ui";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 import { findCity, searchCities } from "@/lib/cities";
+import { DateOfBirthField } from "@/components/date-of-birth-field";
+import { TimeOfBirthField } from "@/components/time-of-birth-field";
 import { useCityIndex } from "@/lib/use-city-index";
 import { ANONYMOUS_SAMPLE_RETENTION_LABEL } from "@/lib/retention";
 import { ElementalRule, SealMark } from "@/components/viz";
@@ -41,7 +43,10 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
   const [fullName, setFullName] = useState("");
   const [gender, setGender] = useState<"M" | "F">("F");
   const [birthDate, setBirthDate] = useState("");
-  const [birthTime, setBirthTime] = useState("12:00");
+  // Empty, not a pre-filled 12:00. The site's own FAQ promises that an unknown birth time is
+  // "marked as lower-confidence rather than quietly assuming a time" — a pre-filled noon would
+  // break that promise silently. The visitor types the time, or ticks "I don't know".
+  const [birthTime, setBirthTime] = useState("");
   const [timeKnown, setTimeKnown] = useState(true);
   const [city, setCity] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
@@ -56,6 +61,9 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
 
     if (!fullName.trim()) return setError("Please give your name.");
     if (!/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) return setError("Add your date of birth.");
+    if (timeKnown && !/^([01]\d|2[0-3]):[0-5]\d$/.test(birthTime)) {
+      return setError("Add your time of birth, or tick \u201cI don\u2019t know my birth time\u201d.");
+    }
     if (!resolved) return setError("Pick your birthplace from the suggestions.");
     setBusy(true);
     try {
@@ -222,29 +230,13 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
                 </Select>
               </Field>
 
-              <Field label="Date of birth" htmlFor="birthDate">
-                <Input
-                  id="birthDate"
-                  type="date"
-                  min="1900-01-01"
-                  value={birthDate}
-                  onChange={(e) => setBirthDate(e.target.value)}
-                />
-              </Field>
+              <DateOfBirthField value={birthDate} onChange={setBirthDate} />
 
-              <Field
-                label="Time of birth"
-                htmlFor="birthTime"
-                hint="The local clock time where you were born."
-              >
-                <Input
-                  id="birthTime"
-                  type="time"
-                  value={birthTime}
-                  onChange={(e) => setBirthTime(e.target.value)}
-                  disabled={!timeKnown}
-                />
-              </Field>
+              <TimeOfBirthField
+                value={birthTime}
+                onChange={setBirthTime}
+                disabled={!timeKnown}
+              />
 
               <Field
                 label="Place of birth"

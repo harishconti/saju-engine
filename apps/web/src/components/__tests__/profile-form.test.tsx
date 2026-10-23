@@ -39,4 +39,18 @@ describe("ProfileForm and consent", () => {
     expect(consentBox).toBeTruthy();
     expect(consentBox!.checked).toBe(false);
   });
+
+  it("does not pre-fill a birth time — a guessed noon is a guessed hour pillar", () => {
+    // The site's FAQ promises an unknown birth time is "marked as lower-confidence rather than
+    // quietly assuming a time". A pre-filled 12:00 would break that silently.
+    render(<ProfileForm hasConsent />);
+    const time = screen.getByLabelText("Time of birth") as HTMLInputElement;
+    expect(time.value).toBe("");
+  });
+
+  it("does not pre-fill a date of birth", () => {
+    render(<ProfileForm hasConsent />);
+    const date = screen.getByLabelText("Date of birth") as HTMLInputElement;
+    expect(date.value).toBe("");
+  });
 });

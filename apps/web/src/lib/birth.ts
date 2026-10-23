@@ -11,6 +11,7 @@
  */
 
 import { findCity, type City } from "./cities";
+import { birthTooRecentMessage, isOldEnoughForReading } from "./birth-date";
 // Side effect: hydrate the world place index from the shipped data, so a birthplace the browser could
 // resolve is also resolvable here. Without it the two halves would disagree about which places exist.
 import "./city-data.server";
@@ -147,6 +148,8 @@ export function validateBirth(input: {
   birthTime: string;
   timezone?: string | null;
   timeKnown?: boolean;
+  /** "Today", injectable so the age rule is testable without freezing the clock. */
+  now?: Date;
 }): BirthValidation {
   if (!isValidCalendarDate(input.birthDate)) {
     return { ok: false, code: "INVALID_DATE", message: "That date doesn't exist. Check the day and month." };
@@ -160,8 +163,25 @@ export function validateBirth(input: {
       message: `Please use a birth year between 1900 and ${currentYear}.`,
     };
   }
+  // Minimum age. The year pillar, the twelve-stage cycle and the first major-luck chapter are
+  // annual structures — a chart for someone a few weeks old is not a chart with fewer
+  // conclusions, it is a chart with none. The reading starts at one year old.
+  //
+  // This is the rule of record: the forms' `max` attribute is only a convenience, and a direct
+  // API call cannot skip this.
+  if (!isOldEnoughForReading(input.birthDate, input.now ?? new Date())) {
+    return { ok: false, code: "BIRTH_TOO_RECENT", message: birthTooRecentMessage() };
+  }
   if (input.timeKnown !== false && !/^([01]\d|2[0-3]):[0-5]\d$/.test(input.birthTime)) {
-    return { ok: false, code: "INVALID_TIME", message: "Use a 24-hour time like 14:30." };
+    // Two different mistakes, two different messages: a missing time is a choice to make (say
+    // that you don't know it), a malformed one is a typo.
+    return {
+      ok: false,
+      code: "INVALID_TIME",
+      message: input.birthTime.trim()
+        ? "Use a 24-hour time like 14:30, or 2:30 pm."
+        : "Add the time of birth, or say that you don't know it.",
+    };
   }
   if (input.timezone && !isValidTimeZone(input.timezone)) {
     return { ok: false, code: "UNKNOWN_TIMEZONE", message: `Unknown time zone "${input.timezone}".` };

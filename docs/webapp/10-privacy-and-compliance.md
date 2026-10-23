@@ -242,6 +242,21 @@ Paid readings cover relationship and health guidance, so they are sold to adults
   [06](06-frontend-ux.md)), takes no payment and stores no row for an anonymous caller, so it asks
   for no age affirmation today. Revisit if that path ever collects contactable details.
 
+**A chart has a minimum age too — one year.** This is a different rule from the 18+ affirmation
+above (that one is about *who buys*; this one is about *whose chart can be read*).
+
+- **Enforced server-side.** `validateBirth` (`apps/web/src/lib/birth.ts`) refuses a birth date
+  inside the last year with `BIRTH_TOO_RECENT`, so profile creation, profile editing, the free
+  snapshot and the share card all refuse it — a direct API call cannot skip it. The legacy
+  self-service intake app applies the same rule (`tools/client_intake_app.py`).
+- **Why one year.** The year pillar, the twelve-stage (12운성) cycle and the first major-luck
+  chapter are **annual** structures. A chart for a baby is not a chart with fewer conclusions — the
+  vocabulary is empty, and the engine would print a confident day master, a career arc and a
+  relationship outlook for someone a few weeks old. The reading starts at one year old.
+- **The form is a convenience, not the rule.** The date field carries the same cutoff, but the
+  server is the rule of record, and the message the visitor sees comes from the same module
+  (`lib/birth-date.ts`).
+
 A short, honest footer disclaimer is required on the site: entertainment/self-reflection framing,
 not prediction of outcomes, no professional advice. It is not a legal shield — it is the same honesty
 the product claims as its differentiator.

@@ -20,6 +20,7 @@ Logs must not contain PII: only intake ids and exception class names are logged.
 """
 from __future__ import annotations
 
+import calendar
 import json
 import logging
 import math
@@ -28,6 +29,7 @@ import re
 import sys
 import threading
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from pathlib import Path
 
 # Make the local src/ tree importable; user-space site-packages is already on
@@ -189,8 +191,36 @@ def _check_len(value: str, limit: int, field: str) -> None:
         raise _bad_request(f"{field} is too long (max {limit} characters).")
 
 
+#: The minimum age for a reading (see apps/web/src/lib/birth-date.ts — the same rule, the same
+#: reason): the year pillar, the twelve-stage cycle and the first major-luck chapter are annual
+#: structures, so a reading starts at one year old.
+MIN_READING_AGE_YEARS = 1
+
+
+def _max_birth_date() -> str:
+    """The latest acceptable birth date: exactly one year ago (UTC)."""
+    today = datetime.now(timezone.utc).date()
+    year = today.year - MIN_READING_AGE_YEARS
+    month = today.month
+    day = min(today.day, calendar.monthrange(year, month)[1])
+    return f"{year:04d}-{month:02d}-{day:02d}"
+
+
+def _check_minimum_age(dob: str, label: str = "") -> None:
+    try:
+        parsed = datetime.strptime(dob.strip(), "%Y-%m-%d").date()
+    except ValueError:
+        return  # the format is checked further down; this rule is about age, not shape
+    if parsed > datetime.strptime(_max_birth_date(), "%Y-%m-%d").date():
+        raise _bad_request(
+            f"{label}Readings start at {MIN_READING_AGE_YEARS} year old — "
+            "please use a birth date at least a year ago."
+        )
+
+
 def _check_birth(dob: str, birth_time: str, tz: str, offset: str, label: str = "") -> None:
     """Validate date/time parse and timezone/offset resolution (no PII in errors)."""
+    _check_minimum_age(dob, label)
     try:
         fallback = float(offset) if offset else None
     except ValueError:

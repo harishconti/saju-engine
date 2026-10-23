@@ -1972,6 +1972,34 @@
   had **hardcoded prices** ("$19 · 6–7 pages") — the exact drift the docs warn about; they now read
   from the tier map. Tests: `src/lib/__tests__/promo.test.ts`, `src/lib/__tests__/pricing.test.ts`
   (plus a `server-only` stub for Vitest, since Next resolves that marker itself).
+- **2026-10-22 (later still): the birth-data fields, three defects at once.** The owner reported
+  (1) the date field **accepted today's date** — a reading for a baby — and asked for a minimum age
+  of one year; (2) the date **could not be typed into**, only picked from the calendar; (3) the
+  **time** could not be typed into either ("on mobile I guess"). All three are fixed, and one of
+  them was quietly a lie the site was already telling.
+  - **Minimum age: one year.** `apps/web/src/lib/birth-date.ts` (pure) + `validateBirth` in
+    `lib/birth.ts` (the rule of record) refuse a birth date inside the last year with
+    `BIRTH_TOO_RECENT`, so profile create/edit, the free snapshot and the share card all refuse it
+    and a direct API call cannot skip it. The legacy self-service app applies the same rule
+    (`tools/client_intake_app.py`). **Why one year:** the year pillar, the twelve-stage cycle and
+    the first major-luck chapter are annual structures — a chart for a baby is not a chart with
+    fewer conclusions, it is a chart with none.
+  - **Typing.** The native `type="date"` / `type="time"` inputs are wheel pickers on phones and
+    silently reject a date in the visitor's own order ("19/03/1993"). Both are now text fields
+    (`components/date-of-birth-field.tsx`, `components/time-of-birth-field.tsx`) that accept
+    `YYYY-MM-DD` / `DD/MM/YYYY` / `M/D/YYYY` and `14:30` / `2:30 pm` / `2pm` / `1430`, and
+    **echo what they understood** ("19 March 1993", "2:30 PM") so a misread is visible before
+    anything is saved. The native picker stays behind a calendar/clock button.
+  - **The quiet lie found on the way.** The time field was **pre-filled with 12:00**, so a visitor
+    who never said they knew their birth time got a *confident* reading built on a guessed hour
+    pillar — while the landing page's FAQ promises the opposite ("the reading will mark it as
+    lower-confidence rather than quietly assuming a time"). The field now starts empty, and the
+    form asks for the time or for the "I don't know" tick.
+  - Tests: `birth-date.test.ts`, `birth-time.test.ts`, `components/__tests__/date-of-birth-field.test.tsx`,
+    and two cases in `profile-form.test.tsx` (nothing is pre-filled). Webapp suite **210 passed / 4
+    skipped**; the live API now answers `422 BIRTH_TOO_RECENT` for today's date and 200 for a date
+    exactly a year old. Docs: `webapp/06` (the fields), `webapp/10` §Minors (the one-year rule),
+    `webapp/12` (the tests).
 - **Intake paths:** self-service FastAPI app (`tools/client_intake_app.py`; `/` single-chart, `/compat` two-chart, saves JSON intake and returns tiered PDFs), and the Next.js webapp (`apps/web`) wired to the calculator for the free sample tier. (The legacy `apps/landing-page` Next.js app was deleted 2026-10-17.)
 - **PDF backends:** reportlab (default) and HTML/Playwright (`--html`).
 - **2026-10-17:** Added the **Harish × Keerthana** compat pair — `candidates_horoscope/marriage_compatibility/harish_keerthana/` (basic + deep `.md`/`.pdf`, **59/100 Mixed**), wired into `tools/regen/{compat.py,pdfs.sh}` and indexed in `candidates_horoscope/README.md`. Keerthana: **3 October 1996, 09:35 IST, Coimbatore** (lon 76.9558) — the client form's `03/10/1996` was confirmed DD/MM before charting; Day Master **癸 (Yin Water)**, pillars 丙子/丁酉/癸酉/丁巳, 용신 Wood / 희신 Water. She has no base report (compat pair only).

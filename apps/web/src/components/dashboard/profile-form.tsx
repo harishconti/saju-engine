@@ -5,8 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Alert, Button, Card, CardContent, Field, Input, Select } from "@/components/ui";
 import { findCity, searchCities } from "@/lib/cities";
+import { DateOfBirthField } from "@/components/date-of-birth-field";
+import { TimeOfBirthField } from "@/components/time-of-birth-field";
 import { useCityIndex } from "@/lib/use-city-index";
 import { POLICY_VERSION } from "@/lib/consent";
+import { birthTooRecentMessage, isOldEnoughForReading } from "@/lib/birth-date";
 
 export interface ProfileFormValues {
   id?: string;
@@ -25,7 +28,9 @@ const EMPTY: ProfileFormValues = {
   fullName: "",
   gender: "F",
   birthDate: "",
-  birthTime: "12:00",
+  // Empty, not a pre-filled 12:00 — a pre-filled noon would quietly assume an hour pillar for
+  // a visitor who never said they knew their birth time.
+  birthTime: "",
   timeKnown: true,
   city: "",
   countryCode: null,
@@ -90,7 +95,14 @@ export function ProfileForm({
     const local: Record<string, string> = {};
     if (!values.label.trim()) local.label = "Give this profile a label, like “Me” or “Partner”.";
     if (!values.fullName.trim()) local.fullName = "Whose chart is this?";
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(values.birthDate)) local.birthDate = "Use the date picker or YYYY-MM-DD.";
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(values.birthDate)) {
+      local.birthDate = "Use the date picker, or type it as DD/MM/YYYY.";
+    } else if (!isOldEnoughForReading(values.birthDate)) {
+      local.birthDate = birthTooRecentMessage();
+    }
+    if (values.timeKnown && !/^([01]\d|2[0-3]):[0-5]\d$/.test(values.birthTime)) {
+      local.birthTime = "Add the time of birth, or tick \u201cI don\u2019t know the birth time\u201d.";
+    }
     if (!values.city.trim()) local.city = "Pick a birthplace from the list.";
     if (values.city.trim() && !resolvedCity) {
       local.city = "Pick a place from the suggestions so we use the right coordinates.";
@@ -211,32 +223,18 @@ export function ProfileForm({
               </Select>
             </Field>
 
-            <Field label="Date of birth" htmlFor="birthDate" error={fieldErrors.birthDate}>
-              <Input
-                id="birthDate"
-                type="date"
-                min="1900-01-01"
-                value={values.birthDate}
-                onChange={(e) => set("birthDate", e.target.value)}
-                required
-              />
-            </Field>
+            <DateOfBirthField
+              value={values.birthDate}
+              onChange={(v) => set("birthDate", v)}
+              error={fieldErrors.birthDate}
+            />
 
-            <Field
-              label="Time of birth"
-              htmlFor="birthTime"
-              hint="Local clock time at the birthplace."
+            <TimeOfBirthField
+              value={values.birthTime}
+              onChange={(v) => set("birthTime", v)}
               error={fieldErrors.birthTime}
-            >
-              <Input
-                id="birthTime"
-                type="time"
-                value={values.birthTime}
-                onChange={(e) => set("birthTime", e.target.value)}
-                disabled={!values.timeKnown}
-                required={values.timeKnown}
-              />
-            </Field>
+              disabled={!values.timeKnown}
+            />
 
             <Field
               label="Place of birth"
