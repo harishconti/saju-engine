@@ -67,6 +67,12 @@ export function DateOfBirthField({
     const parsed = parseTypedBirthDate(next);
     if (!parsed.ok) {
       setParseError(next.trim() === "" ? null : parsed.error);
+      // Clear the committed value too. Keeping it would let the form submit the *previous* entry
+      // while the box shows something else (an edited-then-mistyped or emptied field).
+      if (lastValue.current !== "") {
+        lastValue.current = "";
+        onChange("");
+      }
       return;
     }
     setParseError(null);
@@ -141,6 +147,9 @@ export function DateOfBirthField({
         value={value}
         onChange={(e) => {
           if (!e.target.value) return;
+          // Fill the text box here: the sync effect can't, because `lastValue` already matches.
+          setText(formatBirthDateForInput(e.target.value));
+          setParseError(null);
           lastValue.current = e.target.value;
           onChange(e.target.value);
         }}

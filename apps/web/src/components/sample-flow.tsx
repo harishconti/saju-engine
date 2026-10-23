@@ -64,7 +64,18 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
     if (timeKnown && !/^([01]\d|2[0-3]):[0-5]\d$/.test(birthTime)) {
       return setError("Add your time of birth, or tick \u201cI don\u2019t know my birth time\u201d.");
     }
-    if (!resolved) return setError("Pick your birthplace from the suggestions.");
+    if (!resolved) {
+      // A bare "London" is refused on purpose (several countries have one), so say that rather than
+      // leave the visitor guessing why a real city name didn't take.
+      const typed = city.trim().toLowerCase();
+      const sameName = cityOptions.filter((c) => c.name.toLowerCase() === typed);
+      if (sameName.length > 1) {
+        return setError(
+          `There is more than one ${sameName[0].name}. Pick yours from the suggestions, e.g. “${sameName[0].name}, ${sameName[0].country}”.`,
+        );
+      }
+      return setError("Pick your birthplace from the suggestions.");
+    }
     setBusy(true);
     try {
       const res = await fetch("/api/sample", {

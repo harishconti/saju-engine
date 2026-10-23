@@ -52,6 +52,28 @@ describe("DateOfBirthField", () => {
     render(<DateOfBirthField value="" onChange={vi.fn()} />);
     expect(screen.getByLabelText("Open the calendar")).toBeTruthy();
   });
+
+  it("fills the text box when the date comes from the calendar picker", () => {
+    const onChange = vi.fn();
+    const { container } = render(<DateOfBirthField value="" onChange={onChange} />);
+    const native = container.querySelector('input[type="date"]') as HTMLInputElement;
+
+    fireEvent.change(native, { target: { value: "1990-07-04" } });
+
+    expect(onChange).toHaveBeenCalledWith("1990-07-04");
+    expect((screen.getByLabelText("Date of birth") as HTMLInputElement).value).not.toBe("");
+  });
+
+  it("clears the committed date when the box is emptied or mistyped, so a stale date is never sent", () => {
+    const onChange = vi.fn();
+    render(<DateOfBirthField value="1993-03-19" onChange={onChange} />);
+    const input = screen.getByLabelText("Date of birth") as HTMLInputElement;
+
+    fireEvent.change(input, { target: { value: "19/03/19" } });
+    fireEvent.blur(input);
+
+    expect(onChange).toHaveBeenCalledWith("");
+  });
 });
 
 describe("TimeOfBirthField", () => {
@@ -80,5 +102,26 @@ describe("TimeOfBirthField", () => {
   it("shows the time it read, so 2:30 is never silently 14:30", () => {
     render(<TimeOfBirthField value="14:30" onChange={vi.fn()} />);
     expect(screen.getByText(/2:30 PM/)).toBeTruthy();
+  });
+  it("fills the text box when the time comes from the clock picker", () => {
+    const onChange = vi.fn();
+    const { container } = render(<TimeOfBirthField value="" onChange={onChange} />);
+    const native = container.querySelector('input[type="time"]') as HTMLInputElement;
+
+    fireEvent.change(native, { target: { value: "09:15" } });
+
+    expect(onChange).toHaveBeenCalledWith("09:15");
+    expect((screen.getByLabelText("Time of birth") as HTMLInputElement).value).not.toBe("");
+  });
+
+  it("clears the committed time when the box is emptied", () => {
+    const onChange = vi.fn();
+    render(<TimeOfBirthField value="14:30" onChange={onChange} />);
+    const input = screen.getByLabelText("Time of birth") as HTMLInputElement;
+
+    fireEvent.change(input, { target: { value: "" } });
+    fireEvent.blur(input);
+
+    expect(onChange).toHaveBeenCalledWith("");
   });
 });
