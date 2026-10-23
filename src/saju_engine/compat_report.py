@@ -312,7 +312,50 @@ def _glance_table(chart: Chart, name: str) -> List[str]:
                      ("Day (일주)", chart.day), ("Hour (시주)", chart.hour)]:
         lines.append(f"| {label} | {p.stem} | {p.branch} | {p.combined} |")
     lines.append("")
+    note = _hour_boundary_note(chart, name)
+    if note:
+        lines.extend(note)
+        lines.append("")
     return lines
+
+
+def _hour_boundary_note(chart: Chart, name: str) -> List[str]:
+    """Disclose a knife-edge hour pillar for one partner.
+
+    The natal products already print this (premium_report._solar_time_note); a
+    compatibility reading was silently treating the hour pillar as certain even
+    when the corrected time sat seconds from a branch boundary — and the hour
+    pillar carries the palace/ten-god cross layer. Margin and alternate pillar
+    come from pillars.py's `_hour_boundary_info`, the engine's single source of
+    truth, so this disclosure cannot drift from the calculation.
+    """
+    sc = getattr(chart, "solar_correction", None) or {}
+    boundary = sc.get("hour_boundary")
+    if not boundary:
+        return []
+    dist = boundary["distance_minutes"]
+    secs = boundary.get("distance_seconds")
+    margin = f"~{secs} seconds" if secs is not None and secs < 90 else f"~{dist} minutes"
+    if boundary.get("is_zi_boundary"):
+        # The 子 (23:00/01:00) edge is a compound decision — it can move which
+        # day's stem drives the hour pillar, and right at 23:00 the day pillar
+        # itself. pillars.py flags it without naming an alternate, so warn
+        # without inventing one.
+        return [
+            f"> **⚠ Hour-boundary note ({name}):** the corrected time is only {margin} from the 子 "
+            "(23:00/01:00) hour edge — the single most consequential boundary in the chart. If the "
+            "recorded clock time carries even a few minutes of error, the hour pillar **and possibly "
+            f"the day pillar** could differ from the primary reading (**{boundary['primary_hour_pillar']}** "
+            "used above) — treat the hours read from those pillars as lower-confidence."
+        ]
+    return [
+        f"> **⚠ Hour-boundary note ({name}):** the corrected time is only {margin} from a "
+        "2-hour branch boundary. If the recorded clock time carries even a few minutes of error, "
+        f"the neighbouring hour pillar (**{boundary['alternate_hour_pillar']}**, vs the primary "
+        f"**{boundary['primary_hour_pillar']}** used above) is a plausible alternative — treat the "
+        "hour pillar, and the palace themes read from it, as lower-confidence."
+    ]
+
 
 
 # The four sub-systems the basic ("Compatibility Snapshot") tier is scoped to
@@ -848,6 +891,11 @@ def _basic_report_lines(
     ]:
         lines.append(f"| {label} | {pa.combined} | {pb.combined} |")
     lines.append("")
+    for _name, _chart in ((name_a, chart_a), (name_b, chart_b)):
+        _note = _hour_boundary_note(_chart, _name)
+        if _note:
+            lines.extend(_note)
+            lines.append("")
 
     lines.extend(_verdict_block(report, tier="basic"))
     lines.extend(_verdict_narrative(report))

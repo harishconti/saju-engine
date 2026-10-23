@@ -736,6 +736,11 @@ def _translate_cjk_run(
     # Join translated tokens with a single space so adjacent Hanja pairs like
     # 丙午 do not collapse into "BingO".
     translated = " ".join(tokens)
+    # The 자형 (self-punishment) pairs are the same branch written twice —
+    # 亥亥 reads as "Hae–Hae (亥亥)", not "Hae Hae", which looks like a stutter
+    # and trips the client-ready gate's repeated-word check.
+    if len(tokens) == 2 and tokens[0] == tokens[1] and tokens[0]:
+        translated = f"{tokens[0]}–{tokens[1]}"
     # A map value that already glosses itself ("manseryeok (Korean perpetual
     # calendar)", "Direct Officer (Authority)") needs no second gloss: appending
     # the term printed "… (Korean perpetual calendar) (만세력)".

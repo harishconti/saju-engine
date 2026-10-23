@@ -110,6 +110,20 @@ The generated PDF and engine markdown are saved alongside the intake JSON in `ca
 
 ## Index
 
+> **New report (2026-10-22): Harish × Prethivika 궁합.** Added `marriage_compatibility/harish_prethivika/`
+> (basic + deep MD, PDF and web reading), **48/100 Mixed** — the lowest pair on file. Prethivika:
+> 19 March 1993, 03:17 IST, Pondicherry (lon 79.8083), from the bio-data image; date read as DD/MM;
+> Day Master 己 (Yin Earth), pillars 癸酉/乙卯/己亥/乙丑. Note the two hard signals: both day branches
+> are 亥 (**일지 자형 亥亥**, -12/30) and the day-pillar Nayin tones clash (釵釧金 vs 平地木, -5/5) — but
+> the pair scores **+9/12 on 용신 cross-supply** and **+5/5 on 대운 synchrony**, and the composite stays
+> in Mixed. Born 03:17, corrected solar time 02:57 — **3 minutes from the 寅 hour boundary**, so the hour
+> pillar 乙丑 is low-confidence (alternate 丙寅), exactly as flagged for Harish's own chart. The compat
+> generator now prints the same **hour-boundary disclosure** the natal reports carry
+> (`compat_report._hour_boundary_note`), so this pair flags *both* partners (Harish's own chart is ~29
+> seconds from a boundary). The 7 earlier pairs gain Harish's note the next time the full set is
+> regenerated — delivered PDFs are not rewritten without the owner's say-so. Wired into
+> `tools/regen/compat.py`, `pdfs.sh` and `html.sh`.
+>
 > **Regeneration + web readings (2026-10-17):** every engine-generated report was rebuilt from scratch
 > with `tools/regen_client_reports.sh`, and each canonical report now also ships a **self-contained HTML
 > reading** (`.html`) beside its `.md` and `.pdf` — 45 readings across the 8 candidates and 7 compat pairs,
@@ -163,6 +177,7 @@ Two-chart readings live under `candidates_horoscope/marriage_compatibility/` in 
 | Harish × Priyanka *(b. 1996)* | [MD](marriage_compatibility/harish_priyanka/harish_priyanka_compatibility.md) · [PDF](marriage_compatibility/harish_priyanka/harish_priyanka_compatibility.pdf) | [MD](marriage_compatibility/harish_priyanka/harish_priyanka_compatibility_deep.md) · [PDF](marriage_compatibility/harish_priyanka/harish_priyanka_compatibility_deep.pdf) | 58/100 | Mixed |
 | Harish × Priyanka *(b. 1998)* | [MD](marriage_compatibility/harish_priyanka_1998/harish_priyanka_1998_compatibility.md) · [PDF](marriage_compatibility/harish_priyanka_1998/harish_priyanka_1998_compatibility.pdf) | [MD](marriage_compatibility/harish_priyanka_1998/harish_priyanka_1998_compatibility_deep.md) · [PDF](marriage_compatibility/harish_priyanka_1998/harish_priyanka_1998_compatibility_deep.pdf) | 52/100 | Mixed |
 | Harish × Keerthana | [MD](marriage_compatibility/harish_keerthana/harish_keerthana_compatibility.md) · [PDF](marriage_compatibility/harish_keerthana/harish_keerthana_compatibility.pdf) | [MD](marriage_compatibility/harish_keerthana/harish_keerthana_compatibility_deep.md) · [PDF](marriage_compatibility/harish_keerthana/harish_keerthana_compatibility_deep.pdf) | 59/100 | Mixed |
+| Harish × Prethivika | [MD](marriage_compatibility/harish_prethivika/harish_prethivika_compatibility.md) · [PDF](marriage_compatibility/harish_prethivika/harish_prethivika_compatibility.pdf) | [MD](marriage_compatibility/harish_prethivika/harish_prethivika_compatibility_deep.md) · [PDF](marriage_compatibility/harish_prethivika/harish_prethivika_compatibility_deep.pdf) | 48/100 | Mixed |
 
 *(The two Priyanka rows are namesakes — different people. The 1996-born pair lives in `harish_priyanka/`; the 1998-born pair in `harish_priyanka_1998/` (12 Jul 1998, 21:43 IST, Pallipattu; Day Master 庚).)*
 

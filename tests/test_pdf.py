@@ -192,6 +192,14 @@ def test_translate_inline_separates_adjacent_hanja_pairs():
     assert "O" in translate_inline("丙午")
 
 
+def test_translate_inline_hyphenates_a_doubled_branch():
+    """Regression (2026-10-22, Harish × Prethivika): the 자형 pair 亥亥 rendered
+    as "Hae Hae", which reads like a stutter and tripped the client-ready
+    gate's repeated-word check. A doubled branch is one relation, not two."""
+    assert translate_inline("亥亥") == "Hae–Hae"
+    assert translate_inline("亥亥", gloss=True) == "Hae–Hae (亥亥)"
+
+
 def test_translate_inline_drops_parenthetical_duplicates():
     # Markdown often supplies CJK followed by its English expansion.
     # The translator should not emit "Direct Officer (Direct Officer)".

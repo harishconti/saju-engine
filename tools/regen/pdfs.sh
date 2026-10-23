@@ -62,6 +62,7 @@ for t in basic deep; do
   compat harish_priyanka Harish Priyanka "4 June 1992, 03:10 IST" "3 June 1996, 10:20 IST" 辛 辛 $t
   compat harish_priyanka_1998 Harish Priyanka "4 June 1992, 03:10 IST" "12 July 1998, 21:43 IST" 辛 庚 $t
   compat harish_keerthana Harish Keerthana "4 June 1992, 03:10 IST" "3 October 1996, 09:35 IST" 辛 癸 $t
+  compat harish_prethivika Harish Prethivika "4 June 1992, 03:10 IST" "19 March 1993, 03:17 IST" 辛 己 $t
 done
 # ── Public demo PDFs ──────────────────────────────────────────────────────────────
 # These are served by the WEBAPP (apps/web/public/demo/), not by the legacy landing page,

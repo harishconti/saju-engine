@@ -71,3 +71,26 @@ def test_compat_d_and_f_labels_print_no_percentages(pa, pb):
     for flag in d.flags + f.flags:
         assert "%" not in flag, flag
     assert not re.search(r"=\s*\d+(\.\d+)?%", f.narrative), f.narrative
+
+
+# ── Hour-boundary disclosure (2026-10-22) ───────────────────────────────────
+def test_compat_report_discloses_a_knife_edge_hour_pillar():
+    """Harish × Prethivika (2026-10-22): Prethivika's corrected solar time sits 3
+    minutes from the 寅 boundary, and Harish's own chart is knife-edge too — the
+    natal products warn about this, but the compat report silently presented the
+    hour pillar as certain. It now carries the same disclosure per partner."""
+    harish = compute_chart(name="Harish", gender="M", year=1992, month=6, day=4,
+                           hour=3, minute=10, longitude=79.4408, utc_offset=5.5,
+                           reference_year=2026, reference_month=10, reference_day=22)
+    prethivika = compute_chart(name="Prethivika", gender="F", year=1993, month=3, day=19,
+                               hour=3, minute=17, longitude=79.8083, utc_offset=5.5,
+                               reference_year=2026, reference_month=10, reference_day=22)
+    md = generate_compat_report(harish, prethivika, "Harish", "Prethivika", tier="basic")
+    assert "⚠ Hour-boundary note (Prethivika)" in md
+    assert "丙寅" in md  # the alternate hour pillar the reader should weigh
+    assert "乙丑" in md  # the primary hour pillar actually used
+    # ...and a chart with no boundary note stays clean.
+    quiet = compute_chart(gender="F", year=1990, month=6, day=15, hour=10, minute=0,
+                          utc_offset=9.0, longitude=127.0)
+    quiet_md = generate_compat_report(quiet, prethivika, "Quiet", "Prethivika", tier="basic")
+    assert "Hour-boundary note (Quiet)" not in quiet_md
