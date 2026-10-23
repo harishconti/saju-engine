@@ -2000,6 +2000,31 @@
     skipped**; the live API now answers `422 BIRTH_TOO_RECENT` for today's date and 200 for a date
     exactly a year old. Docs: `webapp/06` (the fields), `webapp/10` §Minors (the one-year rule),
     `webapp/12` (the tests).
+- **2026-10-23: the review queue got a deadline (10 hours) and an alert.** The queue had no SLA —
+  a reading nobody looked at waited as long as the business took to get to it, which is the wrong
+  failure mode for a product that charges up front. Now: **ten hours after a reading becomes
+  reviewable it is delivered anyway**, and the release is **recorded** as unreviewed
+  (`Report.reviewOutcome = SLA_AUTO`, `reviewedBy = null`, audit action `sla_deliver`) rather than
+  passed off as a review. The reasoning: the review is a *judgement call* (the 용신 override), not a
+  rewrite — the prose is the engine's output either way — so an unreviewed reading is a lesser
+  reading, not a broken one. **The human path and the SLA path are now one function**
+  (`apps/web/src/lib/review.ts::approveAndDeliver`, used by the console's Approve button and by the
+  sweep) so they cannot drift; the only difference is the `outcome`. **The MP3 case:** an
+  auto-delivered deep reading is approved at the deadline but its **email waits for the audio**, so
+  the client gets one message with both; the reading is in their profile either way, and a 2-hour
+  fallback sends the email anyway if the audio stalls. **The trigger is a GitHub Actions workflow**
+  (`.github/workflows/sla-sweep.yml`, every 15 minutes) because Vercel **Hobby** allows only two
+  daily crons — with the admin console running the same sweep in-process as a fallback, so the queue
+  cannot grow without bound. ⚠️ **The GitHub secret still has to be added by the owner** (the local
+  `gh` token lacks the `actions` scope): `printf %s "$CRON_SECRET" | gh secret set CRON_SECRET
+  --repo harishconti/saju-engine` — until then the console fallback is doing the work. **The owner
+  is also emailed** when a reading enters the queue (one message per batch, to `ADMIN_EMAILS` via
+  the existing Resend integration) — WhatsApp was considered and dropped for now, so there is no new
+  external service. Copy was softened to match the new promise (the hero badge now says "Delivered
+  within 10 hours"), with the owner's explicit decision that **the delivery email keeps saying
+  "prepared and reviewed"** even for an auto-delivered reading — a recorded, accepted trade.
+  Docs: `webapp/02` (the new columns), `05` (§"The 10-hour delivery rule"), `06` (the console and
+  the copy), `08` (the GitHub secret), `09` (the owner's loop + a runbook).
 - **Intake paths:** self-service FastAPI app (`tools/client_intake_app.py`; `/` single-chart, `/compat` two-chart, saves JSON intake and returns tiered PDFs), and the Next.js webapp (`apps/web`) wired to the calculator for the free sample tier. (The legacy `apps/landing-page` Next.js app was deleted 2026-10-17.)
 - **PDF backends:** reportlab (default) and HTML/Playwright (`--html`).
 - **2026-10-17:** Added the **Harish × Keerthana** compat pair — `candidates_horoscope/marriage_compatibility/harish_keerthana/` (basic + deep `.md`/`.pdf`, **59/100 Mixed**), wired into `tools/regen/{compat.py,pdfs.sh}` and indexed in `candidates_horoscope/README.md`. Keerthana: **3 October 1996, 09:35 IST, Coimbatore** (lon 76.9558) — the client form's `03/10/1996` was confirmed DD/MM before charting; Day Master **癸 (Yin Water)**, pillars 丙子/丁酉/癸酉/丁巳, 용신 Wood / 희신 Water. She has no base report (compat pair only).

@@ -87,6 +87,28 @@ know. Reported by the owner right after signing up.
   client patch that fails open would show the wrong state silently, which is the same class of bug this
   page keeps producing.
 
+**The review console carries the 10-hour rule.** `/admin` shows the oldest item's age against the
+deadline ("past 10h — will be delivered unreviewed" / "within the 10-hour window"), a 30-day count of
+readings the sweep released without a review, and the alert text that says plainly what happens at
+the deadline. Opening the page also **runs the sweep**, so the queue cannot grow without bound even
+if the scheduled workflow is not running. The landing page's promise is written to match: the hero
+badge reads "Delivered within 10 hours" rather than "Reviewed by a human", and the FAQ explains that
+a reading is checked by a person and released anyway if nobody gets to it in time.
+
+**The birth-data fields are typed, not picked.** A native `<input type="date">` / `type="time"` is a
+wheel picker on iOS and Android, so on a phone the visitor could not type a date or a time at all —
+and where it could be typed, a date in the visitor's own order ("19/03/1993") was silently
+rejected. Both fields are now text inputs (`components/date-of-birth-field.tsx`,
+`components/time-of-birth-field.tsx`) that:
+
+- accept `YYYY-MM-DD` and `DD/MM/YYYY` (and `M/D/YYYY`, `.`/`-` separators; `14:30`, `2:30 pm`,
+  `2pm`, `1430` for the time);
+- **echo the date or time they understood** ("19 March 1993", "2:30 PM") so a misread is visible
+  before anything is saved, rather than stored silently;
+- keep the native picker behind a calendar/clock button, for the people who prefer one; and
+- carry the one-year minimum age (see [10](10-privacy-and-compliance.md) §Minors) — a courtesy
+  check, with the server as the rule of record.
+
 **Every authenticated page shares one shell.** The sidebar/mobile-nav/footer/padding markup lives in
 `components/dashboard/shell-frame.tsx`, used by **three** layouts: `dashboard/`, `admin/` and `reports/`.
 Two of those existed only because the missing one was reported as a cosmetic complaint:

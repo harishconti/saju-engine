@@ -9,6 +9,9 @@ This is a human-review product, so "operations" starts with a person.
 ```
 Morning (~10 min)
   1. `/admin` — how many reports are waiting, and how old is the oldest?
+     (Opening this page also runs the 10-hour sweep, so anything past the deadline
+     is released before you look at it — and the "Auto-delivered (30d)" tile tells
+     you how often that has been happening.)
   2. For each: preview the PDF, check the compliance QA flags,
      optionally set the 용신 override and regenerate, then approve or reject.
   3. /api/health — green?
@@ -24,6 +27,10 @@ Weekly (~15 min)
      not an engineering one.
 ```
 
+**You are also emailed when a reading arrives** (one message per batch, to `ADMIN_EMAILS`). If you
+see nothing in the queue and no email, the order never reached the queue — check the webhook health
+below.
+
 **The oldest-item age on `/admin` is the single most important operational number.** It is the
 direct measure of the promise ("reviewed and delivered within N hours") and of whether the business
 can take on more volume.
@@ -34,6 +41,13 @@ can take on more volume.
 |---|---|---|---|
 | `/api/cron/dispatch` | every minute | `Bearer $CRON_SECRET` | Yes — lease-based claiming; a double-run processes different jobs |
 | `/api/cron/cleanup` | daily 03:00 UTC | `Bearer $CRON_SECRET` | Yes — every step is a bounded delete/update |
+| `/api/cron/sla` | every 15 minutes (GitHub Actions) | `Bearer $CRON_SECRET` | Yes — a released reading leaves the queue |
+
+> ⚠️ The first row is aspirational: this account is on **Hobby**, which rejects a per-minute cron at
+> deploy time, so `/api/cron/dispatch` actually runs **daily at 04:00 UTC** and generation is
+> webhook-driven (see [05](05-report-pipeline.md) §4). The `sla` row is different: it is a **GitHub
+> Actions workflow**, not a Vercel cron, precisely because Hobby cannot run one that often. It needs
+> the repository secret `CRON_SECRET` (the same value as the Vercel one) — see the runbook below.
 
 Both accept `GET` and `POST` (Vercel Cron uses `GET`), and both accept `x-maintenance-secret` as an
 alternative header so they can be triggered manually during an incident.
@@ -144,6 +158,57 @@ That last one should always return zero rows. If it does not, the webhook handle
 records the payment.
 
 ## Runbooks
+
+### The 10-hour sweep is not running (readings pile up)
+
+**Symptom.** `/admin` shows a growing "Awaiting review" count, the oldest item keeps ageing past 10
+hours, and the "Auto-delivered (30d)" tile stays at zero.
+
+**Check, in order.**
+
+1. **Is the workflow running?** GitHub → the repo → **Actions → Review queue SLA sweep**. A
+   scheduled workflow is also delayed by a busy GitHub runner pool, and GitHub disables scheduled
+   workflows after 60 days of repository inactivity.
+2. **Is the secret there?** The workflow needs `CRON_SECRET` in the repository secrets
+   (*Settings → Secrets and variables → Actions*), and it must be the **same value** as the app's
+   `CRON_SECRET` in Vercel. Add it with:
+   `printf %s "$CRON_SECRET" | gh secret set CRON_SECRET --repo harishconti/saju-engine`
+3. **Does the endpoint agree?** `curl -H "Authorization: Bearer $CRON_SECRET" https://www.cosmicsaju.com/api/cron/sla`
+   — a 401 means the secret does not match; a 200 with `autoDelivered: 0` means it is working and
+   there was nothing to release.
+4. **The fallback still applies.** Opening `/admin` runs the same sweep in-process, so the queue
+   cannot grow without bound even if the workflow is dead. The readings are then released a little
+   later than the deadline, and the "Auto-delivered" tile shows it.
+
+**A reading released by the sweep is not a failure.** It is recorded (`reviewOutcome = SLA_AUTO`,
+audit action `sla_deliver`) so it can be counted, and the client is told the reading is ready. If the
+prose of an auto-delivered reading is ever wrong, the fix is the same as for a reviewed one —
+regenerate, and the old version is superseded.
+
+### The 20% launch offer ends (2026-12-01)
+
+**What happens on its own.** `PROMO.endsOn` in `apps/web/src/lib/promo.ts` is an inclusive UTC date.
+After it, the landing page stops advertising the discount, the FAQ entry disappears, the tier cards
+show the list price again, and checkout charges the standard product at the list price. **No deploy
+is needed on the day it ends.**
+
+**What does need a human — on 2026-12-01.** The four *standard* Dodo products (`saju-19`,
+`saju-24`, `saju-45`, `saju-55`) still carry a 20% Dodo-level discount from 2026-10-22. While the
+offer runs that is invisible — the same amount is charged either way — but afterwards the site
+would say $19 while the store kept charging $15.20. Dodo's API refuses product updates
+(`PUT`/`POST /products/{id}` → **403**), so this is a dashboard action:
+
+1. Dodo dashboard → **Products** → open `saju-19`, `saju-24`, `saju-45`, `saju-55`.
+2. Set **Discount Applicable (%)** to `0` on each. (The API reports the same value as
+   `discount_bps` — 20% is `2000`.)
+3. Confirm with `GET /products` that each now shows `"discount": 0`.
+4. The four `… — 20% launch offer` products can be left in place (unused) or deleted.
+
+**To extend the offer instead:** change `PROMO.endsOn` (and `PROMO.percentOff`, if the discount
+changes) in `apps/web/src/lib/promo.ts`, and set the same discount on the four promotional
+products in the dashboard. The offer price is derived from the list price, so the site follows
+automatically — but the *store* does not, so the two must be changed together. A mismatch is a
+wrong charge, not a cosmetic drift.
 
 ### New orders fail with `DATABASE_ERROR` right after a migration
 

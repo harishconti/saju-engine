@@ -140,6 +140,12 @@ DODO_PRODUCT_ESSENTIAL_PROMO=«variant_id»
 DODO_PRODUCT_DEEP_PROMO=«variant_id»
 DODO_PRODUCT_COMPAT_BASIC_PROMO=«variant_id»
 DODO_PRODUCT_COMPAT_DEEP_PROMO=«variant_id»
+# ── Scheduled sweeps ──
+# CRON_SECRET also lives as a *GitHub repository secret* — the same value — because the
+# 10-hour review-queue sweep is a GitHub Actions workflow, not a Vercel cron (Hobby can only
+# run two crons a day). See docs/webapp/09-operations.md §"The 10-hour sweep is not running".
+#   printf %s "$CRON_SECRET" | gh secret set CRON_SECRET --repo harishconti/saju-engine
+
 # ── App ──
 NEXT_PUBLIC_APP_URL=https://www.cosmicsaju.com          # www is canonical; the apex 308s to it
 NEXT_PUBLIC_LEGAL_CONTACT_EMAIL=privacy@cosmicsaju.com  # data-protection requests only

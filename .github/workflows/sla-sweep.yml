@@ -1,0 +1,38 @@
+name: Review queue SLA sweep
+
+# Releases any reading that has been waiting for a person for more than 10 hours.
+#
+# Why GitHub Actions and not a Vercel cron: the account is on the Hobby plan, which allows two
+# cron jobs and runs them once a day — far too coarse for a ten-hour rule. A scheduled workflow
+# every 15 minutes costs nothing and lands the release within 10h + 15 min of the deadline.
+#
+# The endpoint is idempotent (a reading that was released is no longer in the queue), so a delayed
+# or duplicated run is harmless. It also reports jobs the dispatcher has not picked up.
+#
+# The secret is the same CRON_SECRET the app authenticates its other crons with.
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sla-sweep
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Release readings past the 10-hour deadline
+        env:
+          APP_URL: https://www.cosmicsaju.com
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl -fsS --max-time 120 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$APP_URL/api/cron/sla"
+          echo "sweep complete"

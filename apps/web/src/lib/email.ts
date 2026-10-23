@@ -95,6 +95,8 @@ export async function deliverReportEmail(opts: {
   profileLabel: string;
   /** True when an audio summary is being prepared. Delivery never waits for it. */
   audioPending?: boolean;
+  /** True when the audio summary is already there — the reading and the audio arrive together. */
+  audioReady?: boolean;
 }): Promise<SendResult> {
   const link = `${appUrl()}/dashboard/reports/${opts.reportId}`;
   const greeting = opts.clientName?.trim() ? `Hi ${opts.clientName.trim()},` : "Hello,";
@@ -114,6 +116,9 @@ export async function deliverReportEmail(opts: {
           "and we will email you when it is ready. You do not need to wait for it.",
         ]
       : []),
+    ...(opts.audioReady
+      ? ["", "Your audio summary is ready too — it is on the same page, and you can play it there."]
+      : []),
     "",
     "This link is personal — please don't forward it.",
     "",
@@ -132,6 +137,11 @@ export async function deliverReportEmail(opts: {
   ${
     opts.audioPending
       ? `<p style="color:#666">Your included <strong>audio summary</strong> is being prepared — it will appear on the same page shortly, and we will email you when it is ready. You do not need to wait for it.</p>`
+      : ""
+  }
+  ${
+    opts.audioReady
+      ? `<p style="color:#666">Your <strong>audio summary</strong> is ready too — it is on the same page, and you can play it there.</p>`
       : ""
   }
   <p style="color:#666;font-size:13px">This link is personal — please don't forward it.</p>
@@ -185,6 +195,10 @@ export async function deliverReport(reportId: string): Promise<void> {
   // wrong on the client's very first read of it.
   const audioPending =
     (report.order ? tierPromisesAudio(report.order) : false) && report.audioStatus !== "READY";
+  // The other side of the same coin: an auto-delivered deep reading waits for its audio, so the
+  // client gets one message with both rather than two messages an hour apart.
+  const audioReady =
+    (report.order ? tierPromisesAudio(report.order) : false) && report.audioStatus === "READY";
 
   const delivery = await prisma.delivery.create({
     data: {
@@ -206,6 +220,7 @@ export async function deliverReport(reportId: string): Promise<void> {
     reportId,
     profileLabel: report.profileA.label,
     audioPending,
+    audioReady,
   });
 
   await prisma.delivery.update({

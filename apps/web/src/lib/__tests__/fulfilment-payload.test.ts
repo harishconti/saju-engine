@@ -43,6 +43,8 @@ vi.mock("@/lib/engine", async (importOriginal) => ({
   callEngine: mocks.callEngine,
 }));
 vi.mock("@/lib/email", () => ({ deliverReport: vi.fn(), deliverAudioReadyEmail: vi.fn() }));
+// The "a reading is waiting" ping is a separate concern from the payload; it is tested on its own.
+vi.mock("@/lib/owner-alert", () => ({ notifyOwnerNewReview: vi.fn().mockResolvedValue(true) }));
 vi.mock("@/lib/audit", () => ({ writeAudit: vi.fn() }));
 vi.mock("@/lib/queue", () => ({
   LEASE_MS: 60_000,

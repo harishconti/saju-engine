@@ -26,6 +26,8 @@ export type AuditAction =
   | "reject"
   | "regenerate"
   | "deliver"
+  /** The 10-hour queue deadline released a reading without a human reading it. */
+  | "sla_deliver"
   | "override"
   | "role_change"
   | "paid"

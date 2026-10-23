@@ -23,8 +23,9 @@ import {
   type EnginePayload,
 } from "./engine";
 import { isTtsConfigured, synthesise, tierPromisesAudio } from "./tts";
-import { autoDelivers } from "./tiers";
+import { autoDelivers, tierNameFor } from "./tiers";
 import { deliverAudioReadyEmail, deliverReport } from "./email";
+import { notifyOwnerNewReview } from "./owner-alert";
 
 /**
  * Fulfilment: render a PDF for an order, verify it, file it as a Report awaiting review.
@@ -243,6 +244,16 @@ export async function processClaimedJob(job: Job): Promise<JobOutcome> {
       return { ok: true, note: `report v${version} auto-delivered`, reportId, version };
     }
 
+    // This one is now waiting for a person. Say so — a review queue nobody is told about is a
+    // review queue that does not happen. Fire-and-forget: it can never affect the delivery.
+    await notifyOwnerNewReview({
+      reportId,
+      tierName: tierNameFor(order.kind, order.tier),
+      profileLabel: order.profileA.label,
+      waitedMinutes: 0,
+      queueDepth: 1,
+    });
+
     return { ok: true, note: `report v${version}`, reportId, version };
   } catch (err) {
     const code =
@@ -344,6 +355,19 @@ async function processVoiceJob(job: Job): Promise<JobOutcome> {
         data: { state: "SUCCEEDED", finishedAt: new Date(), leaseUntil: null },
       });
     });
+
+    // An auto-delivered reading waits for its audio: the client gets ONE message with the reading
+    // and the MP3 together. If the reading's email was held for this audio, release it now — and
+    // do not send the separate "your audio is ready" note as well.
+    //
+    // The flag was read at the top of this function, before the audio was marked READY: it was
+    // set at approval time, when the reading's email was held.
+    const wasHeld = report.emailHeldForAudio;
+    if (wasHeld) {
+      await prisma.report.update({ where: { id: report.id }, data: { emailHeldForAudio: false } });
+      await deliverReport(report.id);
+      return { ok: true, note: `audio ready (${audio.byteLength} bytes); reading emailed with it` };
+    }
 
     // Tell the client their audio has landed. Best-effort: the PDF is already delivered.
     await deliverAudioReadyEmail({

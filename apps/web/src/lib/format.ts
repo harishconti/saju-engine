@@ -93,7 +93,7 @@ export const AUDIO_STATUS_HELP: Record<string, string> = {
 /** The client-facing explanation for a report that exists but is not delivered yet. */
 export const REPORT_STATUS_HELP: Record<string, string> = {
   DRAFT_READY:
-    "We're checking your reading before sending it. Every paid report is reviewed by a human first — usually within a day.",
+    "We're checking your reading before sending it. A person looks at every paid reading first — and if nobody gets to it within 10 hours it is delivered anyway, rather than sitting in the queue.",
   IN_REVIEW: "A reviewer is with your reading now. Usually within a day.",
   APPROVED: "Approved — sending it to you now.",
   DELIVERED: "Delivered. Download it any time.",

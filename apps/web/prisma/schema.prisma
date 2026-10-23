@@ -226,7 +226,21 @@ model Report {
   reviewedBy  String?
   reviewedAt  DateTime?
   deliveredAt DateTime?
-  createdAt   DateTime  @default(now())
+
+  /// How this reading was released. `HUMAN` is the normal path: a person looked at it.
+  /// `SLA_AUTO` means the 10-hour queue deadline passed and it was delivered without one —
+  /// recorded rather than hidden, so "how many were auto-delivered?" is a query, not a guess.
+  reviewOutcome ReviewOutcome @default(HUMAN)
+  /// When the SLA released it (null for a human approval).
+  slaApprovedAt DateTime?
+  /// When the owner was told a reading is waiting (the queue-alert dedup).
+  ownerAlertedAt DateTime?
+  /// True while the delivery EMAIL is being held back so an auto-delivered reading with an
+  /// audio summary reaches the client as one message. The reading itself is already in their
+  /// profile; only the mail waits.
+  emailHeldForAudio Boolean @default(false)
+
+  createdAt DateTime @default(now())
 
   order      Order?     @relation(fields: [orderId], references: [id], onDelete: SetNull)
   user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -247,6 +261,12 @@ enum AudioStatus {
   PROCESSING // text-to-speech in flight
   READY
   FAILED // retryable from the admin console
+}
+
+/// How a reading was released to the client.
+enum ReviewOutcome {
+  HUMAN // a person reviewed it before delivery
+  SLA_AUTO // the 10-hour queue deadline passed; delivered without a human reading it
 }
 
 enum ReportStatus {

@@ -228,6 +228,12 @@ model Report {
   reviewedBy  String?
   reviewedAt  DateTime?
   deliveredAt DateTime?
+  // How the reading was released. HUMAN = a person looked at it; SLA_AUTO = the 10-hour
+  // queue deadline released it unreviewed (recorded, never passed off as reviewed).
+  reviewOutcome ReviewOutcome @default(HUMAN)
+  slaApprovedAt DateTime?        // when the deadline released it (null for a human approval)
+  ownerAlertedAt DateTime?       // when the owner was told a reading is waiting (alert dedup)
+  emailHeldForAudio Boolean @default(false) // the delivery EMAIL waits for the MP3
   createdAt   DateTime    @default(now())
 
   order     Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
@@ -448,6 +454,8 @@ Rules the code enforces (`src/lib/pricing.ts`, tested in `src/lib/__tests__/pric
 | 8 | `Job.state = RUNNING` implies `leaseUntil IS NOT NULL` | Application rule |
 | 9 | `Delivery` exists only for an `APPROVED`+ report | Application rule; nothing emails a draft |
 | 10 | `gender` is present on every profile used by an order | zod at intake + engine guard |
+| 11 | A `DELIVERED` report says **who released it** | `Report.reviewOutcome` (`HUMAN` / `SLA_AUTO`) + `reviewedBy` / `slaApprovedAt`; the 10-hour sweep records the release instead of passing it off as a review |
+| 12 | A report is delivered to a paid order only once | `approveAndDeliver` (lib/review.ts) is the only release path; the `@@unique([orderId, version])` index plus the `DELIVERED` status check make a second release a no-op |
 ## Indexing notes
 
 The indexes above are chosen for the three queries that will run constantly:

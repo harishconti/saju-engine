@@ -474,6 +474,66 @@ survive an arbitrary wait — which is why it lives in a leased job row rather t
 
 ---
 
+### The 10-hour delivery rule
+
+A reading nobody has looked at used to wait in the queue for as long as the business took to get to
+it — days, sometimes. That is the wrong failure mode for a product that charges up front, so a
+reading has a **deadline**: ten hours after it becomes reviewable it is released anyway.
+
+```
+Report.createdAt ──── 10h ────► /api/cron/sla → approveAndDeliver(outcome: SLA_AUTO)
+                                        │
+                                        ├─► status DELIVERED, reviewOutcome = SLA_AUTO
+                                        ├─► PROFILE delivery (in the same transaction)
+                                        └─► email — HELD if the tier owes an MP3 (§ below)
+```
+
+**What it is and is not.** The review is a *judgement call* — the 용신 override — not a rewrite: the
+prose is the engine's output either way, and the engine's copy rules already forbid predictive or
+master-claim language. So an unreviewed reading is a **lesser** reading, not a broken one. What
+changes is that it is **recorded** as unreviewed:
+
+| Field | Human path | SLA path |
+|---|---|---|
+| `reviewOutcome` | `HUMAN` | `SLA_AUTO` |
+| `reviewedBy` | the admin's id | `null` — nobody looked |
+| `reviewedAt` | when they approved it | when the deadline released it |
+| `slaApprovedAt` | `null` | the release time |
+| audit action | `deliver` | `sla_deliver` |
+
+`/admin` shows a 30-day count of SLA releases. A number that stays near zero means the human path
+is still doing the work; a number that climbs is the business telling you it needs another pair of
+hands.
+
+**Both paths are one function.** `lib/review.ts::approveAndDeliver` is the only place a reading is
+released — the console's Approve button and the sweep both call it, and the only difference between
+them is the `outcome`. The state change and the PROFILE delivery are transactional; the email is
+attempted after the commit, and a mail failure never rolls back a release.
+
+**What the sweep will not touch.** A reading a person is already on (`IN_REVIEW`), a reading whose
+order is not `PAID`, and anything that is not `DRAFT_READY`. It is bounded (10 per tick) and
+idempotent — a released reading is no longer in the queue, so a second run does nothing.
+
+**The MP3 case.** The deep single-chart tier promises an audio summary. An auto-delivered reading of
+that tier is approved at the deadline but its **email waits** for the MP3, so the client gets one
+message with the reading and the audio together rather than two messages an hour apart. The reading
+is already in their profile either way — only the mail waits. If the audio has not arrived **two
+hours** after the release, the reading's email goes out anyway with the existing "your audio is being
+prepared" wording: a TTS stall must not become a silent one.
+
+**The trigger.** A scheduled GitHub Actions workflow (`.github/workflows/sla-sweep.yml`) calls
+`GET /api/cron/sla` every 15 minutes with `CRON_SECRET` — a Vercel cron cannot run that often on
+the Hobby plan (see above). The sweep is **also** run when the owner opens `/admin`, so the queue
+cannot grow without bound even if the workflow is not running.
+
+### The queue-alert
+
+When a reading enters the queue, the owner is told once — by email to `ADMIN_EMAILS`, through the
+Resend integration that already exists. One message per *batch* (the alert fires when the queue goes
+from empty to non-empty, not per reading), no birth details, and a link to the review console. It is
+fire-and-forget: a notification failure is logged and nothing else happens, because a ping is never
+allowed to affect a delivery.
+
 ## 5. The review console — where the product actually happens
 
 **Everything except the free tier passes through here.** The rule is read from the tier map

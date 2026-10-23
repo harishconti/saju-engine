@@ -42,7 +42,7 @@ const FAQ = [
   },
   {
     q: "How long until I get my report?",
-    a: "The free snapshot is instant. Paid reports are reviewed before they're sent, which usually takes under a day — occasionally longer if you ask a question we want to answer properly.",
+    a: "The free snapshot is instant. A paid reading is checked by a person before it's sent, which usually takes under a day. If nobody gets to it within 10 hours it is delivered anyway, so you are never left waiting on a review that has not happened.",
   },
   {
     q: "What if my birth time is unknown?",
@@ -160,7 +160,7 @@ export default async function LandingPage() {
         ...FAQ,
         {
           q: "Is there a discount right now?",
-          a: `Yes — ${promoBadgeLabel()} ${promoScopeLabel()} through ${promoEndsLabel()}: ${offerPairs.join(", ")}. It is the same reading and the same human review; only the price changes. After ${promoEndsLabel()} the standard prices apply.`,
+          a: `Yes — ${promoBadgeLabel()} ${promoScopeLabel()} through ${promoEndsLabel()}: ${offerPairs.join(", ")}. It is the same reading and the same 10-hour delivery promise; only the price changes. After ${promoEndsLabel()} the standard prices apply.`,
         },
       ]
     : FAQ;
@@ -177,7 +177,7 @@ export default async function LandingPage() {
             <div className="flex flex-col justify-center gap-6">
               <div className="flex flex-wrap items-center gap-3">
                 <Badge tone="primary">Korean Four Pillars · 사주</Badge>
-                <Badge tone="muted">Reviewed by a human</Badge>
+                <Badge tone="muted">Delivered within 10 hours</Badge>
                 {promoOn ? (
                   <Badge tone="primary">
                     {promoBadgeLabel()} {promoScopeLabel()} — through {promoEndsLabel()}
@@ -436,7 +436,7 @@ export default async function LandingPage() {
                     ["Relationships", [false, false, true]],
                     ["Health & vitality", [false, false, true]],
                     ["Year-by-year timing", [false, false, true]],
-                    ["Reviewed by a human", [false, true, true]],
+                    ["Checked by a person, or delivered at 10h", [false, true, true]],
                   ].map(([label, marks]) => (
                     <tr key={label as string} className="border-b border-border/60">
                       <th scope="row" className="py-2.5 pr-4 text-left font-normal text-foreground">
