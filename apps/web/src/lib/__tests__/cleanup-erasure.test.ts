@@ -151,6 +151,7 @@ describe("processDueDeletions — erasure with an order (AU-04, D2)", () => {
     expect(txMock.profile.updateMany).toHaveBeenCalledWith({
       where: { userId: "u1", id: { in: ["p1"] } },
       data: expect.objectContaining({
+        label: "Deleted profile",
         fullName: "Deleted profile",
         birthDate: new Date(0),
         birthTime: "00:00",

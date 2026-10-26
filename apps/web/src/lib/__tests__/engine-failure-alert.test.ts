@@ -78,6 +78,7 @@ function order() {
     profileBId: null,
     profileA: PROFILE,
     profileB: null,
+    user: { deletedAt: null },
     favorableOverrideA: null,
     favorableOverrideB: null,
   };

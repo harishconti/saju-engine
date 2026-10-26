@@ -17,6 +17,9 @@ import { track } from "@vercel/analytics/server";
  *  - `refund.succeeded` mutates only when the order is not already REFUNDED;
  *  - `payment.failed` / `payment.cancelled` only record an audit row.
  *
+ * An erased account's payment is still recorded on its retained order (D2: accounting stays
+ * correct), but it never queues generation — the customer asked for their reading to be destroyed.
+ *
  * Contract: docs/webapp/03-api-spec.md, docs/webapp/05-report-pipeline.md §6
  */
 
@@ -47,10 +50,12 @@ export async function processDodoEvent(event: DodoEvent): Promise<string> {
   if (type === "payment.succeeded" && orderId) {
     const order = await prisma.order.findUnique({
       where: { id: orderId },
-      select: { id: true, status: true, tier: true },
+      select: { id: true, status: true, tier: true, user: { select: { deletedAt: true } } },
     });
 
     if (order && order.status !== "PAID" && order.status !== "REFUNDED") {
+      const erased = Boolean(order.user.deletedAt);
+
       // The status guard is read-then-write, so two concurrent deliveries (the provider retrying
       // while the first attempt is still running) could both pass it. Re-check it as part of the
       // write: only the delivery that actually moves the order to PAID creates the job and counts
@@ -62,7 +67,11 @@ export async function processDodoEvent(event: DodoEvent): Promise<string> {
         });
         if (updated.count === 0) return false;
 
-        await tx.job.create({ data: { orderId: order.id, kind: "GENERATE", state: "QUEUED" } });
+        // Order rows are retained for accounting (D2), and the payment must still be recorded — but
+        // no reading may be generated for an erased person, so no GENERATE job is queued.
+        if (!erased) {
+          await tx.job.create({ data: { orderId: order.id, kind: "GENERATE", state: "QUEUED" } });
+        }
         await writeAudit(tx, {
           entity: "order",
           entityId: order.id,
@@ -86,17 +95,20 @@ export async function processDodoEvent(event: DodoEvent): Promise<string> {
       }
 
       // Dispatch without blocking the provider's 2xx. On Vercel Hobby there is no per-minute cron,
-      // so this is the primary generation trigger.
-      try {
-        after(async () => {
-          try {
-            await runDispatchTick(1);
-          } catch {
-            // Job stays QUEUED: the daily cron, the dashboard kick, or an admin regenerate recovers it.
-          }
-        });
-      } catch {
-        // `after` unavailable (e.g. replayed outside a request) — recovery paths above pick it up.
+      // so this is the primary generation trigger. Skipped for an erased account: there is no job
+      // to dispatch, and nothing may be generated for them.
+      if (!erased) {
+        try {
+          after(async () => {
+            try {
+              await runDispatchTick(1);
+            } catch {
+              // Job stays QUEUED: the daily cron, the dashboard kick, or an admin regenerate recovers it.
+            }
+          });
+        } catch {
+          // `after` unavailable (e.g. replayed outside a request) — recovery paths above pick it up.
+        }
       }
     }
   }

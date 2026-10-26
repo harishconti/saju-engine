@@ -80,6 +80,7 @@ function order(kind: "SINGLE" | "COMPAT") {
     profileBId: kind === "COMPAT" ? "prof_2" : null,
     profileA: PROFILE,
     profileB: kind === "COMPAT" ? { ...PROFILE, id: "prof_2", fullName: "Arun" } : null,
+    user: { deletedAt: null },
     favorableOverrideA: null,
     favorableOverrideB: null,
   };

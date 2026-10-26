@@ -194,7 +194,9 @@ export async function retryUnprocessedWebhooks(now = new Date()): Promise<number
 }
 
 /**
- * The birth fields a retained profile must lose on erasure.
+ * The personal fields a retained profile must lose on erasure.
+ *
+ * `label` can carry a name ("Partner — Jisoo"), so it is scrubbed with `fullName`.
  *
  * `birthDate`, `birthTime`, `city` and `country` are NOT NULL in the schema, so they get
  * placeholders rather than null. `gender` is also required, but is deliberately left as-is: it is
@@ -202,6 +204,7 @@ export async function retryUnprocessedWebhooks(now = new Date()): Promise<number
  * rewriting it would invent a fact about a person whose data we are destroying.
  */
 const SCRUBBED_PROFILE = {
+  label: "Deleted profile",
   fullName: "Deleted profile",
   birthDate: new Date(0),
   birthTime: "00:00",
@@ -221,8 +224,9 @@ const SCRUBBED_PROFILE = {
  *
  * What survives is deliberate and documented (owner decision D2, 2026-10-26):
  *  - **Order rows are retained** for accounting. `Order_profileAId_fkey` is ON DELETE RESTRICT, so
- *    the profiles any order references are scrubbed in place and kept: birth data and the derived
- *    chart are destroyed, `deletedAt` is set, and the row no longer describes a person.
+ *    the profiles any order references are scrubbed in place and kept: names, labels, birth data
+ *    and the derived chart are destroyed, `deletedAt` is set, and the row no longer describes a
+ *    person.
  *  - **Profiles no order references are deleted outright.**
  *  - **Consent records are retained** as proof the consent existed; they are withdrawn, not removed.
  *  - **Reports and their R2 artefacts are destroyed.** The PDF, markdown, audio and HTML objects are

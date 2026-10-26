@@ -60,7 +60,12 @@ beforeEach(() => {
 
 describe("processDodoEvent — payment.succeeded", () => {
   it("marks the order paid, queues generation and records the audit", async () => {
-    prismaMock.order.findUnique.mockResolvedValue({ id: "o1", status: "AWAITING_PAYMENT", tier: "deep" });
+    prismaMock.order.findUnique.mockResolvedValue({
+      id: "o1",
+      status: "AWAITING_PAYMENT",
+      tier: "deep",
+      user: { deletedAt: null },
+    });
 
     await expect(processDodoEvent(SUCCEEDED)).resolves.toBe("payment.succeeded");
 
@@ -88,7 +93,12 @@ describe("processDodoEvent — payment.succeeded", () => {
   });
 
   it("does nothing when the order is already paid", async () => {
-    prismaMock.order.findUnique.mockResolvedValue({ id: "o1", status: "PAID", tier: "deep" });
+    prismaMock.order.findUnique.mockResolvedValue({
+      id: "o1",
+      status: "PAID",
+      tier: "deep",
+      user: { deletedAt: null },
+    });
 
     await processDodoEvent(SUCCEEDED);
 
@@ -98,7 +108,12 @@ describe("processDodoEvent — payment.succeeded", () => {
   });
 
   it("does not queue a second job when a concurrent delivery already made the transition", async () => {
-    prismaMock.order.findUnique.mockResolvedValue({ id: "o1", status: "AWAITING_PAYMENT", tier: "deep" });
+    prismaMock.order.findUnique.mockResolvedValue({
+      id: "o1",
+      status: "AWAITING_PAYMENT",
+      tier: "deep",
+      user: { deletedAt: null },
+    });
     txMock.order.updateMany.mockResolvedValue({ count: 0 });
 
     await processDodoEvent(SUCCEEDED);
@@ -106,6 +121,29 @@ describe("processDodoEvent — payment.succeeded", () => {
     expect(txMock.job.create).not.toHaveBeenCalled();
     expect(writeAudit).not.toHaveBeenCalled();
     expect(track).not.toHaveBeenCalled();
+    expect(afterCallbacks).toHaveLength(0);
+  });
+
+  it("records the payment on an erased account but queues no generation and no dispatch", async () => {
+    prismaMock.order.findUnique.mockResolvedValue({
+      id: "o1",
+      status: "AWAITING_PAYMENT",
+      tier: "deep",
+      user: { deletedAt: new Date("2026-10-20T00:00:00.000Z") },
+    });
+
+    await processDodoEvent(SUCCEEDED);
+
+    // Accounting stays correct…
+    expect(txMock.order.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ status: "PAID" }) }),
+    );
+    expect(writeAudit).toHaveBeenCalledWith(
+      txMock,
+      expect.objectContaining({ entity: "order", entityId: "o1", action: "paid" }),
+    );
+    // …but nothing is generated for a person who asked to be erased.
+    expect(txMock.job.create).not.toHaveBeenCalled();
     expect(afterCallbacks).toHaveLength(0);
   });
 });

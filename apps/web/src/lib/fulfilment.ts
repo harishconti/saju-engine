@@ -49,7 +49,11 @@ export interface JobOutcome {
   version?: number;
 }
 
-type OrderWithProfiles = Order & { profileA: Profile; profileB: Profile | null };
+type OrderWithProfiles = Order & {
+  profileA: Profile;
+  profileB: Profile | null;
+  user: { deletedAt: Date | null };
+};
 
 /** Create a queued job for an order. Returns the job id. */
 export async function createJobForOrder(orderId: string, kind: "GENERATE" | "REGENERATE"): Promise<string> {
@@ -117,12 +121,20 @@ export async function processClaimedJob(job: Job): Promise<JobOutcome> {
   try {
     const order = (await prisma.order.findUnique({
       where: { id: job.orderId },
-      include: { profileA: true, profileB: true },
+      include: { profileA: true, profileB: true, user: { select: { deletedAt: true } } },
     })) as OrderWithProfiles | null;
 
     if (!order) {
       await failGenerateJob(job, "ORDER_MISSING");
       return { ok: false, note: "order missing" };
+    }
+
+    // Order rows are retained for accounting (D2), but generation must never run for an erased
+    // person. `failJob` directly, not `failGenerateJob`: this is not an outage, so it must not page
+    // the owner.
+    if (order.user.deletedAt) {
+      await failJob(job.id, "ACCOUNT_ERASED");
+      return { ok: false, note: "account erased" };
     }
 
     if (order.kind === "COMPAT" && !order.profileB) {
@@ -308,11 +320,22 @@ async function processVoiceJob(job: Job): Promise<JobOutcome> {
   try {
     const report = await prisma.report.findUnique({
       where: { id: job.reportId ?? "" },
-      include: { order: { select: { userId: true, kind: true, tier: true } }, user: { select: { email: true, name: true } } },
+      include: {
+        order: { select: { userId: true, kind: true, tier: true } },
+        user: { select: { email: true, name: true, deletedAt: true } },
+      },
     });
     if (!report) {
       await failJob(job.id, "REPORT_MISSING");
       return { ok: false, note: "report missing" };
+    }
+
+    // Order rows are retained for accounting (D2), but no artefact may be produced for an erased
+    // person. `failJob` directly: an erased account's voice job is not an outage, so it must not
+    // page the owner.
+    if (report.user.deletedAt) {
+      await failJob(job.id, "ACCOUNT_ERASED");
+      return { ok: false, note: "account erased" };
     }
 
     await prisma.report.update({ where: { id: report.id }, data: { audioStatus: "PROCESSING" } });
