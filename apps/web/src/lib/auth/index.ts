@@ -330,12 +330,22 @@ export const getCurrentSessionId = cache(async (): Promise<string | null> => {
 /**
  * Every active session for the signed-in user, current first (AU-40, D6).
  *
- * Answers null when the provider could not be reached or refused (for example `SESSION_NOT_FRESH`
- * from the provider's own freshness rule) so the page can say "couldn't load" rather than pretend
- * the account has no other devices. Only the fields the page shows are copied out: the provider's
- * rows also carry a session **token**, which must never reach the browser.
+ * Answers null when the provider could not be reached, refused, or answered with something that is
+ * not a session array, so the page can say "couldn't load" rather than pretend the account has no
+ * other devices. `[]` is reserved for a provider-confirmed empty list. Only the fields the page
+ * shows are copied out: the provider's rows also carry a session **token**, which must never reach
+ * the browser.
  *
- * Logs by code/class only — a provider message can echo the request it refused.
+ * The provider gates this endpoint on the session's *creation* age, not its last use
+ * (`freshSessionMiddleware` in better-auth: `node_modules/better-auth/dist/api/routes/session.mjs`
+ * `:337-341,:347-350`, default `freshAge` 24 h from `context/create-context.mjs:149`). A returning
+ * user who is still active therefore gets a 403 `SESSION_NOT_FRESH` here, which is one reason the
+ * account page must not tie the revoke control to this list: `revoke-other-sessions` uses
+ * `sensitiveSessionMiddleware` (`:304-311,:450-453`) and does not apply the freshness comparison at
+ * all.
+ *
+ * Logs by code/class only — a provider message can echo the request it refused. An uninterpretable
+ * payload is logged the same way, without its contents.
  */
 export async function listAccountSessions(): Promise<AccountSession[] | null> {
   let rows: NeonSessionRow[];
@@ -351,7 +361,12 @@ export async function listAccountSessions(): Promise<AccountSession[] | null> {
       );
       return null;
     }
-    rows = Array.isArray(res?.data) ? res.data : [];
+    // A success payload we cannot interpret is not evidence of an empty account.
+    if (!Array.isArray(res?.data)) {
+      console.error("[auth] listSessions failed:", "unexpected payload");
+      return null;
+    }
+    rows = res.data;
   } catch (err) {
     console.error("[auth] listSessions failed:", err instanceof Error ? err.name : "unknown");
     return null;

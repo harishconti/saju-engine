@@ -70,12 +70,17 @@ describe("account page — sessions (AU-40)", () => {
     expect(screen.getByText(/this device stays signed in/i)).toBeTruthy();
   });
 
-  it("says so plainly when the provider could not list the sessions", async () => {
+  it("says so plainly when the provider could not list the sessions, without removing the action", async () => {
     listAccountSessions.mockResolvedValue(null);
 
     render(await AccountPage());
 
     expect(screen.getByText(/couldn't load your active sessions/i)).toBeTruthy();
-    expect(screen.queryByRole("button", { name: "Sign out of other devices" })).toBeNull();
+    // A returning user whose session is no longer "fresh" is exactly the person most likely to have
+    // other devices, and the revoke endpoint has no freshness rule — so the action must stay.
+    const button = screen.getByRole("button", { name: "Sign out of other devices" }) as HTMLButtonElement;
+    expect(button.disabled).toBe(false);
+    // "We couldn't ask" must not be rendered as "you have no other devices".
+    expect(screen.queryByText(/only signed in on this device/i)).toBeNull();
   });
 });

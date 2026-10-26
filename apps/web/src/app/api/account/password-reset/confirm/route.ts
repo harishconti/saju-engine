@@ -28,6 +28,16 @@ const CONFIRM_LIMIT = 10;
 
 const INVALID_TOKEN_MESSAGE = "This reset link is invalid or has expired. Request a new one.";
 const UNAVAILABLE_MESSAGE = "We couldn't reset your password just now. Please try again.";
+const RATE_LIMITED_MESSAGE = "Too many attempts. Please try again in a little while.";
+
+/**
+ * The provider statuses that are a statement about *this token*.
+ *
+ * A blanket "any 4xx means a bad link" told a rate-limited or forbidden caller to discard a link
+ * that still works. Only these codes reject the token; everything else — 429, 403, 5xx, or a
+ * failure with no status at all — is a reason to try again, not to throw the link away.
+ */
+const TOKEN_REJECTION_STATUSES = new Set([400, 401, 404, 410]);
 
 export const POST = handle(async (req) => {
   const ip = clientIp(req);
@@ -53,11 +63,14 @@ export const POST = handle(async (req) => {
       typeof failure.code === "string" ? failure.code : "provider error",
     );
     // A provider outage must not be reported as a bad token — the visitor would discard a link
-    // that still works. Only the provider's own 4xx is a statement about the token; anything else
-    // (5xx, a transport code with no status, a failure we cannot classify) is "try again".
+    // that still works. Conversely only a token-rejection status is a statement about the link;
+    // the token is single-use, so a wrong verdict here costs the person their reset.
     const status = typeof failure.status === "number" ? failure.status : 0;
-    if (status >= 400 && status < 500) {
+    if (TOKEN_REJECTION_STATUSES.has(status)) {
       throw new ApiError(400, "INVALID_RESET_TOKEN", INVALID_TOKEN_MESSAGE);
+    }
+    if (status === 429) {
+      throw ApiError.rateLimited(RATE_LIMITED_MESSAGE);
     }
     throw ApiError.unavailable(UNAVAILABLE_MESSAGE, "RESET_UNAVAILABLE");
   }

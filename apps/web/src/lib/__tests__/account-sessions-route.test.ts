@@ -23,25 +23,15 @@ const upsert = vi.fn(
   },
 );
 
-const { requireUser, listAccountSessions, revokeOtherSessions } = vi.hoisted(() => ({
+const { requireUser, revokeOtherSessions } = vi.hoisted(() => ({
   requireUser: vi.fn(),
-  listAccountSessions: vi.fn(),
   revokeOtherSessions: vi.fn(),
 }));
 
-vi.mock("@/lib/auth", () => ({ requireUser, listAccountSessions, revokeOtherSessions }));
+vi.mock("@/lib/auth", () => ({ requireUser, revokeOtherSessions }));
 vi.mock("@/lib/prisma", () => ({ prisma: { rateLimit: { upsert } } }));
 
 const { POST } = await import("@/app/api/account/sessions/route");
-
-const CURRENT = {
-  id: "sess-current",
-  userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/130.0 Safari/537.36",
-  createdAt: "2026-10-01T10:00:00.000Z",
-  lastUsedAt: "2026-10-20T11:30:00.000Z",
-  current: true,
-};
-const OTHER = { ...CURRENT, id: "sess-other", userAgent: "curl/8.5.0", current: false };
 
 function post(): Request {
   return new Request("https://app.test/api/account/sessions", { method: "POST" });
@@ -52,24 +42,20 @@ beforeEach(() => {
   store.clear();
   requireUser.mockResolvedValue({ id: "u1", name: "A", email: "a@b.c", role: "CLIENT" });
   revokeOtherSessions.mockResolvedValue(true);
-  // The current session survives by design, so the list the route returns after the call still
-  // contains it. That is exactly what the provider promises.
-  listAccountSessions.mockResolvedValue([CURRENT, OTHER]);
 });
 
 describe("POST /api/account/sessions — revoke other devices", () => {
-  it("calls the shared revoke helper with no arguments and returns the surviving sessions", async () => {
+  it("calls the shared revoke helper with no arguments and answers only ok", async () => {
     const res = await POST(post(), undefined as never);
 
     expect(res.status).toBe(200);
     expect(revokeOtherSessions).toHaveBeenCalledTimes(1);
     expect(revokeOtherSessions).toHaveBeenCalledWith();
 
-    const body = (await res.json()) as { sessions?: typeof CURRENT[] };
-    expect(body.sessions?.map((s) => s.id)).toEqual(["sess-current", "sess-other"]);
-    // The current session is still here: a failed "sign out elsewhere" must never sign the
-    // caller out of the page they are standing on.
-    expect(body.sessions?.find((s) => s.id === "sess-current")?.current).toBe(true);
+    // No session list: nothing reads it, and re-listing would cost a second provider round trip
+    // (and return null for a caller whose session is not fresh).
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body).toEqual({ ok: true });
   });
 
   it("answers 503 with an actionable message when the provider refuses", async () => {

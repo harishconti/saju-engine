@@ -57,7 +57,7 @@ describe("SessionsPanel", () => {
   });
 
   it("signs out other devices through the route and confirms the current one stayed", async () => {
-    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ sessions: [CURRENT] }) });
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ ok: true }) });
     render(<SessionsPanel sessions={[CURRENT, OTHER]} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Sign out of other devices" }));
@@ -100,5 +100,48 @@ describe("SessionsPanel", () => {
     const button = screen.getByRole("button", { name: "Sign out of other devices" }) as HTMLButtonElement;
     expect(button.disabled).toBe(true);
     expect(screen.getByText(/only signed in on this device/i)).toBeTruthy();
+  });
+
+  describe("when the provider could not list the sessions", () => {
+    it("keeps the revoke control and shows an error distinct from 'no other devices'", () => {
+      render(<SessionsPanel sessions={null} />);
+
+      expect(screen.getByText(/couldn't load your active sessions/i)).toBeTruthy();
+      // Null is "we don't know", not "there are none" — the empty-list sentence would be a claim.
+      expect(screen.queryByText(/only signed in on this device/i)).toBeNull();
+
+      const button = screen.getByRole("button", { name: "Sign out of other devices" }) as HTMLButtonElement;
+      expect(button.disabled).toBe(false);
+      // Signing out and back in revokes nothing on the other devices, so it is not offered as a fix.
+      expect(screen.queryByText(/sign out and back in/i)).toBeNull();
+    });
+
+    it("still calls the revoke route and confirms success without the list", async () => {
+      fetchMock.mockResolvedValue({ ok: true, json: async () => ({ ok: true }) });
+      render(<SessionsPanel sessions={null} />);
+
+      fireEvent.click(screen.getByRole("button", { name: "Sign out of other devices" }));
+
+      await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+      const [url, init] = fetchMock.mock.calls[0]! as [string, RequestInit];
+      expect(url).toBe("/api/account/sessions");
+      expect(init.method).toBe("POST");
+      expect(await screen.findByText(/still signed in on this device/i)).toBeTruthy();
+      expect(refresh).toHaveBeenCalled();
+    });
+
+    it("still reports a provider failure honestly", async () => {
+      fetchMock.mockResolvedValue({
+        ok: false,
+        status: 503,
+        json: async () => ({ error: "We couldn't sign out your other devices. Please try again." }),
+      });
+      render(<SessionsPanel sessions={null} />);
+
+      fireEvent.click(screen.getByRole("button", { name: "Sign out of other devices" }));
+
+      expect(await screen.findByText(/couldn't sign out your other devices/i)).toBeTruthy();
+      expect(refresh).not.toHaveBeenCalled();
+    });
   });
 });

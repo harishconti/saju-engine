@@ -143,6 +143,16 @@ describe("listAccountSessions", () => {
     expect(sessions?.map((s) => s.id)).toEqual(["sess-other"]);
   });
 
+  it("answers null when the provider succeeds without an array", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    // A payload we cannot interpret is not "no other devices" — saying so would assert something
+    // the provider never told us. Keep the null/[] split: null = unknown, [] = none.
+    listSessions.mockResolvedValue({ data: { rows: [] }, error: null });
+
+    await expect(listAccountSessions()).resolves.toBeNull();
+    expect(error).toHaveBeenCalled();
+  });
+
   it("answers null and logs only the failure class when the provider refuses", async () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
     listSessions.mockResolvedValue({

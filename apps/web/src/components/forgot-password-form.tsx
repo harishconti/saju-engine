@@ -32,9 +32,10 @@ export function ForgotPasswordForm() {
         body: JSON.stringify({ email: email.trim() }),
       });
       // The limit is about this visitor's request rate, not about any account, so saying so is not
-      // an enumeration leak — and claiming the mail was sent would be a lie.
+      // an enumeration leak — and claiming the mail was sent would be a lie. The route's window is
+      // one hour (`WINDOW.hour`), so the copy promises no shorter a wait.
       if (res.status === 429) {
-        setError("Too many reset requests. Please wait a few minutes and try again.");
+        setError("Too many reset requests. Please try again in an hour.");
         return;
       }
       if (!res.ok) {

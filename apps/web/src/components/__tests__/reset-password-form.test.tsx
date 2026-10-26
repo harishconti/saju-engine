@@ -4,21 +4,15 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 /**
  * AU-41 (D6): the reset page.
  *
- * The token arrives in the query string. It is a credential: it is read once into a ref, never
- * rendered, never logged, never kept after the submit, and the address bar is scrubbed on mount so
- * it is not copied into a screenshot or a chat message. The server is the authority on whether the
- * token is valid — the page only reports its answer, with one message for invalid and expired.
+ * The token arrives in the query string. It is read from `window.location.search` on mount — never
+ * from the page's `searchParams`, which Next serialises into the server-rendered payload — then read
+ * once into a ref, never rendered, never logged, and never kept after the submit. The address bar is
+ * scrubbed on mount so it is not copied into a screenshot or a chat message. The server is the
+ * authority on whether the token is valid — the page only reports its answer, with one message for
+ * invalid and expired.
  */
 
-const { params } = vi.hoisted(() => ({
-  params: { value: new URLSearchParams() },
-}));
 let replaceState: ReturnType<typeof vi.spyOn>;
-
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({ refresh: vi.fn(), push: vi.fn(), replace: vi.fn() }),
-  useSearchParams: () => params.value,
-}));
 
 import { ResetPasswordForm } from "../reset-password-form";
 
@@ -27,9 +21,15 @@ const INVALID = "This reset link is invalid or has expired. Request a new one.";
 
 const fetchMock = vi.fn();
 
+function setUrl(search: string) {
+  // A test may call this after the spy exists; drop it so the address bar really changes.
+  replaceState?.mockRestore();
+  window.history.replaceState(null, "", `/reset-password${search}`);
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
-  params.value = new URLSearchParams(`token=${TOKEN}`);
+  setUrl(`?token=${TOKEN}`);
   vi.stubGlobal("fetch", fetchMock);
   replaceState = vi.spyOn(window.history, "replaceState").mockImplementation(() => {});
 });
@@ -82,7 +82,7 @@ describe("ResetPasswordForm", () => {
   });
 
   it("handles an expired link that arrives with ?error= instead of a token", () => {
-    params.value = new URLSearchParams("error=INVALID_TOKEN");
+    setUrl("?error=INVALID_TOKEN");
     render(<ResetPasswordForm />);
 
     expect(screen.getByText(INVALID)).toBeTruthy();
@@ -107,6 +107,19 @@ describe("ResetPasswordForm", () => {
     submit();
 
     expect(await screen.findByText(/at least 8 characters/i)).toBeTruthy();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("refuses an over-long password before spending the one-time token", async () => {
+    render(<ResetPasswordForm />);
+
+    // The server schema caps the password at 128; checking it here gives the length message instead
+    // of a generic failure from the route's validation.
+    const tooLong = "a".repeat(129);
+    fill(tooLong, tooLong);
+    submit();
+
+    expect(await screen.findByText(/at most 128 characters/i)).toBeTruthy();
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

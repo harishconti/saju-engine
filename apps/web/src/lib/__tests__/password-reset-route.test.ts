@@ -197,6 +197,37 @@ describe("POST /api/account/password-reset/confirm — the reset step", () => {
     expect(((await res.json()) as { code: string }).code).toBe("RESET_UNAVAILABLE");
   });
 
+  it("does not tell the visitor to discard a working link when the provider is rate limiting", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    resetPassword.mockResolvedValue({
+      data: null,
+      error: { status: 429, code: "TOO_MANY_REQUESTS", message: "slow down" },
+    });
+
+    const res = await confirmReset(confirmBody(), undefined as never);
+
+    expect(res.status).toBe(429);
+    const body = (await res.json()) as { error: string; code: string };
+    expect(body.code).toBe("RATE_LIMITED");
+    expect(body.error).toMatch(/too many attempts/i);
+    expect(body.error).not.toMatch(/invalid or has expired/i);
+  });
+
+  it("does not report a provider 403 as a bad token", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    resetPassword.mockResolvedValue({
+      data: null,
+      error: { status: 403, code: "FORBIDDEN", message: "request refused" },
+    });
+
+    const res = await confirmReset(confirmBody(), undefined as never);
+
+    expect(res.status).toBe(503);
+    const body = (await res.json()) as { error: string; code: string };
+    expect(body.code).toBe("RESET_UNAVAILABLE");
+    expect(body.error).not.toMatch(/invalid or has expired/i);
+  });
+
   it("treats an unclassified provider failure as retryable, not as a bad token", async () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
     resetPassword.mockResolvedValue({ data: null, error: { code: "NETWORK_ERROR" } });

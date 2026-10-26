@@ -32,8 +32,9 @@ export default async function AccountPage() {
         _count: { select: { profiles: true, reports: true, orders: true } },
       },
     }),
-    // AU-40 (D6). Null means the provider could not be asked, not "no other devices" — the card
-    // says so rather than showing an empty list that would read as a promise.
+    // AU-40 (D6). Null means the provider could not be asked, not "no other devices" — the panel
+    // says so rather than showing an empty list that would read as a promise, and it keeps the
+    // revoke control: the provider's list endpoint is freshness-gated while revocation is not.
     listAccountSessions(),
   ]);
 
@@ -88,14 +89,9 @@ export default async function AccountPage() {
       <Card>
         <CardContent className="py-5">
           <h2 className="pb-1 font-display text-xl">Where you&apos;re signed in</h2>
-          {sessions ? (
-            <SessionsPanel sessions={sessions} />
-          ) : (
-            <Alert tone="warning" title="We couldn't load your active sessions">
-              Refresh the page, or sign out and back in, then try again. The list is unavailable
-              until the sign-in provider answers.
-            </Alert>
-          )}
+          {/* The panel renders the "couldn't load" state itself, so the revoke action survives a
+              provider refusal of the list (e.g. SESSION_NOT_FRESH on a long-lived session). */}
+          <SessionsPanel sessions={sessions} />
         </CardContent>
       </Card>
 

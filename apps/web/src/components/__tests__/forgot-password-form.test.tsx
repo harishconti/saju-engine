@@ -81,6 +81,9 @@ describe("ForgotPasswordForm", () => {
     submit("member@example.com");
 
     expect(await screen.findByText(/too many reset requests/i)).toBeTruthy();
+    // The limit is a one-hour window on the route; the copy must not promise a shorter wait.
+    expect(screen.getByText(/in an hour/i)).toBeTruthy();
+    expect(screen.queryByText(/a few minutes/i)).toBeNull();
     expect(screen.queryByText(NEUTRAL_CONFIRMATION)).toBeNull();
   });
 

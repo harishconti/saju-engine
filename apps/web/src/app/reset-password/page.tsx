@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { Card, CardContent } from "@/components/ui";
 import { ResetPasswordForm } from "@/components/reset-password-form";
 
@@ -10,8 +9,9 @@ import { ResetPasswordForm } from "@/components/reset-password-form";
  *
  * The page must never be cached: the URL carries a one-time credential on arrival, and a cached HTML
  * response (or a shared CDN copy) would be the wrong thing to serve to the next visitor. The form
- * scrubs the token from the address bar as soon as it mounts; `referrer: "no-referrer"` keeps the
- * URL out of any outbound Referer header.
+ * reads the token from `window.location.search` after mount — never from this page's `searchParams`,
+ * which Next would serialise into the delivered flight payload — then scrubs the address bar;
+ * `referrer: "no-referrer"` keeps the URL out of any outbound Referer header.
  */
 
 export const dynamic = "force-dynamic";
@@ -27,10 +27,7 @@ export default function ResetPasswordPage() {
         </div>
         <Card>
           <CardContent className="py-6">
-            {/* `useSearchParams` needs a Suspense boundary so a static shell never embeds it. */}
-            <Suspense fallback={<p className="text-sm text-muted-foreground">Loading…</p>}>
-              <ResetPasswordForm />
-            </Suspense>
+            <ResetPasswordForm />
           </CardContent>
         </Card>
       </div>

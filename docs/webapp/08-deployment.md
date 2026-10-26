@@ -214,6 +214,15 @@ arrives.
 — that is the neutrality contract, not a claim that mail was sent — so a missing console setting is
 invisible from the UI. Check the deployment checklist below before advertising the feature.
 
+**Redact `/reset-password?token=…` in access logs.** The provider's redirect lands on our page with
+the one-time token in the query string, so it is in the request line before any JavaScript runs. The
+page reads it on the client and scrubs the address bar immediately, but that cannot reach the log
+entry already written. Redact the query string for this path at whatever terminates the request — the
+same rule the self-service intake already applies to `/report/<token>` (uvicorn logs it as
+`/report/[redacted]`, and any reverse proxy in front must do the same). Vercel's request logs and any
+additional proxy therefore need a rewrite/redaction rule for `/reset-password`; without one, a working
+reset token is stored in log retention for as long as those logs are kept.
+
 ### The engine project (`saju-report-engine`, root = repository root)
 
 ```bash

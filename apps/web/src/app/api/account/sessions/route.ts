@@ -1,5 +1,5 @@
 import { ApiError, handle, json } from "@/lib/api";
-import { listAccountSessions, requireUser, revokeOtherSessions } from "@/lib/auth";
+import { requireUser, revokeOtherSessions } from "@/lib/auth";
 import { rateLimit, WINDOW } from "@/lib/ratelimit";
 
 /**
@@ -36,5 +36,5 @@ export const POST = handle(async () => {
     );
   }
 
-  return json({ ok: true, sessions: await listAccountSessions() });
+  return json({ ok: true });
 });
