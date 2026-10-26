@@ -6,6 +6,7 @@ import { purgeOldRateLimits } from "./ratelimit";
 import { purgeOldJobs, reclaimStaleJobs } from "./queue";
 import { ANONYMOUS_SAMPLE_RETENTION_DAYS, PROFILE_INACTIVITY_RETENTION_MONTHS } from "./retention";
 import { processDodoEvent, type DodoEvent } from "./dodo-webhook";
+import { notifyOwnerIdentityDeletionFailed } from "./owner-alert";
 
 /**
  * The daily maintenance sweep.
@@ -79,7 +80,19 @@ export async function runCleanup(now = new Date()): Promise<CleanupReport> {
   report.deletionsProcessed = await processDueDeletions(now);
 
   // 7. Retire profiles idle past the published inactivity window.
-  report.profilesRetired = await retireInactiveProfiles(now);
+  //
+  // Isolated like every other step: the sweep selects candidates and then deletes them, so an order
+  // can be created against a candidate in between. That race raises P2003 on Profile A (RESTRICT),
+  // and it must cost one night's sweep — retried by tomorrow's run — not the whole cron, whose later
+  // steps share this function's error path with the HTTP handler that triggered it.
+  try {
+    report.profilesRetired = await retireInactiveProfiles(now);
+  } catch (err) {
+    console.error(
+      "inactive-profile sweep failed; next run retries",
+      err instanceof Error ? err.name : "unknown",
+    );
+  }
 
   return report;
 }
@@ -218,6 +231,9 @@ export async function retryUnprocessedWebhooks(now = new Date()): Promise<number
 export async function processDueDeletions(now: Date): Promise<number> {
   const due = await prisma.deletionRequest.findMany({
     where: { status: "pending", scheduledFor: { lte: now } },
+    // Oldest first (AU-25): with a fixed take of 10 and no ordering, the same stuck rows came back
+    // every run on whatever order the planner chose, and requests behind them never got a slot.
+    orderBy: { scheduledFor: "asc" },
     take: 10,
     select: { id: true, userId: true },
   });
@@ -225,8 +241,8 @@ export async function processDueDeletions(now: Date): Promise<number> {
   let processed = 0;
   for (const request of due) {
     try {
-      // A request is counted only when it reached `completed`. A request whose local erasure
-      // committed but whose identity delete failed stays pending and is retried by the next run.
+      // Counted once the request reaches a terminal state — `completed` or the identity-error end
+      // state — because either way the next run must not see it again.
       if (await processDeletionRequest(request, now)) processed++;
     } catch (err) {
       // Leave it pending. Throwing here would block every later request and the cron's later steps.
@@ -251,6 +267,16 @@ export async function processDueDeletions(now: Date): Promise<number> {
  */
 const NEON_AUTH_RELATIONS = ['neon_auth."session"', 'neon_auth."account"', 'neon_auth."user"'] as const;
 
+/**
+ * How many times the identity delete is attempted before the request is marked terminal (AU-25).
+ *
+ * Three nightly runs is plenty for a blip (a dropped connection, a momentary permission error) and
+ * short enough that a permanent fault becomes a person's problem within days rather than never.
+ * Without a cap the request returns to the front of the queue for ever, and the ten-slot batch
+ * slowly fills with requests that can never finish.
+ */
+const NEON_IDENTITY_MAX_ATTEMPTS = 3;
+
 type IdentityOutcome = "deleted" | "missing-relation" | "failed";
 
 /**
@@ -269,8 +295,8 @@ type IdentityOutcome = "deleted" | "missing-relation" | "failed";
  * delete (sessions gone, user alive) would leave an account nobody can reach but that still blocks
  * re-registration. All three statements share one transaction so it is all or nothing.
  *
- * Returns an outcome instead of throwing: the caller keeps the request pending on anything but
- * "deleted", and must never let this step fail an erasure whose local half already committed.
+ * Returns an outcome instead of throwing: the caller decides how long to retry, and must never let
+ * this step fail an erasure whose local half already committed.
  */
 async function deleteNeonIdentity(neonUserId: string): Promise<IdentityOutcome> {
   try {
@@ -308,7 +334,8 @@ async function deleteNeonIdentity(neonUserId: string): Promise<IdentityOutcome> 
 /**
  * Erase one user's data. Split out only so `processDueDeletions` can isolate failures.
  *
- * Returns true only when the request reached `completed`.
+ * Returns true once the request reaches a terminal state — `completed`, or
+ * `completed_with_identity_error` after the identity delete exhausted its retries (AU-25).
  */
 async function processDeletionRequest(
   request: { id: string; userId: string },
@@ -405,43 +432,96 @@ async function processDeletionRequest(
   }
 
   // AU-25: the local half is committed and idempotent; this half severs sign-in. A failure or a
-  // missing relation leaves the request pending, so the next run retries both halves, and never
-  // undoes what already committed.
+  // missing relation never undoes what already committed.
   const identity = await deleteNeonIdentity(neonUserId);
-  if (identity !== "deleted") {
-    try {
-      await prisma.auditLog.create({
-        data: {
-          entity: "deletion",
-          entityId: requestId,
-          action: "update",
-          actorId: null,
-          after: { neonIdentity: identity, localErasureCommitted: true },
-        },
-      });
-    } catch (err) {
-      // The failure is already logged by `deleteNeonIdentity`; losing the audit row must not be a
-      // second reason to fail an erasure whose local half is done.
-      console.error("deletion identity audit failed", err instanceof Error ? err.name : "unknown");
-    }
-    return false;
+
+  if (identity === "deleted") {
+    await prisma.deletionRequest.update({
+      where: { id: requestId },
+      data: { status: "completed", completedAt: now },
+    });
+    await prisma.auditLog.create({
+      data: {
+        entity: "deletion",
+        entityId: requestId,
+        action: "update",
+        actorId: null,
+        after: { completedAt: now.toISOString(), neonIdentity: "deleted" },
+      },
+    });
+    return true;
   }
 
+  // Prior failures are counted from the audit trail rather than held in memory, so the cap survives
+  // a deploy or a crash. Counting only this request's rows keeps one account's history from
+  // exhausting another's retries.
+  const priorFailures =
+    identity === "failed"
+      ? await prisma.auditLog.count({
+          where: {
+            entity: "deletion",
+            entityId: requestId,
+            action: "update",
+            after: { path: ["neonIdentity"], equals: "failed" },
+          },
+        })
+      : 0;
+  const attempts = priorFailures + 1;
+
+  // `missing-relation` is terminal: the identity schema no longer matches this code, and retrying
+  // cannot make a dropped table reappear. A transient failure is worth retrying, but only
+  // `NEON_IDENTITY_MAX_ATTEMPTS` times — a permanent fault (bad `DATABASE_URL`, a removed DELETE
+  // grant) would otherwise hold one of the ten queue slots on every run for ever.
+  const terminal = identity === "missing-relation" || attempts >= NEON_IDENTITY_MAX_ATTEMPTS;
+
+  try {
+    await prisma.auditLog.create({
+      data: {
+        entity: "deletion",
+        entityId: requestId,
+        action: "update",
+        actorId: null,
+        after: { neonIdentity: identity, localErasureCommitted: true, attempt: attempts },
+      },
+    });
+  } catch (err) {
+    // The failure is already logged by `deleteNeonIdentity`; losing the audit row must not be a
+    // second reason to fail an erasure whose local half is done.
+    console.error("deletion identity audit failed", err instanceof Error ? err.name : "unknown");
+  }
+
+  if (!terminal) return false;
+
+  // Terminal: stop occupying the queue, record why, and tell a human — the data is gone but the
+  // account may still be able to sign in, which is the one state a retry cannot resolve.
   await prisma.deletionRequest.update({
     where: { id: requestId },
-    data: { status: "completed", completedAt: now },
+    data: { status: "completed_with_identity_error", completedAt: now },
   });
-  await prisma.auditLog.create({
-    data: {
-      entity: "deletion",
-      entityId: requestId,
-      action: "update",
-      actorId: null,
-      after: { completedAt: now.toISOString(), neonIdentity: "deleted" },
-    },
+  await notifyOwnerIdentityDeletionFailed({
+    requestId,
+    userId: neonUserId,
+    outcome: identity,
+    attempts,
   });
-
   return true;
+}
+
+/**
+ * Exact calendar months, with the day clamped to the target month's last day.
+ *
+ * `setUTCMonth(getUTCMonth() - 24)` rolls an impossible date forward — 29 February 2028 minus two
+ * years becomes 1 March 2026 — which would put a profile idle since 28 February one day *inside*
+ * the window. The cutoff is a privacy promise, so it is computed exactly instead.
+ */
+function calendarMonthsBefore(date: Date, months: number): Date {
+  const targetMonthIndex = date.getUTCMonth() - months;
+  const targetYear = date.getUTCFullYear() + Math.floor(targetMonthIndex / 12);
+  const targetMonth = ((targetMonthIndex % 12) + 12) % 12;
+  const lastDay = new Date(Date.UTC(targetYear, targetMonth + 1, 0)).getUTCDate();
+  const result = new Date(date);
+  result.setUTCFullYear(targetYear, targetMonth, Math.min(date.getUTCDate(), lastDay));
+  return result;
 }
 
 /**
@@ -459,12 +539,22 @@ async function processDeletionRequest(
  * product decision, not a retention fix. The enforceable half is the sweep at 24, so that is what
  * exists — deliberately, not by omission.
  *
+ * "Inactive" is not `Profile.updatedAt`. That was the Critical defect in the first version of this
+ * sweep: nothing advances the timestamp for an active customer. `mirrorUser` returns early when an
+ * account is unchanged, and no order or report route writes the profile, so a chart delivered
+ * yesterday can still sit on a two-year-old row. Real activity is anything that *references* the
+ * profile — an order or a report — so a profile is a candidate only when the row and every
+ * reference to it predate the cutoff. One recent reference spares it.
+ *
  * Disposition is the one D2 established for erasure, for the same reason:
- *  - `Order_profileAId_fkey` and `Report_profileAId_fkey` are ON DELETE RESTRICT. Deleting a profile
- *    anything still points at would raise P2003 and roll the whole batch back, so a referenced
- *    profile is **scrubbed** (`SCRUBBED_PROFILE`, the one definition), soft-deleted and kept.
- *  - A profile nothing references is deleted outright — the row describes nobody once scrubbed, so
+ *  - `Order_profileAId_fkey` is ON DELETE RESTRICT. Deleting a profile an order points at would
+ *    raise P2003 and roll the whole batch back, so an order-referenced profile is **scrubbed**
+ *    (`SCRUBBED_PROFILE`, the one definition), soft-deleted and kept for accounting.
+ *  - A profile no order references is deleted outright — the row describes nobody once scrubbed, so
  *    there is nothing left to keep it for.
+ *  - The profile's **reports** are deleted with it. The promise covers them, `Report` retains the
+ *    `enginePayload`, the R2 keys and the `script`, and no other sweep purges them. Their objects go
+ *    through the deletion queue only after the transaction commits.
  *
  * Bounded like every other step so one run cannot hold a long transaction over the whole table;
  * `deletedAt` and the bumped `updatedAt` keep already-retired rows out of the next batch.
@@ -472,8 +562,7 @@ async function processDeletionRequest(
  * Exported for the retention tests; `runCleanup` is the only production caller.
  */
 export async function retireInactiveProfiles(now: Date): Promise<number> {
-  const cutoff = new Date(now);
-  cutoff.setUTCMonth(cutoff.getUTCMonth() - PROFILE_INACTIVITY_RETENTION_MONTHS);
+  const cutoff = calendarMonthsBefore(now, PROFILE_INACTIVITY_RETENTION_MONTHS);
 
   const candidates = await prisma.profile.findMany({
     where: { deletedAt: null, updatedAt: { lt: cutoff } },
@@ -483,29 +572,80 @@ export async function retireInactiveProfiles(now: Date): Promise<number> {
   if (candidates.length === 0) return 0;
 
   const ids = candidates.map((p) => p.id);
+  const candidateIds = new Set(ids);
 
-  // A profile is "referenced" by any order or report pointing at it, as A or B: either column being
-  // RESTRICT is enough to make a delete fail, and a B-reference is still a delivery that names them.
+  // Every order and report that references a candidate, with the date that makes it activity.
   const [orders, reports] = await Promise.all([
     prisma.order.findMany({
       where: { OR: [{ profileAId: { in: ids } }, { profileBId: { in: ids } }] },
-      select: { profileAId: true, profileBId: true },
+      select: { profileAId: true, profileBId: true, createdAt: true },
     }),
     prisma.report.findMany({
       where: { OR: [{ profileAId: { in: ids } }, { profileBId: { in: ids } }] },
-      select: { profileAId: true, profileBId: true },
+      select: {
+        id: true,
+        profileAId: true,
+        profileBId: true,
+        createdAt: true,
+        pdfKey: true,
+        mdKey: true,
+        audioKey: true,
+        htmlKey: true,
+      },
     }),
   ]);
-  const referenced = new Set<string>();
-  for (const row of [...orders, ...reports]) {
-    referenced.add(row.profileAId);
-    if (row.profileBId) referenced.add(row.profileBId);
+
+  const active = new Set<string>();
+  const noteReference = (profileId: string | null, createdAt: Date) => {
+    if (!profileId || !candidateIds.has(profileId)) return;
+    if (createdAt.getTime() >= cutoff.getTime()) active.add(profileId);
+  };
+  for (const order of orders) {
+    noteReference(order.profileAId, order.createdAt);
+    noteReference(order.profileBId, order.createdAt);
+  }
+  for (const report of reports) {
+    noteReference(report.profileAId, report.createdAt);
+    noteReference(report.profileBId, report.createdAt);
   }
 
-  const retained = ids.filter((id) => referenced.has(id));
-  const unreferenced = ids.filter((id) => !referenced.has(id));
+  // Only the profiles with no recent reference at all are retired. A report is deleted along with
+  // its profile whether the profile itself is scrubbed or removed.
+  const retiring = ids.filter((id) => !active.has(id));
+  if (retiring.length === 0) return 0;
+  const retiringIds = new Set(retiring);
+
+  const retiringReports = reports.filter(
+    (report) =>
+      retiringIds.has(report.profileAId) ||
+      (report.profileBId !== null && retiringIds.has(report.profileBId)),
+  );
+  const reportIds = [...new Set(retiringReports.map((report) => report.id))];
+  const keys = [
+    ...new Set(
+      retiringReports
+        .flatMap((report) => [report.pdfKey, report.mdKey, report.audioKey, report.htmlKey])
+        .filter((key): key is string => Boolean(key)),
+    ),
+  ];
+
+  // Order A is RESTRICT, so an order-referenced profile is kept (scrubbed); one no order points at
+  // is deleted. Report references are no reason to keep the row: those rows are deleted here too.
+  const orderReferenced = new Set<string>();
+  for (const order of orders) {
+    if (retiringIds.has(order.profileAId)) orderReferenced.add(order.profileAId);
+    if (order.profileBId && retiringIds.has(order.profileBId)) orderReferenced.add(order.profileBId);
+  }
+  const retained = retiring.filter((id) => orderReferenced.has(id));
+  const unreferenced = retiring.filter((id) => !orderReferenced.has(id));
 
   const [scrubbed, deleted] = await prisma.$transaction(async (tx) => {
+    if (reportIds.length > 0) {
+      // Delivery and Job cascade from Report; deleting them explicitly keeps the intent visible and
+      // does not rely on the constraint staying that way.
+      await tx.delivery.deleteMany({ where: { reportId: { in: reportIds } } });
+      await tx.report.deleteMany({ where: { id: { in: reportIds } } });
+    }
     const updated = retained.length
       ? await tx.profile.updateMany({
           where: { id: { in: retained }, deletedAt: null },
@@ -517,6 +657,19 @@ export async function retireInactiveProfiles(now: Date): Promise<number> {
       : { count: 0 };
     return [updated.count, removed.count] as const;
   });
+
+  // Only after the rows are gone, and through the queue: the profile is already retired, so a
+  // storage failure must not roll that back — the next sweep retries the object instead.
+  for (const key of keys) {
+    try {
+      await deleteObjectOrQueue(key);
+    } catch (err) {
+      console.error(
+        "retired report object cleanup failed",
+        err instanceof Error ? err.name : "unknown",
+      );
+    }
+  }
 
   return scrubbed + deleted;
 }

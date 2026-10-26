@@ -8,7 +8,7 @@ passwords, no sessions, and no OAuth tokens.
 | Neon Auth owns | We own |
 |---|---|
 | User records, credentials, sessions, OAuth flows, magic links, email verification | A `User` row **mirrored** from the Neon Auth identity, plus roles, consent, and everything else |
-| The `neon_auth` database schema | Our own tables. **Never touch `neon_auth`.** |
+| The `neon_auth` database schema | Our own tables. **Never touch `neon_auth`**, with one documented exception: account erasure deletes the identity over the app's `DATABASE_URL` after the local erasure commits, because the SDK offers the cron no other route (AU-25 — see [02](02-data-model.md) §Retention and the note on `schema.prisma`). |
 
 ## The three files
 

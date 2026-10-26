@@ -174,3 +174,56 @@ export async function notifyOwnerEngineFailure(input: EngineFailureAlertInput): 
     return false;
   }
 }
+
+/**
+ * "An erasure finished locally but the account can still sign in." (AU-25)
+ *
+ * The local half of an erasure commits before the Neon Auth identity is deleted, deliberately: the
+ * data must go even if the identity half is unavailable, and the local half is idempotent so the
+ * retry is safe. That leaves one state a log line cannot resolve — a scrubbed account whose login
+ * still works — and it needs a person, not another cron run.
+ *
+ * Only fired on a **terminal** identity outcome: a transient failure the next sweep will retry is
+ * not news, and alerting on it every night would train the owner to ignore the alert that matters.
+ */
+export async function notifyOwnerIdentityDeletionFailed(input: {
+  requestId: string;
+  userId: string;
+  outcome: "failed" | "missing-relation";
+  attempts: number;
+}): Promise<boolean> {
+  try {
+    const recipients = ownerRecipients();
+    if (recipients.length === 0) return false;
+
+    const cause =
+      input.outcome === "missing-relation"
+        ? "an expected neon_auth relation is absent (the identity schema changed)"
+        : `the raw delete failed ${input.attempts} time(s)`;
+
+    const text = [
+      "Account erasure completed locally but the Neon Auth identity could not be deleted.",
+      "",
+      `Deletion request: ${input.requestId}`,
+      `Neon user id: ${input.userId}`,
+      `Cause: ${cause}`,
+      "",
+      "The account's data is already scrubbed, but the person may still be able to sign in with",
+      "the identity. Delete the Neon Auth user for this id in the Neon console, then re-run the",
+      "cleanup cron: the request is terminal and will not be retried on its own.",
+      "",
+      `Admin: ${appUrl()}/admin`,
+    ].join("\n");
+
+    const result = await sendEmail({
+      to: recipients,
+      subject: "Account erasure: Neon Auth identity not deleted (AU-25)",
+      text,
+    });
+    return result.ok;
+  } catch (err) {
+    // A notification problem is never an erasure problem: the audit row is the durable record.
+    console.error("identity deletion alert failed:", err instanceof Error ? err.message : "unknown");
+    return false;
+  }
+}

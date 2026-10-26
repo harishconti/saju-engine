@@ -487,6 +487,12 @@ npx prisma migrate deploy
   transaction) are too tight for serverless against Neon. Set
   `transactionOptions: { maxWait: 10_000, timeout: 15_000 }` on the client.
 - **Never** touch the `neon_auth` schema. Neon Auth owns it.
+  - **One exception (AU-25, owner-approved 2026-10-26):** account erasure deletes the identity —
+    sessions, then accounts, then the user, in one raw-statement transaction over the app's existing
+    `DATABASE_URL` — *after* the local erasure has committed. The SDK cannot do it from the cron:
+    `auth.deleteUser()` proxies the caller's cookie behind `sensitiveSessionMiddleware`, and
+    `auth.admin.removeUser()` needs an admin session. The delete is keyed by the local `User.id`
+    (which *is* the Neon Auth user id), never by email. Nothing else may write to `neon_auth`.
 
 ## Retention
 

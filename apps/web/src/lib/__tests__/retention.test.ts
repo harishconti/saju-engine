@@ -14,12 +14,53 @@ import {
  * you delete them, or after 24 months of inactivity", and the compliance notes describe a warning
  * at 23 months and a sweep at 24. Removing the old no-op `flagInactiveProfiles` left the promise
  * with no implementation at all. The tests below pin the real sweep and the number it publishes.
+ *
+ * The first version of the sweep keyed "inactive" on `Profile.updatedAt`, which is a row timestamp,
+ * not activity: `mirrorUser` returns early for an unchanged account and no order or report route
+ * writes the profile, so a customer whose report was delivered yesterday could still carry a
+ * two-year-old profile row. These tests pin the corrected criterion — a profile is idle only when
+ * the row *and every order and report that references it* are older than the cutoff.
  */
-const { prismaMock, txMock, processDodoEvent } = vi.hoisted(() => {
+
+type OrderRef = { profileAId: string; profileBId: string | null; createdAt: Date };
+type ReportRef = {
+  id: string;
+  profileAId: string;
+  profileBId: string | null;
+  createdAt: Date;
+  pdfKey?: string | null;
+  mdKey?: string | null;
+  audioKey?: string | null;
+  htmlKey?: string | null;
+};
+
+const OLD = new Date("2024-01-01T00:00:00.000Z");
+const RECENT = new Date("2026-10-01T00:00:00.000Z");
+
+const { prismaMock, txMock, r2Mock, processDodoEvent, events } = vi.hoisted(() => {
+  const events: string[] = [];
   const txMock = {
+    report: {
+      deleteMany: vi.fn(async () => {
+        events.push("tx:report.deleteMany");
+        return { count: 1 };
+      }),
+    },
+    delivery: {
+      deleteMany: vi.fn(async () => {
+        events.push("tx:delivery.deleteMany");
+        return { count: 0 };
+      }),
+    },
     profile: {
-      updateMany: vi.fn(async () => ({ count: 1 })),
-      deleteMany: vi.fn(async () => ({ count: 0 })),
+      updateMany: vi.fn(async () => {
+        events.push("tx:profile.updateMany");
+        return { count: 1 };
+      }),
+      deleteMany: vi.fn(async () => {
+        events.push("tx:profile.deleteMany");
+        return { count: 0 };
+      }),
     },
   };
   const prismaMock = {
@@ -32,21 +73,32 @@ const { prismaMock, txMock, processDodoEvent } = vi.hoisted(() => {
         }) => [] as Array<{ id: string }>,
       ),
     },
-    order: { findMany: vi.fn(async () => [] as Array<{ profileAId: string; profileBId: string | null }>) },
-    report: { findMany: vi.fn(async () => [] as Array<{ profileAId: string; profileBId: string | null }>) },
-    $transaction: vi.fn(async (fn: (t: typeof txMock) => Promise<unknown>) => fn(txMock)),
+    order: {
+      findMany: vi.fn(async (_args: Record<string, unknown>) => [] as OrderRef[]),
+    },
+    report: {
+      findMany: vi.fn(async (_args: Record<string, unknown>) => [] as ReportRef[]),
+    },
+    $transaction: vi.fn(async (fn: (t: typeof txMock) => Promise<unknown>) => {
+      const result = await fn(txMock);
+      events.push("commit");
+      return result;
+    }),
   };
-  return { prismaMock, txMock, processDodoEvent: vi.fn() };
+  const r2Mock = {
+    isR2Configured: () => false,
+    drainObjectDeletions: vi.fn(),
+    listObjectsByPrefix: vi.fn(),
+    deleteObjects: vi.fn(),
+    deleteObjectOrQueue: vi.fn(async (key: string) => {
+      events.push(`r2:${key}`);
+    }),
+  };
+  return { prismaMock, txMock, r2Mock, processDodoEvent: vi.fn(), events };
 });
 
 vi.mock("@/lib/prisma", () => ({ prisma: prismaMock }));
-vi.mock("@/lib/r2", () => ({
-  isR2Configured: () => false,
-  drainObjectDeletions: vi.fn(),
-  listObjectsByPrefix: vi.fn(),
-  deleteObjects: vi.fn(),
-  deleteObjectOrQueue: vi.fn(),
-}));
+vi.mock("@/lib/r2", () => r2Mock);
 vi.mock("@/lib/dodo-webhook", () => ({ processDodoEvent }));
 
 const { retireInactiveProfiles } = await import("../cleanup");
@@ -59,6 +111,18 @@ function cutoffUsed(): Date {
   const args = prismaMock.profile.findMany.mock.calls[0]?.[0];
   if (!args) throw new Error("profile.findMany was never called");
   return args.where.updatedAt.lt;
+}
+
+function order(profileAId: string, createdAt: Date, profileBId: string | null = null): OrderRef {
+  return { profileAId, profileBId, createdAt };
+}
+
+function report(
+  profileAId: string,
+  createdAt: Date,
+  extra: Partial<Omit<ReportRef, "profileAId" | "createdAt">> = {},
+): ReportRef {
+  return { id: "r1", profileAId, profileBId: null, createdAt, ...extra };
 }
 
 /**
@@ -106,11 +170,14 @@ describe("retention windows", () => {
 describe("inactive-profile sweep — the 24-month promise (AU-27)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    events.length = 0;
     prismaMock.profile.findMany.mockResolvedValue([]);
     prismaMock.order.findMany.mockResolvedValue([]);
     prismaMock.report.findMany.mockResolvedValue([]);
     txMock.profile.updateMany.mockResolvedValue({ count: 1 });
     txMock.profile.deleteMany.mockResolvedValue({ count: 0 });
+    txMock.report.deleteMany.mockResolvedValue({ count: 0 });
+    txMock.delivery.deleteMany.mockResolvedValue({ count: 0 });
   });
 
   it("selects only live profiles older than exactly 24 calendar months", async () => {
@@ -134,11 +201,25 @@ describe("inactive-profile sweep — the 24-month promise (AU-27)", () => {
     expect(txMock.profile.deleteMany).not.toHaveBeenCalled();
   });
 
-  it("scrubs an old profile a report still references, and keeps the row", async () => {
+  it("deletes an old profile whose only reference is a report, retiring the report with it", async () => {
+    // A report reference no longer pins the row: the report is deleted in the same transaction, so
+    // the only RESTRICT that matters is the order one. An unreferenced row describes nobody.
     prismaMock.profile.findMany.mockResolvedValue([{ id: "p1" }]);
-    prismaMock.report.findMany.mockResolvedValue([{ profileAId: "p1", profileBId: null }]);
+    prismaMock.report.findMany.mockResolvedValue([report("p1", OLD, { id: "r1" })]);
+    txMock.profile.deleteMany.mockResolvedValue({ count: 1 });
 
     await expect(retireInactiveProfiles(NOW)).resolves.toBe(1);
+
+    expect(txMock.report.deleteMany).toHaveBeenCalledWith({ where: { id: { in: ["r1"] } } });
+    expect(txMock.profile.deleteMany).toHaveBeenCalledWith({ where: { id: { in: ["p1"] } } });
+    expect(txMock.profile.updateMany).not.toHaveBeenCalled();
+  });
+
+  it("scrubs rather than deletes a profile an order references — Profile A is RESTRICT", async () => {
+    prismaMock.profile.findMany.mockResolvedValue([{ id: "p1" }]);
+    prismaMock.order.findMany.mockResolvedValue([order("p1", OLD)]);
+
+    await retireInactiveProfiles(NOW);
 
     expect(txMock.profile.updateMany).toHaveBeenCalledWith({
       where: { id: { in: ["p1"] }, deletedAt: null },
@@ -155,16 +236,6 @@ describe("inactive-profile sweep — the 24-month promise (AU-27)", () => {
         deletedAt: NOW,
       }),
     });
-    expect(txMock.profile.deleteMany).not.toHaveBeenCalled();
-  });
-
-  it("scrubs rather than deletes a profile an order references — Profile A is RESTRICT", async () => {
-    prismaMock.profile.findMany.mockResolvedValue([{ id: "p1" }]);
-    prismaMock.order.findMany.mockResolvedValue([{ profileAId: "p1", profileBId: null }]);
-
-    await retireInactiveProfiles(NOW);
-
-    expect(txMock.profile.updateMany).toHaveBeenCalledTimes(1);
     expect(txMock.profile.deleteMany).not.toHaveBeenCalled();
   });
 
@@ -185,5 +256,153 @@ describe("inactive-profile sweep — the 24-month promise (AU-27)", () => {
     );
     expect(privacy).toContain("PROFILE_INACTIVITY_RETENTION_LABEL");
     expect(PROFILE_INACTIVITY_RETENTION_LABEL).toBe(`${PROFILE_INACTIVITY_RETENTION_MONTHS} months`);
+  });
+});
+
+describe("inactive-profile sweep — activity spares a live customer (AU-27)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    events.length = 0;
+    prismaMock.profile.findMany.mockResolvedValue([{ id: "p1" }]);
+    prismaMock.order.findMany.mockResolvedValue([]);
+    prismaMock.report.findMany.mockResolvedValue([]);
+    txMock.profile.updateMany.mockResolvedValue({ count: 1 });
+    txMock.profile.deleteMany.mockResolvedValue({ count: 0 });
+    txMock.report.deleteMany.mockResolvedValue({ count: 0 });
+    txMock.delivery.deleteMany.mockResolvedValue({ count: 0 });
+  });
+
+  it("spares a profile whose order is inside the window, though the row is old", async () => {
+    prismaMock.order.findMany.mockResolvedValue([order("p1", RECENT)]);
+
+    await expect(retireInactiveProfiles(NOW)).resolves.toBe(0);
+
+    expect(prismaMock.$transaction).not.toHaveBeenCalled();
+    expect(txMock.profile.updateMany).not.toHaveBeenCalled();
+    expect(txMock.profile.deleteMany).not.toHaveBeenCalled();
+  });
+
+  it("spares a profile whose report was delivered inside the window — the row never moves", async () => {
+    prismaMock.report.findMany.mockResolvedValue([
+      report("p1", OLD, { id: "r-old" }),
+      report("p1", RECENT, { id: "r-new", pdfKey: "reports/u1/o1/r-new.pdf" }),
+    ]);
+
+    await expect(retireInactiveProfiles(NOW)).resolves.toBe(0);
+
+    expect(prismaMock.$transaction).not.toHaveBeenCalled();
+    expect(r2Mock.deleteObjectOrQueue).not.toHaveBeenCalled();
+  });
+
+  it("spares a profile referenced as partner B by a recent order", async () => {
+    prismaMock.order.findMany.mockResolvedValue([order("someone-else", RECENT, "p1")]);
+
+    await expect(retireInactiveProfiles(NOW)).resolves.toBe(0);
+
+    expect(prismaMock.$transaction).not.toHaveBeenCalled();
+  });
+
+  it("still retires a profile whose every reference is older than the cutoff", async () => {
+    prismaMock.report.findMany.mockResolvedValue([report("p1", OLD)]);
+    txMock.profile.deleteMany.mockResolvedValue({ count: 1 });
+
+    await expect(retireInactiveProfiles(NOW)).resolves.toBe(1);
+
+    expect(prismaMock.$transaction).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("inactive-profile sweep — reports go with the profile (AU-27)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    events.length = 0;
+    prismaMock.profile.findMany.mockResolvedValue([{ id: "p1" }]);
+    prismaMock.order.findMany.mockResolvedValue([]);
+    prismaMock.report.findMany.mockResolvedValue([]);
+    txMock.profile.updateMany.mockResolvedValue({ count: 1 });
+    txMock.profile.deleteMany.mockResolvedValue({ count: 1 });
+    txMock.report.deleteMany.mockResolvedValue({ count: 1 });
+    txMock.delivery.deleteMany.mockResolvedValue({ count: 1 });
+  });
+
+  it("deletes the reports and deliveries, then queues their objects after the commit", async () => {
+    prismaMock.report.findMany.mockResolvedValue([
+      report("p1", OLD, {
+        id: "r1",
+        pdfKey: "reports/u1/o1/r1.pdf",
+        mdKey: "reports/u1/o1/r1.md",
+        audioKey: "reports/u1/o1/r1.mp3",
+        htmlKey: null,
+      }),
+    ]);
+
+    await expect(retireInactiveProfiles(NOW)).resolves.toBe(1);
+
+    // The rows go in the same transaction that retires the profile, not in a later sweep.
+    expect(txMock.delivery.deleteMany).toHaveBeenCalledWith({ where: { reportId: { in: ["r1"] } } });
+    expect(txMock.report.deleteMany).toHaveBeenCalledWith({ where: { id: { in: ["r1"] } } });
+
+    // Objects are queued only after the database has committed: the profile row is what the queue
+    // row depends on for its retry, and a storage error must not roll back the retirement.
+    const commitAt = events.indexOf("commit");
+    expect(commitAt).toBeGreaterThan(-1);
+    for (const key of ["reports/u1/o1/r1.pdf", "reports/u1/o1/r1.md", "reports/u1/o1/r1.mp3"]) {
+      const at = events.indexOf(`r2:${key}`);
+      expect(at, `${key} was never queued`).toBeGreaterThan(-1);
+      expect(at, `${key} was queued before the commit`).toBeGreaterThan(commitAt);
+    }
+    // A null key is skipped; the shared key list has no blanks in it.
+    expect(r2Mock.deleteObjectOrQueue).toHaveBeenCalledTimes(3);
+  });
+
+  it("retires the reports of a profile kept for an order, and scrubs the profile", async () => {
+    prismaMock.order.findMany.mockResolvedValue([order("p1", OLD)]);
+    prismaMock.report.findMany.mockResolvedValue([
+      report("p1", OLD, { id: "r1", pdfKey: "reports/u1/o1/r1.pdf" }),
+    ]);
+
+    await retireInactiveProfiles(NOW);
+
+    expect(txMock.report.deleteMany).toHaveBeenCalledWith({ where: { id: { in: ["r1"] } } });
+    expect(txMock.profile.updateMany).toHaveBeenCalledTimes(1);
+    expect(txMock.profile.deleteMany).not.toHaveBeenCalled();
+    expect(r2Mock.deleteObjectOrQueue).toHaveBeenCalledWith("reports/u1/o1/r1.pdf");
+  });
+
+  it("does not touch the reports of a profile the sweep spares", async () => {
+    prismaMock.order.findMany.mockResolvedValue([order("p1", RECENT)]);
+    prismaMock.report.findMany.mockResolvedValue([
+      report("p1", OLD, { id: "r1", pdfKey: "reports/u1/o1/r1.pdf" }),
+    ]);
+
+    await retireInactiveProfiles(NOW);
+
+    expect(txMock.report.deleteMany).not.toHaveBeenCalled();
+    expect(txMock.delivery.deleteMany).not.toHaveBeenCalled();
+    expect(r2Mock.deleteObjectOrQueue).not.toHaveBeenCalled();
+  });
+});
+
+describe("inactive-profile sweep — calendar-month cutoff", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    events.length = 0;
+    prismaMock.profile.findMany.mockResolvedValue([]);
+    prismaMock.order.findMany.mockResolvedValue([]);
+    prismaMock.report.findMany.mockResolvedValue([]);
+  });
+
+  it("clamps a leap day to the last day of the target month instead of rolling into March", async () => {
+    // `setUTCMonth` turns 29 February 2028 minus 24 months into 1 March 2026, so a profile idle
+    // since 28 February would sit one day inside the window. Exact calendar maths clamps it.
+    await retireInactiveProfiles(new Date("2028-02-29T12:00:00.000Z"));
+
+    expect(cutoffUsed()).toEqual(new Date("2026-02-28T12:00:00.000Z"));
+  });
+
+  it("keeps the same month-end day when the target month has it", async () => {
+    await retireInactiveProfiles(new Date("2026-08-31T12:00:00.000Z"));
+
+    expect(cutoffUsed()).toEqual(new Date("2024-08-31T12:00:00.000Z"));
   });
 });

@@ -13,7 +13,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
  * birth data still goes, and the R2 objects are removed only once the database has committed.
  */
 
-const { prismaMock, txMock, r2Mock, processDodoEvent, events } = vi.hoisted(() => {
+const { prismaMock, txMock, r2Mock, ownerAlertMock, processDodoEvent, events } = vi.hoisted(() => {
   const events: string[] = [];
   const txMock = {
     // AU-25: the Neon identity is deleted with raw statements on the transaction client. The
@@ -88,10 +88,13 @@ const { prismaMock, txMock, r2Mock, processDodoEvent, events } = vi.hoisted(() =
     user: { update: vi.fn() },
     consentRecord: { updateMany: vi.fn() },
     auditLog: {
-      create: vi.fn(async () => {
+      create: vi.fn(async (_args: { data: Record<string, unknown> }) => {
         events.push("audit:identity");
         return {};
       }),
+      // AU-25 retry cap: the sweep counts how many times this request already failed to delete
+      // its identity, so a permanent fault cannot retry forever.
+      count: vi.fn(async (_args: Record<string, unknown>) => 0),
     },
     webhookEvent: { findMany: vi.fn(), update: vi.fn() },
     $transaction: vi.fn(),
@@ -109,11 +112,16 @@ const { prismaMock, txMock, r2Mock, processDodoEvent, events } = vi.hoisted(() =
 
   const processDodoEvent = vi.fn();
 
-  return { prismaMock, txMock, r2Mock, processDodoEvent, events };
+  // AU-25: a terminal identity failure must reach a human. The alert is a seam, so the test asserts
+  // it was called rather than what the mail said.
+  const ownerAlertMock = { notifyOwnerIdentityDeletionFailed: vi.fn(async () => true) };
+
+  return { prismaMock, txMock, r2Mock, ownerAlertMock, processDodoEvent, events };
 });
 
 vi.mock("@/lib/prisma", () => ({ prisma: prismaMock }));
 vi.mock("@/lib/r2", () => r2Mock);
+vi.mock("@/lib/owner-alert", () => ownerAlertMock);
 vi.mock("@/lib/dodo-webhook", () => ({ processDodoEvent }));
 
 const { processDueDeletions } = await import("../cleanup");
@@ -143,6 +151,7 @@ beforeEach(() => {
   });
 
   prismaMock.deletionRequest.findMany.mockResolvedValue([deletionRequest("dr1", "u1")]);
+  prismaMock.auditLog.count.mockResolvedValue(0);
   prismaMock.report.findMany.mockResolvedValue([]);
   prismaMock.profile.findMany.mockResolvedValue([]);
   prismaMock.order.findMany.mockResolvedValue([]);
@@ -301,19 +310,87 @@ describe("processDueDeletions — Neon identity deletion (AU-25)", () => {
     error.mockRestore();
   });
 
-  it("skips the delete entirely when a neon_auth relation is absent, leaving the request retryable", async () => {
+  it("marks a missing relation terminal instead of retrying it forever, and alerts the owner", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     txMock.$queryRaw
       .mockResolvedValueOnce([{ name: 'neon_auth."session"' }])
       .mockResolvedValueOnce([{ name: null }])
       .mockResolvedValueOnce([{ name: 'neon_auth."user"' }]);
 
-    await expect(processDueDeletions(NOW)).resolves.toBe(0);
+    await expect(processDueDeletions(NOW)).resolves.toBe(1);
 
     expect(txMock.$executeRaw).not.toHaveBeenCalled();
-    expect(prismaMock.deletionRequest.update).not.toHaveBeenCalled();
+    // Terminal, not retryable: a schema that no longer matches cannot be fixed by trying again, and
+    // leaving it `pending` would take one of the ten slots on every run for ever.
+    expect(prismaMock.deletionRequest.update).toHaveBeenCalledWith({
+      where: { id: "dr1" },
+      data: { status: "completed_with_identity_error", completedAt: NOW },
+    });
+    expect(prismaMock.auditLog.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          entity: "deletion",
+          entityId: "dr1",
+          after: expect.objectContaining({ neonIdentity: "missing-relation" }),
+        }),
+      }),
+    );
+    expect(ownerAlertMock.notifyOwnerIdentityDeletionFailed).toHaveBeenCalledWith(
+      expect.objectContaining({ requestId: "dr1", outcome: "missing-relation" }),
+    );
     expect(warn).toHaveBeenCalled();
     warn.mockRestore();
+  });
+
+  it("caps transient identity failures, then marks the request terminal and alerts the owner", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    txMock.$executeRaw.mockRejectedValueOnce(new Error("permission denied"));
+    // Two earlier attempts are already on record; this run is the third and last.
+    prismaMock.auditLog.count.mockResolvedValue(2);
+
+    await expect(processDueDeletions(NOW)).resolves.toBe(1);
+
+    // The counter is scoped to this request and to this failure, so one request's history cannot
+    // exhaust another's retries.
+    expect(prismaMock.auditLog.count).toHaveBeenCalledWith({
+      where: {
+        entity: "deletion",
+        entityId: "dr1",
+        action: "update",
+        after: { path: ["neonIdentity"], equals: "failed" },
+      },
+    });
+    expect(prismaMock.deletionRequest.update).toHaveBeenCalledWith({
+      where: { id: "dr1" },
+      data: { status: "completed_with_identity_error", completedAt: NOW },
+    });
+    expect(ownerAlertMock.notifyOwnerIdentityDeletionFailed).toHaveBeenCalledWith(
+      expect.objectContaining({ requestId: "dr1", outcome: "failed", attempts: 3 }),
+    );
+    error.mockRestore();
+  });
+
+  it("keeps retrying a transient identity failure below the cap", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    txMock.$executeRaw.mockRejectedValueOnce(new Error("connection reset"));
+    prismaMock.auditLog.count.mockResolvedValue(1);
+
+    await expect(processDueDeletions(NOW)).resolves.toBe(0);
+
+    expect(prismaMock.deletionRequest.update).not.toHaveBeenCalled();
+    expect(ownerAlertMock.notifyOwnerIdentityDeletionFailed).not.toHaveBeenCalled();
+    error.mockRestore();
+  });
+
+  it("takes pending requests oldest-first so one stuck request cannot starve the queue", async () => {
+    await processDueDeletions(NOW);
+
+    expect(prismaMock.deletionRequest.findMany).toHaveBeenCalledWith({
+      where: { status: "pending", scheduledFor: { lte: NOW } },
+      orderBy: { scheduledFor: "asc" },
+      take: 10,
+      select: { id: true, userId: true },
+    });
   });
 });
 
