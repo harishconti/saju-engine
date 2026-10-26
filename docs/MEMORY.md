@@ -2211,8 +2211,13 @@ a commit: they are console settings, environment values and deployment ordering.
 2. ✅ **DONE 2026-10-26** — `20261026120000_user_last_seen_at` applied over `DIRECT_URL`
    (`npx prisma migrate deploy`), `prisma migrate status` then reported "Database schema is up to
    date". Applied **before** the `624f362` deploy finished, which was the required order.
-3. **GitHub secrets for the new 15-minute dispatch job:** `R2_ENDPOINT`, `R2_BUCKET`,
-   `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `ENGINE_URL`, `ENGINE_SERVICE_TOKEN`.
+3. **GitHub repository secrets — none are set, and the sweep workflow is failing every 15 minutes
+   because of it.** Verified 2026-10-26: `gh secret list` is empty, so `secrets.CRON_SECRET` expands
+   to nothing, the app rejects the empty bearer token, and `curl` exits 22 (runs `40277866623`,
+   `40325711907`). While this holds, the 10-hour review-queue release, the engine smoke and the new
+   job dispatch are all dead. Needs `CRON_SECRET` (same value as the app's) plus, for the dispatch
+   job, `R2_ENDPOINT`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `ENGINE_URL`,
+   `ENGINE_SERVICE_TOKEN`. See `docs/issues_bugs.md` → "Live, found during the 2026-10-26 deploy".
 4. **AU-35 — Neon console:** require email verification with a verified sender. Until then the auth
    API still discloses whether an account exists.
 5. **Set `HEALTH_DETAIL_TOKEN`**, or the detailed health view is reachable by admin session only.

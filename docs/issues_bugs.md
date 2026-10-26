@@ -926,6 +926,21 @@ The whole-branch review passed the remediation for merge (as `e370eb8`) and clas
 report lived in gitignored scratch. None of the items below changes report prose, Saju doctrine,
 pricing or a delivered PDF.
 
+### 🔴 Live, found during the 2026-10-26 deploy — the sweep workflow cannot authenticate
+
+`gh secret list --repo harishconti/saju-engine` returns **nothing**: the repository has no secrets at
+all. Every job in `.github/workflows/sla-sweep.yml` sends `Authorization: Bearer ${{ secrets.CRON_SECRET }}`,
+so the header reaches the app empty and the request is rejected; `curl` exits 22 and the job fails.
+Observed on runs `40277866623` (2026-10-26 06:06Z) and `40325711907` (12:51Z) — recurring, every 15
+minutes, and silent unless someone reads the Actions tab.
+
+Consequences today: the 10-hour review-queue deadline is **not** being released by the workflow (the
+admin console's sweep is the only fallback), the engine smoke never runs, and the newly deployed
+15-minute job dispatch job will fail the same way. `CRON_SECRET` must equal the app's, and the
+dispatch job additionally needs `R2_ENDPOINT`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`,
+`R2_SECRET_ACCESS_KEY`, `ENGINE_URL`, `ENGINE_SERVICE_TOKEN`. This is owner action 3 in
+`docs/MEMORY.md`; it is not cosmetic and not deferrable.
+
 ### Correctness, in the order they cost the most
 
 1. ~~**`lib/cleanup.ts` `retireInactiveProfiles` — same PII-orphan window the erasure path just
