@@ -10,7 +10,7 @@ import { rateLimit, WINDOW } from "@/lib/ratelimit";
  * the panel. The identity is `requireUser()` — the same gate every other account route uses.
  *
  * Revocation itself is the existing `revokeOtherSessions()` helper, which calls the provider's
- * `revoke-all-sessions` endpoint with no arguments. Neon documents that endpoint as ending every
+ * `revoke-other-sessions` endpoint with no arguments. Neon documents that endpoint as ending every
  * session *except the current one*, so the caller stays signed in; this route neither re-implements
  * that filter nor accepts a session id from the browser (which would let a visitor pick whose
  * session to end).

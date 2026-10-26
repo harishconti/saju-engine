@@ -269,9 +269,11 @@ Authorization: Bearer $ENGINE_SERVICE_TOKEN
   "tier": "sample" | "essential" | "deep" | "basic",
   // Upload targets are alternative destinations — at least one of uploadUrl / htmlUploadUrl is
   // required (400 MISSING_UPLOAD_URL otherwise). The sample sends htmlUploadUrl only.
-  "uploadUrl": "https://<acct>.r2.cloudflarestorage.com/reports/…&X-Amz-Expires=900",
-  "htmlUploadUrl": "https://<acct>.r2.cloudflarestorage.com/reports/…/report.html&X-Amz-Expires=900",
-  "mdUploadUrl": "https://<acct>.r2.cloudflarestorage.com/reports/…/report.md&X-Amz-Expires=900", // optional
+  // The webapp presigns virtual-hosted (no forcePathStyle), so the bucket is the first DNS
+  // label — {bucket}.{account_id}.r2.cloudflarestorage.com — not a path segment.
+  "uploadUrl": "https://{bucket}.{account_id}.r2.cloudflarestorage.com/reports/…&X-Amz-Expires=900",
+  "htmlUploadUrl": "https://{bucket}.{account_id}.r2.cloudflarestorage.com/reports/…/report.html&X-Amz-Expires=900",
+  "mdUploadUrl": "https://{bucket}.{account_id}.r2.cloudflarestorage.com/reports/…/report.md&X-Amz-Expires=900", // optional
   "profileA": {
     "fullName": "Jisoo K.",
 

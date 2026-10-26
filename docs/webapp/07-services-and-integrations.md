@@ -64,6 +64,11 @@ Three items have external wait times that block launch regardless of engineering
 
 Live state as at **2026-10-15**. Supersedes the recommendations above wherever they conflict.
 
+> **Current state (2026-10-26) overrides one row of this snapshot:** the public `/api/health` body is now
+> only `{ok,status,version,checkedAt}`; probe detail (including `db`) moved behind
+> `GET /api/health/detail` (Bearer `HEALTH_DETAIL_TOKEN` or an admin session). The `{"db":true,…}` body
+> recorded under **🚀 LIVE** below is what was measured on 2026-10-15 and is kept as history.
+
 | Item | State | Value / note |
 |---|---|---|
 | **Domain** | ✅ live, partially routed | `cosmicsaju.com` registered at Hostinger, **DNS delegated to Cloudflare** (`randy`/`veronica`.ns.cloudflare.com). Nameservers confirmed by lookup. |
@@ -72,7 +77,7 @@ Live state as at **2026-10-15**. Supersedes the recommendations above wherever t
 | **Vercel region** | ⚠️ must match | set **`sin1`** on BOTH projects. A cross-region hop to Singapore adds ~100 ms to every query — this is the single most common cause of "the site feels slow" on this stack. |
 | **Neon Auth** | ✅ enabled | Base URL (note the `/neondb/auth` path — it is part of the value):<br>`https://ep-raspy-morning-a1xq0p8c.neonauth.ap-southeast-1.aws.neon.tech/neondb/auth`<br>JWKS: `…/neondb/auth/.well-known/jwks.json` |
 | **Google OAuth redirect URI** | ⬜ to register | Must be exactly `https://ep-raspy-morning-a1xq0p8c.neonauth.ap-southeast-1.aws.neon.tech/neondb/auth/callback/google` |
-| **Database credentials** | ✅ live | Pooled + unpooled fetched via the Neon CLI and written into `apps/web/.env` (gitignored). Hosts match: `ep-raspy-morning-a1xq0p8c{,-pooler}.ap-southeast-1.aws.neon.tech`. The public `/api/health` body is only `{ok,status,version,checkedAt}`; probe detail (including `db`) is behind `GET /api/health/detail` (Bearer `HEALTH_DETAIL_TOKEN` or an admin session). |
+| **Database credentials** | ✅ live | Pooled + unpooled fetched via the Neon CLI and written into `apps/web/.env` (gitignored). Hosts match: `ep-raspy-morning-a1xq0p8c{,-pooler}.ap-southeast-1.aws.neon.tech`. |
 | **Branches** | ✅ **`production` only** | Decision (2026-10-15): **only the `production` branch is used.** `production` = `br-soft-mouse-a1pbgnuq` (default), verified at **14 tables / 13 CHECK constraints**. A `vercel-dev` branch (`br-odd-art-a1xbr1d1`) exists, created by the Neon↔Vercel integration — it has been migrated but is **deliberately unused**; treat it as absent and do not point any env scope at it. Local `apps/web/.env` targets `production`, consistent with that decision. |
 | **Initial migration** | ✅ applied | `20261015120000_init` deployed to **both** branches. Verified live: all 13 hand-written `CHECK` constraints present (e.g. inserting a negative `RateLimit.count` is rejected by name), the partial unique index `profile_one_default_per_user` exists with the right predicate, and all 8 enums have the right label sets. |
 | **Neon Auth** | ✅ enabled on `production` | `better_auth`, base URL confirmed, JWKS reachable and returning an Ed25519 key. **Trusted domains added:** `https://cosmicsaju.com`, `https://www.cosmicsaju.com`; localhost connections allowed. Previously **none** were configured — which is the exact cause of "OAuth succeeds but the user never arrives". |

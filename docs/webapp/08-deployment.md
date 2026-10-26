@@ -167,6 +167,14 @@ NEXT_PUBLIC_TURNSTILE_SITE_KEY=«from the Turnstile widget»  # rendered by the 
                                                             # so changing it needs a redeploy
 ```
 
+#### Reading these values locally
+
+Never `source apps/web/.env` or `source .env`. Values contain `&` (the DB URLs carry a query string) and
+spaces (`EMAIL_FROM`), so the shell backgrounds part of the assignment, leaves variables unset, and copies
+every secret into the shell environment where it can leak into a transcript. Read the file with
+`node --env-file=.env …` (or the app's own `process.env`), which parses it literally; quote every value
+that contains `&`, spaces or `#` so the file is unambiguous to every reader.
+
 #### Mail
 
 `EMAIL_FROM` is the *sending* identity (`reports@cosmicsaju.com`); **`EMAIL_REPLY_TO` is the real inbox**

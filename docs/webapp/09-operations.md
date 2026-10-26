@@ -130,7 +130,7 @@ tests.
 | Probe | How | Failure means |
 |---|---|---|
 | Database | `SELECT 1` via Prisma | Neon down, credentials rotated, or the branch is suspended on the Free plan |
-| Storage | A minimal R2 operation (list one key, or `HeadObject` on a sentinel) | Bad credentials, deleted token, wrong bucket |
+| Storage | `isR2Configured()` — checks that `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` and `R2_ENDPOINT` are set (`src/lib/r2.ts`); no R2 call is made | Only that an env var is missing. It does **not** verify the credentials or the bucket: a revoked token or a deleted bucket still reports `storage: true`, so **R2 credentials are not independently verified by health** — exercise a presign/`HeadObject` (the `RUN_R2_TESTS=1` integration suite) when in doubt |
 | Engine | `POST {ENGINE_URL}/health` with the bearer token, short timeout (result cached 60 s) | The deploy failed, the token drifted between projects, or the engine's upload allowlist is empty (`engineDetail` says `HTTP 503 UPLOAD_HOSTS_UNCONFIGURED uploadAllowlist=0`) — with no allowlist the engine refuses every render |
 | Payments | `isDodoConfigured()` **and** every paid tier has a product id | Checkout would throw `PRODUCT_NOT_CONFIGURED` — i.e. you cannot take money |
 

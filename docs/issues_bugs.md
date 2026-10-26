@@ -908,7 +908,7 @@ and an **OPEN** row names the owner action that remains. Owner-side items have n
 | AU-33 | P2 | **DONE** (`2ebfc84`) | The visitor IP is no longer logged in the sample route (it still keys the in-memory rate limit). |
 | AU-34 | P2 | **DONE** (`7eb3853`, `1963ef0`) | Profile country is stored and passed when re-resolving the city, so "Cambridge" is unambiguous. |
 | AU-35 | P2 | **OPEN** | Owner action: Neon Console → Auth → Configuration → email/password provider → enable **Require email verification** with a verified sender. No code. |
-| AU-36 | P2 | **DONE** (`7eb3853`; the `.env` quoting itself is in the owner's gitignored `apps/web/.env`, which no commit can carry) | Values that need quoting are quoted, and the docs prefer `node --env-file` over `source`. |
+| AU-36 | P2 | **OPEN — verification only, no code** | The fix is already applied to the owner's gitignored `apps/web/.env` (unquoted `EMAIL_FROM`; `&` in the DB URLs). No commit can carry a `.env` edit, so this row cannot be closed by a hash: before deploy, the owner confirms by inspection that values containing `&`, spaces or `#` are quoted, and reads them with `node --env-file=.env …`, never `source` — the practice is now stated in `docs/webapp/08-deployment.md` § Environment variables. Nothing in the repo is outstanding. |
 | AU-37 | P2 | **DONE** (`7eb3853`) | `presignPutUrl` signs the `content-type` the engine actually sends. |
 | AU-40 | IMP | **DONE** (`1922aca`, `c1153c6`) | "Sign out of other devices" calls `revokeOtherSessions` and keeps the current session. |
 | AU-41 | IMP | **DONE** (`1922aca`, `c1153c6`) | Password reset: request + confirm, neutral request response, token absent from delivered HTML. |

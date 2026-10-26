@@ -180,7 +180,7 @@ describe("revokeOtherSessions now reports success (AU-40)", () => {
   it("resolves true and calls the provider with no arguments — the current session is kept by design", async () => {
     await expect(revokeOtherSessions()).resolves.toBe(true);
 
-    // No token is passed: Neon's `revoke-all-sessions` ends every session *except* the caller's.
+    // No token is passed: Neon's `revoke-other-sessions` ends every session *except* the caller's.
     expect(authRevokeOtherSessions).toHaveBeenCalledTimes(1);
     expect(authRevokeOtherSessions).toHaveBeenCalledWith();
   });

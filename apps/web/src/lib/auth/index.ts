@@ -255,7 +255,7 @@ export async function hasPendingDeletion(userId: string): Promise<boolean> {
  *
  * Withdrawing consent stops new processing, but the consent record does not end sessions already
  * open on other devices. The account page offers the same action explicitly. The current session is
- * kept — Neon's `revoke-all-sessions` endpoint is documented as "revokes all sessions except the
+ * kept — Neon's `revoke-other-sessions` endpoint is documented as "revokes all sessions except the
  * current one" — so the visitor stays on the page they are standing on. No token is passed, and none
  * could be: only the provider knows which session made the call.
  *
