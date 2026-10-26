@@ -13,13 +13,22 @@ import {
   presignGetUrl,
   presignPutUrl,
 } from "@/lib/r2";
-import { ENGINE_CONTRACT_VERSION, callEngine, isEngineConfigured } from "@/lib/engine";
+import {
+  ENGINE_CONTRACT_VERSION,
+  SAMPLE_ENGINE_TIMEOUT_MS,
+  callEngine,
+  isEngineConfigured,
+} from "@/lib/engine";
 import { sampleRequestSchema } from "@/lib/validation/schemas";
 import { computeAndStoreChart } from "@/lib/chart-compute";
 import { turnstileMode, verifyTurnstile } from "@/lib/turnstile";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
+
+// AU-11 (2026-10-26 audit): the engine call uses `SAMPLE_ENGINE_TIMEOUT_MS` (50 s), below this
+// 60 s limit. It used to use the 120 s default, so the platform killed the function before the
+// abort fired and the timeout was never logged. Keep the two numbers in that order.
 
 /**
  * The free sample — the funnel, and the only place a visitor does real work before signing up.
@@ -141,25 +150,30 @@ export const POST = handle(async (req) => {
   const readKey = user ? buildSampleKey(user.id, sampleId, "html") : buildAnonymousKey(sampleId, "html");
   const discardedPdfKey = buildAnonymousKey(sampleId, "pdf");
 
-  const result = await callEngine({
-    contractVersion: ENGINE_CONTRACT_VERSION,
-    kind: "single",
-    tier: "sample",
-    uploadUrl: await presignPutUrl(discardedPdfKey, "application/pdf"),
-    htmlUploadUrl: await presignPutUrl(readKey, "text/html"),
-    profileA: {
-      fullName: input.fullName,
-      gender: input.gender,
-      birthDate: input.birthDate,
-      birthTime: input.timeKnown === false ? "12:00" : input.birthTime,
-      timeKnown: input.timeKnown !== false,
-      timezone: location.timezone,
-      utcOffset: offset,
-      city: location.city,
-      latitude: location.latitude,
-      longitude: location.longitude,
+  const result = await callEngine(
+    {
+      contractVersion: ENGINE_CONTRACT_VERSION,
+      kind: "single",
+      tier: "sample",
+      uploadUrl: await presignPutUrl(discardedPdfKey, "application/pdf"),
+      htmlUploadUrl: await presignPutUrl(readKey, "text/html"),
+      profileA: {
+        fullName: input.fullName,
+        gender: input.gender,
+        birthDate: input.birthDate,
+        birthTime: input.timeKnown === false ? "12:00" : input.birthTime,
+        timeKnown: input.timeKnown !== false,
+        timezone: location.timezone,
+        utcOffset: offset,
+        city: location.city,
+        latitude: location.latitude,
+        longitude: location.longitude,
+      },
     },
-  });
+    // Below the function's 60 s limit so a timeout is an `ENGINE_TIMEOUT` we log and explain,
+    // not a platform kill the visitor sees as a bare 504 (AU-11).
+    SAMPLE_ENGINE_TIMEOUT_MS,
+  );
 
   const object = await headObject(readKey);
   if (!object) throw ApiError.unavailable("The snapshot did not upload correctly", "UPLOAD_NOT_VERIFIED");

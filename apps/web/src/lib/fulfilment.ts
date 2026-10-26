@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { Job, Order, Profile } from "@prisma/client";
+import { ApiError } from "./api";
 import { prisma } from "./prisma";
 import { writeAudit } from "./audit";
 import { LEASE_MS, claimJob, completeJob, failJob, requeueJob } from "./queue";
@@ -106,13 +107,29 @@ export async function processJobById(jobId: string, worker = "inline"): Promise<
  * `notifyOwnerEngineFailure`: a defect in the mailer must not turn a recorded `FAILED` job into a
  * thrown exception the dispatcher would lease-reclaim and retry forever.
  */
-async function failGenerateJob(job: Job, code: string): Promise<void> {
-  await failJob(job.id, code);
+async function failGenerateJob(job: Job, lastError: string, alertCode = lastError): Promise<void> {
+  await failJob(job.id, lastError);
   try {
-    await notifyOwnerEngineFailure({ orderId: job.orderId, code, attempts: job.attempts });
+    // The alert names the bare engine code; `lastError` may carry the `ENGINE_FAILED:` prefix.
+    await notifyOwnerEngineFailure({ orderId: job.orderId, code: alertCode, attempts: job.attempts });
   } catch (err) {
     console.error("engine failure alert threw:", err instanceof Error ? err.message : "unknown");
   }
+}
+
+/**
+ * The job's recorded failure for an engine refusal, or null for a local error.
+ *
+ * AU-28 (2026-10-26 audit): every failed job said `ENGINE_FAILED`, so the admin "Recent failures"
+ * view could never have shown `UPLOAD_HOSTS_UNCONFIGURED` — the cause of the October outage. The
+ * engine code is kept after the `ENGINE_FAILED:` prefix: the prefix keeps existing dashboards and
+ * greps working, and the suffix names what actually happened. Only an error that carries the
+ * engine's HTTP status qualifies; a transport failure or a local fault records its own code.
+ */
+function engineFailureLastError(err: unknown): string | null {
+  if (!(err instanceof ApiError)) return null;
+  if (typeof err.details.engineStatus !== "number") return null;
+  return `ENGINE_FAILED:${err.code}`;
 }
 
 /** The actual work. Assumes the job is already leased to us. */
@@ -296,15 +313,18 @@ export async function processClaimedJob(job: Job): Promise<JobOutcome> {
           ? err.name
           : "UNKNOWN";
 
+    // AU-28: keep the engine's code in `lastError`, not just "ENGINE_FAILED".
+    const lastError = engineFailureLastError(err) ?? code;
+
     // A 422 from the engine is permanent: bad birth data will not improve on retry.
     const permanent =
       typeof err === "object" && err !== null && "status" in err && (err as { status?: number }).status === 422;
 
     if (permanent || job.attempts >= job.maxAttempts) {
-      await failGenerateJob(job, code);
+      await failGenerateJob(job, lastError, code);
       return { ok: false, note: `failed: ${code}` };
     }
-    await requeueJob(job.id, code);
+    await requeueJob(job.id, lastError);
     return { ok: false, note: `retry: ${code}` };
   }
 }

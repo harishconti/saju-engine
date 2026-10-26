@@ -282,10 +282,19 @@ Authorization: Bearer $ENGINE_SERVICE_TOKEN
 // 200
 { "sha256": "…", "bytes": 142276, "engineVersion": "saju-engine/0.2.0", "durationMs": 1642 }
 
-// 422  { "error": "…", "code": "INVALID_BIRTH_DATA" }
+// 422  { "error": "…", "code": "INVALID_BIRTH_DATA" }        // birth data ONLY
 // 422  { "error": "…", "code": "UNKNOWN_TIMEZONE" }
-// 500  { "error": "render failed", "code": "RENDER_FAILED" }   // exception CLASS only
+// 503  { "error": "…", "code": "UPLOAD_HOSTS_UNCONFIGURED" }  // deployment fault, retryable
+// 500  { "error": "…", "code": "RENDER_FAILED" }             // exception CLASS only
 ```
+
+**Every** error body is `{ error, code }` — a top-level handler covers auth failures, pydantic
+rejections and unexpected exceptions, so no path returns a bare string or a missing `code`.
+Status carries meaning the webapp acts on: **only birth-data validation is 422**, which the webapp
+treats as permanent and never retries; configuration faults (`UPLOAD_*`, a missing token), an auth
+mismatch, and availability failures are **503** and stay retryable. (AU-09, 2026-10-26 audit: the
+October outage answered `UPLOAD_HOSTS_UNCONFIGURED` with 422 for five days, so restoring the
+allowlist could not have recovered a single order.)
 
 `contractVersion` is checked and rejected on mismatch. It exists so the two Vercel projects can be
 deployed independently: a webapp that ships a new field before the engine understands it must fail
@@ -304,9 +313,10 @@ token would otherwise turn the service into an arbitrary-URL PUT primitive:
 - optional `SAJU_UPLOAD_BUCKET` pins the path to `/<bucket>/…`;
 - a body cap (`SAJU_MAX_REQUEST_BYTES`, default 2 MB) and pydantic bounds on every field.
 
-Errors: `422 UPLOAD_URL_NOT_ALLOWED` / `UPLOAD_URL_INSECURE` / `UPLOAD_URL_INVALID` /
-`UPLOAD_PATH_NOT_ALLOWED`, `503 UPLOAD_HOSTS_UNCONFIGURED`. The error never echoes the URL, which
-carries a signature. See [14 — Security](14-security.md) §3.
+Errors: `503 UPLOAD_URL_NOT_ALLOWED` / `UPLOAD_URL_INSECURE` / `UPLOAD_URL_INVALID` /
+`UPLOAD_PATH_NOT_ALLOWED` / `UPLOAD_HOSTS_UNCONFIGURED` — all deployment/caller faults, so all 503
+and all retryable. The error never echoes the URL, which carries a signature.
+See [14 — Security](14-security.md) §3.
 
 ### Required engine changes — status
 

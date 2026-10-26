@@ -446,9 +446,14 @@ POST /generate
 ```jsonc
 // 200
 { "sha256": "…", "bytes": 142276, "pages": 7, "engineVersion": "saju-engine/0.2.0", "durationMs": 1642 }
-// 422 { "error": "…", "code": "INVALID_BIRTH_DATA" }
-// 500 { "error": "render failed", "code": "RENDER_FAILED" }   // exception class only, never a message with PII
+// 422 { "error": "…", "code": "INVALID_BIRTH_DATA" }        // birth data only; permanent
+// 503 { "error": "…", "code": "UPLOAD_HOSTS_UNCONFIGURED" }  // config/auth fault; retryable
+// 500 { "error": "…", "code": "RENDER_FAILED" }              // exception class only, never a message with PII
 ```
+
+Every error body is `{ error, code }`, including auth failures and bodies pydantic rejects before an
+endpoint runs. Only birth-data validation is 422 (the webapp treats that as permanent); all
+configuration and availability faults are 503 and are retried.
 
 `uploadUrl` is presigned by the webapp so the PDF never transits a request/response body — which
 also keeps every payload comfortably under Vercel's 4.5 MB function limit.

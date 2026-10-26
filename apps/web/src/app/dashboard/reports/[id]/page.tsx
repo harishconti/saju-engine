@@ -22,6 +22,7 @@ import {
   formatDateTime,
 } from "@/lib/format";
 import { tierFor } from "@/lib/tiers";
+import { failureNotice } from "@/lib/visitor-copy";
 
 export const dynamic = "force-dynamic";
 
@@ -124,8 +125,10 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ i
 
       {report.status === "FAILED" ? (
         <Alert tone="danger" title="This reading didn't complete">
-          Something went wrong producing it. We&apos;re on it, and you haven&apos;t been charged twice. If you
-          don&apos;t hear from us, reply to your order email.
+          {/* AU-10 (2026-10-26 audit): the paid variant of the failure copy. It must never say
+              "nothing was charged" — the customer has paid — and it quotes the report id so
+              support can find the order without asking for birth details. */}
+          {failureNotice({ context: "paid", requestId: report.id }).message}
         </Alert>
       ) : null}
 

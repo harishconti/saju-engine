@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { Prisma } from "@prisma/client";
 import { ZodError } from "zod";
 
@@ -8,12 +9,19 @@ import { ZodError } from "zod";
 export class ApiError extends Error {
   readonly status: number;
   readonly code: string;
+  /**
+   * Structured context for callers that must branch on it, never rendered to a visitor.
+   * `callEngine` puts the engine's own HTTP status here so `fulfilment` can tell an engine
+   * refusal apart from a local error without parsing the message.
+   */
+  readonly details: Record<string, unknown>;
 
-  constructor(status: number, code: string, message: string) {
+  constructor(status: number, code: string, message: string, details: Record<string, unknown> = {}) {
     super(message);
     this.name = "ApiError";
     this.status = status;
     this.code = code;
+    this.details = details;
   }
 
   static badRequest(message = "Invalid request", code = "BAD_REQUEST") {
@@ -53,8 +61,18 @@ export function json(data: unknown, status = 200): Response {
 /**
  * Maps a thrown value to the error envelope. Never leaks internals: unknown errors become a
  * generic 500, and Prisma/zod specifics are translated rather than forwarded.
+ *
+ * `requestId`, when given, is echoed as `x-request-id` so a visitor-facing message can quote a
+ * short reference that also appears in this server's log (AU-10, 2026-10-26 audit). It is a
+ * header rather than a body key because every error body is exactly `{ error, code }`.
  */
-export function errorResponse(err: unknown): Response {
+export function errorResponse(err: unknown, requestId?: string): Response {
+  const response = errorEnvelope(err, requestId);
+  if (requestId) response.headers.set("x-request-id", requestId);
+  return response;
+}
+
+function errorEnvelope(err: unknown, requestId?: string): Response {
   if (err instanceof ApiError) {
     return json({ error: err.message, code: err.code }, err.status);
   }
@@ -93,7 +111,11 @@ export function errorResponse(err: unknown): Response {
     return json({ error: "The database is temporarily unavailable", code: "DATABASE_UNAVAILABLE" }, 503);
   }
 
-  console.error("unhandled route error", err instanceof Error ? err.name : typeof err);
+  console.error(
+    "unhandled route error",
+    err instanceof Error ? err.name : typeof err,
+    requestId ? `requestId=${requestId}` : "",
+  );
   return json({ error: "Something went wrong", code: "INTERNAL_ERROR" }, 500);
 }
 
@@ -105,10 +127,14 @@ type Handler<C = unknown> = (req: Request, ctx: C) => Promise<Response>;
  */
 export function handle<C = unknown>(fn: Handler<C>): (req: Request, ctx: C) => Promise<Response> {
   return async (req: Request, ctx: C) => {
+    // A short id that appears both in the response header and in this server's log, so a
+    // visitor's "reference" is enough for support to find the request (AU-10). Generated only
+    // on the error path's response; a successful call has nothing to trace.
     try {
       return await fn(req, ctx);
     } catch (err) {
-      return errorResponse(err);
+      const requestId = randomUUID().replace(/[^a-z0-9]/gi, "").slice(0, 12).toLowerCase();
+      return errorResponse(err, requestId);
     }
   };
 }

@@ -6,7 +6,10 @@ import { createJobForOrder, processJobById } from "@/lib/fulfilment";
 import { audit } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 120;
+// AU-11 (2026-10-26 audit): the engine call may take up to its 120 s default, and this route
+// renders inline plus writes the audit row. A 120 s function budget could be exhausted by the
+// engine alone, so the reviewer saw a platform timeout instead of the new version.
+export const maxDuration = 300;
 
 type Ctx = { params: Promise<{ id: string }> };
 

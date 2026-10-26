@@ -12,6 +12,7 @@
  *    a delivery problem.
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ApiError } from "@/lib/api";
 
 const mocks = vi.hoisted(() => ({
   prisma: {
@@ -111,9 +112,8 @@ beforeEach(() => {
 describe("a failed GENERATE job alerts the owner", () => {
   it("sends exactly one alert carrying the engine's code", async () => {
     mocks.callEngine.mockRejectedValue(
-      Object.assign(new Error("engine refused"), {
-        status: 503,
-        code: "UPLOAD_HOSTS_UNCONFIGURED",
+      new ApiError(503, "UPLOAD_HOSTS_UNCONFIGURED", "no allowlist", {
+        engineStatus: 503,
       }),
     );
 
@@ -121,7 +121,9 @@ describe("a failed GENERATE job alerts the owner", () => {
 
     expect(outcome).toEqual({ ok: false, note: "failed: UPLOAD_HOSTS_UNCONFIGURED" });
     expect(mocks.failJob).toHaveBeenCalledTimes(1);
-    expect(mocks.failJob).toHaveBeenCalledWith("job_1", "UPLOAD_HOSTS_UNCONFIGURED");
+    // AU-28: the job keeps both the "engine failed" fact and the engine's own code, so the admin
+    // "Recent failures" view can show the cause that actually happened.
+    expect(mocks.failJob).toHaveBeenCalledWith("job_1", "ENGINE_FAILED:UPLOAD_HOSTS_UNCONFIGURED");
     expect(mocks.notifyOwnerEngineFailure).toHaveBeenCalledTimes(1);
     expect(mocks.notifyOwnerEngineFailure).toHaveBeenCalledWith({
       orderId: "order_1",
@@ -144,9 +146,8 @@ describe("a failed GENERATE job alerts the owner", () => {
   });
 
   it("does not alert while a job can still be retried", async () => {
-    mocks.callEngine.mockRejectedValue(
-      Object.assign(new Error("engine hiccup"), { status: 503, code: "ENGINE_UNREACHABLE" }),
-    );
+    // A transport failure never reached the engine, so there is no engine code to prefix.
+    mocks.callEngine.mockRejectedValue(new ApiError(503, "ENGINE_UNREACHABLE", "unreachable"));
 
     const retryable = { ...JOB, attempts: 1 };
     const outcome = await processClaimedJob(retryable as never);
@@ -156,11 +157,21 @@ describe("a failed GENERATE job alerts the owner", () => {
     expect(mocks.notifyOwnerEngineFailure).not.toHaveBeenCalled();
   });
 
+  it("records the engine's own code on a retry too", async () => {
+    mocks.callEngine.mockRejectedValue(
+      new ApiError(503, "UPLOAD_HOSTS_UNCONFIGURED", "no allowlist", { engineStatus: 503 }),
+    );
+
+    const outcome = await processClaimedJob({ ...JOB, attempts: 1 } as never);
+
+    expect(outcome).toEqual({ ok: false, note: "retry: UPLOAD_HOSTS_UNCONFIGURED" });
+    expect(mocks.requeueJob).toHaveBeenCalledWith("job_1", "ENGINE_FAILED:UPLOAD_HOSTS_UNCONFIGURED");
+  });
+
   it("an alert that fails never changes the job outcome", async () => {
     mocks.callEngine.mockRejectedValue(
-      Object.assign(new Error("engine refused"), {
-        status: 503,
-        code: "UPLOAD_HOSTS_UNCONFIGURED",
+      new ApiError(503, "UPLOAD_HOSTS_UNCONFIGURED", "no allowlist", {
+        engineStatus: 503,
       }),
     );
     mocks.notifyOwnerEngineFailure.mockRejectedValue(new Error("resend is down"));
@@ -168,6 +179,6 @@ describe("a failed GENERATE job alerts the owner", () => {
     const outcome = await processClaimedJob(JOB as never);
 
     expect(outcome).toEqual({ ok: false, note: "failed: UPLOAD_HOSTS_UNCONFIGURED" });
-    expect(mocks.failJob).toHaveBeenCalledWith("job_1", "UPLOAD_HOSTS_UNCONFIGURED");
+    expect(mocks.failJob).toHaveBeenCalledWith("job_1", "ENGINE_FAILED:UPLOAD_HOSTS_UNCONFIGURED");
   });
 });
