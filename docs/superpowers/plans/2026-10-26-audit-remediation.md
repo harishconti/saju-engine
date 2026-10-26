@@ -148,6 +148,12 @@ existing admin route); `src/app/api/admin/orders/` (list); the review-queue admi
 3. Add an admin list endpoint returning PAID orders that have **no Report** and **no live/queued
    job** — the set the outage left unrecoverable. Include order id, kind/tier, paid time, last
    error, and profile label. Read-only.
+   **Exclude orders whose report was intentionally deleted**: if an `AuditLog` row exists with
+   `entity = "report"`, `action = "delete"`, and `after->>'orderId'` = the order id (or
+   `before`/`after` identifying that order), the customer deleted it themselves — it is not a
+   failure. Without this filter the list would flag user-deleted drafts as recoverable failures.
+   (Verified against production on 2026-10-26: order `cmvngcbv60007n1wpm8d74f5n` is exactly this
+   case.)
 4. Surface both in the review-queue admin UI: a "Failed orders" table with a Retry button per row,
    and a success/failure message on retry. Keep it behind `requireAdmin`.
 5. Add `htmlKey` to the regenerate path's cleanup if it deletes prior artefacts.
