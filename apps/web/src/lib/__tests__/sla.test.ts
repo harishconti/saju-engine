@@ -24,7 +24,8 @@ const { prismaMock, approveAndDeliver, deliverReport, enqueueAudio, tierPromises
         update: vi.fn(),
         findUnique: vi.fn(),
       },
-      job: { count: vi.fn(), create: vi.fn() },
+      job: { count: vi.fn(), create: vi.fn(), findMany: vi.fn() },
+      auditLog: { findMany: vi.fn() },
       delivery: { create: vi.fn(), findFirst: vi.fn() },
       $transaction: vi.fn(),
       order: { findUnique: vi.fn() },
@@ -63,6 +64,8 @@ beforeEach(() => {
   prismaMock.report.count.mockResolvedValue(0);
   prismaMock.report.update.mockResolvedValue({});
   prismaMock.job.count.mockResolvedValue(0);
+  prismaMock.job.findMany.mockResolvedValue([]);
+  prismaMock.auditLog.findMany.mockResolvedValue([]);
   prismaMock.delivery.create.mockResolvedValue({});
   prismaMock.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) => fn(prismaMock));
   approveAndDeliver.mockResolvedValue({
@@ -244,13 +247,13 @@ describe("the 10-hour rule", () => {
   // re-regenerate creating a fresh row, leaves the old FAILED row behind; an order whose later
   // row succeeded and was delivered has a report. Neither is work a person can do, so neither may
   // keep this sweep on 503.
-  it("reports paid renders that have been failed past the deadline", async () => {
-    prismaMock.job.count.mockResolvedValueOnce(0).mockResolvedValueOnce(0).mockResolvedValueOnce(2);
+  it("reports paid orders whose render has been failed past the deadline", async () => {
+    prismaMock.job.findMany.mockResolvedValueOnce([{ orderId: "o-1" }, { orderId: "o-2" }]);
 
     const result = await runSlaSweep(NOW);
 
     expect(result.overdueFailures).toBe(2);
-    expect(prismaMock.job.count).toHaveBeenNthCalledWith(3, {
+    expect(prismaMock.job.findMany).toHaveBeenCalledWith({
       where: {
         state: "FAILED",
         kind: { in: ["GENERATE", "REGENERATE"] },
@@ -258,13 +261,42 @@ describe("the 10-hour rule", () => {
         // A paid order with no report and no live job — the only state the admin retry can clear.
         order: { is: recoverableOrderWhere },
       },
+      select: { orderId: true },
     });
+  });
+
+  // AU-14 residual (re-review, finding #7): the order predicate alone is not enough. A customer
+  // can delete their own report; `deleteReportArtifacts` removes only the Report row and its
+  // objects, never the Job rows. So an abandoned FAILED REGENERATE from before a later successful
+  // regenerate became `reports: { none: {} }` again and was counted forever, while
+  // `listRecoverableOrders` — which knows from the audit log that the deletion was intentional —
+  // hid the order. The sweep stayed 503 with no "Retry job" row to click. The count now subtracts
+  // the same intentional-deletion set the list uses.
+  it("does not count an order whose report the customer deleted themselves", async () => {
+    prismaMock.job.findMany.mockResolvedValueOnce([{ orderId: "o-deleted" }]);
+    prismaMock.auditLog.findMany.mockResolvedValueOnce([
+      // The delete route records `before.orderId` (AU-02), so the link is direct.
+      { entityId: "r-1", action: "delete", before: { orderId: "o-deleted" }, after: null },
+    ]);
+
+    const result = await runSlaSweep(NOW);
+
+    expect(result.overdueFailures).toBe(0);
+    expect(prismaMock.auditLog.findMany).toHaveBeenCalled();
+  });
+
+  it("still counts a failed order whose audit log shows no deletion", async () => {
+    prismaMock.job.findMany.mockResolvedValueOnce([{ orderId: "o-1" }]);
+
+    const result = await runSlaSweep(NOW);
+
+    expect(result.overdueFailures).toBe(1);
   });
 
   it("agrees with the admin recovery list on what needs a retry", async () => {
     await runSlaSweep(NOW);
 
-    const where = prismaMock.job.count.mock.calls[2][0].where;
+    const where = prismaMock.job.findMany.mock.calls[0][0].where;
     // The four exclusions of AU-02's list, unchanged: a delivered/queued order, a report in
     // review, and an erased account all have no retry for an operator to run.
     expect(recoverableOrderWhere).toEqual({

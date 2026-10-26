@@ -64,53 +64,40 @@ function orderIdFromJson(value: Prisma.JsonValue | null): string | null {
   return typeof orderId === "string" ? orderId : null;
 }
 
-export async function listRecoverableOrders(limit = 100): Promise<RecoverableOrder[]> {
-  const orders = await prisma.order.findMany({
-    where: recoverableOrderWhere,
-    orderBy: { paidAt: "desc" },
-    take: limit,
-    select: {
-      id: true,
-      kind: true,
-      tier: true,
-      paidAt: true,
-      profileA: { select: { label: true } },
-      profileB: { select: { label: true } },
+/**
+ * Which of `orderIds` are report-less because the customer deleted their own report(s), rather than
+ * because a render failed.
+ *
+ * Extracted so the SLA sweep's `overdueFailures` can subtract exactly the set this list hides.
+ * AU-14 (2026-10-26 audit, re-review finding #7): the delete route removes only the Report row and
+ * its objects — never the Job rows — so a deleted report puts an order back into the
+ * `reports: { none: {} }` shape while an abandoned FAILED generate-family row remains. Counting that
+ * row kept `/api/cron/sla` on 503 forever with no "Retry job" row in the console to clear it, which
+ * is precisely the unclearable red this scoping exists to end. The count and the list must share
+ * this computation, not each have their own idea of "missing".
+ *
+ * A deletion is linked to an order two ways (both audited):
+ *  - the delete row names the order in `before.orderId` (written from AU-02 onward); or
+ *  - the delete row names a report id that the order's own `create`/`deliver` row also names — the
+ *    only surviving link for rows written before the delete route recorded the order id.
+ * The report row is gone and the job never stored its id, so the audit log is all there is.
+ */
+export async function findIntentionallyDeletedOrderIds(orderIds: string[]): Promise<Set<string>> {
+  if (orderIds.length === 0) return new Set();
+
+  const auditRows = await prisma.auditLog.findMany({
+    where: {
+      entity: "report",
+      OR: [
+        { action: "delete" },
+        ...orderIds.flatMap((orderId) => [
+          { action: "create", after: { path: ["orderId"], equals: orderId } },
+          { action: "deliver", after: { path: ["orderId"], equals: orderId } },
+        ]),
+      ],
     },
+    select: { entityId: true, action: true, before: true, after: true },
   });
-  if (orders.length === 0) return [];
-
-  const orderIds = orders.map((order) => order.id);
-
-  const [jobs, auditRows] = await Promise.all([
-    // The generate-family jobs only: a VOICE job is a different failure and cannot produce the
-    // missing report. Newest first so the table shows the attempt that actually failed.
-    prisma.job.findMany({
-      where: { orderId: { in: orderIds }, kind: { in: ["GENERATE", "REGENERATE"] } },
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        orderId: true,
-        state: true,
-        attempts: true,
-        maxAttempts: true,
-        lastError: true,
-      },
-    }),
-    prisma.auditLog.findMany({
-      where: {
-        entity: "report",
-        OR: [
-          { action: "delete" },
-          ...orderIds.flatMap((orderId) => [
-            { action: "create", after: { path: ["orderId"], equals: orderId } },
-            { action: "deliver", after: { path: ["orderId"], equals: orderId } },
-          ]),
-        ],
-      },
-      select: { entityId: true, action: true, before: true, after: true },
-    }),
-  ]);
 
   const deletedReportIds = new Set<string>();
   const directlyDeletedOrderIds = new Set<string>();
@@ -141,6 +128,45 @@ export async function listRecoverableOrders(limit = 100): Promise<RecoverableOrd
       }
     }
   }
+
+  return intentionallyDeleted;
+}
+
+export async function listRecoverableOrders(limit = 100): Promise<RecoverableOrder[]> {
+  const orders = await prisma.order.findMany({
+    where: recoverableOrderWhere,
+    orderBy: { paidAt: "desc" },
+    take: limit,
+    select: {
+      id: true,
+      kind: true,
+      tier: true,
+      paidAt: true,
+      profileA: { select: { label: true } },
+      profileB: { select: { label: true } },
+    },
+  });
+  if (orders.length === 0) return [];
+
+  const orderIds = orders.map((order) => order.id);
+
+  const [jobs, intentionallyDeleted] = await Promise.all([
+    // The generate-family jobs only: a VOICE job is a different failure and cannot produce the
+    // missing report. Newest first so the table shows the attempt that actually failed.
+    prisma.job.findMany({
+      where: { orderId: { in: orderIds }, kind: { in: ["GENERATE", "REGENERATE"] } },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        orderId: true,
+        state: true,
+        attempts: true,
+        maxAttempts: true,
+        lastError: true,
+      },
+    }),
+    findIntentionallyDeletedOrderIds(orderIds),
+  ]);
 
   const latestJob = new Map<string, (typeof jobs)[number]>();
   for (const job of jobs) {

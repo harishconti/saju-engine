@@ -1,7 +1,7 @@
 import { prisma } from "./prisma";
 import { deliverReport } from "./email";
 import { approveAndDeliver, ApprovalError } from "./review";
-import { recoverableOrderWhere } from "./admin-recovery";
+import { recoverableOrderWhere, findIntentionallyDeletedOrderIds } from "./admin-recovery";
 
 /**
  * The 10-hour delivery rule.
@@ -75,8 +75,11 @@ export interface SlaSweepResult {
    */
   recentFailures: number;
   /**
-   * Paid renders that have been FAILED for longer than `FAILED_RENDER_DEADLINE_HOURS`. Nothing
-   * retries these automatically, so each one is a paid order that will not arrive without a person.
+   * Paid orders whose generate-family render has been FAILED for longer than
+   * `FAILED_RENDER_DEADLINE_HOURS`. Nothing retries these automatically, so each one is a paid
+   * order that will not arrive without a person. Counted as orders, and scoped by the admin
+   * recovery list's own predicate and customer-deletion exclusion, so every one of them has a
+   * "Retry job" row that will clear it.
    */
   overdueFailures: number;
   ranAt: string;
@@ -211,14 +214,27 @@ export async function runSlaSweep(now: Date = new Date()): Promise<SlaSweepResul
   //    503 no one could clear, which is the alert fatigue this signal exists to avoid. A report
   //    means the order was rendered; a live job means it is being worked on; an erased account is
   //    deliberately never re-rendered.
-  result.overdueFailures = await prisma.job.count({
+  //
+  //    The predicate alone is still not enough, because the customer can delete their own report:
+  //    the delete route removes the Report row and its objects, never the Job rows, so an abandoned
+  //    FAILED attempt comes back into the `reports: { none: {} }` shape while the recovery list —
+  //    which reads the deletion audit rows — hides the order. Counting it would keep this sweep red
+  //    with no row to click (AU-14, re-review finding #7). The same helper the list uses is applied
+  //    here, so the alert and the remedy are the same set by construction.
+  const failedJobs = await prisma.job.findMany({
     where: {
       state: "FAILED",
       kind: { in: ["GENERATE", "REGENERATE"] },
       finishedAt: { lte: hoursAgo(now, FAILED_RENDER_DEADLINE_HOURS) },
       order: { is: recoverableOrderWhere },
     },
+    select: { orderId: true },
   });
+  // Orders, not rows: one order can have several abandoned attempts, and one "Retry job" clears
+  // them all. Counting orders is also what the recovery table shows.
+  const failedOrderIds = [...new Set(failedJobs.map((job) => job.orderId))];
+  const deletedOrderIds = await findIntentionallyDeletedOrderIds(failedOrderIds);
+  result.overdueFailures = failedOrderIds.filter((orderId) => !deletedOrderIds.has(orderId)).length;
 
   return result;
 }
