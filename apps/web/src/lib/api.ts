@@ -62,61 +62,71 @@ export function json(data: unknown, status = 200): Response {
  * Maps a thrown value to the error envelope. Never leaks internals: unknown errors become a
  * generic 500, and Prisma/zod specifics are translated rather than forwarded.
  *
- * `requestId`, when given, is echoed as `x-request-id` so a visitor-facing message can quote a
- * short reference that also appears in this server's log (AU-10, 2026-10-26 audit). It is a
- * header rather than a body key because every error body is exactly `{ error, code }`.
+ * Every failure is logged here, once, as its code and (when known) its request id. AU-10
+ * (2026-10-26 audit): the visitor is told to quote that id to support, so it has to exist in
+ * this server's log for *every* class of error — engine failures arrive as `ApiError`, and
+ * before this only the last-resort branch emitted the id. The message text is deliberately not
+ * logged: an `ApiError`'s message can name environment variables and an exception's can embed
+ * birth data.
+ *
+ * `requestId`, when given, is echoed as `x-request-id`. It is a header rather than a body key
+ * because every error body is exactly `{ error, code }`.
  */
 export function errorResponse(err: unknown, requestId?: string): Response {
-  const response = errorEnvelope(err, requestId);
+  const { response, code } = errorEnvelope(err);
+  console.error(`route error code=${code}${requestId ? ` requestId=${requestId}` : ""}`);
   if (requestId) response.headers.set("x-request-id", requestId);
   return response;
 }
 
-function errorEnvelope(err: unknown, requestId?: string): Response {
+function errorEnvelope(err: unknown): { response: Response; code: string } {
   if (err instanceof ApiError) {
-    return json({ error: err.message, code: err.code }, err.status);
+    return { response: json({ error: err.message, code: err.code }, err.status), code: err.code };
   }
 
   if (err instanceof ZodError) {
     const first = err.issues[0];
     const path = first?.path?.join(".") ?? "";
     const detail = first ? `${path ? `${path}: ` : ""}${first.message}` : "Validation failed";
-    return json({ error: detail, code: "VALIDATION_FAILED" }, 422);
+    return { response: json({ error: detail, code: "VALIDATION_FAILED" }, 422), code: "VALIDATION_FAILED" };
   }
 
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     if (err.code === "P2002") {
-      return json({ error: "Already exists", code: "DUPLICATE" }, 409);
+      return { response: json({ error: "Already exists", code: "DUPLICATE" }, 409), code: "DUPLICATE" };
     }
     if (err.code === "P2025") {
-      return json({ error: "Not found", code: "NOT_FOUND" }, 404);
+      return { response: json({ error: "Not found", code: "NOT_FOUND" }, 404), code: "NOT_FOUND" };
     }
     if (err.code === "P2003") {
-      return json({ error: "Related record is missing", code: "FOREIGN_KEY" }, 409);
+      return { response: json({ error: "Related record is missing", code: "FOREIGN_KEY" }, 409), code: "FOREIGN_KEY" };
     }
     // P1xxx = the database could not be reached (auth, DNS, server down); P2024 = pool timeout.
     // These are availability problems, not bugs: report 503 so the client can say "try again"
     // instead of implying the request was malformed.
     if (err.code.startsWith("P1") || err.code === "P2024") {
       console.error("database unavailable", err.code);
-      return json({ error: "The database is temporarily unavailable", code: "DATABASE_UNAVAILABLE" }, 503);
+      return {
+        response: json({ error: "The database is temporarily unavailable", code: "DATABASE_UNAVAILABLE" }, 503),
+        code: "DATABASE_UNAVAILABLE",
+      };
     }
     console.error("prisma error", err.code);
-    return json({ error: "Database error", code: "DATABASE_ERROR" }, 500);
+    return { response: json({ error: "Database error", code: "DATABASE_ERROR" }, 500), code: "DATABASE_ERROR" };
   }
 
   // Thrown when the client cannot connect at all (bad credentials, suspended compute, no network).
   if (err instanceof Prisma.PrismaClientInitializationError) {
     console.error("database initialization failed", err.errorCode ?? "unknown");
-    return json({ error: "The database is temporarily unavailable", code: "DATABASE_UNAVAILABLE" }, 503);
+    return {
+      response: json({ error: "The database is temporarily unavailable", code: "DATABASE_UNAVAILABLE" }, 503),
+      code: "DATABASE_UNAVAILABLE",
+    };
   }
 
-  console.error(
-    "unhandled route error",
-    err instanceof Error ? err.name : typeof err,
-    requestId ? `requestId=${requestId}` : "",
-  );
-  return json({ error: "Something went wrong", code: "INTERNAL_ERROR" }, 500);
+  // The class name only, never the message: an exception message can embed birth data.
+  console.error("unhandled route error", err instanceof Error ? err.name : typeof err);
+  return { response: json({ error: "Something went wrong", code: "INTERNAL_ERROR" }, 500), code: "INTERNAL_ERROR" };
 }
 
 type Handler<C = unknown> = (req: Request, ctx: C) => Promise<Response>;
