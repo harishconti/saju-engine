@@ -1,5 +1,6 @@
 import type { Job } from "@prisma/client";
 import { prisma } from "./prisma";
+import { notifyOwnerEngineFailure } from "./owner-alert";
 
 /**
  * Lease-based job queue, Postgres-native.
@@ -58,6 +59,18 @@ export async function failJob(jobId: string, error: string): Promise<void> {
   });
 }
 
+/**
+ * Record an attempt that a claim deliberately did not spend.
+ *
+ * AU-12 (2026-10-26 audit): a customer's "Check for updates" claims the job without incrementing
+ * `attempts`, so repeated clicks during an outage cannot exhaust a paid order's retries. A run that
+ * still ends in a terminal failure really did happen, though, so the attempt is written here — the
+ * admin views keep an honest count.
+ */
+export async function recordAttempt(jobId: string): Promise<void> {
+  await prisma.job.update({ where: { id: jobId }, data: { attempts: { increment: 1 } } });
+}
+
 /** Transient failure: release the lease so the next tick retries. */
 export async function requeueJob(jobId: string, error: string): Promise<void> {
   await prisma.job.update({
@@ -72,7 +85,7 @@ export async function reclaimStaleJobs(): Promise<{ requeued: number; failed: nu
 
   const stale = await prisma.job.findMany({
     where: { state: "RUNNING", leaseUntil: { lt: cutoff } },
-    select: { id: true, attempts: true, maxAttempts: true },
+    select: { id: true, orderId: true, kind: true, attempts: true, maxAttempts: true },
   });
 
   let requeued = 0;
@@ -80,6 +93,20 @@ export async function reclaimStaleJobs(): Promise<{ requeued: number; failed: nu
   for (const job of stale) {
     if (job.attempts >= job.maxAttempts) {
       await failJob(job.id, "lease expired after max attempts");
+      // AU-03 (2026-10-26 audit): a generate job that dies mid-render is a paid order that will
+      // not arrive. This is a `failJob` on the same path as the dispatcher's, so it alerts too.
+      if (job.kind !== "VOICE") {
+        try {
+          await notifyOwnerEngineFailure({
+            orderId: job.orderId,
+            code: "LEASE_EXPIRED",
+            attempts: job.attempts,
+          });
+        } catch (err) {
+          // A notification problem is never a delivery problem.
+          console.error("engine failure alert threw:", err instanceof Error ? err.message : "unknown");
+        }
+      }
       failed++;
     } else {
       await requeueJob(job.id, "lease expired; reclaimed");

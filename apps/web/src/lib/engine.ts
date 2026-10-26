@@ -12,6 +12,37 @@ import { parseChartSummary, type ChartSummary } from "./chart";
 
 export const ENGINE_CONTRACT_VERSION = 1;
 
+/**
+ * The free-sample route's engine budget.
+ *
+ * AU-11 (2026-10-26 audit): `/api/sample` allows the function 60 s (`maxDuration`), but the engine
+ * call waited the default 120 s. The platform killed the function first, so the abort never fired,
+ * `ENGINE_TIMEOUT` was never logged, and the visitor got a bare 504. 50 s leaves ~10 s for the
+ * storage verification and the response inside the same invocation.
+ */
+export const SAMPLE_ENGINE_TIMEOUT_MS = 50_000;
+
+/**
+ * The engine codes that retrying cannot fix: the visitor's birth data is wrong.
+ *
+ * AU-09 (2026-10-26 audit): permanence used to be inferred from the HTTP status — every 4xx was
+ * "permanent". The October outage returned `UPLOAD_HOSTS_UNCONFIGURED` as 422, so it was recorded
+ * as bad birth data and five days of refusals were never retried once the allowlist was restored.
+ * Permanence is now an explicit set of birth-data codes; every other failure is retryable.
+ */
+export const PERMANENT_ENGINE_CODES: ReadonlySet<string> = new Set([
+  "INVALID_GENDER",
+  "INVALID_BIRTH_DATE",
+  "INVALID_BIRTH_TIME",
+  "MISSING_LONGITUDE",
+  "MISSING_TIMEZONE",
+  "UNKNOWN_TIMEZONE",
+]);
+
+export function isPermanentEngineFailure(code: string): boolean {
+  return PERMANENT_ENGINE_CODES.has(code);
+}
+
 export interface EngineProfile {
   fullName: string;
   gender: "M" | "F";
@@ -29,7 +60,12 @@ export interface EnginePayload {
   contractVersion: number;
   kind: "single" | "compat";
   tier: string;
-  uploadUrl: string;
+  /**
+   * Where to PUT the PDF. Optional since AU-29 (2026-10-26 audit): the free sample keeps the web
+   * document and discards the PDF, so demanding a PDF target made a sample fail on an upload
+   * nobody keeps. At least one of `uploadUrl` / `htmlUploadUrl` must be present.
+   */
+  uploadUrl?: string;
   /** Where the engine should also PUT the source markdown, so the audio script and the
    *  audit trail derive from the artefact that was actually reviewed. */
   mdUploadUrl?: string;
@@ -43,8 +79,10 @@ export interface EnginePayload {
 }
 
 export interface EngineResult {
-  sha256: string;
-  bytes: number;
+  /** Null when no PDF was requested (a reading-only sample, AU-29). */
+  sha256?: string | null;
+  /** Bytes of the uploaded PDF; null when no PDF was requested (AU-29). */
+  bytes?: number | null;
   engineVersion: string;
   durationMs?: number;
   /**
@@ -129,19 +167,36 @@ export async function callEngine(payload: EnginePayload, timeoutMs = 120_000): P
       return data;
     }
 
-    // 4xx from the engine is permanent (bad birth data will not improve on retry).
     const body = (await res.json().catch(() => ({}))) as { error?: string; code?: string };
-    if (res.status >= 400 && res.status < 500) {
-      throw new ApiError(res.status === 422 ? 422 : 400, body.code ?? "ENGINE_REJECTED", body.error ?? "The engine rejected this chart");
+    const engineCode = body.code?.trim() || "";
+
+    // Only birth-data validation is permanent (AU-09). A 4xx is not enough: the engine answered
+    // UPLOAD_* faults with 422 for five days and this branch filed them as bad input.
+    if (isPermanentEngineFailure(engineCode)) {
+      throw new ApiError(
+        422,
+        engineCode,
+        body.error ?? "The engine rejected this birth data.",
+        { engineStatus: res.status },
+      );
     }
-    // The visitor sees a generic message, but the engine's code is what tells a configuration gap
-    // (e.g. UPLOAD_HOSTS_UNCONFIGURED) apart from a render crash. Code and status only: the body
-    // never carries birth data.
-    console.error("engine generate failed", res.status, body.code ?? "unknown");
-    throw ApiError.unavailable("The report engine failed", "ENGINE_FAILED");
+
+    // Everything else is a service or configuration condition, and therefore retryable. The
+    // engine's own prose can name environment variables, so it goes to the log, not the visitor.
+    // The code and status travel on the error so `fulfilment` can record the real cause and the
+    // sample flow can map the code to copy (AU-10, AU-28).
+    console.error("engine generate failed", res.status, engineCode || "unknown");
+    throw new ApiError(
+      503,
+      engineCode || "ENGINE_FAILED",
+      "We couldn't generate the report just now. Please try again.",
+      { engineStatus: res.status },
+    );
   } catch (err) {
     if (err instanceof ApiError) throw err;
     if (err instanceof Error && err.name === "AbortError") {
+      // AU-11: this is the path that never ran when the function was killed first.
+      console.error("engine generate timed out", `ENGINE_TIMEOUT after ${timeoutMs}ms`);
       throw ApiError.unavailable("The report engine timed out", "ENGINE_TIMEOUT");
     }
     throw ApiError.unavailable("The report engine is unreachable", "ENGINE_UNREACHABLE");
@@ -150,6 +205,15 @@ export async function callEngine(payload: EnginePayload, timeoutMs = 120_000): P
   }
 }
 
+/**
+ * Is the engine able to render?
+ *
+ * AU-03 (2026-10-26 audit): this used to trust the status code alone. The engine answered 200
+ * for five days while refusing every render, because its upload allowlist was empty. The probe
+ * now returns 503 in that state; this client also reports *why* and the allowlist count, which
+ * the authorised `/api/health/detail` view exposes as `engineDetail` (never the public body —
+ * AU-31).
+ */
 export async function engineHealth(): Promise<{ ok: boolean; detail?: string }> {
   if (!isEngineConfigured()) return { ok: false, detail: "not configured" };
   try {
@@ -159,7 +223,15 @@ export async function engineHealth(): Promise<{ ok: boolean; detail?: string }> 
       cache: "no-store",
       signal: AbortSignal.timeout(8_000),
     });
-    return { ok: res.ok, detail: res.ok ? undefined : `HTTP ${res.status}` };
+    // The body is small and never carries secrets — only the code and a count.
+    const body = (await res.json().catch(() => ({}))) as { code?: string; uploadAllowlist?: number };
+    const allowlist =
+      typeof body.uploadAllowlist === "number" ? `uploadAllowlist=${body.uploadAllowlist}` : "";
+    if (!res.ok) {
+      const code = body.code ? ` ${body.code}` : "";
+      return { ok: false, detail: [`HTTP ${res.status}${code}`, allowlist].filter(Boolean).join(" ") };
+    }
+    return { ok: true, detail: allowlist || "uploadAllowlist=unknown" };
   } catch {
     return { ok: false, detail: "unreachable" };
   }
@@ -194,6 +266,7 @@ export async function engineChart(profile: EngineProfile, timeoutMs = 20_000): P
         res.status === 422 ? 422 : 503,
         body.code ?? "CHART_FAILED",
         body.error ?? "The chart could not be derived.",
+        { engineStatus: res.status },
       );
     }
 

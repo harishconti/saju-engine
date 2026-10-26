@@ -23,15 +23,18 @@ Hobby accounts are limited to daily cron jobs. This cron expression (* * * * *)
 would run more than once per day. Upgrade to the Pro plan to unlock all Cron Jobs features.
 ```
 
-So generation cannot depend on a per-minute cron. It depends on three triggers instead:
+So generation cannot depend on a per-minute cron. It depends on four triggers instead:
 
 | Trigger | When | Scope |
 |---|---|---|
-| **Dodo Payments webhook → `after()`** | Immediately after payment, without blocking the provider's 2xx | `runDispatchTick(1)` |
+| **Dodo Payments webhook → `after()`** | Immediately after payment, without blocking the provider's 2xx | `processJobById(createdJobId)` — the job this webhook created, not a queue drain (AU-13) |
+| **GitHub Actions workflow, every 15 min** (`.github/workflows/sla-sweep.yml`) | `*/15 * * * *` → `POST /api/cron/dispatch` | `runDispatchTick(3)` — the primary scheduled trigger (decision D4) |
 | **`POST /api/jobs/kick`** | A client taps "Check for updates" in their dashboard | that caller's own queued jobs only |
-| **Daily cron** | 04:00 UTC | safety net for anything missed |
+| **Daily cron** (`vercel.json`) | 04:00 UTC | `runDispatchTick(3)` — fallback for anything the three above missed |
 
-`after()` from `next/server` is what lets the webhook respond promptly and still generate.
+`after()` from `next/server` is what lets the webhook respond promptly and still generate. The
+15-minute dispatch is a GitHub Actions schedule rather than a Vercel cron because Hobby allows only
+daily crons — see [05](05-report-pipeline.md) §4.
 
 ### Restoring the per-minute dispatcher
 

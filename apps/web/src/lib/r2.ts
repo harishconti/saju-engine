@@ -111,12 +111,23 @@ export function objectKeyFromPdfKey(pdfKey: string): string {
   return pdfKey;
 }
 
+/**
+ * A short-lived signed PUT.
+ *
+ * AU-37 (2026-10-26 audit): this used to pass `ContentType` but leave it out of the signature. AWS's
+ * presigner signs `host` only by default, so any content type was accepted and the parameter was
+ * decorative — it promised that the stored type was fixed when it was not. `signableHeaders` puts
+ * `content-type` into `X-Amz-SignedHeaders`, which makes the value part of the signature: a client
+ * that sends a different type gets `SignatureDoesNotMatch`. The caller must therefore pass the exact
+ * string the uploader sends — the engine sends `application/pdf`, `text/markdown` and
+ * `text/html; charset=utf-8`, and the review console sends `audio/mpeg`.
+ */
 export async function presignPutUrl(key: string, contentType = "application/pdf", expiresIn = 600): Promise<string> {
   const c = config();
   return getSignedUrl(
     s3(),
     new PutObjectCommand({ Bucket: c.bucket as string, Key: key, ContentType: contentType }),
-    { expiresIn },
+    { expiresIn, signableHeaders: new Set(["content-type"]) },
   );
 }
 

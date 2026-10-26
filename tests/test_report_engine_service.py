@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import json
 import sys
+import urllib.request
 from pathlib import Path
 
 import pytest
@@ -40,7 +41,11 @@ from api.index import (  # noqa: E402
     ChartRequest,
     GenerateRequest,
     ScriptRequest,
+    _http_error_handler,
+    _status_for_code,
+    _unexpected_error_handler,
     _validate_upload_url,
+    _validation_error_handler,
     chart,
     generate,
     health,
@@ -87,13 +92,21 @@ def chart_request(**overrides) -> ChartRequest:
 
 
 def test_health_requires_a_token():
+    """AU-09 (2026-10-26 audit): a token mismatch is an engine-side fault, not a bad request.
+
+    It used to be a 401, which `callEngine` folded into a 4xx "the engine rejected this chart" —
+    the same permanent bucket as malformed birth data. A wrong shared secret is a deployment
+    problem, so it is a 503 and carries a code the webapp can map.
+    """
     with pytest.raises(HTTPException) as exc:
         health(authorization=None)
-    assert exc.value.status_code == 401
+    assert exc.value.status_code == 503
+    assert exc.value.detail["code"] == "ENGINE_UNAUTHORIZED"
 
     with pytest.raises(HTTPException) as exc:
         health(authorization="Bearer wrong")
-    assert exc.value.status_code == 401
+    assert exc.value.status_code == 503
+    assert exc.value.detail["code"] == "ENGINE_UNAUTHORIZED"
 
 
 def test_health_fails_closed_when_unconfigured(monkeypatch):
@@ -101,16 +114,187 @@ def test_health_fails_closed_when_unconfigured(monkeypatch):
     with pytest.raises(HTTPException) as exc:
         health(authorization=AUTH)
     assert exc.value.status_code == 503
+    assert exc.value.detail["code"] == "ENGINE_NOT_CONFIGURED"
 
 
 def test_health_reports_contract_and_fonts():
     payload = body_of(health(authorization=AUTH))
     assert payload["status"] == "ok"
+    assert payload["ok"] is True
     assert payload["contractVersion"] == CONTRACT_VERSION
     # E1: the renderer must find fonts from the bundle, not only from the system path,
     # or the PDF silently degrades in a serverless function.
     assert payload["fontsDir"], "no DejaVu directory resolved"
     assert payload["engineVersion"] and payload["engineVersion"] != "0.0.0+unknown"
+    # AU-03 (2026-10-26 audit): the fixture configures four hosts (pdf/md/html test + loopback).
+    assert payload["uploadAllowlist"] == 4
+
+
+def test_health_reports_the_upload_allowlist_count(monkeypatch):
+    """One configured host is one allowlist entry."""
+    monkeypatch.setenv("SAJU_UPLOAD_HOSTS", "only.example")
+
+    response = health(authorization=AUTH)
+
+    assert response.status_code == 200
+    payload = body_of(response)
+    assert payload["ok"] is True
+    assert payload["uploadAllowlist"] == 1
+
+
+def test_health_fails_when_the_upload_allowlist_is_empty(monkeypatch):
+    """AU-03: an engine that refuses every render must not report healthy.
+
+    In October `SAJU_UPLOAD_HOSTS` was unset for five days. Every `/generate` returned
+    `UPLOAD_HOSTS_UNCONFIGURED`, but `/health` checked only the token and imports, so the
+    probe stayed green and nothing noticed.
+    """
+    monkeypatch.delenv("SAJU_UPLOAD_HOSTS", raising=False)
+    monkeypatch.delenv("R2_ENDPOINT", raising=False)
+
+    response = health(authorization=AUTH)
+
+    assert response.status_code == 503
+    payload = body_of(response)
+    assert payload["ok"] is False
+    assert payload["code"] == "UPLOAD_HOSTS_UNCONFIGURED"
+    assert payload["uploadAllowlist"] == 0
+    # The house error envelope: both keys, and no secret in the message.
+    assert isinstance(payload["error"], str) and payload["error"]
+
+
+# ─────────────── AU-09: status mapping and the house error envelope ───────────────
+#
+# The October outage was five days of `UPLOAD_HOSTS_UNCONFIGURED` answered as 422. The webapp
+# treats 422 as permanent ("the visitor's birth data is wrong, retrying cannot help"), so the
+# engine's own misconfiguration was filed as bad input and never retried. The contract these
+# tests lock: configuration/auth faults are 503, only birth-data validation is 422, and every
+# error body is `{ error, code }` — never a bare string, never a missing code.
+
+
+@pytest.mark.parametrize(
+    "call",
+    [
+        lambda: health(authorization="Bearer wrong"),
+        lambda: chart(chart_request(), authorization="Bearer wrong"),
+        lambda: generate(generate_request(), authorization="Bearer wrong"),
+        lambda: script(ScriptRequest(markdown=APPROVED_MARKDOWN), authorization="Bearer wrong"),
+    ],
+    ids=["health", "chart", "generate", "script"],
+)
+def test_an_auth_mismatch_is_a_503_with_a_code(call):
+    with pytest.raises(HTTPException) as exc:
+        call()
+    assert exc.value.status_code == 503
+    assert exc.value.detail["code"] == "ENGINE_UNAUTHORIZED"
+
+
+def test_a_missing_service_token_is_a_503_with_a_code(monkeypatch):
+    monkeypatch.delenv("ENGINE_SERVICE_TOKEN", raising=False)
+    with pytest.raises(HTTPException) as exc:
+        generate(generate_request(), authorization=AUTH)
+    assert exc.value.status_code == 503
+    assert exc.value.detail["code"] == "ENGINE_NOT_CONFIGURED"
+
+
+@pytest.mark.parametrize(
+    "upload_url, code",
+    [
+        ("https://evil.example/put", "UPLOAD_URL_NOT_ALLOWED"),
+        ("http://pdf.test/put", "UPLOAD_URL_INSECURE"),
+        ("https://user:pass@pdf.test/put", "UPLOAD_URL_INVALID"),
+        ("https://pdf.test/other-bucket/x.pdf", "UPLOAD_PATH_NOT_ALLOWED"),
+    ],
+)
+def test_upload_target_faults_are_503_with_a_code(upload_url, code, monkeypatch):
+    """Every `UPLOAD_*` fault is a deployment/caller fault, not the visitor's birth data."""
+    monkeypatch.setenv("SAJU_UPLOAD_BUCKET", "saju-engine-dev")
+    response = generate(generate_request(uploadUrl=upload_url), authorization=AUTH)
+    assert response.status_code == 503
+    payload = body_of(response)
+    assert payload["code"] == code
+    assert set(payload) == {"error", "code"}
+
+
+def test_a_storage_write_failure_is_a_503():
+    assert _status_for_code("UPLOAD_FAILED") == 503
+
+
+def test_only_birth_data_codes_keep_422():
+    for code in (
+        "INVALID_GENDER",
+        "INVALID_BIRTH_DATE",
+        "INVALID_BIRTH_TIME",
+        "MISSING_LONGITUDE",
+        "MISSING_TIMEZONE",
+        "UNKNOWN_TIMEZONE",
+    ):
+        assert _status_for_code(code) == 422, code
+    for code in ("UPLOAD_HOSTS_UNCONFIGURED", "ENGINE_UNAUTHORIZED", "CONTRACT_VERSION_MISMATCH"):
+        assert _status_for_code(code) != 422, code
+
+
+def _run(coro):
+    import asyncio
+
+    return asyncio.run(coro)
+
+
+def test_a_bare_http_exception_still_speaks_the_house_envelope():
+    """Starlette's own 404/405 carry a string detail; the client must still get `{error, code}`."""
+    response = _run(_http_error_handler(None, HTTPException(status_code=404, detail="Not Found")))
+
+    assert response.status_code == 404
+    payload = body_of(response)
+    assert set(payload) == {"error", "code"}
+    assert isinstance(payload["error"], str) and payload["error"]
+    assert payload["code"] == "NOT_FOUND"
+
+
+def test_a_request_validation_error_is_422_with_a_code():
+    """A malformed body is rejected by pydantic before any endpoint runs — still the envelope."""
+    from fastapi.exceptions import RequestValidationError
+
+    exc = RequestValidationError(
+        [{"type": "missing", "loc": ("body", "uploadUrl"), "msg": "Field required", "input": {}}]
+    )
+    response = _run(_validation_error_handler(None, exc))
+
+    assert response.status_code == 422
+    payload = body_of(response)
+    assert set(payload) == {"error", "code"}
+    assert payload["code"] == "INVALID_REQUEST"
+
+
+def test_an_unexpected_exception_is_a_500_in_the_house_envelope():
+    response = _run(_unexpected_error_handler(None, RuntimeError("boom with birth data")))
+
+    assert response.status_code == 500
+    payload = body_of(response)
+    assert set(payload) == {"error", "code"}
+    assert payload["code"] == "INTERNAL_ERROR"
+    # Never the exception message: it can embed birth data.
+    assert "boom" not in payload["error"]
+
+
+def test_health_makes_no_network_calls(monkeypatch):
+    """Cheap by contract: an uptime monitor hits this every minute."""
+    import api.index as svc
+
+    class _NoNetwork:
+        def open(self, *args, **kwargs):  # noqa: ANN002, ANN003
+            raise AssertionError("health must not open a network connection")
+
+    def no_urlopen(*args, **kwargs):  # noqa: ANN002, ANN003
+        raise AssertionError("health must not call urllib.request.urlopen")
+
+    monkeypatch.setattr(svc, "_UPLOAD_OPENER", _NoNetwork())
+    monkeypatch.setattr(urllib.request, "urlopen", no_urlopen)
+
+    payload = body_of(health(authorization=AUTH))
+
+    assert payload["ok"] is True
+    assert payload["uploadAllowlist"] == 4
 
 
 # ─────────────────────────────── /chart facts ───────────────────────────────
@@ -181,8 +365,9 @@ def test_chart_requires_a_timezone_or_offset():
 
 
 def test_chart_rejects_a_wrong_contract_version():
+    """A contract mismatch is a caller bug, not birth data: 400, never the permanent 422."""
     response = chart(chart_request(contractVersion=99), authorization=AUTH)
-    assert response.status_code == 422
+    assert response.status_code == 400
     assert body_of(response)["code"] == "CONTRACT_VERSION_MISMATCH"
 
 
@@ -204,36 +389,37 @@ def generate_request(**overrides) -> GenerateRequest:
 def test_generate_requires_auth():
     with pytest.raises(HTTPException) as exc:
         generate(generate_request(), authorization=None)
-    assert exc.value.status_code == 401
+    assert exc.value.status_code == 503
+    assert exc.value.detail["code"] == "ENGINE_UNAUTHORIZED"
 
 
 def test_generate_rejects_a_wrong_contract_version():
     response = generate(generate_request(contractVersion=99), authorization=AUTH)
-    assert response.status_code == 422
+    assert response.status_code == 400
     assert body_of(response)["code"] == "CONTRACT_VERSION_MISMATCH"
 
 
 def test_generate_rejects_an_unknown_kind():
     response = generate(generate_request(kind="triple"), authorization=AUTH)
-    assert response.status_code == 422
+    assert response.status_code == 400
     assert body_of(response)["code"] == "INVALID_KIND"
 
 
 def test_generate_rejects_a_tier_that_does_not_belong_to_the_kind():
     response = generate(generate_request(tier="basic"), authorization=AUTH)
-    assert response.status_code == 422
+    assert response.status_code == 400
     assert body_of(response)["code"] == "INVALID_TIER"
 
     response = generate(
         generate_request(kind="compat", tier="essential", profileB=RM), authorization=AUTH
     )
-    assert response.status_code == 422
+    assert response.status_code == 400
     assert body_of(response)["code"] == "INVALID_TIER"
 
 
 def test_generate_requires_two_people_for_a_compatibility_reading():
     response = generate(generate_request(kind="compat", tier="deep"), authorization=AUTH)
-    assert response.status_code == 422
+    assert response.status_code == 400
     assert body_of(response)["code"] == "COMPAT_NEEDS_TWO_PROFILES"
 
 
@@ -352,6 +538,70 @@ def test_a_failed_web_document_upload_still_delivers_the_report(monkeypatch):
     assert body["sha256"], "the PDF still reported its own integrity metadata"
 
 
+def test_a_reading_only_request_needs_no_pdf_upload(monkeypatch):
+    """AU-29 (2026-10-26 audit): a sample keeps the reading and discards the PDF.
+
+    Requiring a PDF upload target meant a sample rendered, uploaded a PDF nobody keeps, and
+    failed if that throwaway upload failed. The contract now accepts a reading-only request:
+    `uploadUrl` is optional, the response is about the reading, and there is no PDF metadata
+    to describe because no PDF was requested.
+    """
+    import api.index as svc
+
+    uploaded: dict = {}
+
+    def fake_upload(artifact, url, *, content_type="application/pdf", timeout=60.0):
+        uploaded[str(url)] = (artifact.read_bytes(), content_type)
+
+    monkeypatch.setattr(svc, "_upload", fake_upload)
+    response = generate(
+        generate_request(tier="sample", uploadUrl=None, htmlUploadUrl="https://html.test/put"),
+        authorization=AUTH,
+    )
+    assert response.status_code == 200, body_of(response)
+
+    body = body_of(response)
+    assert list(uploaded) == ["https://html.test/put"], "the discarded PDF was never uploaded"
+    document, content_type = uploaded["https://html.test/put"]
+    # The exact string the webapp presigns (AU-37), so the signature cannot mismatch.
+    assert content_type == "text/html; charset=utf-8"
+    assert document.startswith(b"<!DOCTYPE html")
+    assert body["htmlBytes"] == len(document)
+    assert body["htmlSha256"] and len(body["htmlSha256"]) == 64
+    # No PDF was requested, so there is no PDF to report integrity metadata for.
+    assert body["sha256"] is None and body["bytes"] is None
+
+
+def test_a_failed_reading_upload_is_an_html_specific_failure(monkeypatch):
+    """AU-29: when the reading is the only artefact, losing it fails the request.
+
+    It must not answer 200 with `htmlBytes: null` and leave the caller to discover the loss
+    through `headObject` — that surfaced as `UPLOAD_NOT_VERIFIED`, which says nothing about the
+    reading. A real storage rejection is `HTML_UPLOAD_FAILED`, and the URL stays out of the body.
+    """
+    import api.index as svc
+
+    def open_fails(request, timeout=60.0):
+        raise urllib.error.HTTPError(request.full_url, 403, "SignatureDoesNotMatch", {}, None)
+
+    monkeypatch.setattr(svc._UPLOAD_OPENER, "open", open_fails)
+    response = generate(
+        generate_request(tier="sample", uploadUrl=None, htmlUploadUrl="https://html.test/put"),
+        authorization=AUTH,
+    )
+    assert response.status_code == 502
+    payload = body_of(response)
+    assert payload["code"] == "HTML_UPLOAD_FAILED"
+    assert "html.test" not in payload["error"], "the presigned URL leaked into the error message"
+
+
+def test_generate_still_requires_some_upload_target():
+    """A render nobody can retrieve is not a render: at least one artefact target is required."""
+    response = generate(generate_request(uploadUrl=None), authorization=AUTH)
+    assert response.status_code == 400
+    assert body_of(response)["code"] == "MISSING_UPLOAD_URL"
+
+
 def test_no_web_document_is_rendered_unless_asked_for(monkeypatch):
     """A caller that does not ask pays nothing for it — and the response says so."""
     import api.index as svc
@@ -381,8 +631,9 @@ def test_generate_surfaces_an_upload_failure_without_leaking_the_url():
 
 
 def test_generate_refuses_an_upload_url_on_an_unlisted_host():
+    """AU-09: a storage-target fault is a 503, never a 422 the webapp records as bad birth data."""
     response = generate(generate_request(uploadUrl="https://evil.example/put"), authorization=AUTH)
-    assert response.status_code == 422
+    assert response.status_code == 503
     payload = body_of(response)
     assert payload["code"] == "UPLOAD_URL_NOT_ALLOWED"
     assert "evil.example" not in payload["error"], "the target host leaked into the error"
@@ -390,7 +641,7 @@ def test_generate_refuses_an_upload_url_on_an_unlisted_host():
 
 def test_generate_refuses_plain_http_to_a_remote_host():
     response = generate(generate_request(uploadUrl="http://pdf.test/put"), authorization=AUTH)
-    assert response.status_code == 422
+    assert response.status_code == 503
     assert body_of(response)["code"] == "UPLOAD_URL_INSECURE"
 
 
@@ -398,7 +649,7 @@ def test_generate_refuses_an_upload_url_with_embedded_credentials():
     response = generate(
         generate_request(uploadUrl="https://user:pass@pdf.test/put"), authorization=AUTH
     )
-    assert response.status_code == 422
+    assert response.status_code == 503
     assert body_of(response)["code"] == "UPLOAD_URL_INVALID"
 
 
@@ -406,7 +657,7 @@ def test_generate_refuses_a_markdown_upload_to_an_unlisted_host():
     response = generate(
         generate_request(mdUploadUrl="https://evil.example/put"), authorization=AUTH
     )
-    assert response.status_code == 422
+    assert response.status_code == 503
     assert body_of(response)["code"] == "UPLOAD_URL_NOT_ALLOWED"
 
 
@@ -457,6 +708,44 @@ def test_bucket_scope_accepts_a_virtual_hosted_bucket(monkeypatch):
     assert _validate_upload_url(
         "https://other-bucket.account.r2.cloudflarestorage.com/reports/x.pdf"
     ) == "UPLOAD_PATH_NOT_ALLOWED"
+
+
+def test_the_smoke_tool_presigns_exactly_like_the_webapp(monkeypatch):
+    """AU-03: the smoke must sign the URL shape the engine is really sent.
+
+    `src/lib/r2.ts` builds its S3 client without `forcePathStyle`, so the bucket is the first
+    host label. The smoke tool used to sign path-style, which the engine would have accepted —
+    it exercised a target production never uses, so it could pass while a real render failed.
+    """
+    if str(PROJECT_ROOT / "tools") not in sys.path:
+        sys.path.insert(0, str(PROJECT_ROOT / "tools"))
+    import smoke_compat_reading as smoke  # noqa: PLC0415
+
+    cfg = smoke.R2Config(
+        endpoint="https://account.r2.cloudflarestorage.com",
+        bucket="saju-engine-dev",
+        access_key_id="AKIAEXAMPLE",
+        secret_access_key="not-a-real-secret",
+    )
+    url = smoke.presign("PUT", "smoke/compat-basic-1.pdf", cfg)
+
+    # Virtual-hosted: the bucket is a subdomain, and there is no bucket path segment.
+    assert url.startswith("https://saju-engine-dev.account.r2.cloudflarestorage.com/smoke/")
+    assert "/saju-engine-dev/" not in url
+    assert "X-Amz-Signature=" in url
+
+    # The allowlist production actually configures: the virtual-hosted host, nothing else.
+    monkeypatch.delenv("R2_ENDPOINT", raising=False)
+    monkeypatch.delenv("SAJU_UPLOAD_BUCKET", raising=False)
+    monkeypatch.setenv("SAJU_UPLOAD_HOSTS", "saju-engine-dev.account.r2.cloudflarestorage.com")
+    assert _validate_upload_url(url) is None
+
+    # The old path-style shape — the same object, the same credentials — is refused.
+    path_style = (
+        "https://account.r2.cloudflarestorage.com/saju-engine-dev/smoke/compat-basic-1.pdf"
+        "?X-Amz-Signature=deadbeef"
+    )
+    assert _validate_upload_url(path_style) == "UPLOAD_URL_NOT_ALLOWED"
 
 
 # ─────────────────────── request-size and field bounds ───────────────────────
@@ -572,7 +861,8 @@ Water finds its level. That is the whole of it.
 def test_script_requires_a_token():
     with pytest.raises(HTTPException) as exc:
         script(ScriptRequest(markdown=APPROVED_MARKDOWN), authorization=None)
-    assert exc.value.status_code == 401
+    assert exc.value.status_code == 503
+    assert exc.value.detail["code"] == "ENGINE_UNAUTHORIZED"
 
 
 def test_script_derives_a_spoken_script_from_the_approved_markdown():
@@ -608,13 +898,13 @@ def test_script_is_deterministic():
 
 def test_script_rejects_a_wrong_contract_version():
     response = script(ScriptRequest(contractVersion=99, markdown=APPROVED_MARKDOWN), authorization=AUTH)
-    assert response.status_code == 422
+    assert response.status_code == 400
     assert body_of(response)["code"] == "CONTRACT_VERSION_MISMATCH"
 
 
 def test_script_rejects_empty_text():
     response = script(ScriptRequest(markdown="   "), authorization=AUTH)
-    assert response.status_code == 422
+    assert response.status_code == 400
     assert body_of(response)["code"] == "EMPTY_MARKDOWN"
 
 

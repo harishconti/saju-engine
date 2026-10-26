@@ -1,10 +1,7 @@
 import { errorResponse, json } from "@/lib/api";
 import { prisma } from "@/lib/prisma";
-import { audit, writeAudit } from "@/lib/audit";
-import { runDispatchTick } from "@/lib/fulfilment";
+import { DODO_PROVIDER, processDodoEvent, type DodoEvent } from "@/lib/dodo-webhook";
 import { verifyStandardWebhook } from "@/lib/webhook-signature";
-import { after } from "next/server";
-import { track } from "@vercel/analytics/server";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -18,25 +15,17 @@ export const maxDuration = 300;
  *
  * Order of operations matters:
  *   1. Verify the Standard Webhooks signature against the RAW body (before any JSON parsing).
- *   2. Record the event, deduped on the `webhook-id` header. A duplicate returns 200 IMMEDIATELY —
- *      anything non-2xx makes Dodo retry forever.
- *   3. Mutate inside one transaction: Order -> PAID, Job -> QUEUED, audit.
+ *   2. Record the event, deduped on the `webhook-id` header.
+ *   3. Process it through the shared `processDodoEvent` (the same function the cleanup cron replays
+ *      with), then mark `processedAt`.
+ *
+ * A duplicate is acknowledged with 200 IMMEDIATELY — anything non-2xx makes Dodo retry forever —
+ * but only once the stored event was actually processed. If the first attempt crashed mid-way,
+ * `processedAt` is still null and the redelivery is re-processed instead (AU-05). The event id is
+ * still deduped in the database, so this cannot create a second row.
  *
  * Contract: docs/webapp/03-api-spec.md, docs/webapp/05-report-pipeline.md §6
  */
-
-interface DodoEvent {
-  /** e.g. "payment.succeeded" */
-  type?: string;
-  timestamp?: string;
-  data?: {
-    payment_id?: string;
-    status?: string;
-    metadata?: Record<string, unknown>;
-    customer?: { email?: string };
-    checkout_session_id?: string;
-  };
-}
 
 export async function POST(req: Request): Promise<Response> {
   try {
@@ -77,7 +66,7 @@ export async function POST(req: Request): Promise<Response> {
     try {
       const row = await prisma.webhookEvent.create({
         data: {
-          provider: "dodo",
+          provider: DODO_PROVIDER,
           eventId: webhookId as string,
           type,
           payload: JSON.parse(rawBody) as never,
@@ -88,91 +77,21 @@ export async function POST(req: Request): Promise<Response> {
     } catch (err) {
       const isUnique =
         typeof err === "object" && err !== null && "code" in err && (err as { code?: string }).code === "P2002";
-      if (isUnique) return json({ ok: true, duplicate: true });
-      throw err;
-    }
+      if (!isUnique) throw err;
 
-    const orderId = typeof event.data?.metadata?.order_id === "string" ? event.data.metadata.order_id : null;
-    const paymentId = event.data?.payment_id ?? null;
-
-    if (type === "payment.succeeded" && orderId) {
-      const order = await prisma.order.findUnique({
-        where: { id: orderId },
-        select: { id: true, status: true, tier: true },
+      // The provider is retrying an event we already recorded. Only a fully processed event is a
+      // duplicate; otherwise the first attempt died between the insert and `processedAt`, and this
+      // delivery is the retry that must finish the work.
+      const stored = await prisma.webhookEvent.findUnique({
+        where: { provider_eventId: { provider: DODO_PROVIDER, eventId: webhookId as string } },
+        select: { id: true, processedAt: true },
       });
-
-      if (order && order.status !== "PAID" && order.status !== "REFUNDED") {
-        await prisma.$transaction(async (tx) => {
-          await tx.order.update({
-            where: { id: order.id },
-            data: { status: "PAID", paidAt: new Date(), provider: "dodo", providerOrderId: paymentId },
-          });
-          await tx.job.create({ data: { orderId: order.id, kind: "GENERATE", state: "QUEUED" } });
-          await writeAudit(tx, {
-            entity: "order",
-            entityId: order.id,
-            action: "paid",
-            actorId: null,
-            after: { provider: "dodo", paymentId, tier: order.tier },
-          });
-        });
-
-        // Revenue event, server-side on purpose: it fires on the provider's confirmation rather than
-        // on a browser redirect the buyer may never complete, and it cannot be lost to an ad blocker.
-        // Only reachable on the first transition to PAID (the guard above skips replays), so a
-        // duplicate webhook cannot double-count revenue. Wrapped because analytics must never be able
-        // to break fulfilment — and the client rejects non-primitive property values by throwing.
-        try {
-          await track("purchase", { tier: order.tier, provider: "dodo" });
-        } catch {
-          // Fulfilment already committed; a lost analytics event is acceptable.
-        }
-
-        // Dispatch without blocking the provider's 2xx. On Vercel Hobby there is no per-minute cron,
-        // so this is the primary generation trigger.
-        try {
-          after(async () => {
-            try {
-              await runDispatchTick(1);
-            } catch {
-              // Job stays QUEUED: the daily cron, the dashboard kick, or an admin regenerate recovers it.
-            }
-          });
-        } catch {
-          // `after` unavailable — recovery paths above pick it up.
-        }
-      }
+      if (!stored || stored.processedAt) return json({ ok: true, duplicate: true });
+      eventRowId = stored.id;
     }
 
-    if ((type === "payment.failed" || type === "payment.cancelled") && orderId) {
-      // Deliberately NOT cancelling the order: the customer can retry, and Dodo reuses the order id
-      // from metadata on a fresh checkout. We only record what happened.
-      await audit({
-        entity: "order",
-        entityId: orderId,
-        action: "update",
-        actorId: null,
-        after: { provider: "dodo", paymentState: type, paymentId },
-      });
-    }
-
-    if (type === "refund.succeeded" && orderId) {
-      const order = await prisma.order.findUnique({ where: { id: orderId }, select: { id: true, status: true } });
-      if (order && order.status !== "REFUNDED") {
-        await prisma.$transaction(async (tx) => {
-          await tx.order.update({ where: { id: order.id }, data: { status: "REFUNDED" } });
-          await writeAudit(tx, {
-            entity: "order",
-            entityId: order.id,
-            action: "refund",
-            actorId: null,
-            before: { status: order.status },
-            after: { status: "REFUNDED", paymentId },
-          });
-        });
-      }
-    }
-
+    // Step 3: apply the event (shared with the cron's replay), then mark it processed.
+    await processDodoEvent(event);
     await prisma.webhookEvent.update({ where: { id: eventRowId }, data: { processedAt: new Date() } });
 
     return json({ ok: true, type });

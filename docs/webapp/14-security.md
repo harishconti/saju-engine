@@ -55,7 +55,7 @@ and the shared secrets (`ENGINE_SERVICE_TOKEN`, `CRON_SECRET`, `DODO_PAYMENTS_WE
 | Rate limiting | `src/lib/ratelimit.ts` | Postgres fixed window; public + mutating routes | see §3 |
 | Client IP trust | `src/lib/client-ip.ts` | Prefer `x-vercel-forwarded-for` / `x-real-ip`; raw `x-forwarded-for` uses the **rightmost** hop | `client-ip.test.ts` |
 | Email abuse | `src/app/api/sample/email/route.ts` | Per-IP (5/min, 20/h) **and per-recipient** (2/h) | — |
-| Bot protection | `src/lib/turnstile.ts` | Cloudflare Turnstile; `off` / `log` / `enforce`; state exposed by `/api/health` | `turnstile.test.ts` |
+| Bot protection | `src/lib/turnstile.ts` | Cloudflare Turnstile; `off` / `log` / `enforce`; state exposed by the authorised `/api/health/detail` | `turnstile.test.ts` |
 | Storage | `src/lib/r2.ts` | Private bucket; presigned PUT/GET with short TTLs; object keys derived server-side | `r2.integration.test.ts` |
 | Security headers | `apps/web/next.config.ts` | CSP (`default-src 'self'`, `object-src 'none'`, `frame-ancestors 'none'`), HSTS, `nosniff`, `X-Frame-Options: DENY`, Referrer/Permissions policy, no `X-Powered-By` | manual / `audit-ui` |
 | CSRF | Neon Auth cookies + JSON-only mutations + `form-action 'self'` + no CORS | implicit; see §5.4 | — |
@@ -70,8 +70,10 @@ and the shared secrets (`ENGINE_SERVICE_TOKEN`, `CRON_SECRET`, `DODO_PAYMENTS_WE
    engine is token-gated, so this was not internet-reachable abuse — but a leaked token or a webapp
    bug made it an arbitrary-URL write primitive (including cloud metadata). Now every target must
    pass `_validate_upload_url`: https (or http to loopback), no embedded credentials, no fragment,
-   host on `R2_ENDPOINT`/`SAJU_UPLOAD_HOSTS`, and — when `SAJU_UPLOAD_BUCKET` is set — a path under
-   that bucket. **No allowlist means 503**: fail closed.
+   host on `R2_ENDPOINT`/`SAJU_UPLOAD_HOSTS` (one of them must be set on the engine project), and —
+   when `SAJU_UPLOAD_BUCKET` is set — that bucket as the first path segment (path-style) or the
+   first host label (virtual-hosted, which is what the webapp presigns). **No allowlist means 503**:
+   fail closed.
 2. **Unbounded request bodies.** FastAPI/Starlette impose no limit. Added
    `MaxBodySizeMiddleware` (default 2 MB) and pydantic bounds on every engine field, including
    `ScriptRequest.markdown` (1 M chars).
@@ -79,7 +81,7 @@ and the shared secrets (`ENGINE_SERVICE_TOKEN`, `CRON_SECRET`, `DODO_PAYMENTS_WE
    client can prepend. It now prefers Vercel's own headers and otherwise takes the **rightmost** hop.
 4. **Open mail relay.** `POST /api/sample/email` sends mail from our domain to a caller-chosen
    address. Added a per-recipient bucket (2/h) on top of the per-IP buckets.
-5. **Invisible bot-protection state.** `/api/health` now reports `botProtection: off|log|enforce`
+5. **Invisible bot-protection state.** `/api/health/detail` reports `botProtection: off|log|enforce`
    and `botProtectionConfigured`, so a `log` rollout cannot be mistaken for `enforce`.
 
 ## 4. Deploying these changes
@@ -88,21 +90,24 @@ The engine change **fails closed**, so it needs one of these set on the `saju-re
 project **before or with** the deploy, or every `/generate` returns `503 UPLOAD_HOSTS_UNCONFIGURED`:
 
 ```bash
-# Preferred: the same value the webapp already has.
+# Required: the virtual-hosted host the webapp presigns into ({bucket}.{account_id}.r2...).
+# The bucket is the first DNS label, not a path segment (apps/web/src/lib/r2.ts, no forcePathStyle).
+SAJU_UPLOAD_HOSTS=saju-engine-dev.«account_id».r2.cloudflarestorage.com
+
+# Alternative: the account origin. The engine accepts exactly one bucket label in front of it,
+# so this also allows the virtual-hosted URL the webapp actually signs. Set one or both.
 R2_ENDPOINT=https://«account_id».r2.cloudflarestorage.com
 
-# Optional, stricter: also pin the bucket prefix.
+# Optional, stricter: pin the bucket — first path segment (path-style) or first host label
+# (virtual-hosted).
 SAJU_UPLOAD_BUCKET=saju-engine-dev
-
-# Or an explicit list (comma-separated) if a proxy/second bucket is used.
-SAJU_UPLOAD_HOSTS=account.r2.cloudflarestorage.com
 ```
 
 Then flip bot protection only after a real browser has completed the challenge:
 
 ```bash
 vercel env add TURNSTILE_MODE production   # value: enforce
-# /api/health must show botProtection: "enforce" after the redeploy.
+# With HEALTH_DETAIL_TOKEN, /api/health/detail must show botProtection: "enforce" after the redeploy.
 ```
 
 ## 5. Deliberate residual risks (not "done")
@@ -129,9 +134,17 @@ vercel env add TURNSTILE_MODE production   # value: enforce
 9. **The legacy FastAPI intake app** (`tools/client_intake_app.py`, `src/saju_web/`) is a separate
    surface with its own queue/tokens/CORS posture. It is not deployed at cosmicsaju.com; if it is
    ever exposed, it needs its own review at this bar.
-10. **`/api/health` is public** and discloses coarse configuration (db/storage/engine booleans,
-    `paymentsMode`, `botProtection`, version). Accepted: it is what makes an outage visible, and it
-    carries no secret.
+10. **`/api/health` was public and disclosed coarse configuration** (db/storage/engine booleans,
+    `paymentsMode`, `botProtection`, version). **Fixed 2026-10-26 (AU-31):** the public body is now
+    `{ok, status, version, checkedAt}` only. The diagnosis moved to `/api/health/detail`, which needs
+    `HEALTH_DETAIL_TOKEN` or an admin session and answers `401` to everyone else without probing.
+11. **The auth API still reveals account existence.** Neon Auth answers sign-up for an existing
+    address with `422 USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL`. The login page already maps that to a
+    neutral message, but a caller reading the API directly still learns the fact. **Owner action
+    (AU-35):** enable **Require email verification** for the Neon Auth email/password provider (with
+    Resend SMTP configured) so sign-up cannot be used as an account-enumeration oracle. This is a
+    console setting, not code; the exact steps are in
+    [08 — Deployment](08-deployment.md#pre-launch-verification).
 
 ## 6. How to verify
 
@@ -146,8 +159,9 @@ cd apps/web && npm run lint && npm run typecheck
 # Dependencies
 cd apps/web && npm audit --omit=dev
 
-# Live posture (after deploy)
-curl -s https://www.cosmicsaju.com/api/health | jq '{status, botProtection, paymentsMode}'
+# Live posture (after deploy) — the detail view needs the operator token
+curl -s -H "Authorization: Bearer $HEALTH_DETAIL_TOKEN" \
+  https://www.cosmicsaju.com/api/health/detail | jq '{status, botProtection, paymentsMode}'
 ```
 
 ## 7. Maintenance rule

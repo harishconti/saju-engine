@@ -1,10 +1,23 @@
-name: Review queue SLA sweep
+name: Review queue SLA sweep, job dispatch and engine smoke
 
-# Releases any reading that has been waiting for a person for more than 10 hours.
+# Releases any reading that has been waiting for a person for more than 10 hours, dispatches queued
+# jobs every 15 minutes, and (every 30 minutes) renders a real compatibility reading through the
+# deployed engine.
 #
 # Why GitHub Actions and not a Vercel cron: the account is on the Hobby plan, which allows two
-# cron jobs and runs them once a day — far too coarse for a ten-hour rule. A scheduled workflow
-# every 15 minutes costs nothing and lands the release within 10h + 15 min of the deadline.
+# cron jobs and runs them once a day — far too coarse for a ten-hour rule, and far too coarse for
+# job dispatch. A scheduled workflow every 15 minutes costs nothing and lands the release within
+# 10h + 15 min of the deadline.
+#
+# AU-13 (2026-10-26 audit): the dispatcher was believed to run every minute, but Vercel's daily cron
+# was the only trigger besides the webhook — a queued `VOICE` job had waited since 2026-10-26 06:36.
+# Decision D4: dispatch from this workflow (the `dispatch` job below); `vercel.json`'s daily cron
+# stays as a harmless fallback.
+#
+# AU-03 (2026-10-26 audit): the sweep used to answer 200 even when it had counted stuck or failed
+# jobs, so this workflow was green through five days of the engine refusing every render. The
+# endpoint now answers 503 in that state, the body is checked as a second line of defence, and a
+# scheduled smoke renders a real reading end to end — the check that would have caught it.
 #
 # The endpoint is idempotent (a reading that was released is no longer in the queue), so a delayed
 # or duplicated run is harmless. It also reports jobs the dispatcher has not picked up.
@@ -12,7 +25,8 @@ name: Review queue SLA sweep
 # The secret is the same CRON_SECRET the app authenticates its other crons with.
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "*/15 * * * *" # SLA sweep + job dispatch
+    - cron: "*/30 * * * *" # engine smoke (a real render; half as often)
   workflow_dispatch:
 
 permissions:
@@ -24,6 +38,8 @@ concurrency:
 
 jobs:
   sweep:
+    # Both cron entries fire at :00 and :30; only the 15-minute event runs the sweep.
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '*/15 * * * *'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -32,7 +48,107 @@ jobs:
           APP_URL: https://www.cosmicsaju.com
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          curl -fsS --max-time 120 \
+          # Capture the body as well as the status: `curl -f` alone discards the counts we need.
+          http_code="$(curl -sS --max-time 120 -o "$RUNNER_TEMP/sla-sweep.json" -w '%{http_code}' \
             -H "Authorization: Bearer $CRON_SECRET" \
-            "$APP_URL/api/cron/sla"
+            "$APP_URL/api/cron/sla")"
+          echo "HTTP $http_code"
+          cat "$RUNNER_TEMP/sla-sweep.json"; echo
+          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+            echo "::error::SLA sweep returned HTTP $http_code"
+            exit 1
+          fi
           echo "sweep complete"
+
+      - name: Fail when the sweep reports stuck, recently failed or overdue renders
+        # A non-zero count is the outage signal, even if some future change lets it through with
+        # a 200. Never let this step pass on a body it cannot read.
+        run: |
+          result="$RUNNER_TEMP/sla-sweep.json"
+          stuck="$(jq -r '.stuckJobs // empty' "$result")"
+          failures="$(jq -r '.recentFailures // empty' "$result")"
+          overdue="$(jq -r '.overdueFailures // empty' "$result")"
+          if [ -z "$stuck" ] || [ -z "$failures" ] || [ -z "$overdue" ]; then
+            echo "::error::the sweep response did not include stuckJobs, recentFailures and overdueFailures"
+            exit 1
+          fi
+          case "$stuck$failures$overdue" in
+            *[!0-9]*)
+              echo "::error::non-numeric counts in the sweep response (stuckJobs=$stuck recentFailures=$failures overdueFailures=$overdue)"
+              exit 1
+              ;;
+          esac
+          echo "stuckJobs=$stuck recentFailures=$failures overdueFailures=$overdue"
+          if [ "$stuck" -ne 0 ] || [ "$failures" -ne 0 ] || [ "$overdue" -ne 0 ]; then
+            echo "::error::SLA sweep degraded — stuckJobs=$stuck recentFailures=$failures overdueFailures=$overdue"
+            exit 1
+          fi
+
+  dispatch:
+    # AU-13 (2026-10-26 audit, decision D4): drain queued jobs every 15 minutes.
+    #
+    # This is deliberately its OWN job rather than a step after the sweep. The sweep exits non-zero
+    # when jobs are stuck or recently failed, and GitHub skips the remaining steps of a failed job —
+    # so a dispatch step there would be skipped in exactly the state where dispatch matters most.
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '*/15 * * * *'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Dispatch queued jobs
+        env:
+          APP_URL: https://www.cosmicsaju.com
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          # A non-2xx here is an outage of its own: it means the app could not claim or render a
+          # queued job, not that there was nothing to do (that answers 200 with processed=0).
+          http_code="$(curl -sS --max-time 120 -o "$RUNNER_TEMP/dispatch.json" -w '%{http_code}' \
+            -X POST \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$APP_URL/api/cron/dispatch")"
+          echo "HTTP $http_code"
+          cat "$RUNNER_TEMP/dispatch.json"; echo
+          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+            echo "::error::job dispatch returned HTTP $http_code"
+            exit 1
+          fi
+          echo "dispatch complete"
+
+  smoke:
+    # Half as often as the sweep: this is a real end-to-end render, not a probe.
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '*/30 * * * *'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the smoke's credentials
+        # Fails loudly, naming the secret and never its value: a smoke that cannot run must not
+        # pass. AU-03 is precisely the failure mode of a check that was green because it did not
+        # exercise the real path.
+        env:
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          ENGINE_URL: ${{ secrets.ENGINE_URL }}
+          ENGINE_SERVICE_TOKEN: ${{ secrets.ENGINE_SERVICE_TOKEN }}
+        run: |
+          missing=""
+          for name in R2_ENDPOINT R2_BUCKET R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY \
+                      ENGINE_URL ENGINE_SERVICE_TOKEN; do
+            if [ -z "${!name}" ]; then missing="$missing $name"; fi
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::engine smoke cannot run; add these repository secrets:$missing"
+            exit 1
+          fi
+
+      - name: Render a compatibility reading end to end
+        env:
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          ENGINE_URL: ${{ secrets.ENGINE_URL }}
+          ENGINE_SERVICE_TOKEN: ${{ secrets.ENGINE_SERVICE_TOKEN }}
+        run: python3 tools/smoke_compat_reading.py basic

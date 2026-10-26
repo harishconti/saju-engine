@@ -111,10 +111,10 @@ entrypoint = "api.index:app"
 ```
 
 With that, the endpoints are the clean `https://saju-report-engine.vercel.app/{health,chart,generate}`
-and `ENGINE_URL` needs no suffix. **Verified in production:**
+and `ENGINE_URL` needs no suffix. **Verified in production** (measured before the 2026-10-26 audit):
 
 ```
-POST /health  → 200 {"status":"ok","engineVersion":"0.2.0","contractVersion":1,
+POST /health  → 200 {"status":"ok","ok":true,"engineVersion":"0.2.0","contractVersion":1,
                      "fontsDir":"/var/task/src/saju_html/fonts"}
 POST /chart   → 200  甲戌 癸酉 辛丑 乙未 · 辛 Metal · Water via strong-dm-drain
 POST /generate (deep) → 200  139898 bytes · 1877 ms · sha256 matched after download · valid PDF
@@ -122,6 +122,20 @@ POST /generate (deep) → 200  139898 bytes · 1877 ms · sha256 matched after d
 
 `fontsDir` pointing at `/var/task/src/saju_html/fonts` is the proof that **E1 works inside the deployed
 function** — it found the *bundled* faces rather than the system directory, which does not exist there.
+
+**After this change, expect `uploadAllowlist`** in the engine's `/health` body (added by AU-03/AU-31,
+2026-10-26). This is the response shape to check for, not a measured production result — no deploy has
+been observed returning it yet:
+
+```jsonc
+POST /health → 200 {"status":"ok","ok":true,"engineVersion":"0.2.0","contractVersion":1,
+                    "fontsDir":"/var/task/src/saju_html/fonts","uploadAllowlist":1}
+```
+
+`uploadAllowlist` is the number of upload hosts the engine will accept (`_allowed_upload_hosts()`).
+**Zero is a 503** with `{ ok: false, code: "UPLOAD_HOSTS_UNCONFIGURED", error }`: with no allowlist
+the engine refuses every render, which is exactly what happened for five days in October 2026
+(AU-03 audit). `/api/health/detail` surfaces the count and the code as `engineDetail`.
 
 ### Why ReportLab, not the HTML/Chromium backend
 
@@ -135,7 +149,7 @@ Measured locally on this repository:
 |---|---|
 | Deep tier → markdown | **0.70 s** |
 | Deep markdown → ReportLab PDF | **0.62 s** |
-| Sample tier end to end (`compute_chart` → `prepare_chart_render` → `build_pdf`) | **1.57 s** |
+| Sample tier render (`compute_chart` → `prepare_chart_render` → `build_pdf`); measured before AU-29 — the sample route now requests the reading only | **1.57 s** |
 | Runtime dependency closure (pandas 68 MB + numpy 40 MB + reportlab 8 MB + PIL 7 MB + sajupy 3.5 MB) | **~130 MB** |
 
 Against Vercel's **500 MB** Python bundle limit that is comfortable, and against the 300 s function
@@ -253,7 +267,13 @@ Authorization: Bearer $ENGINE_SERVICE_TOKEN
   "contractVersion": 1,
   "kind": "single" | "compat",
   "tier": "sample" | "essential" | "deep" | "basic",
-  "uploadUrl": "https://<acct>.r2.cloudflarestorage.com/reports/…&X-Amz-Expires=900",
+  // Upload targets are alternative destinations — at least one of uploadUrl / htmlUploadUrl is
+  // required (400 MISSING_UPLOAD_URL otherwise). The sample sends htmlUploadUrl only.
+  // The webapp presigns virtual-hosted (no forcePathStyle), so the bucket is the first DNS
+  // label — {bucket}.{account_id}.r2.cloudflarestorage.com — not a path segment.
+  "uploadUrl": "https://{bucket}.{account_id}.r2.cloudflarestorage.com/reports/…&X-Amz-Expires=900",
+  "htmlUploadUrl": "https://{bucket}.{account_id}.r2.cloudflarestorage.com/reports/…/report.html&X-Amz-Expires=900",
+  "mdUploadUrl": "https://{bucket}.{account_id}.r2.cloudflarestorage.com/reports/…/report.md&X-Amz-Expires=900", // optional
   "profileA": {
     "fullName": "Jisoo K.",
 
@@ -277,10 +297,19 @@ Authorization: Bearer $ENGINE_SERVICE_TOKEN
 // 200
 { "sha256": "…", "bytes": 142276, "engineVersion": "saju-engine/0.2.0", "durationMs": 1642 }
 
-// 422  { "error": "…", "code": "INVALID_BIRTH_DATA" }
+// 422  { "error": "…", "code": "INVALID_BIRTH_DATA" }        // birth data ONLY
 // 422  { "error": "…", "code": "UNKNOWN_TIMEZONE" }
-// 500  { "error": "render failed", "code": "RENDER_FAILED" }   // exception CLASS only
+// 503  { "error": "…", "code": "UPLOAD_HOSTS_UNCONFIGURED" }  // deployment fault, retryable
+// 500  { "error": "…", "code": "RENDER_FAILED" }             // exception CLASS only
 ```
+
+**Every** error body is `{ error, code }` — a top-level handler covers auth failures, pydantic
+rejections and unexpected exceptions, so no path returns a bare string or a missing `code`.
+Status carries meaning the webapp acts on: **only birth-data validation is 422**, which the webapp
+treats as permanent and never retries; configuration faults (`UPLOAD_*`, a missing token), an auth
+mismatch, and availability failures are **503** and stay retryable. (AU-09, 2026-10-26 audit: the
+October outage answered `UPLOAD_HOSTS_UNCONFIGURED` with 422 for five days, so restoring the
+allowlist could not have recovered a single order.)
 
 `contractVersion` is checked and rejected on mismatch. It exists so the two Vercel projects can be
 deployed independently: a webapp that ships a new field before the engine understands it must fail
@@ -292,16 +321,23 @@ The engine holds no storage credentials — `uploadUrl` (and the optional `mdUpl
 `htmlUploadUrl`) are the only places it can write. They are **allowlisted**, because a leaked service
 token would otherwise turn the service into an arbitrary-URL PUT primitive:
 
-- allowlist from `SAJU_UPLOAD_HOSTS` (comma-separated) and/or the host of `R2_ENDPOINT`;
-  **empty means fail closed** (`503 UPLOAD_HOSTS_UNCONFIGURED`);
+- **Required on the `saju-report-engine` project:** `SAJU_UPLOAD_HOSTS` (comma-separated) and/or the
+  host of `R2_ENDPOINT`; **empty means fail closed** (`503 UPLOAD_HOSTS_UNCONFIGURED`). The production
+  setting is `SAJU_UPLOAD_HOSTS=saju-engine-dev.{account_id}.r2.cloudflarestorage.com`;
+- **the webapp presigns virtual-hosted** (`apps/web/src/lib/r2.ts`, no `forcePathStyle`), so a target
+  is `https://{bucket}.{account_id}.r2.cloudflarestorage.com/…` — the bucket is the first DNS label,
+  not a `/bucket/` path segment. The engine accepts exactly one such label in front of the
+  `R2_ENDPOINT` host, which is why either allowlist source works;
 - https required (http is allowed only to loopback, for local development), no embedded
   credentials, no fragment;
-- optional `SAJU_UPLOAD_BUCKET` pins the path to `/<bucket>/…`;
+- optional `SAJU_UPLOAD_BUCKET` pins the bucket as the first path segment (path-style) **or** the
+  first host label (virtual-hosted);
 - a body cap (`SAJU_MAX_REQUEST_BYTES`, default 2 MB) and pydantic bounds on every field.
 
-Errors: `422 UPLOAD_URL_NOT_ALLOWED` / `UPLOAD_URL_INSECURE` / `UPLOAD_URL_INVALID` /
-`UPLOAD_PATH_NOT_ALLOWED`, `503 UPLOAD_HOSTS_UNCONFIGURED`. The error never echoes the URL, which
-carries a signature. See [14 — Security](14-security.md) §3.
+Errors: `503 UPLOAD_URL_NOT_ALLOWED` / `UPLOAD_URL_INSECURE` / `UPLOAD_URL_INVALID` /
+`UPLOAD_PATH_NOT_ALLOWED` / `UPLOAD_HOSTS_UNCONFIGURED` — all deployment/caller faults, so all 503
+and all retryable. The error never echoes the URL, which carries a signature.
+See [14 — Security](14-security.md) §3.
 
 ### Required engine changes — status
 
@@ -346,8 +382,8 @@ after a check.
 
 | Key pattern | Contents | Lifetime |
 |---|---|---|
-| `reports/anonymous/{uuid}/sample.pdf` | Free samples not yet claimed | Swept after 3 days, **by object age** (see [09](09-operations.md)) — an anonymous sample creates no row to track, so a row-driven sweep found nothing |
-| `reports/{userId}/samples/{uuid}.pdf` | A sample a signed-in user kept | Until the user deletes it. Deliberately **outside** the swept prefix |
+| `reports/anonymous/{uuid}/sample.html` | Free sample readings not yet claimed | Swept after 3 days, **by object age** (see [09](09-operations.md)) — an anonymous sample creates no row to track, so a row-driven sweep found nothing |
+| `reports/{userId}/samples/{uuid}.html` | A sample a signed-in user kept | Until the user deletes it. Deliberately **outside** the swept prefix |
 | `reports/{userId}/{orderId}/{reportId}.pdf` | Delivered report | Until deletion is requested |
 | `reports/{userId}/{orderId}/{reportId}.md` | Source markdown — the audit trail **and** the input the audio script is derived from | Same |
 | `reports/{userId}/{orderId}/{reportId}.mp3` | The audio summary (Deep tier) | Same |
@@ -422,11 +458,12 @@ Generation is triggered three ways instead, and the same machinery serves all of
 
 | Trigger | Runs | Note |
 |---|---|---|
-| **Dodo Payments webhook → `after()`** | `runDispatchTick(1)` | Primary path. `after()` from `next/server` lets the webhook return its 2xx promptly and generate afterwards |
-| **`POST /api/jobs/kick`** | `kickOwnerJobs(userId)` | A client taps "Check for updates". Scoped to that caller's orders only, rate limited |
-| **Daily cron** (04:00 UTC) | `runDispatchTick(3)` | Safety net for anything the above missed |
+| **Dodo Payments webhook → `after()`** | `processJobById(createdJobId)` | Immediate path. `after()` from `next/server` lets the webhook return its 2xx promptly and generate that exact job afterwards (AU-13: it used to dispatch the *oldest* queued job) |
+| **GitHub Actions workflow, every 15 min** | `POST /api/cron/dispatch` → `runDispatchTick(3)` | Primary scheduled trigger (decision D4, AU-13). `.github/workflows/sla-sweep.yml` |
+| **`POST /api/jobs/kick`** | `kickOwnerJobs(userId)` | A client taps "Check for updates". Scoped to that caller's orders only, rate limited, and it does not spend the job's retries (AU-12) |
+| **Daily cron** (04:00 UTC) | `runDispatchTick(3)` | Fallback for anything the above missed — `vercel.json` keeps it because the Vercel plan is Hobby |
 
-Restoring true per-minute dispatching is a **one-line change** on Pro — `"schedule": "* * * * *"` — with
+A true per-minute cron would still be a **one-line change** on Pro — `"schedule": "* * * * *"` — with
 no code change, because the claim/lease/retry machinery below is already correct and simply runs more
 often. See [08a — Deployment notes](08a-vercel-json-notes.md).
 
@@ -455,12 +492,14 @@ do three and return.
 On a per-minute cron (Pro) the webhook only records the payment and enqueues a job — it never talks to
 the engine, so a cold Python service can never delay or fail a payment acknowledgment.
 
-On Hobby there is no per-minute cron, so the webhook *is* the trigger — but it still does not block:
+On Hobby there is no per-minute Vercel cron, so the webhook *is* the immediate trigger and the
+15-minute GitHub Actions workflow is the scheduled one — but the webhook still does not block:
 `after()` from `next/server` runs the dispatch once the response has already been sent, so the provider
-gets its 2xx first. If the dispatch fails, the job stays `QUEUED` and the recovery paths (the daily
-cron, the dashboard kick, an admin regenerate) pick it up. The webhook is never the single point of
-failure for a paid order, either way. Delivery is gated on human review regardless, so the work must
-survive an arbitrary wait — which is why it lives in a leased job row rather than in the request.
+gets its 2xx first. If the dispatch fails, the job stays `QUEUED` and the recovery paths (the
+15-minute dispatch, the daily cron, the dashboard kick, an admin regenerate) pick it up. The webhook is
+never the single point of failure for a paid order, either way. Delivery is gated on human review
+regardless, so the work must survive an arbitrary wait — which is why it lives in a leased job row
+rather than in the request.
 
 ### Idempotency at every layer
 
@@ -478,10 +517,10 @@ survive an arbitrary wait — which is why it lives in a leased job row rather t
 
 A reading nobody has looked at used to wait in the queue for as long as the business took to get to
 it — days, sometimes. That is the wrong failure mode for a product that charges up front, so a
-reading has a **deadline**: ten hours after it becomes reviewable it is released anyway.
+reading has a **deadline**: ten hours after the order was **paid** it is released anyway.
 
 ```
-Report.createdAt ──── 10h ────► /api/cron/sla → approveAndDeliver(outcome: SLA_AUTO)
+Order.paidAt ──── 10h ────► /api/cron/sla → approveAndDeliver(outcome: SLA_AUTO)
                                         │
                                         ├─► status DELIVERED, reviewOutcome = SLA_AUTO
                                         ├─► PROFILE delivery (in the same transaction)
@@ -510,9 +549,13 @@ released — the console's Approve button and the sweep both call it, and the on
 them is the `outcome`. The state change and the PROFILE delivery are transactional; the email is
 attempted after the commit, and a mail failure never rolls back a release.
 
-**What the sweep will not touch.** A reading a person is already on (`IN_REVIEW`), a reading whose
-order is not `PAID`, and anything that is not `DRAFT_READY`. It is bounded (10 per tick) and
-idempotent — a released reading is no longer in the queue, so a second run does nothing.
+**What the sweep will not touch.** A reading whose order is not `PAID`, and anything that is not
+`DRAFT_READY` or `IN_REVIEW`. The order is part of the query itself, so un-releasable rows cannot
+fill a batch and hide the due readings behind them; an `IN_REVIEW` reading is due at the same
+deadline, because claiming it must not extend the client's wait. It is bounded (10 per tick) and
+idempotent — a released reading is no longer in the queue, so a second run does nothing. It also
+reports paid renders that have been `FAILED` for more than two hours: nothing retries those
+automatically, so each one is an order that needs a person.
 
 **The MP3 case.** The deep single-chart tier promises an audio summary. An auto-delivered reading of
 that tier is approved at the deadline but its **email waits** for the MP3, so the client gets one
@@ -548,11 +591,11 @@ The free snapshot has its own synchronous path (`POST /api/sample`) and is not o
 routing it through the paid flow would only duplicate that machinery.
 
 **Its artefact is the reading, not a PDF** (since 2026-10-17), so `Report.pdfKey` is null for a sample and
-its `htmlKey` is what the library and the detail page serve. The engine's contract still requires a PDF
-upload target, so the route presigns one under the **swept** `reports/anonymous/` prefix and never records
-it — a deliberate, documented waste (one PDF render and roughly 100 KB per free snapshot, swept in 3 days)
-that buys avoiding a contract change across two deployables. The honest fix, if the volume ever justifies
-it, is to make `uploadUrl` optional so the sample skips the PDF render entirely.
+its `htmlKey` is what the library and the detail page serve. The engine's `uploadUrl` is optional, so the
+route asks for the reading only (`htmlUploadUrl`) and the engine uploads no PDF — the renderer still
+builds one internally to produce the markdown, but nothing is stored, so there is no throwaway presign
+and no swept PDF object (AU-29). A request that targets neither URL is still refused with
+`400 MISSING_UPLOAD_URL`.
 
 This is not an admin panel bolted on. Given decision **D5 (always review)**, it is the component
 that delivers the promise *"an accurate engine and an honest interpreter."*
@@ -718,7 +761,7 @@ Rules:
 
 | Signal | Where |
 |---|---|
-| `/api/health` | DB (`SELECT 1`), R2 (head a known-zero-byte sentinel or list one key), engine (`POST /health`) |
+| `/api/health/detail` (authorised) | DB (`SELECT 1`), R2 (head a known-zero-byte sentinel or list one key), engine (`POST /health`) |
 | Job health | `Job` grouped by `state`; a growing `QUEUED` count means the dispatcher is not keeping up |
 | Review backlog | `/admin` — age of the oldest item — the number that tells you if review is the bottleneck |
 | Delivery health | `Delivery` grouped by `status` |

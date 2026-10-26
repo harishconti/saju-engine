@@ -10,6 +10,7 @@ import { DateOfBirthField } from "@/components/date-of-birth-field";
 import { TimeOfBirthField } from "@/components/time-of-birth-field";
 import { useCityIndex } from "@/lib/use-city-index";
 import { ANONYMOUS_SAMPLE_RETENTION_LABEL } from "@/lib/retention";
+import { failureNotice, type FailureNotice } from "@/lib/visitor-copy";
 import { ElementalRule, SealMark } from "@/components/viz";
 
 const STEPS = ["Your birth details", "Check your chart", "Your snapshot"];
@@ -26,7 +27,9 @@ interface SampleResult {
 export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engineReady: boolean }) {
   const [step, setStep] = useState(0);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // AU-10 (2026-10-26 audit): a failure is a `FailureNotice`, not a bare string — the copy says
+  // what happened, offers a retry when retrying can help, and carries a reference support can use.
+  const [error, setError] = useState<FailureNotice | null>(null);
   const [result, setResult] = useState<SampleResult | null>(null);
   // The Day Master card. Held as an object URL so the preview, the save and the share all use one
   // render of the image; revoked on unmount so a long session cannot accumulate blobs.
@@ -56,15 +59,20 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
   const cityOptions = useMemo(() => searchCities(city, 8), [city, cityIndexReady]);
   const resolved = useMemo(() => findCity(city), [city, cityIndexReady]);
 
+  /** A local form problem. No retry control: the visitor has to change a field first. */
+  function formError(message: string) {
+    setError({ message, retryable: false, reference: null, action: null });
+  }
+
   async function generate() {
     setError(null);
 
-    if (!fullName.trim()) return setError("Please give your name.");
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) return setError("Add your date of birth.");
+    if (!fullName.trim()) return formError("Please give your name.");
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) return formError("Add your date of birth.");
     if (timeKnown && !/^([01]\d|2[0-3]):[0-5]\d$/.test(birthTime)) {
-      return setError("Add your time of birth, or tick \u201cI don\u2019t know my birth time\u201d.");
+      return formError("Add your time of birth, or tick \u201cI don\u2019t know my birth time\u201d.");
     }
-    if (!resolved) return setError("Pick your birthplace from the suggestions.");
+    if (!resolved) return formError("Pick your birthplace from the suggestions.");
     setBusy(true);
     try {
       const res = await fetch("/api/sample", {
@@ -85,7 +93,16 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
 
       const body = (await res.json().catch(() => ({}))) as SampleResult & { error?: string; code?: string };
       if (!res.ok || !body.readUrl) {
-        setError(body.error ?? "We couldn't generate your snapshot. Please try again.");
+        // Map the code client-side rather than echoing the API's prose: an operator-facing
+        // message ("set R2_ENDPOINT…") must never reach a visitor, and "nothing was charged" is
+        // true for a free sample. The `x-request-id` header (`handle`) gives support a reference.
+        setError(
+          failureNotice({
+            code: body.code,
+            context: "sample",
+            requestId: res.headers.get("x-request-id"),
+          }),
+        );
         // A Turnstile token is single-use, so any retry needs a fresh challenge.
         setTurnstileReset((n) => n + 1);
         return;
@@ -97,7 +114,8 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
       // birth details — only the fact that a snapshot was produced.
       track("snapshot_complete");
     } catch {
-      setError("Network problem. Please try again.");
+      // The request never reached the server, so there is no request id to quote.
+      setError(failureNotice({ context: "sample", code: null }));
       setTurnstileReset((n) => n + 1);
     } finally {
       setBusy(false);
@@ -213,7 +231,28 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
         </Alert>
       ) : null}
 
-      {error ? <Alert tone="danger">{error}</Alert> : null}
+      {error ? (
+        <Alert tone="danger" title="We couldn't generate your snapshot">
+          <p>{error.message}</p>
+          {error.action ? (
+            <div className="mt-3">
+              {/* AU-22: a refusal a retry cannot fix points at the control that resolves it —
+                  the consent gate on the account page. */}
+              <Link href={error.action.href} className={buttonClasses("outline", "sm")}>
+                {error.action.label}
+              </Link>
+            </div>
+          ) : error.retryable ? (
+            <div className="mt-3">
+              {/* Inside the alert, next to the explanation: the visitor should not have to hunt
+                  for the button, and a Turnstile challenge has already been reset above. */}
+              <Button size="sm" variant="outline" loading={busy} onClick={generate}>
+                Try again
+              </Button>
+            </div>
+          ) : null}
+        </Alert>
+      ) : null}
 
       {step < 2 ? (
         <Card>

@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { Alert, Badge, Card, CardContent, EmptyState, PageHeader, Stat, buttonClasses } from "@/components/ui";
 import { ReportStatusBadge } from "@/components/dashboard/report-row";
+import { FailedOrdersTable } from "@/components/dashboard/failed-orders";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { timeAgo } from "@/lib/format";
-import { tierFor } from "@/lib/tiers";
+import { listRecoverableOrders } from "@/lib/admin-recovery";
+import { timeAgo, formatDate } from "@/lib/format";
+import { tierFor, tierNameFor } from "@/lib/tiers";
 import { jobStats } from "@/lib/queue";
 import { runSlaSweep } from "@/lib/sla";
 
@@ -23,7 +25,7 @@ export default async function AdminQueuePage() {
     console.error("SLA sweep failed:", err instanceof Error ? err.message : "unknown");
   }
 
-  const [queue, failedJobs, stats] = await Promise.all([
+  const [queue, failedJobs, stats, recoverableOrders, pendingDeletions] = await Promise.all([
     prisma.report.findMany({
       where: { status: { in: ["DRAFT_READY", "IN_REVIEW"] } },
       orderBy: { createdAt: "asc" },
@@ -41,6 +43,16 @@ export default async function AdminQueuePage() {
       include: { order: { select: { id: true, tier: true, kind: true } } },
     }),
     jobStats(),
+    listRecoverableOrders(),
+    // AU-24 (D7): a pending deletion now disables sign-in, so the owner needs to see these — the
+    // customer cannot reach the account page to be told, and cancellations arrive through the
+    // login page instead. Read-only: erasure stays with the retention sweep.
+    prisma.deletionRequest.findMany({
+      where: { status: "pending" },
+      orderBy: { scheduledFor: "asc" },
+      take: 20,
+      select: { id: true, requestedAt: true, scheduledFor: true, user: { select: { email: true } } },
+    }),
   ]);
 
   const oldest = queue[0]?.createdAt ?? null;
@@ -147,6 +159,39 @@ export default async function AdminQueuePage() {
           )}
         </CardContent>
       </Card>
+
+      <FailedOrdersTable
+        rows={recoverableOrders.map((order) => ({
+          ...order,
+          tierName: tierNameFor(order.kind, order.tier),
+        }))}
+      />
+
+      {pendingDeletions.length > 0 ? (
+        <Card>
+          <CardContent className="py-4">
+            <h2 className="pb-2 font-display text-xl">Scheduled deletions</h2>
+            <p className="pb-2 text-sm text-muted-foreground">
+              Signed-in access is disabled while a deletion is pending. The customer can cancel it
+              from the sign-in page until the scheduled date, when the retention sweep erases the
+              account.
+            </p>
+            <ul className="space-y-2 text-sm">
+              {pendingDeletions.map((d) => (
+                <li
+                  key={d.id}
+                  className="flex flex-wrap items-center justify-between gap-2 border-b border-border py-2 last:border-0"
+                >
+                  <span>{d.user.email}</span>
+                  <span className="text-muted-foreground">
+                    requested {timeAgo(d.requestedAt)} · erases on {formatDate(d.scheduledFor)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      ) : null}
 
       {failedJobs.length > 0 ? (
         <Card>

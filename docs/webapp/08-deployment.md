@@ -167,6 +167,14 @@ NEXT_PUBLIC_TURNSTILE_SITE_KEY=«from the Turnstile widget»  # rendered by the 
                                                             # so changing it needs a redeploy
 ```
 
+#### Reading these values locally
+
+Never `source apps/web/.env` or `source .env`. Values contain `&` (the DB URLs carry a query string) and
+spaces (`EMAIL_FROM`), so the shell backgrounds part of the assignment, leaves variables unset, and copies
+every secret into the shell environment where it can leak into a transcript. Read the file with
+`node --env-file=.env …` (or the app's own `process.env`), which parses it literally; quote every value
+that contains `&`, spaces or `#` so the file is unambiguous to every reader.
+
 #### Mail
 
 `EMAIL_FROM` is the *sending* identity (`reports@cosmicsaju.com`); **`EMAIL_REPLY_TO` is the real inbox**
@@ -181,6 +189,48 @@ it as configured. Live now: apex MX, exactly one apex SPF, and `_dmarc`; **recei
 CNAMEs** (`hostingermail-a/b/c._domainkey`, **DNS only**) are still missing. Full detail:
 [07](07-services-and-integrations.md) §Mailbox records.
 
+#### Password reset email (Neon Auth)
+
+The app asks Neon Auth to send the reset mail (`POST /api/account/password-reset` →
+`auth.requestPasswordReset({ email, redirectTo })`), and the provider mails a link to its own
+`/reset-password/<token>` endpoint, which then redirects to **our** page with `?token=…`. Two things
+therefore have to be configured in the Neon console before reset mail can arrive. Both are owner
+actions; the code cannot do them.
+
+1. **Email provider.** Neon Console → project **saju** → branch **production** → **Auth** →
+   **Configuration** → email/SMTP provider. Configure the same sending identity used for the
+   sign-in emails (Resend) and **Save**. This is the provider that actually delivers the reset
+   link — no mail is sent by this app itself.
+2. **Allowlist the redirect origin.** In the same **Auth → Configuration** area, find the
+   redirect/trusted-origin setting (the console has labelled it *Redirect URLs*, *Allowed URLs* and
+   *Trusted origins* across releases) and add:
+
+   ```
+   https://www.cosmicsaju.com/reset-password
+   ```
+
+   The origin must match `NEXT_PUBLIC_APP_URL` exactly (www is canonical; the apex redirects). The
+   route derives `redirectTo` from that variable, and Neon Auth's redirect step applies an origin
+   check — a missing entry makes the emailed link fail instead of landing on the form.
+
+**Verify end to end:** request a reset for a real account, open the mail, and confirm the link lands
+on `/reset-password` with a form; set a new password and sign in with it. Request a reset for an
+address with no account and confirm the page still shows the neutral confirmation and no mail
+arrives.
+
+**Until these two steps are done**, `POST /api/account/password-reset` still answers `202 {ok:true}`
+— that is the neutrality contract, not a claim that mail was sent — so a missing console setting is
+invisible from the UI. Check the deployment checklist below before advertising the feature.
+
+**Redact `/reset-password?token=…` in access logs.** The provider's redirect lands on our page with
+the one-time token in the query string, so it is in the request line before any JavaScript runs. The
+page reads it on the client and scrubs the address bar immediately, but that cannot reach the log
+entry already written. Redact the query string for this path at whatever terminates the request — the
+same rule the self-service intake already applies to `/report/<token>` (uvicorn logs it as
+`/report/[redacted]`, and any reverse proxy in front must do the same). Vercel's request logs and any
+additional proxy therefore need a rewrite/redaction rule for `/reset-password`; without one, a working
+reset token is stored in log retention for as long as those logs are kept.
+
 ### The engine project (`saju-report-engine`, root = repository root)
 
 ```bash
@@ -191,9 +241,18 @@ SAJU_FONT_DIR=«usually omit»   # E1 auto-resolves <package>/saju_html/fonts, w
                                # reports `fontsDir`). The system path does not exist there
 
 # Upload-target allowlist. REQUIRED: the engine fails closed (503 UPLOAD_HOSTS_UNCONFIGURED)
-# without one, because a presigned URL is its only write capability. Use the same R2 origin
-# the webapp has; optionally pin the bucket and the request-size ceiling.
+# without one, because a presigned URL is its only write capability.
+#
+# The webapp presigns **virtual-hosted** (apps/web/src/lib/r2.ts, no forcePathStyle), so the URL
+# host is {bucket}.{account_id}.r2.cloudflarestorage.com — the bucket is the first DNS label, not
+# a path segment. List that exact host. Production value:
+SAJU_UPLOAD_HOSTS=saju-engine-dev.«account_id».r2.cloudflarestorage.com
+#
+# R2_ENDPOINT (the account origin the webapp uses) also satisfies the allowlist, because the engine
+# accepts exactly one bucket label in front of that endpoint's host. Set one or both.
 R2_ENDPOINT=https://«account_id».r2.cloudflarestorage.com
+# Optional: pin the bucket. It is accepted as the first path segment (path-style) or the first
+# host label (virtual-hosted), matching the form the presigned URL actually uses.
 SAJU_UPLOAD_BUCKET=«optional: saju-engine-dev»
 SAJU_MAX_REQUEST_BYTES=«optional: default 2097152 (2 MB)»
 ```
@@ -230,7 +289,7 @@ branch and move Preview to it.
 
 | Cron | Schedule | Note |
 |---|---|---|
-| `dispatch` | **daily, 04:00 UTC** | **Hobby allows only once-daily crons** (max 2) — this is why generation is **webhook-driven** and the cron is only a safety net. The original per-minute expression made `vercel deploy` fail outright; see [08a](08a-vercel-json-notes.md) |
+| `dispatch` | **daily, 04:00 UTC** | **Hobby allows only once-daily crons** (max 2), so this is only a fallback: the real dispatcher is the 15-minute GitHub Actions workflow (`sla-sweep.yml`, decision D4). The original per-minute expression made `vercel deploy` fail outright; see [08a](08a-vercel-json-notes.md) |
 | `cleanup` | daily, 03:00 UTC | any plan |
 
 Vercel authenticates cron invocations with `Authorization: Bearer $CRON_SECRET`. Our handlers accept
@@ -330,7 +389,7 @@ yet** — that is the outstanding piece, see [13](13-launch-audit.md) §B5 and [
 3.  npm run db:backup                                                 # before any migration
 4.  npx prisma migrate status && npx prisma migrate deploy
 5.  deploy: merge to the production branch → Vercel builds and promotes
-6.  smoke: /api/health → db, storage, engine all green
+6.  smoke: GET /api/health returns 200; GET /api/health/detail (operator token or admin session) shows db, storage, engine all green
 7.  verify one real order end to end if payment code changed
 ```
 
@@ -363,9 +422,19 @@ code still works against the new schema; then a webapp rollback does not need a 
 - [ ] Google sign-in works **on the production domain**, not just localhost
 - [ ] Neon `production` is migrated, and every Vercel scope points at it (single-branch decision)
 - [ ] R2 presigned PUT then GET round-trips; no public URL is reachable; CORS preflight passes
-- [ ] `/api/health` is green for db + storage + engine
+- [ ] `/api/health/detail` (operator token or admin session) is green for db + storage + engine, and `/api/health` answers 200 with no configuration detail
 - [ ] Dodo Payments store activated; a test-mode purchase creates **exactly one** job under repeated
       webhook delivery; a forged signature is rejected
+- [ ] **Neon Auth requires email verification (AU-35).** Neon Console → project **saju** → branch
+      **production** → **Auth** → **Configuration** (email provider) → enable **Require email
+      verification**, confirm the email provider is the verified Resend/SMTP configuration, **Save**.
+      Then sign up with an existing address against the auth API and confirm it no longer answers
+      `422 USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL` in a way that distinguishes an existing account
+      (the login page already shows a neutral message; this closes the API-level oracle)
+- [ ] **Password reset mail works (AU-41).** Neon Console → **Auth** → **Configuration**: a working
+      email provider, and `https://www.cosmicsaju.com/reset-password` allowlisted as a redirect
+      origin (see § Password reset email above). Prove it with a real address (mail arrives, link
+      lands on the form, new password signs in) and an unregistered one (neutral page, no mail)
 - [ ] Privacy, Terms, and **Refund Policy** are live with a real contact address
 - [ ] Consent checkbox writes a `ConsentRecord`; the deletion path works end to end
 - [ ] The public e2e suite proves every protected route 401s when signed out, and user B cannot fetch

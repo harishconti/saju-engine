@@ -1,8 +1,9 @@
 import { randomUUID } from "node:crypto";
 import type { Job, Order, Profile } from "@prisma/client";
+import { ApiError } from "./api";
 import { prisma } from "./prisma";
 import { writeAudit } from "./audit";
-import { LEASE_MS, claimJob, completeJob, failJob, requeueJob } from "./queue";
+import { LEASE_MS, claimJob, completeJob, failJob, recordAttempt, requeueJob } from "./queue";
 import {
   buildReportKey,
   deleteObjectOrQueue,
@@ -25,7 +26,7 @@ import {
 import { isTtsConfigured, synthesise, tierPromisesAudio } from "./tts";
 import { autoDelivers, tierNameFor } from "./tiers";
 import { deliverAudioReadyEmail, deliverReport } from "./email";
-import { notifyOwnerNewReview } from "./owner-alert";
+import { notifyOwnerEngineFailure, notifyOwnerNewReview } from "./owner-alert";
 
 /**
  * Fulfilment: render a PDF for an order, verify it, file it as a Report awaiting review.
@@ -47,9 +48,46 @@ export interface JobOutcome {
   note: string;
   reportId?: string;
   version?: number;
+  /**
+   * False when this call never ran the job — another dispatcher had already claimed it. The caller
+   * must not report that as a failure: nothing here broke, the work is moving somewhere else.
+   */
+  ran?: boolean;
 }
 
-type OrderWithProfiles = Order & { profileA: Profile; profileB: Profile | null };
+/**
+ * How a claim is accounted.
+ *
+ * `countAttempt` defaults to true, which is the dispatcher's accounting: claiming a job spends one
+ * of its `maxAttempts`. A customer's "Check for updates" passes false (AU-12, 2026-10-26 audit):
+ * during the October outage every click hit a fast 5xx, and two clicks could push a paid job to
+ * `maxAttempts` and fail it for good — the customer's own recovery attempt killed their order.
+ * A run that ends in a terminal failure still records the attempt; it really did happen.
+ */
+export interface ClaimOptions {
+  countAttempt?: boolean;
+}
+
+type OrderWithProfiles = Order & {
+  profileA: Profile;
+  profileB: Profile | null;
+  user: { deletedAt: Date | null };
+};
+
+/**
+ * Raised by the report-write transaction when the account was erased after the render read its
+ * order but before the write (must-fix 2b).
+ *
+ * A sentinel rather than an `ApiError`: nothing upstream produced it, so it must not be classified
+ * as an engine refusal, retried, or paged to the owner. The catch in `processClaimedJob` turns it
+ * into the terminal `ACCOUNT_ERASED` failure.
+ */
+class AccountErasedDuringRender extends Error {
+  constructor() {
+    super("ACCOUNT_ERASED");
+    this.name = "AccountErasedDuringRender";
+  }
+}
 
 /** Create a queued job for an order. Returns the job id. */
 export async function createJobForOrder(orderId: string, kind: "GENERATE" | "REGENERATE"): Promise<string> {
@@ -70,48 +108,146 @@ export async function runOneJob(worker: string): Promise<{ processed: boolean } 
 
 /**
  * Claim a SPECIFIC job and process it inline (used by the admin regenerate path so the reviewer sees
- * the new version immediately instead of waiting up to a minute for the dispatcher).
+ * the new version immediately instead of waiting up to 15 minutes for the scheduled dispatcher).
+ *
+ * `opts.countAttempt: false` is the customer-triggered check: it runs the job without spending one
+ * of its retries unless the run ends in a terminal failure (AU-12).
  */
-export async function processJobById(jobId: string, worker = "inline"): Promise<JobOutcome> {
+export async function processJobById(
+  jobId: string,
+  worker = "inline",
+  opts: ClaimOptions = {},
+): Promise<JobOutcome> {
+  const claimed = await claimJobById(jobId, worker, opts);
+  if (!claimed.matched) return { ok: false, note: "job was not claimable", ran: false };
+  if (!claimed.job) return { ok: false, note: "job vanished", ran: false };
+  return processClaimedJob(claimed.job, opts);
+}
+
+/**
+ * Move a specific QUEUED job to RUNNING under a lease.
+ *
+ * `matched: false` means the row was no longer QUEUED — another dispatcher got it first, or it was
+ * cancelled. `job: null` with `matched: true` means the row disappeared between the claim and the
+ * read, which should not happen and is worth its own note.
+ */
+async function claimJobById(
+  jobId: string,
+  worker: string,
+  opts: ClaimOptions,
+): Promise<{ matched: boolean; job: Job | null }> {
   const claimed = await prisma.job.updateMany({
     where: { id: jobId, state: "QUEUED" },
     data: {
       state: "RUNNING",
-      attempts: { increment: 1 },
+      // AU-12: a customer check claims the job exactly like the dispatcher, but its attempt is only
+      // recorded if the run ends in a terminal failure (see `failJob`).
+      ...(opts.countAttempt === false ? {} : { attempts: { increment: 1 } }),
       leaseUntil: new Date(Date.now() + LEASE_MS),
       startedAt: new Date(),
       worker,
     },
   });
-  if (claimed.count === 0) return { ok: false, note: "job was not claimable" };
+  if (claimed.count === 0) return { matched: false, job: null };
+  return { matched: true, job: await prisma.job.findUnique({ where: { id: jobId } }) };
+}
 
-  const job = await prisma.job.findUnique({ where: { id: jobId } });
-  if (!job) return { ok: false, note: "job vanished" };
-  return processClaimedJob(job);
+/**
+ * Fail a generate job — and tell the owner.
+ *
+ * AU-03 (2026-10-26 audit): during the October outage every render was refused for five days and
+ * no one was told; a `FAILED` row is not an alert. Every *permanent* GENERATE failure — the four
+ * early exits in `processClaimedJob` and its retry-exhausted catch — sends one email carrying the
+ * engine's code.
+ *
+ * The alert can never change the job's outcome. It is guarded here as well as inside
+ * `notifyOwnerEngineFailure`: a defect in the mailer must not turn a recorded `FAILED` job into a
+ * thrown exception the dispatcher would lease-reclaim and retry forever.
+ */
+async function failGenerateJob(
+  job: Job,
+  lastError: string,
+  alertCode = lastError,
+  attemptUncounted = false,
+): Promise<void> {
+  await failJobAfterCheck(job, lastError, attemptUncounted);
+  try {
+    // The alert names the bare engine code; `lastError` may carry the `ENGINE_FAILED:` prefix.
+    await notifyOwnerEngineFailure({ orderId: job.orderId, code: alertCode, attempts: job.attempts });
+  } catch (err) {
+    console.error("engine failure alert threw:", err instanceof Error ? err.message : "unknown");
+  }
+}
+
+/**
+ * Fail a job, first recording the attempt if the claim deliberately skipped it.
+ *
+ * AU-12 (2026-10-26 audit): `processJobById({ countAttempt: false })` — the customer's "Check for
+ * updates" — does not increment `attempts` at claim time, because a fast 5xx during an outage must
+ * not spend a paid order's retries. A run that ends in a terminal failure really did happen, though,
+ * so the attempt is written before the job is marked failed. `attemptUncounted` is false on every
+ * dispatcher path, which keeps the ordinary two-argument `failJob` call unchanged.
+ */
+async function failJobAfterCheck(job: Job, lastError: string, attemptUncounted: boolean): Promise<void> {
+  if (attemptUncounted) await recordAttempt(job.id);
+  await failJob(job.id, lastError);
+}
+
+/**
+ * The job's recorded failure for an engine refusal, or null for a local error.
+ *
+ * AU-28 (2026-10-26 audit): every failed job said `ENGINE_FAILED`, so the admin "Recent failures"
+ * view could never have shown `UPLOAD_HOSTS_UNCONFIGURED` — the cause of the October outage. The
+ * engine code is kept after the `ENGINE_FAILED:` prefix: the prefix keeps existing dashboards and
+ * greps working, and the suffix names what actually happened. Only an error that carries the
+ * engine's HTTP status qualifies; a transport failure or a local fault records its own code.
+ */
+function engineFailureLastError(err: unknown): string | null {
+  if (!(err instanceof ApiError)) return null;
+  if (typeof err.details.engineStatus !== "number") return null;
+  return `ENGINE_FAILED:${err.code}`;
 }
 
 /** The actual work. Assumes the job is already leased to us. */
-export async function processClaimedJob(job: Job): Promise<JobOutcome> {
-  if (job.kind === "VOICE") return processVoiceJob(job);
+export async function processClaimedJob(job: Job, opts: ClaimOptions = {}): Promise<JobOutcome> {
+  // AU-12: a check claimed without spending an attempt still records one if this run ends in a
+  // terminal failure. A transient refusal spends nothing, so the job stays where it was.
+  const attemptUncounted = opts.countAttempt === false;
+
+  // The keys this render uploads before it writes the Report row. If that write is refused because
+  // the account was erased mid-render, the objects exist with no row to find them by, so the
+  // `AccountErasedDuringRender` branch below deletes them. Only keys whose object is known to have
+  // landed are recorded.
+  const uploadedKeys: string[] = [];
+
+  if (job.kind === "VOICE") return processVoiceJob(job, attemptUncounted);
   try {
     const order = (await prisma.order.findUnique({
       where: { id: job.orderId },
-      include: { profileA: true, profileB: true },
+      include: { profileA: true, profileB: true, user: { select: { deletedAt: true } } },
     })) as OrderWithProfiles | null;
 
     if (!order) {
-      await failJob(job.id, "ORDER_MISSING");
+      await failGenerateJob(job, "ORDER_MISSING", undefined, attemptUncounted);
       return { ok: false, note: "order missing" };
     }
 
+    // Order rows are retained for accounting (D2), but generation must never run for an erased
+    // person. `failJob` directly, not `failGenerateJob`: this is not an outage, so it must not page
+    // the owner.
+    if (order.user.deletedAt) {
+      await failJobAfterCheck(job, "ACCOUNT_ERASED", attemptUncounted);
+      return { ok: false, note: "account erased" };
+    }
+
     if (order.kind === "COMPAT" && !order.profileB) {
-      await failJob(job.id, "COMPAT_NEEDS_TWO_PROFILES");
+      await failGenerateJob(job, "COMPAT_NEEDS_TWO_PROFILES", undefined, attemptUncounted);
       return { ok: false, note: "compat without second profile" };
     }
 
     if (!isR2Configured()) {
       // Configuration error, not transient: retrying will not help.
-      await failJob(job.id, "STORAGE_NOT_CONFIGURED");
+      await failGenerateJob(job, "STORAGE_NOT_CONFIGURED", undefined, attemptUncounted);
       return { ok: false, note: "R2 not configured" };
     }
 
@@ -149,7 +285,11 @@ export async function processClaimedJob(job: Job): Promise<JobOutcome> {
       // …and the web document: the artefact the client actually reads on a phone, which they can
       // also save as one file. Best-effort — a reading that fails to upload leaves the PDF as the
       // deliverable rather than losing the order.
-      htmlUploadUrl: await presignPutUrl(htmlKey, "text/html"),
+      //
+      // AU-37 (2026-10-26 audit): the presigned URL now signs `content-type`, so this string must be
+      // exactly what the engine sends (`text/html; charset=utf-8`) or R2 rejects the PUT with a
+      // signature mismatch. The same applies to the PDF and markdown above.
+      htmlUploadUrl: await presignPutUrl(htmlKey, "text/html; charset=utf-8"),
       profileA,
       ...(profileB ? { profileB } : {}),
       favorableOverrideA: order.favorableOverrideA ?? null,
@@ -161,14 +301,36 @@ export async function processClaimedJob(job: Job): Promise<JobOutcome> {
     // Trust but verify: a 200 without an object would leave a report row pointing at nothing.
     const object = await headObject(pdfKey);
     if (!object) {
-      await failJob(job.id, "UPLOAD_NOT_VERIFIED");
+      await failGenerateJob(job, "UPLOAD_NOT_VERIFIED", undefined, attemptUncounted);
       return { ok: false, note: "upload not verified" };
     }
     // The reading is best-effort in the same way: a web document that did not land leaves the PDF
     // as the deliverable rather than losing the order. The row records only what is really there.
     const htmlObject = result.htmlBytes ? await headObject(htmlKey) : null;
 
+    // What this render really put in storage: the PDF and the HTML were verified with `headObject`;
+    // the markdown was uploaded through the presigned URL the engine was given and is best-effort
+    // (never verified separately), so it is recorded as uploaded. Recorded here so the erasure
+    // branch cannot queue a key this call never used.
+    uploadedKeys.push(pdfKey, mdKey);
+    if (htmlObject) uploadedKeys.push(htmlKey);
+
     await prisma.$transaction(async (tx) => {
+      // The `deletedAt` check above ran before the engine call, which can take a minute or more; an
+      // erasure that committed in that window must not leave a Report behind, because the row
+      // carries `enginePayload` (full birth data) and the R2 keys of objects this render uploaded.
+      //
+      // This re-read is defence in depth, not a guarantee. `findUnique` takes no lock, so an
+      // erasure update can still land between this read and `report.create` (no `FOR UPDATE` is
+      // taken deliberately). What closes that residue is the erasure's bounded post-commit
+      // re-sweep, which finds and removes any report that committed after the erasure's own read.
+      // The check still removes the whole engine-call window, which is the long one.
+      const owner = await tx.user.findUnique({
+        where: { id: order.userId },
+        select: { deletedAt: true },
+      });
+      if (!owner || owner.deletedAt) throw new AccountErasedDuringRender();
+
       await tx.report.create({
         data: {
           id: reportId,
@@ -256,6 +418,29 @@ export async function processClaimedJob(job: Job): Promise<JobOutcome> {
 
     return { ok: true, note: `report v${version}`, reportId, version };
   } catch (err) {
+    // Terminal by definition: erasure is not transient, so neither retrying nor paging helps. The
+    // report write rolled back, so no row or delivery was written. Handled before the generic path
+    // so the job cannot be requeued for an account that no longer exists.
+    if (err instanceof AccountErasedDuringRender) {
+      // The engine already PUT these objects. With no Report row they are unreachable: erasure
+      // sweeps `reports/{userId}/` only through report rows, and nothing else lists that prefix
+      // (`listObjectsByPrefix` serves the anonymous sample sweep alone), so no later pass could
+      // find them. Queue the deletion — a storage fault is retried by the next sweep — and never
+      // let a cleanup problem change the job's outcome.
+      for (const key of uploadedKeys) {
+        try {
+          await deleteObjectOrQueue(key);
+        } catch (cleanupErr) {
+          console.error(
+            "erased render artefact cleanup failed",
+            cleanupErr instanceof Error ? cleanupErr.name : "unknown",
+          );
+        }
+      }
+      await failJobAfterCheck(job, "ACCOUNT_ERASED", attemptUncounted);
+      return { ok: false, note: "account erased" };
+    }
+
     const code =
       typeof err === "object" && err !== null && "code" in err
         ? String((err as { code?: string }).code ?? "UNKNOWN")
@@ -263,15 +448,18 @@ export async function processClaimedJob(job: Job): Promise<JobOutcome> {
           ? err.name
           : "UNKNOWN";
 
+    // AU-28: keep the engine's code in `lastError`, not just "ENGINE_FAILED".
+    const lastError = engineFailureLastError(err) ?? code;
+
     // A 422 from the engine is permanent: bad birth data will not improve on retry.
     const permanent =
       typeof err === "object" && err !== null && "status" in err && (err as { status?: number }).status === 422;
 
     if (permanent || job.attempts >= job.maxAttempts) {
-      await failJob(job.id, code);
+      await failGenerateJob(job, lastError, code, attemptUncounted);
       return { ok: false, note: `failed: ${code}` };
     }
-    await requeueJob(job.id, code);
+    await requeueJob(job.id, lastError);
     return { ok: false, note: `retry: ${code}` };
   }
 }
@@ -283,15 +471,26 @@ export async function processClaimedJob(job: Job): Promise<JobOutcome> {
  * paid report hostage. The script is derived from the **stored** markdown (the artefact the
  * reviewer approved), not recomputed, so the narration cannot drift from the PDF.
  */
-async function processVoiceJob(job: Job): Promise<JobOutcome> {
+async function processVoiceJob(job: Job, attemptUncounted = false): Promise<JobOutcome> {
   try {
     const report = await prisma.report.findUnique({
       where: { id: job.reportId ?? "" },
-      include: { order: { select: { userId: true, kind: true, tier: true } }, user: { select: { email: true, name: true } } },
+      include: {
+        order: { select: { userId: true, kind: true, tier: true } },
+        user: { select: { email: true, name: true, deletedAt: true } },
+      },
     });
     if (!report) {
-      await failJob(job.id, "REPORT_MISSING");
+      await failJobAfterCheck(job, "REPORT_MISSING", attemptUncounted);
       return { ok: false, note: "report missing" };
+    }
+
+    // Order rows are retained for accounting (D2), but no artefact may be produced for an erased
+    // person. `failJob` directly: an erased account's voice job is not an outage, so it must not
+    // page the owner.
+    if (report.user.deletedAt) {
+      await failJobAfterCheck(job, "ACCOUNT_ERASED", attemptUncounted);
+      return { ok: false, note: "account erased" };
     }
 
     await prisma.report.update({ where: { id: report.id }, data: { audioStatus: "PROCESSING" } });
@@ -301,7 +500,7 @@ async function processVoiceJob(job: Job): Promise<JobOutcome> {
         where: { id: report.id },
         data: { audioStatus: "FAILED", audioError: "TTS_NOT_CONFIGURED" },
       });
-      await failJob(job.id, "TTS_NOT_CONFIGURED");
+      await failJobAfterCheck(job, "TTS_NOT_CONFIGURED", attemptUncounted);
       return { ok: false, note: "TTS not configured" };
     }
     if (!report.mdKey) {
@@ -309,13 +508,13 @@ async function processVoiceJob(job: Job): Promise<JobOutcome> {
         where: { id: report.id },
         data: { audioStatus: "FAILED", audioError: "NO_SOURCE_MARKDOWN" },
       });
-      await failJob(job.id, "NO_SOURCE_MARKDOWN");
+      await failJobAfterCheck(job, "NO_SOURCE_MARKDOWN", attemptUncounted);
       return { ok: false, note: "source markdown missing" };
     }
 
     const markdown = await getObjectText(report.mdKey);
     if (!markdown) {
-      await requeueOrFail(job, "SOURCE_UNREADABLE");
+      await requeueOrFail(job, "SOURCE_UNREADABLE", undefined, attemptUncounted);
       return { ok: false, note: "source unreadable" };
     }
 
@@ -385,13 +584,18 @@ async function processVoiceJob(job: Job): Promise<JobOutcome> {
         : err instanceof Error
           ? err.name
           : "TTS_FAILED";
-    await requeueOrFail(job, code, job.reportId ? { reportId: job.reportId } : undefined);
+    await requeueOrFail(job, code, job.reportId ? { reportId: job.reportId } : undefined, attemptUncounted);
     return { ok: false, note: `audio: ${code}` };
   }
 }
 
 /** Transient vs permanent, shared by the render and voice paths. */
-async function requeueOrFail(job: Job, code: string, extra?: { reportId: string }): Promise<void> {
+async function requeueOrFail(
+  job: Job,
+  code: string,
+  extra?: { reportId: string },
+  attemptUncounted = false,
+): Promise<void> {
   const permanent = ["TTS_VOICE_MISSING", "EMPTY_SCRIPT", "NO_SOURCE_MARKDOWN"].includes(code);
   if (extra?.reportId) {
     await prisma.report.update({
@@ -403,7 +607,7 @@ async function requeueOrFail(job: Job, code: string, extra?: { reportId: string 
     });
   }
   if (permanent || job.attempts >= job.maxAttempts) {
-    await failJob(job.id, code);
+    await failJobAfterCheck(job, code, attemptUncounted);
   } else {
     await requeueJob(job.id, code);
   }
@@ -445,8 +649,15 @@ export async function enqueueAudio(reportId: string): Promise<boolean> {
   return true;
 }
 
-/** Drain up to `max` jobs. Deliberately bounded — a tick that overruns the function timeout is the
- *  situation leases exist to survive, but doing three and returning is better. */
+/**
+ * Drain up to `max` jobs. Deliberately bounded — a tick that overruns the function timeout is the
+ * situation leases exist to survive, but doing three and returning is better.
+ *
+ * Owner decision D11 (2026-10-26): in-flight paid work is deliberately NOT consent-gated. A
+ * withdrawal stops new orders and new jobs; work already paid for still renders and is delivered.
+ * Do not add a consent check here — the gate belongs at the entry points (order creation, checkout,
+ * job kick).
+ */
 export async function runDispatchTick(max = 3): Promise<DispatchResult> {
   const worker = `cron-${randomUUID().slice(0, 8)}`;
   let processed = 0;
@@ -463,17 +674,31 @@ export async function runDispatchTick(max = 3): Promise<DispatchResult> {
   return { processed, failed, remaining };
 }
 
+export interface KickResult {
+  /** Jobs the check looked at. */
+  processed: number;
+  /** Jobs the check actually rendered. */
+  generated: number;
+  /** Jobs that ran and did not render — the customer is told their check failed. */
+  failed: number;
+}
+
 /**
  * Process the caller's own queued jobs, inline.
  *
- * This exists because Vercel Hobby forbids a per-minute cron, so the per-minute dispatcher cannot be
- * the primary trigger (docs/webapp/05-report-pipeline.md §4). The webhook dispatches via `after()`;
- * this is the recovery path a user can trigger themselves from the dashboard when a report is sitting
- * in review longer than expected.
+ * The scheduled dispatcher runs every 15 minutes from `.github/workflows/sla-sweep.yml` (decision D4:
+ * Vercel Hobby cannot run a per-minute cron, and the daily Vercel cron is only a fallback). This is
+ * the recovery path a client can trigger themselves from the dashboard when a report is sitting in
+ * review longer than expected.
+ *
+ * AU-12 (2026-10-26 audit): the check must not spend the job's retries. During an outage every click
+ * hit a fast 5xx, and two clicks could push a paid job to `maxAttempts` and fail it for good, so the
+ * claim is made with `countAttempt: false`. Failures are counted and returned rather than swallowed:
+ * a check that rendered nothing must not be reported as a success.
  *
  * Ownership is checked before anything is processed, and the work is scoped to that user's orders.
  */
-export async function kickOwnerJobs(userId: string, max = 2): Promise<{ processed: number; generated: number }> {
+export async function kickOwnerJobs(userId: string, max = 2): Promise<KickResult> {
   const jobs = await prisma.job.findMany({
     where: { state: "QUEUED", order: { userId } },
     orderBy: { createdAt: "asc" },
@@ -482,23 +707,28 @@ export async function kickOwnerJobs(userId: string, max = 2): Promise<{ processe
   });
 
   let generated = 0;
+  let failed = 0;
   for (const job of jobs) {
-    const outcome = await processJobById(job.id, `kick-${userId.slice(0, 8)}`);
+    const outcome = await processJobById(job.id, `kick-${userId.slice(0, 8)}`, { countAttempt: false });
     if (outcome.ok) generated++;
+    else if (outcome.ran !== false) failed++;
   }
-  return { processed: jobs.length, generated };
+  return { processed: jobs.length, generated, failed };
 }
 
 /** Delete a report row and queue its objects. */
 export async function deleteReportArtifacts(reportId: string): Promise<void> {
   const report = await prisma.report.findUnique({
     where: { id: reportId },
-    select: { pdfKey: true, mdKey: true, audioKey: true },
+    select: { pdfKey: true, mdKey: true, audioKey: true, htmlKey: true },
   });
   if (!report) return;
   if (report.pdfKey) await deleteObjectOrQueue(report.pdfKey);
   if (report.mdKey) await deleteObjectOrQueue(report.mdKey);
   if (report.audioKey) await deleteObjectOrQueue(report.audioKey);
+  // AU-08 (2026-10-26 audit): the web document is where the birth data actually sits, and for a
+  // sample it is the ONLY artefact — omitting it left the whole chart in R2 after a delete.
+  if (report.htmlKey) await deleteObjectOrQueue(report.htmlKey);
   await prisma.report.delete({ where: { id: reportId } });
 }
 

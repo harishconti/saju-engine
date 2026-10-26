@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Alert, Button } from "@/components/ui";
+import { failureNotice, type FailureAction } from "@/lib/visitor-copy";
 
 /**
  * User-triggered dispatch.
@@ -16,15 +18,22 @@ export function CheckForUpdatesButton() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // AU-24 (D7): a withdrawn consent means this action cannot run, and the fix is on the account
+  // page — so the alert links there instead of leaving the customer to retry a refusal. The link
+  // comes from the shared `failureNotice` helper rather than a local copy of the mapping.
+  const [consentAction, setConsentAction] = useState<FailureAction | null>(null);
 
   async function onClick() {
     setBusy(true);
     setError(null);
     setMessage(null);
+    setConsentAction(null);
     try {
       const res = await fetch("/api/jobs/kick", { method: "POST" });
-      const body = (await res.json().catch(() => ({}))) as { message?: string; error?: string };
+      const body = (await res.json().catch(() => ({}))) as { message?: string; error?: string; code?: string };
       if (!res.ok) {
+        // This button only acts on paid orders, so the failure context is `paid`.
+        setConsentAction(failureNotice({ code: body.code, context: "paid" }).action);
         setError(body.error ?? "Couldn't check right now.");
         return;
       }
@@ -43,7 +52,18 @@ export function CheckForUpdatesButton() {
         Check for updates
       </Button>
       {message ? <span className="text-xs text-muted-foreground">{message}</span> : null}
-      {error ? <Alert tone="danger">{error}</Alert> : null}
+      {error ? (
+        <Alert tone="danger">
+          <p>{error}</p>
+          {consentAction ? (
+            <p className="pt-2">
+              <Link href={consentAction.href} className="font-medium underline">
+                {consentAction.label}
+              </Link>
+            </p>
+          ) : null}
+        </Alert>
+      ) : null}
     </div>
   );
 }

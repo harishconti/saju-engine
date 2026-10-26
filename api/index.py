@@ -42,8 +42,10 @@ from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlsplit
 
 from fastapi import FastAPI, Header, HTTPException
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 # Make the repository's src/ tree importable — the same convention tools/*.py uses.
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -197,19 +199,76 @@ def _fail(status: int, code: str, message: str) -> JSONResponse:
     return JSONResponse(status_code=status, content={"error": message, "code": code})
 
 
+#: Failures that describe the visitor's birth data — the **only** 422s this service emits.
+#: The webapp treats 422 as permanent (identical input cannot succeed on retry), so any other
+#: fault must never borrow this status. AU-09 (2026-10-26 audit): the October outage answered
+#: `UPLOAD_HOSTS_UNCONFIGURED` with 422 for five days, and the webapp recorded every refusal as
+#: bad birth data; restoring the allowlist could not have recovered a single order.
+BIRTH_DATA_CODES = frozenset(
+    {
+        "INVALID_GENDER",
+        "INVALID_BIRTH_DATE",
+        "INVALID_BIRTH_TIME",
+        "MISSING_LONGITUDE",
+        "MISSING_TIMEZONE",
+        "UNKNOWN_TIMEZONE",
+    }
+)
+
+#: Failures that mean the deployment (or the storage target it was handed) is misconfigured, or
+#: that the caller is not authenticated. These are 503 — the request was fine, the service was
+#: not. See AU-09 above.
+CONFIGURATION_CODES = frozenset(
+    {
+        "ENGINE_NOT_CONFIGURED",
+        "ENGINE_UNAUTHORIZED",
+        "UPLOAD_HOSTS_UNCONFIGURED",
+        "UPLOAD_URL_INVALID",
+        "UPLOAD_URL_INSECURE",
+        "UPLOAD_URL_NOT_ALLOWED",
+        "UPLOAD_PATH_NOT_ALLOWED",
+        "UPLOAD_FAILED",
+    }
+)
+
+
+def _status_for_code(code: str) -> int:
+    """The one place a failure code becomes an HTTP status."""
+    if code in CONFIGURATION_CODES:
+        return 503
+    if code in BIRTH_DATA_CODES:
+        return 422
+    # A caller-side contract fault (unknown tier, wrong contract version, …). Never 422, which the
+    # webapp would file as permanent bad birth data.
+    return 400
+
+
+def _fail_code(code: str, message: str) -> JSONResponse:
+    """The envelope for a machine-readable failure code, with the status derived from the code."""
+    return _fail(_status_for_code(code), code, message)
+
+
 # ─────────────────────────────── auth ───────────────────────────────
 
 
 def _authorize(authorization: Optional[str]) -> None:
+    """Authenticate the shared service token.
+
+    AU-09 (2026-10-26 audit): a missing token and a token **mismatch** are both deployment faults,
+    not bad requests. They used to answer 503 and 401 respectively; the 401 became a permanent
+    "the engine rejected this chart" in the webapp, indistinguishable from malformed birth data.
+    Both are now 503 with a code, so the webapp maps them as retryable and the admin view names
+    the real cause.
+    """
     expected = (os.environ.get("ENGINE_SERVICE_TOKEN") or "").strip()
     if not expected:
         # Fail closed: an unauthenticated engine is worse than a dark one.
-        raise HTTPException(status_code=503, detail="Engine is not configured")
+        raise _http(503, "ENGINE_NOT_CONFIGURED", "Engine is not configured")
     provided = ""
     if authorization and authorization.lower().startswith("bearer "):
         provided = authorization[7:].strip()
     if not provided or not hmac.compare_digest(provided, expected):
-        raise HTTPException(status_code=401, detail="Unauthorized")
+        raise _http(503, "ENGINE_UNAUTHORIZED", "Unauthorized")
 
 
 # ─────────────────────────── upload-target allowlist ───────────────────────────
@@ -317,13 +376,12 @@ def _reject_unsafe_uploads(request: "GenerateRequest") -> Optional[JSONResponse]
         if not code:
             continue
         if code == "UPLOAD_HOSTS_UNCONFIGURED":
-            return _fail(
-                503,
+            return _fail_code(
                 code,
                 "The engine has no upload-host allowlist configured (set R2_ENDPOINT or "
                 "SAJU_UPLOAD_HOSTS), so it will not write to an arbitrary URL.",
             )
-        return _fail(422, code, f"{label} is not an allowed storage target.")
+        return _fail_code(code, f"{label} is not an allowed storage target.")
     return None
 
 
@@ -360,7 +418,11 @@ class GenerateRequest(BaseModel):
     contractVersion: int = CONTRACT_VERSION
     kind: str = Field(max_length=16)
     tier: str = Field(max_length=16)
-    uploadUrl: str = Field(max_length=2048)
+    # AU-29 (2026-10-26 audit): optional. The free sample keeps the web document and discards
+    # the PDF, so demanding a PDF target made a sample depend on an upload nobody keeps — and
+    # fail when that throwaway upload did. At least one of `uploadUrl` / `htmlUploadUrl` is
+    # still required, because a render the caller cannot retrieve is not a render.
+    uploadUrl: Optional[str] = Field(default=None, max_length=2048)
     # Optional: where to PUT the source markdown. Storing it is what lets the audio
     # script be derived from the artefact that was actually approved, instead of being
     # recomputed later (an engine deploy in between could change the words).
@@ -473,18 +535,62 @@ def _http(status: int, code: str, message: str) -> HTTPException:
     return HTTPException(status_code=status, detail={"code": code, "message": message})
 
 
-def _error_code(exc: HTTPException) -> str:
+#: Fallback codes for an `HTTPException` raised outside our own helpers (Starlette's 404/405, a
+#: dependency's 401). The envelope always needs *some* code; these are the honest ones.
+_STATUS_CODES = {
+    401: "ENGINE_UNAUTHORIZED",
+    403: "ENGINE_FORBIDDEN",
+    404: "NOT_FOUND",
+    405: "METHOD_NOT_ALLOWED",
+    413: "REQUEST_TOO_LARGE",
+}
+
+
+def _error_code(exc: StarletteHTTPException) -> str:
     detail = exc.detail
-    if isinstance(detail, dict):
-        return str(detail.get("code") or "ENGINE_REJECTED")
-    return "ENGINE_REJECTED"
+    if isinstance(detail, dict) and detail.get("code"):
+        return str(detail["code"])
+    return _STATUS_CODES.get(exc.status_code, "ENGINE_REJECTED")
 
 
-def _error_message(exc: HTTPException) -> str:
+def _error_message(exc: StarletteHTTPException) -> str:
     detail = exc.detail
     if isinstance(detail, dict):
         return str(detail.get("message") or "The engine rejected this request.")
     return str(detail)
+
+
+# ─────────────────────── top-level error handlers ───────────────────────
+#
+# AU-09 (2026-10-26 audit): every error body is `{ error, code }`. Endpoints build that envelope
+# themselves, but three paths bypassed them — an auth failure raised before the try block,
+# pydantic rejecting the body before an endpoint runs, and an unexpected exception. Without these
+# handlers those arrive as `{"detail": ...}` (or a bare 500 page), and a client that needs `code`
+# to tell a configuration fault from bad birth data has nothing to read.
+
+
+@app.exception_handler(StarletteHTTPException)
+async def _http_error_handler(_request: Any, exc: StarletteHTTPException) -> JSONResponse:
+    """Any HTTPException — ours, Starlette's, or a dependency's — in the house envelope."""
+    return _fail(exc.status_code, _error_code(exc), _error_message(exc))
+
+
+@app.exception_handler(RequestValidationError)
+async def _validation_error_handler(_request: Any, exc: RequestValidationError) -> JSONResponse:
+    """A body that does not match the contract is a caller fault — validation, never 500."""
+    log.warning("request validation failed: %d issue(s)", len(exc.errors()))
+    return _fail(422, "INVALID_REQUEST", "The request body did not match the engine contract.")
+
+
+@app.exception_handler(Exception)
+async def _unexpected_error_handler(_request: Any, exc: Exception) -> JSONResponse:
+    """Last resort. Log the class and frames only — messages can embed birth data."""
+    log.error(
+        "unhandled engine error: %s",
+        type(exc).__name__,
+        exc_info=(type(exc), None, exc.__traceback__),
+    )
+    return _fail(500, "INTERNAL_ERROR", "The engine could not complete this request.")
 
 
 # ─────────────────────────────── chart summary ───────────────────────────────
@@ -699,22 +805,29 @@ def _upload(artifact: Path, upload_url: str, *, content_type: str = "application
     # must not be able to turn this helper into an SSRF primitive by forgetting to.
     code = _validate_upload_url(upload_url)
     if code:
-        raise _http(
-            503 if code == "UPLOAD_HOSTS_UNCONFIGURED" else 422,
-            code,
-            "The upload target is not allowed.",
-        )
+        raise _http(_status_for_code(code), code, "The upload target is not allowed.")
     body = artifact.read_bytes()
     request = urllib.request.Request(
         upload_url, data=body, method="PUT", headers={"Content-Type": content_type}
     )
+    # AU-29 (2026-10-26 audit): the reading and the PDF get distinct failure codes. The webapp
+    # turns `HTML_UPLOAD_FAILED` into copy about the reading; before this every storage failure
+    # was `UPLOAD_FAILED`, and a lost reading surfaced as `UPLOAD_NOT_VERIFIED` on the verify
+    # step — which never said which artefact was missing.
+    is_reading = content_type.startswith("text/html")
+    failure_code = "HTML_UPLOAD_FAILED" if is_reading else "UPLOAD_FAILED"
+    failure_message = (
+        "The rendered reading could not be stored."
+        if is_reading
+        else "The rendered PDF could not be stored."
+    )
     try:
         with _UPLOAD_OPENER.open(request, timeout=timeout) as response:
             if response.status not in (200, 201, 204):
-                raise _http(502, "UPLOAD_FAILED", "The rendered PDF could not be stored.")
+                raise _http(502, failure_code, failure_message)
     except urllib.error.HTTPError as exc:
         log.error("upload rejected by storage: HTTP %s", exc.code)  # status only, never the URL
-        raise _http(502, "UPLOAD_FAILED", "The rendered PDF could not be stored.") from exc
+        raise _http(502, failure_code, failure_message) from exc
 
 
 # ─────────────────────────────── endpoints ───────────────────────────────
@@ -722,7 +835,14 @@ def _upload(artifact: Path, upload_url: str, *, content_type: str = "application
 
 @app.post("/health")
 def health(authorization: Optional[str] = Header(None)) -> JSONResponse:
-    """Readiness. Cheap: no engine work, just configuration and imports."""
+    """Readiness. Cheap: no engine work, no network — just configuration and imports.
+
+    AU-03 (2026-10-26 audit): this used to check only the token and the font import. In
+    October `SAJU_UPLOAD_HOSTS` was unset for five days, every `/generate` was refused with
+    `UPLOAD_HOSTS_UNCONFIGURED`, and the probe stayed green the whole time. The allowlist
+    count is now part of the answer, and zero is a 503 — the same state the render path
+    fails closed on.
+    """
     _authorize(authorization)
     fonts = None
     try:
@@ -731,14 +851,25 @@ def health(authorization: Optional[str] = Header(None)) -> JSONResponse:
         fonts = str(_DEJAVU_DIR) if _DEJAVU_DIR else None
     except Exception:  # noqa: BLE001
         pass
-    return JSONResponse(
-        {
-            "status": "ok",
-            "engineVersion": ENGINE_VERSION,
-            "contractVersion": CONTRACT_VERSION,
-            "fontsDir": fonts,
-        }
-    )
+    hosts = _allowed_upload_hosts()
+    body = {
+        "status": "ok" if hosts else "misconfigured",
+        "ok": bool(hosts),
+        "engineVersion": ENGINE_VERSION,
+        "contractVersion": CONTRACT_VERSION,
+        "fontsDir": fonts,
+        "uploadAllowlist": len(hosts),
+    }
+    if not hosts:
+        body.update(
+            {
+                "code": "UPLOAD_HOSTS_UNCONFIGURED",
+                "error": "The engine has no upload-host allowlist configured (set R2_ENDPOINT "
+                "or SAJU_UPLOAD_HOSTS), so it would refuse every render.",
+            }
+        )
+        return JSONResponse(body, status_code=503)
+    return JSONResponse(body)
 
 
 @app.post("/chart")
@@ -749,8 +880,11 @@ def chart(request: ChartRequest, authorization: Optional[str] = Header(None)) ->
     the four pillars for confirmation BEFORE any payment."""
     _authorize(authorization)
     if request.contractVersion != CONTRACT_VERSION:
-        return _fail(422, "CONTRACT_VERSION_MISMATCH", "This engine speaks contract version "
-                     f"{CONTRACT_VERSION}, but the request asked for {request.contractVersion}.")
+        return _fail_code(
+            "CONTRACT_VERSION_MISMATCH",
+            f"This engine speaks contract version {CONTRACT_VERSION}, "
+            f"but the request asked for {request.contractVersion}.",
+        )
     try:
         data = BirthData(request)
         summary = _chart_summary(data.compute(), None)
@@ -771,10 +905,13 @@ def script(request: ScriptRequest, authorization: Optional[str] = Header(None)) 
     is nothing to narrate."""
     _authorize(authorization)
     if request.contractVersion != CONTRACT_VERSION:
-        return _fail(422, "CONTRACT_VERSION_MISMATCH", "This engine speaks contract version "
-                     f"{CONTRACT_VERSION}, but the request asked for {request.contractVersion}.")
+        return _fail_code(
+            "CONTRACT_VERSION_MISMATCH",
+            f"This engine speaks contract version {CONTRACT_VERSION}, "
+            f"but the request asked for {request.contractVersion}.",
+        )
     if not request.markdown.strip():
-        return _fail(422, "EMPTY_MARKDOWN", "No report text was supplied.")
+        return _fail_code("EMPTY_MARKDOWN", "No report text was supplied.")
 
     try:
         spoken = build_audio_script(request.markdown)
@@ -798,18 +935,25 @@ def generate(request: GenerateRequest, authorization: Optional[str] = Header(Non
     _authorize(authorization)
 
     if request.contractVersion != CONTRACT_VERSION:
-        return _fail(422, "CONTRACT_VERSION_MISMATCH", "This engine speaks contract version "
-                     f"{CONTRACT_VERSION}, but the request asked for {request.contractVersion}.")
+        return _fail_code(
+            "CONTRACT_VERSION_MISMATCH",
+            f"This engine speaks contract version {CONTRACT_VERSION}, "
+            f"but the request asked for {request.contractVersion}.",
+        )
     if request.kind not in _KINDS:
-        return _fail(422, "INVALID_KIND", f"kind must be one of {list(_KINDS)}.")
-    if not request.uploadUrl:
-        return _fail(422, "MISSING_UPLOAD_URL", "An uploadUrl is required.")
+        return _fail_code("INVALID_KIND", f"kind must be one of {list(_KINDS)}.")
+    # AU-29: either artefact target is enough; a request with neither retrieves nothing.
+    if not request.uploadUrl and not request.htmlUploadUrl:
+        return _fail_code(
+            "MISSING_UPLOAD_URL",
+            "An uploadUrl or an htmlUploadUrl is required.",
+        )
     if request.kind == "compat" and request.profileB is None:
-        return _fail(422, "COMPAT_NEEDS_TWO_PROFILES", "A compatibility reading needs two people.")
+        return _fail_code("COMPAT_NEEDS_TWO_PROFILES", "A compatibility reading needs two people.")
     if request.kind == "single" and request.tier not in _SINGLE_TIERS:
-        return _fail(422, "INVALID_TIER", f"Unknown single-chart tier {request.tier!r}.")
+        return _fail_code("INVALID_TIER", f"Unknown single-chart tier {request.tier!r}.")
     if request.kind == "compat" and request.tier not in _COMPAT_TIERS:
-        return _fail(422, "INVALID_TIER", f"Unknown compatibility tier {request.tier!r}.")
+        return _fail_code("INVALID_TIER", f"Unknown compatibility tier {request.tier!r}.")
 
     # SSRF guard: the engine has no storage credentials, so the presigned URL *is* its
     # only write capability. Never let the caller point it at an arbitrary host.
@@ -835,13 +979,24 @@ def generate(request: GenerateRequest, authorization: Optional[str] = Header(Non
                     request.favorableOverrideA,
                     wants_html=bool(request.htmlUploadUrl),
                 )
-            digest = hashlib.sha256(pdf.read_bytes()).hexdigest()
-            size = pdf.stat().st_size
-            _upload(pdf, request.uploadUrl)
+            # AU-29: only upload the PDF when the caller asked for one. The renderer still
+            # produces it (it builds the markdown), but a reading-only caller must not fail
+            # because a PDF it never keeps could not be stored — and its response must not
+            # claim integrity metadata for an artefact it cannot retrieve.
+            digest: Optional[str] = None
+            size: Optional[int] = None
+            if request.uploadUrl:
+                digest = hashlib.sha256(pdf.read_bytes()).hexdigest()
+                size = pdf.stat().st_size
+                _upload(pdf, request.uploadUrl)
             if request.htmlUploadUrl and html_path is not None:
-                # Best-effort, like the markdown: the reading failing to upload must not
-                # lose the report. The response says so, so the caller can retry the
-                # document without re-rendering the PDF.
+                # Best-effort when the PDF is the deliverable, like the markdown: the reading
+                # failing to upload must not lose the report. The response says so, so the
+                # caller can retry the document without re-rendering the PDF.
+                #
+                # AU-29: but when no PDF was requested the reading is the only artefact, so a
+                # failed upload means the request delivered nothing — fail with the reading's
+                # own code instead of answering 200 with `htmlBytes: null`.
                 try:
                     document = html_path.read_bytes()
                     _upload(html_path, request.htmlUploadUrl,
@@ -849,6 +1004,8 @@ def generate(request: GenerateRequest, authorization: Optional[str] = Header(Non
                     html_digest = hashlib.sha256(document).hexdigest()
                     html_size = len(document)
                 except HTTPException:
+                    if not request.uploadUrl:
+                        raise
                     log.error("web document upload failed; the PDF is still delivered")
             if request.mdUploadUrl:
                 # Best-effort: a missing markdown only costs the audio and the audit

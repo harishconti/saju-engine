@@ -28,9 +28,12 @@ describe("analytics wiring", () => {
   });
 
   it("fires purchase server-side from the paid transition, not the browser redirect", () => {
-    const webhook = read("src/app/api/webhooks/dodo/route.ts");
-    expect(webhook).toContain("@vercel/analytics/server");
-    expect(webhook).toContain('track("purchase"');
+    // The paid transition moved into the shared processor so the cleanup cron can replay a stored
+    // event through the same code (AU-05). The route still delegates to it.
+    const processor = read("src/lib/dodo-webhook.ts");
+    expect(processor).toContain("@vercel/analytics/server");
+    expect(processor).toContain('track("purchase"');
+    expect(read("src/app/api/webhooks/dodo/route.ts")).toContain("processDodoEvent");
   });
 
   it("keeps 'self' in script-src and connect-src, so the same-origin client is not blocked", () => {

@@ -26,3 +26,18 @@ export const ANONYMOUS_SAMPLE_RETENTION_DAYS = 3;
 
 /** `"3 days"` — for prose that has to state the window. */
 export const ANONYMOUS_SAMPLE_RETENTION_LABEL = `${ANONYMOUS_SAMPLE_RETENTION_DAYS} days`;
+
+/**
+ * How long a profile may sit untouched before its birth details are retired.
+ *
+ * The privacy policy publishes this number ("until you delete them, or after 24 months of
+ * inactivity"), and `docs/webapp/10-privacy-and-compliance.md` describes a warning at 23 months
+ * followed by a sweep at 24. **Only the sweep exists.** Nothing in the app sends an inactivity
+ * warning — there is no scheduled mailer, and inventing one is a product decision, not a retention
+ * fix. So the enforceable half of the promise is this number and the cleanup sweep that applies it;
+ * the copy stays as published (owner decision D7: enforce the promise, do not water down the text).
+ */
+export const PROFILE_INACTIVITY_RETENTION_MONTHS = 24;
+
+/** `"24 months"` — for prose that has to state the window. */
+export const PROFILE_INACTIVITY_RETENTION_LABEL = `${PROFILE_INACTIVITY_RETENTION_MONTHS} months`;

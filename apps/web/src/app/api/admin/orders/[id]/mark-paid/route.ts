@@ -15,6 +15,9 @@ const schema = z.object({ note: z.string().trim().max(200).optional() });
  * when Dodo Payments rejects or stalls the store.
  *
  * Marks the order paid and queues generation — exactly what the webhook does, minus the signature.
+ *
+ * Owner decision D11 (2026-10-26): deliberately NOT consent-gated. A withdrawal stops new orders;
+ * this payment already exists, so its reading still renders and is delivered.
  */
 export const POST = handle(async (req, ctx: Ctx) => {
   const admin = await requireAdmin();

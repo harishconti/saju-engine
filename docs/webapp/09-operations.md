@@ -39,15 +39,16 @@ can take on more volume.
 
 | Job | Schedule | Auth | Idempotent? |
 |---|---|---|---|
-| `/api/cron/dispatch` | every minute | `Bearer $CRON_SECRET` | Yes — lease-based claiming; a double-run processes different jobs |
+| `/api/cron/dispatch` | every 15 minutes (GitHub Actions); daily 04:00 UTC fallback | `Bearer $CRON_SECRET` | Yes — lease-based claiming; a double-run processes different jobs |
 | `/api/cron/cleanup` | daily 03:00 UTC | `Bearer $CRON_SECRET` | Yes — every step is a bounded delete/update |
 | `/api/cron/sla` | every 15 minutes (GitHub Actions) | `Bearer $CRON_SECRET` | Yes — a released reading leaves the queue |
 
-> ⚠️ The first row is aspirational: this account is on **Hobby**, which rejects a per-minute cron at
-> deploy time, so `/api/cron/dispatch` actually runs **daily at 04:00 UTC** and generation is
-> webhook-driven (see [05](05-report-pipeline.md) §4). The `sla` row is different: it is a **GitHub
-> Actions workflow**, not a Vercel cron, precisely because Hobby cannot run one that often. It needs
-> the repository secret `CRON_SECRET` (the same value as the Vercel one) — see the runbook below.
+> ⚠️ This account is on **Hobby**, which rejects a per-minute Vercel cron at deploy time, so
+> `/api/cron/dispatch` is called by the same 15-minute **GitHub Actions** workflow as the SLA sweep
+> (`sla-sweep.yml`, decision D4 / AU-13). The `/api/cron/dispatch` entry in `vercel.json` is a daily
+> fallback only; generation is additionally triggered by the webhook (see
+> [05](05-report-pipeline.md) §4). Both GitHub Actions steps need the repository secret
+> `CRON_SECRET` (the same value as the Vercel one) — see the runbook below.
 
 Both accept `GET` and `POST` (Vercel Cron uses `GET`), and both accept `x-maintenance-secret` as an
 alternative header so they can be triggered manually during an incident.
@@ -74,37 +75,66 @@ alternative header so they can be triggered manually during an incident.
 7. **Process due deletions.** `DeletionRequest` where `scheduledFor <= now()` → anonymise, delete
    solely-owned profiles and reports, queue their R2 objects. See
    [10 — Privacy and compliance](10-privacy-and-compliance.md).
-8. **Retention sweep.** Profiles with no activity for 24 months → queue a warning, not a delete.
+8. **Retention sweep.** Profiles with no activity for 24 months → scrubbed (or deleted when no order
+   references them), with their reports and R2 objects. "Activity" is the profile row's `updatedAt`,
+   any referencing order or report (including a recent delivery of one), and the owner's
+   `COALESCE(User.lastSeenAt, User.createdAt)`. There is no separate warning stage. See
+   [10 — Privacy and compliance](10-privacy-and-compliance.md).
 
 Every step writes a summary line to the log with counts only — never ids of user data at info level.
 
 ## Health checks
 
-`GET /api/health` — no authentication, no secrets in the response.
+`GET /api/health` — no authentication. The public body is deliberately minimal: a status code and
+the two facts a monitor needs, nothing that maps the deployment's configuration.
 
 ```jsonc
 {
+  "ok": true,                        // false => degraded
   "status": "ok",                    // or "degraded"
-  "db": true,
-  "storage": true,
-  "engine": true,
-  "payments": true,
-  "paymentsMode": "live_mode",
-  "botProtection": "enforce",        // off | log | enforce — see 14
-  "botProtectionConfigured": true,
   "version": "«git sha»",
   "checkedAt": "2026-10-15T10:00:00Z"
 }
 ```
 
+AU-31 (2026-10-26 audit): the diagnostic body used to be public, which told anyone which probe was
+failing, whether the deployment could take real money and how far the Turnstile rollout had got.
+The diagnosis now lives at **`GET /api/health/detail`**, which requires either
+`Authorization: Bearer $HEALTH_DETAIL_TOKEN` or an admin session (`ADMIN_EMAILS` + `role: ADMIN` +
+verified email). Unauthenticated callers get `401 {"code":"UNAUTHORIZED"}` without a probe being
+made. Authorised callers see the full snapshot:
+
+```jsonc
+{
+  "ok": false,
+  "status": "degraded",
+  "db": true,
+  "storage": true,
+  "engine": false,
+  "engineDetail": "HTTP 503 UPLOAD_HOSTS_UNCONFIGURED uploadAllowlist=0", // why — see below
+  "payments": true,
+  "paymentsMode": "live_mode",
+  "botProtection": "enforce",        // off | log | enforce — see 14
+  "botProtectionConfigured": true,
+  "missingProducts": [],
+  "version": "«git sha»",
+  "checkedAt": "2026-10-15T10:00:00Z"
+}
+```
+
+Both routes run the same probe. The engine probe is cached for 60 seconds (success *and* failure),
+so a monitor — or a person refreshing during an incident — does not multiply load on the service it
+is checking; the DB probe still runs per hit. `resetHealthProbeCacheForTests()` clears the cache in
+tests.
+
 | Probe | How | Failure means |
 |---|---|---|
 | Database | `SELECT 1` via Prisma | Neon down, credentials rotated, or the branch is suspended on the Free plan |
-| Storage | A minimal R2 operation (list one key, or `HeadObject` on a sentinel) | Bad credentials, deleted token, wrong bucket |
-| Engine | `POST {ENGINE_URL}/health` with the bearer token, short timeout | The deploy failed, or the token drifted between projects |
+| Storage | `isR2Configured()` — checks that `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` and `R2_ENDPOINT` are set (`src/lib/r2.ts`); no R2 call is made | Only that an env var is missing. It does **not** verify the credentials or the bucket: a revoked token or a deleted bucket still reports `storage: true`, so **R2 credentials are not independently verified by health** — exercise a presign/`HeadObject` (the `RUN_R2_TESTS=1` integration suite) when in doubt |
+| Engine | `POST {ENGINE_URL}/health` with the bearer token, short timeout (result cached 60 s) | The deploy failed, the token drifted between projects, or the engine's upload allowlist is empty (`engineDetail` says `HTTP 503 UPLOAD_HOSTS_UNCONFIGURED uploadAllowlist=0`) — with no allowlist the engine refuses every render |
 | Payments | `isDodoConfigured()` **and** every paid tier has a product id | Checkout would throw `PRODUCT_NOT_CONFIGURED` — i.e. you cannot take money |
 
-The response also reports `paymentsMode` (`test_mode` / `live_mode`). That single word is worth watching:
+The detail body also reports `paymentsMode` (`test_mode` / `live_mode`). That single word is worth watching:
 it is how you notice that a real deployment is still pointed at test mode — or, worse, that it went live
 before you meant it to.
 
@@ -113,7 +143,7 @@ so it is not protection yet; production must read `enforce` (see [14](14-securit
 separately from `status` on purpose — a deliberate rollout state is not an outage, but it must be visible
 in an ops review rather than mistaken for "protected".
 
-Returns **503** with `status: "degraded"` if any probe fails, so an uptime monitor can alert on
+Both routes return **503** with `status: "degraded"` if any probe fails, so an uptime monitor can alert on
 status code alone. A degraded engine is not fatal for the site (the sample flow is the only
 synchronous consumer) but it *is* fatal for fulfilment, so it must page.
 
@@ -187,8 +217,9 @@ regenerate, and the old version is superseded.
 
 ### The 20% year-end offer ends (2027-01-01)
 
-**What happens on its own.** `PROMO.endsOn` in `apps/web/src/lib/promo.ts` is an inclusive UTC date.
-After it, the landing page stops advertising the discount, the FAQ entry disappears, the tier cards
+**What happens on its own.** `PROMO.endsAt` in `apps/web/src/lib/promo.ts` is the exclusive end
+instant — the end of 31 December 2026 in US Pacific, `2027-01-01T08:00:00Z`. At and after it, the
+landing page stops advertising the discount, the FAQ entry disappears, the tier cards
 show the list price again, and checkout charges the standard product at the list price. **No deploy
 is needed on the day it ends.**
 
@@ -204,7 +235,7 @@ would say $19 while the store kept charging $15.20. Dodo's API refuses product u
 3. Confirm with `GET /products` that each now shows `"discount": 0`.
 4. The four `… — 20% year-end offer` products can be left in place (unused) or deleted.
 
-**To extend the offer instead:** change `PROMO.endsOn` (and `PROMO.percentOff`, if the discount
+**To extend the offer instead:** change `PROMO.endsAt` (and `PROMO.percentOff`, if the discount
 changes) in `apps/web/src/lib/promo.ts`, and set the same discount on the four promotional
 products in the dashboard. The offer price is derived from the list price, so the site follows
 automatically — but the *store* does not, so the two must be changed together. A mismatch is a
@@ -259,8 +290,9 @@ prefer explicit column lists in raw SQL over `*`.
    - **401** → `CRON_SECRET` mismatch between Vercel's cron and the deployment.
    - **200 with `processed: 0`** → the cron is fine and there is nothing to do.
    - **500** → read the function logs.
-2. Vercel → project → Cron Jobs → run history. Hobby-plan projects silently will not run a
-   per-minute schedule.
+2. GitHub → Actions → *Review queue SLA sweep, job dispatch and engine smoke* → run history. The
+   scheduled dispatch comes from that workflow, not from Vercel's cron; a Hobby-plan Vercel project
+   will never run a per-minute schedule.
 3. Still stuck after a manual trigger: run the leak query above, then work the job manually by
    calling the engine route with the order's payload.
 
@@ -355,7 +387,11 @@ visitor at the top of the funnel.
 
 The site keeps working; only the sample flow and new generation break.
 
-1. `/api/health` — `engine: false`?
+1. **Which probe failed?** — `GET /api/health` answers only `ok`/`status`/`version`/`checkedAt`; a
+   `503`/`degraded` says something is down, not what. With `HEALTH_DETAIL_TOKEN` (or an admin
+   session), `GET /api/health/detail` shows `engine: false` and `engineDetail`. Without the token,
+   the engine's own `POST {ENGINE_URL}/health` (with the bearer token) and the Vercel function logs
+   are the next cheap checks; continue below.
 2. Vercel → `saju-report-engine` → the last deploy. Roll back if it correlates.
 3. If the token rotated, update `ENGINE_SERVICE_TOKEN` in **both** projects and redeploy both. A
    one-sided rotation presents as a 401 from the engine while `/health` on the engine itself still

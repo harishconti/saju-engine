@@ -55,7 +55,8 @@ Rules:
   and nothing on the server ever looked, so the first real signup produced an account with **no**
   `ConsentRecord`, and the account page displayed the required consent as already granted on top of that.
 - Withdrawing consent is a first-class action in `/dashboard/account`, not an email request.
-  Withdrawing `service` stops processing and starts the deletion path.
+  Withdrawing `service` stops new orders and new readings; readings already paid for are still
+  produced and delivered (owner decision D11).
 - `ConsentRecord` is **append-only**. Never update a consent row; insert a new one and set
   `withdrawnAt` on the old. The history is the evidence.
 - The exact policy version is stored, so "they consented to *that* text" is provable.
@@ -99,8 +100,8 @@ consent was given. Recorded as an open item rather than left implicit.
 | Data | Retention | Mechanism |
 |---|---|---|
 | Anonymous samples (R2 + any row) | **3 days** | Cleanup cron — the *only* thing that deletes them: there is no R2 lifecycle rule on `reports/anonymous/` |
-| Profiles / birth data | Until the user deletes it, or 24 months of inactivity | Warning at 23 months, sweep at 24 |
-| Reports + PDFs | Until deletion is requested | Deleted together with the `Report` row |
+| Profiles / birth data | Until the user deletes it, or 24 months of inactivity | Daily sweep retires a profile only when its row, **every order and report that references it** (including a recent delivery of one), **and its owner's `COALESCE(lastSeenAt, createdAt)`** are older than 24 calendar months. There is **no warning at 23 months**: nothing in the app sends scheduled mail, so the warning was never implemented — the sweep is the whole mechanism |
+| Reports + PDFs | Until deletion is requested, or with the retirement of their profile | Erasure deletes the `Report` rows and queues the R2 objects; the inactivity sweep does the same for a retired profile's reports |
 | Account after a deletion request | Deleted, with `Order`/`Report` rows anonymised | 30-day grace, then cleanup cron |
 | `Job`, `WebhookEvent` | 90 days | Cleanup cron |
 | `RateLimit` windows | 1 hour | Cleanup cron |

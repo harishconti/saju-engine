@@ -1,6 +1,7 @@
 import { ApiError, handle, json } from "@/lib/api";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, WINDOW } from "@/lib/ratelimit";
 import { presignGetUrl } from "@/lib/r2";
 
 export const dynamic = "force-dynamic";
@@ -18,11 +19,16 @@ type Ctx = { params: Promise<{ id: string }> };
  */
 export const GET = handle(async (req, ctx: Ctx) => {
   const user = await requireUser();
+  // AU-30 (2026-10-26 audit): an attachment download streams the MP3 through this function, and
+  // every call mints a signed URL. 30/minute is comfortably above a listener and bounds a script.
+  await rateLimit(`report-audio:${user.id}`, 30, WINDOW.minute);
   const { id } = await ctx.params;
 
   const report = await prisma.report.findFirst({
     where: { id, userId: user.id },
-    select: { status: true, audioStatus: true, audioKey: true, audioBytes: true, script: true },
+    // AU-26: no `script` — this path never renders it, and the allow-list rule is "select what you
+    // return", so an unused column is one more place an unreviewed draft could start leaking from.
+    select: { status: true, audioStatus: true, audioKey: true, audioBytes: true },
   });
   if (!report) throw ApiError.notFound("Report not found");
 
@@ -63,14 +69,24 @@ export const GET = handle(async (req, ctx: Ctx) => {
   }
 });
 
-/** The narration text, for anyone who would rather read it (and for audit). */
+/**
+ * The narration text, for anyone who would rather read it (and for audit).
+ *
+ * Same delivery gate as the MP3 itself (AU-26): the script is the reviewed reading spoken aloud,
+ * so returning it for a draft would expose unreviewed content through a second door.
+ */
 export const POST = handle(async (_req, ctx: Ctx) => {
   const user = await requireUser();
+  // AU-30: the same bucket as the MP3 itself — it is the same narration, through a second door.
+  await rateLimit(`report-audio:${user.id}`, 30, WINDOW.minute);
   const { id } = await ctx.params;
   const report = await prisma.report.findFirst({
     where: { id, userId: user.id },
-    select: { script: true, audioStatus: true },
+    select: { status: true, script: true, audioStatus: true },
   });
   if (!report) throw ApiError.notFound("Report not found");
+  if (report.status !== "DELIVERED") {
+    throw new ApiError(409, "REPORT_NOT_READY", "This reading is still being reviewed.");
+  }
   return json({ script: report.script, audioStatus: report.audioStatus });
 });

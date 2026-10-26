@@ -31,6 +31,7 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   deletedAt     DateTime?                            // set on erasure: account anonymised, kept for records
+  lastSeenAt    DateTime?                            // last authenticated request, ≤1 write/24 h (D9)
 
   profiles       Profile[]
   orders         Order[]
@@ -43,6 +44,7 @@ model User {
   reviewedReports Report[]  @relation("ReportReviewer")
 
   @@index([deletedAt])
+  @@index([lastSeenAt])
 }
 
 enum Role {
@@ -370,7 +372,7 @@ model ConsentRecord {
 model DeletionRequest {
   id           String    @id @default(cuid())
   userId       String
-  status       String    @default("pending")           // pending | cancelled | completed
+  status       String    @default("pending")           // pending | cancelled | completed | completed_with_identity_error
   reason       String?
   requestedAt  DateTime  @default(now())
   scheduledFor DateTime                                 // now + grace period (30 days)
@@ -380,6 +382,13 @@ model DeletionRequest {
 
   @@index([status, scheduledFor])
 }
+
+`completed_with_identity_error` (AU-25): the local erasure committed — profiles scrubbed or deleted,
+reports and objects gone, the account anonymised — but the Neon Auth identity could not be deleted
+(a transient failure past the retry cap, or a `neon_auth` relation that no longer exists). The
+request stops being retried and the owner is emailed; the remaining step is deleting the Neon Auth
+user in the console. A guard makes the transition conditional on the row still being `pending`, so
+two overlapping cleanup runs cannot both alert.
 
 /// An address left by an anonymous visitor who asked for their free snapshot by email.
 ///
@@ -434,7 +443,8 @@ Rules the code enforces (`src/lib/pricing.ts`, tested in `src/lib/__tests__/pric
   configured. A missing env var loses the promotion; it never produces a claim we cannot charge.
 - **The store product is chosen from the price recorded on the order**, not from the clock, so a
   customer who started checkout before the window closed keeps the price they were shown.
-- **The offer ends by itself.** After `PROMO.endsOn` the site shows the list price and checkout
+- **The offer ends by itself.** At and after `PROMO.endsAt` (the end of 31 December 2026 US
+  Pacific, `2027-01-01T08:00:00Z`) the site shows the list price and checkout
   uses the standard products. No code change is needed on the day it ends — but the 20% discount
   still set on the four *standard* Dodo products must be removed in the Dodo dashboard (see
   [09 — Operations](09-operations.md)).
@@ -486,6 +496,12 @@ npx prisma migrate deploy
   transaction) are too tight for serverless against Neon. Set
   `transactionOptions: { maxWait: 10_000, timeout: 15_000 }` on the client.
 - **Never** touch the `neon_auth` schema. Neon Auth owns it.
+  - **One exception (AU-25, owner-approved 2026-10-26):** account erasure deletes the identity —
+    sessions, then accounts, then the user, in one raw-statement transaction over the app's existing
+    `DATABASE_URL` — *after* the local erasure has committed. The SDK cannot do it from the cron:
+    `auth.deleteUser()` proxies the caller's cookie behind `sensitiveSessionMiddleware`, and
+    `auth.admin.removeUser()` needs an admin session. The delete is keyed by the local `User.id`
+    (which *is* the Neon Auth user id), never by email. Nothing else may write to `neon_auth`.
 
 ## Retention
 
@@ -494,8 +510,8 @@ npx prisma migrate deploy
 | Anonymous sample objects | 3 days | Daily cleanup cron sweeps `reports/anonymous/…`, by prefix and age, needing no rows — which is why the free tier's discarded PDF is safe there |
 | Anonymous sample rows | none (never persisted) | The sample flow is stateless until "save to profile" |
 | `SampleLead` (an emailed address) | until erasure is requested | **Kept on purpose** — a lead that expires is not a lead. No daily sweep; `email` is unique so a repeat opt-in updates the preference instead of duplicating. `marketingOptIn: false` rows are kept too (they are the record that someone *declined*) |
-| Profile birth data | until the user deletes it, or 24 months after last activity | `Profile.deletedAt` + a periodic sweep |
-| Reports + PDFs | until deletion is requested | `Report` rows + R2 objects, deleted together via `ObjectDeletion` |
+| Profile birth data | until the user deletes it, or 24 months after last activity | `Profile.deletedAt` + a daily sweep. Activity = the profile row's `updatedAt`, any referencing `Order` or `Report` (including a recent `Delivery` of it), and the owner's `COALESCE(User.lastSeenAt, User.createdAt)` |
+| Reports + PDFs | until the user deletes them, or they are retired with an inactive profile | `Report` rows + R2 objects, deleted together via `ObjectDeletion` |
 | `Job`, `WebhookEvent` | 90 days | Daily cleanup cron |
 | `RateLimit` windows | 1 hour | Daily cleanup cron |
 | `IdempotencyKey` | 7 days | Daily cleanup cron |

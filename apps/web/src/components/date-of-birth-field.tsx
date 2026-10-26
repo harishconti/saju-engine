@@ -48,6 +48,7 @@ export function DateOfBirthField({
   const [text, setText] = useState(value ? formatBirthDateForInput(value) : "");
   const [parseError, setParseError] = useState<string | null>(null);
   const nativeRef = useRef<HTMLInputElement>(null);
+  const textRef = useRef<HTMLInputElement>(null);
 
   // Keep the text in step when the value is set from outside (the native picker, an edit form
   // loading a saved profile) without stomping on what the visitor is currently typing.
@@ -60,13 +61,25 @@ export function DateOfBirthField({
     }
   }, [value]);
 
+  // AU-16: a parse error must block the form's submit, not merely be printed under the field. The
+  // native constraint API is what a `<form>` consults, so mirroring the message into
+  // `setCustomValidity` makes the browser refuse to submit while the text is not a date.
+  useEffect(() => {
+    textRef.current?.setCustomValidity(parseError ?? "");
+  }, [parseError]);
+
   const tooRecent = value !== "" && !isOldEnoughForReading(value);
   const message = error ?? parseError ?? (tooRecent ? birthTooRecentMessage() : undefined);
 
   function commit(next: string) {
     const parsed = parseTypedBirthDate(next);
     if (!parsed.ok) {
+      // AU-16: clearing or mistyping used to leave `value` untouched, so the form submitted the
+      // date the visitor had just deleted. Emit "" and keep the typed text visible so it can be
+      // corrected; `lastValue` is updated first so the sync effect does not wipe that text.
       setParseError(next.trim() === "" ? null : parsed.error);
+      lastValue.current = "";
+      onChange("");
       return;
     }
     setParseError(null);
@@ -96,6 +109,7 @@ export function DateOfBirthField({
         <div className="flex gap-2">
           <Input
             id={fieldId}
+            ref={textRef}
             type="text"
             inputMode="numeric"
             autoComplete="bday"
@@ -104,8 +118,15 @@ export function DateOfBirthField({
             value={text}
             aria-describedby={`${fieldId}-echo`}
             onChange={(e) => {
-              setText(e.target.value);
+              const next = e.target.value;
+              setText(next);
               setParseError(null);
+              // AU-16: clearing must reach the parent at once, not only on blur — otherwise a
+              // click that does not move focus could submit the date the visitor just deleted.
+              if (next.trim() === "" && value !== "") {
+                lastValue.current = "";
+                onChange("");
+              }
             }}
             onBlur={(e) => commit(e.target.value)}
             onKeyDown={(e) => {
@@ -140,7 +161,11 @@ export function DateOfBirthField({
         max={maxBirthDateISO()}
         value={value}
         onChange={(e) => {
-          if (!e.target.value) return;
+          if (!e.target.value) {
+            lastValue.current = "";
+            onChange("");
+            return;
+          }
           lastValue.current = e.target.value;
           onChange(e.target.value);
         }}

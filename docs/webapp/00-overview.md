@@ -103,7 +103,7 @@ API but must **never** appear in the UI, the store, or a client-facing artefact.
 | D7 | **Cloudflare R2**, private bucket, presigned URLs | Zero egress fees; no public URL ever |
 | D8 | **No PII column encryption** | Neon encrypts at rest; column encryption would break filtering and complicate every query for marginal gain over strict access control and "never log PII" |
 | D9 | **Postgres-only state** — no Redis, no broker | Rate limits, idempotency, job leases, and the R2 deletion queue are all tables. One fewer vendor |
-| D10 | **Vercel Pro** | Hobby crons are once-daily with a 2-cron maximum; the dispatcher needs per-minute |
+| D10 | **Vercel Pro** | Hobby crons are once-daily with a 2-cron maximum; the dispatcher needs per-minute. **Superseded 2026-10-26 (AU-13):** dispatch runs from the 15-minute GitHub Actions workflow, so Pro is no longer required — it would only restore a per-minute Vercel cron |
 | D11 | **Dark by default, light from the OS** — `:root` is the brand surface and `@media (prefers-color-scheme: light)` swaps the token set | The light palette already existed and was never wired; honouring the OS makes `06`'s "both themes render" true without a toggle to maintain. No user-facing switch, deliberately — a half-considered light mode is worse than a deliberate dark identity |
 | D12 | **The UI/UX bar is machine-checked** — `tools/audit-ui.py --strict` runs in CI as the `ui` job | The bar in [06](06-frontend-ux.md) is measurable (no overflow at three viewports, axe clean in both schemes, ≥44 px controls), so it should not depend on someone remembering to look. Its coverage is stated explicitly, including what it does *not* check |
 

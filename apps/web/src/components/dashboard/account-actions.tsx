@@ -59,6 +59,9 @@ export function ConsentForm({
 }) {
   const router = useRouter();
   const [purposes, setPurposes] = useState(initial);
+  // What the server is known to hold. A failed save snaps back to this rather than to `initial`,
+  // which is only the value at mount and would undo an earlier successful save (AU-19).
+  const [confirmed, setConfirmed] = useState(initial);
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,11 +82,17 @@ export function ConsentForm({
         // must be visible rather than silently absent.
         const body = (await res.json().catch(() => ({}))) as { error?: string };
         setError(body.error ?? "We couldn't save that. Please try again.");
-        setPurposes(initial); // snap the checkbox back to what is actually recorded
+        setPurposes(confirmed); // snap the checkbox back to what is actually recorded
         return;
       }
+      setConfirmed(next);
       setSaved(true);
       router.refresh();
+    } catch {
+      // AU-19: a dropped connection has no response to inspect. It must not leave the checkbox
+      // toggled as though the consent were recorded.
+      setError("We couldn't save that. Please try again.");
+      setPurposes(confirmed);
     } finally {
       setBusy(false);
     }
@@ -101,7 +110,8 @@ export function ConsentForm({
         <span>
           <span className="font-medium text-foreground">Produce and deliver my readings</span>
           <span className="ml-1 text-muted-foreground">
-            Required. Turning this off stops processing and starts the deletion path.
+            Required. Turning this off stops new orders and new readings. Readings you have
+            already paid for are still produced and delivered.
           </span>
         </span>
       </label>
@@ -150,10 +160,13 @@ export function DeletionPanel({
         setError(body.error ?? "Couldn't schedule deletion.");
         return;
       }
+      setConfirming(false);
       router.refresh();
+    } catch {
+      // AU-19: without this the panel looked as though the click had done something.
+      setError("Couldn't schedule deletion.");
     } finally {
       setBusy(false);
-      setConfirming(false);
     }
   }
 
@@ -168,6 +181,8 @@ export function DeletionPanel({
         return;
       }
       router.refresh();
+    } catch {
+      setError("Couldn't cancel deletion.");
     } finally {
       setBusy(false);
     }

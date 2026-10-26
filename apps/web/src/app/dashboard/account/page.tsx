@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Alert, Card, CardContent, KeyValue, PageHeader } from "@/components/ui";
 import { AccountNameForm, ConsentForm, DeletionPanel } from "@/components/dashboard/account-actions";
-import { requireUser } from "@/lib/auth";
+import { SessionsPanel } from "@/components/dashboard/account-sessions";
+import { listAccountSessions, requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/format";
 import { PRIVACY_EMAIL, PRIVACY_HREF } from "@/lib/contact";
@@ -15,7 +16,7 @@ const DELETION_GRACE_DAYS = 30;
 export default async function AccountPage() {
   const user = await requireUser();
 
-  const [latestConsent, deletion, counts] = await Promise.all([
+  const [latestConsent, deletion, counts, sessions] = await Promise.all([
     prisma.consentRecord.findFirst({
       where: { userId: user.id },
       orderBy: { grantedAt: "desc" },
@@ -31,16 +32,27 @@ export default async function AccountPage() {
         _count: { select: { profiles: true, reports: true, orders: true } },
       },
     }),
+    // AU-40 (D6). Null means the provider could not be asked, not "no other devices" — the panel
+    // says so rather than showing an empty list that would read as a promise, and it keeps the
+    // revoke control: the provider's list endpoint is freshness-gated while revocation is not.
+    listAccountSessions(),
   ]);
 
   // Default to NOT granted. This previously said `service: true`, so an account with no
   // `ConsentRecord` at all rendered the required consent as already ticked — the UI asserting a
   // state the database did not have, in exactly the place the privacy policy makes claims. The
   // checkbox below is what records it; it must start unticked and be an explicit action.
-  const purposes = (latestConsent?.purposes ?? { service: false, service_messages: false }) as {
-    service: boolean;
-    service_messages: boolean;
-  };
+  //
+  // AU-23: a record written against an older policy text is not consent to the current one — the
+  // same rule the server enforces — so it renders as ungranted here too, rather than showing a
+  // ticked box for consent the server will refuse to honour.
+  const purposes = (
+    latestConsent && !latestConsent.withdrawnAt && latestConsent.policyVersion === POLICY_VERSION
+      ? latestConsent.purposes
+      : { service: false, service_messages: false }
+  ) as { service: boolean; service_messages: boolean };
+
+  const policyChanged = latestConsent != null && latestConsent.policyVersion !== POLICY_VERSION;
 
   const deletionActive = deletion?.status === "pending" ? deletion : null;
 
@@ -76,12 +88,32 @@ export default async function AccountPage() {
 
       <Card>
         <CardContent className="py-5">
+          <h2 className="pb-1 font-display text-xl">Where you&apos;re signed in</h2>
+          {/* The panel renders the "couldn't load" state itself, so the revoke action survives a
+              provider refusal of the list (e.g. SESSION_NOT_FRESH on a long-lived session). */}
+          <SessionsPanel sessions={sessions} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="py-5">
           <h2 className="pb-1 font-display text-xl">Consent</h2>
           <p className="pb-4 text-sm text-muted-foreground">
-            Consent is recorded with the policy version and the date. Withdrawing the first item stops
-            processing and begins the deletion path. The history is append-only — we never rewrite it.
+            Consent is recorded with the policy version and the date. Turning off the first item
+            stops new orders and new readings; readings you have already paid for are still produced
+            and delivered. The history is append-only — we never rewrite it.
           </p>
-          <ConsentForm initial={purposes} policyVersion={latestConsent?.policyVersion ?? POLICY_VERSION} />
+          <ConsentForm initial={purposes} policyVersion={POLICY_VERSION} />
+          {policyChanged ? (
+            <Alert tone="warning" title="The privacy policy has been updated">
+              Your previous consent was recorded against an earlier version, so it is shown as not
+              granted. Please review the{" "}
+              <Link href="/privacy" className="underline hover:text-foreground">
+                current policy
+              </Link>{" "}
+              and confirm again.
+            </Alert>
+          ) : null}
           <p className="pt-4 text-xs text-muted-foreground">
             Latest record: {latestConsent ? formatDate(latestConsent.grantedAt) : "none"} · policy version{" "}
             {latestConsent?.policyVersion ?? POLICY_VERSION}

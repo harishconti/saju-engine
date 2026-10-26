@@ -6,7 +6,13 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 /**
- * Job dispatcher. Runs every minute (see vercel.json crons).
+ * Job dispatcher.
+ *
+ * Schedule: every 15 minutes from `.github/workflows/sla-sweep.yml` (decision D4, AU-13 — the audit
+ * found a queued `VOICE` job that had waited since 2026-10-26 06:36 while this comment claimed a
+ * per-minute cron). `vercel.json` keeps a DAILY cron as a harmless fallback; the account is on the
+ * Hobby plan, which refuses any cron that runs more than once a day, so a per-minute schedule cannot
+ * be deployed here.
  *
  * Auth: Vercel Cron sends `Authorization: Bearer $CRON_SECRET`; we also accept
  * `x-maintenance-secret` so an operator can trigger a tick by hand during an incident.

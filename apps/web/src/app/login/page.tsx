@@ -7,17 +7,10 @@ import { Alert, Button, Card, CardContent, Field, Input, buttonClasses } from "@
 import { ElementalRule, SealMark } from "@/components/viz";
 import { isAuthError } from "@neondatabase/auth/next";
 import { authClient } from "@/lib/auth/client";
-import { POLICY_VERSION } from "@/lib/consent";
+import { safeNext } from "@/lib/safe-next";
 
 type Mode = "signin" | "signup";
 type Busy = null | "google" | "email" | "magic";
-
-function safeNext(raw: string | null): string {
-  // Allowlist: only same-site, single-leading-slash paths. A naive `next` is an open redirect.
-  if (!raw) return "/dashboard";
-  if (!raw.startsWith("/") || raw.startsWith("//")) return "/dashboard";
-  return raw;
-}
 
 /**
  * The reason an auth call failed, in words a visitor can act on.
@@ -28,17 +21,74 @@ function safeNext(raw: string | null): string {
  * sentence. Only an `AuthError` message is shown; anything else (a network failure) gets the fallback.
  *
  * Except whether an account exists: "User already exists" on sign-up tells anyone which emails are
- * registered here, so those answers get one neutral sentence. Matched on the message as well as the
- * code, because the server's `USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL` is not in Neon's code map.
+ * registered here, so those answers get one neutral sentence (AU-15). Matched on the message as well
+ * as the code, because the server's `USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL` is not in Neon's code map.
+ * The same helper serves a *returned* `{ error }` as well as a thrown one: AU-15 found three paths
+ * that printed `result.error.message` raw, which reintroduced the enumeration leak.
  */
-const ACCOUNT_EXISTENCE_CODES = new Set(["user_already_exists", "email_exists", "user_not_found", "identity_not_found"]);
+const ACCOUNT_EXISTENCE_CODES = new Set([
+  "user_already_exists",
+  "email_exists",
+  "user_not_found",
+  "identity_not_found",
+  "USER_ALREADY_EXISTS",
+  "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL",
+  "USER_NOT_FOUND",
+]);
+
+const NEUTRAL_AUTH_ERROR =
+  "We couldn't do that with this email. If you already have an account, sign in or use a magic link.";
+
+/**
+ * AU-24 (owner decision D7): a pending deletion disables sign-in. Credentials still verify at the
+ * identity provider, so the visitor needs a specific reason and the one control that resolves it —
+ * the deletion stays cancellable until it runs, but the account page that normally offers the
+ * cancel is unreachable from a blocked session.
+ */
+const PENDING_DELETION_ERROR =
+  "This account is pending deletion, so sign-in is turned off. You can cancel the scheduled deletion below and sign in again.";
+
+/** `GET /api/account/deletion` answers this for a session blocked by its own pending deletion. */
+const ACCOUNT_PENDING_DELETION = "ACCOUNT_PENDING_DELETION";
+
+type AuthErrorLike = { code?: unknown; message?: unknown };
+
+/**
+ * Both shapes the auth client produces: a thrown `AuthError` (marked with `__isAuthError`) and a
+ * plain returned `{ code, message }`. A foreign `Error` (a network failure) is deliberately not
+ * accepted — its message ("Failed to fetch") is not something a visitor can act on.
+ */
+function asAuthErrorLike(err: unknown): AuthErrorLike | null {
+  if (!err || typeof err !== "object") return null;
+  if (isAuthError(err)) return err as AuthErrorLike;
+  // A thrown foreign `Error` is a transport failure ("Failed to fetch"), which the fallback covers.
+  if (err instanceof Error) return null;
+  if (typeof (err as AuthErrorLike).code === "string" || typeof (err as AuthErrorLike).message === "string") {
+    return err as AuthErrorLike;
+  }
+  return null;
+}
 
 function authErrorMessage(err: unknown, fallback: string): string {
-  if (!isAuthError(err) || !err.message) return fallback;
-  if (ACCOUNT_EXISTENCE_CODES.has(String(err.code)) || /already exists|not found/i.test(err.message)) {
-    return "We couldn't do that with this email. If you already have an account, sign in or use a magic link.";
+  const e = asAuthErrorLike(err);
+  if (!e) return fallback;
+  const code = typeof e.code === "string" ? e.code : "";
+  const message = typeof e.message === "string" ? e.message.trim() : "";
+  if (ACCOUNT_EXISTENCE_CODES.has(code) || /already exists|not found|already registered/i.test(message)) {
+    return NEUTRAL_AUTH_ERROR;
   }
-  return err.message;
+  return message || fallback;
+}
+
+/**
+ * The `?error=` code a magic-link or Google failure redirect appends to `/login` (AU-15).
+ * The code is shown in parentheses so support can match it to the provider's log; it is capped so a
+ * hand-crafted URL cannot fill the page.
+ */
+function callbackErrorMessage(code: string): string {
+  const reason = code.trim().slice(0, 60);
+  if (reason === ACCOUNT_PENDING_DELETION) return PENDING_DELETION_ERROR;
+  return reason ? `Sign-in didn't complete (${reason}). Please try again.` : "Sign-in didn't complete. Please try again.";
 }
 
 export default function LoginPage() {
@@ -48,8 +98,17 @@ export default function LoginPage() {
 
   const [mode, setMode] = useState<Mode>("signin");
   const [busy, setBusy] = useState<Busy>(null);
-  const [error, setError] = useState<string | null>(null);
+  // A failed magic-link / Google callback lands back here with `?error=`; show it instead of
+  // dropping the visitor on a clean form with no explanation (AU-15).
+  const callbackError = params.get("error");
+  const [error, setError] = useState<string | null>(callbackError ? callbackErrorMessage(callbackError) : null);
   const [notice, setNotice] = useState<string | null>(null);
+  // Set when the credentials verified but the account is blocked, or when the OAuth callback came
+  // back with the code. Shows the cancel control without claiming the visitor is signed in.
+  const [pendingDeletion, setPendingDeletion] = useState(
+    callbackError?.trim() === ACCOUNT_PENDING_DELETION,
+  );
+  const [cancelling, setCancelling] = useState(false);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -62,33 +121,14 @@ export default function LoginPage() {
   };
 
   /**
-   * Record consent after sign-up, once a session exists.
-   *
-   * Retried once, because the session cookie is not always readable by the server on the very first
-   * request after `signUp.email`. The old version fired a single request and swallowed every failure,
-   * which is how the first real signup produced a `User` row with **no** `ConsentRecord` at all. A
-   * failure here is no longer silent in effect: the server refuses to store birth data without an
-   * active `service` consent and points the visitor at their account settings, where it can be granted.
+   * Where the provider sends a failed sign-in. It must be `/login` itself, not `/auth/complete`:
+   * the provider appends `?error=<code>`, and `/auth/complete` (protected by the middleware) would
+   * bounce a session-less arrival to `/login` without the query string.
    */
-  async function recordConsent() {
-    const body = JSON.stringify({
-      policyVersion: POLICY_VERSION,
-      purposes: { service: true, service_messages: false },
-    });
-    for (let attempt = 0; attempt < 2; attempt++) {
-      try {
-        const res = await fetch("/api/account/consent", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body,
-        });
-        if (res.ok) return;
-      } catch {
-        /* fall through to the retry */
-      }
-      await new Promise((resolve) => setTimeout(resolve, 700));
-    }
-  }
+  const errorCallbackUrl = () => {
+    const origin = typeof window === "undefined" ? "" : window.location.origin;
+    return `${origin}/login`;
+  };
 
   async function onGoogle() {
     setError(null);
@@ -98,13 +138,62 @@ export default function LoginPage() {
         provider: "google",
         callbackURL: completeUrl(next),
         newUserCallbackURL: completeUrl(next),
-        errorCallbackURL: completeUrl("/login"),
+        errorCallbackURL: errorCallbackUrl(),
       });
-      if (result?.error) setError(result.error.message ?? "Google sign-in failed.");
+      if (result?.error) setError(authErrorMessage(result?.error, "Google sign-in failed."));
     } catch (err) {
       setError(authErrorMessage(err, "Google sign-in failed. Try email instead."));
     } finally {
       setBusy(null);
+    }
+  }
+
+  /**
+   * Whether the just-authenticated account is blocked by its own pending deletion.
+   *
+   * The identity provider has no concept of our `DeletionRequest`, so the sign-in itself succeeds;
+   * the server is what treats the account as signed out (`getCurrentUser`). Asking this route is
+   * how the browser finds out before navigating into a wall. It answers 401 for every other
+   * signed-out state, which is a plain "no".
+   */
+  async function isPendingDeletion(): Promise<boolean> {
+    try {
+      const res = await fetch("/api/account/deletion", { cache: "no-store" });
+      if (!res.ok) return false;
+      const body = (await res.json().catch(() => ({}))) as { pendingDeletion?: boolean };
+      return body.pendingDeletion === true;
+    } catch {
+      // A network failure is not evidence of deletion; fall through to the normal path.
+      return false;
+    }
+  }
+
+  async function onCancelDeletion() {
+    setError(null);
+    setNotice(null);
+    setCancelling(true);
+    try {
+      const res = await fetch("/api/account/deletion", { method: "DELETE" });
+      if (!res.ok) {
+        // 401 is the stale-link case: the code arrived in a URL but there is no session to cancel
+        // with. Saying "sign in again" is more useful than the bare "Not signed in".
+        if (res.status === 401) {
+          setError("Please sign in again to cancel the scheduled deletion.");
+          return;
+        }
+        const body = (await res.json().catch(() => ({}))) as { error?: string };
+        setError(body.error ?? "Couldn't cancel the deletion. Please try again.");
+        return;
+      }
+      // The session still exists — only the block is gone — so the sign-in can simply resume.
+      setPendingDeletion(false);
+      setNotice("Deletion cancelled. Signing you in…");
+      router.push(next);
+      router.refresh();
+    } catch {
+      setError("Couldn't cancel the deletion. Check your connection and try again.");
+    } finally {
+      setCancelling(false);
     }
   }
 
@@ -130,12 +219,25 @@ export default function LoginPage() {
           : await authClient.signIn.email({ email, password });
 
       if (result?.error) {
-        setError(result.error.message ?? "That didn't work. Check your details and try again.");
+        setError(authErrorMessage(result?.error, "That didn't work. Check your details and try again."));
         return;
       }
 
-      if (mode === "signup") await recordConsent();
-      router.push(next);
+      if (mode === "signup") {
+        // AU-22: send a new account through `/auth/complete` — the same landing every OAuth and
+        // magic-link sign-in uses — so the server records the initial consent once, for all three
+        // paths. A browser POST here could be lost with the tab and was only ever wired for email.
+        router.push(`/auth/complete?next=${encodeURIComponent(next)}`);
+      } else {
+        // AU-24 (D7): credentials verified, but a pending deletion means the server will treat this
+        // session as signed out. Say so here instead of letting the next page 401.
+        if (await isPendingDeletion()) {
+          setPendingDeletion(true);
+          setError(PENDING_DELETION_ERROR);
+          return;
+        }
+        router.push(next);
+      }
       router.refresh();
     } catch (err) {
       setError(authErrorMessage(err, "That didn't work. Check your details and try again."));
@@ -157,10 +259,10 @@ export default function LoginPage() {
         email,
         callbackURL: completeUrl(next),
         newUserCallbackURL: completeUrl(next),
-        errorCallbackURL: completeUrl("/login"),
+        errorCallbackURL: errorCallbackUrl(),
       });
       if (result?.error) {
-        setError(result.error.message ?? "Couldn't send the link.");
+        setError(authErrorMessage(result?.error, "Couldn't send the link."));
         return;
       }
       setNotice("Check your inbox — the link expires in a few minutes.");
@@ -202,6 +304,7 @@ export default function LoginPage() {
                     setMode(m);
                     setError(null);
                     setNotice(null);
+                    setPendingDeletion(false);
                   }}
                   // min-h-11 (44px): these are real controls on a touch-first page, and `py-2` alone
                   // measured 36px — under the >=44 px bar in docs/webapp/06.
@@ -219,6 +322,21 @@ export default function LoginPage() {
 
             {error ? <Alert tone="danger">{error}</Alert> : null}
             {notice ? <Alert tone="success">{notice}</Alert> : null}
+
+            {/* The one control that resolves a pending-deletion block. Deliberately outside the
+                sign-in form: it acts on the account, not on the credentials. */}
+            {pendingDeletion ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="md"
+                className="w-full"
+                loading={cancelling}
+                onClick={onCancelDeletion}
+              >
+                Cancel scheduled deletion
+              </Button>
+            ) : null}
 
             <Button
               type="button"
@@ -302,6 +420,17 @@ export default function LoginPage() {
                     , including storing my birth date, time, and place to produce my reading.
                   </span>
                 </label>
+              ) : null}
+
+              {mode === "signin" ? (
+                <div className="flex justify-end">
+                  <Link
+                    href="/forgot-password"
+                    className="text-xs text-muted-foreground underline hover:text-foreground"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
               ) : null}
 
               <Button type="submit" size="md" className="w-full" loading={busy === "email"}>

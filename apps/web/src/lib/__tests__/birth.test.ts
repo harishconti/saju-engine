@@ -118,6 +118,13 @@ describe("city resolution", () => {
 
     const canada = resolveBirthLocation({ city: "Cambridge", countryCode: "CA" });
     expect(canada.timezone).toBe("America/Toronto");
+
+    // AU-34 (2026-10-26 audit): a stored profile carries the country *name* (`Profile.country`), and
+    // an edit that changes only the city re-resolves with it. `country` was declared and ignored, so
+    // this case resolved to nothing and the edit failed with CITY_NOT_RESOLVED.
+    const byName = resolveBirthLocation({ city: "Cambridge", country: "United States" });
+    expect(byName.countryCode).toBe("US");
+    expect(byName.timezone).toBe("America/New_York");
   });
 });
 

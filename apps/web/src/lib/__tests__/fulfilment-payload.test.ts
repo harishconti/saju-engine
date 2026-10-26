@@ -25,6 +25,9 @@ const mocks = vi.hoisted(() => ({
   headObject: vi.fn(),
   callEngine: vi.fn(),
   tx: {
+    // The report-write transaction re-reads `deletedAt` before writing (must-fix 2b); the account
+    // is live in these tests, which are about the payload.
+    user: { findUnique: vi.fn(async () => ({ deletedAt: null })) },
     report: { create: vi.fn(), updateMany: vi.fn() },
     delivery: { create: vi.fn() },
     job: { update: vi.fn() },
@@ -80,6 +83,7 @@ function order(kind: "SINGLE" | "COMPAT") {
     profileBId: kind === "COMPAT" ? "prof_2" : null,
     profileA: PROFILE,
     profileB: kind === "COMPAT" ? { ...PROFILE, id: "prof_2", fullName: "Arun" } : null,
+    user: { deletedAt: null },
     favorableOverrideA: null,
     favorableOverrideB: null,
   };

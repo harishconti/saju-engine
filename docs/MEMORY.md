@@ -12,7 +12,7 @@
 - **License:** MIT
 - **Stack:** Python 3.10+, `sajupy==0.2.0` (pinned 2026-09-26 — see N-17 below; was `>=0.2.0`), `reportlab>=4.1`, optional `playwright`, optional `fastapi`/`uvicorn`.
 
-## Current State (last updated 2026-10-16)
+## Current State (last updated 2026-10-26)
 
 - **2026-10-01 audit fully worked through (2026-10-02 → 10-04), all merged to `develop`, not pushed.**
   Suite **1,794 passed / 5 skipped / 14 xfailed**; validation gate **315 checks (PASS 306,
@@ -29,10 +29,15 @@
     `SAJU_PUBLIC_URL` for links. PDFs default to HTML/Playwright (system Chrome used with a warning if
     bundled Chromium is missing; `SAJU_ALLOW_SYSTEM_CHROME=0` = strict); `--reportlab` for legacy.
     Delivered client PDFs were NOT regenerated (`tools/regen/pdfs.sh` overwrites them — owner's call).
-  - **Open:** D1 MoR checkout, D3 deploy, A1 landing-page source (not on this machine),
-    reportlab removal (deferred). (`D2` email, `P4-ratelimit`, and `C1-templates` are now DONE —
-    code complete and tested; D2 only needs SMTP credentials / a proxy at deploy.) P3-isolated/
-    geonrok are deliberate `documented_interpretation` school divergences, not bugs.
+  - **Open:** D1 MoR checkout live mode (Dodo is wired but `test_mode`), reportlab removal
+    (deferred). (`D3` deployment is DONE — the site is live at `www.cosmicsaju.com`; `A1` is DONE —
+    the landing page is `apps/web/src/app/page.tsx`. `D2` email, `P4-ratelimit`, and `C1-templates`
+    are also DONE — code complete and tested; D2 only needs SMTP credentials / a proxy at deploy.)
+    P3-isolated/geonrok are deliberate `documented_interpretation` school divergences, not bugs.
+  - **2026-10-26 production audit (AU-01 – AU-47):** remediation is on branch
+    `audit/2026-10-26-remediation` and not yet merged; per-item status and commit hashes are in
+    `docs/issues_bugs.md` → "Audit 2026-10-26". AU-01 (rotate the Neon password) and AU-35 (require
+    email verification in the Neon console) remain owner actions.
   - **2026-10-07:** `P3-bangham` FIXED (방합국 detector in `patterns.detect_structural_notes`,
     fixture `bangham-guk-巳午未-1991`), `P3-yangin` FIXED (`stars._yangin` scans all four pillars,
     matching `knowledge/11 §I` "in chart"; no published compat score moved), `P3-golden` FIXED
@@ -175,6 +180,7 @@
     **no MX and no TXT records**, so no mailbox and no Resend verification exist yet. **(e)** The
     stored Vercel CLI token (`~/.local/share/com.vercel.cli/auth.json`) is **expired** — `vercel whoami`
     → "The specified token is not valid" — so `npx vercel login` is needed before CLI/API inspection.
+    *(Superseded the same day — `vercel login` was completed in the next entry.)*
     `dig` is not installed on this machine; `07` now ships a DNS-over-HTTPS helper instead.
   - **2026-10-15 (Vercel connected and inspected).** `vercel login` was completed by the owner and the
     project was inspected via CLI + REST API. One project: **`saju-engine`**
@@ -1764,6 +1770,11 @@
     renderer, same tier) — inline header, no giant cover page.
     Docs: `03` (route row + response, and why the PDF is discarded), `05` (the same, with the honest fix named),
     `06` (the flow), `02` (retention), `12`, and `openwiki/products/reports.md`.
+    > **Superseded by AU-29 (2026-10-26):** the sample flow now presigns `htmlUploadUrl` to
+    > `…/sample.html`, sends **no** `uploadUrl`, and `uploadUrl` is optional in the engine contract
+    > (at least one of `uploadUrl` / `htmlUploadUrl` is required). The throwaway `sample.pdf` upload
+    > described above no longer happens; the engine still builds a PDF internally to derive the
+    > markdown but stores nothing. The record above is what was observed on 2026-10-17.
 
   - **2026-10-17 (the free snapshot's lifetime is 3 days, and it turns out nothing else was deleting them).**
     Owner: *"what is the lifetime like when it gets auto delete … i suggest 3 days. is the purge process needed or
@@ -2210,7 +2221,7 @@ As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P1 items:
   the reading. The console now says exactly that and offers Regenerate, which would produce the reading
   alongside the PDF.
 - **Playwright end-to-end tier** — still missing (launch-audit B5). CI now covers the engine, the webapp
-  (lint / types / 112 tests / build) and the **UI/UX audit** (`tools/audit-ui.py --strict`), but nothing
+  (lint / types / tests / build) and the **UI/UX audit** (`tools/audit-ui.py --strict`), but nothing
   drives a browser through the funnel. `12-testing.md` marks that surface as planned rather than present.
 - **Turnstile is deployed at `TURNSTILE_MODE=log`** — it verifies and records but never blocks, because the
   widget cannot yet produce a challenge (Cloudflare-side) and an enforcing server took the funnel down once.

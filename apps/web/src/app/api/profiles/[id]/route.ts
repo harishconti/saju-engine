@@ -1,11 +1,13 @@
 import { ApiError, handle, json, parseJson } from "@/lib/api";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, WINDOW } from "@/lib/ratelimit";
 import { CONSENT_REQUIRED_MESSAGE, hasActiveServiceConsent } from "@/lib/consent";
 import { writeAudit } from "@/lib/audit";
 import { birthUtcOffset, resolveBirthLocation, validateBirth } from "@/lib/birth";
 import { profileUpdateSchema } from "@/lib/validation/schemas";
 import { computeAndStoreChart } from "@/lib/chart-compute";
+import { SCRUBBED_PROFILE } from "@/lib/profile-scrub";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +29,11 @@ export const GET = handle(async (_req, ctx: Ctx) => {
 
 export const PATCH = handle(async (req, ctx: Ctx) => {
   const user = await requireUser();
+  // AU-30 (2026-10-26 audit): an edit re-resolves the birthplace and re-derives the chart through
+  // the engine (`computeAndStoreChart`), so it is a metered operation like an order rather than a
+  // plain write. The limit is per hour, matching consent/kick; it also bounds a runaway client
+  // that would otherwise spend engine renders on repeated edits.
+  await rateLimit(`profile-update:${user.id}`, 30, WINDOW.hour);
   const { id } = await ctx.params;
   const existing = await ownedProfile(user.id, id);
   const input = await parseJson(req, profileUpdateSchema);
@@ -55,9 +62,19 @@ export const PATCH = handle(async (req, ctx: Ctx) => {
     return json({ profile: fresh });
   }
 
+  // AU-34 (2026-10-26 audit): an edit that changes only the city sends no country, so a bare
+  // ambiguous name ("Cambridge") would be re-resolved with nothing to disambiguate it and the edit
+  // would fail. Fall back to the country already stored on the profile — `findCity` accepts the
+  // country name or its two-letter code. A country supplied by the request wins, so re-pointing a
+  // profile at a same-named place in another country actually resolves there.
+  //
+  // An explicitly empty (or whitespace-only) country means "not supplied": the picker sends `""`
+  // when nothing was chosen, and `??` alone would let that defeat the stored-country fallback.
+  const suppliedCountry = input.country?.trim() || null;
   const location = resolveBirthLocation({
     city: input.city ?? existing.city,
     countryCode: input.countryCode ?? null,
+    country: suppliedCountry ?? existing.country,
   });
 
   const birthDate = input.birthDate ?? existing.birthDate.toISOString().slice(0, 10);
@@ -73,10 +90,15 @@ export const PATCH = handle(async (req, ctx: Ctx) => {
   if (!check.ok) throw new ApiError(422, check.code ?? "INVALID_BIRTH_DATA", check.message ?? "Invalid birth data");
 
   const offset = birthUtcOffset(birthDate, birthTime, location.timezone);
+  // Country and timezone are chart-affecting too: two same-named cities (Cambridge GB and Cambridge
+  // US) share a city string but not an offset. Comparing only the city name left a chart computed
+  // for the old zone in place after the location moved.
   const birthChanged =
     birthDate !== existing.birthDate.toISOString().slice(0, 10) ||
     birthTime !== existing.birthTime ||
     location.city !== existing.city ||
+    location.country !== existing.country ||
+    location.timezone !== existing.timezone ||
     timeKnown !== existing.timeKnown;
 
   const updated = await prisma.$transaction(async (tx) => {
@@ -126,7 +148,10 @@ export const DELETE = handle(async (_req, ctx: Ctx) => {
   await prisma.$transaction(async (tx) => {
     await tx.profile.update({
       where: { id },
-      data: { deletedAt: new Date(), isDefault: false },
+      // AU-27: a soft delete that only sets `deletedAt` leaves the birth date, time and place — the
+      // sensitive category consent exists for — in the row indefinitely. Scrub the person with the
+      // same definition account erasure uses, in the same write that marks the row deleted.
+      data: { ...SCRUBBED_PROFILE, deletedAt: new Date(), isDefault: false },
     });
     await writeAudit(tx, { entity: "profile", entityId: id, action: "delete", actorId: user.id });
 

@@ -1,9 +1,10 @@
 import { clientIp, handle, json, parseJson } from "@/lib/api";
-import { requireUser } from "@/lib/auth";
+import { requireUser, revokeOtherSessions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { rateLimit, WINDOW } from "@/lib/ratelimit";
 import { consentSchema } from "@/lib/validation/schemas";
+import { POLICY_VERSION } from "@/lib/consent";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,12 @@ export const POST = handle(async (req) => {
 
   const unchanged =
     previous &&
-    previous.policyVersion === input.policyVersion &&
+    // AU-23 follow-up: a withdrawn row still carries the purposes it granted before withdrawal. If
+    // it counted as "unchanged", a visitor re-granting exactly those purposes would write nothing
+    // and `hasActiveServiceConsent` would stay false — consent visibly ticked, every birth-data
+    // write refused.
+    !previous.withdrawnAt &&
+    previous.policyVersion === POLICY_VERSION &&
     JSON.stringify(previous.purposes) === JSON.stringify(input.purposes);
 
   if (unchanged) {
@@ -46,7 +52,9 @@ export const POST = handle(async (req) => {
     const created = await tx.consentRecord.create({
       data: {
         userId: user.id,
-        policyVersion: input.policyVersion,
+        // AU-23: the version the *user* is consenting to is the one live now, not whatever a
+        // possibly-stale tab put in the request body.
+        policyVersion: POLICY_VERSION,
         purposes: input.purposes as never,
         ip,
         ua,
@@ -64,9 +72,17 @@ export const POST = handle(async (req) => {
     after: { policyVersion: record.policyVersion, purposes: record.purposes },
   });
 
-  // Withdrawing the `service` purpose stops processing — the deletion path is the honest
-  // consequence, and the account page surfaces it.
+  // Withdrawing the `service` purpose stops new orders and new readings (owner decision D11);
+  // readings already paid for still render and are delivered. The account page says both halves.
   const withdrawnService = input.purposes.service === false;
+
+  // AU-24 (owner decision D7): a withdrawal has to reach sessions that are already open, or the
+  // promise only holds on this device. Other sessions end; this one stays, because the visitor is
+  // still on the page that just recorded the withdrawal. Best-effort — `revokeOtherSessions` never
+  // throws, so a provider failure cannot lose the record we just wrote.
+  if (withdrawnService) {
+    await revokeOtherSessions();
+  }
 
   return json({ consent: record, withdrawnService });
 });

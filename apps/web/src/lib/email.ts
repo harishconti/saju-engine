@@ -41,15 +41,25 @@ function replyToAddress(): string | undefined {
   return configured ? configured : undefined;
 }
 
-/** Low-level send. Never throws — a delivery problem is reported, not propagated. */
+/**
+ * Low-level send. Never throws — a delivery problem is reported, not propagated.
+ *
+ * `to` accepts one address or a list, because admin alerts fan out to every owner in
+ * `ADMIN_EMAILS`. Splitting is the *caller's* job (see `ownerRecipients`): this only trims whitespace
+ * and drops empty entries, then hands the transport a real array. A joined `"a@x, b@y"` string would
+ * otherwise reach Resend as one malformed address and be silently rejected.
+ */
 export async function sendEmail(opts: {
-  to: string;
+  to: string | string[];
   subject: string;
   text: string;
   html?: string;
   replyTo?: string;
 }): Promise<SendResult> {
   if (!isEmailConfigured()) return { ok: false, skipped: true, error: "email not configured" };
+
+  const to = (Array.isArray(opts.to) ? opts.to : [opts.to]).map((address) => address.trim()).filter(Boolean);
+  if (to.length === 0) return { ok: false, error: "no recipients" };
 
   const replyTo = opts.replyTo?.trim() || replyToAddress();
 
@@ -62,7 +72,7 @@ export async function sendEmail(opts: {
       },
       body: JSON.stringify({
         from: process.env.EMAIL_FROM,
-        to: [opts.to],
+        to,
         subject: opts.subject,
         text: opts.text,
         ...(opts.html ? { html: opts.html } : {}),

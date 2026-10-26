@@ -13,13 +13,23 @@ import {
   presignGetUrl,
   presignPutUrl,
 } from "@/lib/r2";
-import { ENGINE_CONTRACT_VERSION, callEngine, isEngineConfigured } from "@/lib/engine";
+import {
+  ENGINE_CONTRACT_VERSION,
+  SAMPLE_ENGINE_TIMEOUT_MS,
+  callEngine,
+  isEngineConfigured,
+} from "@/lib/engine";
 import { sampleRequestSchema } from "@/lib/validation/schemas";
+import { CONSENT_REQUIRED_MESSAGE, hasActiveServiceConsent } from "@/lib/consent";
 import { computeAndStoreChart } from "@/lib/chart-compute";
 import { turnstileMode, verifyTurnstile } from "@/lib/turnstile";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
+
+// AU-11 (2026-10-26 audit): the engine call uses `SAMPLE_ENGINE_TIMEOUT_MS` (50 s), below this
+// 60 s limit. It used to use the 120 s default, so the platform killed the function before the
+// abort fired and the timeout was never logged. Keep the two numbers in that order.
 
 /**
  * The free sample — the funnel, and the only place a visitor does real work before signing up.
@@ -38,6 +48,16 @@ export const POST = handle(async (req) => {
   await rateLimit(`sample:${ip}`, 5, WINDOW.minute);
 
   const input = await parseJson(req, sampleRequestSchema);
+
+  // AU-22 (2026-10-26 audit): saving a sample on a signed-in visitor creates a `Profile` holding
+  // birth date, time and place — precisely the data consent is the lawful basis for. The check used
+  // to be absent entirely, so the sample route could write sensitive birth data for a user whose
+  // consent had never been recorded, or had been withdrawn. Refuse with a code the UI turns into a
+  // link to the consent control; never silently proceed.
+  const user = await getCurrentUser();
+  if (user && !(await hasActiveServiceConsent(user.id))) {
+    throw new ApiError(409, "CONSENT_REQUIRED", CONSENT_REQUIRED_MESSAGE);
+  }
 
   // Bot protection. Deliberately after the rate limit (cheap, and it bounds the cost of this call)
   // and before any storage or engine work.
@@ -58,7 +78,9 @@ export const POST = handle(async (req) => {
         );
       }
       // Log-only: surface it for the rollout without refusing a real visitor.
-      console.warn(`turnstile[log]: not satisfied (${turnstile.error}) ip=${ip}`);
+      // AU-33: no IP in the log line. An address is personal data, the log has no erasure path, and
+      // the rollout signal needs only the failure reason.
+      console.warn(`turnstile[log]: not satisfied (${turnstile.error})`);
     }
   }
 
@@ -72,7 +94,11 @@ export const POST = handle(async (req) => {
     );
   }
 
-  const location = resolveBirthLocation({ city: input.city, countryCode: input.countryCode ?? null });
+  const location = resolveBirthLocation({
+    city: input.city,
+    countryCode: input.countryCode ?? null,
+    country: input.country ?? null,
+  });
   const check = validateBirth({
     birthDate: input.birthDate,
     birthTime: input.birthTime,
@@ -83,7 +109,6 @@ export const POST = handle(async (req) => {
 
   const offset = birthUtcOffset(input.birthDate, input.birthTime, location.timezone);
 
-  const user = await getCurrentUser();
   const birthDate = new Date(`${input.birthDate}T00:00:00Z`);
   const birthTime = input.timeKnown === false ? "12:00" : input.birthTime;
 
@@ -135,34 +160,47 @@ export const POST = handle(async (req) => {
   // delivered as the same self-contained web document every paid tier is, and the free tier offers **no
   // PDF at all**.
   //
-  // The engine still requires an upload target for a PDF (that is the contract), so one is presigned —
-  // but always under the **swept** prefix and never recorded on the row, so it cannot become dead
-  // storage that nobody can reach. When signed in, the *reading* is the copy that is kept.
+  // AU-29 (2026-10-26 audit): the engine used to require a PDF upload target, so this route presigned
+  // one under the swept prefix and the sample failed whenever that throwaway upload failed. The
+  // contract's `uploadUrl` is now optional, so a sample asks for the reading and nothing else.
   const readKey = user ? buildSampleKey(user.id, sampleId, "html") : buildAnonymousKey(sampleId, "html");
-  const discardedPdfKey = buildAnonymousKey(sampleId, "pdf");
 
-  const result = await callEngine({
-    contractVersion: ENGINE_CONTRACT_VERSION,
-    kind: "single",
-    tier: "sample",
-    uploadUrl: await presignPutUrl(discardedPdfKey, "application/pdf"),
-    htmlUploadUrl: await presignPutUrl(readKey, "text/html"),
-    profileA: {
-      fullName: input.fullName,
-      gender: input.gender,
-      birthDate: input.birthDate,
-      birthTime: input.timeKnown === false ? "12:00" : input.birthTime,
-      timeKnown: input.timeKnown !== false,
-      timezone: location.timezone,
-      utcOffset: offset,
-      city: location.city,
-      latitude: location.latitude,
-      longitude: location.longitude,
+  const result = await callEngine(
+    {
+      contractVersion: ENGINE_CONTRACT_VERSION,
+      kind: "single",
+      tier: "sample",
+      // No `uploadUrl`: there is no PDF to keep or verify. The reading is the deliverable.
+      // AU-37: this exact content type is what `presignPutUrl` signs (and what the engine sends),
+      // so the presigned PUT cannot fail with a signature mismatch.
+      htmlUploadUrl: await presignPutUrl(readKey, "text/html; charset=utf-8"),
+      profileA: {
+        fullName: input.fullName,
+        gender: input.gender,
+        birthDate: input.birthDate,
+        birthTime: input.timeKnown === false ? "12:00" : input.birthTime,
+        timeKnown: input.timeKnown !== false,
+        timezone: location.timezone,
+        utcOffset: offset,
+        city: location.city,
+        latitude: location.latitude,
+        longitude: location.longitude,
+      },
     },
-  });
+    // Below the function's 60 s limit so a timeout is an `ENGINE_TIMEOUT` we log and explain,
+    // not a platform kill the visitor sees as a bare 504 (AU-11).
+    SAMPLE_ENGINE_TIMEOUT_MS,
+  );
 
+  // AU-29: `engine` answers `htmlBytes` only when the reading really uploaded. Check that **before**
+  // `headObject`, so a failed reading upload surfaces as an HTML-specific code rather than as
+  // `UPLOAD_NOT_VERIFIED` on a verify step for an object that was never written.
+  if (!result.htmlBytes) {
+    throw ApiError.unavailable("The snapshot did not upload correctly", "HTML_UPLOAD_FAILED");
+  }
   const object = await headObject(readKey);
   if (!object) throw ApiError.unavailable("The snapshot did not upload correctly", "UPLOAD_NOT_VERIFIED");
+  const bytes = result.htmlBytes ?? object.size;
 
   // If the visitor is signed in, keep it — and make the copy true. Previously only the Profile was
   // saved: the PDF was not, so the reading never appeared in the dashboard library and the download
@@ -221,8 +259,8 @@ export const POST = handle(async (req) => {
           pdfKey: null,
           htmlKey: readKey,
           sha256: null,
-          bytes: result.htmlBytes ?? object.size,
-          htmlBytes: result.htmlBytes ?? object.size,
+          bytes,
+          htmlBytes: bytes,
           engineVersion: result.engineVersion ?? null,
           deliveredAt: new Date(),
         },
@@ -263,7 +301,7 @@ export const POST = handle(async (req) => {
     // The reading. There is deliberately no PDF URL: the free tier offers the web document only.
     readUrl,
     expiresIn: 900,
-    bytes: result.htmlBytes ?? object.size,
+    bytes,
     engineVersion: result.engineVersion,
     savedToProfile: Boolean(user),
     // Present when signed in, so the UI can link straight to the library entry.

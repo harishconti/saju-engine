@@ -87,13 +87,52 @@ export const audioUploadCompleteSchema = z.object({
   key: z.string().trim().min(1).max(400),
 });
 
+/**
+ * The purposes the privacy policy actually defines. AU-32 (2026-10-26 audit): this used to be
+ * `z.record(z.string(), z.boolean())`, which accepted an unbounded map and wrote it into a JSON
+ * column. A strict object means a typo, a stale client, or a hand-crafted request cannot invent a
+ * purpose — and cannot grow the stored payload without bound.
+ */
+export const consentPurposesSchema = z.strictObject({
+  service: z.boolean(),
+  service_messages: z.boolean(),
+});
+
 export const consentSchema = z.object({
+  /**
+   * Accepted for compatibility, but deliberately not trusted: the server records `POLICY_VERSION`
+   * (AU-23), so a tab left open across a policy update cannot write consent to the superseded text.
+   */
   policyVersion: z.string().trim().min(1).max(40),
-  purposes: z.record(z.string(), z.boolean()),
+  purposes: consentPurposesSchema,
 });
 
 export const deletionRequestSchema = z.object({
   reason: z.string().trim().max(500).optional(),
+});
+
+/**
+ * Password reset (AU-41, D6).
+ *
+ * The email address is only a routing hint to the identity provider: the response is neutral either
+ * way, so this schema must never grow a check that could distinguish a stored address.
+ *
+ * The token is a one-time credential. Validation messages deliberately never include a received
+ * value (zod does not echo values by default), because these routes are the one place a token could
+ * otherwise be duplicated into a log through a validation error.
+ */
+export const passwordResetRequestSchema = z.object({
+  email: z.string().trim().toLowerCase().pipe(z.email("That email doesn't look right")),
+});
+
+export const passwordResetConfirmSchema = z.object({
+  token: z.string().trim().min(1, "The reset link is missing its token").max(256, "That reset link is not valid"),
+  // Same bounds the identity provider enforces (8 minimum, 128 maximum), checked here first so a
+  // too-short or too-long password does not consume the one-time token.
+  newPassword: z
+    .string()
+    .min(8, "Use at least 8 characters")
+    .max(128, "Use at most 128 characters"),
 });
 
 export const contactSchema = z.object({

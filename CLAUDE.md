@@ -197,6 +197,13 @@ Operations notes:
 
 Both forms ask for: name, DOB, birth time, birth location, UTC offset, email, gender, marriage/relationship status, and tier selection. The "main concern" textarea is enabled only when **The Deep Destiny Report (`deep` tier)** is selected.
 
+## Webapp Deployment (`apps/web` on Vercel + the engine project)
+
+The product ships as two Vercel projects: the Next.js app in `apps/web` (project `saju-engine`, canonical `https://www.cosmicsaju.com`) and the Python report engine at the repository root (project `saju-report-engine`). Full runbook: `docs/webapp/08-deployment.md`.
+
+- **Engine env is required.** The engine holds no storage credentials; a presigned URL is its only write capability, so it fails closed (`503 UPLOAD_HOSTS_UNCONFIGURED`) with an empty allowlist — that was the five-day October 2026 outage. Set **`R2_ENDPOINT` and/or `SAJU_UPLOAD_HOSTS`** on `saju-report-engine`. The webapp presigns **virtual-hosted** (`apps/web/src/lib/r2.ts`, no `forcePathStyle`), so the URL host is `{bucket}.{account_id}.r2.cloudflarestorage.com` — the bucket is the first DNS label. `SAJU_UPLOAD_HOSTS` should name that host; `R2_ENDPOINT` (the account origin) also works because the engine accepts exactly one bucket label in front of it.
+- **Verified-admin rule.** ADMIN is granted only when **all three** hold: the stored `User.role` is `ADMIN`, the account email is in `ADMIN_EMAILS`, and the identity provider reports `emailVerified=true`. An `ADMIN_EMAILS` entry alone never grants admin (`apps/web/src/lib/auth/index.ts`). An unverified stored ADMIN gets the error page, not the review console — the owner's admin address must be verified in Neon (decision D1).
+
 ## OpenWiki Documentation
 
 For a structured project reference beyond this file, see `docs/openwiki/`:
@@ -220,4 +227,4 @@ Current state at a glance:
 - ✅ **Priority E — Compatibility (궁합) Reading.** Standalone product with Snapshot ($24) and Deep ($45) tiers, two-chart intake form, JSON intake server, FastAPI `/compat` route, standalone PDF renderer, and an 11-sub-system engine grounded in 적천수, 연해자평, 궁통보감, 명리정종, 자평진전, 서전구미록 + 권인성·곽임성·정봉재·송기영 Korean schools. See `knowledge/11-gunghap.md`.
 - ✅ **Priority B — Go-to-market pivot (2026-09-07).** English-global / USD positioning; 3 client-launch blockers (G1–G3) fixed.
 - ✅ **2026-10-01 audit follow-ups (2026-10-02 → 10-04).** Wave A/B correctness fixes; P2 `report_primitives` + golden snapshots + typed compat flags; P3 신살/격국 validation gates + extreme_weak Option C (종격 by conditions; "likely" 종격 follows the dominant element); P4 encrypted intake store + paid-order review queue + single solar-term calendar; P5 HTML/Playwright default PDF backend (reportlab behind `--reportlab`). Plans: `docs/superpowers/plans/2026-10-0*.md`; tracker: `docs/issues_bugs.md` (Audit 2026-10-01 table).
-- ⏳ **Priority 7+ — Future polish.** Real testimonials + Merchant-of-Record checkout + deployment (P1), the quiz funnel and embedded calculator (P2), richer engine-drafted prose (G4), and additional Korean textbook cases remain open. See `docs/MEMORY.md` for the live state.
+- ⏳ **Priority 7+ — Future polish.** Real testimonials + Merchant-of-Record checkout live mode (D1: Dodo is wired but still `test_mode`), the quiz funnel and embedded calculator (P2), richer engine-drafted prose (G4), and additional Korean textbook cases remain open. See `docs/MEMORY.md` for the live state.
