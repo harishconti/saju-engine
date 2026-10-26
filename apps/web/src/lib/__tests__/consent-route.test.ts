@@ -100,6 +100,34 @@ describe("POST /api/account/consent — the recorded version (AU-23)", () => {
     expect(prismaMock.tx.consentRecord.create).toHaveBeenCalledTimes(1);
   });
 
+  it("treats a withdrawn row with identical purposes as a fresh grant, never 'unchanged'", async () => {
+    // AU-23 follow-up: withdrawal is a later record with `withdrawnAt` set, so its purposes can
+    // still match the re-grant the visitor is sending. Returning `unchanged` there would write
+    // nothing and leave `hasActiveServiceConsent` false — the account page would look granted and
+    // every birth-data write would be refused.
+    prismaMock.consentRecord.findFirst.mockResolvedValue({
+      id: "c1",
+      policyVersion: POLICY_VERSION,
+      purposes: { service: true, service_messages: false },
+      withdrawnAt: new Date("2026-10-20T09:00:00.000Z"),
+    });
+
+    const res = await POST(
+      request({
+        policyVersion: POLICY_VERSION,
+        purposes: { service: true, service_messages: false },
+      }),
+      undefined as never,
+    );
+    const body = (await res.json()) as Record<string, unknown>;
+
+    expect(body.unchanged).toBeUndefined();
+    expect(prismaMock.$transaction).toHaveBeenCalledTimes(1);
+    // A withdrawn row has nothing left to withdraw, so no second withdrawal is written.
+    expect(prismaMock.tx.consentRecord.update).not.toHaveBeenCalled();
+    expect(prismaMock.tx.consentRecord.create).toHaveBeenCalledTimes(1);
+  });
+
   it("still answers unchanged for a matching current-version record", async () => {
     prismaMock.consentRecord.findFirst.mockResolvedValue({
       id: "c1",

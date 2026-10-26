@@ -4,7 +4,7 @@ import { drainObjectDeletions, deleteObjectOrQueue, deleteObjects, isR2Configure
 import { purgeOldIdempotencyKeys } from "./idempotency";
 import { purgeOldRateLimits } from "./ratelimit";
 import { purgeOldJobs, reclaimStaleJobs } from "./queue";
-import { ANONYMOUS_SAMPLE_RETENTION_DAYS } from "./retention";
+import { ANONYMOUS_SAMPLE_RETENTION_DAYS, PROFILE_INACTIVITY_RETENTION_MONTHS } from "./retention";
 import { processDodoEvent, type DodoEvent } from "./dodo-webhook";
 
 /**
@@ -32,6 +32,7 @@ export interface CleanupReport {
   webhooksReplayed: number;
   deletionsProcessed: number;
   anonymousSwept: number;
+  profilesRetired: number;
 }
 
 export async function runCleanup(now = new Date()): Promise<CleanupReport> {
@@ -47,6 +48,7 @@ export async function runCleanup(now = new Date()): Promise<CleanupReport> {
     webhooksReplayed: 0,
     deletionsProcessed: 0,
     anonymousSwept: 0,
+    profilesRetired: 0,
   };
 
   // 1. Reclaim dead leases.
@@ -75,6 +77,9 @@ export async function runCleanup(now = new Date()): Promise<CleanupReport> {
 
   // 6. Process due deletions.
   report.deletionsProcessed = await processDueDeletions(now);
+
+  // 7. Retire profiles idle past the published inactivity window.
+  report.profilesRetired = await retireInactiveProfiles(now);
 
   return report;
 }
@@ -327,5 +332,82 @@ async function processDeletionRequest(
       console.error("erasure object cleanup failed", err instanceof Error ? err.name : "unknown");
     }
   }
+}
+
+/**
+ * Retire profiles nobody has touched for the published inactivity window (AU-27).
+ *
+ * The privacy policy promises birth details are kept "until you delete them, or after 24 months of
+ * inactivity". Before this, the sweep that was supposed to enforce it was an `updateMany` with an
+ * empty `data` object — a no-op that changed nothing and could not: no field marked an inactive
+ * profile, so nobody downstream could have acted on one either. The promise had no implementation
+ * at all. `PROFILE_INACTIVITY_RETENTION_MONTHS` is the number the policy publishes, and this
+ * function is what enforces it.
+ *
+ * The compliance notes also describe a warning at 23 months. Nothing in the app sends mail on a
+ * schedule, so there is no delivery mechanism for that warning; inventing an inactivity-mailer is a
+ * product decision, not a retention fix. The enforceable half is the sweep at 24, so that is what
+ * exists — deliberately, not by omission.
+ *
+ * Disposition is the one D2 established for erasure, for the same reason:
+ *  - `Order_profileAId_fkey` and `Report_profileAId_fkey` are ON DELETE RESTRICT. Deleting a profile
+ *    anything still points at would raise P2003 and roll the whole batch back, so a referenced
+ *    profile is **scrubbed** (`SCRUBBED_PROFILE`, the one definition), soft-deleted and kept.
+ *  - A profile nothing references is deleted outright — the row describes nobody once scrubbed, so
+ *    there is nothing left to keep it for.
+ *
+ * Bounded like every other step so one run cannot hold a long transaction over the whole table;
+ * `deletedAt` and the bumped `updatedAt` keep already-retired rows out of the next batch.
+ *
+ * Exported for the retention tests; `runCleanup` is the only production caller.
+ */
+export async function retireInactiveProfiles(now: Date): Promise<number> {
+  const cutoff = new Date(now);
+  cutoff.setUTCMonth(cutoff.getUTCMonth() - PROFILE_INACTIVITY_RETENTION_MONTHS);
+
+  const candidates = await prisma.profile.findMany({
+    where: { deletedAt: null, updatedAt: { lt: cutoff } },
+    select: { id: true },
+    take: 200,
+  });
+  if (candidates.length === 0) return 0;
+
+  const ids = candidates.map((p) => p.id);
+
+  // A profile is "referenced" by any order or report pointing at it, as A or B: either column being
+  // RESTRICT is enough to make a delete fail, and a B-reference is still a delivery that names them.
+  const [orders, reports] = await Promise.all([
+    prisma.order.findMany({
+      where: { OR: [{ profileAId: { in: ids } }, { profileBId: { in: ids } }] },
+      select: { profileAId: true, profileBId: true },
+    }),
+    prisma.report.findMany({
+      where: { OR: [{ profileAId: { in: ids } }, { profileBId: { in: ids } }] },
+      select: { profileAId: true, profileBId: true },
+    }),
+  ]);
+  const referenced = new Set<string>();
+  for (const row of [...orders, ...reports]) {
+    referenced.add(row.profileAId);
+    if (row.profileBId) referenced.add(row.profileBId);
+  }
+
+  const retained = ids.filter((id) => referenced.has(id));
+  const unreferenced = ids.filter((id) => !referenced.has(id));
+
+  const [scrubbed, deleted] = await prisma.$transaction(async (tx) => {
+    const updated = retained.length
+      ? await tx.profile.updateMany({
+          where: { id: { in: retained }, deletedAt: null },
+          data: { ...SCRUBBED_PROFILE, deletedAt: now },
+        })
+      : { count: 0 };
+    const removed = unreferenced.length
+      ? await tx.profile.deleteMany({ where: { id: { in: unreferenced } } })
+      : { count: 0 };
+    return [updated.count, removed.count] as const;
+  });
+
+  return scrubbed + deleted;
 }
 

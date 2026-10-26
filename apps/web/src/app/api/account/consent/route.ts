@@ -29,6 +29,11 @@ export const POST = handle(async (req) => {
 
   const unchanged =
     previous &&
+    // AU-23 follow-up: a withdrawn row still carries the purposes it granted before withdrawal. If
+    // it counted as "unchanged", a visitor re-granting exactly those purposes would write nothing
+    // and `hasActiveServiceConsent` would stay false — consent visibly ticked, every birth-data
+    // write refused.
+    !previous.withdrawnAt &&
     previous.policyVersion === POLICY_VERSION &&
     JSON.stringify(previous.purposes) === JSON.stringify(input.purposes);
 
