@@ -140,7 +140,7 @@ Measured locally on this repository:
 |---|---|
 | Deep tier → markdown | **0.70 s** |
 | Deep markdown → ReportLab PDF | **0.62 s** |
-| Sample tier end to end (`compute_chart` → `prepare_chart_render` → `build_pdf`) | **1.57 s** |
+| Sample tier render (`compute_chart` → `prepare_chart_render` → `build_pdf`); measured before AU-29 — the sample route now requests the reading only | **1.57 s** |
 | Runtime dependency closure (pandas 68 MB + numpy 40 MB + reportlab 8 MB + PIL 7 MB + sajupy 3.5 MB) | **~130 MB** |
 
 Against Vercel's **500 MB** Python bundle limit that is comfortable, and against the 300 s function
@@ -361,8 +361,8 @@ after a check.
 
 | Key pattern | Contents | Lifetime |
 |---|---|---|
-| `reports/anonymous/{uuid}/sample.pdf` | Free samples not yet claimed | Swept after 3 days, **by object age** (see [09](09-operations.md)) — an anonymous sample creates no row to track, so a row-driven sweep found nothing |
-| `reports/{userId}/samples/{uuid}.pdf` | A sample a signed-in user kept | Until the user deletes it. Deliberately **outside** the swept prefix |
+| `reports/anonymous/{uuid}/sample.html` | Free sample readings not yet claimed | Swept after 3 days, **by object age** (see [09](09-operations.md)) — an anonymous sample creates no row to track, so a row-driven sweep found nothing |
+| `reports/{userId}/samples/{uuid}.html` | A sample a signed-in user kept | Until the user deletes it. Deliberately **outside** the swept prefix |
 | `reports/{userId}/{orderId}/{reportId}.pdf` | Delivered report | Until deletion is requested |
 | `reports/{userId}/{orderId}/{reportId}.md` | Source markdown — the audit trail **and** the input the audio script is derived from | Same |
 | `reports/{userId}/{orderId}/{reportId}.mp3` | The audio summary (Deep tier) | Same |

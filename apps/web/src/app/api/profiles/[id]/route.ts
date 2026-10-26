@@ -67,10 +67,14 @@ export const PATCH = handle(async (req, ctx: Ctx) => {
   // would fail. Fall back to the country already stored on the profile — `findCity` accepts the
   // country name or its two-letter code. A country supplied by the request wins, so re-pointing a
   // profile at a same-named place in another country actually resolves there.
+  //
+  // An explicitly empty (or whitespace-only) country means "not supplied": the picker sends `""`
+  // when nothing was chosen, and `??` alone would let that defeat the stored-country fallback.
+  const suppliedCountry = input.country?.trim() || null;
   const location = resolveBirthLocation({
     city: input.city ?? existing.city,
     countryCode: input.countryCode ?? null,
-    country: input.country ?? existing.country,
+    country: suppliedCountry ?? existing.country,
   });
 
   const birthDate = input.birthDate ?? existing.birthDate.toISOString().slice(0, 10);

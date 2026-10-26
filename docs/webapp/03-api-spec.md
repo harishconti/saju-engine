@@ -194,12 +194,12 @@ The funnel. Deliberately account-free.
 
 **The free tier is the reading, with no PDF** (since 2026-10-17). A sample is one page of chart, so the
 PDF was the worst way to present it: it leaves the site, cannot be read on the phone that requested it,
-and looks nothing like what a paid client receives. The engine still *requires* an upload target for a
-PDF (that is the contract), so one is presigned — always under the **swept** `reports/anonymous/` prefix
-and never recorded on a row, so it cannot become dead storage nobody can reach. For a signed-in visitor
-the *reading* is what is kept. Consequently `Report.pdfKey` is **null** for a sample, and the reused-sample
-lookup filters on `htmlKey`; a sample saved before this change has no reading and is superseded by a
-fresh render rather than reused.
+and looks nothing like what a paid client receives. The engine's `uploadUrl` is **optional** (AU-29), so
+the route sends only `htmlUploadUrl` — no PDF target is presigned, no PDF is uploaded, and none is
+recorded on a row. For a signed-in visitor the *reading* is what is kept, under
+`reports/{userId}/samples/{uuid}.html`. Consequently `Report.pdfKey` is **null** for a sample, and the
+reused-sample lookup filters on `htmlKey`; a sample saved before this change has no reading and is
+superseded by a fresh render rather than reused.
 
 ⚠️ **The response carries no chart.** An earlier version of this page documented `dayMaster` and
 `chartPreview.pillars` here; the route has never returned them. That matters, because the same page
@@ -208,11 +208,11 @@ described the free flow as confirming the derived pillars before the snapshot �
 **order flow**, from `Profile.chartJson`, which is populated by the engine's `/chart`.
 
 **Signed in?** The snapshot is *kept*: a `Report` is filed as `DELIVERED` under
-`reports/{userId}/samples/…` and a link to it appears in the dashboard library. A repeat request for the
-same birth details returns the **stored** report (`reused: true`, same `reportId`) rather than rendering
-the identical chart again — so the free endpoint is idempotent per person and the library does not fill
-with duplicates. Signed out, nothing is persisted and the object lives under `reports/anonymous/…`,
-which is swept after 3 days.
+`reports/{userId}/samples/{uuid}.html` and a link to it appears in the dashboard library. A repeat
+request for the same birth details returns the **stored** report (`reused: true`, same `reportId`)
+rather than rendering the identical chart again — so the free endpoint is idempotent per person and the
+library does not fill with duplicates. Signed out, nothing is persisted and the reading lives under
+`reports/anonymous/{uuid}/sample.html`, which is swept after 3 days.
 
 Errors: `422 VALIDATION_FAILED` (bad or missing birth fields), `409 BIRTH_DATA_AMBIGUOUS`
 (the engine flagged a solar-term or hour-boundary knife-edge and wants confirmation), `429
@@ -227,9 +227,8 @@ records but **never refuses**, and `enforce` returns `403 TURNSTILE_FAILED` on a
 **Deploy new keys at `log`**, confirm real visitors actually receive tokens, then move to `enforce`. The
 switch exists because this control can take the whole funnel down: a widget that fails to render produces
 no token, and an enforcing server then refuses *everybody* — which happened on 2026-10-16. The
-authorised `/api/health/detail` reports the live mode as `botProtection`, so a `log` rollout is visible
-rather than mistaken for
-`enforce`; see [14](14-security.md) §4 for the flip.
+authorised `/api/health/detail` reports the live mode as `botProtection`, so a `log` rollout is
+visible rather than mistaken for `enforce`; see [14](14-security.md) §4 for the flip.
 
 `TURNSTILE_SECRET_KEY` and the public site key must be deployed as a pair — the secret alone verifies, the
 site key alone renders, and only both together protect anything. Note the site key is public by design
@@ -444,7 +443,8 @@ POST /generate
   "contractVersion": 1,
   "kind": "single" | "compat",
   "tier": "sample|essential|deep|basic",
-  "uploadUrl": "https://…r2.cloudflarestorage.com/reports/…?X-Amz-Signature=…",
+  "uploadUrl": "optional — where to PUT the PDF; omit it when the reading is the only artefact",
+  "htmlUploadUrl": "optional — where to PUT the web reading; the sample sends only this",
   "mdUploadUrl": "optional — where to also PUT the source markdown",
   "profileA": { "fullName","gender","birthDate","birthTime","timezone","utcOffset","city","longitude","latitude" },
   "profileB": { … },                       // compat only
@@ -453,9 +453,16 @@ POST /generate
 }
 ```
 
+At least one of `uploadUrl` / `htmlUploadUrl` is required: a render the caller cannot retrieve is a
+`400 MISSING_UPLOAD_URL`. In a reading-only request (no `uploadUrl`, as `POST /api/sample` sends) the
+PDF metadata is `null` and only `htmlSha256` / `htmlBytes` describe an artefact:
+
 ```jsonc
 // 200
-{ "sha256": "…", "bytes": 142276, "pages": 7, "engineVersion": "saju-engine/0.2.0", "durationMs": 1642 }
+{ "sha256": "…", "bytes": 142276, "pages": 7,
+  "htmlSha256": "…", "htmlBytes": 273689,
+  "engineVersion": "saju-engine/0.2.0", "durationMs": 1642 }
+// reading only: "sha256": null, "bytes": null; htmlSha256/htmlBytes set
 // 422 { "error": "…", "code": "INVALID_BIRTH_DATA" }        // birth data only; permanent
 // 503 { "error": "…", "code": "UPLOAD_HOSTS_UNCONFIGURED" }  // config/auth fault; retryable
 // 500 { "error": "…", "code": "RENDER_FAILED" }              // exception class only, never a message with PII
@@ -465,5 +472,6 @@ Every error body is `{ error, code }`, including auth failures and bodies pydant
 endpoint runs. Only birth-data validation is 422 (the webapp treats that as permanent); all
 configuration and availability faults are 503 and are retried.
 
-`uploadUrl` is presigned by the webapp so the PDF never transits a request/response body — which
-also keeps every payload comfortably under Vercel's 4.5 MB function limit.
+When a PDF is requested, its `uploadUrl` is presigned by the webapp so the PDF never transits a
+request/response body — which also keeps every payload comfortably under Vercel's 4.5 MB function
+limit.

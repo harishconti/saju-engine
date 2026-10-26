@@ -96,6 +96,9 @@ describe("GET /api/health — the public body", () => {
     expect(res.status).toBe(200);
     expect(body.status).toBe("ok");
     expect(body.ok).toBe(true);
+    // The same exact key set as the degraded path: a field added only on the healthy branch would
+    // otherwise leak unnoticed.
+    expect(Object.keys(body).sort()).toEqual([...PUBLIC_KEYS]);
   });
 
   it("reuses the cached engine probe on a repeat hit", async () => {
@@ -165,6 +168,23 @@ describe("GET /api/health/detail — the authorised view", () => {
     const res = await detailGET(detailRequest());
 
     expect(res.status).toBe(200);
+  });
+
+  it("does not accept the x-maintenance-secret header", async () => {
+    // The detail view documents exactly two doors: Bearer $HEALTH_DETAIL_TOKEN and an admin session.
+    // `x-maintenance-secret` belongs to the cron routes, which compare it against a different secret;
+    // accepting it here (even with the right value) would be a third, undocumented way in.
+    process.env.HEALTH_DETAIL_TOKEN = "health-secret";
+    mocks.fetchMock.mockResolvedValue(engineReply({ ok: true, uploadAllowlist: 1 }, 200));
+
+    const res = await detailGET(
+      new Request("https://app.test/api/health/detail", {
+        headers: { "x-maintenance-secret": "health-secret" },
+      }),
+    );
+
+    expect(res.status).toBe(401);
+    expect(mocks.fetchMock).not.toHaveBeenCalled();
   });
 
   it("does not accept an unverified admin address", async () => {

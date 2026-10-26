@@ -147,6 +147,45 @@ describe("PATCH /api/profiles/[id] — city-only edit (AU-34)", () => {
       country: "United States",
     });
   });
+
+  it.each([
+    ["an empty string", ""],
+    ["whitespace only", "   "],
+  ])("treats %s as absent and falls back to the stored country", async (_label, country) => {
+    // The picker sends `country: ""` when no country was chosen. `??` treats that as a supplied
+    // value, so a city-only edit becomes indistinguishable from one with no country at all and an
+    // ambiguous name is re-resolved without the stored disambiguator.
+    const req = new Request("https://app.test/api/profiles/p1", {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ city: "Cambridge", country }),
+    });
+
+    await PATCH(req, { params: Promise.resolve({ id: "p1" }) } as never);
+
+    expect(mocks.resolveBirthLocation.mock.calls[0]![0]).toMatchObject({
+      city: "Cambridge",
+      country: "United Kingdom",
+    });
+  });
+});
+
+describe("PATCH /api/profiles/[id] — chart recompute predicate", () => {
+  it("does not re-render the chart when no chart-relevant field changed", async () => {
+    mocks.validateBirth.mockReturnValue({ ok: true });
+
+    const req = new Request("https://app.test/api/profiles/p1", {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ label: "Work" }),
+    });
+
+    const res = await PATCH(req, { params: Promise.resolve({ id: "p1" }) } as never);
+
+    expect(res.status).toBe(200);
+    // A rename must not spend an engine render. The predicate is correct by inspection; this pins it.
+    expect(mocks.computeAndStoreChart).not.toHaveBeenCalled();
+  });
 });
 
 describe("PATCH /api/profiles/[id] — chart follows the resolved location (AU-34)", () => {
