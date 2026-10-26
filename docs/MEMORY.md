@@ -34,10 +34,16 @@
     the landing page is `apps/web/src/app/page.tsx`. `D2` email, `P4-ratelimit`, and `C1-templates`
     are also DONE — code complete and tested; D2 only needs SMTP credentials / a proxy at deploy.)
     P3-isolated/geonrok are deliberate `documented_interpretation` school divergences, not bugs.
-  - **2026-10-26 production audit (AU-01 – AU-47):** remediation is on branch
-    `audit/2026-10-26-remediation` and not yet merged; per-item status and commit hashes are in
-    `docs/issues_bugs.md` → "Audit 2026-10-26". AU-01 (rotate the Neon password) and AU-35 (require
-    email verification in the Neon console) remain owner actions.
+  - **2026-10-26 production audit (AU-01 – AU-47):** remediation **merged to `develop`** on
+    2026-10-26 (`e370eb8`, 34 commits from `audit/2026-10-26-remediation`, **not pushed**). Per-item
+    status and commit hashes are in `docs/issues_bugs.md` → "Audit 2026-10-26"; the items still OPEN
+    there are deliberate deferrals, not unfinished work. Verified at the merge commit:
+    engine **2,049 passed / 5 skipped / 13 xfailed**, web **638 passed / 4 skipped**, `tsc` and
+    `eslint` clean. The branch was reviewed task-by-task and then whole-branch; three must-fix
+    findings from that final review (retained `Job.payload` birth data, erasure/R2 orphans under
+    READ COMMITTED, an over-wide reset-token rejection set) were fixed in two follow-up rounds and
+    re-reviewed. **Deploy blockers are owner actions, not code** — see "Owner actions before the
+    audit remediation is safe to deploy" under Active Wishes.
   - **2026-10-07:** `P3-bangham` FIXED (방합국 detector in `patterns.detect_structural_notes`,
     fixture `bangham-guk-巳午未-1991`), `P3-yangin` FIXED (`stars._yangin` scans all four pillars,
     matching `knowledge/11 §I` "in chart"; no published compat score moved), `P3-golden` FIXED
@@ -2190,6 +2196,28 @@ AUDIT_EMAIL=… AUDIT_PASSWORD=… python3 tools/audit-ui.py
 ```
 
 ## Active Wishes / Open Items
+
+### Owner actions before the audit remediation is safe to deploy (2026-10-26)
+
+The remediation merged as `e370eb8` is code-complete and green, but none of these can be finished by
+a commit: they are console settings, environment values and deployment ordering. In order:
+
+1. **AU-01 — rotate the Neon database password** echoed into a session transcript. Rewrite the three
+   DB URLs, then redeploy (brief outage).
+2. **Apply `apps/web/prisma/migrations/20261026120000_user_last_seen_at/` BEFORE deploying.** The
+   `lastSeenAt` write and the retention owner filter read the new column; deploying first means a
+   window where those paths error.
+3. **GitHub secrets for the new 15-minute dispatch job:** `R2_ENDPOINT`, `R2_BUCKET`,
+   `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `ENGINE_URL`, `ENGINE_SERVICE_TOKEN`.
+4. **AU-35 — Neon console:** require email verification with a verified sender. Until then the auth
+   API still discloses whether an account exists.
+5. **Set `HEALTH_DETAIL_TOKEN`**, or the detailed health view is reachable by admin session only.
+6. **Verify the `neon_auth` session/account/user delete order on a Neon branch** before the erasure
+   path runs against production — it is mock-verified only.
+7. **Configure a Neon Auth email provider and allowlist `https://www.cosmicsaju.com/reset-password`** —
+   password reset cannot complete end to end without it.
+8. **Confirm the four promotional Dodo products carry no discount expiry earlier than
+   `2027-01-01T08:00:00Z`.**
 
 As of 2026-09-07 the engine P0 blockers (G1–G3, G6) are fixed. Open P1 items:
 - **Merchant-of-Record checkout** — ✅ **Dodo Payments** chosen (replacing Lemon Squeezy/Paddle) and

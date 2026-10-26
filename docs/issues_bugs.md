@@ -919,6 +919,56 @@ and an **OPEN** row names the owner action that remains. Owner-side items have n
 | AU-46 | IMP | **OPEN** | Purge `SampleLead` emails and stored webhook payloads on a schedule. Not in this pass. |
 | AU-47 | IMP | **OPEN** | Launch items: Turnstile `log` mode, Dodo `test_mode`, DKIM/DMARC, unsubscribe route, no Playwright E2E. |
 
+## Post-merge backlog — audit remediation (2026-10-26)
+
+The whole-branch review passed the remediation for merge (as `e370eb8`) and classified these as
+**post-merge quality work, not merge blockers**. They are recorded here because the review's own
+report lived in gitignored scratch. None of the items below changes report prose, Saju doctrine,
+pricing or a delivered PDF.
+
+### Correctness, in the order they cost the most
+
+1. **`lib/cleanup.ts` `retireInactiveProfiles` — same PII-orphan window the erasure path just fixed.**
+   It captures report keys before its transaction commits but queues them only in the post-commit
+   loop, so a process death in between permanently orphans those R2 objects with no report row left
+   to find them. One-line remedy, already applied to erasure: insert the `ObjectDeletion` rows inside
+   the same transaction. *Pre-existing — not introduced by this branch.*
+2. **`lib/cleanup.ts:157-190` webhook replay is unbounded** — no attempt or next-attempt cap.
+3. **`lib/sla.ts:200-202`** `recentFailures` counts every FAILED job (VOICE, samples, permanent 422s),
+   so one legitimate failure reddens the 15-minute workflow and mails the owner.
+4. **`app/api/admin/jobs/retry/route.ts:57`** `notIn: ["QUEUED", "RUNNING"]` permits requeuing a
+   **SUCCEEDED** job.
+5. **`lib/admin-recovery.ts:116-124`** "ever had a deleted report" hides genuine later failures.
+6. **`lib/auth/index.ts:55-59`** `isDatabaseError` omits `UnknownRequestError` / `RustPanic` /
+   `Validation`, so the AU-18 symptom returns for those classes.
+7. **`app/api/jobs/kick/route.ts:36-47`** the 503 body breaks the `{ error, code }` invariant.
+8. **`lib/owner-alert.ts:100`** a *skipped* send (email unconfigured) still writes `ownerAlertedAt`,
+   losing the nudge forever.
+9. **`lib/fulfilment.ts:106-109`** `claimJobById` returns `matched: true, job: null` and the caller
+   reports "Checked N reports" on an anomaly.
+10. **`lib/fulfilment.ts:388-390`** permanence is inferred from `status === 422` rather than
+    `isPermanentEngineFailure(code)`.
+11. **`.github/workflows/sla-sweep.yml:35-37`** workflow-level `concurrency` can postpone a tick from
+    15 to 25 minutes; move it onto each job.
+
+### Highest-risk behaviours still without a meaningful test
+
+1. **Erasure completeness** — enumerate every remaining row for an erased user and assert no birth
+   field survives. Today the tests assert per-table behaviour, not the end state.
+2. **`isDatabaseError` classification** — one test per error class (see item 6).
+3. **Pending-deletion non-oracle** — that a pending-deletion account is indistinguishable from an
+   unknown one, and that `getSessionUserId` cannot be used as authentication outside its route.
+
+### Accepted residual risks (documented, deliberately unfixed)
+
+- No row lock on the `deletedAt` re-read in `fulfilment.ts`: a render committing after the erasure's
+  final re-sweep read can still leave a report row. The re-sweep is bounded at 3 passes and logs when
+  it hits the bound; `FOR UPDATE` was deliberately not added.
+- S3/R2 delete idempotency is assumed — duplicate keys in one `DeleteObjects` batch are expected to be
+  tolerated. If a provider rejected that, the affected rows retry to the 10-attempt cap.
+- A single-profile soft delete leaves that person's birth data in retained job payloads until the
+  90-day purge; whole-account erasure nulls them immediately.
+
 ## Change Log
 
 | Date | Change |
@@ -944,3 +994,4 @@ and an **OPEN** row names the owner action that remains. Owner-side items have n
 | 2026-10-22 (later still) | Birth-data fixes: P5-birth-age (a reading now needs someone at least one year old), P5-birth-inputs (the date and time fields can be typed into, and echo what they understood), P5-birth-time-guess (the time field no longer arrives pre-filled with a guessed noon). Webapp suite 210 passed / 4 skipped. |
 | 2026-10-22 | Harish × Prethivika compat pair added (48/100 Mixed). Found and FIXED P5-doubled-branch (a 자형 branch pair rendered "Hae Hae"); found and left OPEN P5-compat-heading-gloss (the zodiac heading's redundant `(Branch Compatibility)` gloss, present in every compat pair). Regression test added to `tests/test_pdf.py`. |
 | 2026-10-26 | Production audit recorded (AU-01 – AU-47) in `docs/analysis/2026-10-26-production-audit.md`; outage fixes `6027746`, `310fd3d`, `5701ce9` deployed. Execution deferred to the next session. |
+| 2026-10-26 | Audit remediation merged to `develop` as `e370eb8` (34 commits, not pushed): 36 of the 45 recorded items closed, 9 deliberately still OPEN (see the Audit table; the audit itself skips AU-38/AU-39, so 45 rows is the full set), 8 owner actions outstanding (see `docs/MEMORY.md` → "Owner actions before the audit remediation is safe to deploy"). Engine 2,049 passed / 5 skipped / 13 xfailed; web 638 passed / 4 skipped; tsc + eslint clean at the merge commit. Eleven follow-ups and three accepted residual risks recorded in "Post-merge backlog — audit remediation". |
