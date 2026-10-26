@@ -928,11 +928,22 @@ pricing or a delivered PDF.
 
 ### Correctness, in the order they cost the most
 
-1. **`lib/cleanup.ts` `retireInactiveProfiles` — same PII-orphan window the erasure path just fixed.**
-   It captures report keys before its transaction commits but queues them only in the post-commit
-   loop, so a process death in between permanently orphans those R2 objects with no report row left
-   to find them. One-line remedy, already applied to erasure: insert the `ObjectDeletion` rows inside
-   the same transaction. *Pre-existing — not introduced by this branch.*
+1. ~~**`lib/cleanup.ts` `retireInactiveProfiles` — same PII-orphan window the erasure path just
+   fixed.**~~ **FIXED** (`61e3588`, 2026-10-26): the `ObjectDeletion` rows are now written inside the
+   retirement transaction, so a crash between the commit and the R2 loop cannot orphan the objects;
+   the post-commit delete stays as the immediate attempt. Pinned by four tests (two-phase ordering,
+   durability independent of the loop, empty guard, spared-profile keys never queued).
+   *It was pre-existing, not introduced by the remediation branch.*
+   - Residual, recorded not fixed: the reports are read **outside** the transaction
+     (`cleanup.ts:716-730`) and `audioKey` is mutable after creation
+     (`api/admin/reports/[id]/audio/upload/route.ts:97-100`, `fulfilment.ts:534-543`). An MP3 key
+     landing on a retiring report between that read and the delete would be deleted with its row and
+     never queued. Practically unreachable (a profile 24 months idle with no recent order, report,
+     delivery or sign-in). Closing it means re-reading the deleted rows' keys inside the transaction,
+     which is the shape `eraseAccount` already uses.
+   - Operational note: each retirement now writes one durable queue row per key, drained at 200 rows
+     per run (`cleanup.ts:63`) while a full 200-profile batch can enqueue ~800 — a large batch takes
+     several nights to clear. No correctness impact, and step 2 is skipped while R2 is unconfigured.
 2. **`lib/cleanup.ts:157-190` webhook replay is unbounded** — no attempt or next-attempt cap.
 3. **`lib/sla.ts:200-202`** `recentFailures` counts every FAILED job (VOICE, samples, permanent 422s),
    so one legitimate failure reddens the 15-minute workflow and mails the owner.
@@ -995,3 +1006,4 @@ pricing or a delivered PDF.
 | 2026-10-22 | Harish × Prethivika compat pair added (48/100 Mixed). Found and FIXED P5-doubled-branch (a 자형 branch pair rendered "Hae Hae"); found and left OPEN P5-compat-heading-gloss (the zodiac heading's redundant `(Branch Compatibility)` gloss, present in every compat pair). Regression test added to `tests/test_pdf.py`. |
 | 2026-10-26 | Production audit recorded (AU-01 – AU-47) in `docs/analysis/2026-10-26-production-audit.md`; outage fixes `6027746`, `310fd3d`, `5701ce9` deployed. Execution deferred to the next session. |
 | 2026-10-26 | Audit remediation merged to `develop` as `e370eb8` (34 commits, not pushed): 36 of the 45 recorded items closed, 9 deliberately still OPEN (see the Audit table; the audit itself skips AU-38/AU-39, so 45 rows is the full set), 8 owner actions outstanding (see `docs/MEMORY.md` → "Owner actions before the audit remediation is safe to deploy"). Engine 2,049 passed / 5 skipped / 13 xfailed; web 638 passed / 4 skipped; tsc + eslint clean at the merge commit. Eleven follow-ups and three accepted residual risks recorded in "Post-merge backlog — audit remediation". |
+| 2026-10-26 | Post-merge backlog item 1 FIXED (`61e3588`): `retireInactiveProfiles` writes its `ObjectDeletion` rows inside the retirement transaction, closing the crash window that could orphan retired reports' R2 objects. Web suite 641 passed / 4 skipped; tsc + eslint clean. The reviewer's two residual notes (mutable `audioKey` read outside the transaction; queue drain throughput on a full batch) are recorded under that item, not fixed. |
