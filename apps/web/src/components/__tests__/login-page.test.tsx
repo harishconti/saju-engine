@@ -122,6 +122,15 @@ describe("login error display", () => {
   });
 });
 
+describe("password reset entry point (AU-41, D6)", () => {
+  it("offers a 'Forgot password?' link that leads to the request step", () => {
+    render(<LoginPage />);
+
+    const link = screen.getByRole("link", { name: /forgot password\?/i });
+    expect(link.getAttribute("href")).toBe("/forgot-password");
+  });
+});
+
 describe("all three sign-in paths record consent through /auth/complete (AU-22)", () => {
   it("sends a completed email sign-up through /auth/complete, not straight to the dashboard", async () => {
     signUpEmail.mockResolvedValue({});

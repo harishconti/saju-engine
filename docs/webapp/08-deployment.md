@@ -181,6 +181,39 @@ it as configured. Live now: apex MX, exactly one apex SPF, and `_dmarc`; **recei
 CNAMEs** (`hostingermail-a/b/c._domainkey`, **DNS only**) are still missing. Full detail:
 [07](07-services-and-integrations.md) §Mailbox records.
 
+#### Password reset email (Neon Auth)
+
+The app asks Neon Auth to send the reset mail (`POST /api/account/password-reset` →
+`auth.requestPasswordReset({ email, redirectTo })`), and the provider mails a link to its own
+`/reset-password/<token>` endpoint, which then redirects to **our** page with `?token=…`. Two things
+therefore have to be configured in the Neon console before reset mail can arrive. Both are owner
+actions; the code cannot do them.
+
+1. **Email provider.** Neon Console → project **saju** → branch **production** → **Auth** →
+   **Configuration** → email/SMTP provider. Configure the same sending identity used for the
+   sign-in emails (Resend) and **Save**. This is the provider that actually delivers the reset
+   link — no mail is sent by this app itself.
+2. **Allowlist the redirect origin.** In the same **Auth → Configuration** area, find the
+   redirect/trusted-origin setting (the console has labelled it *Redirect URLs*, *Allowed URLs* and
+   *Trusted origins* across releases) and add:
+
+   ```
+   https://www.cosmicsaju.com/reset-password
+   ```
+
+   The origin must match `NEXT_PUBLIC_APP_URL` exactly (www is canonical; the apex redirects). The
+   route derives `redirectTo` from that variable, and Neon Auth's redirect step applies an origin
+   check — a missing entry makes the emailed link fail instead of landing on the form.
+
+**Verify end to end:** request a reset for a real account, open the mail, and confirm the link lands
+on `/reset-password` with a form; set a new password and sign in with it. Request a reset for an
+address with no account and confirm the page still shows the neutral confirmation and no mail
+arrives.
+
+**Until these two steps are done**, `POST /api/account/password-reset` still answers `202 {ok:true}`
+— that is the neutrality contract, not a claim that mail was sent — so a missing console setting is
+invisible from the UI. Check the deployment checklist below before advertising the feature.
+
 ### The engine project (`saju-report-engine`, root = repository root)
 
 ```bash
@@ -372,6 +405,10 @@ code still works against the new schema; then a webapp rollback does not need a 
       Then sign up with an existing address against the auth API and confirm it no longer answers
       `422 USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL` in a way that distinguishes an existing account
       (the login page already shows a neutral message; this closes the API-level oracle)
+- [ ] **Password reset mail works (AU-41).** Neon Console → **Auth** → **Configuration**: a working
+      email provider, and `https://www.cosmicsaju.com/reset-password` allowlisted as a redirect
+      origin (see § Password reset email above). Prove it with a real address (mail arrives, link
+      lands on the form, new password signs in) and an unregistered one (neutral page, no mail)
 - [ ] Privacy, Terms, and **Refund Policy** are live with a real contact address
 - [ ] Consent checkbox writes a `ConsentRecord`; the deletion path works end to end
 - [ ] The public e2e suite proves every protected route 401s when signed out, and user B cannot fetch

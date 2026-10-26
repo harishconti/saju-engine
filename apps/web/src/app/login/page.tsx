@@ -422,6 +422,17 @@ export default function LoginPage() {
                 </label>
               ) : null}
 
+              {mode === "signin" ? (
+                <div className="flex justify-end">
+                  <Link
+                    href="/forgot-password"
+                    className="text-xs text-muted-foreground underline hover:text-foreground"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+              ) : null}
+
               <Button type="submit" size="md" className="w-full" loading={busy === "email"}>
                 {mode === "signin" ? "Sign in" : "Create account"}
               </Button>

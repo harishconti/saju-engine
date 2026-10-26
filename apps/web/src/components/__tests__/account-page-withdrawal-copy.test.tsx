@@ -13,8 +13,9 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn(), push: vi.fn(), replace: vi.fn() }),
 }));
 
-const { requireUser, prisma } = vi.hoisted(() => ({
+const { requireUser, listAccountSessions, prisma } = vi.hoisted(() => ({
   requireUser: vi.fn(),
+  listAccountSessions: vi.fn(),
   prisma: {
     consentRecord: { findFirst: vi.fn() },
     deletionRequest: { findFirst: vi.fn() },
@@ -22,7 +23,7 @@ const { requireUser, prisma } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("@/lib/auth", () => ({ requireUser }));
+vi.mock("@/lib/auth", () => ({ requireUser, listAccountSessions }));
 vi.mock("@/lib/prisma", () => ({ prisma }));
 
 import AccountPage from "@/app/dashboard/account/page";
@@ -30,6 +31,8 @@ import AccountPage from "@/app/dashboard/account/page";
 beforeEach(() => {
   vi.clearAllMocks();
   requireUser.mockResolvedValue({ id: "u1", name: "Visitor", email: "visitor@example.com", role: "CLIENT" });
+  // AU-40: the page also lists active sessions; an empty list keeps this test about copy.
+  listAccountSessions.mockResolvedValue([]);
   prisma.consentRecord.findFirst.mockResolvedValue(null);
   prisma.deletionRequest.findFirst.mockResolvedValue(null);
   prisma.user.findUnique.mockResolvedValue({

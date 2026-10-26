@@ -179,11 +179,12 @@ describe("getCurrentUser — pending deletion (AU-24, D7)", () => {
 describe("revokeOtherSessions — withdrawal ends other devices (AU-24, D7)", () => {
   it("swallows a provider failure so the recorded withdrawal still answers 200", async () => {
     // The consent record is already written when this runs. A revoked-session call that fails at
-    // the identity provider must not tell the visitor the withdrawal itself failed.
+    // the identity provider must not tell the visitor the withdrawal itself failed. Since AU-40 the
+    // helper reports the failure to callers that can act on it, but it still never throws.
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
     authRevokeOtherSessions.mockRejectedValue(new Error("provider down"));
 
-    await expect(revokeOtherSessions()).resolves.toBeUndefined();
+    await expect(revokeOtherSessions()).resolves.toBe(false);
 
     expect(error).toHaveBeenCalled();
     error.mockRestore();
@@ -193,7 +194,7 @@ describe("revokeOtherSessions — withdrawal ends other devices (AU-24, D7)", ()
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
     authRevokeOtherSessions.mockResolvedValue({ error: { message: "invalid session" } });
 
-    await revokeOtherSessions();
+    await expect(revokeOtherSessions()).resolves.toBe(false);
 
     expect(error).toHaveBeenCalled();
     error.mockRestore();

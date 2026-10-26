@@ -251,26 +251,127 @@ export async function hasPendingDeletion(userId: string): Promise<boolean> {
 }
 
 /**
- * End the caller's other sessions (AU-24, D7).
+ * End the caller's other sessions (AU-24 D7; reused by the account page in AU-40 D6).
  *
  * Withdrawing consent stops new processing, but the consent record does not end sessions already
- * open on other devices. The current session is kept so the visitor stays on the page that just
- * recorded the withdrawal.
+ * open on other devices. The account page offers the same action explicitly. The current session is
+ * kept — Neon's `revoke-all-sessions` endpoint is documented as "revokes all sessions except the
+ * current one" — so the visitor stays on the page they are standing on. No token is passed, and none
+ * could be: only the provider knows which session made the call.
  *
- * Best-effort by contract: this crosses into the identity provider, and a failure there must not
- * turn a recorded withdrawal into a 500 — the record is the promise that matters. The failure is
- * logged by class/code only (never a token or cookie).
+ * Never throws: this crosses into the identity provider, and a failure there must not turn a
+ * recorded withdrawal into a 500. It reports whether the call succeeded so a caller that *is* just a
+ * button can show an error (AU-40); callers that only need best effort ignore the value. The failure
+ * is logged by class/code only (never a message, a token or a cookie).
  */
-export async function revokeOtherSessions(): Promise<void> {
+export async function revokeOtherSessions(): Promise<boolean> {
   try {
     const res = (await auth.revokeOtherSessions()) as { error?: { code?: string } } | undefined;
     if (res?.error) {
       // The code, never the message: a provider message can echo the request it refused.
       console.error("[auth] revokeOtherSessions failed:", res.error.code ?? "provider error");
+      return false;
     }
+    return true;
   } catch (err) {
     console.error("[auth] revokeOtherSessions failed:", err instanceof Error ? err.name : "unknown");
+    return false;
   }
+}
+
+/** A signed-in device, as the account page needs it — and no more (AU-40, D6). */
+export interface AccountSession {
+  id: string;
+  /** Raw user-agent; the page turns it into a short device name. */
+  userAgent: string | null;
+  /** When this device first signed in. */
+  createdAt: string | null;
+  /** The provider's `updatedAt`, which moves as the session is used. */
+  lastUsedAt: string | null;
+  /** True for the session making the request. */
+  current: boolean;
+}
+
+interface NeonSessionRow {
+  id?: string | null;
+  userAgent?: string | null;
+  createdAt?: string | Date | null;
+  updatedAt?: string | Date | null;
+}
+
+function isoOrNull(value: string | Date | null | undefined): string | null {
+  if (!value) return null;
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+/**
+ * The id of the session making this request, or null.
+ *
+ * AU-40: marking "this device" is only honest if both sides expose an id. They do — `getSession()`
+ * returns `data.session.id` and every `list-sessions` row carries the same `id` — so no approximation
+ * is needed. A missing id simply means no marker, never a guess.
+ */
+export const getCurrentSessionId = cache(async (): Promise<string | null> => {
+  try {
+    const res = (await auth.getSession()) as unknown as {
+      data?: { session?: { id?: string | null } | null } | null;
+      error?: unknown;
+    };
+    if (res?.error) return null;
+    const id = res?.data?.session?.id;
+    return typeof id === "string" && id.length > 0 ? id : null;
+  } catch {
+    // Unconfigured auth, network failure, corrupt cookie: no usable session id.
+    return null;
+  }
+});
+
+/**
+ * Every active session for the signed-in user, current first (AU-40, D6).
+ *
+ * Answers null when the provider could not be reached or refused (for example `SESSION_NOT_FRESH`
+ * from the provider's own freshness rule) so the page can say "couldn't load" rather than pretend
+ * the account has no other devices. Only the fields the page shows are copied out: the provider's
+ * rows also carry a session **token**, which must never reach the browser.
+ *
+ * Logs by code/class only — a provider message can echo the request it refused.
+ */
+export async function listAccountSessions(): Promise<AccountSession[] | null> {
+  let rows: NeonSessionRow[];
+  try {
+    const res = (await auth.listSessions()) as unknown as {
+      data?: NeonSessionRow[] | null;
+      error?: { code?: unknown } | null;
+    };
+    if (res?.error) {
+      console.error(
+        "[auth] listSessions failed:",
+        typeof res.error.code === "string" ? res.error.code : "provider error",
+      );
+      return null;
+    }
+    rows = Array.isArray(res?.data) ? res.data : [];
+  } catch (err) {
+    console.error("[auth] listSessions failed:", err instanceof Error ? err.name : "unknown");
+    return null;
+  }
+
+  const currentId = await getCurrentSessionId();
+
+  return rows
+    .filter((row): row is NeonSessionRow & { id: string } => typeof row?.id === "string" && row.id.length > 0)
+    .map((row) => ({
+      id: row.id,
+      userAgent: typeof row.userAgent === "string" && row.userAgent.trim() ? row.userAgent : null,
+      createdAt: isoOrNull(row.createdAt),
+      lastUsedAt: isoOrNull(row.updatedAt),
+      current: row.id === currentId,
+    }))
+    .sort((a, b) => {
+      if (a.current !== b.current) return a.current ? -1 : 1;
+      return (b.lastUsedAt ?? "").localeCompare(a.lastUsedAt ?? "");
+    });
 }
 
 /** Roles are always read fresh from the database — never trusted from a token. */

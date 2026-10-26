@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Alert, Card, CardContent, KeyValue, PageHeader } from "@/components/ui";
 import { AccountNameForm, ConsentForm, DeletionPanel } from "@/components/dashboard/account-actions";
-import { requireUser } from "@/lib/auth";
+import { SessionsPanel } from "@/components/dashboard/account-sessions";
+import { listAccountSessions, requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/format";
 import { PRIVACY_EMAIL, PRIVACY_HREF } from "@/lib/contact";
@@ -15,7 +16,7 @@ const DELETION_GRACE_DAYS = 30;
 export default async function AccountPage() {
   const user = await requireUser();
 
-  const [latestConsent, deletion, counts] = await Promise.all([
+  const [latestConsent, deletion, counts, sessions] = await Promise.all([
     prisma.consentRecord.findFirst({
       where: { userId: user.id },
       orderBy: { grantedAt: "desc" },
@@ -31,6 +32,9 @@ export default async function AccountPage() {
         _count: { select: { profiles: true, reports: true, orders: true } },
       },
     }),
+    // AU-40 (D6). Null means the provider could not be asked, not "no other devices" — the card
+    // says so rather than showing an empty list that would read as a promise.
+    listAccountSessions(),
   ]);
 
   // Default to NOT granted. This previously said `service: true`, so an account with no
@@ -78,6 +82,20 @@ export default async function AccountPage() {
             Your email is the sign-in identity and is managed by our authentication provider. To change it,
             contact us.
           </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="py-5">
+          <h2 className="pb-1 font-display text-xl">Where you&apos;re signed in</h2>
+          {sessions ? (
+            <SessionsPanel sessions={sessions} />
+          ) : (
+            <Alert tone="warning" title="We couldn't load your active sessions">
+              Refresh the page, or sign out and back in, then try again. The list is unavailable
+              until the sign-in provider answers.
+            </Alert>
+          )}
         </CardContent>
       </Card>
 
