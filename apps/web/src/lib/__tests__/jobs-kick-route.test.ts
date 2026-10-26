@@ -9,13 +9,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
  * non-2xx with an `error` the dashboard already renders as an alert.
  */
 
-const { requireUser, rateLimit, kickOwnerJobs } = vi.hoisted(() => ({
+const { requireUser, requireActiveServiceConsent, rateLimit, kickOwnerJobs } = vi.hoisted(() => ({
   requireUser: vi.fn(),
+  requireActiveServiceConsent: vi.fn(),
   rateLimit: vi.fn(),
   kickOwnerJobs: vi.fn(),
 }));
 
 vi.mock("@/lib/auth", () => ({ requireUser }));
+vi.mock("@/lib/consent", () => ({ requireActiveServiceConsent }));
 vi.mock("@/lib/ratelimit", () => ({ rateLimit, WINDOW: { hour: 3_600_000 } }));
 vi.mock("@/lib/fulfilment", () => ({ kickOwnerJobs }));
 
@@ -29,6 +31,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   requireUser.mockResolvedValue({ id: "user_1", email: "client@test" });
   rateLimit.mockResolvedValue(undefined);
+  requireActiveServiceConsent.mockResolvedValue(true);
   kickOwnerJobs.mockResolvedValue({ processed: 0, generated: 0, failed: 0 });
 });
 
@@ -67,5 +70,22 @@ describe("POST /api/jobs/kick", () => {
     const body = (await res.json()) as Record<string, unknown>;
     expect(body.ok).toBe(true);
     expect(String(body.message)).toBe("Nothing was waiting.");
+  });
+
+  it("does not start render work for an account with no active service consent (AU-24)", async () => {
+    const { ApiError } = await import("@/lib/api");
+    requireActiveServiceConsent.mockRejectedValue(
+      new ApiError(409, "CONSENT_REQUIRED", "Please accept the privacy policy in your account settings first."),
+    );
+
+    const res = await POST(request(), undefined as never);
+
+    expect(res.status).toBe(409);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.code).toBe("CONSENT_REQUIRED");
+    expect(body.ok).toBeUndefined();
+    // The whole point of D7: withdrawal stops processing, it does not merely record a flag.
+    expect(kickOwnerJobs).not.toHaveBeenCalled();
+    expect(requireActiveServiceConsent).toHaveBeenCalledWith("user_1");
   });
 });

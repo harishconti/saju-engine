@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
  * and a record that only matches an older version is not "unchanged" — it is superseded.
  */
 
-const { requireUser, prismaMock, audit, rateLimit } = vi.hoisted(() => {
+const { requireUser, prismaMock, audit, rateLimit, revokeOtherSessions } = vi.hoisted(() => {
   const tx = {
     consentRecord: {
       update: vi.fn(async () => ({})),
@@ -22,6 +22,7 @@ const { requireUser, prismaMock, audit, rateLimit } = vi.hoisted(() => {
     requireUser: vi.fn(),
     audit: vi.fn(async () => ({})),
     rateLimit: vi.fn(async () => undefined),
+    revokeOtherSessions: vi.fn(async () => undefined),
     prismaMock: {
       consentRecord: { findFirst: vi.fn() },
       $transaction: vi.fn(async (fn: (t: typeof tx) => Promise<unknown>) => fn(tx)),
@@ -30,7 +31,7 @@ const { requireUser, prismaMock, audit, rateLimit } = vi.hoisted(() => {
   };
 });
 
-vi.mock("@/lib/auth", () => ({ requireUser }));
+vi.mock("@/lib/auth", () => ({ requireUser, revokeOtherSessions }));
 vi.mock("@/lib/prisma", () => ({ prisma: prismaMock }));
 vi.mock("@/lib/audit", () => ({ audit }));
 vi.mock("@/lib/ratelimit", () => ({
@@ -147,5 +148,59 @@ describe("POST /api/account/consent — the recorded version (AU-23)", () => {
 
     expect(body.unchanged).toBe(true);
     expect(prismaMock.$transaction).not.toHaveBeenCalled();
+  });
+});
+
+describe("POST /api/account/consent — withdrawal also ends other sessions (AU-24)", () => {
+  it("revokes the other sessions when the service purpose is withdrawn", async () => {
+    // D7: withdrawal is meant to stop processing. The record alone does not end a session that is
+    // already open on another device, so the withdrawal signs those out too — the current one is
+    // kept, because the visitor stays on the page that just recorded it.
+    prismaMock.consentRecord.findFirst.mockResolvedValue({
+      id: "c1",
+      policyVersion: POLICY_VERSION,
+      purposes: { service: true, service_messages: false },
+      withdrawnAt: null,
+    });
+    prismaMock.tx.consentRecord.create.mockResolvedValue({
+      id: "c2",
+      policyVersion: POLICY_VERSION,
+      purposes: { service: false, service_messages: false },
+    });
+
+    const res = await POST(
+      request({ policyVersion: POLICY_VERSION, purposes: { service: false, service_messages: false } }),
+      undefined as never,
+    );
+    const body = (await res.json()) as Record<string, unknown>;
+
+    expect(body.withdrawnService).toBe(true);
+    expect(revokeOtherSessions).toHaveBeenCalledTimes(1);
+  });
+
+  it("leaves other sessions alone when consent is granted", async () => {
+    await POST(
+      request({ policyVersion: POLICY_VERSION, purposes: { service: true, service_messages: false } }),
+      undefined as never,
+    );
+
+    expect(revokeOtherSessions).not.toHaveBeenCalled();
+  });
+
+  it("does not revoke for the no-op 'unchanged' answer", async () => {
+    prismaMock.consentRecord.findFirst.mockResolvedValue({
+      id: "c1",
+      policyVersion: POLICY_VERSION,
+      purposes: { service: true, service_messages: false },
+      withdrawnAt: null,
+    });
+
+    const res = await POST(
+      request({ policyVersion: POLICY_VERSION, purposes: { service: true, service_messages: false } }),
+      undefined as never,
+    );
+
+    expect(((await res.json()) as Record<string, unknown>).unchanged).toBe(true);
+    expect(revokeOtherSessions).not.toHaveBeenCalled();
   });
 });

@@ -1,6 +1,7 @@
 import { handle, json } from "@/lib/api";
 import { requireUser } from "@/lib/auth";
 import { rateLimit, WINDOW } from "@/lib/ratelimit";
+import { requireActiveServiceConsent } from "@/lib/consent";
 import { kickOwnerJobs } from "@/lib/fulfilment";
 
 export const dynamic = "force-dynamic";
@@ -23,6 +24,11 @@ export const maxDuration = 300;
 export const POST = handle(async () => {
   const user = await requireUser();
   await rateLimit(`kick:${user.id}`, 20, WINDOW.hour);
+
+  // AU-24 (owner decision D7): this route starts report generation, so it is an entry point the
+  // withdrawal promise has to cover. Refused with the same code as order creation, so the UI offers
+  // the same route back to the consent control.
+  await requireActiveServiceConsent(user.id);
 
   const result = await kickOwnerJobs(user.id, 2);
 

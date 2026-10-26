@@ -112,7 +112,7 @@ const BIRTH_DATA_FIX: Record<string, string> = {
 };
 
 /** Where a signed-in visitor can grant or withdraw the `service` consent. */
-const CONSENT_CONTROL: FailureAction = {
+export const CONSENT_CONTROL: FailureAction = {
   href: "/dashboard/account",
   label: "Open your consent settings",
 };

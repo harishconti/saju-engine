@@ -7,15 +7,18 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
  * all three instead of only the email form's best-effort browser call.
  */
 
-const { getCurrentUser, recordInitialServiceConsent, redirect } = vi.hoisted(() => ({
-  getCurrentUser: vi.fn(),
-  recordInitialServiceConsent: vi.fn(),
-  redirect: vi.fn((url: string) => {
-    throw new Error(`NEXT_REDIRECT:${url}`);
-  }),
-}));
+const { getCurrentUser, getSessionUserId, hasPendingDeletion, recordInitialServiceConsent, redirect } =
+  vi.hoisted(() => ({
+    getCurrentUser: vi.fn(),
+    getSessionUserId: vi.fn(),
+    hasPendingDeletion: vi.fn(),
+    recordInitialServiceConsent: vi.fn(),
+    redirect: vi.fn((url: string) => {
+      throw new Error(`NEXT_REDIRECT:${url}`);
+    }),
+  }));
 
-vi.mock("@/lib/auth", () => ({ getCurrentUser }));
+vi.mock("@/lib/auth", () => ({ getCurrentUser, getSessionUserId, hasPendingDeletion }));
 vi.mock("@/lib/consent", () => ({ recordInitialServiceConsent }));
 vi.mock("next/navigation", () => ({ redirect }));
 
@@ -24,6 +27,8 @@ const { default: AuthCompletePage } = await import("@/app/auth/complete/page");
 beforeEach(() => {
   vi.clearAllMocks();
   getCurrentUser.mockResolvedValue({ id: "u1", name: "Test", email: "t@test", role: "CLIENT" });
+  getSessionUserId.mockResolvedValue("u1");
+  hasPendingDeletion.mockResolvedValue(false);
   recordInitialServiceConsent.mockResolvedValue(undefined);
 });
 
@@ -39,6 +44,7 @@ describe("/auth/complete — initial consent (AU-22)", () => {
 
   it("redirects without recording for an arrival with no session", async () => {
     getCurrentUser.mockResolvedValue(null);
+    getSessionUserId.mockResolvedValue(null);
 
     await expect(
       AuthCompletePage({ searchParams: Promise.resolve({ next: "/sample" }) }),
@@ -57,5 +63,43 @@ describe("/auth/complete — initial consent (AU-22)", () => {
 
     expect(error).toHaveBeenCalled();
     error.mockRestore();
+  });
+});
+
+describe("/auth/complete — pending deletion (AU-24, D7)", () => {
+  it("sends a pending-deletion account to the login notice instead of onward", async () => {
+    // Google and magic-link sign-ins land here with a live session. `getCurrentUser` now answers
+    // null for this account, but "no user" would silently redirect a blocked visitor into the app;
+    // they need to be told, and offered the cancel control.
+    getCurrentUser.mockResolvedValue(null);
+    getSessionUserId.mockResolvedValue("u1");
+    hasPendingDeletion.mockResolvedValue(true);
+
+    await expect(
+      AuthCompletePage({ searchParams: Promise.resolve({ next: "/dashboard" }) }),
+    ).rejects.toThrow("NEXT_REDIRECT:/login?error=ACCOUNT_PENDING_DELETION");
+
+    expect(recordInitialServiceConsent).not.toHaveBeenCalled();
+  });
+
+  it("does not assume deletion from a plain signed-out arrival", async () => {
+    getCurrentUser.mockResolvedValue(null);
+    getSessionUserId.mockResolvedValue(null);
+
+    await expect(
+      AuthCompletePage({ searchParams: Promise.resolve({ next: "/dashboard" }) }),
+    ).rejects.toThrow("NEXT_REDIRECT:/dashboard");
+  });
+
+  it("still sends an erased-but-session-holding account onward, not to a deletion notice", async () => {
+    // `deletedAt` also makes getCurrentUser null. Only a *pending* request gets the specific
+    // message; anything else keeps the previous behaviour.
+    getCurrentUser.mockResolvedValue(null);
+    getSessionUserId.mockResolvedValue("u1");
+    hasPendingDeletion.mockResolvedValue(false);
+
+    await expect(
+      AuthCompletePage({ searchParams: Promise.resolve({ next: "/dashboard" }) }),
+    ).rejects.toThrow("NEXT_REDIRECT:/dashboard");
   });
 });

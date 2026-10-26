@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, getSessionUserId, hasPendingDeletion } from "@/lib/auth";
 import { recordInitialServiceConsent } from "@/lib/consent";
 import { safeNext } from "@/lib/safe-next";
 
@@ -27,14 +27,24 @@ export default async function AuthCompletePage({
 }) {
   const params = await searchParams;
   const next = Array.isArray(params.next) ? params.next[0] : params.next;
+  let pendingDeletion = false;
 
   try {
     const user = await getCurrentUser();
-    if (user) await recordInitialServiceConsent(user.id);
+    if (user) {
+      await recordInitialServiceConsent(user.id);
+    } else {
+      // AU-24 (owner decision D7): an account pending deletion authenticates at the provider but
+      // is treated as signed out. Redirecting it onward would drop it into a 401 page; the login
+      // page is where the reason and the cancel control live.
+      const sessionUserId = await getSessionUserId();
+      pendingDeletion = sessionUserId ? await hasPendingDeletion(sessionUserId) : false;
+    }
   } catch (err) {
     // Recording consent is best-effort by design (see the comment above); the sign-in itself is not.
     console.error("auth/complete: could not record initial consent", err);
   }
 
+  if (pendingDeletion) redirect("/login?error=ACCOUNT_PENDING_DELETION");
   redirect(safeNext(next));
 }

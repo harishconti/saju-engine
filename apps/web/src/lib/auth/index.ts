@@ -97,7 +97,17 @@ async function mirrorUser(u: NeonUser): Promise<AppUser | null> {
 
   const existing = await prisma.user.findUnique({
     where: { id: n.id },
-    select: { id: true, name: true, email: true, role: true, deletedAt: true, lastSeenAt: true },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      deletedAt: true,
+      lastSeenAt: true,
+      // AU-24 (D7): a pending deletion disables sign-in. Only `pending` blocks — a cancelled or
+      // completed request must not (Task 4 / D2).
+      deletions: { where: { status: "pending" }, take: 1, select: { id: true } },
+    },
   });
 
   // Admin is derived here because nothing else can grant it: there is no route, script or CLI that
@@ -119,6 +129,10 @@ async function mirrorUser(u: NeonUser): Promise<AppUser | null> {
 
   if (existing) {
     if (existing.deletedAt) return null; // anonymised account: treat as signed out
+    // AU-24 (D7): the account is scheduled for deletion, so it cannot sign in. Checked before
+    // `touchLastSeen` on purpose: a blocked account must not be recorded as "in use", or the
+    // retention sweep would count a session it just refused as activity.
+    if (existing.deletions.length > 0) return null;
     const needsRole = grantAdmin && existing.role !== "ADMIN";
     // AU-17: the local row is authoritative for the display name once it exists. Copying the
     // Neon session's name here reverted every change made on the account page, because that page
@@ -161,9 +175,17 @@ async function mirrorUser(u: NeonUser): Promise<AppUser | null> {
     // Lost the race: another request created it. Re-read.
     const row = await prisma.user.findUnique({
       where: { id: n.id },
-      select: { id: true, name: true, email: true, role: true, deletedAt: true, lastSeenAt: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        deletedAt: true,
+        lastSeenAt: true,
+        deletions: { where: { status: "pending" }, take: 1, select: { id: true } },
+      },
     });
-    if (!row || row.deletedAt) return null;
+    if (!row || row.deletedAt || row.deletions.length > 0) return null;
     await touchLastSeen(row.id, row.lastSeenAt);
     return { id: row.id, name: row.name, email: row.email, role: row.role as Role, emailVerified: n.emailVerified };
   }
@@ -195,6 +217,60 @@ export async function requireUser(): Promise<AppUser> {
   const user = await getCurrentUser();
   if (!user) throw ApiError.unauthorized();
   return user;
+}
+
+/**
+ * The raw Neon session user id, without mirroring and without the pending-deletion gate.
+ *
+ * AU-24 (D7) needs this for the one honest exception to the sign-in block: an account that is
+ * *pending* deletion must still be able to read and cancel that request, which is how the privacy
+ * page's "cancellable any time before it completes" survives sign-in being disabled. Callers must
+ * never treat this as authentication — `getCurrentUser`/`requireUser` remain the only identity gates.
+ */
+export const getSessionUserId = cache(async (): Promise<string | null> => {
+  try {
+    const res = (await auth.getSession()) as unknown as {
+      data?: { user?: { id?: string | null } } | null;
+      error?: unknown;
+    };
+    if (res?.error) return null;
+    return res?.data?.user?.id ?? null;
+  } catch {
+    // Unconfigured auth, network failure, corrupt cookie: no usable session.
+    return null;
+  }
+});
+
+/** Whether the account has a `pending` deletion request (AU-24, D7). */
+export async function hasPendingDeletion(userId: string): Promise<boolean> {
+  const pending = await prisma.deletionRequest.findFirst({
+    where: { userId, status: "pending" },
+    select: { id: true },
+  });
+  return pending !== null;
+}
+
+/**
+ * End the caller's other sessions (AU-24, D7).
+ *
+ * Withdrawing consent stops processing, but the consent record does not end sessions already open
+ * on other devices. The current session is kept so the visitor stays on the page that just recorded
+ * the withdrawal.
+ *
+ * Best-effort by contract: this crosses into the identity provider, and a failure there must not
+ * turn a recorded withdrawal into a 500 — the record is the promise that matters. The failure is
+ * logged by class/code only (never a token or cookie).
+ */
+export async function revokeOtherSessions(): Promise<void> {
+  try {
+    const res = (await auth.revokeOtherSessions()) as { error?: { code?: string } } | undefined;
+    if (res?.error) {
+      // The code, never the message: a provider message can echo the request it refused.
+      console.error("[auth] revokeOtherSessions failed:", res.error.code ?? "provider error");
+    }
+  } catch (err) {
+    console.error("[auth] revokeOtherSessions failed:", err instanceof Error ? err.name : "unknown");
+  }
 }
 
 /** Roles are always read fresh from the database — never trusted from a token. */

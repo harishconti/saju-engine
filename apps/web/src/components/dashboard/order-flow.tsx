@@ -7,6 +7,7 @@ import { track } from "@vercel/analytics";
 import { Alert, Badge, Button, Card, CardContent, Field, Select, Steps, buttonClasses } from "@/components/ui";
 import { COMPAT_TIERS, SINGLE_TIERS, TIERS, type Tier } from "@/lib/tiers";
 import { promoPriceCents } from "@/lib/promo";
+import { CONSENT_CONTROL } from "@/lib/visitor-copy";
 import { formatUSD } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -43,6 +44,9 @@ export function OrderFlow({
   const [profileBId, setProfileBId] = useState<string>("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // AU-24 (D7): the server refuses an order without an active service consent. That refusal has
+  // exactly one fix, so the alert carries the link to it rather than inviting a retry.
+  const [consentRequired, setConsentRequired] = useState(false);
   // Not persisted anywhere client-side: it is an affirmation made at submission, and the server
   // re-requires it (lib/validation/schemas.ts) so this state is only a convenience.
   const [adultConfirmed, setAdultConfirmed] = useState(false);
@@ -71,6 +75,7 @@ export function OrderFlow({
     if (!tier) return;
     setBusy(true);
     setError(null);
+    setConsentRequired(false);
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
@@ -87,10 +92,12 @@ export function OrderFlow({
       const body = (await res.json().catch(() => ({}))) as {
         checkoutUrl?: string;
         error?: string;
+        code?: string;
         order?: { id: string; priceCents?: number };
       };
 
       if (!res.ok) {
+        setConsentRequired(body.code === "CONSENT_REQUIRED");
         setError(body.error ?? "Couldn't create that order. Try again.");
         return;
       }
@@ -147,7 +154,18 @@ export function OrderFlow({
     <div className="space-y-6">
       <Steps steps={STEPS} current={step} />
 
-      {error ? <Alert tone="danger">{error}</Alert> : null}
+      {error ? (
+        <Alert tone="danger">
+          <p>{error}</p>
+          {consentRequired ? (
+            <p className="pt-2">
+              <Link href={CONSENT_CONTROL.href} className="font-medium underline">
+                {CONSENT_CONTROL.label}
+              </Link>
+            </p>
+          ) : null}
+        </Alert>
+      ) : null}
       {priceNote ? <Alert tone="warning">{priceNote}</Alert> : null}
 
       {/* Step 1 — tier */}

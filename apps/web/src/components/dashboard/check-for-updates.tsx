@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Alert, Button } from "@/components/ui";
+import { CONSENT_CONTROL } from "@/lib/visitor-copy";
 
 /**
  * User-triggered dispatch.
@@ -16,15 +18,20 @@ export function CheckForUpdatesButton() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // AU-24 (D7): a withdrawn consent means this action cannot run, and the fix is on the account
+  // page — so the alert links there instead of leaving the customer to retry a refusal.
+  const [consentRequired, setConsentRequired] = useState(false);
 
   async function onClick() {
     setBusy(true);
     setError(null);
     setMessage(null);
+    setConsentRequired(false);
     try {
       const res = await fetch("/api/jobs/kick", { method: "POST" });
-      const body = (await res.json().catch(() => ({}))) as { message?: string; error?: string };
+      const body = (await res.json().catch(() => ({}))) as { message?: string; error?: string; code?: string };
       if (!res.ok) {
+        setConsentRequired(body.code === "CONSENT_REQUIRED");
         setError(body.error ?? "Couldn't check right now.");
         return;
       }
@@ -43,7 +50,18 @@ export function CheckForUpdatesButton() {
         Check for updates
       </Button>
       {message ? <span className="text-xs text-muted-foreground">{message}</span> : null}
-      {error ? <Alert tone="danger">{error}</Alert> : null}
+      {error ? (
+        <Alert tone="danger">
+          <p>{error}</p>
+          {consentRequired ? (
+            <p className="pt-2">
+              <Link href={CONSENT_CONTROL.href} className="font-medium underline">
+                {CONSENT_CONTROL.label}
+              </Link>
+            </p>
+          ) : null}
+        </Alert>
+      ) : null}
     </div>
   );
 }

@@ -34,7 +34,17 @@ function signedIn(overrides: Record<string, unknown> = {}) {
 
 /** Mirror the columns `mirrorUser` selects, so a stubbed row looks like a real one. */
 function storedRow(overrides: Record<string, unknown> = {}) {
-  return { id: "u1", name: "Owner", email: ADMIN_EMAIL, role: "USER", deletedAt: null, ...overrides };
+  return {
+    id: "u1",
+    name: "Owner",
+    email: ADMIN_EMAIL,
+    role: "USER",
+    deletedAt: null,
+    lastSeenAt: null,
+    // AU-24: `mirrorUser` selects pending deletions; empty means the account can sign in.
+    deletions: [],
+    ...overrides,
+  };
 }
 
 beforeEach(() => {

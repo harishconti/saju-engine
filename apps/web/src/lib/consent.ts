@@ -1,3 +1,4 @@
+import { ApiError } from "./api";
 import { prisma } from "./prisma";
 
 /**
@@ -71,3 +72,20 @@ export async function recordInitialServiceConsent(userId: string): Promise<void>
 export const CONSENT_REQUIRED_MESSAGE =
   "Please accept the privacy policy in your account settings before we store birth details. " +
   "It takes a moment and you can withdraw it there at any time.";
+
+/**
+ * The enforcement half of AU-24 (owner decision D7).
+ *
+ * Withdrawal used to record a fact and nothing else: the account page said processing had stopped,
+ * while an order could still be created and a render started. Any route that begins processing now
+ * calls this first. It deliberately delegates to `hasActiveServiceConsent` rather than repeating the
+ * rule — the version-awareness from AU-23 must apply to this gate too, and a second copy of the
+ * semantics would drift.
+ *
+ * 409 `CONSENT_REQUIRED` is a stable code the dashboard turns into a link to the consent control
+ * (`lib/visitor-copy.ts`), so the refusal is never a dead end.
+ */
+export async function requireActiveServiceConsent(userId: string): Promise<void> {
+  if (await hasActiveServiceConsent(userId)) return;
+  throw new ApiError(409, "CONSENT_REQUIRED", CONSENT_REQUIRED_MESSAGE);
+}

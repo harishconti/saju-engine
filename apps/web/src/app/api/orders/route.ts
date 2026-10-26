@@ -2,6 +2,7 @@ import { ApiError, handle, json, parseJson } from "@/lib/api";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { rateLimit, WINDOW } from "@/lib/ratelimit";
+import { requireActiveServiceConsent } from "@/lib/consent";
 import { writeAudit } from "@/lib/audit";
 import { withIdempotency } from "@/lib/idempotency";
 import { getTierById } from "@/lib/tiers";
@@ -31,6 +32,10 @@ export const GET = handle(async () => {
 export const POST = handle(async (req) => {
   const user = await requireUser();
   await rateLimit(`order:${user.id}`, 10, WINDOW.hour);
+
+  // AU-24 (owner decision D7): creating an order starts processing, so it needs a live service
+  // consent. 409 CONSENT_REQUIRED is turned into a link to the account page by the order flow.
+  await requireActiveServiceConsent(user.id);
 
   const input = await parseJson(req, orderSchema);
   const idempotencyKey = req.headers.get("idempotency-key") ?? input.idempotencyKey ?? null;

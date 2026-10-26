@@ -1,5 +1,5 @@
 import { clientIp, handle, json, parseJson } from "@/lib/api";
-import { requireUser } from "@/lib/auth";
+import { requireUser, revokeOtherSessions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { rateLimit, WINDOW } from "@/lib/ratelimit";
@@ -75,6 +75,14 @@ export const POST = handle(async (req) => {
   // Withdrawing the `service` purpose stops processing — the deletion path is the honest
   // consequence, and the account page surfaces it.
   const withdrawnService = input.purposes.service === false;
+
+  // AU-24 (owner decision D7): a withdrawal has to reach sessions that are already open, or the
+  // promise only holds on this device. Other sessions end; this one stays, because the visitor is
+  // still on the page that just recorded the withdrawal. Best-effort — `revokeOtherSessions` never
+  // throws, so a provider failure cannot lose the record we just wrote.
+  if (withdrawnService) {
+    await revokeOtherSessions();
+  }
 
   return json({ consent: record, withdrawnService });
 });

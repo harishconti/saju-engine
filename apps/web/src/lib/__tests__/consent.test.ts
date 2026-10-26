@@ -19,9 +19,9 @@ const mocks = vi.hoisted(() => ({
 }));
 vi.mock("@/lib/prisma", () => ({ prisma: mocks.prisma }));
 
-const { POLICY_VERSION, hasActiveServiceConsent, recordInitialServiceConsent } = await import(
-  "../consent"
-);
+const { POLICY_VERSION, hasActiveServiceConsent, recordInitialServiceConsent, requireActiveServiceConsent } =
+  await import("../consent");
+const { ApiError } = await import("@/lib/api");
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -125,5 +125,44 @@ describe("recordInitialServiceConsent (AU-22)", () => {
     await recordInitialServiceConsent("u1");
 
     expect(mocks.prisma.consentRecord.create).not.toHaveBeenCalled();
+  });
+});
+
+describe("requireActiveServiceConsent (AU-24, D7)", () => {
+  it("passes when the latest record grants the service purpose", async () => {
+    mocks.prisma.consentRecord.findFirst.mockResolvedValue({
+      policyVersion: POLICY_VERSION,
+      withdrawnAt: null,
+      purposes: { service: true },
+    });
+
+    await expect(requireActiveServiceConsent("u1")).resolves.toBeUndefined();
+  });
+
+  it("refuses with a stable, actionable code when consent has been withdrawn", async () => {
+    // D7 turns withdrawal into enforcement. The route layer answers this 409 as-is; the UI keys on
+    // the code to point at the account page, so the code and status must not drift.
+    mocks.prisma.consentRecord.findFirst.mockResolvedValue({
+      policyVersion: POLICY_VERSION,
+      withdrawnAt: new Date(),
+      purposes: { service: true },
+    });
+
+    await expect(requireActiveServiceConsent("u1")).rejects.toMatchObject({
+      status: 409,
+      code: "CONSENT_REQUIRED",
+    });
+  });
+
+  it("uses the same version-aware check as every other consent gate", async () => {
+    // The point of reusing `hasActiveServiceConsent`: a grant to an older policy text is not
+    // consent to what the app does now, and this gate must not be more lenient than the rest.
+    mocks.prisma.consentRecord.findFirst.mockResolvedValue({
+      policyVersion: "2025-01-01",
+      withdrawnAt: null,
+      purposes: { service: true },
+    });
+
+    await expect(requireActiveServiceConsent("u1")).rejects.toBeInstanceOf(ApiError);
   });
 });

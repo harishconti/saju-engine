@@ -17,11 +17,12 @@ type UserRow = {
   role: string;
   deletedAt: Date | null;
   lastSeenAt: Date | null;
+  deletions: { id: string }[];
 };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-const { prismaMock, getSession } = vi.hoisted(() => {
+const { prismaMock, getSession, revokeOtherSessions: authRevokeOtherSessions } = vi.hoisted(() => {
   const prismaMock = {
     user: {
       findUnique: vi.fn(async (_args: Record<string, unknown>) => null as UserRow | null),
@@ -40,22 +41,24 @@ const { prismaMock, getSession } = vi.hoisted(() => {
       updateMany: vi.fn(async (_args: Record<string, unknown>) => ({ count: 1 })),
     },
   };
-  return { prismaMock, getSession: vi.fn() };
+  return { prismaMock, getSession: vi.fn(), revokeOtherSessions: vi.fn() };
 });
 
 // `cache()` needs a React request scope that a unit test does not have; identity is what matters.
 vi.mock("react", () => ({ cache: (fn: unknown) => fn }));
 vi.mock("@/lib/prisma", () => ({ prisma: prismaMock }));
-vi.mock("@/lib/auth/server", () => ({ auth: { getSession } }));
+vi.mock("@/lib/auth/server", () => ({
+  auth: { getSession, revokeOtherSessions: authRevokeOtherSessions },
+}));
 
-const { getCurrentUser } = await import("../auth");
+const { getCurrentUser, revokeOtherSessions } = await import("../auth");
 
 const SESSION = {
   data: { user: { id: "u1", email: "a@b.c", name: "A", emailVerified: true } },
 };
 
 function existingRow(lastSeenAt: Date | null): UserRow {
-  return { id: "u1", name: "A", email: "a@b.c", role: "USER", deletedAt: null, lastSeenAt };
+  return { id: "u1", name: "A", email: "a@b.c", role: "USER", deletedAt: null, lastSeenAt, deletions: [] };
 }
 
 beforeEach(() => {
@@ -63,6 +66,8 @@ beforeEach(() => {
   getSession.mockResolvedValue(SESSION);
   prismaMock.user.findUnique.mockResolvedValue(existingRow(null));
   prismaMock.user.updateMany.mockResolvedValue({ count: 1 });
+  authRevokeOtherSessions.mockReset();
+  authRevokeOtherSessions.mockResolvedValue(undefined);
 });
 
 describe("getCurrentUser — lastSeenAt (D9)", () => {
@@ -135,5 +140,62 @@ describe("getCurrentUser — lastSeenAt (D9)", () => {
 
     expect(prismaMock.user.updateMany).not.toHaveBeenCalled();
     expect(prismaMock.user.create).not.toHaveBeenCalled();
+  });
+});
+
+describe("getCurrentUser — pending deletion (AU-24, D7)", () => {
+  it("treats an account with a pending deletion as signed out", async () => {
+    // D7: the login page promises a pending-deletion account cannot sign in. Every server gate reads
+    // identity through this function, so this is the one place the block has to hold.
+    prismaMock.user.findUnique.mockResolvedValue({
+      ...existingRow(new Date(Date.now() - 5 * DAY_MS)),
+      deletions: [{ id: "d1" }],
+    });
+
+    await expect(getCurrentUser()).resolves.toBeNull();
+
+    // Nothing else ran: no role update, and — the point of putting the check first — no
+    // `lastSeenAt` write, which would otherwise record a blocked account as "in use".
+    expect(prismaMock.user.updateMany).not.toHaveBeenCalled();
+    expect(prismaMock.user.update).not.toHaveBeenCalled();
+  });
+
+  it("asks the database only for a pending deletion, not the whole history", async () => {
+    await getCurrentUser();
+
+    const args = prismaMock.user.findUnique.mock.calls[0]![0] as {
+      select: Record<string, unknown>;
+    };
+    // Task 4 (D2) established that only `pending` blocks: a cancelled or completed request must
+    // not lock the account out.
+    expect(args.select.deletions).toEqual({
+      where: { status: "pending" },
+      take: 1,
+      select: { id: true },
+    });
+  });
+});
+
+describe("revokeOtherSessions — withdrawal ends other devices (AU-24, D7)", () => {
+  it("swallows a provider failure so the recorded withdrawal still answers 200", async () => {
+    // The consent record is already written when this runs. A revoked-session call that fails at
+    // the identity provider must not tell the visitor the withdrawal itself failed.
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    authRevokeOtherSessions.mockRejectedValue(new Error("provider down"));
+
+    await expect(revokeOtherSessions()).resolves.toBeUndefined();
+
+    expect(error).toHaveBeenCalled();
+    error.mockRestore();
+  });
+
+  it("logs a returned provider error instead of ignoring it", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    authRevokeOtherSessions.mockResolvedValue({ error: { message: "invalid session" } });
+
+    await revokeOtherSessions();
+
+    expect(error).toHaveBeenCalled();
+    error.mockRestore();
   });
 });

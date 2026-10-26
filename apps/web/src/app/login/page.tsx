@@ -39,6 +39,18 @@ const ACCOUNT_EXISTENCE_CODES = new Set([
 const NEUTRAL_AUTH_ERROR =
   "We couldn't do that with this email. If you already have an account, sign in or use a magic link.";
 
+/**
+ * AU-24 (owner decision D7): a pending deletion disables sign-in. Credentials still verify at the
+ * identity provider, so the visitor needs a specific reason and the one control that resolves it —
+ * the deletion stays cancellable until it runs, but the account page that normally offers the
+ * cancel is unreachable from a blocked session.
+ */
+const PENDING_DELETION_ERROR =
+  "This account is pending deletion, so sign-in is turned off. You can cancel the scheduled deletion below and sign in again.";
+
+/** `GET /api/account/deletion` answers this for a session blocked by its own pending deletion. */
+const ACCOUNT_PENDING_DELETION = "ACCOUNT_PENDING_DELETION";
+
 type AuthErrorLike = { code?: unknown; message?: unknown };
 
 /**
@@ -75,6 +87,7 @@ function authErrorMessage(err: unknown, fallback: string): string {
  */
 function callbackErrorMessage(code: string): string {
   const reason = code.trim().slice(0, 60);
+  if (reason === ACCOUNT_PENDING_DELETION) return PENDING_DELETION_ERROR;
   return reason ? `Sign-in didn't complete (${reason}). Please try again.` : "Sign-in didn't complete. Please try again.";
 }
 
@@ -90,6 +103,12 @@ export default function LoginPage() {
   const callbackError = params.get("error");
   const [error, setError] = useState<string | null>(callbackError ? callbackErrorMessage(callbackError) : null);
   const [notice, setNotice] = useState<string | null>(null);
+  // Set when the credentials verified but the account is blocked, or when the OAuth callback came
+  // back with the code. Shows the cancel control without claiming the visitor is signed in.
+  const [pendingDeletion, setPendingDeletion] = useState(
+    callbackError?.trim() === ACCOUNT_PENDING_DELETION,
+  );
+  const [cancelling, setCancelling] = useState(false);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -129,6 +148,55 @@ export default function LoginPage() {
     }
   }
 
+  /**
+   * Whether the just-authenticated account is blocked by its own pending deletion.
+   *
+   * The identity provider has no concept of our `DeletionRequest`, so the sign-in itself succeeds;
+   * the server is what treats the account as signed out (`getCurrentUser`). Asking this route is
+   * how the browser finds out before navigating into a wall. It answers 401 for every other
+   * signed-out state, which is a plain "no".
+   */
+  async function isPendingDeletion(): Promise<boolean> {
+    try {
+      const res = await fetch("/api/account/deletion", { cache: "no-store" });
+      if (!res.ok) return false;
+      const body = (await res.json().catch(() => ({}))) as { pendingDeletion?: boolean };
+      return body.pendingDeletion === true;
+    } catch {
+      // A network failure is not evidence of deletion; fall through to the normal path.
+      return false;
+    }
+  }
+
+  async function onCancelDeletion() {
+    setError(null);
+    setNotice(null);
+    setCancelling(true);
+    try {
+      const res = await fetch("/api/account/deletion", { method: "DELETE" });
+      if (!res.ok) {
+        // 401 is the stale-link case: the code arrived in a URL but there is no session to cancel
+        // with. Saying "sign in again" is more useful than the bare "Not signed in".
+        if (res.status === 401) {
+          setError("Please sign in again to cancel the scheduled deletion.");
+          return;
+        }
+        const body = (await res.json().catch(() => ({}))) as { error?: string };
+        setError(body.error ?? "Couldn't cancel the deletion. Please try again.");
+        return;
+      }
+      // The session still exists — only the block is gone — so the sign-in can simply resume.
+      setPendingDeletion(false);
+      setNotice("Deletion cancelled. Signing you in…");
+      router.push(next);
+      router.refresh();
+    } catch {
+      setError("Couldn't cancel the deletion. Check your connection and try again.");
+    } finally {
+      setCancelling(false);
+    }
+  }
+
   async function onEmailSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -161,6 +229,13 @@ export default function LoginPage() {
         // paths. A browser POST here could be lost with the tab and was only ever wired for email.
         router.push(`/auth/complete?next=${encodeURIComponent(next)}`);
       } else {
+        // AU-24 (D7): credentials verified, but a pending deletion means the server will treat this
+        // session as signed out. Say so here instead of letting the next page 401.
+        if (await isPendingDeletion()) {
+          setPendingDeletion(true);
+          setError(PENDING_DELETION_ERROR);
+          return;
+        }
         router.push(next);
       }
       router.refresh();
@@ -229,6 +304,7 @@ export default function LoginPage() {
                     setMode(m);
                     setError(null);
                     setNotice(null);
+                    setPendingDeletion(false);
                   }}
                   // min-h-11 (44px): these are real controls on a touch-first page, and `py-2` alone
                   // measured 36px — under the >=44 px bar in docs/webapp/06.
@@ -246,6 +322,21 @@ export default function LoginPage() {
 
             {error ? <Alert tone="danger">{error}</Alert> : null}
             {notice ? <Alert tone="success">{notice}</Alert> : null}
+
+            {/* The one control that resolves a pending-deletion block. Deliberately outside the
+                sign-in form: it acts on the account, not on the credentials. */}
+            {pendingDeletion ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="md"
+                className="w-full"
+                loading={cancelling}
+                onClick={onCancelDeletion}
+              >
+                Cancel scheduled deletion
+              </Button>
+            ) : null}
 
             <Button
               type="button"
