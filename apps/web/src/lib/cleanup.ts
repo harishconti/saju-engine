@@ -658,8 +658,9 @@ function calendarMonthsBefore(date: Date, months: number): Date {
  *  - A profile no order references is deleted outright — the row describes nobody once scrubbed, so
  *    there is nothing left to keep it for.
  *  - The profile's **reports** are deleted with it. The promise covers them, `Report` retains the
- *    `enginePayload`, the R2 keys and the `script`, and no other sweep purges them. Their objects go
- *    through the deletion queue only after the transaction commits.
+ *    `enginePayload`, the R2 keys and the `script`, and no other sweep purges them. Their object
+ *    keys are queued inside the same transaction, so a crash after the commit cannot orphan them,
+ *    and the R2 delete is attempted after it.
  *
  * Bounded like every other step so one run cannot hold a long transaction over the whole table;
  * `deletedAt` and the bumped `updatedAt` keep already-retired rows out of the next batch.
@@ -798,6 +799,22 @@ export async function retireInactiveProfiles(now: Date): Promise<number> {
     const removed = unreferenced.length
       ? await tx.profile.deleteMany({ where: { id: { in: unreferenced } } })
       : { count: 0 };
+
+    // The captured keys are also written to the deletion queue here, before the commit. Between
+    // this commit and the post-commit R2 loop only memory holds them: a process death there would
+    // leave the report rows deleted and their objects present in R2, and no later sweep could find
+    // them from a row that no longer exists — permanent, unfindable PII. A queue row survives that
+    // crash and is drained by the next sweep.
+    //
+    // `ObjectDeletion.fileKey` has no unique constraint, and `drainObjectDeletions` deletes every
+    // row for a key once its object is gone — so the duplicate the post-commit loop may add (when a
+    // delete fails) is harmless. Do not "fix" this into an upsert.
+    if (keys.length > 0) {
+      await tx.objectDeletion.createMany({
+        data: keys.map((fileKey) => ({ fileKey })),
+      });
+    }
+
     return [updated.count, removed.count] as const;
   });
 

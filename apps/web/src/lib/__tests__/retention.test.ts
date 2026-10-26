@@ -74,6 +74,12 @@ const { prismaMock, txMock, r2Mock, processDodoEvent, events } = vi.hoisted(() =
         return { count: 0 };
       }),
     },
+    objectDeletion: {
+      createMany: vi.fn(async (args: { data: Array<{ fileKey: string }> }) => {
+        events.push("tx:objectDeletion.createMany");
+        return { count: args.data.length };
+      }),
+    },
   };
   const prismaMock = {
     profile: {
@@ -408,9 +414,15 @@ describe("inactive-profile sweep — reports go with the profile (AU-27, D10)", 
     txMock.profile.deleteMany.mockResolvedValue({ count: 1 });
     txMock.report.deleteMany.mockResolvedValue({ count: 1 });
     txMock.delivery.deleteMany.mockResolvedValue({ count: 1 });
+    // The crash-window test replaces this implementation. `vi.clearAllMocks()` clears calls, not
+    // implementations, so the replacement is undone here rather than left to leak forward.
+    r2Mock.deleteObjectOrQueue.mockReset();
+    r2Mock.deleteObjectOrQueue.mockImplementation(async (key: string) => {
+      events.push(`r2:${key}`);
+    });
   });
 
-  it("deletes the reports and deliveries, then queues their objects after the commit", async () => {
+  it("writes the object keys to the queue inside the transaction, then deletes them from R2 after the commit", async () => {
     prismaMock.report.findMany.mockResolvedValue([
       report("p1", OLD, {
         id: "r1",
@@ -427,10 +439,24 @@ describe("inactive-profile sweep — reports go with the profile (AU-27, D10)", 
     expect(txMock.delivery.deleteMany).toHaveBeenCalledWith({ where: { reportId: { in: ["r1"] } } });
     expect(txMock.report.deleteMany).toHaveBeenCalledWith({ where: { id: { in: ["r1"] } } });
 
-    // Objects are queued only after the database has committed: the profile row is what the queue
-    // row depends on for its retry, and a storage error must not roll back the retirement.
+    // The durability net is the queue row, written before the commit: a crash between the commit
+    // and the storage loop must leave the keys somewhere a later sweep can find them.
+    expect(txMock.objectDeletion.createMany).toHaveBeenCalledTimes(1);
+    expect(txMock.objectDeletion.createMany).toHaveBeenCalledWith({
+      data: [
+        { fileKey: "reports/u1/o1/r1.pdf" },
+        { fileKey: "reports/u1/o1/r1.md" },
+        { fileKey: "reports/u1/o1/r1.mp3" },
+      ],
+    });
     const commitAt = events.indexOf("commit");
     expect(commitAt).toBeGreaterThan(-1);
+    const queueAt = events.indexOf("tx:objectDeletion.createMany");
+    expect(queueAt, "the queue row was written after the commit").toBeGreaterThan(-1);
+    expect(queueAt).toBeLessThan(commitAt);
+
+    // The R2 attempt itself stays after the commit: the profile row is what the queue row depends
+    // on for its retry, and a storage error must not roll back the retirement.
     for (const key of ["reports/u1/o1/r1.pdf", "reports/u1/o1/r1.md", "reports/u1/o1/r1.mp3"]) {
       const at = events.indexOf(`r2:${key}`);
       expect(at, `${key} was never queued`).toBeGreaterThan(-1);
@@ -438,6 +464,66 @@ describe("inactive-profile sweep — reports go with the profile (AU-27, D10)", 
     }
     // A null key is skipped; the shared key list has no blanks in it.
     expect(r2Mock.deleteObjectOrQueue).toHaveBeenCalledTimes(3);
+  });
+
+  it("queues the keys regardless of the post-commit loop's outcome", async () => {
+    // The defect: between the commit and the loop only process memory held the keys. The real
+    // failure is process death there, which a unit test cannot simulate; the proxy is the loop
+    // failing for every key. The queue row written inside the transaction is what makes that window
+    // harmless — it is written before the loop runs at all, so its durability cannot depend on it.
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      prismaMock.report.findMany.mockResolvedValue([
+        report("p1", OLD, {
+          id: "r1",
+          pdfKey: "reports/u1/o1/r1.pdf",
+          mdKey: "reports/u1/o1/r1.md",
+          audioKey: "reports/u1/o1/r1.mp3",
+          htmlKey: null,
+        }),
+      ]);
+      r2Mock.deleteObjectOrQueue.mockRejectedValue(new Error("storage down"));
+
+      await expect(retireInactiveProfiles(NOW)).resolves.toBe(1);
+
+      expect(txMock.objectDeletion.createMany).toHaveBeenCalledWith({
+        data: [
+          { fileKey: "reports/u1/o1/r1.pdf" },
+          { fileKey: "reports/u1/o1/r1.md" },
+          { fileKey: "reports/u1/o1/r1.mp3" },
+        ],
+      });
+    } finally {
+      // A failing assertion must not leave the spy installed for the rest of the file: the config
+      // sets no `restoreMocks` and this project has no setup file.
+      consoleError.mockRestore();
+    }
+  });
+
+  it("does not write an empty queue row for a profile with no reports", async () => {
+    prismaMock.report.findMany.mockResolvedValue([]);
+
+    await expect(retireInactiveProfiles(NOW)).resolves.toBe(1);
+
+    expect(txMock.objectDeletion.createMany).not.toHaveBeenCalled();
+    expect(r2Mock.deleteObjectOrQueue).not.toHaveBeenCalled();
+  });
+
+  it("queues only the retiring profile's keys when the batch also spares one", async () => {
+    // `retiringReports` is filtered by `retiringIds`; a spared profile's report is not deleted, so
+    // its objects must not enter the queue (a queued key is a deletion order for the next sweep).
+    prismaMock.profile.findMany.mockResolvedValue([profileRow("p1"), profileRow("p2", { lastSeenAt: RECENT })]);
+    prismaMock.report.findMany.mockResolvedValue([
+      report("p1", OLD, { id: "r1", pdfKey: "reports/u1/o1/r1.pdf" }),
+      report("p2", OLD, { id: "r2", pdfKey: "reports/u2/o2/r2.pdf" }),
+    ]);
+
+    await retireInactiveProfiles(NOW);
+
+    expect(txMock.report.deleteMany).toHaveBeenCalledWith({ where: { id: { in: ["r1"] } } });
+    expect(txMock.objectDeletion.createMany).toHaveBeenCalledWith({
+      data: [{ fileKey: "reports/u1/o1/r1.pdf" }],
+    });
   });
 
   it("retires the reports of a profile kept for an order, and scrubs the profile", async () => {
