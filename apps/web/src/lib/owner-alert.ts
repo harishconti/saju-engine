@@ -93,7 +93,7 @@ async function sendOwnerAlert(input: OwnerAlertInput): Promise<boolean> {
 
   try {
     const result = await sendEmail({
-      to: recipients.join(", "),
+      to: recipients,
       subject: `A reading is waiting for review — ${input.tierName}`,
       text,
     });
@@ -163,7 +163,7 @@ export async function notifyOwnerEngineFailure(input: EngineFailureAlertInput): 
     ].join("\n");
 
     const result = await sendEmail({
-      to: recipients.join(", "),
+      to: recipients,
       subject: `Report generation failed — ${input.code}`,
       text,
     });

@@ -42,10 +42,23 @@ describe("notifyOwnerNewReview", () => {
     const sent = await notifyOwnerNewReview(INPUT);
     expect(sent).toBe(true);
     expect(sendEmail).toHaveBeenCalledTimes(1);
-    const call = sendEmail.mock.calls[0]![0] as { to: string; subject: string; text: string };
-    expect(call.to).toContain("owner@cosmicsaju.com");
+    const call = sendEmail.mock.calls[0]![0] as { to: string | string[]; subject: string; text: string };
+    // One address, handed over as a real array — never a joined string.
+    expect(call.to).toEqual(["owner@cosmicsaju.com"]);
     expect(call.subject).toContain("waiting for review");
     expect(call.text).toContain("/admin/reports/r1");
+  });
+
+  it("hands every configured owner a separate address — not one joined string", async () => {
+    process.env.ADMIN_EMAILS = " owner@cosmicsaju.com , second@cosmicsaju.com , ";
+
+    const sent = await notifyOwnerNewReview(INPUT);
+
+    expect(sent).toBe(true);
+    const call = sendEmail.mock.calls[0]![0] as { to: string | string[] };
+    // The transport must receive two distinct addresses. `join(", ")` here would produce
+    // ["owner@cosmicsaju.com, second@cosmicsaju.com"], which Resend rejects as malformed.
+    expect(call.to).toEqual(["owner@cosmicsaju.com", "second@cosmicsaju.com"]);
   });
 
   it("says nothing when a reading is already waiting — one ping per batch", async () => {
@@ -99,11 +112,22 @@ describe("notifyOwnerEngineFailure", () => {
 
     expect(sent).toBe(true);
     expect(sendEmail).toHaveBeenCalledTimes(1);
-    const call = sendEmail.mock.calls[0]![0] as { to: string; subject: string; text: string };
-    expect(call.to).toContain("owner@cosmicsaju.com");
+    const call = sendEmail.mock.calls[0]![0] as { to: string | string[]; subject: string; text: string };
+    // One address, handed over as a real array — never a joined string.
+    expect(call.to).toEqual(["owner@cosmicsaju.com"]);
     expect(call.subject).toContain("ENGINE_TIMEOUT");
     expect(call.text).toContain("order_1");
     expect(call.text).toContain("Attempts: 3");
+  });
+
+  it("hands every configured owner a separate address — not one joined string", async () => {
+    process.env.ADMIN_EMAILS = " owner@cosmicsaju.com , second@cosmicsaju.com , ";
+
+    const sent = await notifyOwnerEngineFailure(FAILURE);
+
+    expect(sent).toBe(true);
+    const call = sendEmail.mock.calls[0]![0] as { to: string | string[] };
+    expect(call.to).toEqual(["owner@cosmicsaju.com", "second@cosmicsaju.com"]);
   });
 
   it("names the fix when the upload allowlist is the reason", async () => {
