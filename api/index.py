@@ -215,6 +215,18 @@ def _authorize(authorization: Optional[str]) -> None:
 # ─────────────────────────── upload-target allowlist ───────────────────────────
 
 
+def _r2_endpoint_host() -> Optional[str]:
+    """The lowercased host of `R2_ENDPOINT`, or None when unset or unparseable."""
+    endpoint = (os.environ.get("R2_ENDPOINT") or "").strip()
+    if not endpoint:
+        return None
+    try:
+        host = urlsplit(endpoint).hostname
+    except ValueError:
+        return None
+    return host.lower() if host else None
+
+
 def _allowed_upload_hosts() -> List[str]:
     """Hostnames the engine may PUT to.
 
@@ -229,15 +241,26 @@ def _allowed_upload_hosts() -> List[str]:
         for h in (os.environ.get("SAJU_UPLOAD_HOSTS") or "").split(",")
         if h.strip()
     ]
-    endpoint = (os.environ.get("R2_ENDPOINT") or "").strip()
-    if endpoint:
-        try:
-            host = urlsplit(endpoint).hostname
-        except ValueError:
-            host = None
-        if host:
-            hosts.append(host.lower())
+    endpoint_host = _r2_endpoint_host()
+    if endpoint_host:
+        hosts.append(endpoint_host)
     return list(dict.fromkeys(hosts))
+
+
+def _is_allowed_host(host: str, hosts: List[str]) -> bool:
+    """An exact allowlist match, or a virtual-hosted bucket on the R2 endpoint.
+
+    The webapp's S3 client presigns virtual-hosted style (`{bucket}.{endpoint}`), so the
+    bucket arrives as one extra DNS label. Exactly one label: anything deeper is not a
+    bucket URL and stays refused.
+    """
+    if host in hosts:
+        return True
+    endpoint_host = _r2_endpoint_host()
+    if not endpoint_host:
+        return False
+    label, _, rest = host.partition(".")
+    return rest == endpoint_host and bool(label)
 
 
 _LOOPBACK_HOSTS = {"localhost", "127.0.0.1", "::1"}
@@ -248,7 +271,8 @@ def _validate_upload_url(url: str) -> Optional[str]:
 
     Deliberately strict: https (or http to loopback, for local development), no
     embedded credentials, no fragment, a hostname on the allowlist, and — when
-    `SAJU_UPLOAD_BUCKET` is set — a path scoped to that bucket. The error never
+    `SAJU_UPLOAD_BUCKET` is set — that bucket, as the first path segment or the first
+    host label. The error never
     echoes the URL, which may carry a presigned signature.
     """
     hosts = _allowed_upload_hosts()
@@ -268,11 +292,14 @@ def _validate_upload_url(url: str) -> Optional[str]:
 
     if parts.scheme == "http" and host not in _LOOPBACK_HOSTS:
         return "UPLOAD_URL_INSECURE"
-    if host not in hosts:
+    if not _is_allowed_host(host, hosts):
         return "UPLOAD_URL_NOT_ALLOWED"
 
+    # Path-style carries the bucket as the first path segment; virtual-hosted as the first label.
     bucket = (os.environ.get("SAJU_UPLOAD_BUCKET") or "").strip()
-    if bucket and not parts.path.startswith(f"/{bucket}/"):
+    if bucket and not (
+        parts.path.startswith(f"/{bucket}/") or host.startswith(f"{bucket.lower()}.")
+    ):
         return "UPLOAD_PATH_NOT_ALLOWED"
     return None
 

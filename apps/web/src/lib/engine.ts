@@ -134,6 +134,10 @@ export async function callEngine(payload: EnginePayload, timeoutMs = 120_000): P
     if (res.status >= 400 && res.status < 500) {
       throw new ApiError(res.status === 422 ? 422 : 400, body.code ?? "ENGINE_REJECTED", body.error ?? "The engine rejected this chart");
     }
+    // The visitor sees a generic message, but the engine's code is what tells a configuration gap
+    // (e.g. UPLOAD_HOSTS_UNCONFIGURED) apart from a render crash. Code and status only: the body
+    // never carries birth data.
+    console.error("engine generate failed", res.status, body.code ?? "unknown");
     throw ApiError.unavailable("The report engine failed", "ENGINE_FAILED");
   } catch (err) {
     if (err instanceof ApiError) throw err;

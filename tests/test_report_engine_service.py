@@ -427,10 +427,36 @@ def test_the_r2_endpoint_is_itself_an_allowlist(monkeypatch):
     )
 
 
+def test_the_r2_endpoint_allows_virtual_hosted_bucket_urls(monkeypatch):
+    # The webapp's S3 client presigns virtual-hosted style: the bucket is a subdomain of the
+    # endpoint, not a path segment. Setting R2_ENDPOINT alone must cover those URLs.
+    monkeypatch.delenv("SAJU_UPLOAD_HOSTS", raising=False)
+    monkeypatch.setenv("R2_ENDPOINT", "https://account.r2.cloudflarestorage.com")
+    assert _validate_upload_url("https://bucket.account.r2.cloudflarestorage.com/x.pdf") is None
+    assert _validate_upload_url("https://a.b.account.r2.cloudflarestorage.com/x.pdf") == (
+        "UPLOAD_URL_NOT_ALLOWED"
+    )
+    assert _validate_upload_url("https://bucket.other.r2.cloudflarestorage.com/x.pdf") == (
+        "UPLOAD_URL_NOT_ALLOWED"
+    )
+
+
 def test_generate_scopes_uploads_to_the_configured_bucket(monkeypatch):
     monkeypatch.setenv("SAJU_UPLOAD_BUCKET", "saju-engine-dev")
     assert _validate_upload_url("https://pdf.test/saju-engine-dev/reports/x.pdf") is None
     assert _validate_upload_url("https://pdf.test/other-bucket/x.pdf") == "UPLOAD_PATH_NOT_ALLOWED"
+
+
+def test_bucket_scope_accepts_a_virtual_hosted_bucket(monkeypatch):
+    monkeypatch.delenv("SAJU_UPLOAD_HOSTS", raising=False)
+    monkeypatch.setenv("R2_ENDPOINT", "https://account.r2.cloudflarestorage.com")
+    monkeypatch.setenv("SAJU_UPLOAD_BUCKET", "saju-engine-dev")
+    assert _validate_upload_url(
+        "https://saju-engine-dev.account.r2.cloudflarestorage.com/reports/x.pdf"
+    ) is None
+    assert _validate_upload_url(
+        "https://other-bucket.account.r2.cloudflarestorage.com/reports/x.pdf"
+    ) == "UPLOAD_PATH_NOT_ALLOWED"
 
 
 # ─────────────────────── request-size and field bounds ───────────────────────
