@@ -434,7 +434,8 @@ Rules the code enforces (`src/lib/pricing.ts`, tested in `src/lib/__tests__/pric
   configured. A missing env var loses the promotion; it never produces a claim we cannot charge.
 - **The store product is chosen from the price recorded on the order**, not from the clock, so a
   customer who started checkout before the window closed keeps the price they were shown.
-- **The offer ends by itself.** After `PROMO.endsOn` the site shows the list price and checkout
+- **The offer ends by itself.** At and after `PROMO.endsAt` (the end of 31 December 2026 US
+  Pacific, `2027-01-01T08:00:00Z`) the site shows the list price and checkout
   uses the standard products. No code change is needed on the day it ends — but the 20% discount
   still set on the four *standard* Dodo products must be removed in the Dodo dashboard (see
   [09 — Operations](09-operations.md)).

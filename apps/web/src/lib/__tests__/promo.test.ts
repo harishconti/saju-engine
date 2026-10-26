@@ -1,5 +1,5 @@
 /**
- * The launch promotion (20% off every paid report, ends 2026-12-31).
+ * The launch promotion (20% off every paid report, through 31 December 2026 US Pacific).
  *
  * The rule these tests protect is the one the whole feature rests on: **the number the site
  * advertises is the number the store charges.** A Dodo product carries exactly one price, so
@@ -40,10 +40,23 @@ describe("promo arithmetic", () => {
 });
 
 describe("the offer window", () => {
-  it("is open before the end date and closed after it", () => {
+  it("pins the end to the end of 31 December in US Pacific", () => {
+    // The copy says "through 31 December", so the offer must close when that day ends where
+    // the offer is written from — an instant, not a UTC date (AU-20).
+    expect(PROMO.endsAt).toBe("2027-01-01T08:00:00Z");
+  });
+
+  it("is open for the whole of 31 December US Pacific", () => {
     expect(promoActive(new Date("2026-10-22T12:00:00Z"))).toBe(true);
     expect(promoActive(new Date("2026-12-31T23:59:59Z"))).toBe(true);
-    expect(promoActive(new Date("2027-01-01T00:00:00Z"))).toBe(false);
+    // 2027-01-01T07:59:59Z is 2026-12-31T23:59:59 PST — the last second of the day.
+    expect(promoActive(new Date("2027-01-01T07:59:59Z"))).toBe(true);
+  });
+
+  it("is closed at the boundary instant and after it", () => {
+    expect(promoActive(new Date("2027-01-01T08:00:00Z"))).toBe(false);
+    expect(promoActive(new Date("2027-01-01T08:00:01Z"))).toBe(false);
+    expect(promoActive(new Date("2027-06-01T00:00:00Z"))).toBe(false);
   });
 
   it("states the end date in copy", () => {

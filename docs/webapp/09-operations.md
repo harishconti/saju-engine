@@ -189,8 +189,9 @@ regenerate, and the old version is superseded.
 
 ### The 20% year-end offer ends (2027-01-01)
 
-**What happens on its own.** `PROMO.endsOn` in `apps/web/src/lib/promo.ts` is an inclusive UTC date.
-After it, the landing page stops advertising the discount, the FAQ entry disappears, the tier cards
+**What happens on its own.** `PROMO.endsAt` in `apps/web/src/lib/promo.ts` is the exclusive end
+instant — the end of 31 December 2026 in US Pacific, `2027-01-01T08:00:00Z`. At and after it, the
+landing page stops advertising the discount, the FAQ entry disappears, the tier cards
 show the list price again, and checkout charges the standard product at the list price. **No deploy
 is needed on the day it ends.**
 
@@ -206,7 +207,7 @@ would say $19 while the store kept charging $15.20. Dodo's API refuses product u
 3. Confirm with `GET /products` that each now shows `"discount": 0`.
 4. The four `… — 20% year-end offer` products can be left in place (unused) or deleted.
 
-**To extend the offer instead:** change `PROMO.endsOn` (and `PROMO.percentOff`, if the discount
+**To extend the offer instead:** change `PROMO.endsAt` (and `PROMO.percentOff`, if the discount
 changes) in `apps/web/src/lib/promo.ts`, and set the same discount on the four promotional
 products in the dashboard. The offer price is derived from the list price, so the site follows
 automatically — but the *store* does not, so the two must be changed together. A mismatch is a
