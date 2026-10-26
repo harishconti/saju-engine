@@ -862,6 +862,26 @@ Source: `research-engine/output/2026-10-01/saju-engine-audit-2026-10-01.md`. Fix
 
 ---
 
+## Audit 2026-10-26 (production)
+
+Source: `docs/analysis/2026-10-26-production-audit.md` (full evidence, fixes, decisions D1–D6, execution
+handoff). Triggered by the 2026-10-18 → 10-23 engine outage (`UPLOAD_HOSTS_UNCONFIGURED`). Already fixed
+and verified live: `6027746`, `310fd3d`, `5701ce9`. No other fixes started.
+
+| ID | Sev | Status | Summary |
+|----|-----|--------|---------|
+| AU-01 | P0 | OPEN | owner: rotate Neon DB password |
+| AU-02 | P0 | OPEN | outage-failed paid orders unrecoverable from UI |
+| AU-03 | P0 | OPEN | no alert when engine refuses all renders |
+| AU-04 | P0 | OPEN | erasure fails for users with orders (after R2 delete) |
+| AU-05 | P0 | OPEN | failed webhook never retried |
+| AU-06 | P0 | OPEN | open redirect via backslash in safeNext |
+| AU-07 | P0 | OPEN | admin granted without email verification |
+| AU-08 | P0 | OPEN | report delete leaves HTML in R2 |
+| AU-09 – AU-21 | P1 | OPEN | Engine error mapping, visitor copy, timeouts, retry burn, daily dispatcher, SLA sweep, login error paths, date/time fields, name revert, DB-outage-as-signed-out, account panels, promo end time, reports `?status=` 500 |
+| AU-22 – AU-37 | P2 | OPEN | Consent gaps, erasure leaves Neon identity, pre-delivery data exposure, soft-delete retention, error codes, sample PDF waste, rate limits, health over-share, `.env` quoting, presign content-type |
+| AU-40 – AU-47 | IMP | OPEN | Sign out other devices, password reset, data export, sign-out error, sample funnel polish, Vercel Analytics, purge leads/webhook payloads, launch items |
+
 ## Change Log
 
 | Date | Change |
@@ -886,3 +906,4 @@ Source: `research-engine/output/2026-10-01/saju-engine-audit-2026-10-01.md`. Fix
 | 2026-10-22 (later) | The 20% offer, live on the landing page and in the store (a real, windowed discount, not a claim). Extended to 2026-12-31 on 2026-10-23 and renamed the year-end offer; the four promotional Dodo products were recreated so the end date on the customer's checkout page is right. |
 | 2026-10-22 (later still) | Birth-data fixes: P5-birth-age (a reading now needs someone at least one year old), P5-birth-inputs (the date and time fields can be typed into, and echo what they understood), P5-birth-time-guess (the time field no longer arrives pre-filled with a guessed noon). Webapp suite 210 passed / 4 skipped. |
 | 2026-10-22 | Harish × Prethivika compat pair added (48/100 Mixed). Found and FIXED P5-doubled-branch (a 자형 branch pair rendered "Hae Hae"); found and left OPEN P5-compat-heading-gloss (the zodiac heading's redundant `(Branch Compatibility)` gloss, present in every compat pair). Regression test added to `tests/test_pdf.py`. |
+| 2026-10-26 | Production audit recorded (AU-01 – AU-47) in `docs/analysis/2026-10-26-production-audit.md`; outage fixes `6027746`, `310fd3d`, `5701ce9` deployed. Execution deferred to the next session. |
