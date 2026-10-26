@@ -199,6 +199,13 @@ calls); tests.
    replayer.
 4. Keep the erasure semantics documented in the function's docstring (orders retained, consent
    retained, birth data destroyed).
+5. **Interaction with Task 3's recovery surface** (added after the Task 3 review): once erasure
+   scrubs profiles instead of being FK-blocked, an erased user's PAID order can survive with no
+   report. `listRecoverableOrders` must exclude orders whose user has `deletedAt` set, and the
+   admin retry route must refuse an erased account (404/409 with a code) so the console can never
+   requeue generation for a deleted person. Add tests for both. This is a correctness requirement,
+   not polish: the order rows are deliberately retained for accounting, so they must stay out of a
+   list whose action is "regenerate this customer's reading".
 
 **Tests**
 
