@@ -45,6 +45,19 @@ function isUniqueViolation(err: unknown): boolean {
   return err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002";
 }
 
+/**
+ * A database failure, as opposed to an identity one.
+ *
+ * AU-18: a Prisma outage inside `mirrorUser` used to be swallowed by the same `catch` that handles
+ * "no session", so a signed-in visitor was shown the signed-out page during the October outage.
+ * These errors must reach the route layer, which maps them to a retryable 503.
+ */
+function isDatabaseError(err: unknown): boolean {
+  return (
+    err instanceof Prisma.PrismaClientKnownRequestError || err instanceof Prisma.PrismaClientInitializationError
+  );
+}
+
 /** Upsert the local mirror. The first-sign-in race (P2002) is handled, not fatal. */
 async function mirrorUser(u: NeonUser): Promise<AppUser | null> {
   const n = normalise(u);
@@ -75,7 +88,10 @@ async function mirrorUser(u: NeonUser): Promise<AppUser | null> {
   if (existing) {
     if (existing.deletedAt) return null; // anonymised account: treat as signed out
     const needsRole = grantAdmin && existing.role !== "ADMIN";
-    if (!needsRole && existing.name === n.name && existing.email === n.email) {
+    // AU-17: the local row is authoritative for the display name once it exists. Copying the
+    // Neon session's name here reverted every change made on the account page, because that page
+    // saves to this row and the next request overwrote it. The session name seeds a new row only.
+    if (!needsRole && existing.email === n.email) {
       return {
         id: existing.id,
         name: existing.name,
@@ -86,7 +102,7 @@ async function mirrorUser(u: NeonUser): Promise<AppUser | null> {
     }
     const updated = await prisma.user.update({
       where: { id: n.id },
-      data: { name: n.name, email: n.email, ...(needsRole ? { role: "ADMIN" as const } : {}) },
+      data: { email: n.email, ...(needsRole ? { role: "ADMIN" as const } : {}) },
       select: { id: true, name: true, email: true, role: true },
     });
     return { ...updated, role: updated.role as Role, emailVerified: n.emailVerified };
@@ -123,8 +139,10 @@ export const getCurrentUser = cache(async (): Promise<AppUser | null> => {
     };
     if (res?.error) return null;
     return mirrorUser(res?.data?.user ?? {});
-  } catch {
+  } catch (err) {
     // Unconfigured auth, network failure, or a corrupt cookie: treat as signed out rather than 500.
+    // AU-18: a database error is not "signed out" — re-throw it so the caller answers 503.
+    if (isDatabaseError(err)) throw err;
     return null;
   }
 });

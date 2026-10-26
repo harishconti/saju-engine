@@ -22,17 +22,61 @@ type Busy = null | "google" | "email" | "magic";
  * sentence. Only an `AuthError` message is shown; anything else (a network failure) gets the fallback.
  *
  * Except whether an account exists: "User already exists" on sign-up tells anyone which emails are
- * registered here, so those answers get one neutral sentence. Matched on the message as well as the
- * code, because the server's `USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL` is not in Neon's code map.
+ * registered here, so those answers get one neutral sentence (AU-15). Matched on the message as well
+ * as the code, because the server's `USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL` is not in Neon's code map.
+ * The same helper serves a *returned* `{ error }` as well as a thrown one: AU-15 found three paths
+ * that printed `result.error.message` raw, which reintroduced the enumeration leak.
  */
-const ACCOUNT_EXISTENCE_CODES = new Set(["user_already_exists", "email_exists", "user_not_found", "identity_not_found"]);
+const ACCOUNT_EXISTENCE_CODES = new Set([
+  "user_already_exists",
+  "email_exists",
+  "user_not_found",
+  "identity_not_found",
+  "USER_ALREADY_EXISTS",
+  "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL",
+  "USER_NOT_FOUND",
+]);
+
+const NEUTRAL_AUTH_ERROR =
+  "We couldn't do that with this email. If you already have an account, sign in or use a magic link.";
+
+type AuthErrorLike = { code?: unknown; message?: unknown };
+
+/**
+ * Both shapes the auth client produces: a thrown `AuthError` (marked with `__isAuthError`) and a
+ * plain returned `{ code, message }`. A foreign `Error` (a network failure) is deliberately not
+ * accepted — its message ("Failed to fetch") is not something a visitor can act on.
+ */
+function asAuthErrorLike(err: unknown): AuthErrorLike | null {
+  if (!err || typeof err !== "object") return null;
+  if (isAuthError(err)) return err as AuthErrorLike;
+  // A thrown foreign `Error` is a transport failure ("Failed to fetch"), which the fallback covers.
+  if (err instanceof Error) return null;
+  if (typeof (err as AuthErrorLike).code === "string" || typeof (err as AuthErrorLike).message === "string") {
+    return err as AuthErrorLike;
+  }
+  return null;
+}
 
 function authErrorMessage(err: unknown, fallback: string): string {
-  if (!isAuthError(err) || !err.message) return fallback;
-  if (ACCOUNT_EXISTENCE_CODES.has(String(err.code)) || /already exists|not found/i.test(err.message)) {
-    return "We couldn't do that with this email. If you already have an account, sign in or use a magic link.";
+  const e = asAuthErrorLike(err);
+  if (!e) return fallback;
+  const code = typeof e.code === "string" ? e.code : "";
+  const message = typeof e.message === "string" ? e.message.trim() : "";
+  if (ACCOUNT_EXISTENCE_CODES.has(code) || /already exists|not found|already registered/i.test(message)) {
+    return NEUTRAL_AUTH_ERROR;
   }
-  return err.message;
+  return message || fallback;
+}
+
+/**
+ * The `?error=` code a magic-link or Google failure redirect appends to `/login` (AU-15).
+ * The code is shown in parentheses so support can match it to the provider's log; it is capped so a
+ * hand-crafted URL cannot fill the page.
+ */
+function callbackErrorMessage(code: string): string {
+  const reason = code.trim().slice(0, 60);
+  return reason ? `Sign-in didn't complete (${reason}). Please try again.` : "Sign-in didn't complete. Please try again.";
 }
 
 export default function LoginPage() {
@@ -42,7 +86,10 @@ export default function LoginPage() {
 
   const [mode, setMode] = useState<Mode>("signin");
   const [busy, setBusy] = useState<Busy>(null);
-  const [error, setError] = useState<string | null>(null);
+  // A failed magic-link / Google callback lands back here with `?error=`; show it instead of
+  // dropping the visitor on a clean form with no explanation (AU-15).
+  const callbackError = params.get("error");
+  const [error, setError] = useState<string | null>(callbackError ? callbackErrorMessage(callbackError) : null);
   const [notice, setNotice] = useState<string | null>(null);
 
   const [name, setName] = useState("");
@@ -53,6 +100,16 @@ export default function LoginPage() {
   const completeUrl = (target: string) => {
     const origin = typeof window === "undefined" ? "" : window.location.origin;
     return `${origin}/auth/complete?next=${encodeURIComponent(target)}`;
+  };
+
+  /**
+   * Where the provider sends a failed sign-in. It must be `/login` itself, not `/auth/complete`:
+   * the provider appends `?error=<code>`, and `/auth/complete` (protected by the middleware) would
+   * bounce a session-less arrival to `/login` without the query string.
+   */
+  const errorCallbackUrl = () => {
+    const origin = typeof window === "undefined" ? "" : window.location.origin;
+    return `${origin}/login`;
   };
 
   /**
@@ -92,9 +149,9 @@ export default function LoginPage() {
         provider: "google",
         callbackURL: completeUrl(next),
         newUserCallbackURL: completeUrl(next),
-        errorCallbackURL: completeUrl("/login"),
+        errorCallbackURL: errorCallbackUrl(),
       });
-      if (result?.error) setError(result.error.message ?? "Google sign-in failed.");
+      if (result?.error) setError(authErrorMessage(result?.error, "Google sign-in failed."));
     } catch (err) {
       setError(authErrorMessage(err, "Google sign-in failed. Try email instead."));
     } finally {
@@ -124,7 +181,7 @@ export default function LoginPage() {
           : await authClient.signIn.email({ email, password });
 
       if (result?.error) {
-        setError(result.error.message ?? "That didn't work. Check your details and try again.");
+        setError(authErrorMessage(result?.error, "That didn't work. Check your details and try again."));
         return;
       }
 
@@ -151,10 +208,10 @@ export default function LoginPage() {
         email,
         callbackURL: completeUrl(next),
         newUserCallbackURL: completeUrl(next),
-        errorCallbackURL: completeUrl("/login"),
+        errorCallbackURL: errorCallbackUrl(),
       });
       if (result?.error) {
-        setError(result.error.message ?? "Couldn't send the link.");
+        setError(authErrorMessage(result?.error, "Couldn't send the link."));
         return;
       }
       setNotice("Check your inbox — the link expires in a few minutes.");

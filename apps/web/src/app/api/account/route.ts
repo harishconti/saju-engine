@@ -31,6 +31,9 @@ export const PATCH = handle(async (req) => {
   const { name } = await parseJson(req, patchSchema);
 
   const before = await prisma.user.findUnique({ where: { id: user.id }, select: { name: true } });
+  // This row is the display name everywhere the app shows one. `mirrorUser` deliberately no longer
+  // copies the Neon session's name over it (AU-17), so the value saved here survives the next
+  // request instead of being reverted.
   const updated = await prisma.user.update({
     where: { id: user.id },
     data: { name },

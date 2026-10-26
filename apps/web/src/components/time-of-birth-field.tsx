@@ -34,6 +34,7 @@ export function TimeOfBirthField({
   const [text, setText] = useState(value ? formatBirthTimeForInput(value) : "");
   const [parseError, setParseError] = useState<string | null>(null);
   const nativeRef = useRef<HTMLInputElement>(null);
+  const textRef = useRef<HTMLInputElement>(null);
 
   const lastValue = useRef(value);
   useEffect(() => {
@@ -44,12 +45,22 @@ export function TimeOfBirthField({
     }
   }, [value]);
 
+  // AU-16: mirror the parse error into the native constraint API so a `<form>` cannot be submitted
+  // while the field shows text it could not understand.
+  useEffect(() => {
+    textRef.current?.setCustomValidity(parseError ?? "");
+  }, [parseError]);
+
   const message = error ?? parseError ?? undefined;
 
   function commit(next: string) {
     const parsed = parseTypedBirthTime(next);
     if (!parsed.ok) {
+      // AU-16: an empty or unparseable field must clear the parent's value rather than submit the
+      // previous time. The typed text stays visible for correction.
       setParseError(next.trim() === "" ? null : parsed.error);
+      lastValue.current = "";
+      onChange("");
       return;
     }
     setParseError(null);
@@ -77,6 +88,7 @@ export function TimeOfBirthField({
         <div className="flex gap-2">
           <Input
             id={fieldId}
+            ref={textRef}
             type="text"
             inputMode="numeric"
             autoComplete="off"
@@ -86,8 +98,15 @@ export function TimeOfBirthField({
             aria-describedby={`${fieldId}-echo`}
             disabled={disabled}
             onChange={(e) => {
-              setText(e.target.value);
+              const next = e.target.value;
+              setText(next);
               setParseError(null);
+              // AU-16: clearing must reach the parent at once, not only on blur — otherwise a
+              // click that does not move focus could submit the time the visitor just deleted.
+              if (next.trim() === "" && value !== "") {
+                lastValue.current = "";
+                onChange("");
+              }
             }}
             onBlur={(e) => commit(e.target.value)}
             onKeyDown={(e) => {
@@ -121,7 +140,11 @@ export function TimeOfBirthField({
         value={value}
         disabled={disabled}
         onChange={(e) => {
-          if (!e.target.value) return;
+          if (!e.target.value) {
+            lastValue.current = "";
+            onChange("");
+            return;
+          }
           lastValue.current = e.target.value;
           onChange(e.target.value);
         }}

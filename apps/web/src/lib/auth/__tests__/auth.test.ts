@@ -7,6 +7,7 @@
  * the database faked, so the emailVerified plumbing from the Neon payload to `AppUser` is covered.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { Prisma } from "@prisma/client";
 
 const { getSession, prismaMock, warn } = vi.hoisted(() => ({
   getSession: vi.fn(),
@@ -98,6 +99,98 @@ describe("mirrorUser admin grant", () => {
 
     expect(user).toMatchObject({ role: "ADMIN", emailVerified: false });
     expect(prismaMock.user.update).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * AU-17 (2026-10-26 audit): the account page's new display name was silently reverted.
+ *
+ * `mirrorUser` copied the Neon session's name onto the local row on *every* request, so a name
+ * saved through `PATCH /api/account` survived only until the next page load. The local row is now
+ * authoritative once it exists: the session's name is used to create the row, never to overwrite
+ * it afterwards.
+ */
+describe("mirrorUser display name", () => {
+  it("does not overwrite a name that was changed on the account page", async () => {
+    prismaMock.user.findUnique.mockResolvedValue(storedRow({ name: "Chosen Name", email: USER_EMAIL }));
+    signedIn({ email: USER_EMAIL, name: "Provider Name" });
+
+    const user = await getCurrentUser();
+
+    expect(user?.name).toBe("Chosen Name");
+    expect(prismaMock.user.update).not.toHaveBeenCalled();
+  });
+
+  it("still syncs the email when the provider has a different one", async () => {
+    prismaMock.user.findUnique.mockResolvedValue(storedRow({ name: "Chosen Name", email: "old@example.com" }));
+    prismaMock.user.update.mockResolvedValue({
+      id: "u1",
+      name: "Chosen Name",
+      email: USER_EMAIL,
+      role: "USER",
+    });
+    signedIn({ email: USER_EMAIL });
+
+    const user = await getCurrentUser();
+
+    expect(user).toMatchObject({ name: "Chosen Name", email: USER_EMAIL });
+    expect(prismaMock.user.update).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.not.objectContaining({ name: expect.anything() }) }),
+    );
+  });
+
+  it("creates the row with the session's name on first sign-in", async () => {
+    signedIn({ email: USER_EMAIL, name: "First Visit" });
+
+    const user = await getCurrentUser();
+
+    expect(user?.name).toBe("First Visit");
+    expect(prismaMock.user.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ name: "First Visit" }) }),
+    );
+  });
+});
+
+/**
+ * AU-18 (2026-10-26 audit): a database outage made every signed-in visitor look signed out.
+ *
+ * The bare `catch {}` around the session read swallowed a Prisma connectivity failure and returned
+ * `null`, which the UI rendered as "signed out" instead of "try again". A database error is now
+ * re-thrown so the route layer answers 503; an unconfigured auth provider, a network failure or a
+ * corrupt cookie is still a safe `null`.
+ */
+describe("getCurrentUser database failures", () => {
+  it("propagates a Prisma connectivity error so the caller can answer 503", async () => {
+    signedIn();
+    prismaMock.user.findUnique.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError("Can't reach database server", {
+        code: "P1001",
+        clientVersion: "5.22.0",
+      }),
+    );
+
+    await expect(getCurrentUser()).rejects.toMatchObject({ code: "P1001" });
+  });
+
+  it("propagates a Prisma initialization error", async () => {
+    signedIn();
+    prismaMock.user.findUnique.mockRejectedValue(
+      new Prisma.PrismaClientInitializationError("Engine is not yet connected", "5.22.0", "P1001"),
+    );
+
+    await expect(getCurrentUser()).rejects.toBeInstanceOf(Prisma.PrismaClientInitializationError);
+  });
+
+  it("returns null when no session exists", async () => {
+    getSession.mockResolvedValue({ data: null });
+
+    await expect(getCurrentUser()).resolves.toBeNull();
+  });
+
+  it("still returns null when the auth provider is not configured", async () => {
+    getSession.mockRejectedValue(new Error("Neon Auth is not configured: set NEON_AUTH_BASE_URL"));
+
+    await expect(getCurrentUser()).resolves.toBeNull();
   });
 });
 
