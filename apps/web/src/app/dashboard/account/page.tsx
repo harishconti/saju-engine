@@ -85,8 +85,9 @@ export default async function AccountPage() {
         <CardContent className="py-5">
           <h2 className="pb-1 font-display text-xl">Consent</h2>
           <p className="pb-4 text-sm text-muted-foreground">
-            Consent is recorded with the policy version and the date. Withdrawing the first item stops
-            processing and begins the deletion path. The history is append-only — we never rewrite it.
+            Consent is recorded with the policy version and the date. Turning off the first item
+            stops new orders and new readings; readings you have already paid for are still produced
+            and delivered. The history is append-only — we never rewrite it.
           </p>
           <ConsentForm initial={purposes} policyVersion={POLICY_VERSION} />
           {policyChanged ? (

@@ -77,9 +77,33 @@ describe("/auth/complete — pending deletion (AU-24, D7)", () => {
 
     await expect(
       AuthCompletePage({ searchParams: Promise.resolve({ next: "/dashboard" }) }),
-    ).rejects.toThrow("NEXT_REDIRECT:/login?error=ACCOUNT_PENDING_DELETION");
+    ).rejects.toThrow("NEXT_REDIRECT:/login?error=ACCOUNT_PENDING_DELETION&next=%2Fdashboard");
 
     expect(recordInitialServiceConsent).not.toHaveBeenCalled();
+  });
+
+  it("carries the intended destination through the pending-deletion redirect", async () => {
+    // Without `next`, cancelling the scheduled deletion on the login page resumed at /dashboard
+    // instead of the page the visitor was actually heading for.
+    getCurrentUser.mockResolvedValue(null);
+    getSessionUserId.mockResolvedValue("u1");
+    hasPendingDeletion.mockResolvedValue(true);
+
+    await expect(
+      AuthCompletePage({ searchParams: Promise.resolve({ next: "/dashboard/reports" }) }),
+    ).rejects.toThrow(
+      "NEXT_REDIRECT:/login?error=ACCOUNT_PENDING_DELETION&next=%2Fdashboard%2Freports",
+    );
+  });
+
+  it("falls back to /dashboard for an unsafe next on the pending-deletion redirect", async () => {
+    getCurrentUser.mockResolvedValue(null);
+    getSessionUserId.mockResolvedValue("u1");
+    hasPendingDeletion.mockResolvedValue(true);
+
+    await expect(
+      AuthCompletePage({ searchParams: Promise.resolve({ next: "//evil.example" }) }),
+    ).rejects.toThrow("NEXT_REDIRECT:/login?error=ACCOUNT_PENDING_DELETION&next=%2Fdashboard");
   });
 
   it("does not assume deletion from a plain signed-out arrival", async () => {

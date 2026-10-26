@@ -72,8 +72,8 @@ export const POST = handle(async (req) => {
     after: { policyVersion: record.policyVersion, purposes: record.purposes },
   });
 
-  // Withdrawing the `service` purpose stops processing — the deletion path is the honest
-  // consequence, and the account page surfaces it.
+  // Withdrawing the `service` purpose stops new orders and new readings (owner decision D11);
+  // readings already paid for still render and are delivered. The account page says both halves.
   const withdrawnService = input.purposes.service === false;
 
   // AU-24 (owner decision D7): a withdrawal has to reach sessions that are already open, or the

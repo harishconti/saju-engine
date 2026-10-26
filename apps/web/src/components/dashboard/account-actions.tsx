@@ -110,7 +110,8 @@ export function ConsentForm({
         <span>
           <span className="font-medium text-foreground">Produce and deliver my readings</span>
           <span className="ml-1 text-muted-foreground">
-            Required. Turning this off stops processing and starts the deletion path.
+            Required. Turning this off stops new orders and new readings. Readings you have
+            already paid for are still produced and delivered.
           </span>
         </span>
       </label>

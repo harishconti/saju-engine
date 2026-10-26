@@ -74,6 +74,15 @@ export const CONSENT_REQUIRED_MESSAGE =
   "It takes a moment and you can withdraw it there at any time.";
 
 /**
+ * The refusal used wherever processing would begin — creating an order, paying for one, or nudging a
+ * queued job. The reason there is processing, not storage, so it is a second message rather than a
+ * reworded first one; the storage wording above is what the sample and profile routes promise.
+ */
+export const CONSENT_REQUIRED_PROCESSING_MESSAGE =
+  "Please accept the privacy policy in your account settings before we start a reading. " +
+  "It takes a moment and you can withdraw it there at any time.";
+
+/**
  * The enforcement half of AU-24 (owner decision D7).
  *
  * Withdrawal used to record a fact and nothing else: the account page said processing had stopped,
@@ -87,5 +96,5 @@ export const CONSENT_REQUIRED_MESSAGE =
  */
 export async function requireActiveServiceConsent(userId: string): Promise<void> {
   if (await hasActiveServiceConsent(userId)) return;
-  throw new ApiError(409, "CONSENT_REQUIRED", CONSENT_REQUIRED_MESSAGE);
+  throw new ApiError(409, "CONSENT_REQUIRED", CONSENT_REQUIRED_PROCESSING_MESSAGE);
 }

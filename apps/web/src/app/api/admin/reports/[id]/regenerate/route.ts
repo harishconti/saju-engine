@@ -19,6 +19,9 @@ type Ctx = { params: Promise<{ id: string }> };
  * Runs inline so the reviewer sees the result immediately rather than waiting for the next dispatcher
  * tick. A no-op regenerate (identical chart hash and no override change) is refused with 409 rather
  * than burning a render.
+ *
+ * Owner decision D11 (2026-10-26): deliberately NOT consent-gated. The order is already paid, so a
+ * later withdrawal does not stop its reading from being produced and delivered.
  */
 export const POST = handle(async (_req, ctx: Ctx) => {
   const admin = await requireAdmin();

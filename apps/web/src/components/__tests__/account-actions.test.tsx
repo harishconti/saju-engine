@@ -82,6 +82,21 @@ describe("ConsentForm", () => {
   });
 });
 
+describe("ConsentForm — withdrawal copy (D11, D12)", () => {
+  it("describes withdrawal as stopping new work, not as starting a deletion path", () => {
+    render(<ConsentForm initial={{ service: true, service_messages: false }} policyVersion="v1" />);
+    const text = document.body.textContent ?? "";
+
+    expect(text).not.toMatch(/starts the deletion path/i);
+    expect(text).not.toMatch(/begins the deletion path/i);
+    expect(text).toMatch(/stops new orders and new readings/i);
+    expect(text).toMatch(/already paid for/i);
+    // The required-vs-optional distinction the checkbox carried is preserved.
+    expect(text).toMatch(/Required\./);
+    expect(text).toMatch(/Off by default/);
+  });
+});
+
 describe("DeletionPanel", () => {
   it("shows an error instead of silently doing nothing when the request fails", async () => {
     fetchMock.mockRejectedValue(new Error("offline"));

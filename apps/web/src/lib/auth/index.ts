@@ -253,9 +253,9 @@ export async function hasPendingDeletion(userId: string): Promise<boolean> {
 /**
  * End the caller's other sessions (AU-24, D7).
  *
- * Withdrawing consent stops processing, but the consent record does not end sessions already open
- * on other devices. The current session is kept so the visitor stays on the page that just recorded
- * the withdrawal.
+ * Withdrawing consent stops new processing, but the consent record does not end sessions already
+ * open on other devices. The current session is kept so the visitor stays on the page that just
+ * recorded the withdrawal.
  *
  * Best-effort by contract: this crosses into the identity provider, and a failure there must not
  * turn a recorded withdrawal into a 500 — the record is the promise that matters. The failure is

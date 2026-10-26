@@ -2,6 +2,7 @@ import { ApiError, handle, json } from "@/lib/api";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { rateLimit, WINDOW } from "@/lib/ratelimit";
+import { requireActiveServiceConsent } from "@/lib/consent";
 import { createCheckout, isDodoConfigured } from "@/lib/dodo";
 
 export const dynamic = "force-dynamic";
@@ -23,6 +24,13 @@ export const POST = handle(async (_req, ctx: Ctx) => {
   if (order.status === "REFUNDED" || order.status === "CANCELLED") {
     throw ApiError.conflict("This order is closed", "ORDER_CLOSED");
   }
+
+  // Owner decision D11 (2026-10-26): withdrawal gates payment for an order that has not been paid
+  // yet — taking payment now would start processing after the withdrawal. A PAID order was answered
+  // above and never reaches this guard; in-flight paid work is deliberately not gated
+  // (`lib/fulfilment.ts::runDispatchTick`). Placed after `rateLimit` and before any write.
+  await requireActiveServiceConsent(user.id);
+
   if (order.priceCents === 0) {
     return json({ checkoutUrl: null, message: "This order is free and needs no payment." });
   }

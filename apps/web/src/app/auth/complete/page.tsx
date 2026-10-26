@@ -45,6 +45,10 @@ export default async function AuthCompletePage({
     console.error("auth/complete: could not record initial consent", err);
   }
 
-  if (pendingDeletion) redirect("/login?error=ACCOUNT_PENDING_DELETION");
+  if (pendingDeletion) {
+    // Carry the intended destination so cancelling the deletion resumes the sign-in where it was
+    // heading, not on /dashboard. `safeNext` applies the same open-redirect validation as below.
+    redirect(`/login?error=ACCOUNT_PENDING_DELETION&next=${encodeURIComponent(safeNext(next))}`);
+  }
   redirect(safeNext(next));
 }

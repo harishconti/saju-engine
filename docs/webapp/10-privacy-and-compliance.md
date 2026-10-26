@@ -55,7 +55,8 @@ Rules:
   and nothing on the server ever looked, so the first real signup produced an account with **no**
   `ConsentRecord`, and the account page displayed the required consent as already granted on top of that.
 - Withdrawing consent is a first-class action in `/dashboard/account`, not an email request.
-  Withdrawing `service` stops processing and starts the deletion path.
+  Withdrawing `service` stops new orders and new readings; readings already paid for are still
+  produced and delivered (owner decision D11).
 - `ConsentRecord` is **append-only**. Never update a consent row; insert a new one and set
   `withdrawnAt` on the old. The history is the evidence.
 - The exact policy version is stored, so "they consented to *that* text" is provable.

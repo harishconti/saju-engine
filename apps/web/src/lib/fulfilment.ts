@@ -579,8 +579,15 @@ export async function enqueueAudio(reportId: string): Promise<boolean> {
   return true;
 }
 
-/** Drain up to `max` jobs. Deliberately bounded — a tick that overruns the function timeout is the
- *  situation leases exist to survive, but doing three and returning is better. */
+/**
+ * Drain up to `max` jobs. Deliberately bounded — a tick that overruns the function timeout is the
+ * situation leases exist to survive, but doing three and returning is better.
+ *
+ * Owner decision D11 (2026-10-26): in-flight paid work is deliberately NOT consent-gated. A
+ * withdrawal stops new orders and new jobs; work already paid for still renders and is delivered.
+ * Do not add a consent check here — the gate belongs at the entry points (order creation, checkout,
+ * job kick).
+ */
 export async function runDispatchTick(max = 3): Promise<DispatchResult> {
   const worker = `cron-${randomUUID().slice(0, 8)}`;
   let processed = 0;
