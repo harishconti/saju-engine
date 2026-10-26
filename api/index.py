@@ -722,7 +722,14 @@ def _upload(artifact: Path, upload_url: str, *, content_type: str = "application
 
 @app.post("/health")
 def health(authorization: Optional[str] = Header(None)) -> JSONResponse:
-    """Readiness. Cheap: no engine work, just configuration and imports."""
+    """Readiness. Cheap: no engine work, no network — just configuration and imports.
+
+    AU-03 (2026-10-26 audit): this used to check only the token and the font import. In
+    October `SAJU_UPLOAD_HOSTS` was unset for five days, every `/generate` was refused with
+    `UPLOAD_HOSTS_UNCONFIGURED`, and the probe stayed green the whole time. The allowlist
+    count is now part of the answer, and zero is a 503 — the same state the render path
+    fails closed on.
+    """
     _authorize(authorization)
     fonts = None
     try:
@@ -731,14 +738,25 @@ def health(authorization: Optional[str] = Header(None)) -> JSONResponse:
         fonts = str(_DEJAVU_DIR) if _DEJAVU_DIR else None
     except Exception:  # noqa: BLE001
         pass
-    return JSONResponse(
-        {
-            "status": "ok",
-            "engineVersion": ENGINE_VERSION,
-            "contractVersion": CONTRACT_VERSION,
-            "fontsDir": fonts,
-        }
-    )
+    hosts = _allowed_upload_hosts()
+    body = {
+        "status": "ok" if hosts else "misconfigured",
+        "ok": bool(hosts),
+        "engineVersion": ENGINE_VERSION,
+        "contractVersion": CONTRACT_VERSION,
+        "fontsDir": fonts,
+        "uploadAllowlist": len(hosts),
+    }
+    if not hosts:
+        body.update(
+            {
+                "code": "UPLOAD_HOSTS_UNCONFIGURED",
+                "error": "The engine has no upload-host allowlist configured (set R2_ENDPOINT "
+                "or SAJU_UPLOAD_HOSTS), so it would refuse every render.",
+            }
+        )
+        return JSONResponse(body, status_code=503)
+    return JSONResponse(body)
 
 
 @app.post("/chart")

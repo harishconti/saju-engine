@@ -25,7 +25,7 @@ import {
 import { isTtsConfigured, synthesise, tierPromisesAudio } from "./tts";
 import { autoDelivers, tierNameFor } from "./tiers";
 import { deliverAudioReadyEmail, deliverReport } from "./email";
-import { notifyOwnerNewReview } from "./owner-alert";
+import { notifyOwnerEngineFailure, notifyOwnerNewReview } from "./owner-alert";
 
 /**
  * Fulfilment: render a PDF for an order, verify it, file it as a Report awaiting review.
@@ -90,6 +90,27 @@ export async function processJobById(jobId: string, worker = "inline"): Promise<
   return processClaimedJob(job);
 }
 
+/**
+ * Fail a generate job — and tell the owner.
+ *
+ * AU-03 (2026-10-26 audit): during the October outage every render was refused for five days and
+ * no one was told; a `FAILED` row is not an alert. Every *permanent* GENERATE failure — the four
+ * early exits in `processClaimedJob` and its retry-exhausted catch — sends one email carrying the
+ * engine's code.
+ *
+ * The alert can never change the job's outcome. It is guarded here as well as inside
+ * `notifyOwnerEngineFailure`: a defect in the mailer must not turn a recorded `FAILED` job into a
+ * thrown exception the dispatcher would lease-reclaim and retry forever.
+ */
+async function failGenerateJob(job: Job, code: string): Promise<void> {
+  await failJob(job.id, code);
+  try {
+    await notifyOwnerEngineFailure({ orderId: job.orderId, code, attempts: job.attempts });
+  } catch (err) {
+    console.error("engine failure alert threw:", err instanceof Error ? err.message : "unknown");
+  }
+}
+
 /** The actual work. Assumes the job is already leased to us. */
 export async function processClaimedJob(job: Job): Promise<JobOutcome> {
   if (job.kind === "VOICE") return processVoiceJob(job);
@@ -100,18 +121,18 @@ export async function processClaimedJob(job: Job): Promise<JobOutcome> {
     })) as OrderWithProfiles | null;
 
     if (!order) {
-      await failJob(job.id, "ORDER_MISSING");
+      await failGenerateJob(job, "ORDER_MISSING");
       return { ok: false, note: "order missing" };
     }
 
     if (order.kind === "COMPAT" && !order.profileB) {
-      await failJob(job.id, "COMPAT_NEEDS_TWO_PROFILES");
+      await failGenerateJob(job, "COMPAT_NEEDS_TWO_PROFILES");
       return { ok: false, note: "compat without second profile" };
     }
 
     if (!isR2Configured()) {
       // Configuration error, not transient: retrying will not help.
-      await failJob(job.id, "STORAGE_NOT_CONFIGURED");
+      await failGenerateJob(job, "STORAGE_NOT_CONFIGURED");
       return { ok: false, note: "R2 not configured" };
     }
 
@@ -161,7 +182,7 @@ export async function processClaimedJob(job: Job): Promise<JobOutcome> {
     // Trust but verify: a 200 without an object would leave a report row pointing at nothing.
     const object = await headObject(pdfKey);
     if (!object) {
-      await failJob(job.id, "UPLOAD_NOT_VERIFIED");
+      await failGenerateJob(job, "UPLOAD_NOT_VERIFIED");
       return { ok: false, note: "upload not verified" };
     }
     // The reading is best-effort in the same way: a web document that did not land leaves the PDF
@@ -268,7 +289,7 @@ export async function processClaimedJob(job: Job): Promise<JobOutcome> {
       typeof err === "object" && err !== null && "status" in err && (err as { status?: number }).status === 422;
 
     if (permanent || job.attempts >= job.maxAttempts) {
-      await failJob(job.id, code);
+      await failGenerateJob(job, code);
       return { ok: false, note: `failed: ${code}` };
     }
     await requeueJob(job.id, code);

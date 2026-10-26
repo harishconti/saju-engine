@@ -88,6 +88,7 @@ Every step writes a summary line to the log with counts only — never ids of us
   "db": true,
   "storage": true,
   "engine": true,
+  "engineDetail": "uploadAllowlist=1", // why, or which allowlist count — see below
   "payments": true,
   "paymentsMode": "live_mode",
   "botProtection": "enforce",        // off | log | enforce — see 14
@@ -101,7 +102,7 @@ Every step writes a summary line to the log with counts only — never ids of us
 |---|---|---|
 | Database | `SELECT 1` via Prisma | Neon down, credentials rotated, or the branch is suspended on the Free plan |
 | Storage | A minimal R2 operation (list one key, or `HeadObject` on a sentinel) | Bad credentials, deleted token, wrong bucket |
-| Engine | `POST {ENGINE_URL}/health` with the bearer token, short timeout | The deploy failed, or the token drifted between projects |
+| Engine | `POST {ENGINE_URL}/health` with the bearer token, short timeout | The deploy failed, the token drifted between projects, or the engine's upload allowlist is empty (`engineDetail` says `HTTP 503 UPLOAD_HOSTS_UNCONFIGURED uploadAllowlist=0`) — with no allowlist the engine refuses every render |
 | Payments | `isDodoConfigured()` **and** every paid tier has a product id | Checkout would throw `PRODUCT_NOT_CONFIGURED` — i.e. you cannot take money |
 
 The response also reports `paymentsMode` (`test_mode` / `live_mode`). That single word is worth watching:

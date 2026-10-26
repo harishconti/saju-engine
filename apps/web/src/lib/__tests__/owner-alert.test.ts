@@ -18,7 +18,7 @@ const { prismaMock, sendEmail } = vi.hoisted(() => ({
 vi.mock("@/lib/prisma", () => ({ prisma: prismaMock }));
 vi.mock("@/lib/email", () => ({ sendEmail }));
 
-import { notifyOwnerNewReview } from "@/lib/owner-alert";
+import { notifyOwnerEngineFailure, notifyOwnerNewReview } from "@/lib/owner-alert";
 
 const INPUT = {
   reportId: "r1",
@@ -83,6 +83,48 @@ describe("notifyOwnerNewReview", () => {
     delete process.env.EMAIL_FROM;
     const sent = await notifyOwnerNewReview(INPUT);
     expect(sent).toBe(false);
+    expect(sendEmail).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * AU-03 (2026-10-26 audit): a lost render used to be a row nobody looked at. This is the direct
+ * channel, and unlike the review nudge it is not batched: every lost order is worth a message.
+ */
+describe("notifyOwnerEngineFailure", () => {
+  const FAILURE = { orderId: "order_1", code: "ENGINE_TIMEOUT", attempts: 3 };
+
+  it("emails the owner with the code, the order and the attempt count", async () => {
+    const sent = await notifyOwnerEngineFailure(FAILURE);
+
+    expect(sent).toBe(true);
+    expect(sendEmail).toHaveBeenCalledTimes(1);
+    const call = sendEmail.mock.calls[0]![0] as { to: string; subject: string; text: string };
+    expect(call.to).toContain("owner@cosmicsaju.com");
+    expect(call.subject).toContain("ENGINE_TIMEOUT");
+    expect(call.text).toContain("order_1");
+    expect(call.text).toContain("Attempts: 3");
+  });
+
+  it("names the fix when the upload allowlist is the reason", async () => {
+    await notifyOwnerEngineFailure({ ...FAILURE, code: "UPLOAD_HOSTS_UNCONFIGURED" });
+
+    const call = sendEmail.mock.calls[0]![0] as { text: string };
+    expect(call.text).toContain("R2_ENDPOINT");
+    expect(call.text).toContain("uploadAllowlist");
+  });
+
+  it("never throws when the mail fails", async () => {
+    sendEmail.mockRejectedValue(new Error("resend is down"));
+
+    await expect(notifyOwnerEngineFailure(FAILURE)).resolves.toBe(false);
+  });
+
+  it("does nothing when no owner address is configured", async () => {
+    delete process.env.ADMIN_EMAILS;
+    delete process.env.EMAIL_FROM;
+
+    expect(await notifyOwnerEngineFailure(FAILURE)).toBe(false);
     expect(sendEmail).not.toHaveBeenCalled();
   });
 });

@@ -150,6 +150,14 @@ export async function callEngine(payload: EnginePayload, timeoutMs = 120_000): P
   }
 }
 
+/**
+ * Is the engine able to render?
+ *
+ * AU-03 (2026-10-26 audit): this used to trust the status code alone. The engine answered 200
+ * for five days while refusing every render, because its upload allowlist was empty. The probe
+ * now returns 503 in that state; this client also reports *why* and the allowlist count, which
+ * `/api/health` exposes as `engineDetail`.
+ */
 export async function engineHealth(): Promise<{ ok: boolean; detail?: string }> {
   if (!isEngineConfigured()) return { ok: false, detail: "not configured" };
   try {
@@ -159,7 +167,15 @@ export async function engineHealth(): Promise<{ ok: boolean; detail?: string }> 
       cache: "no-store",
       signal: AbortSignal.timeout(8_000),
     });
-    return { ok: res.ok, detail: res.ok ? undefined : `HTTP ${res.status}` };
+    // The body is small and never carries secrets — only the code and a count.
+    const body = (await res.json().catch(() => ({}))) as { code?: string; uploadAllowlist?: number };
+    const allowlist =
+      typeof body.uploadAllowlist === "number" ? `uploadAllowlist=${body.uploadAllowlist}` : "";
+    if (!res.ok) {
+      const code = body.code ? ` ${body.code}` : "";
+      return { ok: false, detail: [`HTTP ${res.status}${code}`, allowlist].filter(Boolean).join(" ") };
+    }
+    return { ok: true, detail: allowlist || "uploadAllowlist=unknown" };
   } catch {
     return { ok: false, detail: "unreachable" };
   }

@@ -158,4 +158,18 @@ describe("the 10-hour rule", () => {
     expect(result.stuckJobs).toBe(2);
     expect(prismaMock.job.create).not.toHaveBeenCalled();
   });
+
+  it("counts jobs that failed recently, so the sweep can go non-2xx", async () => {
+    // AU-03 (2026-10-26 audit): FAILED jobs were never counted, so a render that refused every
+    // order left the sweep's answer 200 and the workflow green.
+    prismaMock.job.count.mockResolvedValueOnce(0).mockResolvedValueOnce(3);
+
+    const result = await runSlaSweep(NOW);
+
+    expect(result.stuckJobs).toBe(0);
+    expect(result.recentFailures).toBe(3);
+    expect(prismaMock.job.count).toHaveBeenLastCalledWith({
+      where: { state: "FAILED", finishedAt: { gte: expect.any(Date) } },
+    });
+  });
 });

@@ -6,6 +6,28 @@ throwaway prefix, then fetches the objects back and checks them: both artefacts 
 document is the two-chart one, it is self-contained and private, and it passes the client-ready gate.
 Everything it creates is deleted at the end.
 
+The URLs are **virtual-hosted** (`https://{bucket}.{endpoint-host}/{key}`), exactly like
+`apps/web/src/lib/r2.ts`, which builds its S3 client without `forcePathStyle`. That is the only
+shape the engine is ever sent in production, so it is the only shape worth smoking.
+
+Engine project environment this exercises (set on the deployed Vercel engine, not here):
+
+  SAJU_UPLOAD_HOSTS    optional, comma-separated extra upload hosts. `R2_ENDPOINT` alone is
+                       enough, because the engine also accepts `{bucket}.{R2_ENDPOINT host}`.
+                       **Empty is fatal**: the engine refuses every render with
+                       `UPLOAD_HOSTS_UNCONFIGURED` (see `/health`, which reports
+                       `uploadAllowlist`). This is the state the tool exists to catch.
+  R2_ENDPOINT          the S3 endpoint; its host anchors the allowlist.
+  SAJU_UPLOAD_BUCKET   optional; when set, pins uploads to that bucket (host label or path).
+
+Credentials for this script (from the process environment, or `apps/web/.env` as a fallback —
+the file is parsed, never `source`d):
+
+  R2_ENDPOINT, R2_BUCKET, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_REGION (optional,
+  default `auto`), ENGINE_URL, ENGINE_SERVICE_TOKEN
+
+A missing value is fatal and named: a smoke that cannot run must fail, not pass.
+
 Usage: python3 smoke_compat_reading.py [basic|deep]
 """
 from __future__ import annotations
@@ -13,43 +35,102 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+import os
 import sys
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Mapping
 
 ROOT = Path(__file__).resolve().parent.parent
+ENV_FILE = ROOT / "apps/web/.env"
 
-ENV: dict[str, str] = {}
-for line in (ROOT / "apps/web/.env").read_text().splitlines():
-    line = line.strip()
-    if line and not line.startswith("#") and "=" in line:
-        k, v = line.split("=", 1)
-        ENV[k.strip()] = v.strip().strip('"').strip("'")
 
-ENDPOINT = ENV["R2_ENDPOINT"].rstrip("/")
-BUCKET = ENV["R2_BUCKET"]
-REGION = ENV.get("R2_REGION") or "auto"
-ACCESS = ENV["R2_ACCESS_KEY_ID"]
-SECRET = ENV["R2_SECRET_ACCESS_KEY"]
+@dataclass(frozen=True)
+class R2Config:
+    """What the signer needs. The names are the webapp's own (`R2_*`)."""
+
+    endpoint: str
+    bucket: str
+    access_key_id: str
+    secret_access_key: str
+    region: str = "auto"
+
+    @property
+    def host(self) -> str:
+        """The virtual-hosted host the webapp's S3 client uses: `{bucket}.{endpoint host}`."""
+        return f"{self.bucket}.{urllib.parse.urlsplit(self.endpoint).netloc}"
+
+
+def read_env_file(path: Path) -> dict[str, str]:
+    """Parse a dotenv file. A missing file is an empty mapping — CI supplies the environment."""
+    values: dict[str, str] = {}
+    if not path.exists():
+        return values
+    for line in path.read_text().splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            k, v = line.split("=", 1)
+            values[k.strip()] = v.strip().strip('"').strip("'")
+    return values
+
+
+def load_config(
+    environ: Mapping[str, str] | None = None, env_file: Path | None = None
+) -> tuple[R2Config, str, str]:
+    """Return `(r2 config, engine url, engine token)`.
+
+    The process environment wins, so GitHub Actions can pass the same names as secrets;
+    `apps/web/.env` is the local fallback. Never `source` the file — parsing it keeps the
+    values out of the shell's environment (and out of any child process it spawns).
+    """
+    file_values = read_env_file(env_file if env_file is not None else ENV_FILE)
+    live = os.environ if environ is None else environ
+
+    def get(name: str) -> str:
+        value = (live.get(name) or file_values.get(name) or "").strip()
+        if not value:
+            raise SystemExit(
+                f"  missing {name} — set it in the environment or {ENV_FILE} "
+                "(never `source` the file)"
+            )
+        return value
+
+    cfg = R2Config(
+        endpoint=get("R2_ENDPOINT").rstrip("/"),
+        bucket=get("R2_BUCKET"),
+        access_key_id=get("R2_ACCESS_KEY_ID"),
+        secret_access_key=get("R2_SECRET_ACCESS_KEY"),
+        region=(live.get("R2_REGION") or file_values.get("R2_REGION") or "auto").strip(),
+    )
+    return cfg, get("ENGINE_URL").rstrip("/"), get("ENGINE_SERVICE_TOKEN")
 
 
 def _sign(key: bytes, msg: str) -> bytes:
     return hmac.new(key, msg.encode(), hashlib.sha256).digest()
 
 
-def presign(method: str, key: str, expires: int = 900) -> str:
-    """A presigned URL for one object. Signs `host` only, so the engine may send Content-Type."""
+def presign(method: str, key: str, cfg: R2Config, expires: int = 900) -> str:
+    """A presigned URL for one object, virtual-hosted — exactly like the webapp.
+
+    `src/lib/r2.ts` presigns `https://{bucket}.{endpoint-host}/{key}` (the S3 client is built
+    without `forcePathStyle`). The engine's allowlist accepts that shape — one extra DNS label
+    on the `R2_ENDPOINT` host — so this is the URL to smoke. Signing path-style would test a
+    target production never uses, and would have passed while a real render failed
+    (AU-03, 2026-10-26 audit). Signs `host` only, so the engine may send Content-Type.
+    """
     now = datetime.now(timezone.utc)
     stamp, day = now.strftime("%Y%m%dT%H%M%SZ"), now.strftime("%Y%m%d")
-    host = urllib.parse.urlparse(ENDPOINT).netloc
-    scope = f"{day}/{REGION}/s3/aws4_request"
+    host = cfg.host
+    scope = f"{day}/{cfg.region}/s3/aws4_request"
+    quoted_key = urllib.parse.quote(key, safe="/")
     query = {
         "X-Amz-Algorithm": "AWS4-HMAC-SHA256",
-        "X-Amz-Credential": f"{ACCESS}/{scope}",
+        "X-Amz-Credential": f"{cfg.access_key_id}/{scope}",
         "X-Amz-Date": stamp,
         "X-Amz-Expires": str(expires),
         "X-Amz-SignedHeaders": "host",
@@ -60,7 +141,7 @@ def presign(method: str, key: str, expires: int = 900) -> str:
     )
     canonical_request = "\n".join([
         method,
-        f"/{BUCKET}/{urllib.parse.quote(key, safe='/')}",
+        f"/{quoted_key}",
         canonical_query,
         f"host:{host}\n",
         "host",
@@ -70,11 +151,12 @@ def presign(method: str, key: str, expires: int = 900) -> str:
         "AWS4-HMAC-SHA256", stamp, scope,
         hashlib.sha256(canonical_request.encode()).hexdigest(),
     ])
-    k = _sign(f"AWS4{SECRET}".encode(), day)
-    for part in (REGION, "s3", "aws4_request"):
+    k = _sign(f"AWS4{cfg.secret_access_key}".encode(), day)
+    for part in (cfg.region, "s3", "aws4_request"):
         k = _sign(k, part)
     signature = hmac.new(k, to_sign.encode(), hashlib.sha256).hexdigest()
-    return f"{ENDPOINT}/{BUCKET}/{key}?{canonical_query}&X-Amz-Signature={signature}"
+    scheme = urllib.parse.urlsplit(cfg.endpoint).scheme or "https"
+    return f"{scheme}://{host}/{quoted_key}?{canonical_query}&X-Amz-Signature={signature}"
 
 
 def post(url: str, payload: dict, token: str) -> tuple[int, dict]:
@@ -128,15 +210,17 @@ def main() -> int:
         print("  tier must be basic or deep")
         return 2
 
+    cfg, engine, token = load_config()
+
     stamp = time.strftime("%Y%m%d-%H%M%S")
     prefix = f"smoke/compat-{tier}-{stamp}"
     keys = {kind: f"{prefix}.{kind}" for kind in ("pdf", "md", "html")}
-    urls = {kind: presign("PUT", key) for kind, key in keys.items()}
-    gets = {kind: presign("GET", key) for kind, key in keys.items()}
-    deletes = {kind: presign("DELETE", key) for kind, key in keys.items()}
+    urls = {kind: presign("PUT", key, cfg) for kind, key in keys.items()}
+    gets = {kind: presign("GET", key, cfg) for kind, key in keys.items()}
+    deletes = {kind: presign("DELETE", key, cfg) for kind, key in keys.items()}
 
-    engine = ENV["ENGINE_URL"].rstrip("/")
     print(f"  engine   : {engine}")
+    print(f"  storage  : {cfg.host}")
     print(f"  tier     : compat/{tier}")
     print(f"  prefix   : {prefix}")
     print("  asking the deployed engine for a compatibility reading with htmlUploadUrl …\n")
@@ -153,7 +237,7 @@ def main() -> int:
         "profileB": PROFILE_B,
         "favorableOverrideA": None,
         "favorableOverrideB": None,
-    }, ENV["ENGINE_SERVICE_TOKEN"])
+    }, token)
     elapsed = time.monotonic() - started
 
     checks: list[tuple[str, bool, str]] = []

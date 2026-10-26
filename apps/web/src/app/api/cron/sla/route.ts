@@ -20,6 +20,10 @@ export const maxDuration = 120;
  *
  * Idempotent: a reading that was released is no longer `DRAFT_READY`, so a second run does
  * nothing. Safe to call twice.
+ *
+ * Answers **503** (keeping the JSON body) when `stuckJobs > 0` or `recentFailures > 0`, so the
+ * scheduled workflow fails rather than reporting a green sweep over a broken dispatcher or an
+ * engine that is refusing renders.
  */
 function authorized(req: Request): boolean {
   const provided = providedSecret(req);
@@ -35,7 +39,11 @@ async function run(req: Request) {
     return json({ error: "Not authorised", code: "UNAUTHORIZED" }, 401);
   }
   const result = await runSlaSweep();
-  return json({ ok: true, ...result });
+  // AU-03 (2026-10-26 audit): the counts used to be reported with a 200, and the workflow's
+  // `curl -f` only sees the status code — so a dispatcher that had stopped, or an engine that
+  // refused every render, left the check green. The status is now the alert; the body stays.
+  const degraded = result.stuckJobs > 0 || result.recentFailures > 0;
+  return json({ ok: !degraded, ...result }, degraded ? 503 : 200);
 }
 
 export const GET = handle(run);

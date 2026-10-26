@@ -31,6 +31,16 @@ export const AUDIO_HOLD_FALLBACK_HOURS = 2;
 /** A stuck job is one the dispatcher has not picked up for this long. Visibility, not delivery. */
 export const STUCK_JOB_HOURS = 2;
 
+/**
+ * How far back a FAILED job counts as "recent".
+ *
+ * AU-03 (2026-10-26 audit): failed renders were never counted, so an engine that refused every
+ * order left this sweep answering 200. "Recent" is deliberately short: while an outage lasts,
+ * new orders keep failing and the count stays non-zero; once renders succeed again it clears
+ * within four sweeps, so the workflow goes green on its own without anyone resetting state.
+ */
+export const RECENT_FAILURE_HOURS = 1;
+
 /** How many readings one sweep may release. A tick that tries to drain a backlog is a tick that times out. */
 export const MAX_PER_SWEEP = 10;
 
@@ -47,6 +57,11 @@ export interface SlaSweepResult {
   heldReleased: number;
   /** Jobs the dispatcher has not picked up — reported, never touched. */
   stuckJobs: number;
+  /**
+   * Jobs that failed within `RECENT_FAILURE_HOURS` — reported, never touched. Non-zero means the
+   * engine (or the storage path) is refusing renders right now, and the endpoint answers 503.
+   */
+  recentFailures: number;
   ranAt: string;
 }
 
@@ -69,6 +84,7 @@ export async function runSlaSweep(now: Date = new Date()): Promise<SlaSweepResul
     skipped: 0,
     heldReleased: 0,
     stuckJobs: 0,
+    recentFailures: 0,
     ranAt: now.toISOString(),
   };
 
@@ -132,6 +148,12 @@ export async function runSlaSweep(now: Date = new Date()): Promise<SlaSweepResul
   //    dispatcher's problem and a failed render, not a review.
   result.stuckJobs = await prisma.job.count({
     where: { state: "QUEUED", createdAt: { lte: hoursAgo(now, STUCK_JOB_HOURS) } },
+  });
+
+  // 4. Jobs that gave up inside the last hour. AU-03 (2026-10-26 audit): an engine refusing
+  //    every render produced FAILED rows that no one counted, and this sweep answered 200.
+  result.recentFailures = await prisma.job.count({
+    where: { state: "FAILED", finishedAt: { gte: hoursAgo(now, RECENT_FAILURE_HOURS) } },
   });
 
   return result;

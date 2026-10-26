@@ -114,14 +114,19 @@ With that, the endpoints are the clean `https://saju-report-engine.vercel.app/{h
 and `ENGINE_URL` needs no suffix. **Verified in production:**
 
 ```
-POST /health  → 200 {"status":"ok","engineVersion":"0.2.0","contractVersion":1,
-                     "fontsDir":"/var/task/src/saju_html/fonts"}
+POST /health  → 200 {"status":"ok","ok":true,"engineVersion":"0.2.0","contractVersion":1,
+                     "fontsDir":"/var/task/src/saju_html/fonts","uploadAllowlist":1}
 POST /chart   → 200  甲戌 癸酉 辛丑 乙未 · 辛 Metal · Water via strong-dm-drain
 POST /generate (deep) → 200  139898 bytes · 1877 ms · sha256 matched after download · valid PDF
 ```
 
 `fontsDir` pointing at `/var/task/src/saju_html/fonts` is the proof that **E1 works inside the deployed
 function** — it found the *bundled* faces rather than the system directory, which does not exist there.
+
+`uploadAllowlist` is the number of upload hosts the engine will accept (`_allowed_upload_hosts()`).
+**Zero is a 503** with `{ ok: false, code: "UPLOAD_HOSTS_UNCONFIGURED", error }`: with no allowlist
+the engine refuses every render, which is exactly what happened for five days in October 2026
+(AU-03 audit). `/api/health` surfaces the count and the code as `engineDetail`.
 
 ### Why ReportLab, not the HTML/Chromium backend
 

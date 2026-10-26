@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import json
 import sys
+import urllib.request
 from pathlib import Path
 
 import pytest
@@ -106,11 +107,67 @@ def test_health_fails_closed_when_unconfigured(monkeypatch):
 def test_health_reports_contract_and_fonts():
     payload = body_of(health(authorization=AUTH))
     assert payload["status"] == "ok"
+    assert payload["ok"] is True
     assert payload["contractVersion"] == CONTRACT_VERSION
     # E1: the renderer must find fonts from the bundle, not only from the system path,
     # or the PDF silently degrades in a serverless function.
     assert payload["fontsDir"], "no DejaVu directory resolved"
     assert payload["engineVersion"] and payload["engineVersion"] != "0.0.0+unknown"
+    # AU-03 (2026-10-26 audit): the fixture configures four hosts (pdf/md/html test + loopback).
+    assert payload["uploadAllowlist"] == 4
+
+
+def test_health_reports_the_upload_allowlist_count(monkeypatch):
+    """One configured host is one allowlist entry."""
+    monkeypatch.setenv("SAJU_UPLOAD_HOSTS", "only.example")
+
+    response = health(authorization=AUTH)
+
+    assert response.status_code == 200
+    payload = body_of(response)
+    assert payload["ok"] is True
+    assert payload["uploadAllowlist"] == 1
+
+
+def test_health_fails_when_the_upload_allowlist_is_empty(monkeypatch):
+    """AU-03: an engine that refuses every render must not report healthy.
+
+    In October `SAJU_UPLOAD_HOSTS` was unset for five days. Every `/generate` returned
+    `UPLOAD_HOSTS_UNCONFIGURED`, but `/health` checked only the token and imports, so the
+    probe stayed green and nothing noticed.
+    """
+    monkeypatch.delenv("SAJU_UPLOAD_HOSTS", raising=False)
+    monkeypatch.delenv("R2_ENDPOINT", raising=False)
+
+    response = health(authorization=AUTH)
+
+    assert response.status_code == 503
+    payload = body_of(response)
+    assert payload["ok"] is False
+    assert payload["code"] == "UPLOAD_HOSTS_UNCONFIGURED"
+    assert payload["uploadAllowlist"] == 0
+    # The house error envelope: both keys, and no secret in the message.
+    assert isinstance(payload["error"], str) and payload["error"]
+
+
+def test_health_makes_no_network_calls(monkeypatch):
+    """Cheap by contract: an uptime monitor hits this every minute."""
+    import api.index as svc
+
+    class _NoNetwork:
+        def open(self, *args, **kwargs):  # noqa: ANN002, ANN003
+            raise AssertionError("health must not open a network connection")
+
+    def no_urlopen(*args, **kwargs):  # noqa: ANN002, ANN003
+        raise AssertionError("health must not call urllib.request.urlopen")
+
+    monkeypatch.setattr(svc, "_UPLOAD_OPENER", _NoNetwork())
+    monkeypatch.setattr(urllib.request, "urlopen", no_urlopen)
+
+    payload = body_of(health(authorization=AUTH))
+
+    assert payload["ok"] is True
+    assert payload["uploadAllowlist"] == 4
 
 
 # ─────────────────────────────── /chart facts ───────────────────────────────
@@ -457,6 +514,44 @@ def test_bucket_scope_accepts_a_virtual_hosted_bucket(monkeypatch):
     assert _validate_upload_url(
         "https://other-bucket.account.r2.cloudflarestorage.com/reports/x.pdf"
     ) == "UPLOAD_PATH_NOT_ALLOWED"
+
+
+def test_the_smoke_tool_presigns_exactly_like_the_webapp(monkeypatch):
+    """AU-03: the smoke must sign the URL shape the engine is really sent.
+
+    `src/lib/r2.ts` builds its S3 client without `forcePathStyle`, so the bucket is the first
+    host label. The smoke tool used to sign path-style, which the engine would have accepted —
+    it exercised a target production never uses, so it could pass while a real render failed.
+    """
+    if str(PROJECT_ROOT / "tools") not in sys.path:
+        sys.path.insert(0, str(PROJECT_ROOT / "tools"))
+    import smoke_compat_reading as smoke  # noqa: PLC0415
+
+    cfg = smoke.R2Config(
+        endpoint="https://account.r2.cloudflarestorage.com",
+        bucket="saju-engine-dev",
+        access_key_id="AKIAEXAMPLE",
+        secret_access_key="not-a-real-secret",
+    )
+    url = smoke.presign("PUT", "smoke/compat-basic-1.pdf", cfg)
+
+    # Virtual-hosted: the bucket is a subdomain, and there is no bucket path segment.
+    assert url.startswith("https://saju-engine-dev.account.r2.cloudflarestorage.com/smoke/")
+    assert "/saju-engine-dev/" not in url
+    assert "X-Amz-Signature=" in url
+
+    # The allowlist production actually configures: the virtual-hosted host, nothing else.
+    monkeypatch.delenv("R2_ENDPOINT", raising=False)
+    monkeypatch.delenv("SAJU_UPLOAD_BUCKET", raising=False)
+    monkeypatch.setenv("SAJU_UPLOAD_HOSTS", "saju-engine-dev.account.r2.cloudflarestorage.com")
+    assert _validate_upload_url(url) is None
+
+    # The old path-style shape — the same object, the same credentials — is refused.
+    path_style = (
+        "https://account.r2.cloudflarestorage.com/saju-engine-dev/smoke/compat-basic-1.pdf"
+        "?X-Amz-Signature=deadbeef"
+    )
+    assert _validate_upload_url(path_style) == "UPLOAD_URL_NOT_ALLOWED"
 
 
 # ─────────────────────── request-size and field bounds ───────────────────────
