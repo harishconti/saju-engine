@@ -7,7 +7,6 @@ import { Alert, Button, Card, CardContent, Field, Input, buttonClasses } from "@
 import { ElementalRule, SealMark } from "@/components/viz";
 import { isAuthError } from "@neondatabase/auth/next";
 import { authClient } from "@/lib/auth/client";
-import { POLICY_VERSION } from "@/lib/consent";
 import { safeNext } from "@/lib/safe-next";
 
 type Mode = "signin" | "signup";
@@ -112,35 +111,6 @@ export default function LoginPage() {
     return `${origin}/login`;
   };
 
-  /**
-   * Record consent after sign-up, once a session exists.
-   *
-   * Retried once, because the session cookie is not always readable by the server on the very first
-   * request after `signUp.email`. The old version fired a single request and swallowed every failure,
-   * which is how the first real signup produced a `User` row with **no** `ConsentRecord` at all. A
-   * failure here is no longer silent in effect: the server refuses to store birth data without an
-   * active `service` consent and points the visitor at their account settings, where it can be granted.
-   */
-  async function recordConsent() {
-    const body = JSON.stringify({
-      policyVersion: POLICY_VERSION,
-      purposes: { service: true, service_messages: false },
-    });
-    for (let attempt = 0; attempt < 2; attempt++) {
-      try {
-        const res = await fetch("/api/account/consent", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body,
-        });
-        if (res.ok) return;
-      } catch {
-        /* fall through to the retry */
-      }
-      await new Promise((resolve) => setTimeout(resolve, 700));
-    }
-  }
-
   async function onGoogle() {
     setError(null);
     setBusy("google");
@@ -185,8 +155,14 @@ export default function LoginPage() {
         return;
       }
 
-      if (mode === "signup") await recordConsent();
-      router.push(next);
+      if (mode === "signup") {
+        // AU-22: send a new account through `/auth/complete` — the same landing every OAuth and
+        // magic-link sign-in uses — so the server records the initial consent once, for all three
+        // paths. A browser POST here could be lost with the tab and was only ever wired for email.
+        router.push(`/auth/complete?next=${encodeURIComponent(next)}`);
+      } else {
+        router.push(next);
+      }
       router.refresh();
     } catch (err) {
       setError(authErrorMessage(err, "That didn't work. Check your details and try again."));

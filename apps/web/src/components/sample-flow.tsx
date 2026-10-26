@@ -61,7 +61,7 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
 
   /** A local form problem. No retry control: the visitor has to change a field first. */
   function formError(message: string) {
-    setError({ message, retryable: false, reference: null });
+    setError({ message, retryable: false, reference: null, action: null });
   }
 
   async function generate() {
@@ -234,7 +234,15 @@ export function SampleFlow({ signedIn, engineReady }: { signedIn: boolean; engin
       {error ? (
         <Alert tone="danger" title="We couldn't generate your snapshot">
           <p>{error.message}</p>
-          {error.retryable ? (
+          {error.action ? (
+            <div className="mt-3">
+              {/* AU-22: a refusal a retry cannot fix points at the control that resolves it —
+                  the consent gate on the account page. */}
+              <Link href={error.action.href} className={buttonClasses("outline", "sm")}>
+                {error.action.label}
+              </Link>
+            </div>
+          ) : error.retryable ? (
             <div className="mt-3">
               {/* Inside the alert, next to the explanation: the visitor should not have to hunt
                   for the button, and a Turnstile challenge has already been reset above. */}

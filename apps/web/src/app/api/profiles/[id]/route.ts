@@ -6,6 +6,7 @@ import { writeAudit } from "@/lib/audit";
 import { birthUtcOffset, resolveBirthLocation, validateBirth } from "@/lib/birth";
 import { profileUpdateSchema } from "@/lib/validation/schemas";
 import { computeAndStoreChart } from "@/lib/chart-compute";
+import { SCRUBBED_PROFILE } from "@/lib/profile-scrub";
 
 export const dynamic = "force-dynamic";
 
@@ -126,7 +127,10 @@ export const DELETE = handle(async (_req, ctx: Ctx) => {
   await prisma.$transaction(async (tx) => {
     await tx.profile.update({
       where: { id },
-      data: { deletedAt: new Date(), isDefault: false },
+      // AU-27: a soft delete that only sets `deletedAt` leaves the birth date, time and place — the
+      // sensitive category consent exists for — in the row indefinitely. Scrub the person with the
+      // same definition account erasure uses, in the same write that marks the row deleted.
+      data: { ...SCRUBBED_PROFILE, deletedAt: new Date(), isDefault: false },
     });
     await writeAudit(tx, { entity: "profile", entityId: id, action: "delete", actorId: user.id });
 

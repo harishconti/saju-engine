@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { rateLimit, WINDOW } from "@/lib/ratelimit";
 import { consentSchema } from "@/lib/validation/schemas";
+import { POLICY_VERSION } from "@/lib/consent";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,7 @@ export const POST = handle(async (req) => {
 
   const unchanged =
     previous &&
-    previous.policyVersion === input.policyVersion &&
+    previous.policyVersion === POLICY_VERSION &&
     JSON.stringify(previous.purposes) === JSON.stringify(input.purposes);
 
   if (unchanged) {
@@ -46,7 +47,9 @@ export const POST = handle(async (req) => {
     const created = await tx.consentRecord.create({
       data: {
         userId: user.id,
-        policyVersion: input.policyVersion,
+        // AU-23: the version the *user* is consenting to is the one live now, not whatever a
+        // possibly-stale tab put in the request body.
+        policyVersion: POLICY_VERSION,
         purposes: input.purposes as never,
         ip,
         ua,

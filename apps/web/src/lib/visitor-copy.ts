@@ -19,6 +19,12 @@
 
 export type FailureContext = "sample" | "paid";
 
+/** A link out of the failure, for refusals that a retry cannot fix (AU-22's consent gate). */
+export interface FailureAction {
+  href: string;
+  label: string;
+}
+
 export interface FailureNotice {
   /** The sentence(s) the visitor sees. Always complete, always actionable. */
   message: string;
@@ -26,6 +32,12 @@ export interface FailureNotice {
   retryable: boolean;
   /** Short id support can grep the server log for; null when the request never reached us. */
   reference: string | null;
+  /**
+   * A control that actually resolves the refusal, when one exists. `CONSENT_REQUIRED` (AU-22) is the
+   * case: no number of retries will store birth data the account has not consented to, so the alert
+   * must point at the account page instead of offering "Try again".
+   */
+  action: FailureAction | null;
 }
 
 /**
@@ -99,6 +111,24 @@ const BIRTH_DATA_FIX: Record<string, string> = {
   INVALID_BIRTH_DATA: "Please check the birth details and try again.",
 };
 
+/** Where a signed-in visitor can grant or withdraw the `service` consent. */
+const CONSENT_CONTROL: FailureAction = {
+  href: "/dashboard/account",
+  label: "Open your consent settings",
+};
+
+const ACTIONS: Record<string, FailureAction> = {
+  CONSENT_REQUIRED: CONSENT_CONTROL,
+};
+
+const REFUSALS: Record<string, (context: FailureContext) => string> = {
+  // AU-22: the server refused to store birth data because no current consent is on file. The fix
+  // is on the account page, so the copy names it and never invites another attempt as-is.
+  CONSENT_REQUIRED: (context) =>
+    `Please accept the privacy policy in your account settings first — we can't store birth details ` +
+    `without your consent, so ${SUBJECT[context]} wasn't generated. ${REASSURANCE[context]}`,
+};
+
 function capitalise(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
@@ -112,13 +142,24 @@ export function failureNotice(input: {
   const reference = shortReference(input.requestId);
 
   const fix = BIRTH_DATA_FIX[code];
-  const base = fix
-    ? `${fix} ${REASSURANCE[input.context]}`
-    : (ACTIONABLE[code]?.(input.context) ??
-      sentence(input.context, `We couldn't generate ${SUBJECT[input.context]} just now.`));
+  const refusal = REFUSALS[code];
+  const base = refusal
+    ? refusal(input.context)
+    : fix
+      ? `${fix} ${REASSURANCE[input.context]}`
+      : (ACTIONABLE[code]?.(input.context) ??
+        sentence(input.context, `We couldn't generate ${SUBJECT[input.context]} just now.`));
 
   const message = reference ? `${base} If you contact support, quote reference ${reference}.` : base;
 
-  // Only a free visitor can retry from the page; a paid order's regeneration is ours to run.
-  return { message, retryable: input.context === "sample" && !fix, reference };
+  const action = ACTIONS[code] ?? null;
+
+  // Only a free visitor can retry from the page; a paid order's regeneration is ours to run — and a
+  // refusal with a named fix (bad birth data, missing consent) never becomes a retry.
+  return {
+    message,
+    retryable: input.context === "sample" && !fix && !refusal,
+    reference,
+    action,
+  };
 }

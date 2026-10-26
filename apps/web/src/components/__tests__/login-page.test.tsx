@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 /**
  * AU-15 (2026-10-26 audit): the login form leaked whether an email was registered.
@@ -12,16 +12,18 @@ import { fireEvent, render, screen } from "@testing-library/react";
  * read at all. Every display now goes through one helper, and the callback error is shown.
  */
 
-const { state, signInEmail, signUpEmail, signInSocial, signInMagicLink } = vi.hoisted(() => ({
+const { state, signInEmail, signUpEmail, signInSocial, signInMagicLink, push, refresh } = vi.hoisted(() => ({
   state: { params: new URLSearchParams() },
   signInEmail: vi.fn(),
   signUpEmail: vi.fn(),
   signInSocial: vi.fn(),
   signInMagicLink: vi.fn(),
+  push: vi.fn(),
+  refresh: vi.fn(),
 }));
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+  useRouter: () => ({ push, refresh }),
   useSearchParams: () => state.params,
 }));
 
@@ -117,6 +119,38 @@ describe("login error display", () => {
     render(<LoginPage />);
 
     expect(screen.getByText(/state_mismatch/)).toBeTruthy();
+  });
+});
+
+describe("all three sign-in paths record consent through /auth/complete (AU-22)", () => {
+  it("sends a completed email sign-up through /auth/complete, not straight to the dashboard", async () => {
+    signUpEmail.mockResolvedValue({});
+    render(<LoginPage />);
+    fillSignUp();
+
+    fireEvent.click(screen.getByRole("button", { name: "Create account" }));
+
+    await waitFor(() => expect(push).toHaveBeenCalledTimes(1));
+    expect(push.mock.calls[0]![0]).toBe(`/auth/complete?next=${encodeURIComponent("/dashboard")}`);
+  });
+
+  it("points Google and magic-link new users at the same place", async () => {
+    signInSocial.mockResolvedValue({});
+    signInMagicLink.mockResolvedValue({});
+    render(<LoginPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: /Continue with Google/ }));
+    await waitFor(() => expect(signInSocial).toHaveBeenCalledTimes(1));
+    const google = signInSocial.mock.calls[0]![0] as Record<string, string>;
+    expect(google.callbackURL).toMatch(/\/auth\/complete\?next=%2Fdashboard$/);
+    expect(google.newUserCallbackURL).toMatch(/\/auth\/complete\?next=%2Fdashboard$/);
+
+    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "visitor@example.com" } });
+    fireEvent.click(screen.getByRole("button", { name: /magic link/i }));
+    await waitFor(() => expect(signInMagicLink).toHaveBeenCalledTimes(1));
+    const magic = signInMagicLink.mock.calls[0]![0] as Record<string, string>;
+    expect(magic.callbackURL).toMatch(/\/auth\/complete\?next=%2Fdashboard$/);
+    expect(magic.newUserCallbackURL).toMatch(/\/auth\/complete\?next=%2Fdashboard$/);
   });
 });
 

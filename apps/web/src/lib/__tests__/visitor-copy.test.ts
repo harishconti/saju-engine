@@ -78,6 +78,21 @@ describe("failureNotice", () => {
     );
   });
 
+  it("turns a missing consent into a LINK to the consent control, never a retry (AU-22)", () => {
+    const notice = failureNotice({ code: "CONSENT_REQUIRED", context: "sample" });
+
+    expect(notice.retryable).toBe(false);
+    expect(notice.message).toMatch(/consent/i);
+    expect(notice.message).toContain("Nothing was charged.");
+    expect(notice.action).not.toBeNull();
+    expect(notice.action?.href).toBe("/dashboard/account");
+    expect(notice.action?.label).toMatch(/consent/i);
+  });
+
+  it("has no action for an ordinary failure", () => {
+    expect(failureNotice({ code: "ENGINE_TIMEOUT", context: "sample" }).action).toBeNull();
+  });
+
   it("carries a short reference derived from the request id", () => {
     const notice = failureNotice({ code: "ENGINE_TIMEOUT", context: "sample", requestId: REQUEST_ID });
 

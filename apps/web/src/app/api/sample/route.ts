@@ -20,6 +20,7 @@ import {
   isEngineConfigured,
 } from "@/lib/engine";
 import { sampleRequestSchema } from "@/lib/validation/schemas";
+import { CONSENT_REQUIRED_MESSAGE, hasActiveServiceConsent } from "@/lib/consent";
 import { computeAndStoreChart } from "@/lib/chart-compute";
 import { turnstileMode, verifyTurnstile } from "@/lib/turnstile";
 
@@ -48,6 +49,16 @@ export const POST = handle(async (req) => {
 
   const input = await parseJson(req, sampleRequestSchema);
 
+  // AU-22 (2026-10-26 audit): saving a sample on a signed-in visitor creates a `Profile` holding
+  // birth date, time and place — precisely the data consent is the lawful basis for. The check used
+  // to be absent entirely, so the sample route could write sensitive birth data for a user whose
+  // consent had never been recorded, or had been withdrawn. Refuse with a code the UI turns into a
+  // link to the consent control; never silently proceed.
+  const user = await getCurrentUser();
+  if (user && !(await hasActiveServiceConsent(user.id))) {
+    throw new ApiError(409, "CONSENT_REQUIRED", CONSENT_REQUIRED_MESSAGE);
+  }
+
   // Bot protection. Deliberately after the rate limit (cheap, and it bounds the cost of this call)
   // and before any storage or engine work.
   //
@@ -67,7 +78,9 @@ export const POST = handle(async (req) => {
         );
       }
       // Log-only: surface it for the rollout without refusing a real visitor.
-      console.warn(`turnstile[log]: not satisfied (${turnstile.error}) ip=${ip}`);
+      // AU-33: no IP in the log line. An address is personal data, the log has no erasure path, and
+      // the rollout signal needs only the failure reason.
+      console.warn(`turnstile[log]: not satisfied (${turnstile.error})`);
     }
   }
 
@@ -92,7 +105,6 @@ export const POST = handle(async (req) => {
 
   const offset = birthUtcOffset(input.birthDate, input.birthTime, location.timezone);
 
-  const user = await getCurrentUser();
   const birthDate = new Date(`${input.birthDate}T00:00:00Z`);
   const birthTime = input.timeKnown === false ? "12:00" : input.birthTime;
 

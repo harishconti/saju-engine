@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { SCRUBBED_PROFILE } from "./profile-scrub";
 import { prisma } from "./prisma";
 import { drainObjectDeletions, deleteObjectOrQueue, deleteObjects, isR2Configured, listObjectsByPrefix } from "./r2";
 import { purgeOldIdempotencyKeys } from "./idempotency";
@@ -75,9 +75,6 @@ export async function runCleanup(now = new Date()): Promise<CleanupReport> {
 
   // 6. Process due deletions.
   report.deletionsProcessed = await processDueDeletions(now);
-
-  // 7. Retention sweep: flag long-inactive profiles (warn, never delete silently).
-  await flagInactiveProfiles(now);
 
   return report;
 }
@@ -192,32 +189,6 @@ export async function retryUnprocessedWebhooks(now = new Date()): Promise<number
 
   return replayed;
 }
-
-/**
- * The personal fields a retained profile must lose on erasure.
- *
- * `label` can carry a name ("Partner — Jisoo"), so it is scrubbed with `fullName`.
- *
- * `birthDate`, `birthTime`, `city` and `country` are NOT NULL in the schema, so they get
- * placeholders rather than null. `gender` is also required, but is deliberately left as-is: it is
- * an enum with no neutral member, the row is anonymised and unreachable after `deletedAt`, and
- * rewriting it would invent a fact about a person whose data we are destroying.
- */
-const SCRUBBED_PROFILE = {
-  label: "Deleted profile",
-  fullName: "Deleted profile",
-  birthDate: new Date(0),
-  birthTime: "00:00",
-  timezone: null,
-  utcOffset: null,
-  city: "Deleted",
-  country: "Deleted",
-  latitude: null,
-  longitude: null,
-  timeKnown: false,
-  chartJson: Prisma.DbNull,
-  chartComputedAt: null,
-} satisfies Prisma.ProfileUpdateManyMutationInput;
 
 /**
  * Complete deletions whose grace period has expired.
@@ -358,11 +329,3 @@ async function processDeletionRequest(
   }
 }
 
-/** Warn at 23 months of inactivity; the actual sweep is a manual decision, not an automatic one. */
-async function flagInactiveProfiles(now: Date): Promise<void> {
-  const cutoff = new Date(now.getTime() - 23 * 30 * 24 * 60 * 60 * 1000);
-  await prisma.profile.updateMany({
-    where: { updatedAt: { lt: cutoff }, deletedAt: null },
-    data: {},
-  });
-}

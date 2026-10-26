@@ -27,12 +27,44 @@ export async function hasActiveServiceConsent(userId: string): Promise<boolean> 
   const latest = await prisma.consentRecord.findFirst({
     where: { userId },
     orderBy: { grantedAt: "desc" },
-    select: { withdrawnAt: true, purposes: true },
+    select: { withdrawnAt: true, purposes: true, policyVersion: true },
   });
   if (!latest || latest.withdrawnAt) return false;
 
+  // AU-23: a grant is evidence of agreement to *a text*. If the policy has moved on since the
+  // record was written, the user has not consented to what we do now, so the record satisfies
+  // nothing until they re-consent on the account page.
+  if (latest.policyVersion !== POLICY_VERSION) return false;
+
   const purposes = latest.purposes as { service?: boolean } | null;
   return purposes?.service === true;
+}
+
+/**
+ * Record the initial `service` grant for a brand-new account (AU-22).
+ *
+ * Every sign-in path converges on `/auth/complete` — email, Google and magic link — so that page is
+ * the one place the server can record this for all three. The old approach was a best-effort browser
+ * POST during email sign-up only: closing the tab lost it, and the OAuth and magic-link paths never
+ * made it at all.
+ *
+ * Idempotent by design: any existing row, including a withdrawn one, means this is not a first
+ * arrival. Re-granting a withdrawn consent on the next sign-in would quietly undo a withdrawal.
+ */
+export async function recordInitialServiceConsent(userId: string): Promise<void> {
+  const existing = await prisma.consentRecord.findFirst({
+    where: { userId },
+    select: { id: true },
+  });
+  if (existing) return;
+
+  await prisma.consentRecord.create({
+    data: {
+      userId,
+      policyVersion: POLICY_VERSION,
+      purposes: { service: true, service_messages: false },
+    },
+  });
 }
 
 /** The refusal used wherever birth data would be written. Single copy, so the wording cannot drift. */

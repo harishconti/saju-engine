@@ -37,10 +37,17 @@ export default async function AccountPage() {
   // `ConsentRecord` at all rendered the required consent as already ticked — the UI asserting a
   // state the database did not have, in exactly the place the privacy policy makes claims. The
   // checkbox below is what records it; it must start unticked and be an explicit action.
-  const purposes = (latestConsent?.purposes ?? { service: false, service_messages: false }) as {
-    service: boolean;
-    service_messages: boolean;
-  };
+  //
+  // AU-23: a record written against an older policy text is not consent to the current one — the
+  // same rule the server enforces — so it renders as ungranted here too, rather than showing a
+  // ticked box for consent the server will refuse to honour.
+  const purposes = (
+    latestConsent && !latestConsent.withdrawnAt && latestConsent.policyVersion === POLICY_VERSION
+      ? latestConsent.purposes
+      : { service: false, service_messages: false }
+  ) as { service: boolean; service_messages: boolean };
+
+  const policyChanged = latestConsent != null && latestConsent.policyVersion !== POLICY_VERSION;
 
   const deletionActive = deletion?.status === "pending" ? deletion : null;
 
@@ -81,7 +88,17 @@ export default async function AccountPage() {
             Consent is recorded with the policy version and the date. Withdrawing the first item stops
             processing and begins the deletion path. The history is append-only — we never rewrite it.
           </p>
-          <ConsentForm initial={purposes} policyVersion={latestConsent?.policyVersion ?? POLICY_VERSION} />
+          <ConsentForm initial={purposes} policyVersion={POLICY_VERSION} />
+          {policyChanged ? (
+            <Alert tone="warning" title="The privacy policy has been updated">
+              Your previous consent was recorded against an earlier version, so it is shown as not
+              granted. Please review the{" "}
+              <Link href="/privacy" className="underline hover:text-foreground">
+                current policy
+              </Link>{" "}
+              and confirm again.
+            </Alert>
+          ) : null}
           <p className="pt-4 text-xs text-muted-foreground">
             Latest record: {latestConsent ? formatDate(latestConsent.grantedAt) : "none"} · policy version{" "}
             {latestConsent?.policyVersion ?? POLICY_VERSION}

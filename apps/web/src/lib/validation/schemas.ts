@@ -87,9 +87,24 @@ export const audioUploadCompleteSchema = z.object({
   key: z.string().trim().min(1).max(400),
 });
 
+/**
+ * The purposes the privacy policy actually defines. AU-32 (2026-10-26 audit): this used to be
+ * `z.record(z.string(), z.boolean())`, which accepted an unbounded map and wrote it into a JSON
+ * column. A strict object means a typo, a stale client, or a hand-crafted request cannot invent a
+ * purpose — and cannot grow the stored payload without bound.
+ */
+export const consentPurposesSchema = z.strictObject({
+  service: z.boolean(),
+  service_messages: z.boolean(),
+});
+
 export const consentSchema = z.object({
+  /**
+   * Accepted for compatibility, but deliberately not trusted: the server records `POLICY_VERSION`
+   * (AU-23), so a tab left open across a policy update cannot write consent to the superseded text.
+   */
   policyVersion: z.string().trim().min(1).max(40),
-  purposes: z.record(z.string(), z.boolean()),
+  purposes: consentPurposesSchema,
 });
 
 export const deletionRequestSchema = z.object({
