@@ -233,9 +233,18 @@ SAJU_FONT_DIR=«usually omit»   # E1 auto-resolves <package>/saju_html/fonts, w
                                # reports `fontsDir`). The system path does not exist there
 
 # Upload-target allowlist. REQUIRED: the engine fails closed (503 UPLOAD_HOSTS_UNCONFIGURED)
-# without one, because a presigned URL is its only write capability. Use the same R2 origin
-# the webapp has; optionally pin the bucket and the request-size ceiling.
+# without one, because a presigned URL is its only write capability.
+#
+# The webapp presigns **virtual-hosted** (apps/web/src/lib/r2.ts, no forcePathStyle), so the URL
+# host is {bucket}.{account_id}.r2.cloudflarestorage.com — the bucket is the first DNS label, not
+# a path segment. List that exact host. Production value:
+SAJU_UPLOAD_HOSTS=saju-engine-dev.«account_id».r2.cloudflarestorage.com
+#
+# R2_ENDPOINT (the account origin the webapp uses) also satisfies the allowlist, because the engine
+# accepts exactly one bucket label in front of that endpoint's host. Set one or both.
 R2_ENDPOINT=https://«account_id».r2.cloudflarestorage.com
+# Optional: pin the bucket. It is accepted as the first path segment (path-style) or the first
+# host label (virtual-hosted), matching the form the presigned URL actually uses.
 SAJU_UPLOAD_BUCKET=«optional: saju-engine-dev»
 SAJU_MAX_REQUEST_BYTES=«optional: default 2097152 (2 MB)»
 ```

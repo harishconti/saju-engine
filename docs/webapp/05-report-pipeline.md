@@ -111,17 +111,26 @@ entrypoint = "api.index:app"
 ```
 
 With that, the endpoints are the clean `https://saju-report-engine.vercel.app/{health,chart,generate}`
-and `ENGINE_URL` needs no suffix. **Verified in production:**
+and `ENGINE_URL` needs no suffix. **Verified in production** (measured before the 2026-10-26 audit):
 
 ```
 POST /health  → 200 {"status":"ok","ok":true,"engineVersion":"0.2.0","contractVersion":1,
-                     "fontsDir":"/var/task/src/saju_html/fonts","uploadAllowlist":1}
+                     "fontsDir":"/var/task/src/saju_html/fonts"}
 POST /chart   → 200  甲戌 癸酉 辛丑 乙未 · 辛 Metal · Water via strong-dm-drain
 POST /generate (deep) → 200  139898 bytes · 1877 ms · sha256 matched after download · valid PDF
 ```
 
 `fontsDir` pointing at `/var/task/src/saju_html/fonts` is the proof that **E1 works inside the deployed
 function** — it found the *bundled* faces rather than the system directory, which does not exist there.
+
+**After this change, expect `uploadAllowlist`** in the engine's `/health` body (added by AU-03/AU-31,
+2026-10-26). This is the response shape to check for, not a measured production result — no deploy has
+been observed returning it yet:
+
+```jsonc
+POST /health → 200 {"status":"ok","ok":true,"engineVersion":"0.2.0","contractVersion":1,
+                    "fontsDir":"/var/task/src/saju_html/fonts","uploadAllowlist":1}
+```
 
 `uploadAllowlist` is the number of upload hosts the engine will accept (`_allowed_upload_hosts()`).
 **Zero is a 503** with `{ ok: false, code: "UPLOAD_HOSTS_UNCONFIGURED", error }`: with no allowlist
@@ -258,7 +267,11 @@ Authorization: Bearer $ENGINE_SERVICE_TOKEN
   "contractVersion": 1,
   "kind": "single" | "compat",
   "tier": "sample" | "essential" | "deep" | "basic",
+  // Upload targets are alternative destinations — at least one of uploadUrl / htmlUploadUrl is
+  // required (400 MISSING_UPLOAD_URL otherwise). The sample sends htmlUploadUrl only.
   "uploadUrl": "https://<acct>.r2.cloudflarestorage.com/reports/…&X-Amz-Expires=900",
+  "htmlUploadUrl": "https://<acct>.r2.cloudflarestorage.com/reports/…/report.html&X-Amz-Expires=900",
+  "mdUploadUrl": "https://<acct>.r2.cloudflarestorage.com/reports/…/report.md&X-Amz-Expires=900", // optional
   "profileA": {
     "fullName": "Jisoo K.",
 
@@ -306,11 +319,17 @@ The engine holds no storage credentials — `uploadUrl` (and the optional `mdUpl
 `htmlUploadUrl`) are the only places it can write. They are **allowlisted**, because a leaked service
 token would otherwise turn the service into an arbitrary-URL PUT primitive:
 
-- allowlist from `SAJU_UPLOAD_HOSTS` (comma-separated) and/or the host of `R2_ENDPOINT`;
-  **empty means fail closed** (`503 UPLOAD_HOSTS_UNCONFIGURED`);
+- **Required on the `saju-report-engine` project:** `SAJU_UPLOAD_HOSTS` (comma-separated) and/or the
+  host of `R2_ENDPOINT`; **empty means fail closed** (`503 UPLOAD_HOSTS_UNCONFIGURED`). The production
+  setting is `SAJU_UPLOAD_HOSTS=saju-engine-dev.{account_id}.r2.cloudflarestorage.com`;
+- **the webapp presigns virtual-hosted** (`apps/web/src/lib/r2.ts`, no `forcePathStyle`), so a target
+  is `https://{bucket}.{account_id}.r2.cloudflarestorage.com/…` — the bucket is the first DNS label,
+  not a `/bucket/` path segment. The engine accepts exactly one such label in front of the
+  `R2_ENDPOINT` host, which is why either allowlist source works;
 - https required (http is allowed only to loopback, for local development), no embedded
   credentials, no fragment;
-- optional `SAJU_UPLOAD_BUCKET` pins the path to `/<bucket>/…`;
+- optional `SAJU_UPLOAD_BUCKET` pins the bucket as the first path segment (path-style) **or** the
+  first host label (virtual-hosted);
 - a body cap (`SAJU_MAX_REQUEST_BYTES`, default 2 MB) and pydantic bounds on every field.
 
 Errors: `503 UPLOAD_URL_NOT_ALLOWED` / `UPLOAD_URL_INSECURE` / `UPLOAD_URL_INVALID` /
@@ -571,8 +590,9 @@ routing it through the paid flow would only duplicate that machinery.
 
 **Its artefact is the reading, not a PDF** (since 2026-10-17), so `Report.pdfKey` is null for a sample and
 its `htmlKey` is what the library and the detail page serve. The engine's `uploadUrl` is optional, so the
-route asks for the reading only (`htmlUploadUrl`) and renders no PDF at all — no throwaway presign and no
-swept PDF object (AU-29). A request that targets neither URL is still refused with
+route asks for the reading only (`htmlUploadUrl`) and the engine uploads no PDF — the renderer still
+builds one internally to produce the markdown, but nothing is stored, so there is no throwaway presign
+and no swept PDF object (AU-29). A request that targets neither URL is still refused with
 `400 MISSING_UPLOAD_URL`.
 
 This is not an admin panel bolted on. Given decision **D5 (always review)**, it is the component

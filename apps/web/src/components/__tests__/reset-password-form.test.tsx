@@ -134,7 +134,7 @@ describe("ResetPasswordForm", () => {
     fill();
     submit();
 
-    expect(await screen.findByText(/too many attempts/i)).toBeTruthy();
+    expect(await screen.findByText("Too many attempts. Please try again later.")).toBeTruthy();
     expect(screen.queryByText(INVALID)).toBeNull();
   });
 

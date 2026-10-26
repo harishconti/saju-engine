@@ -823,7 +823,7 @@ Source: `research-engine/output/2026-10-01/saju-engine-audit-2026-10-01.md`. Fix
 | A6 | FIXED (2026-10-02, 1efdd25) | CLAUDE.md paths corrected (`src/saju_html/__init__.py`, `$SAJU_SITE`). |
 | A7 | FIXED (2026-10-02, f1012ea) | Dead code removed; `nayin_relation` kept (public API). |
 | B5 | ALREADY DONE | `tests/validation/test_val_compat.py:169` pins WEIGHT total 112 / scored 100 (the audit's "88" figure was wrong). |
-| S4/A1 | OPEN | Landing page source not in repo; see follow-up plan P6. |
+| S4/A1 | DONE (2026-10-26, `e76fabe`) | Landing page source is in the repo: the webapp's root route is `apps/web/src/app/page.tsx`. The legacy `apps/landing-page` scaffold was removed (`a399e0b`). |
 | S6, B6 | FIXED (2026-10-03, 5d2501e) | Typed compat flags: `compat.Flag(str)` with `kind`/`severity`/`code` fields; legacy substring classifiers kept only as test oracle. See `docs/superpowers/plans/2026-10-02-p2-report-primitives.md`. |
 | P2-F | FIXED (2026-10-07, user decision) | The compat F over/missing flags and narrative now derive from the **canonical** per-partner element balance (`strength.element_balance_pct`), so they can no longer contradict the client-visible per-partner tables. The §F **score** stays on the weighted union (frozen 2026-10-02). Client text changed: F now surfaces a `결합 과다` flag where the canonical union has an over-element (e.g. Bindu×Harish Wood 44.6%, Priyanka×Harish Water, park/seoul Metal, ny/seoul Water). Regenerated 6 compat pairs' deep `.md`/`.pdf` + goldens. |
 | P2-X | WONTFIX (deliberate) | `_ELEMENT_ORGANS` copies in `report_data` / `prose_fillers` / `prose_scaffold` not merged — they carry different client wording. |
@@ -852,7 +852,8 @@ Source: `research-engine/output/2026-10-01/saju-engine-audit-2026-10-01.md`. Fix
 | P5-birth-age | FIXED (2026-10-22) | The birth-date field accepted **today's** date, so the engine would print a confident day master, career arc and relationship outlook for a baby. A reading now requires a birth date at least **one year** old: `lib/birth-date.ts` + `validateBirth` (`lib/birth.ts`) refuse it with `BIRTH_TOO_RECENT` — profile create/edit, the free snapshot and the share card all refuse it, and a direct API call cannot skip it. The legacy self-service app applies the same rule (`tools/client_intake_app.py`). Why one year: the year pillar, the twelve-stage cycle and the first major-luck chapter are annual structures, so a chart for someone a few weeks old is not a chart with fewer conclusions — it is a chart with none. |
 | P5-birth-inputs | FIXED (2026-10-22) | The date and time fields could not be typed into on a phone (a native `type="date"` / `type="time"` is a wheel picker on iOS/Android), and a typed "19/03/1993" was silently rejected where it could be typed. Both are now text fields (`components/date-of-birth-field.tsx`, `components/time-of-birth-field.tsx`) that parse `YYYY-MM-DD` / `DD/MM/YYYY` / `M/D/YYYY` and `14:30` / `2:30 pm` / `2pm` / `1430`, and **echo the date or time they understood** so a misread is visible before anything is saved; the native picker stays behind a calendar/clock button. |
 | P5-birth-time-guess | FIXED (2026-10-22) | The time field was **pre-filled with 12:00** while `timeKnown` defaulted to true — so a visitor who never said they knew their birth time got a confident reading built on a guessed hour pillar, while the landing page's FAQ promised "the reading will mark it as lower-confidence rather than quietly assuming a time". The field now starts empty and the form asks for the time or the "I don't know" tick; the server's `INVALID_TIME` message distinguishes a missing time from a malformed one. |
-| D1/D3 | OPEN | MoR checkout (needs an external payment account) and deployment (needs a host). |
+| D1 | OPEN | MoR checkout live mode — Dodo Payments is wired, but `DODO_PAYMENTS_ENVIRONMENT=test_mode` (AU-47), so nothing can be charged for real yet. |
+| D3 | DONE (2026-10-26) | Deployment: the site is live at `https://www.cosmicsaju.com` (Vercel project `saju-engine`, verified 2026-10-15; see `docs/webapp/07-services-and-integrations.md`). |
 | P5-doubled-branch | FIXED (2026-10-22) | A doubled branch rendered as a repeated word — the 자형 pair 亥亥 became "Hae Hae", which reads like a stutter and failed `qa_client_ready`'s `REPEATED_WORD` check (found on Harish × Prethivika, the first pair whose two day branches are the same). `saju_html._translate_cjk_run` now joins a two-token identical run with an en dash → "Hae–Hae (亥亥)". Regression test `tests/test_pdf.py::test_translate_inline_hyphenates_a_doubled_branch`; the 7 previously delivered pairs are byte-identical (no doubled branch among them). |
 | P5-compat-heading-gloss | OPEN | Cosmetic, systemic: the compat deep report's zodiac sub-system heading reads "Year-Branch Zodiac Pair (띠) — Zodiac (띠) Compatibility (궁합) (Branch Compatibility)" — 띠 and 궁합 are each stated twice and the Hanja `(支 宮合)` glosses to a redundant "(Branch Compatibility)". `qa_client_ready` flags it as `DOUBLE_GLOSS`. Source prose is `compat_report.py`'s heading ("Year-branch zodiac pair (띠) — 띠 궁합 (支 宮合)"); `translate_inline`'s `_gloss_redundant` only drops a gloss when *every* word repeats, so the extra modifier defeats it. Present in all 8 compat pairs; fix once and regenerate the set together. |
 | D2 | FIXED (2026-10-07) | Optional SMTP delivery of private links: `saju_web.notify` (stdlib `smtplib`, STARTTLS/SSL, never raises) wired into `intake_admin.py` `approve`/`reissue`. Opt-in via `SAJU_SMTP_HOST`/`_PORT`/`_USER`/`_PASSWORD`/`_FROM`/`_STARTTLS`; unconfigured = old print-the-link behaviour. The recipient address is never printed or logged. Tests `tests/web/test_notify.py` (FakeSMTP capture). Sending requires real SMTP credentials at deploy, but the code path is complete and tested. |
@@ -866,21 +867,57 @@ Source: `research-engine/output/2026-10-01/saju-engine-audit-2026-10-01.md`. Fix
 
 Source: `docs/analysis/2026-10-26-production-audit.md` (full evidence, fixes, decisions D1–D6, execution
 handoff). Triggered by the 2026-10-18 → 10-23 engine outage (`UPLOAD_HOSTS_UNCONFIGURED`). Already fixed
-and verified live: `6027746`, `310fd3d`, `5701ce9`. No other fixes started.
+and verified live before the remediation: `6027746`, `310fd3d`, `5701ce9`. Everything below was executed
+on branch `audit/2026-10-26-remediation` (2026-10-26); a **DONE** row names the commit(s) that closed it,
+and an **OPEN** row names the owner action that remains. Owner-side items have no code and no commit.
 
 | ID | Sev | Status | Summary |
 |----|-----|--------|---------|
-| AU-01 | P0 | OPEN | owner: rotate Neon DB password |
-| AU-02 | P0 | OPEN | outage-failed paid orders unrecoverable from UI |
-| AU-03 | P0 | OPEN | no alert when engine refuses all renders |
-| AU-04 | P0 | OPEN | erasure fails for users with orders (after R2 delete) |
-| AU-05 | P0 | OPEN | failed webhook never retried |
-| AU-06 | P0 | OPEN | open redirect via backslash in safeNext |
-| AU-07 | P0 | OPEN | admin granted without email verification |
-| AU-08 | P0 | OPEN | report delete leaves HTML in R2 |
-| AU-09 – AU-21 | P1 | OPEN | Engine error mapping, visitor copy, timeouts, retry burn, daily dispatcher, SLA sweep, login error paths, date/time fields, name revert, DB-outage-as-signed-out, account panels, promo end time, reports `?status=` 500 |
-| AU-22 – AU-37 | P2 | OPEN | Consent gaps, erasure leaves Neon identity, pre-delivery data exposure, soft-delete retention, error codes, sample PDF waste, rate limits, health over-share, `.env` quoting, presign content-type |
-| AU-40 – AU-47 | IMP | OPEN | Sign out other devices, password reset, data export, sign-out error, sample funnel polish, Vercel Analytics, purge leads/webhook payloads, launch items |
+| AU-01 | P0 | **OPEN** | Owner action: rotate the Neon DB password that was echoed into a transcript, update Vercel `DATABASE_URL`/`DIRECT_URL` and the local `.env`, redeploy. No code. |
+| AU-02 | P0 | **DONE** (`a695420`) | Outage-failed paid orders are recoverable from the admin recovery queue (UI half). The data half (D5) was a read-only production query: 0 PAID orders 2026-10-17 → 10-24 lacked a report, so no requeue was needed. |
+| AU-03 | P0 | **DONE** (`e50e1df`, `3a6bada`) | Owner alert when the engine refuses all renders; the allowlist state is visible in health detail; the smoke checks the real contract. |
+| AU-04 | P0 | **DONE** (`fbfd977`, `af72a72`) | Erasure works for users who have ordered (keep order rows, scrub profile birth data, delete R2 after commit). |
+| AU-05 | P0 | **DONE** (`fbfd977`) | A payment webhook that fails mid-processing is replayed instead of lost. |
+| AU-06 | P0 | **DONE** (`78a4deb`) | Open redirect via a backslash in `safeNext` closed. |
+| AU-07 | P0 | **DONE** (`78a4deb`) | ADMIN needs the stored role, `ADMIN_EMAILS` **and** a verified email. |
+| AU-08 | P0 | **DONE** (`a695420`) | Deleting a report deletes the HTML reading (birth data) from R2 too. |
+| AU-09 | P1 | **DONE** (`c583df2`, `f9b8dc9`) | Engine config/auth errors answer 503, not permanent 422/401; every error body is `{error, code}`. |
+| AU-10 | P1 | **DONE** (`c583df2`) | Visitor copy maps engine codes to an actionable sentence with a request id. |
+| AU-11 | P1 | **DONE** (`c583df2`) | The sample engine timeout sits below the function's 60 s limit; regenerate `maxDuration` raised. |
+| AU-12 | P1 | **DONE** (`ac8a0e7`) | "Check for updates" no longer burns paid retry attempts. |
+| AU-13 | P1 | **DONE** (`ac8a0e7`) | Dispatch runs from the 15-minute GitHub Actions workflow; the webhook processes the job it created. |
+| AU-14 | P1 | **DONE** (`ac8a0e7`, `6c9ada3`, `26247be`) | SLA sweep deadlines: PAID-only candidates, stale `IN_REVIEW` deadline, clock from payment, failed-render deadline. |
+| AU-15 | P1 | **DONE** (`234af39`) | All login error paths go through `authErrorMessage`; `?error=` is shown. |
+| AU-16 | P1 | **DONE** (`234af39`) | Clearing or mistyping the date/time no longer keeps or submits the old value. |
+| AU-17 | P1 | **DONE** (`234af39`) | A display-name change is no longer reverted by `mirrorUser`. |
+| AU-18 | P1 | **DONE** (`234af39`) | A DB outage surfaces as 503, not "signed out". |
+| AU-19 | P1 | **DONE** (`234af39`) | Account panels catch failures and revert the consent checkbox. |
+| AU-20 | P1 | **DONE** (`77dbb75`) | The offer ends at `2027-01-01T08:00:00Z` (end of 31 December US Pacific), matching the copy. |
+| AU-21 | P1 | **DONE** (`234af39`) | A bad `?status=` on the reports list is a 400, not a Prisma 500. |
+| AU-22 | P2 | **DONE** (`2ebfc84`) | Birth data is written only with active service consent; Google/magic-link sign-ups record consent at `/auth/complete`. |
+| AU-23 | P2 | **DONE** (`2ebfc84`) | Re-consent records the current `POLICY_VERSION`, and `hasActiveServiceConsent` requires it. |
+| AU-24 | P2 | **DONE** (`6cf139d`, `e18b059`, `0d8310f`) | Consent withdrawal is enforced for new orders/jobs; the copy states what actually happens (D11/D12). |
+| AU-25 | P2 | **DONE** (`0991b97`) | Erasure deletes the Neon Auth identity (sessions → accounts → users) via `DATABASE_URL` (D8). |
+| AU-26 | P2 | **DONE** (`6cf139d`) | Unreviewed audio and whole-row data are withheld until `DELIVERED`; explicit field allow-list. |
+| AU-27 | P2 | **DONE** (`2ebfc84`, `e368822`, `351214f`, `2c5b15a`) | Profiles are retired by real activity (`lastSeenAt`, D9), birth data is scrubbed, and a shared compat report is deleted when either profile retires (D10). |
+| AU-28 | P2 | **DONE** (`c583df2`, `f9b8dc9`) | Failed jobs record `ENGINE_FAILED:<code>`, and the code/request id are logged. |
+| AU-29 | P2 | **DONE** (`7eb3853`) | `uploadUrl` is optional; the sample asks for the HTML reading only and checks `htmlBytes` before `headObject`. |
+| AU-30 | P2 | **DONE** (`7eb3853`) | Rate limits added to profile PATCH, account PATCH, and report download/html/audio. |
+| AU-31 | P2 | **DONE** (`7eb3853`, `e16c785`) | Public `/api/health` body is minimal; diagnostics moved behind `GET /api/health/detail`; the engine probe is cached. |
+| AU-32 | P2 | **DONE** (`2ebfc84`) | Consent `purposes` is a strict, bounded object. |
+| AU-33 | P2 | **DONE** (`2ebfc84`) | The visitor IP is no longer logged in the sample route (it still keys the in-memory rate limit). |
+| AU-34 | P2 | **DONE** (`7eb3853`, `1963ef0`) | Profile country is stored and passed when re-resolving the city, so "Cambridge" is unambiguous. |
+| AU-35 | P2 | **OPEN** | Owner action: Neon Console → Auth → Configuration → email/password provider → enable **Require email verification** with a verified sender. No code. |
+| AU-36 | P2 | **DONE** (`7eb3853`; the `.env` quoting itself is in the owner's gitignored `apps/web/.env`, which no commit can carry) | Values that need quoting are quoted, and the docs prefer `node --env-file` over `source`. |
+| AU-37 | P2 | **DONE** (`7eb3853`) | `presignPutUrl` signs the `content-type` the engine actually sends. |
+| AU-40 | IMP | **DONE** (`1922aca`, `c1153c6`) | "Sign out of other devices" calls `revokeOtherSessions` and keeps the current session. |
+| AU-41 | IMP | **DONE** (`1922aca`, `c1153c6`) | Password reset: request + confirm, neutral request response, token absent from delivered HTML. |
+| AU-42 | IMP | **OPEN** | Self-serve data export — the account page still offers email only. Not in this pass. |
+| AU-43 | IMP | **OPEN** | Sign-out failure is still hidden (redirects with a valid cookie). Not in this pass. |
+| AU-44 | IMP | **OPEN** | Sample-funnel polish (5xx not counted, Zod messages, nearest-city escape, city-index warning, ambiguous echo, "2:30 p.m."). Not in this pass. |
+| AU-45 | IMP | **OPEN** | Vercel Web Analytics: enable on `saju-engine` or remove `<Analytics/>`. Not in this pass. |
+| AU-46 | IMP | **OPEN** | Purge `SampleLead` emails and stored webhook payloads on a schedule. Not in this pass. |
+| AU-47 | IMP | **OPEN** | Launch items: Turnstile `log` mode, Dodo `test_mode`, DKIM/DMARC, unsubscribe route, no Playwright E2E. |
 
 ## Change Log
 

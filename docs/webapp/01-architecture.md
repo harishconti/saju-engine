@@ -23,10 +23,12 @@
                    │  POST /generate                            │
                    │  Authorization: Bearer $ENGINE_SERVICE_TOKEN
                    │  { kind, tier, profileA, profileB?,        │
-                   │    favorableOverrideA?, uploadUrl }        │
+                   │    favorableOverrideA?, uploadUrl |        │
+                   │    htmlUploadUrl }                         │
                    └────────────────────────────────────────────┘
-                        engine PUTs the PDF to the presigned R2 URL
-                        and returns { sha256, bytes, engineVersion }
+                        engine PUTs the artefact(s) to the presigned R2 URLs
+                        and returns { sha256?, bytes?, htmlSha256?, htmlBytes?,
+                                      engineVersion }
 ```
 
 ## Why the split is here
@@ -73,19 +75,19 @@ Browser
 apps/web
   │ rateLimit('sample:{ip}', 5, minute)
   │ validate profile (zod) + resolve lat/long/tz
-  │ presign R2 PUT → reports/anonymous/{uuid}/sample.pdf
-  │ POST {ENGINE_URL}/generate  { kind:'single', tier:'sample', uploadUrl, … }
-  ▼
+  │ presign R2 PUT → reports/anonymous/{uuid}/sample.html
+  │ POST {ENGINE_URL}/generate  { kind:'single', tier:'sample', htmlUploadUrl, … }
+  ▼                              (no uploadUrl — the sample keeps no PDF)
 saju-report-engine  (Vercel project #2, root = repository root)
-  │ compute_chart() → prepare_chart_render() → build_pdf()   (~1.6 s total)
-  │ PUT the PDF to uploadUrl
+  │ compute_chart() → prepare_chart_render() → render the HTML reading  (~1.6 s total)
+  │ PUT the HTML to htmlUploadUrl
   ▼
-→ { sha256, bytes }
+→ { htmlSha256, htmlBytes }
   │
 apps/web
-  │ HeadObject to verify, then return a short-lived presigned GET
+  │ check htmlBytes, verify with HeadObject, then return a short-lived presigned GET
   ▼
-Browser downloads the sample
+Browser opens the reading (Read it / Save it)
 ```
 
 Notes:
@@ -103,7 +105,8 @@ Notes:
 3  POST /api/webhooks/dodo      → verify signature (Standard Webhooks)
                                         → WebhookEvent upsert (idempotent on event id)
                                         → txn: Order → paid, Job → QUEUED, AuditLog
-4  GET /api/cron/dispatch   (1/min)     → claim job (FOR UPDATE SKIP LOCKED, leaseUntil)
+4  GET /api/cron/dispatch  (every 15 min, GitHub Actions; daily Vercel fallback)
+                                        → claim job (FOR UPDATE SKIP LOCKED, leaseUntil)
                                         → presign R2 PUT
                                         → POST {ENGINE_URL}/generate
                                         → verify object with HeadObject

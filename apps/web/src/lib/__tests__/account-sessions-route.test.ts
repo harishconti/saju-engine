@@ -7,9 +7,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
  * and delegates to the existing `revokeOtherSessions()` helper — the same wrapper the consent
  * withdrawal already uses, now reporting success so the panel can show an honest error.
  *
- * The current session surviving is a property of the provider's `revoke-all-sessions` endpoint
+ * The current session surviving is a property of the provider's `revoke-other-sessions` endpoint
  * (Neon documents it as "revokes all sessions except the current one"), not something this route
- * re-implements; the test below proves the route passes no token and reports the list it gets back.
+ * re-implements; the test below proves the route passes no token and returns `{ok:true}` when the
+ * provider accepts the revoke.
  */
 
 const store = new Map<string, number>();

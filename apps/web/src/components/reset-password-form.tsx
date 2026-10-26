@@ -86,7 +86,7 @@ export function ResetPasswordForm() {
         body: JSON.stringify({ token, newPassword }),
       });
       if (res.status === 429) {
-        setError("Too many attempts. Please wait a few minutes and try again.");
+        setError("Too many attempts. Please try again later.");
         return;
       }
       if (res.status === 400) {

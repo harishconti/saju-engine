@@ -70,7 +70,7 @@ export const POST = handle(async (req: Request) => {
 | `GET` | `/api/account/deletion` | user | Deletion request state |
 | `POST` | `/api/account/deletion` | user | Schedule account deletion (30-day grace) |
 | `DELETE` | `/api/account/deletion` | user | Cancel a scheduled deletion |
-| `POST` | `/api/account/sessions` | user | Sign out of every other session, keeping this one (`revoke-all-sessions`). `503 SESSION_REVOKE_FAILED` when the provider refuses. Returns `{ok:true}` only — the panel does not need a re-list. 5 / h / user |
+| `POST` | `/api/account/sessions` | user | Sign out of every other session, keeping this one (`revoke-other-sessions`). `503 SESSION_REVOKE_FAILED` when the provider refuses. Returns `{ok:true}` only — the panel does not need a re-list. 5 / h / user |
 | `POST` | `/api/account/password-reset` | none | Ask the identity provider to mail a reset link. **Neutral: always 202 `{ok:true}`** for a syntactically valid address — registered or not, sent or not. `422 VALIDATION_FAILED` for a malformed address. 5 / h / IP |
 | `POST` | `/api/account/password-reset/confirm` | none | Consume the mailed token and set the new password (`200 {ok:true}`). `400 INVALID_RESET_TOKEN` (invalid or expired; one indistinguishable answer), `429 RATE_LIMITED`, `503 RESET_UNAVAILABLE` (provider outage or a refusal that is not about the token). 10 / h / IP |
 

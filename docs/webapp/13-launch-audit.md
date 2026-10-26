@@ -53,6 +53,11 @@ POST https://www.cosmicsaju.com/api/sample
        "expiresIn":900}
 ```
 
+> **Superseded by AU-29 (2026-10-26).** The free sample no longer returns `downloadUrl` and renders
+> no stored PDF. `POST /api/sample` now returns `readUrl` for the HTML reading, presigned to
+> `…/sample.html`, and sends no `uploadUrl`. The block above records what was observed on
+> 2026-10-15.
+
 The downloaded artefact was checked: a valid PDF, a correct cover (`Born 15 August 1988, 14:20, Seoul`,
 `Day Master Im (Water Yang)`), Korean terms properly romanised, and **zero** citation / draft /
 reviewer leaks. The health probe is green across the board for the first time:

@@ -70,8 +70,10 @@ and the shared secrets (`ENGINE_SERVICE_TOKEN`, `CRON_SECRET`, `DODO_PAYMENTS_WE
    engine is token-gated, so this was not internet-reachable abuse — but a leaked token or a webapp
    bug made it an arbitrary-URL write primitive (including cloud metadata). Now every target must
    pass `_validate_upload_url`: https (or http to loopback), no embedded credentials, no fragment,
-   host on `R2_ENDPOINT`/`SAJU_UPLOAD_HOSTS`, and — when `SAJU_UPLOAD_BUCKET` is set — a path under
-   that bucket. **No allowlist means 503**: fail closed.
+   host on `R2_ENDPOINT`/`SAJU_UPLOAD_HOSTS` (one of them must be set on the engine project), and —
+   when `SAJU_UPLOAD_BUCKET` is set — that bucket as the first path segment (path-style) or the
+   first host label (virtual-hosted, which is what the webapp presigns). **No allowlist means 503**:
+   fail closed.
 2. **Unbounded request bodies.** FastAPI/Starlette impose no limit. Added
    `MaxBodySizeMiddleware` (default 2 MB) and pydantic bounds on every engine field, including
    `ScriptRequest.markdown` (1 M chars).
@@ -88,14 +90,17 @@ The engine change **fails closed**, so it needs one of these set on the `saju-re
 project **before or with** the deploy, or every `/generate` returns `503 UPLOAD_HOSTS_UNCONFIGURED`:
 
 ```bash
-# Preferred: the same value the webapp already has.
+# Required: the virtual-hosted host the webapp presigns into ({bucket}.{account_id}.r2...).
+# The bucket is the first DNS label, not a path segment (apps/web/src/lib/r2.ts, no forcePathStyle).
+SAJU_UPLOAD_HOSTS=saju-engine-dev.«account_id».r2.cloudflarestorage.com
+
+# Alternative: the account origin. The engine accepts exactly one bucket label in front of it,
+# so this also allows the virtual-hosted URL the webapp actually signs. Set one or both.
 R2_ENDPOINT=https://«account_id».r2.cloudflarestorage.com
 
-# Optional, stricter: also pin the bucket prefix.
+# Optional, stricter: pin the bucket — first path segment (path-style) or first host label
+# (virtual-hosted).
 SAJU_UPLOAD_BUCKET=saju-engine-dev
-
-# Or an explicit list (comma-separated) if a proxy/second bucket is used.
-SAJU_UPLOAD_HOSTS=account.r2.cloudflarestorage.com
 ```
 
 Then flip bot protection only after a real browser has completed the challenge:
