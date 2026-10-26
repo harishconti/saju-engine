@@ -49,6 +49,7 @@ vi.mock("@/lib/review", () => ({
   },
 }));
 
+import { recoverableOrderWhere } from "@/lib/admin-recovery";
 import { AUDIO_HOLD_FALLBACK_HOURS, FAILED_RENDER_DEADLINE_HOURS, REVIEW_SLA_HOURS, runSlaSweep } from "@/lib/sla";
 
 const NOW = new Date("2026-10-23T12:00:00Z");
@@ -175,6 +176,33 @@ describe("the 10-hour rule", () => {
     expect(where.order.is.paidAt.lte.getTime()).toBe(CUTOFF.getTime());
   });
 
+  // AU-14 follow-up (review): the paid clock applied to EVERY report, so an operator's regenerate
+  // on an older order — v2, created `DRAFT_READY` by the admin route — was due on the very next
+  // 15-minute sweep and auto-released as SLA_AUTO, emailing the client and bypassing the review the
+  // operator had just asked for. The paid clock is for the first render; later versions get their
+  // own window from `createdAt`.
+  it("does not make a freshly regenerated v2 due, however old the order is", async () => {
+    await runSlaSweep(NOW);
+
+    const where = prismaMock.report.findMany.mock.calls[0][0].where;
+    // A v2 report created now has `createdAt > cutoff`, so it does not match.
+    expect(where.OR).toEqual([
+      { version: 1 },
+      { version: { gt: 1 }, createdAt: { lte: CUTOFF } },
+    ]);
+  });
+
+  it("still finds a v1 report that only just rendered on an old paid order", async () => {
+    await runSlaSweep(NOW);
+
+    const where = prismaMock.report.findMany.mock.calls[0][0].where;
+    // v1 has no `createdAt` condition: the client's promise began at payment, and a slow first
+    // render must not buy a longer wait. `version` is non-nullable with default 1 (schema), so no
+    // null/1 special case is needed.
+    expect(where.OR[0]).toEqual({ version: 1 });
+    expect(where.order.is.paidAt.lte.getTime()).toBe(CUTOFF.getTime());
+  });
+
   it("releases a stale IN_REVIEW row: claiming a reading does not extend the deadline", async () => {
     prismaMock.report.findMany.mockResolvedValueOnce([overdue("r-stale", "IN_REVIEW")]);
 
@@ -208,6 +236,14 @@ describe("the 10-hour rule", () => {
 
   // AU-14: a failed render has no automatic retry. `recentFailures` only looks an hour back, so a
   // paid order whose job died yesterday produced no signal at all and waited forever.
+  //
+  // AU-14 follow-up (review): the count has to mean the same thing the remedy does. "Retry job"
+  // acts on an order from `listRecoverableOrders`, so the count is scoped by that list's order
+  // predicate: paid, not erased, no report, and no live job. Counting every FAILED row left
+  // orphaned attempts counted forever — a REGENERATE that exhausted its attempts, then a
+  // re-regenerate creating a fresh row, leaves the old FAILED row behind; an order whose later
+  // row succeeded and was delivered has a report. Neither is work a person can do, so neither may
+  // keep this sweep on 503.
   it("reports paid renders that have been failed past the deadline", async () => {
     prismaMock.job.count.mockResolvedValueOnce(0).mockResolvedValueOnce(0).mockResolvedValueOnce(2);
 
@@ -219,10 +255,28 @@ describe("the 10-hour rule", () => {
         state: "FAILED",
         kind: { in: ["GENERATE", "REGENERATE"] },
         finishedAt: { lte: new Date(NOW.getTime() - FAILED_RENDER_DEADLINE_HOURS * 3_600_000) },
-        // A paid order that will never arrive. An erased customer's row is excluded: it is
-        // deliberately not re-rendered, so it must not alarm forever.
-        order: { is: { status: "PAID", user: { deletedAt: null } } },
+        // A paid order with no report and no live job — the only state the admin retry can clear.
+        order: { is: recoverableOrderWhere },
       },
     });
+  });
+
+  it("agrees with the admin recovery list on what needs a retry", async () => {
+    await runSlaSweep(NOW);
+
+    const where = prismaMock.job.count.mock.calls[2][0].where;
+    // The four exclusions of AU-02's list, unchanged: a delivered/queued order, a report in
+    // review, and an erased account all have no retry for an operator to run.
+    expect(recoverableOrderWhere).toEqual({
+      status: "PAID",
+      reports: { none: {} },
+      jobs: { none: { state: { in: ["QUEUED", "RUNNING"] } } },
+      user: { deletedAt: null },
+    });
+    // A report means the render eventually produced something (perhaps a newer job row
+    // succeeded); a live job means someone is already on it. Neither is an overdue failure.
+    expect(where.order.is.reports).toEqual({ none: {} });
+    expect(where.order.is.jobs).toEqual({ none: { state: { in: ["QUEUED", "RUNNING"] } } });
+    expect(where.order.is.user).toEqual({ deletedAt: null });
   });
 });

@@ -1,6 +1,7 @@
 import { prisma } from "./prisma";
 import { deliverReport } from "./email";
 import { approveAndDeliver, ApprovalError } from "./review";
+import { recoverableOrderWhere } from "./admin-recovery";
 
 /**
  * The 10-hour delivery rule.
@@ -115,10 +116,18 @@ export async function runSlaSweep(now: Date = new Date()): Promise<SlaSweepResul
   //
   // IN_REVIEW rows are due at the same deadline: a reviewer who claims a reading and never comes
   // back must not hold it past the promise either.
+  //
+  // The clock is per version. v1 keeps the paid clock — that is the case AU-14 is about, a first
+  // render that only completed after a long wait, where the client's promise began at payment. A
+  // later version is an operator's regenerate (`regenerate/route.ts`) and starts its own window at
+  // `createdAt`; without that, v2 on any order paid >10 h ago matched on the very next sweep and was
+  // auto-released as SLA_AUTO, emailing the client and bypassing the review the operator had just
+  // asked for. `Report.version` is non-nullable with default 1, so there is no null/1 case.
   const due = await prisma.report.findMany({
     where: {
       status: { in: ["DRAFT_READY", "IN_REVIEW"] },
       orderId: { not: null },
+      OR: [{ version: 1 }, { version: { gt: 1 }, createdAt: { lte: cutoff } }],
       // Every transition to PAID writes `paidAt` (the Dodo webhook, the manual mark-paid route and
       // the free-order path), so this cannot silently exclude a paid order.
       order: { is: { status: "PAID", paidAt: { lte: cutoff } } },
@@ -192,14 +201,22 @@ export async function runSlaSweep(now: Date = new Date()): Promise<SlaSweepResul
   // 5. Paid renders that failed long enough ago to be a standing breach. AU-14 (2026-10-26 audit):
   //    a FAILED job is never retried automatically, and `recentFailures` stops looking after an
   //    hour, so yesterday's dead render was invisible today. Reported, never touched — the recovery
-  //    is a person's: "Retry job" in the admin console. An erased customer's order is excluded
-  //    because it is deliberately never re-rendered and would alarm forever.
+  //    is a person's: "Retry job" in the admin console.
+  //
+  //    The count is scoped by the admin recovery list's own predicate, so 503 here always means
+  //    there is something "Retry job" can clear. Counting raw FAILED rows did not: an orphaned
+  //    attempt — a REGENERATE that exhausted its attempts before a re-regenerate created a fresh
+  //    row, or a later row that succeeded and was delivered — stayed counted forever, because the
+  //    remedy only acts on an order's newest job and refuses while there is a report. That was a
+  //    503 no one could clear, which is the alert fatigue this signal exists to avoid. A report
+  //    means the order was rendered; a live job means it is being worked on; an erased account is
+  //    deliberately never re-rendered.
   result.overdueFailures = await prisma.job.count({
     where: {
       state: "FAILED",
       kind: { in: ["GENERATE", "REGENERATE"] },
       finishedAt: { lte: hoursAgo(now, FAILED_RENDER_DEADLINE_HOURS) },
-      order: { is: { status: "PAID", user: { deletedAt: null } } },
+      order: { is: recoverableOrderWhere },
     },
   });
 

@@ -39,6 +39,24 @@ export interface RecoverableOrder {
   lastError: string | null;
 }
 
+/**
+ * The order-level predicate for "this paid order's missing reading needs a person".
+ *
+ * Exported so the SLA sweep counts the same set this list offers, rather than its own idea of
+ * failure. AU-14 (2026-10-26 audit): the sweep counted every FAILED generate-family row, but the
+ * only remedy — "Retry job" in the admin console — acts on an order from this list. An orphaned
+ * attempt (a REGENERATE that exhausted its attempts before a re-regenerate created a fresh row, or
+ * a later row that succeeded and was delivered) is not in this list, so counting it produced a 503
+ * no operator action could ever clear. One predicate, so the alert and the remedy cannot drift.
+ */
+export const recoverableOrderWhere: Prisma.OrderWhereInput = {
+  status: "PAID",
+  reports: { none: {} },
+  jobs: { none: { state: { in: ["QUEUED", "RUNNING"] } } },
+  // Erasure retains the order but destroys the report; never offer to rebuild it.
+  user: { deletedAt: null },
+};
+
 /** The order id an audit row names, when it names one. */
 function orderIdFromJson(value: Prisma.JsonValue | null): string | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
@@ -48,13 +66,7 @@ function orderIdFromJson(value: Prisma.JsonValue | null): string | null {
 
 export async function listRecoverableOrders(limit = 100): Promise<RecoverableOrder[]> {
   const orders = await prisma.order.findMany({
-    where: {
-      status: "PAID",
-      reports: { none: {} },
-      jobs: { none: { state: { in: ["QUEUED", "RUNNING"] } } },
-      // Erasure retains the order but destroys the report; never offer to rebuild it.
-      user: { deletedAt: null },
-    },
+    where: recoverableOrderWhere,
     orderBy: { paidAt: "desc" },
     take: limit,
     select: {
