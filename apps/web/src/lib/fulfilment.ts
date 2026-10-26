@@ -264,7 +264,11 @@ export async function processClaimedJob(job: Job, opts: ClaimOptions = {}): Prom
       // …and the web document: the artefact the client actually reads on a phone, which they can
       // also save as one file. Best-effort — a reading that fails to upload leaves the PDF as the
       // deliverable rather than losing the order.
-      htmlUploadUrl: await presignPutUrl(htmlKey, "text/html"),
+      //
+      // AU-37 (2026-10-26 audit): the presigned URL now signs `content-type`, so this string must be
+      // exactly what the engine sends (`text/html; charset=utf-8`) or R2 rejects the PUT with a
+      // signature mismatch. The same applies to the PDF and markdown above.
+      htmlUploadUrl: await presignPutUrl(htmlKey, "text/html; charset=utf-8"),
       profileA,
       ...(profileB ? { profileB } : {}),
       favorableOverrideA: order.favorableOverrideA ?? null,

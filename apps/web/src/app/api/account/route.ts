@@ -2,6 +2,7 @@ import { z } from "zod";
 import { handle, json, parseJson } from "@/lib/api";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, WINDOW } from "@/lib/ratelimit";
 import { audit } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +29,9 @@ export const GET = handle(async () => {
 
 export const PATCH = handle(async (req) => {
   const user = await requireUser();
+  // AU-30 (2026-10-26 audit): a write with no limit. 30/hour matches consent and job-kick; a
+  // display-name edit is a deliberate act, not a polling path.
+  await rateLimit(`account-update:${user.id}`, 30, WINDOW.hour);
   const { name } = await parseJson(req, patchSchema);
 
   const before = await prisma.user.findUnique({ where: { id: user.id }, select: { name: true } });

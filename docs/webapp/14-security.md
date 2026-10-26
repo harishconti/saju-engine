@@ -79,7 +79,7 @@ and the shared secrets (`ENGINE_SERVICE_TOKEN`, `CRON_SECRET`, `DODO_PAYMENTS_WE
    client can prepend. It now prefers Vercel's own headers and otherwise takes the **rightmost** hop.
 4. **Open mail relay.** `POST /api/sample/email` sends mail from our domain to a caller-chosen
    address. Added a per-recipient bucket (2/h) on top of the per-IP buckets.
-5. **Invisible bot-protection state.** `/api/health` now reports `botProtection: off|log|enforce`
+5. **Invisible bot-protection state.** `/api/health/detail` reports `botProtection: off|log|enforce`
    and `botProtectionConfigured`, so a `log` rollout cannot be mistaken for `enforce`.
 
 ## 4. Deploying these changes
@@ -129,9 +129,17 @@ vercel env add TURNSTILE_MODE production   # value: enforce
 9. **The legacy FastAPI intake app** (`tools/client_intake_app.py`, `src/saju_web/`) is a separate
    surface with its own queue/tokens/CORS posture. It is not deployed at cosmicsaju.com; if it is
    ever exposed, it needs its own review at this bar.
-10. **`/api/health` is public** and discloses coarse configuration (db/storage/engine booleans,
-    `paymentsMode`, `botProtection`, version). Accepted: it is what makes an outage visible, and it
-    carries no secret.
+10. **`/api/health` was public and disclosed coarse configuration** (db/storage/engine booleans,
+    `paymentsMode`, `botProtection`, version). **Fixed 2026-10-26 (AU-31):** the public body is now
+    `{ok, status, version, checkedAt}` only. The diagnosis moved to `/api/health/detail`, which needs
+    `HEALTH_DETAIL_TOKEN` or an admin session and answers `401` to everyone else without probing.
+11. **The auth API still reveals account existence.** Neon Auth answers sign-up for an existing
+    address with `422 USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL`. The login page already maps that to a
+    neutral message, but a caller reading the API directly still learns the fact. **Owner action
+    (AU-35):** enable **Require email verification** for the Neon Auth email/password provider (with
+    Resend SMTP configured) so sign-up cannot be used as an account-enumeration oracle. This is a
+    console setting, not code; the exact steps are in
+    [08 — Deployment](08-deployment.md#pre-launch-verification).
 
 ## 6. How to verify
 
@@ -146,8 +154,9 @@ cd apps/web && npm run lint && npm run typecheck
 # Dependencies
 cd apps/web && npm audit --omit=dev
 
-# Live posture (after deploy)
-curl -s https://www.cosmicsaju.com/api/health | jq '{status, botProtection, paymentsMode}'
+# Live posture (after deploy) — the detail view needs the operator token
+curl -s -H "Authorization: Bearer $HEALTH_DETAIL_TOKEN" \
+  https://www.cosmicsaju.com/api/health/detail | jq '{status, botProtection, paymentsMode}'
 ```
 
 ## 7. Maintenance rule

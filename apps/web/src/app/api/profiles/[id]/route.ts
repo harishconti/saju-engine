@@ -1,6 +1,7 @@
 import { ApiError, handle, json, parseJson } from "@/lib/api";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, WINDOW } from "@/lib/ratelimit";
 import { CONSENT_REQUIRED_MESSAGE, hasActiveServiceConsent } from "@/lib/consent";
 import { writeAudit } from "@/lib/audit";
 import { birthUtcOffset, resolveBirthLocation, validateBirth } from "@/lib/birth";
@@ -28,6 +29,11 @@ export const GET = handle(async (_req, ctx: Ctx) => {
 
 export const PATCH = handle(async (req, ctx: Ctx) => {
   const user = await requireUser();
+  // AU-30 (2026-10-26 audit): an edit re-resolves the birthplace and re-derives the chart through
+  // the engine (`computeAndStoreChart`), so it is a metered operation like an order rather than a
+  // plain write. The limit is per hour, matching consent/kick; it also bounds a runaway client
+  // that would otherwise spend engine renders on repeated edits.
+  await rateLimit(`profile-update:${user.id}`, 30, WINDOW.hour);
   const { id } = await ctx.params;
   const existing = await ownedProfile(user.id, id);
   const input = await parseJson(req, profileUpdateSchema);
@@ -56,9 +62,14 @@ export const PATCH = handle(async (req, ctx: Ctx) => {
     return json({ profile: fresh });
   }
 
+  // AU-34 (2026-10-26 audit): an edit that changes only the city sent no country, so a bare
+  // ambiguous name ("Cambridge") was re-resolved with nothing to disambiguate it and the edit
+  // failed. Fall back to the country already stored on the profile — `findCity` accepts the
+  // country name or its two-letter code.
   const location = resolveBirthLocation({
     city: input.city ?? existing.city,
     countryCode: input.countryCode ?? null,
+    country: existing.country,
   });
 
   const birthDate = input.birthDate ?? existing.birthDate.toISOString().slice(0, 10);

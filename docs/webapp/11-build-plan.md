@@ -90,7 +90,7 @@ warm < 2 s; Hangul/Hanja render correctly in the compat PDF.
 | 2.7 | `/login` — tabbed sign-in/sign-up, Google + email + magic link, consent checkbox | `window.location.origin` callbacks; allowlisted `next` |
 | 2.8 | `/auth/complete` — exchange verifier, redirect | |
 | 2.9 | `requireUser` / `requireRole` / `handle()` / `ApiError` / error envelope | |
-| 2.10 | `/api/health` — db + storage + engine | 503 on any failure |
+| 2.10 | `/api/health` (minimal liveness) + `/api/health/detail` (db + storage + engine, token/admin) | 503 on any failure |
 | 2.11 | Dashboard shell + sign-out | `router.refresh()` after sign-out |
 | 2.12 | Audit + rate-limit + idempotency helpers | Postgres-backed |
 
@@ -229,7 +229,7 @@ clean; a sample PDF downloads and lands in the profile.
 | 8.13 | Legal review of policy, terms, refund policy, consent wording | External, see [10](10-privacy-and-compliance.md) §9 |
 | 8.14 | Launch checklist in [08](08-deployment.md) | Every box ticked |
 
-**Exit:** CI green; `/api/health` green for all three probes; a real purchase completes end to end in
+**Exit:** CI green; `/api/health/detail` shows all three probes green; a real purchase completes end to end in
 production.
 
 ---

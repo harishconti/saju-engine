@@ -1,6 +1,7 @@
 import { ApiError, handle, json } from "@/lib/api";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, WINDOW } from "@/lib/ratelimit";
 import { presignGetUrl } from "@/lib/r2";
 
 export const dynamic = "force-dynamic";
@@ -20,6 +21,10 @@ type Ctx = { params: Promise<{ id: string }> };
  */
 export const GET = handle(async (req, ctx: Ctx) => {
   const user = await requireUser();
+  // AU-30 (2026-10-26 audit): a download streams the object through this function for an HTML
+  // download or a forced attachment, so it is bandwidth we pay for. 30/minute is far above a
+  // person reading their own report (a download or two) and bounds a script.
+  await rateLimit(`report-download:${user.id}`, 30, WINDOW.minute);
   const { id } = await ctx.params;
 
   const kind = new URL(req.url).searchParams.get("kind") === "pdf" ? "pdf" : "html";

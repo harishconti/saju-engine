@@ -85,32 +85,56 @@ Every step writes a summary line to the log with counts only — never ids of us
 
 ## Health checks
 
-`GET /api/health` — no authentication, no secrets in the response.
+`GET /api/health` — no authentication. The public body is deliberately minimal: a status code and
+the two facts a monitor needs, nothing that maps the deployment's configuration.
 
 ```jsonc
 {
+  "ok": true,                        // false => degraded
   "status": "ok",                    // or "degraded"
-  "db": true,
-  "storage": true,
-  "engine": true,
-  "engineDetail": "uploadAllowlist=1", // why, or which allowlist count — see below
-  "payments": true,
-  "paymentsMode": "live_mode",
-  "botProtection": "enforce",        // off | log | enforce — see 14
-  "botProtectionConfigured": true,
   "version": "«git sha»",
   "checkedAt": "2026-10-15T10:00:00Z"
 }
 ```
 
+AU-31 (2026-10-26 audit): the diagnostic body used to be public, which told anyone which probe was
+failing, whether the deployment could take real money and how far the Turnstile rollout had got.
+The diagnosis now lives at **`GET /api/health/detail`**, which requires either
+`Authorization: Bearer $HEALTH_DETAIL_TOKEN` or an admin session (`ADMIN_EMAILS` + `role: ADMIN` +
+verified email). Unauthenticated callers get `401 {"code":"UNAUTHORIZED"}` without a probe being
+made. Authorised callers see the full snapshot:
+
+```jsonc
+{
+  "ok": false,
+  "status": "degraded",
+  "db": true,
+  "storage": true,
+  "engine": false,
+  "engineDetail": "HTTP 503 UPLOAD_HOSTS_UNCONFIGURED uploadAllowlist=0", // why — see below
+  "payments": true,
+  "paymentsMode": "live_mode",
+  "botProtection": "enforce",        // off | log | enforce — see 14
+  "botProtectionConfigured": true,
+  "missingProducts": [],
+  "version": "«git sha»",
+  "checkedAt": "2026-10-15T10:00:00Z"
+}
+```
+
+Both routes run the same probe. The engine probe is cached for 60 seconds (success *and* failure),
+so a monitor — or a person refreshing during an incident — does not multiply load on the service it
+is checking; the DB probe still runs per hit. `resetHealthProbeCacheForTests()` clears the cache in
+tests.
+
 | Probe | How | Failure means |
 |---|---|---|
 | Database | `SELECT 1` via Prisma | Neon down, credentials rotated, or the branch is suspended on the Free plan |
 | Storage | A minimal R2 operation (list one key, or `HeadObject` on a sentinel) | Bad credentials, deleted token, wrong bucket |
-| Engine | `POST {ENGINE_URL}/health` with the bearer token, short timeout | The deploy failed, the token drifted between projects, or the engine's upload allowlist is empty (`engineDetail` says `HTTP 503 UPLOAD_HOSTS_UNCONFIGURED uploadAllowlist=0`) — with no allowlist the engine refuses every render |
+| Engine | `POST {ENGINE_URL}/health` with the bearer token, short timeout (result cached 60 s) | The deploy failed, the token drifted between projects, or the engine's upload allowlist is empty (`engineDetail` says `HTTP 503 UPLOAD_HOSTS_UNCONFIGURED uploadAllowlist=0`) — with no allowlist the engine refuses every render |
 | Payments | `isDodoConfigured()` **and** every paid tier has a product id | Checkout would throw `PRODUCT_NOT_CONFIGURED` — i.e. you cannot take money |
 
-The response also reports `paymentsMode` (`test_mode` / `live_mode`). That single word is worth watching:
+The detail body also reports `paymentsMode` (`test_mode` / `live_mode`). That single word is worth watching:
 it is how you notice that a real deployment is still pointed at test mode — or, worse, that it went live
 before you meant it to.
 
@@ -119,7 +143,7 @@ so it is not protection yet; production must read `enforce` (see [14](14-securit
 separately from `status` on purpose — a deliberate rollout state is not an outage, but it must be visible
 in an ops review rather than mistaken for "protected".
 
-Returns **503** with `status: "degraded"` if any probe fails, so an uptime monitor can alert on
+Both routes return **503** with `status: "degraded"` if any probe fails, so an uptime monitor can alert on
 status code alone. A degraded engine is not fatal for the site (the sample flow is the only
 synchronous consumer) but it *is* fatal for fulfilment, so it must page.
 

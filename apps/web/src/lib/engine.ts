@@ -60,7 +60,12 @@ export interface EnginePayload {
   contractVersion: number;
   kind: "single" | "compat";
   tier: string;
-  uploadUrl: string;
+  /**
+   * Where to PUT the PDF. Optional since AU-29 (2026-10-26 audit): the free sample keeps the web
+   * document and discards the PDF, so demanding a PDF target made a sample fail on an upload
+   * nobody keeps. At least one of `uploadUrl` / `htmlUploadUrl` must be present.
+   */
+  uploadUrl?: string;
   /** Where the engine should also PUT the source markdown, so the audio script and the
    *  audit trail derive from the artefact that was actually reviewed. */
   mdUploadUrl?: string;
@@ -74,8 +79,10 @@ export interface EnginePayload {
 }
 
 export interface EngineResult {
-  sha256: string;
-  bytes: number;
+  /** Null when no PDF was requested (a reading-only sample, AU-29). */
+  sha256?: string | null;
+  /** Bytes of the uploaded PDF; null when no PDF was requested (AU-29). */
+  bytes?: number | null;
   engineVersion: string;
   durationMs?: number;
   /**
@@ -204,7 +211,8 @@ export async function callEngine(payload: EnginePayload, timeoutMs = 120_000): P
  * AU-03 (2026-10-26 audit): this used to trust the status code alone. The engine answered 200
  * for five days while refusing every render, because its upload allowlist was empty. The probe
  * now returns 503 in that state; this client also reports *why* and the allowlist count, which
- * `/api/health` exposes as `engineDetail`.
+ * the authorised `/api/health/detail` view exposes as `engineDetail` (never the public body —
+ * AU-31).
  */
 export async function engineHealth(): Promise<{ ok: boolean; detail?: string }> {
   if (!isEngineConfigured()) return { ok: false, detail: "not configured" };

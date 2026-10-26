@@ -330,7 +330,7 @@ yet** — that is the outstanding piece, see [13](13-launch-audit.md) §B5 and [
 3.  npm run db:backup                                                 # before any migration
 4.  npx prisma migrate status && npx prisma migrate deploy
 5.  deploy: merge to the production branch → Vercel builds and promotes
-6.  smoke: /api/health → db, storage, engine all green
+6.  smoke: GET /api/health returns 200; GET /api/health/detail (operator token or admin session) shows db, storage, engine all green
 7.  verify one real order end to end if payment code changed
 ```
 
@@ -363,9 +363,15 @@ code still works against the new schema; then a webapp rollback does not need a 
 - [ ] Google sign-in works **on the production domain**, not just localhost
 - [ ] Neon `production` is migrated, and every Vercel scope points at it (single-branch decision)
 - [ ] R2 presigned PUT then GET round-trips; no public URL is reachable; CORS preflight passes
-- [ ] `/api/health` is green for db + storage + engine
+- [ ] `/api/health/detail` (operator token or admin session) is green for db + storage + engine, and `/api/health` answers 200 with no configuration detail
 - [ ] Dodo Payments store activated; a test-mode purchase creates **exactly one** job under repeated
       webhook delivery; a forged signature is rejected
+- [ ] **Neon Auth requires email verification (AU-35).** Neon Console → project **saju** → branch
+      **production** → **Auth** → **Configuration** (email provider) → enable **Require email
+      verification**, confirm the email provider is the verified Resend/SMTP configuration, **Save**.
+      Then sign up with an existing address against the auth API and confirm it no longer answers
+      `422 USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL` in a way that distinguishes an existing account
+      (the login page already shows a neutral message; this closes the API-level oracle)
 - [ ] Privacy, Terms, and **Refund Policy** are live with a real contact address
 - [ ] Consent checkbox writes a `ConsentRecord`; the deletion path works end to end
 - [ ] The public e2e suite proves every protected route 401s when signed out, and user B cannot fetch

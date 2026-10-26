@@ -156,19 +156,20 @@ export const POST = handle(async (req) => {
   // delivered as the same self-contained web document every paid tier is, and the free tier offers **no
   // PDF at all**.
   //
-  // The engine still requires an upload target for a PDF (that is the contract), so one is presigned —
-  // but always under the **swept** prefix and never recorded on the row, so it cannot become dead
-  // storage that nobody can reach. When signed in, the *reading* is the copy that is kept.
+  // AU-29 (2026-10-26 audit): the engine used to require a PDF upload target, so this route presigned
+  // one under the swept prefix and the sample failed whenever that throwaway upload failed. The
+  // contract's `uploadUrl` is now optional, so a sample asks for the reading and nothing else.
   const readKey = user ? buildSampleKey(user.id, sampleId, "html") : buildAnonymousKey(sampleId, "html");
-  const discardedPdfKey = buildAnonymousKey(sampleId, "pdf");
 
   const result = await callEngine(
     {
       contractVersion: ENGINE_CONTRACT_VERSION,
       kind: "single",
       tier: "sample",
-      uploadUrl: await presignPutUrl(discardedPdfKey, "application/pdf"),
-      htmlUploadUrl: await presignPutUrl(readKey, "text/html"),
+      // No `uploadUrl`: there is no PDF to keep or verify. The reading is the deliverable.
+      // AU-37: this exact content type is what `presignPutUrl` signs (and what the engine sends),
+      // so the presigned PUT cannot fail with a signature mismatch.
+      htmlUploadUrl: await presignPutUrl(readKey, "text/html; charset=utf-8"),
       profileA: {
         fullName: input.fullName,
         gender: input.gender,
@@ -187,8 +188,15 @@ export const POST = handle(async (req) => {
     SAMPLE_ENGINE_TIMEOUT_MS,
   );
 
+  // AU-29: `engine` answers `htmlBytes` only when the reading really uploaded. Check that **before**
+  // `headObject`, so a failed reading upload surfaces as an HTML-specific code rather than as
+  // `UPLOAD_NOT_VERIFIED` on a verify step for an object that was never written.
+  if (!result.htmlBytes) {
+    throw ApiError.unavailable("The snapshot did not upload correctly", "HTML_UPLOAD_FAILED");
+  }
   const object = await headObject(readKey);
   if (!object) throw ApiError.unavailable("The snapshot did not upload correctly", "UPLOAD_NOT_VERIFIED");
+  const bytes = result.htmlBytes ?? object.size;
 
   // If the visitor is signed in, keep it — and make the copy true. Previously only the Profile was
   // saved: the PDF was not, so the reading never appeared in the dashboard library and the download
@@ -247,8 +255,8 @@ export const POST = handle(async (req) => {
           pdfKey: null,
           htmlKey: readKey,
           sha256: null,
-          bytes: result.htmlBytes ?? object.size,
-          htmlBytes: result.htmlBytes ?? object.size,
+          bytes,
+          htmlBytes: bytes,
           engineVersion: result.engineVersion ?? null,
           deliveredAt: new Date(),
         },
@@ -289,7 +297,7 @@ export const POST = handle(async (req) => {
     // The reading. There is deliberately no PDF URL: the free tier offers the web document only.
     readUrl,
     expiresIn: 900,
-    bytes: result.htmlBytes ?? object.size,
+    bytes,
     engineVersion: result.engineVersion,
     savedToProfile: Boolean(user),
     // Present when signed in, so the UI can link straight to the library entry.

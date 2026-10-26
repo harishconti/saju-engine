@@ -538,6 +538,70 @@ def test_a_failed_web_document_upload_still_delivers_the_report(monkeypatch):
     assert body["sha256"], "the PDF still reported its own integrity metadata"
 
 
+def test_a_reading_only_request_needs_no_pdf_upload(monkeypatch):
+    """AU-29 (2026-10-26 audit): a sample keeps the reading and discards the PDF.
+
+    Requiring a PDF upload target meant a sample rendered, uploaded a PDF nobody keeps, and
+    failed if that throwaway upload failed. The contract now accepts a reading-only request:
+    `uploadUrl` is optional, the response is about the reading, and there is no PDF metadata
+    to describe because no PDF was requested.
+    """
+    import api.index as svc
+
+    uploaded: dict = {}
+
+    def fake_upload(artifact, url, *, content_type="application/pdf", timeout=60.0):
+        uploaded[str(url)] = (artifact.read_bytes(), content_type)
+
+    monkeypatch.setattr(svc, "_upload", fake_upload)
+    response = generate(
+        generate_request(tier="sample", uploadUrl=None, htmlUploadUrl="https://html.test/put"),
+        authorization=AUTH,
+    )
+    assert response.status_code == 200, body_of(response)
+
+    body = body_of(response)
+    assert list(uploaded) == ["https://html.test/put"], "the discarded PDF was never uploaded"
+    document, content_type = uploaded["https://html.test/put"]
+    # The exact string the webapp presigns (AU-37), so the signature cannot mismatch.
+    assert content_type == "text/html; charset=utf-8"
+    assert document.startswith(b"<!DOCTYPE html")
+    assert body["htmlBytes"] == len(document)
+    assert body["htmlSha256"] and len(body["htmlSha256"]) == 64
+    # No PDF was requested, so there is no PDF to report integrity metadata for.
+    assert body["sha256"] is None and body["bytes"] is None
+
+
+def test_a_failed_reading_upload_is_an_html_specific_failure(monkeypatch):
+    """AU-29: when the reading is the only artefact, losing it fails the request.
+
+    It must not answer 200 with `htmlBytes: null` and leave the caller to discover the loss
+    through `headObject` — that surfaced as `UPLOAD_NOT_VERIFIED`, which says nothing about the
+    reading. A real storage rejection is `HTML_UPLOAD_FAILED`, and the URL stays out of the body.
+    """
+    import api.index as svc
+
+    def open_fails(request, timeout=60.0):
+        raise urllib.error.HTTPError(request.full_url, 403, "SignatureDoesNotMatch", {}, None)
+
+    monkeypatch.setattr(svc._UPLOAD_OPENER, "open", open_fails)
+    response = generate(
+        generate_request(tier="sample", uploadUrl=None, htmlUploadUrl="https://html.test/put"),
+        authorization=AUTH,
+    )
+    assert response.status_code == 502
+    payload = body_of(response)
+    assert payload["code"] == "HTML_UPLOAD_FAILED"
+    assert "html.test" not in payload["error"], "the presigned URL leaked into the error message"
+
+
+def test_generate_still_requires_some_upload_target():
+    """A render nobody can retrieve is not a render: at least one artefact target is required."""
+    response = generate(generate_request(uploadUrl=None), authorization=AUTH)
+    assert response.status_code == 400
+    assert body_of(response)["code"] == "MISSING_UPLOAD_URL"
+
+
 def test_no_web_document_is_rendered_unless_asked_for(monkeypatch):
     """A caller that does not ask pays nothing for it — and the response says so."""
     import api.index as svc

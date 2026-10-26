@@ -126,7 +126,7 @@ function** — it found the *bundled* faces rather than the system directory, wh
 `uploadAllowlist` is the number of upload hosts the engine will accept (`_allowed_upload_hosts()`).
 **Zero is a 503** with `{ ok: false, code: "UPLOAD_HOSTS_UNCONFIGURED", error }`: with no allowlist
 the engine refuses every render, which is exactly what happened for five days in October 2026
-(AU-03 audit). `/api/health` surfaces the count and the code as `engineDetail`.
+(AU-03 audit). `/api/health/detail` surfaces the count and the code as `engineDetail`.
 
 ### Why ReportLab, not the HTML/Chromium backend
 

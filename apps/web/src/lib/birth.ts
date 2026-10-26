@@ -56,7 +56,12 @@ export function resolveBirthLocation(input: {
   countryCode?: string | null;
   country?: string | null;
 }): ResolvedLocation {
-  const city = findCity(input.city, input.countryCode ?? null);
+  // AU-34 (2026-10-26 audit): `country` was declared and then ignored, so an edit that supplied the
+  // stored country (a name, not a code — `Profile.country`) re-resolved a bare, ambiguous city with
+  // no country at all. "Cambridge" then resolved to nothing and the edit failed. `findCity` matches
+  // either the country name or its two-letter code, so either is a valid disambiguator; the code is
+  // preferred when both are present.
+  const city = findCity(input.city, input.countryCode ?? input.country ?? null);
 
   if (!city) {
     // **Deliberately no fallback.** This used to fall back to the *first city of the given country* when

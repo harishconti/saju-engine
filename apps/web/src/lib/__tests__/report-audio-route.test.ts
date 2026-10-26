@@ -15,6 +15,11 @@ const { requireUser, prismaMock, presignGetUrl } = vi.hoisted(() => ({
 vi.mock("@/lib/auth", () => ({ requireUser }));
 vi.mock("@/lib/prisma", () => ({ prisma: prismaMock }));
 vi.mock("@/lib/r2", () => ({ presignGetUrl }));
+// AU-30: the route now limits per user before touching the report; this suite is about exposure.
+vi.mock("@/lib/ratelimit", () => ({
+  rateLimit: vi.fn(async () => undefined),
+  WINDOW: { minute: 60_000, hour: 3_600_000, day: 86_400_000 },
+}));
 
 const { GET, POST } = await import("@/app/api/reports/[id]/audio/route");
 

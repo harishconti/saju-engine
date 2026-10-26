@@ -1,62 +1,22 @@
 import { json } from "@/lib/api";
-import { prisma } from "@/lib/prisma";
-import { isR2Configured } from "@/lib/r2";
-import { engineHealth } from "@/lib/engine";
-import { isDodoConfigured, isDodoLiveMode } from "@/lib/dodo";
-import { productIdForTier } from "@/lib/tiers";
-import { isTurnstileConfigured, turnstileMode } from "@/lib/turnstile";
+import { publicHealth, runHealthProbe } from "@/lib/health";
 
 export const dynamic = "force-dynamic";
 
-/** Every paid tier must have a product id or checkout throws PRODUCT_NOT_CONFIGURED. */
-const PAID_TIER_IDS = ["essential", "deep", "compat-basic", "compat-deep"] as const;
-
 /**
- * Health probe for uptime monitoring. No auth, no secrets in the response.
- * Returns 503 when anything is degraded so a monitor can alert on status code alone.
+ * Public health probe for uptime monitoring.
+ *
+ * AU-31 (2026-10-26 audit): this used to answer with `db`, `storage`, `engine`, `engineDetail`,
+ * `payments`, `paymentsMode`, `botProtection` and `missingProducts` to anyone — a map of which
+ * environment variables are wrong, and whether the deployment can take real money. The public body
+ * is now just enough for a monitor (`ok`, `status`, `version`, `checkedAt`); the diagnostic detail
+ * moved to the authorised `/api/health/detail`, and the engine probe is cached so repeated hits do
+ * not call the engine every time.
+ *
+ * Still answers **503** when anything is degraded, so a monitor can alert on the status code alone
+ * (AU-03: a green probe over an engine that refused every render is what hid the October outage).
  */
 export async function GET() {
-  let db = false;
-  try {
-    await prisma.$queryRaw`SELECT 1`;
-    db = true;
-  } catch {
-    db = false;
-  }
-
-  const storage = isR2Configured();
-  const engine = await engineHealth();
-
-  const missingProducts = PAID_TIER_IDS.filter((id) => !productIdForTier(id));
-  const payments = isDodoConfigured() && missingProducts.length === 0;
-  const liveMode = isDodoLiveMode();
-
-  // The engine is the only probe that does not affect the marketing site, so it degrades rather than
-  // fails. DB and storage are hard requirements; payments is too, once you intend to sell.
-  const ok = db && storage && engine.ok;
-
-  return json(
-    {
-      status: ok ? "ok" : "degraded",
-      db,
-      storage,
-      engine: engine.ok,
-      ...(engine.detail ? { engineDetail: engine.detail } : {}),
-      payments,
-      /** `test_mode` means nothing can be charged for real — a useful thing to see in one glance. */
-      paymentsMode: liveMode ? "live_mode" : "test_mode",
-      /**
-       * Bot protection is a rollout switch, not a boolean: `off` (no verification),
-       * `log` (verify + record, **never block**) and `enforce` (refuse). Surfacing it
-       * here is deliberate — in an ops review, "log" must not look like "protected".
-       * It does not affect `ok`: a rollout state is a known posture, not an outage.
-       */
-      botProtection: turnstileMode(),
-      botProtectionConfigured: isTurnstileConfigured(),
-      ...(missingProducts.length ? { missingProducts } : {}),
-      version: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "dev",
-      checkedAt: new Date().toISOString(),
-    },
-    ok ? 200 : 503,
-  );
+  const snapshot = await runHealthProbe();
+  return json(publicHealth(snapshot), snapshot.ok ? 200 : 503);
 }

@@ -418,7 +418,11 @@ class GenerateRequest(BaseModel):
     contractVersion: int = CONTRACT_VERSION
     kind: str = Field(max_length=16)
     tier: str = Field(max_length=16)
-    uploadUrl: str = Field(max_length=2048)
+    # AU-29 (2026-10-26 audit): optional. The free sample keeps the web document and discards
+    # the PDF, so demanding a PDF target made a sample depend on an upload nobody keeps — and
+    # fail when that throwaway upload did. At least one of `uploadUrl` / `htmlUploadUrl` is
+    # still required, because a render the caller cannot retrieve is not a render.
+    uploadUrl: Optional[str] = Field(default=None, max_length=2048)
     # Optional: where to PUT the source markdown. Storing it is what lets the audio
     # script be derived from the artefact that was actually approved, instead of being
     # recomputed later (an engine deploy in between could change the words).
@@ -806,13 +810,24 @@ def _upload(artifact: Path, upload_url: str, *, content_type: str = "application
     request = urllib.request.Request(
         upload_url, data=body, method="PUT", headers={"Content-Type": content_type}
     )
+    # AU-29 (2026-10-26 audit): the reading and the PDF get distinct failure codes. The webapp
+    # turns `HTML_UPLOAD_FAILED` into copy about the reading; before this every storage failure
+    # was `UPLOAD_FAILED`, and a lost reading surfaced as `UPLOAD_NOT_VERIFIED` on the verify
+    # step — which never said which artefact was missing.
+    is_reading = content_type.startswith("text/html")
+    failure_code = "HTML_UPLOAD_FAILED" if is_reading else "UPLOAD_FAILED"
+    failure_message = (
+        "The rendered reading could not be stored."
+        if is_reading
+        else "The rendered PDF could not be stored."
+    )
     try:
         with _UPLOAD_OPENER.open(request, timeout=timeout) as response:
             if response.status not in (200, 201, 204):
-                raise _http(502, "UPLOAD_FAILED", "The rendered PDF could not be stored.")
+                raise _http(502, failure_code, failure_message)
     except urllib.error.HTTPError as exc:
         log.error("upload rejected by storage: HTTP %s", exc.code)  # status only, never the URL
-        raise _http(502, "UPLOAD_FAILED", "The rendered PDF could not be stored.") from exc
+        raise _http(502, failure_code, failure_message) from exc
 
 
 # ─────────────────────────────── endpoints ───────────────────────────────
@@ -927,8 +942,12 @@ def generate(request: GenerateRequest, authorization: Optional[str] = Header(Non
         )
     if request.kind not in _KINDS:
         return _fail_code("INVALID_KIND", f"kind must be one of {list(_KINDS)}.")
-    if not request.uploadUrl:
-        return _fail_code("MISSING_UPLOAD_URL", "An uploadUrl is required.")
+    # AU-29: either artefact target is enough; a request with neither retrieves nothing.
+    if not request.uploadUrl and not request.htmlUploadUrl:
+        return _fail_code(
+            "MISSING_UPLOAD_URL",
+            "An uploadUrl or an htmlUploadUrl is required.",
+        )
     if request.kind == "compat" and request.profileB is None:
         return _fail_code("COMPAT_NEEDS_TWO_PROFILES", "A compatibility reading needs two people.")
     if request.kind == "single" and request.tier not in _SINGLE_TIERS:
@@ -960,13 +979,24 @@ def generate(request: GenerateRequest, authorization: Optional[str] = Header(Non
                     request.favorableOverrideA,
                     wants_html=bool(request.htmlUploadUrl),
                 )
-            digest = hashlib.sha256(pdf.read_bytes()).hexdigest()
-            size = pdf.stat().st_size
-            _upload(pdf, request.uploadUrl)
+            # AU-29: only upload the PDF when the caller asked for one. The renderer still
+            # produces it (it builds the markdown), but a reading-only caller must not fail
+            # because a PDF it never keeps could not be stored — and its response must not
+            # claim integrity metadata for an artefact it cannot retrieve.
+            digest: Optional[str] = None
+            size: Optional[int] = None
+            if request.uploadUrl:
+                digest = hashlib.sha256(pdf.read_bytes()).hexdigest()
+                size = pdf.stat().st_size
+                _upload(pdf, request.uploadUrl)
             if request.htmlUploadUrl and html_path is not None:
-                # Best-effort, like the markdown: the reading failing to upload must not
-                # lose the report. The response says so, so the caller can retry the
-                # document without re-rendering the PDF.
+                # Best-effort when the PDF is the deliverable, like the markdown: the reading
+                # failing to upload must not lose the report. The response says so, so the
+                # caller can retry the document without re-rendering the PDF.
+                #
+                # AU-29: but when no PDF was requested the reading is the only artefact, so a
+                # failed upload means the request delivered nothing — fail with the reading's
+                # own code instead of answering 200 with `htmlBytes: null`.
                 try:
                     document = html_path.read_bytes()
                     _upload(html_path, request.htmlUploadUrl,
@@ -974,6 +1004,8 @@ def generate(request: GenerateRequest, authorization: Optional[str] = Header(Non
                     html_digest = hashlib.sha256(document).hexdigest()
                     html_size = len(document)
                 except HTTPException:
+                    if not request.uploadUrl:
+                        raise
                     log.error("web document upload failed; the PDF is still delivered")
             if request.mdUploadUrl:
                 # Best-effort: a missing markdown only costs the audio and the audit

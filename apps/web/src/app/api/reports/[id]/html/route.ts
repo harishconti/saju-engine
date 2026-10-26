@@ -1,6 +1,7 @@
 import { ApiError, handle } from "@/lib/api";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, WINDOW } from "@/lib/ratelimit";
 import { presignGetUrl } from "@/lib/r2";
 
 export const dynamic = "force-dynamic";
@@ -26,6 +27,10 @@ type Ctx = { params: Promise<{ id: string }> };
  */
 export const GET = handle(async (_req, ctx: Ctx) => {
   const user = await requireUser();
+  // AU-30 (2026-10-26 audit): opening the reading streams the document through this function.
+  // 60/minute covers a page and a few reloads; it is higher than the download limit because
+  // reading is the primary action and a refresh must not be refused.
+  await rateLimit(`report-html:${user.id}`, 60, WINDOW.minute);
   const { id } = await ctx.params;
 
   const report = await prisma.report.findFirst({

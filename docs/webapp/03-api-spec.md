@@ -43,7 +43,7 @@ export const POST = handle(async (req: Request) => {
 
 | Method | Path | Purpose | Rate limit |
 |---|---|---|---|
-| `GET` | `/api/health` | DB + R2 + engine probe. No secrets. Also reports `botProtection: off\|log\|enforce` and `botProtectionConfigured`. 200 `{status:'ok',…}` / 503 `{status:'degraded',…}` | none |
+| `GET` | `/api/health` | Minimal liveness for monitors: `{ok, status, version, checkedAt}`. No configuration detail. 200 `{status:'ok',…}` / 503 `{status:'degraded',…}` | none |
 | `POST` | `/api/sample` | Generate a free sample **reading** (the web document). No account required, and no PDF — see the response below | 5 / min / IP |
 | `POST` | `/api/share-card` | The reader's own Day Master card, a 1080×1920 PNG. No account required — it is the free snapshot's growth loop. Carries no birth data (built from `shareCardFields()`), stores nothing | 5 / min / IP |
 | `POST` | `/api/sample/email` | Email the free snapshot, and record the lead (`SampleLead`). No account required. Stores no birth data — only the address and the marketing choice | 5 / min / IP **and** 20 / h / IP **and** 2 / h / recipient |
@@ -134,6 +134,15 @@ All admin routes require `role = ADMIN` and additionally check that the actor's 
 |---|---|---|---|
 | `POST` | `/api/webhooks/dodo` | HMAC signature | `order_created` → paid + enqueue; `order_refunded` → refunded |
 | `POST` | `/api/webhooks/resend` | signature | Bounce/complaint → update `Delivery` |
+
+### Operations
+
+| Method | Path | Auth | Purpose |
+|---|---|---|---|
+| `GET` | `/api/health/detail` | `Authorization: Bearer $HEALTH_DETAIL_TOKEN`, **or** an admin session (`ADMIN_EMAILS` + `role: ADMIN` + verified email) | The full health snapshot: db/storage/engine booleans, `engineDetail`, `payments` + `paymentsMode`, `botProtection` + `botProtectionConfigured`, `missingProducts`, `status`, `version`, `checkedAt`. Same 200/503 rule as the public route; `401 UNAUTHORIZED` without disclosing anything (AU-31) |
+
+The engine probe behind both routes is cached for 60 seconds; see
+[09 — Operations](09-operations.md#health-checks).
 
 ### Cron
 

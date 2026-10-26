@@ -1,6 +1,7 @@
 import { ApiError, handle, json } from "@/lib/api";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, WINDOW } from "@/lib/ratelimit";
 import { presignGetUrl } from "@/lib/r2";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +19,9 @@ type Ctx = { params: Promise<{ id: string }> };
  */
 export const GET = handle(async (req, ctx: Ctx) => {
   const user = await requireUser();
+  // AU-30 (2026-10-26 audit): an attachment download streams the MP3 through this function, and
+  // every call mints a signed URL. 30/minute is comfortably above a listener and bounds a script.
+  await rateLimit(`report-audio:${user.id}`, 30, WINDOW.minute);
   const { id } = await ctx.params;
 
   const report = await prisma.report.findFirst({
@@ -73,6 +77,8 @@ export const GET = handle(async (req, ctx: Ctx) => {
  */
 export const POST = handle(async (_req, ctx: Ctx) => {
   const user = await requireUser();
+  // AU-30: the same bucket as the MP3 itself — it is the same narration, through a second door.
+  await rateLimit(`report-audio:${user.id}`, 30, WINDOW.minute);
   const { id } = await ctx.params;
   const report = await prisma.report.findFirst({
     where: { id, userId: user.id },
