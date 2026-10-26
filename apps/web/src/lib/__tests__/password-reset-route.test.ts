@@ -228,6 +228,37 @@ describe("POST /api/account/password-reset/confirm — the reset step", () => {
     expect(body.error).not.toMatch(/invalid or has expired/i);
   });
 
+  it("pins the whole provider-status mapping", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    // Only 400 is a statement about this token. `resetPassword` in the installed better-auth
+    // (`dist/api/routes/password.mjs`) throws `APIError.from("BAD_REQUEST", …)` — 400 — for a
+    // missing or consumed token, `USER_NOT_FOUND`, and a password too short or too long; it never
+    // emits 401/404/410. Every other code is something in between, and the token is single-use, so
+    // telling the person their link is dead would cost them the reset.
+    const cases: Array<{ status?: number; http: number; code: string }> = [
+      { status: 400, http: 400, code: "INVALID_RESET_TOKEN" },
+      { status: 429, http: 429, code: "RATE_LIMITED" },
+      { status: 401, http: 503, code: "RESET_UNAVAILABLE" },
+      { status: 404, http: 503, code: "RESET_UNAVAILABLE" },
+      { status: 500, http: 503, code: "RESET_UNAVAILABLE" },
+      { status: undefined, http: 503, code: "RESET_UNAVAILABLE" },
+    ];
+
+    for (const testCase of cases) {
+      resetPassword.mockResolvedValue({
+        data: null,
+        error: { status: testCase.status, code: "PROVIDER_CODE", message: "provider said no" },
+      });
+
+      const res = await confirmReset(confirmBody(), undefined as never);
+      const body = (await res.json()) as { code: string };
+
+      expect(res.status, `status ${String(testCase.status)}`).toBe(testCase.http);
+      expect(body.code, `status ${String(testCase.status)}`).toBe(testCase.code);
+    }
+  });
+
   it("treats an unclassified provider failure as retryable, not as a bad token", async () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
     resetPassword.mockResolvedValue({ data: null, error: { code: "NETWORK_ERROR" } });

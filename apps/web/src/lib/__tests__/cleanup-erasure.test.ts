@@ -13,8 +13,49 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
  * birth data still goes, and the R2 objects are removed only once the database has committed.
  */
 
-const { prismaMock, txMock, r2Mock, ownerAlertMock, processDodoEvent, events } = vi.hoisted(() => {
+const {
+  prismaMock,
+  txMock,
+  r2Mock,
+  ownerAlertMock,
+  processDodoEvent,
+  events,
+  jobRows,
+  ORIGINAL_JOB_PAYLOAD,
+} = vi.hoisted(() => {
   const events: string[] = [];
+
+  /**
+   * A retained job row as `fulfilment.ts` really leaves it: `Job.payload` holds the whole engine
+   * request — the profiles' names and full birth details included — and the row outlives the account
+   * for up to 90 days (`queue.ts` purge window). The transaction mock below mutates this fixture, so
+   * the assertion is about what a retained row actually contains, not about a call being made.
+   *
+   * `ownerId` is test-only: the real row has no user column, and the erasure reaches it through its
+   * required `order` relation.
+   */
+  const ORIGINAL_JOB_PAYLOAD = {
+    contractVersion: "1.0",
+    kind: "single",
+    tier: "deep",
+    uploadUrl: "https://r2.test/reports/u1/o1/r1.pdf",
+    mdUploadUrl: "https://r2.test/reports/u1/o1/r1.md",
+    htmlUploadUrl: "https://r2.test/reports/u1/o1/r1.html",
+    profileA: {
+      fullName: "Priya Sharma",
+      birthDate: "1992-03-20",
+      birthTime: "14:00",
+      timezone: "Asia/Seoul",
+      utcOffset: 9,
+      city: "Seoul",
+      latitude: 37.5665,
+      longitude: 126.978,
+    },
+  };
+  const jobRows: Array<{ id: string; orderId: string; ownerId: string; payload: unknown }> = [
+    { id: "job_1", orderId: "o1", ownerId: "u1", payload: structuredClone(ORIGINAL_JOB_PAYLOAD) },
+  ];
+
   const txMock = {
     // AU-25: the Neon identity is deleted with raw statements on the transaction client. The
     // default probe answers "the relation exists"; tests override the once-queue to simulate a
@@ -33,9 +74,26 @@ const { prismaMock, txMock, r2Mock, ownerAlertMock, processDodoEvent, events } =
       return 1;
     }),
     report: {
+      // Must-fix 2(a): the key capture moved inside the transaction, so this is the read whose
+      // result the deletion and the queued keys both come from.
+      findMany: vi.fn(),
       deleteMany: vi.fn(async () => {
         events.push("tx:report.deleteMany");
         return { count: 1 };
+      }),
+    },
+    // Must-fix 1: `Job.payload` is nullable Json, so erasure writes `Prisma.DbNull` — a literal
+    // `null` would store JSON null and `{}` an object, neither of which is a SQL NULL.
+    job: {
+      updateMany: vi.fn(async (args: { where: { order?: { userId?: string } }; data: { payload?: unknown } }) => {
+        events.push("tx:job.updateMany");
+        let count = 0;
+        for (const row of jobRows) {
+          if (row.ownerId !== args.where.order?.userId) continue;
+          row.payload = args.data.payload === Prisma.DbNull ? null : args.data.payload;
+          count++;
+        }
+        return { count };
       }),
     },
     profile: {
@@ -122,7 +180,16 @@ const { prismaMock, txMock, r2Mock, ownerAlertMock, processDodoEvent, events } =
   // it was called rather than what the mail said.
   const ownerAlertMock = { notifyOwnerIdentityDeletionFailed: vi.fn(async () => true) };
 
-  return { prismaMock, txMock, r2Mock, ownerAlertMock, processDodoEvent, events };
+  return {
+    prismaMock,
+    txMock,
+    r2Mock,
+    ownerAlertMock,
+    processDodoEvent,
+    events,
+    jobRows,
+    ORIGINAL_JOB_PAYLOAD,
+  };
 });
 
 vi.mock("@/lib/prisma", () => ({ prisma: prismaMock }));
@@ -149,6 +216,10 @@ beforeEach(() => {
   vi.clearAllMocks();
   events.length = 0;
 
+  // The retained job fixture is mutated by the transaction mock, so each test starts from the
+  // pre-erasure state — the state a real database is in before any erasure runs.
+  for (const row of jobRows) row.payload = structuredClone(ORIGINAL_JOB_PAYLOAD);
+
   // A commit is what makes the post-commit R2 deletion safe, so record when it happens.
   prismaMock.$transaction.mockImplementation(async (fn: (tx: typeof txMock) => Promise<unknown>) => {
     const result = await fn(txMock);
@@ -159,6 +230,9 @@ beforeEach(() => {
   prismaMock.deletionRequest.findMany.mockResolvedValue([deletionRequest("dr1", "u1")]);
   prismaMock.deletionRequest.updateMany.mockResolvedValue({ count: 1 });
   prismaMock.auditLog.count.mockResolvedValue(0);
+  // The report read inside the erasure transaction, and the post-commit re-sweep. Both default to
+  // "nothing there", like a real user with no reports.
+  txMock.report.findMany.mockResolvedValue([]);
   prismaMock.report.findMany.mockResolvedValue([]);
   prismaMock.profile.findMany.mockResolvedValue([]);
   prismaMock.order.findMany.mockResolvedValue([]);
@@ -166,7 +240,7 @@ beforeEach(() => {
 
 describe("processDueDeletions — erasure with an order (AU-04, D2)", () => {
   beforeEach(() => {
-    prismaMock.report.findMany.mockResolvedValue([{ id: "r1", ...KEYS }]);
+    txMock.report.findMany.mockResolvedValue([{ id: "r1", ...KEYS }]);
     prismaMock.profile.findMany.mockResolvedValue([{ id: "p1" }]);
     prismaMock.order.findMany.mockResolvedValue([{ profileAId: "p1", profileBId: null }]);
   });
@@ -246,7 +320,7 @@ describe("processDueDeletions — erasure with an order (AU-04, D2)", () => {
 
 describe("processDueDeletions — erasure with no order", () => {
   it("deletes the profile as before", async () => {
-    prismaMock.report.findMany.mockResolvedValue([{ id: "r1", ...KEYS }]);
+    txMock.report.findMany.mockResolvedValue([{ id: "r1", ...KEYS }]);
     prismaMock.profile.findMany.mockResolvedValue([{ id: "p1" }]);
 
     await expect(processDueDeletions(NOW)).resolves.toBe(1);
@@ -262,7 +336,7 @@ describe("processDueDeletions — erasure with no order", () => {
 
 describe("processDueDeletions — Neon identity deletion (AU-25)", () => {
   beforeEach(() => {
-    prismaMock.report.findMany.mockResolvedValue([{ id: "r1", ...KEYS }]);
+    txMock.report.findMany.mockResolvedValue([{ id: "r1", ...KEYS }]);
     prismaMock.profile.findMany.mockResolvedValue([{ id: "p1" }]);
     prismaMock.order.findMany.mockResolvedValue([{ profileAId: "p1", profileBId: null }]);
   });
@@ -419,6 +493,110 @@ describe("processDueDeletions — Neon identity deletion (AU-25)", () => {
   });
 });
 
+describe("processDueDeletions — the engine payload (must-fix 1)", () => {
+  beforeEach(() => {
+    txMock.report.findMany.mockResolvedValue([{ id: "r1", ...KEYS }]);
+    prismaMock.profile.findMany.mockResolvedValue([{ id: "p1" }]);
+    prismaMock.order.findMany.mockResolvedValue([{ profileAId: "p1", profileBId: null }]);
+  });
+
+  it("nulls Job.payload for every job the erased user still owns", async () => {
+    await processDueDeletions(NOW);
+
+    // Reached through the job's required order relation, and `Prisma.DbNull` — not `null`, which
+    // would store a JSON null in a nullable Json column, and not `{}`, which would keep a row shape.
+    expect(txMock.job.updateMany).toHaveBeenCalledWith({
+      where: { order: { userId: "u1" } },
+      data: { payload: Prisma.DbNull },
+    });
+  });
+
+  it("leaves no retained row carrying a birth field", async () => {
+    await processDueDeletions(NOW);
+
+    // Everything the user still has after erasure: order rows are retained for accounting, and this
+    // job hangs off one. Serialising the retained rows is the privacy page's promise made testable.
+    expect(jobRows.length).toBeGreaterThan(0);
+    const retained = JSON.stringify(jobRows);
+    for (const field of [
+      "fullName",
+      "birthDate",
+      "birthTime",
+      "timezone",
+      "utcOffset",
+      "city",
+      "latitude",
+      "longitude",
+    ]) {
+      expect(retained, `a retained job row still carries ${field}`).not.toContain(field);
+    }
+    expect(jobRows[0]!.payload).toBeNull();
+  });
+
+  it("is safe to run twice: the second pass writes the same NULL again", async () => {
+    await processDueDeletions(NOW);
+    await processDueDeletions(NOW);
+
+    expect(txMock.job.updateMany).toHaveBeenCalledTimes(2);
+    expect(jobRows[0]!.payload).toBeNull();
+  });
+});
+
+describe("processDueDeletions — a report that commits during erasure (must-fix 2a)", () => {
+  const LATE_KEYS = {
+    pdfKey: "reports/u1/o1/r2.pdf",
+    mdKey: "reports/u1/o1/r2.md",
+    audioKey: null,
+    htmlKey: "reports/u1/o1/r2.html",
+  };
+
+  beforeEach(() => {
+    txMock.report.findMany.mockResolvedValue([{ id: "r1", ...KEYS }]);
+    prismaMock.profile.findMany.mockResolvedValue([{ id: "p1" }]);
+    prismaMock.order.findMany.mockResolvedValue([{ profileAId: "p1", profileBId: null }]);
+  });
+
+  it("takes the keys and the deletion from the same view of the reports", async () => {
+    await processDueDeletions(NOW);
+
+    expect(txMock.report.findMany).toHaveBeenCalledWith({
+      where: { userId: "u1" },
+      select: { id: true, pdfKey: true, mdKey: true, audioKey: true, htmlKey: true },
+    });
+    expect(txMock.report.deleteMany).toHaveBeenCalledWith({ where: { userId: "u1" } });
+  });
+
+  it("queues a late report's objects and deletes its row, so nothing is orphaned in R2", async () => {
+    // A report that was not visible to the transaction — the render that committed between the
+    // transaction and the sweep. Its row would otherwise be deleted (or left) with its objects
+    // still in R2 and no record of their keys.
+    prismaMock.report.findMany
+      .mockResolvedValueOnce([{ id: "r2", ...LATE_KEYS }])
+      .mockResolvedValue([]);
+    prismaMock.report.deleteMany.mockResolvedValue({ count: 1 });
+
+    await processDueDeletions(NOW);
+
+    const queued = (r2Mock.deleteObjectOrQueue.mock.calls as unknown as Array<[string]>).map(
+      (call) => call[0],
+    );
+    expect(queued).toEqual(
+      expect.arrayContaining([
+        KEYS.pdfKey,
+        KEYS.mdKey,
+        KEYS.audioKey,
+        KEYS.htmlKey,
+        LATE_KEYS.pdfKey,
+        LATE_KEYS.mdKey,
+        LATE_KEYS.htmlKey,
+      ]),
+    );
+    expect(prismaMock.report.deleteMany).toHaveBeenCalledWith({ where: { userId: "u1" } });
+    // Two passes only: the late report, then the empty confirmation. The bound is not reached.
+    expect(prismaMock.report.findMany).toHaveBeenCalledTimes(2);
+  });
+});
+
 describe("processDueDeletions — one failure cannot block the rest", () => {
   it("leaves the failed request pending and completes a later one", async () => {
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
@@ -426,9 +604,11 @@ describe("processDueDeletions — one failure cannot block the rest", () => {
       deletionRequest("dr1", "u1"),
       deletionRequest("dr2", "u2"),
     ]);
-    prismaMock.report.findMany
+    // The failure the erasure must survive is a database error inside its own transaction: it
+    // happens before anything commits, so request u1 stays pending and u2 is still processed.
+    txMock.report.findMany
       .mockRejectedValueOnce(new Error("database hiccup"))
-      .mockResolvedValueOnce([]);
+      .mockResolvedValue([]);
     prismaMock.profile.findMany.mockResolvedValue([]);
 
     await expect(processDueDeletions(NOW)).resolves.toBe(1);

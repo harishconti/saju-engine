@@ -74,6 +74,21 @@ type OrderWithProfiles = Order & {
   user: { deletedAt: Date | null };
 };
 
+/**
+ * Raised by the report-write transaction when the account was erased after the render read its
+ * order but before the write (must-fix 2b).
+ *
+ * A sentinel rather than an `ApiError`: nothing upstream produced it, so it must not be classified
+ * as an engine refusal, retried, or paged to the owner. The catch in `processClaimedJob` turns it
+ * into the terminal `ACCOUNT_ERASED` failure.
+ */
+class AccountErasedDuringRender extends Error {
+  constructor() {
+    super("ACCOUNT_ERASED");
+    this.name = "AccountErasedDuringRender";
+  }
+}
+
 /** Create a queued job for an order. Returns the job id. */
 export async function createJobForOrder(orderId: string, kind: "GENERATE" | "REGENERATE"): Promise<string> {
   const job = await prisma.job.create({ data: { orderId, kind, state: "QUEUED" } });
@@ -288,6 +303,17 @@ export async function processClaimedJob(job: Job, opts: ClaimOptions = {}): Prom
     const htmlObject = result.htmlBytes ? await headObject(htmlKey) : null;
 
     await prisma.$transaction(async (tx) => {
+      // The `deletedAt` check above ran before the engine call, which can take a minute or more. An
+      // erasure that committed in that window must not leave a Report behind: the row carries
+      // `enginePayload` (full birth data) and the R2 keys of objects this render just uploaded.
+      // Re-read under the transaction, so either this write commits before the erasure's delete or
+      // it sees the erasure and aborts — there is no window between the check and the write.
+      const owner = await tx.user.findUnique({
+        where: { id: order.userId },
+        select: { deletedAt: true },
+      });
+      if (!owner || owner.deletedAt) throw new AccountErasedDuringRender();
+
       await tx.report.create({
         data: {
           id: reportId,
@@ -375,6 +401,14 @@ export async function processClaimedJob(job: Job, opts: ClaimOptions = {}): Prom
 
     return { ok: true, note: `report v${version}`, reportId, version };
   } catch (err) {
+    // Terminal by definition: erasure is not transient, so neither retrying nor paging helps. The
+    // report write rolled back, so no row or delivery was written. Handled before the generic path
+    // so the job cannot be requeued for an account that no longer exists.
+    if (err instanceof AccountErasedDuringRender) {
+      await failJobAfterCheck(job, "ACCOUNT_ERASED", attemptUncounted);
+      return { ok: false, note: "account erased" };
+    }
+
     const code =
       typeof err === "object" && err !== null && "code" in err
         ? String((err as { code?: string }).code ?? "UNKNOWN")

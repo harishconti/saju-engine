@@ -129,8 +129,10 @@ function applyJobData(data: Record<string, unknown>): void {
   if ("worker" in data) job.worker = (data.worker as string | null) ?? null;
 }
 
-/** The transaction body only touches report/delivery/job; the job update is the real fake. */
+/** The transaction body touches the account state, report/delivery, and the job update (the real fake). */
 const tx = {
+  // Must-fix 2b: the report write re-reads `deletedAt`; this account is live.
+  user: { findUnique: vi.fn(async () => ({ deletedAt: null })) },
   report: { create: vi.fn(), updateMany: vi.fn() },
   delivery: { create: vi.fn() },
   job: { update: vi.fn() },

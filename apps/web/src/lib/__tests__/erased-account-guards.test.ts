@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => ({
     $transaction: vi.fn(),
   },
   presignPutUrl: vi.fn(async (key: string) => `https://r2.test/${key}`),
+  headObject: vi.fn(),
   callEngine: vi.fn(),
   engineScript: vi.fn(),
   synthesise: vi.fn(),
@@ -25,6 +26,14 @@ const mocks = vi.hoisted(() => ({
   completeJob: vi.fn(),
   notifyOwnerEngineFailure: vi.fn(),
   notifyOwnerNewReview: vi.fn(),
+  // The transaction client for the report write. `user.findUnique` is the re-read that closes the
+  // window between the pre-engine check and the commit.
+  tx: {
+    user: { findUnique: vi.fn() },
+    report: { create: vi.fn(), updateMany: vi.fn() },
+    delivery: { create: vi.fn() },
+    job: { update: vi.fn() },
+  },
 }));
 
 vi.mock("@/lib/prisma", () => ({ prisma: mocks.prisma }));
@@ -32,7 +41,7 @@ vi.mock("@/lib/r2", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../r2")>()),
   isR2Configured: () => true,
   presignPutUrl: mocks.presignPutUrl,
-  headObject: vi.fn(),
+  headObject: mocks.headObject,
 }));
 vi.mock("@/lib/engine", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../engine")>()),
@@ -119,6 +128,91 @@ describe("generation for an erased account", () => {
         user: { select: { deletedAt: true } },
       },
     });
+  });
+});
+
+describe("an erasure that commits while a render is in flight", () => {
+  const RENDER_JOB = {
+    id: "job_1",
+    orderId: "order_1",
+    kind: "GENERATE" as const,
+    attempts: 1,
+    maxAttempts: 3,
+  };
+
+  function renderableOrder() {
+    return {
+      id: "order_1",
+      userId: "user_1",
+      kind: "SINGLE" as const,
+      tier: "deep",
+      profileAId: "prof_1",
+      profileBId: null,
+      profileA: {
+        id: "prof_1",
+        fullName: "Priya",
+        gender: "F" as const,
+        birthDate: new Date("1992-03-20T00:00:00.000Z"),
+        birthTime: "14:00",
+        timeKnown: true,
+        timezone: "Asia/Seoul",
+        utcOffset: 9,
+        city: "Seoul",
+        latitude: 37.5665,
+        longitude: 126.978,
+      },
+      profileB: null,
+      // The check at the top of the render passed: the account was not erased then.
+      user: { deletedAt: null },
+      favorableOverrideA: null,
+      favorableOverrideB: null,
+    };
+  }
+
+  beforeEach(() => {
+    mocks.prisma.order.findUnique.mockResolvedValue(renderableOrder());
+    mocks.prisma.report.findFirst.mockResolvedValue(null);
+    mocks.prisma.$transaction.mockImplementation(async (fn: (tx: unknown) => Promise<unknown>) =>
+      fn(mocks.tx),
+    );
+    mocks.headObject.mockResolvedValue({ size: 1234 });
+    mocks.callEngine.mockResolvedValue({
+      sha256: "a".repeat(64),
+      bytes: 4096,
+      pages: 7,
+      engineVersion: "0.2.0",
+      htmlBytes: null,
+    });
+  });
+
+  it("aborts the report write, writes no Report and fails the job with ACCOUNT_ERASED", async () => {
+    // Erasure committed after `processClaimedJob` read the order, before this transaction. The
+    // report row would carry `enginePayload` (full birth data) and the R2 keys, and its uploads
+    // would already be in storage — so the write has to be refused here, under the transaction.
+    mocks.tx.user.findUnique.mockResolvedValue({ deletedAt: ERASED_AT });
+
+    const outcome = await processClaimedJob(RENDER_JOB as never);
+
+    expect(outcome).toEqual({ ok: false, note: "account erased" });
+    expect(mocks.tx.user.findUnique).toHaveBeenCalledWith({
+      where: { id: "user_1" },
+      select: { deletedAt: true },
+    });
+    expect(mocks.tx.report.create).not.toHaveBeenCalled();
+    expect(mocks.tx.job.update).not.toHaveBeenCalled();
+    // Terminal: one FAILED row, no retries, and no owner page — an erased account is not an outage.
+    expect(mocks.failJob).toHaveBeenCalledWith("job_1", "ACCOUNT_ERASED");
+    expect(mocks.requeueJob).not.toHaveBeenCalled();
+    expect(mocks.notifyOwnerEngineFailure).not.toHaveBeenCalled();
+  });
+
+  it("writes the report when the account is still live at commit time", async () => {
+    mocks.tx.user.findUnique.mockResolvedValue({ deletedAt: null });
+
+    const outcome = await processClaimedJob(RENDER_JOB as never);
+
+    expect(outcome.ok).toBe(true);
+    expect(mocks.tx.report.create).toHaveBeenCalledTimes(1);
   });
 });
 

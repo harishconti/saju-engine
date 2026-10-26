@@ -31,13 +31,19 @@ const UNAVAILABLE_MESSAGE = "We couldn't reset your password just now. Please tr
 const RATE_LIMITED_MESSAGE = "Too many attempts. Please try again in a little while.";
 
 /**
- * The provider statuses that are a statement about *this token*.
+ * The only provider status that is a statement about *this token*.
  *
- * A blanket "any 4xx means a bad link" told a rate-limited or forbidden caller to discard a link
- * that still works. Only these codes reject the token; everything else — 429, 403, 5xx, or a
- * failure with no status at all — is a reason to try again, not to throw the link away.
+ * The installed provider emits 400 for every rejection: `resetPassword` in
+ * `node_modules/better-auth/dist/api/routes/password.mjs` throws `APIError.from("BAD_REQUEST", …)`
+ * for a missing token, a consumed/expired verification (`INVALID_TOKEN`), `USER_NOT_FOUND`, and a
+ * new password that is too short or too long (`INVALID_PASSWORD`). It never emits 401/404/410.
+ *
+ * So any other 4xx comes from something in between — a proxy, a wrong `baseURL` — and means "try
+ * again", not "your link is dead". A blanket "any 4xx means a bad link" told a rate-limited or
+ * misrouted caller to discard a link that still works; the token is single-use, so the wrong
+ * verdict here costs the person their reset.
  */
-const TOKEN_REJECTION_STATUSES = new Set([400, 401, 404, 410]);
+const TOKEN_REJECTION_STATUSES = new Set([400]);
 
 export const POST = handle(async (req) => {
   const ip = clientIp(req);

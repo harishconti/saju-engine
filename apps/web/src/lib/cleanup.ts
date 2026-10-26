@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { SCRUBBED_PROFILE } from "./profile-scrub";
 import { prisma } from "./prisma";
 import { drainObjectDeletions, deleteObjectOrQueue, deleteObjects, isR2Configured, listObjectsByPrefix } from "./r2";
@@ -218,9 +219,15 @@ export async function retryUnprocessedWebhooks(now = new Date()): Promise<number
  *    person.
  *  - **Profiles no order references are deleted outright.**
  *  - **Consent records are retained** as proof the consent existed; they are withdrawn, not removed.
- *  - **Reports and their R2 artefacts are destroyed.** The PDF, markdown, audio and HTML objects are
- *    deleted only after the transaction commits (through `deleteObjectOrQueue`, so a storage error is
- *    retried by the next sweep instead of rolling back an already-completed erasure).
+ *  - **Reports and their R2 artefacts are destroyed.** The keys are read inside the erasure
+ *    transaction, so the rows deleted and the keys queued come from the same view, and a bounded
+ *    post-commit re-sweep catches a report that committed just afterwards. The PDF, markdown, audio
+ *    and HTML objects are deleted only after the transaction commits (through `deleteObjectOrQueue`,
+ *    so a storage error is retried by the next sweep instead of rolling back an already-completed
+ *    erasure).
+ *  - **Retained job rows lose their payload.** `Job.payload` holds the full engine request (both
+ *    profiles' birth data) and the row outlives the account until `purgeOldJobs()` removes it, so it
+ *    is nulled in the same transaction.
  *  - **The User is anonymised but kept**, because the retained order rows resolve to it.
  *
  * Each request is isolated in its own try/catch: one failure is logged and leaves that request
@@ -276,6 +283,16 @@ const NEON_AUTH_RELATIONS = ['neon_auth."session"', 'neon_auth."account"', 'neon
  * slowly fills with requests that can never finish.
  */
 const NEON_IDENTITY_MAX_ATTEMPTS = 3;
+
+/**
+ * How many post-commit re-sweeps may run for reports that committed just after the erasure
+ * transaction (must-fix 2a).
+ *
+ * A report can commit between the transaction and the sweep; the sweep reads, queues the keys and
+ * deletes the row, and a second pass confirms nothing is left. Three is plenty and fixed — an
+ * unbounded loop over a table a concurrent render could keep writing to would never terminate.
+ */
+const ERASURE_RESWEEP_PASSES = 3;
 
 type IdentityOutcome = "deleted" | "missing-relation" | "failed";
 
@@ -347,15 +364,6 @@ async function processDeletionRequest(
   // below, so matching on email here would find nothing.
   const neonUserId = userId;
 
-  const reports = await prisma.report.findMany({
-    where: { userId },
-    // Include the MP3 and the web document: an erasure request must not leave either behind.
-    select: { id: true, pdfKey: true, mdKey: true, audioKey: true, htmlKey: true },
-  });
-  const keys = reports
-    .flatMap((r) => [r.pdfKey, r.mdKey, r.audioKey, r.htmlKey])
-    .filter((k): k is string => Boolean(k));
-
   // Order rows are retained for accounting, so find which profiles they still point at. Profile B
   // is SET NULL on delete, but Profile A is RESTRICT — deleting either referenced row fails the
   // whole transaction with P2003.
@@ -378,10 +386,35 @@ async function processDeletionRequest(
   }
   const retainedProfileIds = [...referencedProfileIds];
 
-  await prisma.$transaction(async (tx) => {
+  // The report keys are read *inside* the transaction, not before it, and that ordering is the
+  // point. The transaction deletes reports by `userId`; a report that committed between an outside
+  // snapshot and the transaction would be deleted with its storage keys never queued — permanent,
+  // unfindable PII in R2 that no later sweep could locate. Reading and deleting under one
+  // transaction makes the rows deleted and the keys queued the same view.
+  const keys = await prisma.$transaction(async (tx) => {
+    const reports = await tx.report.findMany({
+      where: { userId },
+      // Include the MP3 and the web document: an erasure request must not leave either behind.
+      select: { id: true, pdfKey: true, mdKey: true, audioKey: true, htmlKey: true },
+    });
+    const reportKeys = reports
+      .flatMap((r) => [r.pdfKey, r.mdKey, r.audioKey, r.htmlKey])
+      .filter((k): k is string => Boolean(k));
+
     // Reports first: Report_profileAId_fkey is RESTRICT too.
     await tx.report.deleteMany({ where: { userId } });
     await tx.delivery.deleteMany({ where: { userId } });
+
+    // `fulfilment.ts` stores the entire engine request in `Job.payload` — both profiles' names and
+    // full birth details included — and a finished job is retained by `purgeOldJobs()` long after
+    // the order's profiles are scrubbed. The job row outlives the person's profile data, so erasure
+    // must clear the payload in place. Jobs are reached through their required `order` relation, and
+    // `payload` is nullable Json, so the value is `Prisma.DbNull` (a SQL NULL) — not `null` (JSON
+    // null) and not `{}` (an object).
+    await tx.job.updateMany({
+      where: { order: { userId } },
+      data: { payload: Prisma.DbNull },
+    });
 
     if (retainedProfileIds.length > 0) {
       await tx.profile.updateMany({
@@ -419,6 +452,8 @@ async function processDeletionRequest(
         after: { localErasureCommittedAt: now.toISOString() },
       },
     });
+
+    return reportKeys;
   });
 
   // Only now that the database has committed. If storage is down, `deleteObjectOrQueue` enqueues
@@ -428,6 +463,43 @@ async function processDeletionRequest(
       await deleteObjectOrQueue(key);
     } catch (err) {
       console.error("erasure object cleanup failed", err instanceof Error ? err.name : "unknown");
+    }
+  }
+
+  // A render that was already past its account check when the transaction above ran can still
+  // commit a Report just after it. The transaction's view could not contain it, so a single delete
+  // by `userId` would strand its objects in R2 with no row left to find them by. Re-read and purge
+  // what is still there, taking each row's keys before deleting it.
+  //
+  // Bounded by `ERASURE_RESWEEP_PASSES`: two concurrent commits cannot repeat indefinitely now that
+  // the report write re-checks `deletedAt` inside its own transaction (`fulfilment.ts`), and an
+  // unbounded loop over a table an attacker could keep writing to is not an option. A database
+  // error here deliberately propagates: the request stays `pending`, so the next run repeats the
+  // idempotent erasure rather than settling it with a report row left behind.
+  for (let pass = 0; pass < ERASURE_RESWEEP_PASSES; pass++) {
+    const leftovers = await prisma.report.findMany({
+      where: { userId },
+      select: { id: true, pdfKey: true, mdKey: true, audioKey: true, htmlKey: true },
+    });
+    if (leftovers.length === 0) break;
+
+    for (const report of leftovers) {
+      for (const key of [report.pdfKey, report.mdKey, report.audioKey, report.htmlKey]) {
+        if (!key) continue;
+        try {
+          await deleteObjectOrQueue(key);
+        } catch (err) {
+          console.error(
+            "erasure re-sweep object cleanup failed",
+            err instanceof Error ? err.name : "unknown",
+          );
+        }
+      }
+    }
+    await prisma.report.deleteMany({ where: { userId } });
+
+    if (pass === ERASURE_RESWEEP_PASSES - 1) {
+      console.error("erasure re-sweep hit its bound; a report row may remain", userId);
     }
   }
 
