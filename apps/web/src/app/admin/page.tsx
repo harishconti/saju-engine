@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { Alert, Badge, Card, CardContent, EmptyState, PageHeader, Stat, buttonClasses } from "@/components/ui";
 import { ReportStatusBadge } from "@/components/dashboard/report-row";
+import { FailedOrdersTable } from "@/components/dashboard/failed-orders";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { listRecoverableOrders } from "@/lib/admin-recovery";
 import { timeAgo } from "@/lib/format";
-import { tierFor } from "@/lib/tiers";
+import { tierFor, tierNameFor } from "@/lib/tiers";
 import { jobStats } from "@/lib/queue";
 import { runSlaSweep } from "@/lib/sla";
 
@@ -23,7 +25,7 @@ export default async function AdminQueuePage() {
     console.error("SLA sweep failed:", err instanceof Error ? err.message : "unknown");
   }
 
-  const [queue, failedJobs, stats] = await Promise.all([
+  const [queue, failedJobs, stats, recoverableOrders] = await Promise.all([
     prisma.report.findMany({
       where: { status: { in: ["DRAFT_READY", "IN_REVIEW"] } },
       orderBy: { createdAt: "asc" },
@@ -41,6 +43,7 @@ export default async function AdminQueuePage() {
       include: { order: { select: { id: true, tier: true, kind: true } } },
     }),
     jobStats(),
+    listRecoverableOrders(),
   ]);
 
   const oldest = queue[0]?.createdAt ?? null;
@@ -147,6 +150,13 @@ export default async function AdminQueuePage() {
           )}
         </CardContent>
       </Card>
+
+      <FailedOrdersTable
+        rows={recoverableOrders.map((order) => ({
+          ...order,
+          tierName: tierNameFor(order.kind, order.tier),
+        }))}
+      />
 
       {failedJobs.length > 0 ? (
         <Card>

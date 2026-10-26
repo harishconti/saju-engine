@@ -33,7 +33,9 @@ export const DELETE = handle(async (_req, ctx: Ctx) => {
       entityId: id,
       action: "delete",
       actorId: user.id,
-      before: { tier: report.tier, status: report.status, version: report.version },
+      // AU-02 (2026-10-26 audit): record the order, so the admin recovery list can tell a
+      // customer-deleted report from an outage failure without guessing from the actor.
+      before: { orderId: report.orderId, tier: report.tier, status: report.status, version: report.version },
     });
   });
 

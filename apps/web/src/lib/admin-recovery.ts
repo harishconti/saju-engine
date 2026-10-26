@@ -1,0 +1,151 @@
+import type { JobState, OrderKind, Prisma } from "@prisma/client";
+import { prisma } from "./prisma";
+
+/**
+ * The admin recovery list for AU-02 (2026-10-26 audit).
+ *
+ * A paid order whose GENERATE job exhausted its attempts during the October outage has no Report,
+ * so the regenerate action — which starts from a report — has nothing to act on. This is the
+ * read-only query that finds those orders so an operator can retry the job from the console.
+ *
+ * Two exclusions, both deliberate:
+ *  - an order that has a report is not a failure (it may simply be waiting for review);
+ *  - an order with a live (QUEUED/RUNNING) job is already being worked on.
+ *
+ * A third exclusion is subtler. A paid order can legitimately have no report because the customer
+ * deleted it themselves. That is not an outage loss and "retrying" it would regenerate a reading
+ * the customer asked to be removed. Deletions are audited (`entity = "report"`, `action =
+ * "delete"`); the link back to the order is either the order id recorded on the deletion row
+ * (written from this task onward) or the report id shared with the order's own `create`/`deliver`
+ * audit row. Rows written before the delete route recorded the order id have no other surviving
+ * link — the report row is gone and the job never stored its id.
+ */
+
+export interface RecoverableOrder {
+  orderId: string;
+  kind: OrderKind;
+  tier: string;
+  paidAt: string | null;
+  profileLabel: string;
+  jobId: string | null;
+  jobState: JobState | null;
+  attempts: number | null;
+  maxAttempts: number | null;
+  lastError: string | null;
+}
+
+/** The order id an audit row names, when it names one. */
+function orderIdFromJson(value: Prisma.JsonValue | null): string | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const orderId = (value as { orderId?: unknown }).orderId;
+  return typeof orderId === "string" ? orderId : null;
+}
+
+export async function listRecoverableOrders(limit = 100): Promise<RecoverableOrder[]> {
+  const orders = await prisma.order.findMany({
+    where: {
+      status: "PAID",
+      reports: { none: {} },
+      jobs: { none: { state: { in: ["QUEUED", "RUNNING"] } } },
+    },
+    orderBy: { paidAt: "desc" },
+    take: limit,
+    select: {
+      id: true,
+      kind: true,
+      tier: true,
+      paidAt: true,
+      profileA: { select: { label: true } },
+      profileB: { select: { label: true } },
+    },
+  });
+  if (orders.length === 0) return [];
+
+  const orderIds = orders.map((order) => order.id);
+
+  const [jobs, auditRows] = await Promise.all([
+    // The generate-family jobs only: a VOICE job is a different failure and cannot produce the
+    // missing report. Newest first so the table shows the attempt that actually failed.
+    prisma.job.findMany({
+      where: { orderId: { in: orderIds }, kind: { in: ["GENERATE", "REGENERATE"] } },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        orderId: true,
+        state: true,
+        attempts: true,
+        maxAttempts: true,
+        lastError: true,
+      },
+    }),
+    prisma.auditLog.findMany({
+      where: {
+        entity: "report",
+        OR: [
+          { action: "delete" },
+          ...orderIds.flatMap((orderId) => [
+            { action: "create", after: { path: ["orderId"], equals: orderId } },
+            { action: "deliver", after: { path: ["orderId"], equals: orderId } },
+          ]),
+        ],
+      },
+      select: { entityId: true, action: true, before: true, after: true },
+    }),
+  ]);
+
+  const deletedReportIds = new Set<string>();
+  const directlyDeletedOrderIds = new Set<string>();
+  const reportIdsByOrder = new Map<string, Set<string>>();
+  const wantedOrderIds = new Set(orderIds);
+
+  for (const row of auditRows) {
+    if (row.action === "delete") {
+      deletedReportIds.add(row.entityId);
+      const orderId = orderIdFromJson(row.before) ?? orderIdFromJson(row.after);
+      if (orderId && wantedOrderIds.has(orderId)) directlyDeletedOrderIds.add(orderId);
+      continue;
+    }
+    // `create` / `deliver`: the only surviving record of which report belonged to the order.
+    const orderId = orderIdFromJson(row.after);
+    if (!orderId || !wantedOrderIds.has(orderId)) continue;
+    const ids = reportIdsByOrder.get(orderId) ?? new Set<string>();
+    ids.add(row.entityId);
+    reportIdsByOrder.set(orderId, ids);
+  }
+
+  const intentionallyDeleted = new Set(directlyDeletedOrderIds);
+  for (const [orderId, reportIds] of reportIdsByOrder) {
+    for (const reportId of reportIds) {
+      if (deletedReportIds.has(reportId)) {
+        intentionallyDeleted.add(orderId);
+        break;
+      }
+    }
+  }
+
+  const latestJob = new Map<string, (typeof jobs)[number]>();
+  for (const job of jobs) {
+    if (!latestJob.has(job.orderId)) latestJob.set(job.orderId, job);
+  }
+
+  return orders
+    .filter((order) => !intentionallyDeleted.has(order.id))
+    .map((order) => {
+      const job = latestJob.get(order.id) ?? null;
+      return {
+        orderId: order.id,
+        kind: order.kind,
+        tier: order.tier,
+        paidAt: order.paidAt ? order.paidAt.toISOString() : null,
+        profileLabel:
+          order.kind === "COMPAT" && order.profileB
+            ? `${order.profileA.label} × ${order.profileB.label}`
+            : order.profileA.label,
+        jobId: job?.id ?? null,
+        jobState: job?.state ?? null,
+        attempts: job?.attempts ?? null,
+        maxAttempts: job?.maxAttempts ?? null,
+        lastError: job?.lastError ?? null,
+      };
+    });
+}

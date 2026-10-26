@@ -514,12 +514,15 @@ export async function kickOwnerJobs(userId: string, max = 2): Promise<{ processe
 export async function deleteReportArtifacts(reportId: string): Promise<void> {
   const report = await prisma.report.findUnique({
     where: { id: reportId },
-    select: { pdfKey: true, mdKey: true, audioKey: true },
+    select: { pdfKey: true, mdKey: true, audioKey: true, htmlKey: true },
   });
   if (!report) return;
   if (report.pdfKey) await deleteObjectOrQueue(report.pdfKey);
   if (report.mdKey) await deleteObjectOrQueue(report.mdKey);
   if (report.audioKey) await deleteObjectOrQueue(report.audioKey);
+  // AU-08 (2026-10-26 audit): the web document is where the birth data actually sits, and for a
+  // sample it is the ONLY artefact — omitting it left the whole chart in R2 after a delete.
+  if (report.htmlKey) await deleteObjectOrQueue(report.htmlKey);
   await prisma.report.delete({ where: { id: reportId } });
 }
 
