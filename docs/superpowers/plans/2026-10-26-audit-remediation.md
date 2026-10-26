@@ -529,6 +529,10 @@ artefact it discards.
    the verified-admin rule.
 6. Set every AU status in the "Audit 2026-10-26" table to DONE / OPEN with the commit hash, in the
    same pass as the code tasks complete. Never mark an item DONE without a commit.
+7. `docs/webapp/05-report-pipeline.md:114-120`: move the new `uploadAllowlist` line out of the block
+   headed "Verified in production" (it was measured after deploy at the earliest) — a docs block
+   must not claim a response shape nobody has observed. Add it as an "after this change, expect"
+   example instead.
 
 **Tests:** none (docs), but `git diff --check` must pass and no secret may appear in the diff.
 
