@@ -35,15 +35,19 @@
     are also DONE — code complete and tested; D2 only needs SMTP credentials / a proxy at deploy.)
     P3-isolated/geonrok are deliberate `documented_interpretation` school divergences, not bugs.
   - **2026-10-26 production audit (AU-01 – AU-47):** remediation **merged to `develop`** on
-    2026-10-26 (`e370eb8`, 34 commits from `audit/2026-10-26-remediation`, **not pushed**). Per-item
-    status and commit hashes are in `docs/issues_bugs.md` → "Audit 2026-10-26"; the items still OPEN
-    there are deliberate deferrals, not unfinished work. Verified at the merge commit:
-    engine **2,049 passed / 5 skipped / 13 xfailed**, web **638 passed / 4 skipped**, `tsc` and
-    `eslint` clean. The branch was reviewed task-by-task and then whole-branch; three must-fix
-    findings from that final review (retained `Job.payload` birth data, erasure/R2 orphans under
-    READ COMMITTED, an over-wide reset-token rejection set) were fixed in two follow-up rounds and
-    re-reviewed. **Deploy blockers are owner actions, not code** — see "Owner actions before the
-    audit remediation is safe to deploy" under Active Wishes.
+    2026-10-26 (`e370eb8`, 34 commits from `audit/2026-10-26-remediation`), **pushed to
+    `origin/develop` and deployed** as `624f362` (webapp + engine, Vercel Git integration builds on
+    push to `develop`). The `lastSeenAt` migration was applied over `DIRECT_URL` **before** the
+    webapp build finished. Post-merge backlog item 1 (`retireInactiveProfiles` orphaning R2 objects on
+    a crash between commit and its queue loop) was fixed in `61e3588`. Per-item status and commit
+    hashes are in `docs/issues_bugs.md` → "Audit 2026-10-26"; the items still OPEN there are
+    deliberate deferrals, not unfinished work. Verified before the merge: engine **2,049 passed /
+    5 skipped / 13 xfailed**, web **641 passed / 4 skipped** at the fix, `tsc` and `eslint` clean.
+    The branch was reviewed task-by-task and then whole-branch; three must-fix findings from that
+    final review (retained `Job.payload` birth data, erasure/R2 orphans under READ COMMITTED, an
+    over-wide reset-token rejection set) were fixed in two follow-up rounds and re-reviewed.
+    **The remaining deploy blockers are owner actions, not code** — see "Owner actions before the
+    audit remediation is safe to deploy" under Active Wishes (Neon password rotation is still open).
   - **2026-10-07:** `P3-bangham` FIXED (방합국 detector in `patterns.detect_structural_notes`,
     fixture `bangham-guk-巳午未-1991`), `P3-yangin` FIXED (`stars._yangin` scans all four pillars,
     matching `knowledge/11 §I` "in chart"; no published compat score moved), `P3-golden` FIXED
@@ -2204,9 +2208,9 @@ a commit: they are console settings, environment values and deployment ordering.
 
 1. **AU-01 — rotate the Neon database password** echoed into a session transcript. Rewrite the three
    DB URLs, then redeploy (brief outage).
-2. **Apply `apps/web/prisma/migrations/20261026120000_user_last_seen_at/` BEFORE deploying.** The
-   `lastSeenAt` write and the retention owner filter read the new column; deploying first means a
-   window where those paths error.
+2. ✅ **DONE 2026-10-26** — `20261026120000_user_last_seen_at` applied over `DIRECT_URL`
+   (`npx prisma migrate deploy`), `prisma migrate status` then reported "Database schema is up to
+   date". Applied **before** the `624f362` deploy finished, which was the required order.
 3. **GitHub secrets for the new 15-minute dispatch job:** `R2_ENDPOINT`, `R2_BUCKET`,
    `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `ENGINE_URL`, `ENGINE_SERVICE_TOKEN`.
 4. **AU-35 — Neon console:** require email verification with a verified sender. Until then the auth
