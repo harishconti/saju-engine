@@ -18,6 +18,7 @@ const mocks = vi.hoisted(() => ({
   },
   presignPutUrl: vi.fn(async (key: string) => `https://r2.test/${key}`),
   headObject: vi.fn(),
+  deleteObjectOrQueue: vi.fn(async (_key: string) => undefined),
   callEngine: vi.fn(),
   engineScript: vi.fn(),
   synthesise: vi.fn(),
@@ -42,6 +43,8 @@ vi.mock("@/lib/r2", async (importOriginal) => ({
   isR2Configured: () => true,
   presignPutUrl: mocks.presignPutUrl,
   headObject: mocks.headObject,
+  // The queue-delete the erasure branch uses for artefacts the engine already uploaded.
+  deleteObjectOrQueue: mocks.deleteObjectOrQueue,
 }));
 vi.mock("@/lib/engine", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../engine")>()),
@@ -176,6 +179,7 @@ describe("an erasure that commits while a render is in flight", () => {
       fn(mocks.tx),
     );
     mocks.headObject.mockResolvedValue({ size: 1234 });
+    mocks.deleteObjectOrQueue.mockResolvedValue(undefined);
     mocks.callEngine.mockResolvedValue({
       sha256: "a".repeat(64),
       bytes: 4096,
@@ -204,6 +208,70 @@ describe("an erasure that commits while a render is in flight", () => {
     expect(mocks.failJob).toHaveBeenCalledWith("job_1", "ACCOUNT_ERASED");
     expect(mocks.requeueJob).not.toHaveBeenCalled();
     expect(mocks.notifyOwnerEngineFailure).not.toHaveBeenCalled();
+    // The PDF and markdown were uploaded before the write; the HTML was not (`htmlBytes: null`), so
+    // its key is not queued. Only objects this render actually created may be touched.
+    const keys = (mocks.deleteObjectOrQueue.mock.calls as unknown as Array<[string]>).map(
+      (call) => call[0],
+    );
+    expect(keys.filter((key) => key.endsWith(".pdf"))).toHaveLength(1);
+    expect(keys.filter((key) => key.endsWith(".md"))).toHaveLength(1);
+    expect(keys.filter((key) => key.endsWith(".html"))).toHaveLength(0);
+  });
+
+  it("deletes every artefact the engine already uploaded, once per key", async () => {
+    // Erasure committed during the render. The engine has PUT the PDF, the markdown and the HTML;
+    // with the write refused there is no Report row, and erasure finds objects only through report
+    // rows — so nothing would ever reach these three again.
+    mocks.tx.user.findUnique.mockResolvedValue({ deletedAt: ERASED_AT });
+    mocks.callEngine.mockResolvedValue({
+      sha256: "a".repeat(64),
+      bytes: 4096,
+      pages: 7,
+      engineVersion: "0.2.0",
+      htmlBytes: 4096,
+    });
+
+    const outcome = await processClaimedJob(RENDER_JOB as never);
+
+    expect(outcome).toEqual({ ok: false, note: "account erased" });
+    expect(mocks.deleteObjectOrQueue).toHaveBeenCalledTimes(3);
+    const keys = (mocks.deleteObjectOrQueue.mock.calls as unknown as Array<[string]>).map(
+      (call) => call[0],
+    );
+    for (const suffix of [".pdf", ".md", ".html"]) {
+      expect(keys.filter((key) => key.endsWith(suffix))).toHaveLength(1);
+    }
+    for (const key of keys) {
+      expect(key).toMatch(/^reports\/user_1\/order_1\/[0-9a-f-]{36}\./);
+    }
+    // Still terminal: a cleanup failure must not convert the refusal into a retry or a page.
+    expect(mocks.failJob).toHaveBeenCalledWith("job_1", "ACCOUNT_ERASED");
+    expect(mocks.requeueJob).not.toHaveBeenCalled();
+    expect(mocks.notifyOwnerEngineFailure).not.toHaveBeenCalled();
+  });
+
+  it("keeps the terminal ACCOUNT_ERASED outcome when the artefact cleanup throws", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    mocks.tx.user.findUnique.mockResolvedValue({ deletedAt: ERASED_AT });
+    mocks.deleteObjectOrQueue.mockRejectedValue(new Error("r2 is down"));
+
+    const outcome = await processClaimedJob(RENDER_JOB as never);
+
+    // `deleteObjectOrQueue` already queues on a live failure; here it throws outright, and even
+    // that must not change the job's outcome.
+    expect(outcome).toEqual({ ok: false, note: "account erased" });
+    expect(mocks.failJob).toHaveBeenCalledWith("job_1", "ACCOUNT_ERASED");
+    expect(mocks.requeueJob).not.toHaveBeenCalled();
+    expect(mocks.notifyOwnerEngineFailure).not.toHaveBeenCalled();
+    expect(consoleError).toHaveBeenCalled();
+    // The log carries the error class only — never a key, never PII.
+    const logged = consoleError.mock.calls
+      .flat()
+      .map((arg) => (typeof arg === "string" ? arg : String(arg)))
+      .join(" ");
+    expect(logged).toContain("Error");
+    expect(logged).not.toContain("reports/user_1");
+    consoleError.mockRestore();
   });
 
   it("writes the report when the account is still live at commit time", async () => {
@@ -213,6 +281,8 @@ describe("an erasure that commits while a render is in flight", () => {
 
     expect(outcome.ok).toBe(true);
     expect(mocks.tx.report.create).toHaveBeenCalledTimes(1);
+    // The live path keeps its artefacts; the erasure cleanup is not reached.
+    expect(mocks.deleteObjectOrQueue).not.toHaveBeenCalled();
   });
 });
 

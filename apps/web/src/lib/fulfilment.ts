@@ -214,6 +214,12 @@ export async function processClaimedJob(job: Job, opts: ClaimOptions = {}): Prom
   // terminal failure. A transient refusal spends nothing, so the job stays where it was.
   const attemptUncounted = opts.countAttempt === false;
 
+  // The keys this render uploads before it writes the Report row. If that write is refused because
+  // the account was erased mid-render, the objects exist with no row to find them by, so the
+  // `AccountErasedDuringRender` branch below deletes them. Only keys whose object is known to have
+  // landed are recorded.
+  const uploadedKeys: string[] = [];
+
   if (job.kind === "VOICE") return processVoiceJob(job, attemptUncounted);
   try {
     const order = (await prisma.order.findUnique({
@@ -301,6 +307,12 @@ export async function processClaimedJob(job: Job, opts: ClaimOptions = {}): Prom
     // The reading is best-effort in the same way: a web document that did not land leaves the PDF
     // as the deliverable rather than losing the order. The row records only what is really there.
     const htmlObject = result.htmlBytes ? await headObject(htmlKey) : null;
+
+    // What this render really put in storage: the PDF was just verified, the markdown was uploaded
+    // through the presigned URL the engine was given, and the HTML only counts when its object
+    // landed. Recorded here so the erasure branch cannot queue a key this call never used.
+    uploadedKeys.push(pdfKey, mdKey);
+    if (htmlObject) uploadedKeys.push(htmlKey);
 
     await prisma.$transaction(async (tx) => {
       // The `deletedAt` check above ran before the engine call, which can take a minute or more. An
@@ -405,6 +417,21 @@ export async function processClaimedJob(job: Job, opts: ClaimOptions = {}): Prom
     // report write rolled back, so no row or delivery was written. Handled before the generic path
     // so the job cannot be requeued for an account that no longer exists.
     if (err instanceof AccountErasedDuringRender) {
+      // The engine already PUT these objects. With no Report row they are unreachable: erasure
+      // sweeps `reports/{userId}/` only through report rows, and nothing else lists that prefix
+      // (`listObjectsByPrefix` serves the anonymous sample sweep alone), so no later pass could
+      // find them. Queue the deletion — a storage fault is retried by the next sweep — and never
+      // let a cleanup problem change the job's outcome.
+      for (const key of uploadedKeys) {
+        try {
+          await deleteObjectOrQueue(key);
+        } catch (cleanupErr) {
+          console.error(
+            "erased render artefact cleanup failed",
+            cleanupErr instanceof Error ? cleanupErr.name : "unknown",
+          );
+        }
+      }
       await failJobAfterCheck(job, "ACCOUNT_ERASED", attemptUncounted);
       return { ok: false, note: "account erased" };
     }
