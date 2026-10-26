@@ -1,6 +1,6 @@
 import { prisma } from "./prisma";
 import { audit, writeAudit } from "./audit";
-import { runDispatchTick } from "./fulfilment";
+import { processJobById } from "./fulfilment";
 import { after } from "next/server";
 import { track } from "@vercel/analytics/server";
 
@@ -60,6 +60,7 @@ export async function processDodoEvent(event: DodoEvent): Promise<string> {
       // while the first attempt is still running) could both pass it. Re-check it as part of the
       // write: only the delivery that actually moves the order to PAID creates the job and counts
       // the revenue, which makes replay safe under concurrency as well as sequentially.
+      let createdJobId: string | null = null;
       const transitioned = await prisma.$transaction(async (tx) => {
         const updated = await tx.order.updateMany({
           where: { id: order.id, status: { notIn: ["PAID", "REFUNDED"] } },
@@ -70,7 +71,11 @@ export async function processDodoEvent(event: DodoEvent): Promise<string> {
         // Order rows are retained for accounting (D2), and the payment must still be recorded — but
         // no reading may be generated for an erased person, so no GENERATE job is queued.
         if (!erased) {
-          await tx.job.create({ data: { orderId: order.id, kind: "GENERATE", state: "QUEUED" } });
+          const job = await tx.job.create({
+            data: { orderId: order.id, kind: "GENERATE", state: "QUEUED" },
+            select: { id: true },
+          });
+          createdJobId = job.id;
         }
         await writeAudit(tx, {
           entity: "order",
@@ -94,16 +99,22 @@ export async function processDodoEvent(event: DodoEvent): Promise<string> {
         // Fulfilment already committed; a lost analytics event is acceptable.
       }
 
-      // Dispatch without blocking the provider's 2xx. On Vercel Hobby there is no per-minute cron,
-      // so this is the primary generation trigger. Skipped for an erased account: there is no job
-      // to dispatch, and nothing may be generated for them.
-      if (!erased) {
+      // Dispatch without blocking the provider's 2xx. The scheduled dispatcher runs every 15
+      // minutes from `.github/workflows/sla-sweep.yml` (decision D4 — Hobby cannot run a per-minute
+      // Vercel cron), so this is the immediate trigger and that workflow is the ceiling on the wait.
+      //
+      // AU-13 (2026-10-26 audit): this used to run `runDispatchTick(1)`, which claims the OLDEST
+      // queued job — during a backlog that is somebody else's order, and the payment that just
+      // succeeded waited another round. It now dispatches exactly the job this event created.
+      if (createdJobId) {
+        const jobId = createdJobId;
         try {
           after(async () => {
             try {
-              await runDispatchTick(1);
+              await processJobById(jobId, "webhook");
             } catch {
-              // Job stays QUEUED: the daily cron, the dashboard kick, or an admin regenerate recovers it.
+              // Job stays QUEUED: the 15-minute dispatcher, the dashboard kick, or an admin
+              // regenerate recovers it.
             }
           });
         } catch {

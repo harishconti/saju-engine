@@ -139,7 +139,7 @@ All admin routes require `role = ADMIN` and additionally check that the actor's 
 
 | Method | Path | Auth | Schedule |
 |---|---|---|---|
-| `GET`/`POST` | `/api/cron/dispatch` | `Authorization: Bearer $CRON_SECRET` | every minute (Pro) |
+| `GET`/`POST` | `/api/cron/dispatch` | `Authorization: Bearer $CRON_SECRET` | every 15 minutes (GitHub Actions); daily Vercel cron fallback |
 | `GET`/`POST` | `/api/cron/cleanup` | same | daily |
 
 Cron routes must accept both `GET` and `POST` (Vercel Cron uses `GET`) and must be safe to run

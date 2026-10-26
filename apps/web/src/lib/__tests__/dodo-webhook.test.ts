@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
  * job, or double-count revenue.
  */
 
-const { prismaMock, txMock, writeAudit, audit, track, runDispatchTick, afterCallbacks } = vi.hoisted(() => {
+const { prismaMock, txMock, writeAudit, audit, track, processJobById, afterCallbacks } = vi.hoisted(() => {
   const afterCallbacks: Array<() => Promise<void> | void> = [];
   const txMock = {
     order: { updateMany: vi.fn(), update: vi.fn() },
@@ -23,14 +23,14 @@ const { prismaMock, txMock, writeAudit, audit, track, runDispatchTick, afterCall
     writeAudit: vi.fn(),
     audit: vi.fn(),
     track: vi.fn(),
-    runDispatchTick: vi.fn(),
+    processJobById: vi.fn(),
     afterCallbacks,
   };
 });
 
 vi.mock("@/lib/prisma", () => ({ prisma: prismaMock }));
 vi.mock("@/lib/audit", () => ({ writeAudit, audit }));
-vi.mock("@/lib/fulfilment", () => ({ runDispatchTick }));
+vi.mock("@/lib/fulfilment", () => ({ processJobById }));
 vi.mock("next/server", () => ({
   after: (fn: () => Promise<void> | void) => {
     afterCallbacks.push(fn);
@@ -53,9 +53,9 @@ beforeEach(() => {
   );
   txMock.order.updateMany.mockResolvedValue({ count: 1 });
   txMock.order.update.mockResolvedValue({});
-  txMock.job.create.mockResolvedValue({});
+  txMock.job.create.mockResolvedValue({ id: "job_new" });
   track.mockResolvedValue({});
-  runDispatchTick.mockResolvedValue({ processed: 0, generated: 0 });
+  processJobById.mockResolvedValue({ ok: true, note: "report v1" });
 });
 
 describe("processDodoEvent — payment.succeeded", () => {
@@ -80,6 +80,7 @@ describe("processDodoEvent — payment.succeeded", () => {
     });
     expect(txMock.job.create).toHaveBeenCalledWith({
       data: { orderId: "o1", kind: "GENERATE", state: "QUEUED" },
+      select: { id: true },
     });
     expect(writeAudit).toHaveBeenCalledWith(
       txMock,
@@ -87,9 +88,13 @@ describe("processDodoEvent — payment.succeeded", () => {
     );
     expect(track).toHaveBeenCalledWith("purchase", { tier: "deep", provider: "dodo" });
 
+    // AU-13 (2026-10-26 audit): the old dispatch tick picked the OLDEST queued job, which during a
+    // backlog is somebody else's order — the payment that just succeeded waited another round trip.
+    // The webhook now dispatches the exact job this event created.
     expect(afterCallbacks).toHaveLength(1);
     await afterCallbacks[0]();
-    expect(runDispatchTick).toHaveBeenCalledWith(1);
+    expect(processJobById).toHaveBeenCalledTimes(1);
+    expect(processJobById.mock.calls[0][0]).toBe("job_new");
   });
 
   it("does nothing when the order is already paid", async () => {

@@ -437,11 +437,12 @@ Generation is triggered three ways instead, and the same machinery serves all of
 
 | Trigger | Runs | Note |
 |---|---|---|
-| **Dodo Payments webhook → `after()`** | `runDispatchTick(1)` | Primary path. `after()` from `next/server` lets the webhook return its 2xx promptly and generate afterwards |
-| **`POST /api/jobs/kick`** | `kickOwnerJobs(userId)` | A client taps "Check for updates". Scoped to that caller's orders only, rate limited |
-| **Daily cron** (04:00 UTC) | `runDispatchTick(3)` | Safety net for anything the above missed |
+| **Dodo Payments webhook → `after()`** | `processJobById(createdJobId)` | Immediate path. `after()` from `next/server` lets the webhook return its 2xx promptly and generate that exact job afterwards (AU-13: it used to dispatch the *oldest* queued job) |
+| **GitHub Actions workflow, every 15 min** | `POST /api/cron/dispatch` → `runDispatchTick(3)` | Primary scheduled trigger (decision D4, AU-13). `.github/workflows/sla-sweep.yml` |
+| **`POST /api/jobs/kick`** | `kickOwnerJobs(userId)` | A client taps "Check for updates". Scoped to that caller's orders only, rate limited, and it does not spend the job's retries (AU-12) |
+| **Daily cron** (04:00 UTC) | `runDispatchTick(3)` | Fallback for anything the above missed — `vercel.json` keeps it because the Vercel plan is Hobby |
 
-Restoring true per-minute dispatching is a **one-line change** on Pro — `"schedule": "* * * * *"` — with
+A true per-minute cron would still be a **one-line change** on Pro — `"schedule": "* * * * *"` — with
 no code change, because the claim/lease/retry machinery below is already correct and simply runs more
 often. See [08a — Deployment notes](08a-vercel-json-notes.md).
 
@@ -470,12 +471,14 @@ do three and return.
 On a per-minute cron (Pro) the webhook only records the payment and enqueues a job — it never talks to
 the engine, so a cold Python service can never delay or fail a payment acknowledgment.
 
-On Hobby there is no per-minute cron, so the webhook *is* the trigger — but it still does not block:
+On Hobby there is no per-minute Vercel cron, so the webhook *is* the immediate trigger and the
+15-minute GitHub Actions workflow is the scheduled one — but the webhook still does not block:
 `after()` from `next/server` runs the dispatch once the response has already been sent, so the provider
-gets its 2xx first. If the dispatch fails, the job stays `QUEUED` and the recovery paths (the daily
-cron, the dashboard kick, an admin regenerate) pick it up. The webhook is never the single point of
-failure for a paid order, either way. Delivery is gated on human review regardless, so the work must
-survive an arbitrary wait — which is why it lives in a leased job row rather than in the request.
+gets its 2xx first. If the dispatch fails, the job stays `QUEUED` and the recovery paths (the
+15-minute dispatch, the daily cron, the dashboard kick, an admin regenerate) pick it up. The webhook is
+never the single point of failure for a paid order, either way. Delivery is gated on human review
+regardless, so the work must survive an arbitrary wait — which is why it lives in a leased job row
+rather than in the request.
 
 ### Idempotency at every layer
 
@@ -493,10 +496,10 @@ survive an arbitrary wait — which is why it lives in a leased job row rather t
 
 A reading nobody has looked at used to wait in the queue for as long as the business took to get to
 it — days, sometimes. That is the wrong failure mode for a product that charges up front, so a
-reading has a **deadline**: ten hours after it becomes reviewable it is released anyway.
+reading has a **deadline**: ten hours after the order was **paid** it is released anyway.
 
 ```
-Report.createdAt ──── 10h ────► /api/cron/sla → approveAndDeliver(outcome: SLA_AUTO)
+Order.paidAt ──── 10h ────► /api/cron/sla → approveAndDeliver(outcome: SLA_AUTO)
                                         │
                                         ├─► status DELIVERED, reviewOutcome = SLA_AUTO
                                         ├─► PROFILE delivery (in the same transaction)
@@ -525,9 +528,13 @@ released — the console's Approve button and the sweep both call it, and the on
 them is the `outcome`. The state change and the PROFILE delivery are transactional; the email is
 attempted after the commit, and a mail failure never rolls back a release.
 
-**What the sweep will not touch.** A reading a person is already on (`IN_REVIEW`), a reading whose
-order is not `PAID`, and anything that is not `DRAFT_READY`. It is bounded (10 per tick) and
-idempotent — a released reading is no longer in the queue, so a second run does nothing.
+**What the sweep will not touch.** A reading whose order is not `PAID`, and anything that is not
+`DRAFT_READY` or `IN_REVIEW`. The order is part of the query itself, so un-releasable rows cannot
+fill a batch and hide the due readings behind them; an `IN_REVIEW` reading is due at the same
+deadline, because claiming it must not extend the client's wait. It is bounded (10 per tick) and
+idempotent — a released reading is no longer in the queue, so a second run does nothing. It also
+reports paid renders that have been `FAILED` for more than two hours: nothing retries those
+automatically, so each one is an order that needs a person.
 
 **The MP3 case.** The deep single-chart tier promises an audio summary. An auto-delivered reading of
 that tier is approved at the deadline but its **email waits** for the MP3, so the client gets one

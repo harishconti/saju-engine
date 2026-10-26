@@ -39,15 +39,16 @@ can take on more volume.
 
 | Job | Schedule | Auth | Idempotent? |
 |---|---|---|---|
-| `/api/cron/dispatch` | every minute | `Bearer $CRON_SECRET` | Yes — lease-based claiming; a double-run processes different jobs |
+| `/api/cron/dispatch` | every 15 minutes (GitHub Actions); daily 04:00 UTC fallback | `Bearer $CRON_SECRET` | Yes — lease-based claiming; a double-run processes different jobs |
 | `/api/cron/cleanup` | daily 03:00 UTC | `Bearer $CRON_SECRET` | Yes — every step is a bounded delete/update |
 | `/api/cron/sla` | every 15 minutes (GitHub Actions) | `Bearer $CRON_SECRET` | Yes — a released reading leaves the queue |
 
-> ⚠️ The first row is aspirational: this account is on **Hobby**, which rejects a per-minute cron at
-> deploy time, so `/api/cron/dispatch` actually runs **daily at 04:00 UTC** and generation is
-> webhook-driven (see [05](05-report-pipeline.md) §4). The `sla` row is different: it is a **GitHub
-> Actions workflow**, not a Vercel cron, precisely because Hobby cannot run one that often. It needs
-> the repository secret `CRON_SECRET` (the same value as the Vercel one) — see the runbook below.
+> ⚠️ This account is on **Hobby**, which rejects a per-minute Vercel cron at deploy time, so
+> `/api/cron/dispatch` is called by the same 15-minute **GitHub Actions** workflow as the SLA sweep
+> (`sla-sweep.yml`, decision D4 / AU-13). The `/api/cron/dispatch` entry in `vercel.json` is a daily
+> fallback only; generation is additionally triggered by the webhook (see
+> [05](05-report-pipeline.md) §4). Both GitHub Actions steps need the repository secret
+> `CRON_SECRET` (the same value as the Vercel one) — see the runbook below.
 
 Both accept `GET` and `POST` (Vercel Cron uses `GET`), and both accept `x-maintenance-secret` as an
 alternative header so they can be triggered manually during an incident.
@@ -260,8 +261,9 @@ prefer explicit column lists in raw SQL over `*`.
    - **401** → `CRON_SECRET` mismatch between Vercel's cron and the deployment.
    - **200 with `processed: 0`** → the cron is fine and there is nothing to do.
    - **500** → read the function logs.
-2. Vercel → project → Cron Jobs → run history. Hobby-plan projects silently will not run a
-   per-minute schedule.
+2. GitHub → Actions → *Review queue SLA sweep, job dispatch and engine smoke* → run history. The
+   scheduled dispatch comes from that workflow, not from Vercel's cron; a Hobby-plan Vercel project
+   will never run a per-minute schedule.
 3. Still stuck after a manual trigger: run the leak query above, then work the job manually by
    calling the engine route with the order's payload.
 

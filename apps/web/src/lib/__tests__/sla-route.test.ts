@@ -23,6 +23,7 @@ function sweepResult(overrides: Record<string, number> = {}) {
     heldReleased: 0,
     stuckJobs: 0,
     recentFailures: 0,
+    overdueFailures: 0,
     ranAt: "2026-10-26T12:00:00.000Z",
     ...overrides,
   };
@@ -76,6 +77,19 @@ describe("GET /api/cron/sla", () => {
     const body = (await res.json()) as Record<string, unknown>;
     expect(body.ok).toBe(false);
     expect(body.recentFailures).toBe(1);
+  });
+
+  it("answers 503 for a paid render that failed past its deadline", async () => {
+    // AU-14: nothing retries a FAILED job, so "recent only" would let a dead paid order sit in a
+    // green pipeline forever.
+    runSlaSweep.mockResolvedValue(sweepResult({ overdueFailures: 2 }));
+
+    const res = await GET(request(), undefined as never);
+
+    expect(res.status).toBe(503);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.ok).toBe(false);
+    expect(body.overdueFailures).toBe(2);
   });
 
   it("still refuses an unauthenticated caller", async () => {

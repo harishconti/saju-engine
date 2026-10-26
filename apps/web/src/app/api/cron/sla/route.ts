@@ -21,9 +21,10 @@ export const maxDuration = 120;
  * Idempotent: a reading that was released is no longer `DRAFT_READY`, so a second run does
  * nothing. Safe to call twice.
  *
- * Answers **503** (keeping the JSON body) when `stuckJobs > 0` or `recentFailures > 0`, so the
- * scheduled workflow fails rather than reporting a green sweep over a broken dispatcher or an
- * engine that is refusing renders.
+ * Answers **503** (keeping the JSON body) when `stuckJobs > 0`, `recentFailures > 0` or
+ * `overdueFailures > 0`, so the scheduled workflow fails rather than reporting a green sweep over a
+ * broken dispatcher, an engine that is refusing renders, or a paid order whose render died and was
+ * never retried.
  */
 function authorized(req: Request): boolean {
   const provided = providedSecret(req);
@@ -42,7 +43,11 @@ async function run(req: Request) {
   // AU-03 (2026-10-26 audit): the counts used to be reported with a 200, and the workflow's
   // `curl -f` only sees the status code — so a dispatcher that had stopped, or an engine that
   // refused every render, left the check green. The status is now the alert; the body stays.
-  const degraded = result.stuckJobs > 0 || result.recentFailures > 0;
+  //
+  // AU-14: a paid render that has been FAILED past its deadline is added to that alert. Nothing
+  // retries it automatically, so without this the order would wait forever in a green pipeline.
+  const degraded =
+    result.stuckJobs > 0 || result.recentFailures > 0 || result.overdueFailures > 0;
   return json({ ok: !degraded, ...result }, degraded ? 503 : 200);
 }
 

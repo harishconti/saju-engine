@@ -230,7 +230,7 @@ branch and move Preview to it.
 
 | Cron | Schedule | Note |
 |---|---|---|
-| `dispatch` | **daily, 04:00 UTC** | **Hobby allows only once-daily crons** (max 2) — this is why generation is **webhook-driven** and the cron is only a safety net. The original per-minute expression made `vercel deploy` fail outright; see [08a](08a-vercel-json-notes.md) |
+| `dispatch` | **daily, 04:00 UTC** | **Hobby allows only once-daily crons** (max 2), so this is only a fallback: the real dispatcher is the 15-minute GitHub Actions workflow (`sla-sweep.yml`, decision D4). The original per-minute expression made `vercel deploy` fail outright; see [08a](08a-vercel-json-notes.md) |
 | `cleanup` | daily, 03:00 UTC | any plan |
 
 Vercel authenticates cron invocations with `Authorization: Bearer $CRON_SECRET`. Our handlers accept

@@ -59,6 +59,18 @@ export async function failJob(jobId: string, error: string): Promise<void> {
   });
 }
 
+/**
+ * Record an attempt that a claim deliberately did not spend.
+ *
+ * AU-12 (2026-10-26 audit): a customer's "Check for updates" claims the job without incrementing
+ * `attempts`, so repeated clicks during an outage cannot exhaust a paid order's retries. A run that
+ * still ends in a terminal failure really did happen, though, so the attempt is written here — the
+ * admin views keep an honest count.
+ */
+export async function recordAttempt(jobId: string): Promise<void> {
+  await prisma.job.update({ where: { id: jobId }, data: { attempts: { increment: 1 } } });
+}
+
 /** Transient failure: release the lease so the next tick retries. */
 export async function requeueJob(jobId: string, error: string): Promise<void> {
   await prisma.job.update({
