@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Alert, Button, Card, CardContent, Field, Input, buttonClasses } from "@/components/ui";
 import { ElementalRule, SealMark } from "@/components/viz";
+import { isAuthError } from "@neondatabase/auth/next";
 import { authClient } from "@/lib/auth/client";
 import { POLICY_VERSION } from "@/lib/consent";
 
@@ -16,6 +17,18 @@ function safeNext(raw: string | null): string {
   if (!raw) return "/dashboard";
   if (!raw.startsWith("/") || raw.startsWith("//")) return "/dashboard";
   return raw;
+}
+
+/**
+ * The reason an auth call failed, in words a visitor can act on.
+ *
+ * Neon Auth's fetch wrapper **throws** a normalized `AuthError` on any non-2xx response rather than
+ * returning `{ error }`, so a wrong password lands in `catch`, not in `result.error`. A bare `catch`
+ * therefore turned "Invalid email or password" and "User already exists" into the same vague
+ * sentence. Only an `AuthError` message is shown; anything else (a network failure) gets the fallback.
+ */
+function authErrorMessage(err: unknown, fallback: string): string {
+  return isAuthError(err) && err.message ? err.message : fallback;
 }
 
 export default function LoginPage() {
@@ -78,8 +91,8 @@ export default function LoginPage() {
         errorCallbackURL: completeUrl("/login"),
       });
       if (result?.error) setError(result.error.message ?? "Google sign-in failed.");
-    } catch {
-      setError("Google sign-in failed. Try email instead.");
+    } catch (err) {
+      setError(authErrorMessage(err, "Google sign-in failed. Try email instead."));
     } finally {
       setBusy(null);
     }
@@ -114,8 +127,8 @@ export default function LoginPage() {
       if (mode === "signup") await recordConsent();
       router.push(next);
       router.refresh();
-    } catch {
-      setError("That didn't work. Check your details and try again.");
+    } catch (err) {
+      setError(authErrorMessage(err, "That didn't work. Check your details and try again."));
     } finally {
       setBusy(null);
     }
@@ -141,8 +154,8 @@ export default function LoginPage() {
         return;
       }
       setNotice("Check your inbox — the link expires in a few minutes.");
-    } catch {
-      setError("Couldn't send the link. Try a different method.");
+    } catch (err) {
+      setError(authErrorMessage(err, "Couldn't send the link. Try a different method."));
     } finally {
       setBusy(null);
     }

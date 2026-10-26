@@ -20,7 +20,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const isAdmin = user.role === "ADMIN" && isAdminEmail(user.email);
 
   return (
-    <DashboardShell user={user} isAdmin>
+    <DashboardShell user={user} isAdmin={isAdmin}>
       {children}
     </DashboardShell>
   );
