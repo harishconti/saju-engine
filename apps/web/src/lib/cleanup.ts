@@ -1,9 +1,11 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
-import { drainObjectDeletions, deleteObjects, isR2Configured, listObjectsByPrefix } from "./r2";
+import { drainObjectDeletions, deleteObjectOrQueue, deleteObjects, isR2Configured, listObjectsByPrefix } from "./r2";
 import { purgeOldIdempotencyKeys } from "./idempotency";
 import { purgeOldRateLimits } from "./ratelimit";
 import { purgeOldJobs, reclaimStaleJobs } from "./queue";
 import { ANONYMOUS_SAMPLE_RETENTION_DAYS } from "./retention";
+import { processDodoEvent, type DodoEvent } from "./dodo-webhook";
 
 /**
  * The daily maintenance sweep.
@@ -64,7 +66,7 @@ export async function runCleanup(now = new Date()): Promise<CleanupReport> {
   }
 
   // 4. Retry webhooks that were recorded but never processed.
-  report.webhooksReplayed = await retryUnprocessedWebhooks();
+  report.webhooksReplayed = await retryUnprocessedWebhooks(now);
 
   // 5. Purges.
   report.jobsPurged = await purgeOldJobs();
@@ -134,29 +136,106 @@ async function sweepAnonymousSamples(now: Date): Promise<number> {
   return deleted;
 }
 
-/** Replay webhook events that were stored but not processed (a crash between the two steps). */
-async function retryUnprocessedWebhooks(): Promise<number> {
-  const cutoff = new Date(Date.now() - 60_000);
+/**
+ * Providers whose recorded events can be replayed from the stored payload.
+ *
+ * A provider without a replayer is skipped rather than guessed at: replaying an event shape we do
+ * not understand could duplicate whatever side effect it represents. The query below also filters
+ * on this list so un-replayable rows cannot crowd replayable ones out of the bounded batch.
+ */
+const WEBHOOK_REPLAYERS: Record<string, (payload: unknown) => Promise<unknown>> = {
+  dodo: (payload) => processDodoEvent(payload as DodoEvent),
+};
+
+/**
+ * Replay webhook events that were stored but never processed (a crash between the two steps).
+ *
+ * Exported so the retention tests can exercise it directly; `runCleanup` is the only production
+ * caller. Bounded to 20 per run, oldest first, so a poison event cannot hold up the whole day.
+ * A failed replay keeps `processedAt` null (and records its error class) so the next run retries.
+ */
+export async function retryUnprocessedWebhooks(now = new Date()): Promise<number> {
+  const cutoff = new Date(now.getTime() - 60_000);
   const pending = await prisma.webhookEvent.findMany({
-    where: { processedAt: null, receivedAt: { lt: cutoff } },
+    where: {
+      processedAt: null,
+      receivedAt: { lt: cutoff },
+      provider: { in: Object.keys(WEBHOOK_REPLAYERS) },
+    },
     orderBy: { receivedAt: "asc" },
     take: 20,
-    select: { id: true, provider: true },
+    select: { id: true, provider: true, payload: true },
   });
-  // Handlers are idempotent; the dispatcher route re-runs them.
-  // We only mark the count here — the actual replay is provider-specific and lives in the webhook
-  // routes, which are safe to re-invoke with the stored payload.
-  return pending.length;
+
+  let replayed = 0;
+  for (const row of pending) {
+    const replayer = WEBHOOK_REPLAYERS[row.provider];
+    if (!replayer) continue;
+
+    try {
+      await replayer(row.payload);
+      await prisma.webhookEvent.update({
+        where: { id: row.id },
+        data: { processedAt: now, error: null },
+      });
+      replayed++;
+    } catch (err) {
+      const name = err instanceof Error ? err.name : "unknown";
+      console.error("webhook replay failed", row.provider, row.id, name);
+      try {
+        await prisma.webhookEvent.update({ where: { id: row.id }, data: { error: name } });
+      } catch {
+        // Leave the row unprocessed; the next run tries again.
+      }
+    }
+  }
+
+  return replayed;
 }
+
+/**
+ * The birth fields a retained profile must lose on erasure.
+ *
+ * `birthDate`, `birthTime`, `city` and `country` are NOT NULL in the schema, so they get
+ * placeholders rather than null. `gender` is also required, but is deliberately left as-is: it is
+ * an enum with no neutral member, the row is anonymised and unreachable after `deletedAt`, and
+ * rewriting it would invent a fact about a person whose data we are destroying.
+ */
+const SCRUBBED_PROFILE = {
+  fullName: "Deleted profile",
+  birthDate: new Date(0),
+  birthTime: "00:00",
+  timezone: null,
+  utcOffset: null,
+  city: "Deleted",
+  country: "Deleted",
+  latitude: null,
+  longitude: null,
+  timeKnown: false,
+  chartJson: Prisma.DbNull,
+  chartComputedAt: null,
+} satisfies Prisma.ProfileUpdateManyMutationInput;
 
 /**
  * Complete deletions whose grace period has expired.
  *
- * What survives is deliberate and documented: order rows are anonymised (financial record-keeping),
- * consent records are retained as proof, and audit logs are kept for dispute resolution. Birth data
- * and reports are destroyed.
+ * What survives is deliberate and documented (owner decision D2, 2026-10-26):
+ *  - **Order rows are retained** for accounting. `Order_profileAId_fkey` is ON DELETE RESTRICT, so
+ *    the profiles any order references are scrubbed in place and kept: birth data and the derived
+ *    chart are destroyed, `deletedAt` is set, and the row no longer describes a person.
+ *  - **Profiles no order references are deleted outright.**
+ *  - **Consent records are retained** as proof the consent existed; they are withdrawn, not removed.
+ *  - **Reports and their R2 artefacts are destroyed.** The PDF, markdown, audio and HTML objects are
+ *    deleted only after the transaction commits (through `deleteObjectOrQueue`, so a storage error is
+ *    retried by the next sweep instead of rolling back an already-completed erasure).
+ *  - **The User is anonymised but kept**, because the retained order rows resolve to it.
+ *
+ * Each request is isolated in its own try/catch: one failure is logged and leaves that request
+ * `pending` for the next run, without blocking the requests after it or the rest of the cron.
+ *
+ * Exported for the retention tests; `runCleanup` is the only production caller.
  */
-async function processDueDeletions(now: Date): Promise<number> {
+export async function processDueDeletions(now: Date): Promise<number> {
   const due = await prisma.deletionRequest.findMany({
     where: { status: "pending", scheduledFor: { lte: now } },
     take: 10,
@@ -165,59 +244,114 @@ async function processDueDeletions(now: Date): Promise<number> {
 
   let processed = 0;
   for (const request of due) {
-    const reports = await prisma.report.findMany({
-      where: { userId: request.userId },
-      // Include the MP3: an erasure request must not leave the audio behind.
-      select: { id: true, pdfKey: true, mdKey: true, audioKey: true, htmlKey: true },
-    });
-
-    const keys = reports
-      .flatMap((r) => [r.pdfKey, r.mdKey, r.audioKey, r.htmlKey])
-      .filter((k): k is string => Boolean(k));
-    if (keys.length > 0 && isR2Configured()) {
-      await deleteObjects(keys);
+    try {
+      await processDeletionRequest(request, now);
+      processed++;
+    } catch (err) {
+      // Leave it pending. Throwing here would block every later request and the cron's later steps.
+      console.error(
+        "deletion request failed; left pending for the next run",
+        request.id,
+        err instanceof Error ? err.name : "unknown",
+      );
     }
-
-    await prisma.$transaction(async (tx) => {
-      await tx.report.deleteMany({ where: { userId: request.userId } });
-      await tx.profile.deleteMany({ where: { userId: request.userId } });
-      await tx.delivery.deleteMany({ where: { userId: request.userId } });
-
-      // Anonymise the account; keep it so the order rows still resolve.
-      await tx.user.update({
-        where: { id: request.userId },
-        data: {
-          name: "Deleted user",
-          email: `deleted+${request.userId}@deleted.invalid`,
-          deletedAt: now,
-        },
-      });
-
-      await tx.consentRecord.updateMany({
-        where: { userId: request.userId, withdrawnAt: null },
-        data: { withdrawnAt: now },
-      });
-
-      await tx.deletionRequest.update({
-        where: { id: request.id },
-        data: { status: "completed", completedAt: now },
-      });
-
-      await tx.auditLog.create({
-        data: {
-          entity: "deletion",
-          entityId: request.id,
-          action: "delete",
-          actorId: null,
-          after: { completedAt: now.toISOString() },
-        },
-      });
-    });
-
-    processed++;
   }
 
   return processed;
+}
+
+/** Erase one user's data. Split out only so `processDueDeletions` can isolate failures. */
+async function processDeletionRequest(
+  request: { id: string; userId: string },
+  now: Date,
+): Promise<void> {
+  const { id: requestId, userId } = request;
+
+  const reports = await prisma.report.findMany({
+    where: { userId },
+    // Include the MP3 and the web document: an erasure request must not leave either behind.
+    select: { id: true, pdfKey: true, mdKey: true, audioKey: true, htmlKey: true },
+  });
+  const keys = reports
+    .flatMap((r) => [r.pdfKey, r.mdKey, r.audioKey, r.htmlKey])
+    .filter((k): k is string => Boolean(k));
+
+  // Order rows are retained for accounting, so find which profiles they still point at. Profile B
+  // is SET NULL on delete, but Profile A is RESTRICT — deleting either referenced row fails the
+  // whole transaction with P2003.
+  const profiles = await prisma.profile.findMany({
+    where: { userId },
+    select: { id: true },
+  });
+  const profileIds = profiles.map((p) => p.id);
+
+  const referencedProfileIds = new Set<string>();
+  if (profileIds.length > 0) {
+    const orders = await prisma.order.findMany({
+      where: { OR: [{ profileAId: { in: profileIds } }, { profileBId: { in: profileIds } }] },
+      select: { profileAId: true, profileBId: true },
+    });
+    for (const order of orders) {
+      referencedProfileIds.add(order.profileAId);
+      if (order.profileBId) referencedProfileIds.add(order.profileBId);
+    }
+  }
+  const retainedProfileIds = [...referencedProfileIds];
+
+  await prisma.$transaction(async (tx) => {
+    // Reports first: Report_profileAId_fkey is RESTRICT too.
+    await tx.report.deleteMany({ where: { userId } });
+    await tx.delivery.deleteMany({ where: { userId } });
+
+    if (retainedProfileIds.length > 0) {
+      await tx.profile.updateMany({
+        where: { userId, id: { in: retainedProfileIds } },
+        data: { ...SCRUBBED_PROFILE, deletedAt: now },
+      });
+    }
+    // `notIn: []` matches everything, which is what an order-free user needs.
+    await tx.profile.deleteMany({ where: { userId, id: { notIn: retainedProfileIds } } });
+
+    // Anonymise the account; keep it so the order rows still resolve.
+    await tx.user.update({
+      where: { id: userId },
+      data: {
+        name: "Deleted user",
+        email: `deleted+${userId}@deleted.invalid`,
+        deletedAt: now,
+      },
+    });
+
+    await tx.consentRecord.updateMany({
+      where: { userId, withdrawnAt: null },
+      data: { withdrawnAt: now },
+    });
+
+    await tx.deletionRequest.update({
+      where: { id: requestId },
+      data: { status: "completed", completedAt: now },
+    });
+
+    await tx.auditLog.create({
+      data: {
+        entity: "deletion",
+        entityId: requestId,
+        action: "delete",
+        actorId: null,
+        after: { completedAt: now.toISOString() },
+      },
+    });
+  });
+
+  // Only now that the database has committed. If storage is down, `deleteObjectOrQueue` enqueues
+  // the key for the next sweep instead of throwing away an erasure that already succeeded.
+  for (const key of keys) {
+    try {
+      await deleteObjectOrQueue(key);
+    } catch (err) {
+      console.error("erasure object cleanup failed", err instanceof Error ? err.name : "unknown");
+    }
+  }
 }
 
 /** Warn at 23 months of inactivity; the actual sweep is a manual decision, not an automatic one. */

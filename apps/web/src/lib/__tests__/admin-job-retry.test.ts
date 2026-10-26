@@ -45,7 +45,7 @@ const FAILED_JOB = {
 beforeEach(() => {
   vi.clearAllMocks();
   requireAdmin.mockResolvedValue({ id: "admin-1", role: "ADMIN", email: "owner@test", emailVerified: true });
-  prismaMock.order.findUnique.mockResolvedValue({ id: "o1", status: "PAID" });
+  prismaMock.order.findUnique.mockResolvedValue({ id: "o1", status: "PAID", user: { deletedAt: null } });
   // First query: is a job already live? Second: the job to requeue.
   prismaMock.job.findFirst.mockResolvedValueOnce(null).mockResolvedValueOnce(FAILED_JOB);
   prismaMock.job.updateMany.mockResolvedValue({ count: 1 });
@@ -97,13 +97,35 @@ describe("POST /api/admin/jobs/retry", () => {
   });
 
   it("does not retry an order that was never paid", async () => {
-    prismaMock.order.findUnique.mockResolvedValue({ id: "o1", status: "AWAITING_PAYMENT" });
+    prismaMock.order.findUnique.mockResolvedValue({
+      id: "o1",
+      status: "AWAITING_PAYMENT",
+      user: { deletedAt: null },
+    });
 
     const res = await POST(retryRequest(), undefined as never);
 
     expect(res.status).toBe(409);
     const body = (await res.json()) as Record<string, unknown>;
     expect(body.code).toBe("ORDER_NOT_PAID");
+    expect(prismaMock.job.updateMany).not.toHaveBeenCalled();
+  });
+
+  it("refuses to regenerate a reading for an erased account", async () => {
+    // Erasure keeps the paid order for accounting but scrubs the profile's birth data; retrying
+    // its generation job would rebuild the reading the customer asked to destroy.
+    prismaMock.order.findUnique.mockResolvedValue({
+      id: "o1",
+      status: "PAID",
+      user: { deletedAt: new Date("2026-10-20T00:00:00.000Z") },
+    });
+
+    const res = await POST(retryRequest(), undefined as never);
+
+    expect(res.status).toBe(409);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.code).toBe("ACCOUNT_ERASED");
+    expect(prismaMock.job.findFirst).not.toHaveBeenCalled();
     expect(prismaMock.job.updateMany).not.toHaveBeenCalled();
   });
 

@@ -19,6 +19,11 @@ import { prisma } from "./prisma";
  * (written from this task onward) or the report id shared with the order's own `create`/`deliver`
  * audit row. Rows written before the delete route recorded the order id have no other surviving
  * link — the report row is gone and the job never stored its id.
+ *
+ * A fourth exclusion is broader than any of those: an erased account (`User.deletedAt` set) keeps
+ * its order rows for accounting, and after erasure those orders have no report. They must never
+ * appear here, because this list's only action is "regenerate this customer's reading" — the exact
+ * thing the customer asked us to destroy.
  */
 
 export interface RecoverableOrder {
@@ -47,6 +52,8 @@ export async function listRecoverableOrders(limit = 100): Promise<RecoverableOrd
       status: "PAID",
       reports: { none: {} },
       jobs: { none: { state: { in: ["QUEUED", "RUNNING"] } } },
+      // Erasure retains the order but destroys the report; never offer to rebuild it.
+      user: { deletedAt: null },
     },
     orderBy: { paidAt: "desc" },
     take: limit,

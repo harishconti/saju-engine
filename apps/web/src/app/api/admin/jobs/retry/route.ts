@@ -17,6 +17,9 @@ const schema = z.object({ orderId: z.string().trim().min(1) });
  *
  * It refuses to fight a job that is already queued or running, and says plainly when there is no
  * job at all (nothing to retry — the order needs `mark-paid` or a fresh job).
+ *
+ * It also refuses an erased account: erasure keeps the paid order for accounting but scrubs the
+ * profile's birth data, so retrying would regenerate the reading the customer asked us to destroy.
  */
 export const POST = handle(async (req) => {
   const admin = await requireAdmin();
@@ -24,9 +27,12 @@ export const POST = handle(async (req) => {
 
   const order = await prisma.order.findUnique({
     where: { id: orderId },
-    select: { id: true, status: true },
+    select: { id: true, status: true, user: { select: { deletedAt: true } } },
   });
   if (!order) throw ApiError.notFound("Order not found");
+  if (order.user.deletedAt) {
+    throw ApiError.conflict("This account has been erased; its reading cannot be regenerated", "ACCOUNT_ERASED");
+  }
   if (order.status !== "PAID") {
     throw ApiError.conflict("Only a paid order can be retried", "ORDER_NOT_PAID");
   }

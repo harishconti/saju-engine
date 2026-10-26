@@ -73,9 +73,22 @@ describe("GET /api/admin/orders", () => {
           status: "PAID",
           reports: { none: {} },
           jobs: { none: { state: { in: ["QUEUED", "RUNNING"] } } },
+          // Requirement 5 (Task 4): erasure now retains an erased customer's order, so the
+          // recovery list must filter on the account's deletedAt as well.
+          user: { deletedAt: null },
         },
       }),
     );
+  });
+
+  it("never offers an erased account's retained order for regeneration", async () => {
+    // Erasure keeps the order row for accounting and leaves it with no report, which is exactly
+    // the shape this list looks for. The deleted account must be filtered out in the query, or the
+    // console would offer to regenerate a reading for someone who asked to be erased.
+    await GET(undefined as never, undefined as never);
+
+    const args = prismaMock.order.findMany.mock.calls[0][0] as { where: Record<string, unknown> };
+    expect(args.where.user).toEqual({ deletedAt: null });
   });
 
   it("returns the fields the recovery table needs", async () => {
