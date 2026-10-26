@@ -494,10 +494,16 @@ async function processDeletionRequest(
 
   // Terminal: stop occupying the queue, record why, and tell a human — the data is gone but the
   // account may still be able to sign in, which is the one state a retry cannot resolve.
-  await prisma.deletionRequest.update({
-    where: { id: requestId },
+  //
+  // Guarded on the row still being `pending`: two cleanup runs can overlap (a retried invocation, a
+  // manual run during the cron), and without the condition both would settle the request and both
+  // would send the owner the same alert. Only the run whose update changed a row alerts.
+  const settled = await prisma.deletionRequest.updateMany({
+    where: { id: requestId, status: "pending" },
     data: { status: "completed_with_identity_error", completedAt: now },
   });
+  if (settled.count === 0) return true;
+
   await notifyOwnerIdentityDeletionFailed({
     requestId,
     userId: neonUserId,
@@ -546,6 +552,10 @@ function calendarMonthsBefore(date: Date, months: number): Date {
  * profile — an order or a report — so a profile is a candidate only when the row and every
  * reference to it predate the cutoff. One recent reference spares it.
  *
+ * Owner decision D9 supplies the signal references cannot see: `User.lastSeenAt`, written on
+ * authenticated requests. A customer who signs in to re-read an old report creates no order and no
+ * report, and is now recognised as active — measured as COALESCE(lastSeenAt, createdAt).
+ *
  * Disposition is the one D2 established for erasure, for the same reason:
  *  - `Order_profileAId_fkey` is ON DELETE RESTRICT. Deleting a profile an order points at would
  *    raise P2003 and roll the whole batch back, so an order-referenced profile is **scrubbed**
@@ -564,9 +574,36 @@ function calendarMonthsBefore(date: Date, months: number): Date {
 export async function retireInactiveProfiles(now: Date): Promise<number> {
   const cutoff = calendarMonthsBefore(now, PROFILE_INACTIVITY_RETENTION_MONTHS);
 
+  // The activity conditions belong in the query, not after it. Filtering the batch in memory after
+  // `take: 200` (the first version of this fix) meant two hundred spared rows could fill the batch
+  // and every idle profile behind them was never reached. The `none` relation filters ask the
+  // database instead, and the ordering makes the batch deterministic, so the same rows cannot sit
+  // in the prefix run after run.
+  const recentReport = () => ({
+    OR: [
+      { createdAt: { gte: cutoff } },
+      // A report created long ago but delivered (or re-sent) recently is still use of the profile.
+      { deliveries: { some: { createdAt: { gte: cutoff } } } },
+    ],
+  });
+
   const candidates = await prisma.profile.findMany({
-    where: { deletedAt: null, updatedAt: { lt: cutoff } },
-    select: { id: true },
+    where: {
+      deletedAt: null,
+      updatedAt: { lt: cutoff },
+      ordersAsA: { none: { createdAt: { gte: cutoff } } },
+      ordersAsB: { none: { createdAt: { gte: cutoff } } },
+      reportsAsA: { none: recentReport() },
+      reportsAsB: { none: recentReport() },
+      // The owner's own sign-in signal (D9, `User.lastSeenAt`): COALESCE(lastSeenAt, createdAt)
+      // must be older than the cutoff too. A null means the account has not been seen since the
+      // column existed, so its created date stands in — exactly what COALESCE does.
+      user: {
+        OR: [{ lastSeenAt: null, createdAt: { lt: cutoff } }, { lastSeenAt: { lt: cutoff } }],
+      },
+    },
+    select: { id: true, user: { select: { lastSeenAt: true, createdAt: true } } },
+    orderBy: [{ updatedAt: "asc" }, { id: "asc" }],
     take: 200,
   });
   if (candidates.length === 0) return 0;
@@ -574,7 +611,7 @@ export async function retireInactiveProfiles(now: Date): Promise<number> {
   const ids = candidates.map((p) => p.id);
   const candidateIds = new Set(ids);
 
-  // Every order and report that references a candidate, with the date that makes it activity.
+  // Every order and report that references a candidate, with the dates that make them activity.
   const [orders, reports] = await Promise.all([
     prisma.order.findMany({
       where: { OR: [{ profileAId: { in: ids } }, { profileBId: { in: ids } }] },
@@ -587,6 +624,7 @@ export async function retireInactiveProfiles(now: Date): Promise<number> {
         profileAId: true,
         profileBId: true,
         createdAt: true,
+        deliveries: { select: { createdAt: true } },
         pdfKey: true,
         mdKey: true,
         audioKey: true,
@@ -595,18 +633,28 @@ export async function retireInactiveProfiles(now: Date): Promise<number> {
     }),
   ]);
 
+  // A second check at execution time: a row can change between the select and the delete, and
+  // sparing one profile costs a night's delay while retiring a live customer costs their chart.
   const active = new Set<string>();
-  const noteReference = (profileId: string | null, createdAt: Date) => {
+  for (const profile of candidates) {
+    const seenAt = profile.user.lastSeenAt ?? profile.user.createdAt;
+    if (seenAt.getTime() >= cutoff.getTime()) active.add(profile.id);
+  }
+  const noteReference = (profileId: string | null, recent: boolean) => {
     if (!profileId || !candidateIds.has(profileId)) return;
-    if (createdAt.getTime() >= cutoff.getTime()) active.add(profileId);
+    if (recent) active.add(profileId);
   };
   for (const order of orders) {
-    noteReference(order.profileAId, order.createdAt);
-    noteReference(order.profileBId, order.createdAt);
+    const recent = order.createdAt.getTime() >= cutoff.getTime();
+    noteReference(order.profileAId, recent);
+    noteReference(order.profileBId, recent);
   }
   for (const report of reports) {
-    noteReference(report.profileAId, report.createdAt);
-    noteReference(report.profileBId, report.createdAt);
+    const recent =
+      report.createdAt.getTime() >= cutoff.getTime() ||
+      report.deliveries.some((delivery) => delivery.createdAt.getTime() >= cutoff.getTime());
+    noteReference(report.profileAId, recent);
+    noteReference(report.profileBId, recent);
   }
 
   // Only the profiles with no recent reference at all are retired. A report is deleted along with

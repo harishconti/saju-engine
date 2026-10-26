@@ -18,20 +18,32 @@ import {
  * The first version of the sweep keyed "inactive" on `Profile.updatedAt`, which is a row timestamp,
  * not activity: `mirrorUser` returns early for an unchanged account and no order or report route
  * writes the profile, so a customer whose report was delivered yesterday could still carry a
- * two-year-old profile row. These tests pin the corrected criterion — a profile is idle only when
- * the row *and every order and report that references it* are older than the cutoff.
+ * two-year-old profile row. Owner decision D9 adds the missing signal — `User.lastSeenAt`, written
+ * on authenticated requests — and the activity conditions now live in the query itself, so a spared
+ * row cannot occupy the `take: 200` prefix.
  */
 
+type Candidate = {
+  id: string;
+  user: { lastSeenAt: Date | null; createdAt: Date };
+};
 type OrderRef = { profileAId: string; profileBId: string | null; createdAt: Date };
 type ReportRef = {
   id: string;
   profileAId: string;
   profileBId: string | null;
   createdAt: Date;
+  deliveries: Array<{ createdAt: Date }>;
   pdfKey?: string | null;
   mdKey?: string | null;
   audioKey?: string | null;
   htmlKey?: string | null;
+};
+type FindArgs = {
+  where: { updatedAt: { lt: Date } } & Record<string, unknown>;
+  select: Record<string, unknown>;
+  orderBy: unknown;
+  take: number;
 };
 
 const OLD = new Date("2024-01-01T00:00:00.000Z");
@@ -65,13 +77,7 @@ const { prismaMock, txMock, r2Mock, processDodoEvent, events } = vi.hoisted(() =
   };
   const prismaMock = {
     profile: {
-      findMany: vi.fn(
-        async (_args: {
-          where: { deletedAt: null; updatedAt: { lt: Date } };
-          select: { id: true };
-          take: number;
-        }) => [] as Array<{ id: string }>,
-      ),
+      findMany: vi.fn(async (_args: FindArgs) => [] as Candidate[]),
     },
     order: {
       findMany: vi.fn(async (_args: Record<string, unknown>) => [] as OrderRef[]),
@@ -107,6 +113,19 @@ const NOW = new Date("2026-10-26T12:00:00.000Z");
 /** Exactly 24 calendar months before NOW. */
 const CUTOFF = new Date("2024-10-26T12:00:00.000Z");
 
+function profileRow(
+  id: string,
+  overrides: { lastSeenAt?: Date | null; createdAt?: Date } = {},
+): Candidate {
+  return {
+    id,
+    user: {
+      lastSeenAt: overrides.lastSeenAt === undefined ? OLD : overrides.lastSeenAt,
+      createdAt: overrides.createdAt ?? OLD,
+    },
+  };
+}
+
 function cutoffUsed(): Date {
   const args = prismaMock.profile.findMany.mock.calls[0]?.[0];
   if (!args) throw new Error("profile.findMany was never called");
@@ -122,7 +141,17 @@ function report(
   createdAt: Date,
   extra: Partial<Omit<ReportRef, "profileAId" | "createdAt">> = {},
 ): ReportRef {
-  return { id: "r1", profileAId, profileBId: null, createdAt, ...extra };
+  return { id: "r1", profileAId, profileBId: null, createdAt, deliveries: [], ...extra };
+}
+
+/** The report condition both profile columns use: recent row, or a recent delivery of it. */
+function recentReportFilter() {
+  return {
+    OR: [
+      { createdAt: { gte: CUTOFF } },
+      { deliveries: { some: { createdAt: { gte: CUTOFF } } } },
+    ],
+  };
 }
 
 /**
@@ -185,10 +214,34 @@ describe("inactive-profile sweep — the 24-month promise (AU-27)", () => {
 
     expect(PROFILE_INACTIVITY_RETENTION_MONTHS).toBe(24);
     expect(cutoffUsed()).toEqual(CUTOFF);
-    expect(prismaMock.profile.findMany.mock.calls[0]![0].where).toEqual({
+    const args = prismaMock.profile.findMany.mock.calls[0]![0];
+    expect(args.where.deletedAt).toBeNull();
+    expect(args.take).toBe(200);
+  });
+
+  it("pushes every activity condition into the query, not a post-`take` filter", async () => {
+    // Important 1: the in-memory filter ran *after* `take: 200`, so two hundred spared rows could
+    // occupy the whole batch and the idle profiles behind them would never be reached. The `none`
+    // relation filters make the database answer the activity question before the limit applies.
+    await retireInactiveProfiles(NOW);
+
+    const args = prismaMock.profile.findMany.mock.calls[0]![0];
+    expect(args.where).toEqual({
       deletedAt: null,
       updatedAt: { lt: CUTOFF },
+      ordersAsA: { none: { createdAt: { gte: CUTOFF } } },
+      ordersAsB: { none: { createdAt: { gte: CUTOFF } } },
+      reportsAsA: { none: recentReportFilter() },
+      reportsAsB: { none: recentReportFilter() },
+      user: {
+        OR: [
+          { lastSeenAt: null, createdAt: { lt: CUTOFF } },
+          { lastSeenAt: { lt: CUTOFF } },
+        ],
+      },
     });
+    // Deterministic order, so the same rows cannot sit in the prefix run after run.
+    expect(args.orderBy).toEqual([{ updatedAt: "asc" }, { id: "asc" }]);
   });
 
   it("does nothing when no profile has been idle that long", async () => {
@@ -204,7 +257,7 @@ describe("inactive-profile sweep — the 24-month promise (AU-27)", () => {
   it("deletes an old profile whose only reference is a report, retiring the report with it", async () => {
     // A report reference no longer pins the row: the report is deleted in the same transaction, so
     // the only RESTRICT that matters is the order one. An unreferenced row describes nobody.
-    prismaMock.profile.findMany.mockResolvedValue([{ id: "p1" }]);
+    prismaMock.profile.findMany.mockResolvedValue([profileRow("p1")]);
     prismaMock.report.findMany.mockResolvedValue([report("p1", OLD, { id: "r1" })]);
     txMock.profile.deleteMany.mockResolvedValue({ count: 1 });
 
@@ -216,7 +269,7 @@ describe("inactive-profile sweep — the 24-month promise (AU-27)", () => {
   });
 
   it("scrubs rather than deletes a profile an order references — Profile A is RESTRICT", async () => {
-    prismaMock.profile.findMany.mockResolvedValue([{ id: "p1" }]);
+    prismaMock.profile.findMany.mockResolvedValue([profileRow("p1")]);
     prismaMock.order.findMany.mockResolvedValue([order("p1", OLD)]);
 
     await retireInactiveProfiles(NOW);
@@ -240,7 +293,7 @@ describe("inactive-profile sweep — the 24-month promise (AU-27)", () => {
   });
 
   it("deletes an old profile nothing references", async () => {
-    prismaMock.profile.findMany.mockResolvedValue([{ id: "p1" }]);
+    prismaMock.profile.findMany.mockResolvedValue([profileRow("p1")]);
     txMock.profile.deleteMany.mockResolvedValue({ count: 1 });
 
     await expect(retireInactiveProfiles(NOW)).resolves.toBe(1);
@@ -259,11 +312,11 @@ describe("inactive-profile sweep — the 24-month promise (AU-27)", () => {
   });
 });
 
-describe("inactive-profile sweep — activity spares a live customer (AU-27)", () => {
+describe("inactive-profile sweep — activity spares a live customer (AU-27, D9)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     events.length = 0;
-    prismaMock.profile.findMany.mockResolvedValue([{ id: "p1" }]);
+    prismaMock.profile.findMany.mockResolvedValue([profileRow("p1")]);
     prismaMock.order.findMany.mockResolvedValue([]);
     prismaMock.report.findMany.mockResolvedValue([]);
     txMock.profile.updateMany.mockResolvedValue({ count: 1 });
@@ -294,8 +347,40 @@ describe("inactive-profile sweep — activity spares a live customer (AU-27)", (
     expect(r2Mock.deleteObjectOrQueue).not.toHaveBeenCalled();
   });
 
+  it("spares a profile whose old report was delivered recently", async () => {
+    prismaMock.report.findMany.mockResolvedValue([
+      report("p1", OLD, { id: "r1", deliveries: [{ createdAt: RECENT }] }),
+    ]);
+
+    await expect(retireInactiveProfiles(NOW)).resolves.toBe(0);
+
+    expect(prismaMock.$transaction).not.toHaveBeenCalled();
+  });
+
   it("spares a profile referenced as partner B by a recent order", async () => {
     prismaMock.order.findMany.mockResolvedValue([order("someone-else", RECENT, "p1")]);
+
+    await expect(retireInactiveProfiles(NOW)).resolves.toBe(0);
+
+    expect(prismaMock.$transaction).not.toHaveBeenCalled();
+  });
+
+  it("spares a profile whose owner signed in recently (D9), though the row and references are old", async () => {
+    // Nothing writes `Profile.updatedAt` when a customer signs in to re-read a report, so a fresh
+    // `User.lastSeenAt` is the only evidence that the profile is still in use.
+    prismaMock.profile.findMany.mockResolvedValue([profileRow("p1", { lastSeenAt: RECENT })]);
+
+    await expect(retireInactiveProfiles(NOW)).resolves.toBe(0);
+
+    expect(prismaMock.$transaction).not.toHaveBeenCalled();
+    expect(txMock.profile.updateMany).not.toHaveBeenCalled();
+    expect(txMock.profile.deleteMany).not.toHaveBeenCalled();
+  });
+
+  it("treats a never-seen account by its created date: a recent account is spared", async () => {
+    prismaMock.profile.findMany.mockResolvedValue([
+      profileRow("p1", { lastSeenAt: null, createdAt: RECENT }),
+    ]);
 
     await expect(retireInactiveProfiles(NOW)).resolves.toBe(0);
 
@@ -312,11 +397,11 @@ describe("inactive-profile sweep — activity spares a live customer (AU-27)", (
   });
 });
 
-describe("inactive-profile sweep — reports go with the profile (AU-27)", () => {
+describe("inactive-profile sweep — reports go with the profile (AU-27, D10)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     events.length = 0;
-    prismaMock.profile.findMany.mockResolvedValue([{ id: "p1" }]);
+    prismaMock.profile.findMany.mockResolvedValue([profileRow("p1")]);
     prismaMock.order.findMany.mockResolvedValue([]);
     prismaMock.report.findMany.mockResolvedValue([]);
     txMock.profile.updateMany.mockResolvedValue({ count: 1 });
@@ -367,6 +452,21 @@ describe("inactive-profile sweep — reports go with the profile (AU-27)", () =>
     expect(txMock.profile.updateMany).toHaveBeenCalledTimes(1);
     expect(txMock.profile.deleteMany).not.toHaveBeenCalled();
     expect(r2Mock.deleteObjectOrQueue).toHaveBeenCalledWith("reports/u1/o1/r1.pdf");
+  });
+
+  it("retires a compatibility report shared with another profile (D10)", async () => {
+    // The report embeds the retiring person's birth data, so it cannot be kept for the survivor.
+    // The survivor gets no email: the deletion is part of the published retention behaviour.
+    prismaMock.profile.findMany.mockResolvedValue([profileRow("p1"), profileRow("p2")]);
+    prismaMock.order.findMany.mockResolvedValue([order("p1", OLD, "p2")]);
+    prismaMock.report.findMany.mockResolvedValue([
+      report("p1", OLD, { id: "shared", profileBId: "p2", pdfKey: "reports/u1/o1/shared.pdf" }),
+    ]);
+
+    await retireInactiveProfiles(NOW);
+
+    expect(txMock.report.deleteMany).toHaveBeenCalledWith({ where: { id: { in: ["shared"] } } });
+    expect(r2Mock.deleteObjectOrQueue).toHaveBeenCalledWith("reports/u1/o1/shared.pdf");
   });
 
   it("does not touch the reports of a profile the sweep spares", async () => {

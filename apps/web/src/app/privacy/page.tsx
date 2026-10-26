@@ -94,6 +94,10 @@ export default function PrivacyPage() {
       <h2>How long we keep it</h2>
       <ul>
         <li>Birth details and reports: until you delete them, or after {PROFILE_INACTIVITY_RETENTION_LABEL} of inactivity.</li>
+        <li>
+          If you share a compatibility report with another person, that report is deleted when either of
+          your profiles is retired, and the other person is not emailed about it.
+        </li>
         <li>Anonymous free snapshots that were never saved to an account: {ANONYMOUS_SAMPLE_RETENTION_LABEL}.</li>
         <li>Delivery records: 24 months. Audit logs: 24 months.</li>
         <li>

@@ -209,8 +209,9 @@ export async function notifyOwnerIdentityDeletionFailed(input: {
       `Cause: ${cause}`,
       "",
       "The account's data is already scrubbed, but the person may still be able to sign in with",
-      "the identity. Delete the Neon Auth user for this id in the Neon console, then re-run the",
-      "cleanup cron: the request is terminal and will not be retried on its own.",
+      "the identity. Delete the Neon Auth user for this id in the Neon console. The request is",
+      "already in its terminal state, so the cleanup cron will not retry it: no further action is",
+      "needed in the app.",
       "",
       `Admin: ${appUrl()}/admin`,
     ].join("\n");

@@ -33,6 +33,10 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime? // set on erasure: account anonymised, retained for records
+  /// Last authenticated request, throttled to at most one write per 24 h (owner decision D9).
+  /// Null until the account's first request after the column was added; the inactivity sweep then
+  /// falls back to `createdAt`, which is exactly `COALESCE(lastSeenAt, createdAt)`.
+  lastSeenAt DateTime?
 
   profiles        Profile[]
   orders          Order[]
@@ -45,6 +49,9 @@ model User {
   idempotency     IdempotencyKey[]
 
   @@index([deletedAt])
+  /// D9's retention filter. The sweep's COALESCE on the null rows cannot use this index, but the
+  /// "recently seen" side and any activity query can.
+  @@index([lastSeenAt])
 }
 
 enum Role {
@@ -395,7 +402,7 @@ model ConsentRecord {
 model DeletionRequest {
   id           String    @id @default(cuid())
   userId       String
-  status       String    @default("pending") // pending | cancelled | completed
+  status       String    @default("pending") // pending | cancelled | completed | completed_with_identity_error (AU-25: local erasure done, Neon Auth identity could not be deleted)
   reason       String?
   requestedAt  DateTime  @default(now())
   scheduledFor DateTime

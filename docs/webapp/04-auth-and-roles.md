@@ -124,6 +124,10 @@ export const getCurrentUser = cache(async (): Promise<AppUser | null> => {
    race, so catch it and re-read.
 5. **Claims pending invitations** if the product ever adds them (it does not in v1, but the hook
    point is documented so nobody re-invents it later).
+6. **Touches `User.lastSeenAt`** (owner decision D9) — at most once per 24 hours, conditioned on the
+   stored value, and swallowed-and-logged on failure, so a bookkeeping write can never break a
+   sign-in. This is the signal the inactivity retention sweep reads; without it a customer who only
+   signs in to re-read a report looks inactive.
 
 `getCurrentUser` is wrapped in React's `cache()` so a page and its layout resolve the session once.
 

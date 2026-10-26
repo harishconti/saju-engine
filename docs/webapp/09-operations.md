@@ -75,7 +75,11 @@ alternative header so they can be triggered manually during an incident.
 7. **Process due deletions.** `DeletionRequest` where `scheduledFor <= now()` → anonymise, delete
    solely-owned profiles and reports, queue their R2 objects. See
    [10 — Privacy and compliance](10-privacy-and-compliance.md).
-8. **Retention sweep.** Profiles with no activity for 24 months → queue a warning, not a delete.
+8. **Retention sweep.** Profiles with no activity for 24 months → scrubbed (or deleted when no order
+   references them), with their reports and R2 objects. "Activity" is the profile row's `updatedAt`,
+   any referencing order or report (including a recent delivery of one), and the owner's
+   `COALESCE(User.lastSeenAt, User.createdAt)`. There is no separate warning stage. See
+   [10 — Privacy and compliance](10-privacy-and-compliance.md).
 
 Every step writes a summary line to the log with counts only — never ids of user data at info level.
 

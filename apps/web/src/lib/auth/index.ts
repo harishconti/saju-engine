@@ -58,6 +58,38 @@ function isDatabaseError(err: unknown): boolean {
   );
 }
 
+/** The sign-in signal is written at most once per this window (owner decision D9). */
+const LAST_SEEN_THROTTLE_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Record that an account was used (owner decision D9).
+ *
+ * Retention measures "inactivity" as 24 months without use, and nothing else writes a timestamp
+ * when an account is merely read: `Profile.updatedAt` moves only when the profile itself changes, and
+ * mirrored users return unchanged. This is that timestamp, written from the `getCurrentUser` path at
+ * most once every 24 hours.
+ *
+ * Three rules:
+ *  - the in-memory check keeps the common case at zero writes;
+ *  - the `updateMany` re-checks the stored value as well as the id, so two concurrent requests
+ *    cannot both write it;
+ *  - a failure is logged and swallowed — bookkeeping must never turn a valid session into a 500 or a
+ *    signed-out page.
+ */
+async function touchLastSeen(userId: string, lastSeenAt: Date | null): Promise<void> {
+  const now = new Date();
+  if (lastSeenAt && now.getTime() - lastSeenAt.getTime() < LAST_SEEN_THROTTLE_MS) return;
+  const staleBefore = new Date(now.getTime() - LAST_SEEN_THROTTLE_MS);
+  try {
+    await prisma.user.updateMany({
+      where: { id: userId, OR: [{ lastSeenAt: null }, { lastSeenAt: { lt: staleBefore } }] },
+      data: { lastSeenAt: now },
+    });
+  } catch (err) {
+    console.error("[auth] lastSeenAt write failed:", err instanceof Error ? err.name : "unknown");
+  }
+}
+
 /** Upsert the local mirror. The first-sign-in race (P2002) is handled, not fatal. */
 async function mirrorUser(u: NeonUser): Promise<AppUser | null> {
   const n = normalise(u);
@@ -65,7 +97,7 @@ async function mirrorUser(u: NeonUser): Promise<AppUser | null> {
 
   const existing = await prisma.user.findUnique({
     where: { id: n.id },
-    select: { id: true, name: true, email: true, role: true, deletedAt: true },
+    select: { id: true, name: true, email: true, role: true, deletedAt: true, lastSeenAt: true },
   });
 
   // Admin is derived here because nothing else can grant it: there is no route, script or CLI that
@@ -92,6 +124,7 @@ async function mirrorUser(u: NeonUser): Promise<AppUser | null> {
     // Neon session's name here reverted every change made on the account page, because that page
     // saves to this row and the next request overwrote it. The session name seeds a new row only.
     if (!needsRole && existing.email === n.email) {
+      await touchLastSeen(existing.id, existing.lastSeenAt);
       return {
         id: existing.id,
         name: existing.name,
@@ -105,12 +138,21 @@ async function mirrorUser(u: NeonUser): Promise<AppUser | null> {
       data: { email: n.email, ...(needsRole ? { role: "ADMIN" as const } : {}) },
       select: { id: true, name: true, email: true, role: true },
     });
+    await touchLastSeen(existing.id, existing.lastSeenAt);
     return { ...updated, role: updated.role as Role, emailVerified: n.emailVerified };
   }
 
   try {
     const created = await prisma.user.create({
-      data: { id: n.id, name: n.name, email: n.email, ...(grantAdmin ? { role: "ADMIN" as const } : {}) },
+      data: {
+        id: n.id,
+        name: n.name,
+        email: n.email,
+        // A first sign-in is activity: seeding it here keeps the new account out of the sweep's
+        // candidate set from day one, without waiting for the first throttled write.
+        lastSeenAt: new Date(),
+        ...(grantAdmin ? { role: "ADMIN" as const } : {}),
+      },
       select: { id: true, name: true, email: true, role: true },
     });
     return { ...created, role: created.role as Role, emailVerified: n.emailVerified };
@@ -119,9 +161,10 @@ async function mirrorUser(u: NeonUser): Promise<AppUser | null> {
     // Lost the race: another request created it. Re-read.
     const row = await prisma.user.findUnique({
       where: { id: n.id },
-      select: { id: true, name: true, email: true, role: true, deletedAt: true },
+      select: { id: true, name: true, email: true, role: true, deletedAt: true, lastSeenAt: true },
     });
     if (!row || row.deletedAt) return null;
+    await touchLastSeen(row.id, row.lastSeenAt);
     return { id: row.id, name: row.name, email: row.email, role: row.role as Role, emailVerified: n.emailVerified };
   }
 }

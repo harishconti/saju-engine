@@ -81,6 +81,12 @@ const { prismaMock, txMock, r2Mock, ownerAlertMock, processDodoEvent, events } =
         events.push("deletion:completed");
         return {};
       }),
+      // AU-25: the terminal transition is guarded on `status: "pending"` so two overlapping cleanup
+      // runs cannot both alert. A count of 0 means the other run already settled this request.
+      updateMany: vi.fn(async (_args: { where: Record<string, unknown>; data: Record<string, unknown> }) => {
+        events.push("deletion:terminal");
+        return { count: 1 };
+      }),
     },
     report: { findMany: vi.fn(), deleteMany: vi.fn() },
     profile: { findMany: vi.fn(), updateMany: vi.fn(), deleteMany: vi.fn() },
@@ -151,6 +157,7 @@ beforeEach(() => {
   });
 
   prismaMock.deletionRequest.findMany.mockResolvedValue([deletionRequest("dr1", "u1")]);
+  prismaMock.deletionRequest.updateMany.mockResolvedValue({ count: 1 });
   prismaMock.auditLog.count.mockResolvedValue(0);
   prismaMock.report.findMany.mockResolvedValue([]);
   prismaMock.profile.findMany.mockResolvedValue([]);
@@ -322,10 +329,11 @@ describe("processDueDeletions — Neon identity deletion (AU-25)", () => {
     expect(txMock.$executeRaw).not.toHaveBeenCalled();
     // Terminal, not retryable: a schema that no longer matches cannot be fixed by trying again, and
     // leaving it `pending` would take one of the ten slots on every run for ever.
-    expect(prismaMock.deletionRequest.update).toHaveBeenCalledWith({
-      where: { id: "dr1" },
+    expect(prismaMock.deletionRequest.updateMany).toHaveBeenCalledWith({
+      where: { id: "dr1", status: "pending" },
       data: { status: "completed_with_identity_error", completedAt: NOW },
     });
+    expect(prismaMock.deletionRequest.update).not.toHaveBeenCalled();
     expect(prismaMock.auditLog.create).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
@@ -360,8 +368,8 @@ describe("processDueDeletions — Neon identity deletion (AU-25)", () => {
         after: { path: ["neonIdentity"], equals: "failed" },
       },
     });
-    expect(prismaMock.deletionRequest.update).toHaveBeenCalledWith({
-      where: { id: "dr1" },
+    expect(prismaMock.deletionRequest.updateMany).toHaveBeenCalledWith({
+      where: { id: "dr1", status: "pending" },
       data: { status: "completed_with_identity_error", completedAt: NOW },
     });
     expect(ownerAlertMock.notifyOwnerIdentityDeletionFailed).toHaveBeenCalledWith(
@@ -378,8 +386,25 @@ describe("processDueDeletions — Neon identity deletion (AU-25)", () => {
     await expect(processDueDeletions(NOW)).resolves.toBe(0);
 
     expect(prismaMock.deletionRequest.update).not.toHaveBeenCalled();
+    expect(prismaMock.deletionRequest.updateMany).not.toHaveBeenCalled();
     expect(ownerAlertMock.notifyOwnerIdentityDeletionFailed).not.toHaveBeenCalled();
     error.mockRestore();
+  });
+
+  it("does not alert twice when two cleanup runs settle the same request", async () => {
+    // The terminal transition is conditional on the row still being `pending`. The second run's
+    // guarded update changes nothing, so only the run that actually settled the request alerts.
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    txMock.$queryRaw
+      .mockResolvedValueOnce([{ name: null }])
+      .mockResolvedValueOnce([{ name: null }])
+      .mockResolvedValueOnce([{ name: null }]);
+    prismaMock.deletionRequest.updateMany.mockResolvedValue({ count: 0 });
+
+    await processDueDeletions(NOW);
+
+    expect(ownerAlertMock.notifyOwnerIdentityDeletionFailed).not.toHaveBeenCalled();
+    warn.mockRestore();
   });
 
   it("takes pending requests oldest-first so one stuck request cannot starve the queue", async () => {
