@@ -26,9 +26,19 @@ function safeNext(raw: string | null): string {
  * returning `{ error }`, so a wrong password lands in `catch`, not in `result.error`. A bare `catch`
  * therefore turned "Invalid email or password" and "User already exists" into the same vague
  * sentence. Only an `AuthError` message is shown; anything else (a network failure) gets the fallback.
+ *
+ * Except whether an account exists: "User already exists" on sign-up tells anyone which emails are
+ * registered here, so those answers get one neutral sentence. Matched on the message as well as the
+ * code, because the server's `USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL` is not in Neon's code map.
  */
+const ACCOUNT_EXISTENCE_CODES = new Set(["user_already_exists", "email_exists", "user_not_found", "identity_not_found"]);
+
 function authErrorMessage(err: unknown, fallback: string): string {
-  return isAuthError(err) && err.message ? err.message : fallback;
+  if (!isAuthError(err) || !err.message) return fallback;
+  if (ACCOUNT_EXISTENCE_CODES.has(String(err.code)) || /already exists|not found/i.test(err.message)) {
+    return "We couldn't do that with this email. If you already have an account, sign in or use a magic link.";
+  }
+  return err.message;
 }
 
 export default function LoginPage() {
