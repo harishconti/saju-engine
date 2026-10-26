@@ -6,6 +6,11 @@
 //  - Reports are immutable once DELIVERED. A change creates a new `version`.
 //  - All operational state is a table (rate limits, idempotency, job leases, R2 deletion queue).
 //  - Never touch the `neon_auth` schema — Neon Auth owns it.
+//    EXCEPTION (AU-25, owner-approved 2026-10-26): account erasure deletes the identity directly
+//    over the app's `DATABASE_URL` — sessions, accounts, then the user, in one transaction — after
+//    the local erasure commits. The SDK offers no other route for the cron: `deleteUser` proxies
+//    the caller's cookie and is guarded by `sensitiveSessionMiddleware`, and `admin.removeUser`
+//    needs an admin session. The cron has neither. Nothing else may write to `neon_auth`.
 
 generator client {
   provider = "prisma-client-js"

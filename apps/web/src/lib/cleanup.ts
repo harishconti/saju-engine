@@ -225,8 +225,9 @@ export async function processDueDeletions(now: Date): Promise<number> {
   let processed = 0;
   for (const request of due) {
     try {
-      await processDeletionRequest(request, now);
-      processed++;
+      // A request is counted only when it reached `completed`. A request whose local erasure
+      // committed but whose identity delete failed stays pending and is retried by the next run.
+      if (await processDeletionRequest(request, now)) processed++;
     } catch (err) {
       // Leave it pending. Throwing here would block every later request and the cron's later steps.
       console.error(
@@ -240,12 +241,84 @@ export async function processDueDeletions(now: Date): Promise<number> {
   return processed;
 }
 
-/** Erase one user's data. Split out only so `processDueDeletions` can isolate failures. */
+/**
+ * The Neon Auth relations an erasure must clear (AU-25).
+ *
+ * Probed before deleting rather than assumed: the identity schema belongs to Neon Auth, so a
+ * version that renamed or dropped a table must stop the delete cleanly instead of removing half of
+ * an identity. `to_regclass` answers null for a relation that does not exist, which is exactly the
+ * signal needed and involves no privileged access beyond the app's own connection.
+ */
+const NEON_AUTH_RELATIONS = ['neon_auth."session"', 'neon_auth."account"', 'neon_auth."user"'] as const;
+
+type IdentityOutcome = "deleted" | "missing-relation" | "failed";
+
+/**
+ * Delete the Neon Auth identity behind an erased account (AU-25).
+ *
+ * The SDK cannot do this for the cron: `auth.deleteUser()` proxies with the caller's session and
+ * Better Auth guards it with `sensitiveSessionMiddleware`, while `auth.admin.removeUser()` needs an
+ * admin session. The cron has neither. The owner has therefore approved one documented exception to
+ * "never touch the `neon_auth` schema" (recorded on the Prisma schema): delete directly over the
+ * app's existing `DATABASE_URL`.
+ *
+ * The id is the Neon user id — the local `User` is mirrored with `id: n.id` — so this never matches
+ * on email, which the local transaction has already rewritten by the time this runs.
+ *
+ * Sessions, then accounts, then the user: the child rows reference the identity, and a partial
+ * delete (sessions gone, user alive) would leave an account nobody can reach but that still blocks
+ * re-registration. All three statements share one transaction so it is all or nothing.
+ *
+ * Returns an outcome instead of throwing: the caller keeps the request pending on anything but
+ * "deleted", and must never let this step fail an erasure whose local half already committed.
+ */
+async function deleteNeonIdentity(neonUserId: string): Promise<IdentityOutcome> {
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const missing: string[] = [];
+      for (const relation of NEON_AUTH_RELATIONS) {
+        const rows = await tx.$queryRaw<Array<{ name: string | null }>>`
+          SELECT to_regclass(${relation})::text AS name
+        `;
+        if (!rows[0]?.name) missing.push(relation);
+      }
+      if (missing.length > 0) {
+        console.warn(
+          "neon identity deletion skipped: expected relation(s) absent",
+          missing.join(", "),
+        );
+        return "missing-relation";
+      }
+
+      await tx.$executeRaw`DELETE FROM neon_auth."session" WHERE "userId" = ${neonUserId}`;
+      await tx.$executeRaw`DELETE FROM neon_auth."account" WHERE "userId" = ${neonUserId}`;
+      await tx.$executeRaw`DELETE FROM neon_auth."user" WHERE "id" = ${neonUserId}`;
+      return "deleted";
+    });
+  } catch (err) {
+    console.error(
+      "neon identity deletion failed; deletion request left pending",
+      neonUserId,
+      err instanceof Error ? err.name : "unknown",
+    );
+    return "failed";
+  }
+}
+
+/**
+ * Erase one user's data. Split out only so `processDueDeletions` can isolate failures.
+ *
+ * Returns true only when the request reached `completed`.
+ */
 async function processDeletionRequest(
   request: { id: string; userId: string },
   now: Date,
-): Promise<void> {
+): Promise<boolean> {
   const { id: requestId, userId } = request;
+  // AU-25: capture the identity key before the local transaction rewrites the account. `User.id`
+  // IS the Neon Auth user id (the mirror is created with `id: n.id`), and the email is anonymised
+  // below, so matching on email here would find nothing.
+  const neonUserId = userId;
 
   const reports = await prisma.report.findMany({
     where: { userId },
@@ -307,18 +380,16 @@ async function processDeletionRequest(
       data: { withdrawnAt: now },
     });
 
-    await tx.deletionRequest.update({
-      where: { id: requestId },
-      data: { status: "completed", completedAt: now },
-    });
-
+    // The request is NOT marked completed here (AU-25). Its identity delete happens after this
+    // commits, and a request that is `completed` while the user can still sign in would be a lie
+    // the retry path could never correct. Completion is written below, only once that succeeds.
     await tx.auditLog.create({
       data: {
         entity: "deletion",
         entityId: requestId,
         action: "delete",
         actorId: null,
-        after: { completedAt: now.toISOString() },
+        after: { localErasureCommittedAt: now.toISOString() },
       },
     });
   });
@@ -332,6 +403,45 @@ async function processDeletionRequest(
       console.error("erasure object cleanup failed", err instanceof Error ? err.name : "unknown");
     }
   }
+
+  // AU-25: the local half is committed and idempotent; this half severs sign-in. A failure or a
+  // missing relation leaves the request pending, so the next run retries both halves, and never
+  // undoes what already committed.
+  const identity = await deleteNeonIdentity(neonUserId);
+  if (identity !== "deleted") {
+    try {
+      await prisma.auditLog.create({
+        data: {
+          entity: "deletion",
+          entityId: requestId,
+          action: "update",
+          actorId: null,
+          after: { neonIdentity: identity, localErasureCommitted: true },
+        },
+      });
+    } catch (err) {
+      // The failure is already logged by `deleteNeonIdentity`; losing the audit row must not be a
+      // second reason to fail an erasure whose local half is done.
+      console.error("deletion identity audit failed", err instanceof Error ? err.name : "unknown");
+    }
+    return false;
+  }
+
+  await prisma.deletionRequest.update({
+    where: { id: requestId },
+    data: { status: "completed", completedAt: now },
+  });
+  await prisma.auditLog.create({
+    data: {
+      entity: "deletion",
+      entityId: requestId,
+      action: "update",
+      actorId: null,
+      after: { completedAt: now.toISOString(), neonIdentity: "deleted" },
+    },
+  });
+
+  return true;
 }
 
 /**
