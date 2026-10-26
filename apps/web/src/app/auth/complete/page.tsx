@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { safeNext } from "@/lib/safe-next";
 
 /**
  * Where every OAuth and magic-link sign-in lands.
@@ -10,18 +11,12 @@ import { redirect } from "next/navigation";
  */
 export const dynamic = "force-dynamic";
 
-function safeNext(raw: string | string[] | undefined): string {
-  const value = Array.isArray(raw) ? raw[0] : raw;
-  if (!value) return "/dashboard";
-  if (!value.startsWith("/") || value.startsWith("//")) return "/dashboard";
-  return value;
-}
-
 export default async function AuthCompletePage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const params = await searchParams;
-  redirect(safeNext(params.next));
+  const next = Array.isArray(params.next) ? params.next[0] : params.next;
+  redirect(safeNext(next));
 }

@@ -8,16 +8,10 @@ import { ElementalRule, SealMark } from "@/components/viz";
 import { isAuthError } from "@neondatabase/auth/next";
 import { authClient } from "@/lib/auth/client";
 import { POLICY_VERSION } from "@/lib/consent";
+import { safeNext } from "@/lib/safe-next";
 
 type Mode = "signin" | "signup";
 type Busy = null | "google" | "email" | "magic";
-
-function safeNext(raw: string | null): string {
-  // Allowlist: only same-site, single-leading-slash paths. A naive `next` is an open redirect.
-  if (!raw) return "/dashboard";
-  if (!raw.startsWith("/") || raw.startsWith("//")) return "/dashboard";
-  return raw;
-}
 
 /**
  * The reason an auth call failed, in words a visitor can act on.
