@@ -241,6 +241,9 @@ describe("POST /api/account/password-reset/confirm — the reset step", () => {
       { status: 429, http: 429, code: "RATE_LIMITED" },
       { status: 401, http: 503, code: "RESET_UNAVAILABLE" },
       { status: 404, http: 503, code: "RESET_UNAVAILABLE" },
+      // 410 is not a provider verdict (it only ever emits 400), so a revert to `{400, 410}` must
+      // fail here rather than silently discard a link that still works.
+      { status: 410, http: 503, code: "RESET_UNAVAILABLE" },
       { status: 500, http: 503, code: "RESET_UNAVAILABLE" },
       { status: undefined, http: 503, code: "RESET_UNAVAILABLE" },
     ];

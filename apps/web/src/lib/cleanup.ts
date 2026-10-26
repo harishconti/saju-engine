@@ -219,12 +219,13 @@ export async function retryUnprocessedWebhooks(now = new Date()): Promise<number
  *    person.
  *  - **Profiles no order references are deleted outright.**
  *  - **Consent records are retained** as proof the consent existed; they are withdrawn, not removed.
- *  - **Reports and their R2 artefacts are destroyed.** The keys are read inside the erasure
- *    transaction, so the rows deleted and the keys queued come from the same view, and a bounded
- *    post-commit re-sweep catches a report that committed just afterwards. The PDF, markdown, audio
- *    and HTML objects are deleted only after the transaction commits (through `deleteObjectOrQueue`,
- *    so a storage error is retried by the next sweep instead of rolling back an already-completed
- *    erasure).
+ *  - **Reports and their R2 artefacts are destroyed.** The keys are captured inside the erasure
+ *    transaction, the captured keys are queued for deletion there, and the rows are deleted by the
+ *    ids just captured — never by `userId`, because the transaction is READ COMMITTED and a
+ *    `userId` delete could take a newer snapshot than the read. A bounded post-commit re-sweep
+ *    catches a report that committed just afterwards. The PDF, markdown, audio and HTML objects are
+ *    deleted only after the transaction commits (through `deleteObjectOrQueue`, so a storage error
+ *    is retried by the next sweep instead of rolling back an already-completed erasure).
  *  - **Retained job rows lose their payload.** `Job.payload` holds the full engine request (both
  *    profiles' birth data) and the row outlives the account until `purgeOldJobs()` removes it, so it
  *    is nulled in the same transaction.
@@ -386,24 +387,44 @@ async function processDeletionRequest(
   }
   const retainedProfileIds = [...referencedProfileIds];
 
-  // The report keys are read *inside* the transaction, not before it, and that ordering is the
-  // point. The transaction deletes reports by `userId`; a report that committed between an outside
-  // snapshot and the transaction would be deleted with its storage keys never queued — permanent,
-  // unfindable PII in R2 that no later sweep could locate. Reading and deleting under one
-  // transaction makes the rows deleted and the keys queued the same view.
+  // The report keys are captured inside the transaction, and the rows are then deleted by the ids
+  // just captured — never by `userId`.
+  //
+  // The transaction is Postgres READ COMMITTED (`prisma.ts` sets no `isolationLevel`), so each
+  // statement takes a fresh snapshot. A `deleteMany({ where: { userId } })` could therefore remove a
+  // report that committed *after* the read, whose `pdfKey/mdKey/audioKey/htmlKey` were never
+  // captured — permanent, unfindable PII in `reports/{userId}/…` that no later sweep could locate.
+  // Deleting `where: { id: { in: reportIds } }` can only remove rows whose keys are in hand; a row
+  // that commits later survives this transaction and is caught by the bounded re-sweep below.
   const keys = await prisma.$transaction(async (tx) => {
     const reports = await tx.report.findMany({
       where: { userId },
       // Include the MP3 and the web document: an erasure request must not leave either behind.
       select: { id: true, pdfKey: true, mdKey: true, audioKey: true, htmlKey: true },
     });
+    const reportIds = reports.map((r) => r.id);
     const reportKeys = reports
       .flatMap((r) => [r.pdfKey, r.mdKey, r.audioKey, r.htmlKey])
       .filter((k): k is string => Boolean(k));
 
-    // Reports first: Report_profileAId_fkey is RESTRICT too.
-    await tx.report.deleteMany({ where: { userId } });
+    // Reports first: Report_profileAId_fkey is RESTRICT too. `in: []` matches nothing.
+    await tx.report.deleteMany({ where: { id: { in: reportIds } } });
     await tx.delivery.deleteMany({ where: { userId } });
+
+    // The captured keys are also written to the deletion queue here, before the commit. Between
+    // this commit and the post-commit R2 loop only memory holds them: a process death there would
+    // leave the rows deleted and the objects present, and the retry would find no rows, sever
+    // sign-in and mark the request `completed` with the residue still in R2. A queue row survives
+    // that crash and is drained by the next sweep.
+    //
+    // `ObjectDeletion.fileKey` has no unique constraint, and `drainObjectDeletions` deletes every
+    // row for a key once its object is gone — so the duplicate the post-commit loop may add (when a
+    // delete fails) is harmless. Do not "fix" this into an upsert.
+    if (reportKeys.length > 0) {
+      await tx.objectDeletion.createMany({
+        data: reportKeys.map((fileKey) => ({ fileKey })),
+      });
+    }
 
     // `fulfilment.ts` stores the entire engine request in `Job.payload` — both profiles' names and
     // full birth details included — and a finished job is retained by `purgeOldJobs()` long after
@@ -467,9 +488,9 @@ async function processDeletionRequest(
   }
 
   // A render that was already past its account check when the transaction above ran can still
-  // commit a Report just after it. The transaction's view could not contain it, so a single delete
-  // by `userId` would strand its objects in R2 with no row left to find them by. Re-read and purge
-  // what is still there, taking each row's keys before deleting it.
+  // commit a Report just after it. The transaction's read could not see that row, so its keys are
+  // not in hand. Re-read and purge what is still there, taking each row's keys and then deleting
+  // the rows by those same ids.
   //
   // Bounded by `ERASURE_RESWEEP_PASSES`: two concurrent commits cannot repeat indefinitely now that
   // the report write re-checks `deletedAt` inside its own transaction (`fulfilment.ts`), and an
@@ -496,7 +517,9 @@ async function processDeletionRequest(
         }
       }
     }
-    await prisma.report.deleteMany({ where: { userId } });
+    // By the ids just read, for the same READ COMMITTED reason as the transaction: a row that
+    // commits after this read survives to the next pass with its keys still capturable there.
+    await prisma.report.deleteMany({ where: { id: { in: leftovers.map((r) => r.id) } } });
 
     if (pass === ERASURE_RESWEEP_PASSES - 1) {
       console.error("erasure re-sweep hit its bound; a report row may remain", userId);

@@ -54,6 +54,8 @@ const {
   };
   const jobRows: Array<{ id: string; orderId: string; ownerId: string; payload: unknown }> = [
     { id: "job_1", orderId: "o1", ownerId: "u1", payload: structuredClone(ORIGINAL_JOB_PAYLOAD) },
+    // Another account's retained job. The erasure must reach only the erased user's rows.
+    { id: "job_2", orderId: "o2", ownerId: "u2", payload: structuredClone(ORIGINAL_JOB_PAYLOAD) },
   ];
 
   const txMock = {
@@ -110,6 +112,14 @@ const {
       deleteMany: vi.fn(async () => {
         events.push("tx:delivery.deleteMany");
         return { count: 0 };
+      }),
+    },
+    // The captured keys are also queued here, inside the transaction, so a crash between the
+    // commit and the post-commit R2 loop cannot lose them.
+    objectDeletion: {
+      createMany: vi.fn(async (args: { data: Array<{ fileKey: string }> }) => {
+        events.push("tx:objectDeletion.createMany");
+        return { count: args.data.length };
       }),
     },
     user: {
@@ -301,7 +311,10 @@ describe("processDueDeletions — erasure with an order (AU-04, D2)", () => {
   it("deletes deliveries and anonymises the account", async () => {
     await processDueDeletions(NOW);
 
-    expect(txMock.report.deleteMany).toHaveBeenCalledWith({ where: { userId: "u1" } });
+    // The reports are deleted by the ids just read, never by `userId`: at READ COMMITTED a
+    // `where: { userId }` delete would take a fresh snapshot and could remove a report whose keys
+    // were never captured. A row that commits after the read survives to the re-sweep instead.
+    expect(txMock.report.deleteMany).toHaveBeenCalledWith({ where: { id: { in: ["r1"] } } });
     expect(txMock.delivery.deleteMany).toHaveBeenCalledWith({ where: { userId: "u1" } });
     expect(txMock.user.update).toHaveBeenCalledWith({
       where: { id: "u1" },
@@ -511,13 +524,14 @@ describe("processDueDeletions — the engine payload (must-fix 1)", () => {
     });
   });
 
-  it("leaves no retained row carrying a birth field", async () => {
+  it("leaves no retained row of the erased user carrying a birth field", async () => {
     await processDueDeletions(NOW);
 
-    // Everything the user still has after erasure: order rows are retained for accounting, and this
-    // job hangs off one. Serialising the retained rows is the privacy page's promise made testable.
-    expect(jobRows.length).toBeGreaterThan(0);
-    const retained = JSON.stringify(jobRows);
+    // Everything the erased user still has: order rows are retained for accounting, and this job
+    // hangs off one. Serialising the retained rows is the privacy page's promise made testable.
+    const erasedUserRows = jobRows.filter((row) => row.ownerId === "u1");
+    expect(erasedUserRows.length).toBeGreaterThan(0);
+    const retained = JSON.stringify(erasedUserRows);
     for (const field of [
       "fullName",
       "birthDate",
@@ -530,7 +544,16 @@ describe("processDueDeletions — the engine payload (must-fix 1)", () => {
     ]) {
       expect(retained, `a retained job row still carries ${field}`).not.toContain(field);
     }
-    expect(jobRows[0]!.payload).toBeNull();
+    expect(erasedUserRows[0]!.payload).toBeNull();
+  });
+
+  it("does not touch another account's job payload", async () => {
+    await processDueDeletions(NOW);
+
+    // The `order: { userId }` filter is the scope. Another user's retained row is not this
+    // request's to change.
+    const other = jobRows.find((row) => row.ownerId === "u2");
+    expect(other?.payload).toEqual(ORIGINAL_JOB_PAYLOAD);
   });
 
   it("is safe to run twice: the second pass writes the same NULL again", async () => {
@@ -556,20 +579,23 @@ describe("processDueDeletions — a report that commits during erasure (must-fix
     prismaMock.order.findMany.mockResolvedValue([{ profileAId: "p1", profileBId: null }]);
   });
 
-  it("takes the keys and the deletion from the same view of the reports", async () => {
+  it("reads the keys and deletes exactly the rows it read, by id", async () => {
     await processDueDeletions(NOW);
 
     expect(txMock.report.findMany).toHaveBeenCalledWith({
       where: { userId: "u1" },
       select: { id: true, pdfKey: true, mdKey: true, audioKey: true, htmlKey: true },
     });
-    expect(txMock.report.deleteMany).toHaveBeenCalledWith({ where: { userId: "u1" } });
+    // Not `where: { userId }`. The transaction is READ COMMITTED (`prisma.ts` sets no
+    // `isolationLevel`), so each statement takes a fresh snapshot: a `userId` delete could remove a
+    // report that committed after the read, with keys that were never captured.
+    expect(txMock.report.deleteMany).toHaveBeenCalledWith({ where: { id: { in: ["r1"] } } });
   });
 
-  it("queues a late report's objects and deletes its row, so nothing is orphaned in R2", async () => {
-    // A report that was not visible to the transaction — the render that committed between the
-    // transaction and the sweep. Its row would otherwise be deleted (or left) with its objects
-    // still in R2 and no record of their keys.
+  it("survives a row that commits between the reads and is swept by id next pass", async () => {
+    // The row the transaction read, and one that committed after that read — the delete by captured
+    // ids cannot touch the second, which is the point: it survives this pass and the re-sweep reads
+    // its keys before deleting it by its own id.
     prismaMock.report.findMany
       .mockResolvedValueOnce([{ id: "r2", ...LATE_KEYS }])
       .mockResolvedValue([]);
@@ -577,6 +603,8 @@ describe("processDueDeletions — a report that commits during erasure (must-fix
 
     await processDueDeletions(NOW);
 
+    expect(txMock.report.deleteMany).toHaveBeenCalledWith({ where: { id: { in: ["r1"] } } });
+    expect(prismaMock.report.deleteMany).toHaveBeenCalledWith({ where: { id: { in: ["r2"] } } });
     const queued = (r2Mock.deleteObjectOrQueue.mock.calls as unknown as Array<[string]>).map(
       (call) => call[0],
     );
@@ -591,9 +619,65 @@ describe("processDueDeletions — a report that commits during erasure (must-fix
         LATE_KEYS.htmlKey,
       ]),
     );
-    expect(prismaMock.report.deleteMany).toHaveBeenCalledWith({ where: { userId: "u1" } });
     // Two passes only: the late report, then the empty confirmation. The bound is not reached.
     expect(prismaMock.report.findMany).toHaveBeenCalledTimes(2);
+  });
+
+  it("writes the captured keys to the deletion queue inside the transaction", async () => {
+    await processDueDeletions(NOW);
+
+    // Between the commit and the post-commit R2 loop only memory holds the keys. A process death
+    // there would leave the rows deleted, the objects present, and the retry finding no rows — so
+    // the queue row must exist before the commit.
+    expect(txMock.objectDeletion.createMany).toHaveBeenCalledWith({
+      data: Object.values(KEYS).map((fileKey) => ({ fileKey })),
+    });
+    const queuedAt = events.indexOf("tx:objectDeletion.createMany");
+    expect(queuedAt).toBeGreaterThan(-1);
+    expect(queuedAt).toBeLessThan(events.indexOf("commit"));
+  });
+
+  it("keeps the queued keys even when the post-commit loop fails", async () => {
+    // The loop is best-effort; the queue row is what actually guarantees the objects are deleted.
+    for (let i = 0; i < Object.keys(KEYS).length; i += 1) {
+      r2Mock.deleteObjectOrQueue.mockRejectedValueOnce(new Error("r2 down"));
+    }
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await expect(processDueDeletions(NOW)).resolves.toBe(1);
+
+    expect(txMock.objectDeletion.createMany).toHaveBeenCalledWith({
+      data: Object.values(KEYS).map((fileKey) => ({ fileKey })),
+    });
+    expect(error).toHaveBeenCalled();
+    error.mockRestore();
+  });
+
+  it("stops the re-sweep at its fixed bound and logs once", async () => {
+    // A writer that keeps committing: every read returns a row, so the loop must terminate on the
+    // bound rather than chase it for ever.
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    prismaMock.report.findMany.mockResolvedValue([{ id: "r2", ...LATE_KEYS }]);
+    prismaMock.report.deleteMany.mockResolvedValue({ count: 1 });
+
+    await expect(processDueDeletions(NOW)).resolves.toBe(1);
+
+    expect(prismaMock.report.findMany).toHaveBeenCalledTimes(3);
+    const boundLogs = error.mock.calls.filter((call) =>
+      String(call[0]).includes("re-sweep hit its bound"),
+    );
+    expect(boundLogs).toHaveLength(1);
+    error.mockRestore();
+  });
+
+  it("does not log the bound when the first re-sweep pass finds nothing", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await processDueDeletions(NOW);
+
+    expect(prismaMock.report.findMany).toHaveBeenCalledTimes(1);
+    expect(error).not.toHaveBeenCalled();
+    error.mockRestore();
   });
 });
 

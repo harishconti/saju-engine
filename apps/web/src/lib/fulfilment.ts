@@ -308,18 +308,23 @@ export async function processClaimedJob(job: Job, opts: ClaimOptions = {}): Prom
     // as the deliverable rather than losing the order. The row records only what is really there.
     const htmlObject = result.htmlBytes ? await headObject(htmlKey) : null;
 
-    // What this render really put in storage: the PDF was just verified, the markdown was uploaded
-    // through the presigned URL the engine was given, and the HTML only counts when its object
-    // landed. Recorded here so the erasure branch cannot queue a key this call never used.
+    // What this render really put in storage: the PDF and the HTML were verified with `headObject`;
+    // the markdown was uploaded through the presigned URL the engine was given and is best-effort
+    // (never verified separately), so it is recorded as uploaded. Recorded here so the erasure
+    // branch cannot queue a key this call never used.
     uploadedKeys.push(pdfKey, mdKey);
     if (htmlObject) uploadedKeys.push(htmlKey);
 
     await prisma.$transaction(async (tx) => {
-      // The `deletedAt` check above ran before the engine call, which can take a minute or more. An
-      // erasure that committed in that window must not leave a Report behind: the row carries
-      // `enginePayload` (full birth data) and the R2 keys of objects this render just uploaded.
-      // Re-read under the transaction, so either this write commits before the erasure's delete or
-      // it sees the erasure and aborts — there is no window between the check and the write.
+      // The `deletedAt` check above ran before the engine call, which can take a minute or more; an
+      // erasure that committed in that window must not leave a Report behind, because the row
+      // carries `enginePayload` (full birth data) and the R2 keys of objects this render uploaded.
+      //
+      // This re-read is defence in depth, not a guarantee. `findUnique` takes no lock, so an
+      // erasure update can still land between this read and `report.create` (no `FOR UPDATE` is
+      // taken deliberately). What closes that residue is the erasure's bounded post-commit
+      // re-sweep, which finds and removes any report that committed after the erasure's own read.
+      // The check still removes the whole engine-call window, which is the long one.
       const owner = await tx.user.findUnique({
         where: { id: order.userId },
         select: { deletedAt: true },
