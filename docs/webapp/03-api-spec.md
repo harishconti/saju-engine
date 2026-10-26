@@ -226,8 +226,9 @@ RATE_LIMITED`, `403 TURNSTILE_FAILED` (bot check not satisfied — see below), `
 records but **never refuses**, and `enforce` returns `403 TURNSTILE_FAILED` on an absent or invalid token.
 **Deploy new keys at `log`**, confirm real visitors actually receive tokens, then move to `enforce`. The
 switch exists because this control can take the whole funnel down: a widget that fails to render produces
-no token, and an enforcing server then refuses *everybody* — which happened on 2026-10-16. `/api/health`
-reports the live mode as `botProtection`, so a `log` rollout is visible rather than mistaken for
+no token, and an enforcing server then refuses *everybody* — which happened on 2026-10-16. The
+authorised `/api/health/detail` reports the live mode as `botProtection`, so a `log` rollout is visible
+rather than mistaken for
 `enforce`; see [14](14-security.md) §4 for the flip.
 
 `TURNSTILE_SECRET_KEY` and the public site key must be deployed as a pair — the secret alone verifies, the

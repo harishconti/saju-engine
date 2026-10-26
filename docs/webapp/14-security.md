@@ -55,7 +55,7 @@ and the shared secrets (`ENGINE_SERVICE_TOKEN`, `CRON_SECRET`, `DODO_PAYMENTS_WE
 | Rate limiting | `src/lib/ratelimit.ts` | Postgres fixed window; public + mutating routes | see §3 |
 | Client IP trust | `src/lib/client-ip.ts` | Prefer `x-vercel-forwarded-for` / `x-real-ip`; raw `x-forwarded-for` uses the **rightmost** hop | `client-ip.test.ts` |
 | Email abuse | `src/app/api/sample/email/route.ts` | Per-IP (5/min, 20/h) **and per-recipient** (2/h) | — |
-| Bot protection | `src/lib/turnstile.ts` | Cloudflare Turnstile; `off` / `log` / `enforce`; state exposed by `/api/health` | `turnstile.test.ts` |
+| Bot protection | `src/lib/turnstile.ts` | Cloudflare Turnstile; `off` / `log` / `enforce`; state exposed by the authorised `/api/health/detail` | `turnstile.test.ts` |
 | Storage | `src/lib/r2.ts` | Private bucket; presigned PUT/GET with short TTLs; object keys derived server-side | `r2.integration.test.ts` |
 | Security headers | `apps/web/next.config.ts` | CSP (`default-src 'self'`, `object-src 'none'`, `frame-ancestors 'none'`), HSTS, `nosniff`, `X-Frame-Options: DENY`, Referrer/Permissions policy, no `X-Powered-By` | manual / `audit-ui` |
 | CSRF | Neon Auth cookies + JSON-only mutations + `form-action 'self'` + no CORS | implicit; see §5.4 | — |
@@ -102,7 +102,7 @@ Then flip bot protection only after a real browser has completed the challenge:
 
 ```bash
 vercel env add TURNSTILE_MODE production   # value: enforce
-# /api/health must show botProtection: "enforce" after the redeploy.
+# With HEALTH_DETAIL_TOKEN, /api/health/detail must show botProtection: "enforce" after the redeploy.
 ```
 
 ## 5. Deliberate residual risks (not "done")

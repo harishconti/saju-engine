@@ -94,7 +94,11 @@ export const POST = handle(async (req) => {
     );
   }
 
-  const location = resolveBirthLocation({ city: input.city, countryCode: input.countryCode ?? null });
+  const location = resolveBirthLocation({
+    city: input.city,
+    countryCode: input.countryCode ?? null,
+    country: input.country ?? null,
+  });
   const check = validateBirth({
     birthDate: input.birthDate,
     birthTime: input.birthTime,

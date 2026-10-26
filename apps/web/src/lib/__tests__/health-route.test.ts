@@ -34,18 +34,8 @@ const { GET } = await import("@/app/api/health/route");
 const { GET: detailGET } = await import("@/app/api/health/detail/route");
 const { resetHealthProbeCacheForTests } = await import("@/lib/health");
 
-/** The fields AU-31 moved off the public body. */
-const MOVED_FIELDS = [
-  "db",
-  "storage",
-  "engine",
-  "engineDetail",
-  "payments",
-  "paymentsMode",
-  "botProtection",
-  "botProtectionConfigured",
-  "missingProducts",
-] as const;
+/** The exact public contract. A new field must be a deliberate change to this list, not a leak. */
+const PUBLIC_KEYS = ["checkedAt", "ok", "status", "version"] as const;
 
 function engineReply(body: unknown, status: number): Response {
   return new Response(JSON.stringify(body), {
@@ -93,9 +83,8 @@ describe("GET /api/health — the public body", () => {
     expect(body.ok).toBe(false);
     expect(typeof body.version).toBe("string");
     expect(typeof body.checkedAt).toBe("string");
-    for (const field of MOVED_FIELDS) {
-      expect(body, `${field} must not be in the public body`).not.toHaveProperty(field);
-    }
+    // Exactly these keys: a denylist would let a newly added field leak silently.
+    expect(Object.keys(body).sort()).toEqual([...PUBLIC_KEYS]);
   });
 
   it("stays green when everything is healthy", async () => {

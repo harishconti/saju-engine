@@ -387,7 +387,11 @@ visitor at the top of the funnel.
 
 The site keeps working; only the sample flow and new generation break.
 
-1. `/api/health` — `engine: false`?
+1. **Which probe failed?** — `GET /api/health` answers only `ok`/`status`/`version`/`checkedAt`; a
+   `503`/`degraded` says something is down, not what. With `HEALTH_DETAIL_TOKEN` (or an admin
+   session), `GET /api/health/detail` shows `engine: false` and `engineDetail`. Without the token,
+   the engine's own `POST {ENGINE_URL}/health` (with the bearer token) and the Vercel function logs
+   are the next cheap checks; continue below.
 2. Vercel → `saju-report-engine` → the last deploy. Roll back if it correlates.
 3. If the token rotated, update `ENGINE_SERVICE_TOKEN` in **both** projects and redeploy both. A
    one-sided rotation presents as a 401 from the engine while `/health` on the engine itself still

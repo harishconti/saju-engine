@@ -62,14 +62,15 @@ export const PATCH = handle(async (req, ctx: Ctx) => {
     return json({ profile: fresh });
   }
 
-  // AU-34 (2026-10-26 audit): an edit that changes only the city sent no country, so a bare
-  // ambiguous name ("Cambridge") was re-resolved with nothing to disambiguate it and the edit
-  // failed. Fall back to the country already stored on the profile — `findCity` accepts the
-  // country name or its two-letter code.
+  // AU-34 (2026-10-26 audit): an edit that changes only the city sends no country, so a bare
+  // ambiguous name ("Cambridge") would be re-resolved with nothing to disambiguate it and the edit
+  // would fail. Fall back to the country already stored on the profile — `findCity` accepts the
+  // country name or its two-letter code. A country supplied by the request wins, so re-pointing a
+  // profile at a same-named place in another country actually resolves there.
   const location = resolveBirthLocation({
     city: input.city ?? existing.city,
     countryCode: input.countryCode ?? null,
-    country: existing.country,
+    country: input.country ?? existing.country,
   });
 
   const birthDate = input.birthDate ?? existing.birthDate.toISOString().slice(0, 10);
@@ -85,10 +86,15 @@ export const PATCH = handle(async (req, ctx: Ctx) => {
   if (!check.ok) throw new ApiError(422, check.code ?? "INVALID_BIRTH_DATA", check.message ?? "Invalid birth data");
 
   const offset = birthUtcOffset(birthDate, birthTime, location.timezone);
+  // Country and timezone are chart-affecting too: two same-named cities (Cambridge GB and Cambridge
+  // US) share a city string but not an offset. Comparing only the city name left a chart computed
+  // for the old zone in place after the location moved.
   const birthChanged =
     birthDate !== existing.birthDate.toISOString().slice(0, 10) ||
     birthTime !== existing.birthTime ||
     location.city !== existing.city ||
+    location.country !== existing.country ||
+    location.timezone !== existing.timezone ||
     timeKnown !== existing.timeKnown;
 
   const updated = await prisma.$transaction(async (tx) => {

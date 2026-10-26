@@ -570,11 +570,10 @@ The free snapshot has its own synchronous path (`POST /api/sample`) and is not o
 routing it through the paid flow would only duplicate that machinery.
 
 **Its artefact is the reading, not a PDF** (since 2026-10-17), so `Report.pdfKey` is null for a sample and
-its `htmlKey` is what the library and the detail page serve. The engine's contract still requires a PDF
-upload target, so the route presigns one under the **swept** `reports/anonymous/` prefix and never records
-it — a deliberate, documented waste (one PDF render and roughly 100 KB per free snapshot, swept in 3 days)
-that buys avoiding a contract change across two deployables. The honest fix, if the volume ever justifies
-it, is to make `uploadUrl` optional so the sample skips the PDF render entirely.
+its `htmlKey` is what the library and the detail page serve. The engine's `uploadUrl` is optional, so the
+route asks for the reading only (`htmlUploadUrl`) and renders no PDF at all — no throwaway presign and no
+swept PDF object (AU-29). A request that targets neither URL is still refused with
+`400 MISSING_UPLOAD_URL`.
 
 This is not an admin panel bolted on. Given decision **D5 (always review)**, it is the component
 that delivers the promise *"an accurate engine and an honest interpreter."*
@@ -740,7 +739,7 @@ Rules:
 
 | Signal | Where |
 |---|---|
-| `/api/health` | DB (`SELECT 1`), R2 (head a known-zero-byte sentinel or list one key), engine (`POST /health`) |
+| `/api/health/detail` (authorised) | DB (`SELECT 1`), R2 (head a known-zero-byte sentinel or list one key), engine (`POST /health`) |
 | Job health | `Job` grouped by `state`; a growing `QUEUED` count means the dispatcher is not keeping up |
 | Review backlog | `/admin` — age of the oldest item — the number that tells you if review is the bottleneck |
 | Delivery health | `Delivery` grouped by `status` |

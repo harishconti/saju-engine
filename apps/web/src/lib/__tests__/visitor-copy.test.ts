@@ -46,6 +46,23 @@ describe("failureNotice", () => {
     expect(notice.message).toContain("Nothing was charged.");
   });
 
+  it("maps HTML_UPLOAD_FAILED to copy about the reading", () => {
+    // `api/index.py` reports a lost reading as HTML_UPLOAD_FAILED and relies on the webapp to
+    // explain it. Without this entry the visitor got the generic sentence.
+    const sample = failureNotice({ code: "HTML_UPLOAD_FAILED", context: "sample" });
+
+    expect(sample.retryable).toBe(true);
+    expect(sample.message).toMatch(/reading/i);
+    expect(sample.message).toMatch(/didn't save correctly/i);
+    expect(sample.message).toContain("Nothing was charged.");
+
+    const paid = failureNotice({ code: "HTML_UPLOAD_FAILED", context: "paid" });
+    expect(paid.retryable).toBe(false);
+    expect(paid.message).toMatch(/reading/i);
+    expect(paid.message).not.toMatch(/nothing was charged/i);
+    expect(paid.message).toMatch(/order is safe|not been charged twice/i);
+  });
+
   it("falls back to a complete sentence for an unknown code", () => {
     const notice = failureNotice({ code: "SOMETHING_NEW", context: "sample", requestId: "abcdef123456" });
 

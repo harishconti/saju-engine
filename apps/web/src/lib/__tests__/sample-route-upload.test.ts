@@ -73,11 +73,11 @@ const BODY = {
   country: "South Korea",
 };
 
-function request(): Request {
+function request(overrides: Partial<typeof BODY> = {}): Request {
   return new Request("https://app.test/api/sample", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify(BODY),
+    body: JSON.stringify({ ...BODY, ...overrides }),
   });
 }
 
@@ -142,5 +142,20 @@ describe("POST /api/sample — reading-only upload (AU-29)", () => {
     expect(res.status).toBe(200);
     expect(body.bytes).toBe(1024);
     expect(body.readUrl).toBe("https://r2.test/read");
+  });
+});
+
+describe("POST /api/sample — country disambiguation", () => {
+  it("forwards a request-supplied country so a country-only choice resolves", async () => {
+    // "Cambridge" is ambiguous without a country; the schema accepts `country`, so a caller may
+    // disambiguate that way even when it sends no two-letter code.
+    const res = await POST(
+      request({ city: "Cambridge", country: "United States", countryCode: undefined }),
+      undefined as never,
+    );
+
+    expect(res.status).toBe(200);
+    const profile = enginePayload().profileA as Record<string, unknown>;
+    expect(profile.timezone).toBe("America/New_York");
   });
 });

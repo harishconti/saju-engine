@@ -84,6 +84,10 @@ const ACTIONABLE: Record<string, (context: FailureContext) => string> = {
     sentence(context, `The report engine took too long to answer, so ${SUBJECT[context]} was not generated.`),
   UPLOAD_NOT_VERIFIED: (context) =>
     sentence(context, `${capitalise(SUBJECT[context])} was generated but didn't save correctly.`),
+  // A lost *reading* upload (the engine's `HTML_UPLOAD_FAILED`). `UPLOAD_NOT_VERIFIED` covers a
+  // claimed-but-missing object; this one is the engine telling us the reading never reached storage.
+  HTML_UPLOAD_FAILED: (context) =>
+    sentence(context, `We generated ${SUBJECT[context]}, but the reading didn't save correctly.`),
   ENGINE_UNAVAILABLE: (context) =>
     sentence(context, `The report service isn't reachable at the moment, so ${SUBJECT[context]} could not be generated.`),
   ENGINE_UNREACHABLE: (context) =>
